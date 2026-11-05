@@ -32,7 +32,7 @@ const LinkModal = _LinkModal;
 
 /**
  * Generic search/typeahead input, used by link target types backed by a suggestion service (e.g., the built-in
- * "page" and "attachment" types). Re-exported so that other link target type extensions can reuse it.
+ * "page" and "attachment" types). Re-exported so that other link target types can reuse it.
  *
  * @since 18.10.0RC1
  * @beta

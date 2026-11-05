@@ -23,7 +23,7 @@ import { tryFallible } from "@xwiki/platform-fn-utils";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
 import type { EmailLinkTargetConfig } from "../data/linkType";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
+import type { LinkTargetType } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
@@ -33,9 +33,7 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
  * @beta
  */
 @injectable()
-class EmailLinkTargetType
-  implements LinkTargetTypeExtension<EmailLinkTargetConfig>
-{
+class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
   readonly type = "email";
   readonly order = 200;
 

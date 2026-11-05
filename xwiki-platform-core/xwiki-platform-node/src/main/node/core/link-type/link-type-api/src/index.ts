@@ -21,13 +21,13 @@
 export type { LinkData, LinkTarget } from "./data/linkType";
 export {
   linkTargetToResourceReference,
-  listLinkTargetTypeExtensions,
+  listLinkTargetTypes,
   parseLinkTarget,
   resourceReferenceToLinkTarget,
   serializeLinkTarget,
 } from "./convert";
-export { linkTargetTypeExtensionRole } from "./linkTargetType";
-export type { LinkTargetTypeExtension } from "./linkTargetType";
+export { linkTargetTypeRole } from "./linkTargetType";
+export type { LinkTargetType } from "./linkTargetType";
 export { unsupportedLinkTargetType } from "./unsupportedLinkTarget";
 export type { UnsupportedLinkTargetConfig } from "./unsupportedLinkTarget";
 export { AbstractPlainTextLinkTargetType } from "./plainTextLinkTarget";

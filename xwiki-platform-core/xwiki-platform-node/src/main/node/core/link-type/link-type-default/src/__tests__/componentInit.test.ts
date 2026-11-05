@@ -19,11 +19,11 @@
  */
 import { ComponentInit } from "../componentInit";
 import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
-import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
+import { linkTargetTypeRole } from "@xwiki/platform-link-type-api";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
 import type { LinkTargetTypeForm } from "@xwiki/platform-link-modal-ui";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
+import type { LinkTargetType } from "@xwiki/platform-link-type-api";
 
 /**
  * The built-in page and attachment link target types inject the providers of the model reference and remote URL
@@ -47,11 +47,9 @@ describe("ComponentInit", () => {
     const container = containerWithModelServices();
     new ComponentInit(container);
 
-    const extensions = container.getAll<LinkTargetTypeExtension>(
-      linkTargetTypeExtensionRole,
-    );
+    const targetTypes = container.getAll<LinkTargetType>(linkTargetTypeRole);
 
-    expect(extensions.map((e) => e.type).sort()).toEqual([
+    expect(targetTypes.map((e) => e.type).sort()).toEqual([
       "attachment",
       "email",
       "page",
@@ -63,7 +61,7 @@ describe("ComponentInit", () => {
 
   it("lets a 3rd party add its own link target type into the same container", () => {
     @injectable()
-    class CustomLinkTargetType implements LinkTargetTypeExtension {
+    class CustomLinkTargetType implements LinkTargetType {
       readonly type = "custom";
       getLabel = async () => "Custom";
       createDefaultConfig = () => undefined;
@@ -73,13 +71,11 @@ describe("ComponentInit", () => {
 
     const container = containerWithModelServices();
     new ComponentInit(container);
-    container.bind(linkTargetTypeExtensionRole).to(CustomLinkTargetType);
+    container.bind(linkTargetTypeRole).to(CustomLinkTargetType);
 
-    const extensions = container.getAll<LinkTargetTypeExtension>(
-      linkTargetTypeExtensionRole,
-    );
+    const targetTypes = container.getAll<LinkTargetType>(linkTargetTypeRole);
 
-    expect(extensions.map((e) => e.type).sort()).toEqual([
+    expect(targetTypes.map((e) => e.type).sort()).toEqual([
       "attachment",
       "custom",
       "email",

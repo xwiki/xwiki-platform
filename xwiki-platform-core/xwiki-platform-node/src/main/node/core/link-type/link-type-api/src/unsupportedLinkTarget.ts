@@ -20,9 +20,9 @@
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
- * The type of the link targets pointing to a resource that no registered {@link LinkTargetTypeExtension} supports
+ * The type of the link targets pointing to a resource that no registered {@link LinkTargetType} supports
  * (e.g. an interwiki link written in the wiki syntax), so that such links can still be edited, and saved without
- * changing the reference of the linked resource. This type is reserved: no extension should use it.
+ * changing the reference of the linked resource. This type is reserved: no link target type should use it.
  *
  * @since 18.10.0RC1
  * @beta

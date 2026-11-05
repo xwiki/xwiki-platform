@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ref, watch } from "vue";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
+import type { LinkTargetType } from "@xwiki/platform-link-type-api";
 import type { Ref } from "vue";
 
 /**
@@ -26,17 +26,17 @@ import type { Ref } from "vue";
  * asynchronously (a link target type may fetch its label from the server), so a link target type is labelled with its
  * type until its label is resolved, or when it fails to resolve.
  *
- * @param extensions - the link target types to resolve the labels of
+ * @param targetTypes - the link target types to resolve the labels of
  * @param locale - the locale to resolve the labels in
  * @returns the labels, indexed by link target type
  */
 function useLinkTargetTypeLabels(
-  extensions: LinkTargetTypeExtension[],
+  targetTypes: LinkTargetType[],
   locale: Ref<string>,
 ): Ref<Record<string, string>> {
   const labels = ref<Record<string, string>>(
     Object.fromEntries(
-      extensions.map((extension) => [extension.type, extension.type]),
+      targetTypes.map((targetType) => [targetType.type, targetType.type]),
     ),
   );
 
@@ -47,9 +47,9 @@ function useLinkTargetTypeLabels(
       onCleanup(() => (superseded = true));
 
       const resolvedLabels = await Promise.all(
-        extensions.map(async (extension) => [
-          extension.type,
-          await extension.getLabel(locale).catch(() => extension.type),
+        targetTypes.map(async (targetType) => [
+          targetType.type,
+          await targetType.getLabel(locale).catch(() => targetType.type),
         ]),
       );
 

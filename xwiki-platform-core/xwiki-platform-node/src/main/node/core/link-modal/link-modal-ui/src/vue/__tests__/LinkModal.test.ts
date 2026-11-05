@@ -25,23 +25,20 @@ import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
 import { describe, expect, it } from "vitest";
 import { defineComponent, reactive } from "vue";
 import { createI18n } from "vue-i18n";
-import type {
-  LinkData,
-  LinkTargetTypeExtension,
-} from "@xwiki/platform-link-type-api";
+import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 import type { Component } from "vue";
 
 // A fake link target type, along with its form and options, if any.
-type FakeExtension = LinkTargetTypeExtension & {
+type FakeLinkTargetType = LinkTargetType & {
   fakeForm?: Component;
   fakeOptions?: Component;
 };
 
-// `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetTypeExtension`s and their forms, out
+// `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetType`s and their forms, out
 // of the same `depsContainer`; a minimal fake satisfying every lookup it performs is enough since none of the domain
 // services are exercised in this test (the fake forms below don't use them).
-function fakeDepsContainer(extensions: FakeExtension[]): Container {
+function fakeDepsContainer(targetTypes: FakeLinkTargetType[]): Container {
   const noopProvider = { get: () => null };
   const providers: Record<string, unknown> = {
     LinkSuggestServiceProvider: noopProvider,
@@ -53,14 +50,14 @@ function fakeDepsContainer(extensions: FakeExtension[]): Container {
     AttachmentsService: {},
     DocumentService: {},
   };
-  const forms = extensions.flatMap((extension) =>
-    extension.fakeForm
+  const forms = targetTypes.flatMap((targetType) =>
+    targetType.fakeForm
       ? [
           {
-            type: extension.type,
-            component: () => extension.fakeForm,
-            optionsComponent: extension.fakeOptions
-              ? () => extension.fakeOptions
+            type: targetType.type,
+            component: () => targetType.fakeForm,
+            optionsComponent: targetType.fakeOptions
+              ? () => targetType.fakeOptions
               : undefined,
           },
         ]
@@ -71,7 +68,7 @@ function fakeDepsContainer(extensions: FakeExtension[]): Container {
     isBound: (token: string) =>
       token === linkTargetTypeFormRole ? forms.length > 0 : true,
     getAll: (token: string) =>
-      token === linkTargetTypeFormRole ? forms : extensions,
+      token === linkTargetTypeFormRole ? forms : targetTypes,
   } as unknown as Container;
 }
 
@@ -79,12 +76,12 @@ function fakeDepsContainer(extensions: FakeExtension[]): Container {
  * @param form - the form of the link target type, or `undefined` to register it without a form
  * @param options - the options of the link target type, if any
  */
-function fakeExtension(
+function fakeLinkTargetType(
   type: string,
   label: string,
   form?: Component,
   options?: Component,
-): FakeExtension {
+): FakeLinkTargetType {
   return {
     type,
     getLabel: async () => label,
@@ -98,7 +95,7 @@ function fakeExtension(
 
 function mountLinkModal(
   current: LinkData,
-  extensions: FakeExtension[] = [],
+  targetTypes: FakeLinkTargetType[] = [],
   excludedLinkTargetTypes?: string[],
 ) {
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
@@ -106,7 +103,7 @@ function mountLinkModal(
   return mount(LinkModal, {
     props: {
       current,
-      depsContainer: fakeDepsContainer(extensions),
+      depsContainer: fakeDepsContainer(targetTypes),
       excludedLinkTargetTypes,
     },
     global: { plugins: [i18n], components: dsComponentStubs },
@@ -116,8 +113,11 @@ function mountLinkModal(
 /**
  * @returns a fake link target type with a form displaying its label
  */
-function fakeExtensionWithForm(type: string, label: string): FakeExtension {
-  return fakeExtension(
+function fakeLinkTargetTypeWithForm(
+  type: string,
+  label: string,
+): FakeLinkTargetType {
+  return fakeLinkTargetType(
     type,
     label,
     defineComponent({ template: `<div>form-${type}</div>` }),
@@ -156,13 +156,13 @@ function linkTypeOptions(wrapper: ReturnType<typeof mountLinkModal>) {
 
 describe("LinkModal", () => {
   it("renders the configuration component matching the current target's type, on the first render", () => {
-    const extensions = [
-      fakeExtension(
+    const targetTypes = [
+      fakeLinkTargetType(
         "a",
         "A",
         defineComponent({ template: "<div>component-a</div>" }),
       ),
-      fakeExtension(
+      fakeLinkTargetType(
         "b",
         "B",
         defineComponent({ template: "<div>component-b</div>" }),
@@ -171,7 +171,7 @@ describe("LinkModal", () => {
 
     const wrapper = mountLinkModal(
       { displayText: "", target: { type: "b", config: {} } },
-      extensions,
+      targetTypes,
     );
 
     // No `flushPromises()`/`nextTick()` wait: everything resolves synchronously, so the correct component is
@@ -181,13 +181,13 @@ describe("LinkModal", () => {
   });
 
   it("swaps the rendered component when the target's type changes", async () => {
-    const extensions = [
-      fakeExtension(
+    const targetTypes = [
+      fakeLinkTargetType(
         "a",
         "A",
         defineComponent({ template: "<div>component-a</div>" }),
       ),
-      fakeExtension(
+      fakeLinkTargetType(
         "b",
         "B",
         defineComponent({ template: "<div>component-b</div>" }),
@@ -201,12 +201,12 @@ describe("LinkModal", () => {
       displayText: "",
       target: { type: "a", config: {} },
     });
-    const wrapper = mountLinkModal(current, extensions);
+    const wrapper = mountLinkModal(current, targetTypes);
     expect(wrapper.text()).toContain("component-a");
 
     current.target = { type: "b", config: {} };
     // Vue batches and flushes reactive DOM updates on the next tick, even when the underlying computation is
-    // synchronous — this waits for that render, not for any extension/component resolution.
+    // synchronous — this waits for that render, not for any link target type/component resolution.
     await flushPromises();
 
     expect(wrapper.text()).toContain("component-b");
@@ -214,8 +214,8 @@ describe("LinkModal", () => {
   });
 
   it("emits submit with the current link data when the submit button is clicked", async () => {
-    const extensions = [
-      fakeExtension(
+    const targetTypes = [
+      fakeLinkTargetType(
         "a",
         "A",
         defineComponent({ template: "<div>component-a</div>" }),
@@ -226,7 +226,7 @@ describe("LinkModal", () => {
       displayText: "hello",
       target: { type: "a", config: {} },
     };
-    const wrapper = mountLinkModal(current, extensions);
+    const wrapper = mountLinkModal(current, targetTypes);
 
     await wrapper.find("[data-test='linkSubmit']").trigger("click");
 
@@ -235,7 +235,7 @@ describe("LinkModal", () => {
 
   it("edits the reference of a link to an unsupported resource as plain text, keeping its type", async () => {
     const wrapper = mountLinkModal(unsupportedLinkData(), [
-      fakeExtension(
+      fakeLinkTargetType(
         "a",
         "A",
         defineComponent({ template: "<div>component-a</div>" }),
@@ -264,7 +264,7 @@ describe("LinkModal", () => {
 
   it("offers an unsupported resource type first, as is, and restores its reference when reselected", async () => {
     const wrapper = mountLinkModal(unsupportedLinkData(), [
-      fakeExtensionWithForm("a", "A"),
+      fakeLinkTargetTypeWithForm("a", "A"),
     ]);
     await flushPromises();
     expect(linkTypeOptions(wrapper)).toEqual([
@@ -288,7 +288,7 @@ describe("LinkModal", () => {
     const wrapper = mountLinkModal(
       { displayText: "", target: { type: "a", config: {} } },
       ["a", "b", "c"].map((type) =>
-        fakeExtensionWithForm(type, type.toUpperCase()),
+        fakeLinkTargetTypeWithForm(type, type.toUpperCase()),
       ),
       ["b", "unknown"],
     );
@@ -303,7 +303,9 @@ describe("LinkModal", () => {
   it("offers the type of the edited link even when it's excluded, to edit the link with it", async () => {
     const wrapper = mountLinkModal(
       { displayText: "", target: { type: "b", config: {} } },
-      ["a", "b"].map((type) => fakeExtensionWithForm(type, type.toUpperCase())),
+      ["a", "b"].map((type) =>
+        fakeLinkTargetTypeWithForm(type, type.toUpperCase()),
+      ),
       ["b"],
     );
     await flushPromises();
@@ -327,7 +329,7 @@ describe("LinkModal", () => {
         displayText: "",
         target: { type: "jira", config: { location: "XWIKI-1" } },
       },
-      [fakeExtension("jira", "Jira issue")],
+      [fakeLinkTargetType("jira", "Jira issue")],
     );
     await flushPromises();
 
@@ -348,13 +350,13 @@ describe("LinkModal", () => {
     const wrapper = mountLinkModal(
       { displayText: "", target: { type: "a", config: {} } },
       [
-        fakeExtension(
+        fakeLinkTargetType(
           "a",
           "A",
           defineComponent({ template: "<div>fields-a</div>" }),
           defineComponent({ template: "<div>options-a</div>" }),
         ),
-        fakeExtensionWithForm("b", "B"),
+        fakeLinkTargetTypeWithForm("b", "B"),
       ],
     );
     await flushPromises();

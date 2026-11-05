@@ -22,7 +22,7 @@
  * Target of a link: its type and its type-specific configuration.
  *
  * The set of valid `type`/`config` combinations is open-ended: it is defined by whichever
- * {@link LinkTargetTypeExtension} implementations are registered (the built-in ones, provided by
+ * {@link LinkTargetType} implementations are registered (the built-in ones, provided by
  * `@xwiki/platform-link-type-default`, contribute `"page"`, `"attachment"`, `"url"` and `"email"`), rather than
  * being a fixed, closed set of types.
  *

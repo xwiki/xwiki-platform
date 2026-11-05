@@ -26,8 +26,8 @@ import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { inject, injectable } from "inversify";
-import type { PageLinkTargetConfig } from "../data/linkType";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
+import type { AttachmentLinkTargetConfig } from "../data/linkType";
+import type { LinkTargetType } from "@xwiki/platform-link-type-api";
 import type {
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
@@ -39,17 +39,17 @@ import type {
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
- * Built-in link target type for links to an internal wiki page.
+ * Built-in link target type for links to an attachment.
  *
  * @since 18.10.0RC1
  * @beta
  */
 @injectable()
-class PageLinkTargetType
-  implements LinkTargetTypeExtension<PageLinkTargetConfig>
+class AttachmentLinkTargetType
+  implements LinkTargetType<AttachmentLinkTargetConfig>
 {
-  readonly type = "page";
-  readonly order = 0;
+  readonly type = "attachment";
+  readonly order = 100;
 
   constructor(
     @inject("RemoteURLParserProvider")
@@ -62,22 +62,18 @@ class PageLinkTargetType
     private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
   ) {}
 
-  getLabel = labelFromTranslations("link-type.target-types.page.label");
+  getLabel = labelFromTranslations("link-type.target-types.attachment.label");
 
-  createDefaultConfig(): PageLinkTargetConfig {
+  createDefaultConfig(): AttachmentLinkTargetConfig {
     return { ref: null };
   }
 
-  tryParseURL(url: string): PageLinkTargetConfig | null {
-    if (url.trim() === "") {
-      return { ref: null };
-    }
-
+  tryParseURL(url: string): AttachmentLinkTargetConfig | null {
     const ref = tryFallible(() =>
       this.remoteURLParserProvider.get()?.parse(url),
     );
 
-    if (ref?.type !== EntityType.DOCUMENT) {
+    if (ref?.type !== EntityType.ATTACHMENT) {
       return null;
     }
 
@@ -85,42 +81,43 @@ class PageLinkTargetType
 
     return {
       ref,
-      anchor: parsedURL?.hash,
       queryString: parsedURL?.search,
     };
   }
 
-  serializeURL({ ref, queryString, anchor }: PageLinkTargetConfig): string {
+  serializeURL({ ref, queryString }: AttachmentLinkTargetConfig): string {
     const base = this.remoteURLSerializerProvider
       .get()
       ?.serialize(ref ?? undefined);
 
-    return `${base ?? ""}${queryString ?? ""}${anchor ?? ""}`;
+    return `${base ?? ""}${queryString ?? ""}`;
   }
 
-  tryParseReference(reference: ResourceReference): PageLinkTargetConfig | null {
-    if (reference.type !== ResourceType.DOCUMENT) {
+  tryParseReference(
+    reference: ResourceReference,
+  ): AttachmentLinkTargetConfig | null {
+    if (reference.type !== ResourceType.ATTACHMENT) {
       return null;
     }
 
     const ref = parseEntityReference(
       reference.reference,
-      EntityType.DOCUMENT,
+      EntityType.ATTACHMENT,
       this.modelReferenceParserProvider,
     );
 
-    return ref?.type === EntityType.DOCUMENT ? { ref } : null;
+    return ref?.type === EntityType.ATTACHMENT ? { ref } : null;
   }
 
   configToReference({
     ref,
-  }: PageLinkTargetConfig): ResourceReference | undefined {
+  }: AttachmentLinkTargetConfig): ResourceReference | undefined {
     return entityResourceReference(
-      ResourceType.DOCUMENT,
+      ResourceType.ATTACHMENT,
       ref,
       this.modelReferenceSerializerProvider,
     );
   }
 }
 
-export { PageLinkTargetType };
+export { AttachmentLinkTargetType };

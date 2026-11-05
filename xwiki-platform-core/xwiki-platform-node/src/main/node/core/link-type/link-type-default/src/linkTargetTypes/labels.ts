@@ -20,8 +20,8 @@
 import { translations } from "../translations";
 
 /**
- * Build a {@link LinkTargetTypeExtension.getLabel} implementation resolving a label from this package's own
- * bundled translations, given `LinkTargetTypeExtension` implementations are plain objects and cannot rely on the
+ * Build a {@link LinkTargetType.getLabel} implementation resolving a label from this package's own
+ * bundled translations, given `LinkTargetType` implementations are plain objects and cannot rely on the
  * Vue composition API (`useI18n()`) to resolve their own label.
  *
  * @param key - the translation key to resolve

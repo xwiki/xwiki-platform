@@ -21,31 +21,31 @@ import { URLLinkTargetType } from "../URLLinkTargetType";
 import { describe, expect, it } from "vitest";
 
 describe("URLLinkTargetType", () => {
-  const extension = new URLLinkTargetType();
+  const targetType = new URLLinkTargetType();
 
   it("has the expected identity, and the lowest possible priority (highest order)", async () => {
-    expect(extension.type).toBe("url");
-    expect(extension.order).toBe(Number.MAX_SAFE_INTEGER);
-    await expect(extension.getLabel("en")).resolves.toBe("URL");
+    expect(targetType.type).toBe("url");
+    expect(targetType.order).toBe(Number.MAX_SAFE_INTEGER);
+    await expect(targetType.getLabel("en")).resolves.toBe("URL");
   });
 
   it("matches any URL, unconditionally", () => {
     expect(
-      extension.tryParseURL("anything at all, not even a valid URL"),
+      targetType.tryParseURL("anything at all, not even a valid URL"),
     ).toEqual({
       location: "anything at all, not even a valid URL",
     });
   });
 
   it("serializes back to the exact same URL", () => {
-    expect(extension.serializeURL({ location: "https://example.org" })).toBe(
+    expect(targetType.serializeURL({ location: "https://example.org" })).toBe(
       "https://example.org",
     );
   });
 
   it("converts a URL reference into its URL", () => {
     expect(
-      extension.tryParseReference?.({
+      targetType.tryParseReference?.({
         type: "url",
         typed: false,
         reference: "https://example.org",
@@ -58,7 +58,7 @@ describe("URLLinkTargetType", () => {
     ["doc", "attach", "mailto", "path", "unc", "unknown", "interwiki"].forEach(
       (type) => {
         expect(
-          extension.tryParseReference?.({
+          targetType.tryParseReference?.({
             type,
             typed: true,
             reference: "Space.Page",
@@ -71,7 +71,7 @@ describe("URLLinkTargetType", () => {
 
   it("converts a URL config back into an untyped reference", () => {
     expect(
-      extension.configToReference?.({ location: "https://example.org" }),
+      targetType.configToReference?.({ location: "https://example.org" }),
     ).toEqual({
       type: "url",
       typed: false,
@@ -81,6 +81,6 @@ describe("URLLinkTargetType", () => {
   });
 
   it("returns undefined when converting to a reference with an empty URL", () => {
-    expect(extension.configToReference?.({ location: "  " })).toBeUndefined();
+    expect(targetType.configToReference?.({ location: "  " })).toBeUndefined();
   });
 });

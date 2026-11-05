@@ -8,7 +8,7 @@ import { AbstractPlainTextLinkTargetType } from '@xwiki/platform-link-type-api';
 import { AttachmentReference } from '@xwiki/platform-model-api';
 import { Container } from 'inversify';
 import { DocumentReference } from '@xwiki/platform-model-api';
-import { LinkTargetTypeExtension } from '@xwiki/platform-link-type-api';
+import { LinkTargetType } from '@xwiki/platform-link-type-api';
 import { ModelReferenceParserProvider } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceSerializerProvider } from '@xwiki/platform-model-reference-api';
 import { PlainTextLinkTargetConfig } from '@xwiki/platform-link-type-api';
@@ -23,7 +23,7 @@ export type AttachmentLinkTargetConfig = {
 };
 
 // @beta
-export class AttachmentLinkTargetType implements LinkTargetTypeExtension<AttachmentLinkTargetConfig> {
+export class AttachmentLinkTargetType implements LinkTargetType<AttachmentLinkTargetConfig> {
     constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
     // (undocumented)
     configToReference(input: AttachmentLinkTargetConfig): ResourceReference | undefined;
@@ -56,7 +56,7 @@ export type EmailLinkTargetConfig = {
 };
 
 // @beta
-export class EmailLinkTargetType implements LinkTargetTypeExtension<EmailLinkTargetConfig> {
+export class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
     // (undocumented)
     configToReference(input: EmailLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
@@ -83,7 +83,7 @@ export type PageLinkTargetConfig = {
 };
 
 // @beta
-export class PageLinkTargetType implements LinkTargetTypeExtension<PageLinkTargetConfig> {
+export class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
     // (undocumented)
     configToReference(input: PageLinkTargetConfig): ResourceReference | undefined;

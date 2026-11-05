@@ -17,65 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { linkTargetTypeExtensionRole } from "./linkTargetType";
+import { linkTargetTypeRole } from "./linkTargetType";
 import { unsupportedLinkTargetType } from "./unsupportedLinkTarget";
 import type { LinkTarget } from "./data/linkType";
-import type { LinkTargetTypeExtension } from "./linkTargetType";
+import type { LinkTargetType } from "./linkTargetType";
 import type { UnsupportedLinkTargetConfig } from "./unsupportedLinkTarget";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
 
 /**
- * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
- * @returns every registered link target type extension, sorted by ascending {@link LinkTargetTypeExtension.order}
+ * @param container - the `depsContainer` to look up registered {@link LinkTargetType}s from
+ * @returns every registered link target type, sorted by ascending {@link LinkTargetType.order}
  *
  * @since 18.10.0RC1
  * @beta
  */
-function listLinkTargetTypeExtensions(
-  container: Container,
-): LinkTargetTypeExtension[] {
-  const extensions = container.getAll<LinkTargetTypeExtension>(
-    linkTargetTypeExtensionRole,
-  );
+function listLinkTargetTypes(container: Container): LinkTargetType[] {
+  const targetTypes = container.getAll<LinkTargetType>(linkTargetTypeRole);
 
-  return [...extensions].sort((a, b) => (a.order ?? 1000) - (b.order ?? 1000));
+  return [...targetTypes].sort((a, b) => (a.order ?? 1000) - (b.order ?? 1000));
 }
 
 /**
- * Parse a link target from a raw URL, by trying each registered {@link LinkTargetTypeExtension} in ascending
- * {@link LinkTargetTypeExtension.order}, and keeping the first one that matches (see
- * {@link LinkTargetTypeExtension.tryParseURL}).
+ * Parse a link target from a raw URL, by trying each registered {@link LinkTargetType} in ascending
+ * {@link LinkTargetType.order}, and keeping the first one that matches (see
+ * {@link LinkTargetType.tryParseURL}).
  *
  * @param url - the URL to parse
  * @param container - the `depsContainer` to look up registered link target types from
  *
  * @returns the parsed link target
  *
- * @throws {@link Error} when no registered extension matches the URL (should not happen as long as a
- *   permissive catch-all extension, such as the built-in `"url"` type, is registered)
+ * @throws {@link Error} when no registered link target type matches the URL (should not happen as long as a
+ *   permissive catch-all link target type, such as the built-in `"url"` type, is registered)
  *
  * @since 18.10.0RC1
  * @beta
  */
 function parseLinkTarget(url: string, container: Container): LinkTarget {
-  const extensions = listLinkTargetTypeExtensions(container);
+  const targetTypes = listLinkTargetTypes(container);
 
-  for (const extension of extensions) {
-    const config = extension.tryParseURL(url);
+  for (const targetType of targetTypes) {
+    const config = targetType.tryParseURL(url);
 
     if (config !== null) {
-      return { type: extension.type, config };
+      return { type: targetType.type, config };
     }
   }
 
-  throw new Error(
-    `No link target type extension could parse this URL: "${url}"`,
-  );
+  throw new Error(`No link target type could parse this URL: "${url}"`);
 }
 
 /**
- * Serialize a link target back into a raw URL, using the registered {@link LinkTargetTypeExtension} matching
+ * Serialize a link target back into a raw URL, using the registered {@link LinkTargetType} matching
  * its `type` field. The reverse of {@link parseLinkTarget}.
  *
  * @param target - the link target to serialize
@@ -83,36 +77,37 @@ function parseLinkTarget(url: string, container: Container): LinkTarget {
  *
  * @returns the serialized URL
  *
- * @throws {@link Error} when no registered extension matches `target.type`, which is also the case for a target of
- *   the {@link unsupportedLinkTargetType} type: the URL of an unsupported resource can't be computed client-side
+ * @throws {@link Error} when no registered link target type matches `target.type`, which is also the case for a
+ *   target of the {@link unsupportedLinkTargetType} type: the URL of an unsupported resource can't be computed
+ *   client-side
  *
  * @since 18.10.0RC1
  * @beta
  */
 function serializeLinkTarget(target: LinkTarget, container: Container): string {
-  const extensions = listLinkTargetTypeExtensions(container);
-  const extension = extensions.find((e) => e.type === target.type);
+  const targetTypes = listLinkTargetTypes(container);
+  const targetType = targetTypes.find(
+    (candidate) => candidate.type === target.type,
+  );
 
-  if (!extension) {
-    throw new Error(
-      `No registered link target type extension for type "${target.type}"`,
-    );
+  if (!targetType) {
+    throw new Error(`No registered link target type for type "${target.type}"`);
   }
 
-  return extension.serializeURL(target.config);
+  return targetType.serializeURL(target.config);
 }
 
 /**
  * Convert the reference of a linked resource into the link target used to configure it in the link
- * modal, by trying each registered {@link LinkTargetTypeExtension} in ascending
- * {@link LinkTargetTypeExtension.order} (see {@link LinkTargetTypeExtension.tryParseReference}). The
+ * modal, by trying each registered {@link LinkTargetType} in ascending
+ * {@link LinkTargetType.order} (see {@link LinkTargetType.tryParseReference}). The
  * reverse of {@link linkTargetToResourceReference}.
  *
  * @param reference - the reference of the linked resource
  * @param container - the `depsContainer` to look up registered link target types from
  *
  * @returns the matching link target, or a target of the {@link unsupportedLinkTargetType} type holding a copy of the
- *   reference when no registered extension claims this resource type, so that the link can be edited without
+ *   reference when no registered link target type claims this resource type, so that the link can be edited without
  *   changing the type of the linked resource
  *
  * @since 18.10.0RC1
@@ -122,13 +117,13 @@ function resourceReferenceToLinkTarget(
   reference: ResourceReference,
   container: Container,
 ): LinkTarget {
-  const extensions = listLinkTargetTypeExtensions(container);
+  const targetTypes = listLinkTargetTypes(container);
 
-  for (const extension of extensions) {
-    const config = extension.tryParseReference?.(reference) ?? null;
+  for (const targetType of targetTypes) {
+    const config = targetType.tryParseReference?.(reference) ?? null;
 
     if (config !== null) {
-      return { type: extension.type, config };
+      return { type: targetType.type, config };
     }
   }
 
@@ -143,15 +138,15 @@ function resourceReferenceToLinkTarget(
 
 /**
  * Convert a link target into the reference of the resource it designates, using the registered
- * {@link LinkTargetTypeExtension} matching its `type` field. The reverse of
+ * {@link LinkTargetType} matching its `type` field. The reverse of
  * {@link resourceReferenceToLinkTarget}.
  *
  * @param target - the link target to convert
  * @param container - the `depsContainer` to look up registered link target types from
  *
- * @returns the reference of the linked resource, or `undefined` when no registered extension matches
- *   `target.type`, or when the matching extension doesn't implement
- *   {@link LinkTargetTypeExtension.configToReference}, or when it does but the configuration doesn't
+ * @returns the reference of the linked resource, or `undefined` when no registered link target type matches
+ *   `target.type`, or when the matching link target type doesn't implement
+ *   {@link LinkTargetType.configToReference}, or when it does but the configuration doesn't
  *   designate a resource yet (e.g. no page selected, empty URL). A target of the {@link unsupportedLinkTargetType}
  *   type is converted to the reference it holds, unless that reference is empty.
  *
@@ -167,15 +162,17 @@ function linkTargetToResourceReference(
     return reference.reference.trim() === "" ? undefined : reference;
   }
 
-  const extensions = listLinkTargetTypeExtensions(container);
-  const extension = extensions.find((e) => e.type === target.type);
+  const targetTypes = listLinkTargetTypes(container);
+  const targetType = targetTypes.find(
+    (candidate) => candidate.type === target.type,
+  );
 
-  return extension?.configToReference?.(target.config);
+  return targetType?.configToReference?.(target.config);
 }
 
 export {
   linkTargetToResourceReference,
-  listLinkTargetTypeExtensions,
+  listLinkTargetTypes,
   parseLinkTarget,
   resourceReferenceToLinkTarget,
   serializeLinkTarget,

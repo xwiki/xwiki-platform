@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AttachmentLinkTargetType } from "./extensions/AttachmentLinkTargetType";
-import { EmailLinkTargetType } from "./extensions/EmailLinkTargetType";
-import { PageLinkTargetType } from "./extensions/PageLinkTargetType";
-import { PathLinkTargetType } from "./extensions/PathLinkTargetType";
-import { UNCLinkTargetType } from "./extensions/UNCLinkTargetType";
-import { URLLinkTargetType } from "./extensions/URLLinkTargetType";
+import { AttachmentLinkTargetType } from "./linkTargetTypes/AttachmentLinkTargetType";
+import { EmailLinkTargetType } from "./linkTargetTypes/EmailLinkTargetType";
+import { PageLinkTargetType } from "./linkTargetTypes/PageLinkTargetType";
+import { PathLinkTargetType } from "./linkTargetTypes/PathLinkTargetType";
+import { UNCLinkTargetType } from "./linkTargetTypes/UNCLinkTargetType";
+import { URLLinkTargetType } from "./linkTargetTypes/URLLinkTargetType";
 import AttachmentLinkTargetForm from "./vue/AttachmentLinkTargetForm.vue";
 import AttachmentLinkTargetOptions from "./vue/AttachmentLinkTargetOptions.vue";
 import EmailLinkTargetForm from "./vue/EmailLinkTargetForm.vue";
@@ -31,15 +31,15 @@ import PageLinkTargetForm from "./vue/PageLinkTargetForm.vue";
 import PageLinkTargetOptions from "./vue/PageLinkTargetOptions.vue";
 import { URLLinkTargetForm } from "./vue/URLLinkTargetForm";
 import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
-import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
+import { linkTargetTypeRole } from "@xwiki/platform-link-type-api";
 import type { LinkTargetTypeForm } from "@xwiki/platform-link-modal-ui";
 import type { Container } from "inversify";
 import type { Component } from "vue";
 
 /**
  * Registers the built-in link target types (page, attachment, email, path, UNC path, URL) against the given
- * `depsContainer`, as unconstrained bindings of {@link linkTargetTypeExtensionRole} — see
- * `@xwiki/platform-link-type-api`'s `LinkTargetTypeExtension` for the rationale (mirrors
+ * `depsContainer`, as unconstrained bindings of {@link linkTargetTypeRole} — see
+ * `@xwiki/platform-link-type-api`'s `LinkTargetType` for the rationale (mirrors
  * `@xwiki/platform-markdown-syntax-config` and its siblings' own `"SyntaxConfig"` registration).
  *
  * Registers also the forms of these link target types, as bindings of `linkTargetTypeFormRole` (see
@@ -47,19 +47,19 @@ import type { Component } from "vue";
  * that the link modal uses for the link target types without a form.
  *
  * A consumer that does not want one (or several) of the built-in link target types (e.g. to offer a reduced set)
- * should simply not instantiate this class, and instead register only the extensions it wants, the same way.
+ * should simply not instantiate this class, and instead register only the link target types it wants, the same way.
  *
  * @since 18.10.0RC1
  * @beta
  */
 class ComponentInit {
   constructor(container: Container) {
-    container.bind(linkTargetTypeExtensionRole).to(PageLinkTargetType);
-    container.bind(linkTargetTypeExtensionRole).to(AttachmentLinkTargetType);
-    container.bind(linkTargetTypeExtensionRole).to(EmailLinkTargetType);
-    container.bind(linkTargetTypeExtensionRole).to(PathLinkTargetType);
-    container.bind(linkTargetTypeExtensionRole).to(UNCLinkTargetType);
-    container.bind(linkTargetTypeExtensionRole).to(URLLinkTargetType);
+    container.bind(linkTargetTypeRole).to(PageLinkTargetType);
+    container.bind(linkTargetTypeRole).to(AttachmentLinkTargetType);
+    container.bind(linkTargetTypeRole).to(EmailLinkTargetType);
+    container.bind(linkTargetTypeRole).to(PathLinkTargetType);
+    container.bind(linkTargetTypeRole).to(UNCLinkTargetType);
+    container.bind(linkTargetTypeRole).to(URLLinkTargetType);
 
     bindForm(container, "page", PageLinkTargetForm, PageLinkTargetOptions);
     bindForm(

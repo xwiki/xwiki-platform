@@ -23,15 +23,15 @@ import {
   resourceReferenceToLinkTarget,
   serializeLinkTarget,
 } from "../convert";
-import { linkTargetTypeExtensionRole } from "../linkTargetType";
+import { linkTargetTypeRole } from "../linkTargetType";
 import { unsupportedLinkTargetType } from "../unsupportedLinkTarget";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
-import type { LinkTargetTypeExtension } from "../linkTargetType";
+import type { LinkTargetType } from "../linkTargetType";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 @injectable()
-class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
+class CatchAllTargetType implements LinkTargetType<{ url: string }> {
   readonly type = "url";
   readonly order = Number.MAX_SAFE_INTEGER;
   getLabel = async () => "URL";
@@ -50,7 +50,7 @@ class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
 }
 
 @injectable()
-class PageExtension implements LinkTargetTypeExtension<{ ref: string }> {
+class PageTargetType implements LinkTargetType<{ ref: string }> {
   readonly type = "page";
   readonly order = 0;
   getLabel = async () => "Page";
@@ -68,12 +68,10 @@ class PageExtension implements LinkTargetTypeExtension<{ ref: string }> {
   });
 }
 
-// Deliberately doesn't implement tryParseReference/configToReference, to exercise the "extension
+// Deliberately doesn't implement tryParseReference/configToReference, to exercise the "link target type
 // doesn't support reference conversion" skip path.
 @injectable()
-class NoReferenceSupportExtension
-  implements LinkTargetTypeExtension<{ ref: string }>
-{
+class NoReferenceSupportTargetType implements LinkTargetType<{ ref: string }> {
   readonly type = "no-reference-support";
   readonly order = 50;
   getLabel = async () => "No reference support";
@@ -82,21 +80,19 @@ class NoReferenceSupportExtension
   serializeURL = (config: { ref: string }) => config.ref;
 }
 
-function buildContainer(
-  extensions: (new () => LinkTargetTypeExtension)[],
-): Container {
+function buildContainer(targetTypes: (new () => LinkTargetType)[]): Container {
   const container = new Container();
 
-  extensions.forEach((extension) => {
-    container.bind(linkTargetTypeExtensionRole).to(extension);
+  targetTypes.forEach((targetType) => {
+    container.bind(linkTargetTypeRole).to(targetType);
   });
 
   return container;
 }
 
 describe("parseLinkTarget", () => {
-  it("returns the type contributed by the first matching extension, in order", () => {
-    const container = buildContainer([CatchAllExtension, PageExtension]);
+  it("returns the type contributed by the first matching link target type, in order", () => {
+    const container = buildContainer([CatchAllTargetType, PageTargetType]);
 
     const target = parseLinkTarget("page:Some.Page", container);
 
@@ -104,7 +100,7 @@ describe("parseLinkTarget", () => {
   });
 
   it("falls back to the catch-all (lowest order) when nothing else matches", () => {
-    const container = buildContainer([CatchAllExtension, PageExtension]);
+    const container = buildContainer([CatchAllTargetType, PageTargetType]);
 
     const target = parseLinkTarget("https://example.org", container);
 
@@ -114,16 +110,16 @@ describe("parseLinkTarget", () => {
     });
   });
 
-  it("throws when no registered extension matches", () => {
-    const container = buildContainer([PageExtension]);
+  it("throws when no registered link target type matches", () => {
+    const container = buildContainer([PageTargetType]);
 
     expect(() => parseLinkTarget("https://example.org", container)).toThrow();
   });
 });
 
 describe("serializeLinkTarget", () => {
-  it("serializes using the extension matching the target's type", () => {
-    const container = buildContainer([CatchAllExtension, PageExtension]);
+  it("serializes using the link target type matching the target's type", () => {
+    const container = buildContainer([CatchAllTargetType, PageTargetType]);
 
     const url = serializeLinkTarget(
       { type: "page", config: { ref: "Some.Page" } },
@@ -133,8 +129,8 @@ describe("serializeLinkTarget", () => {
     expect(url).toBe("page:Some.Page");
   });
 
-  it("throws when no registered extension matches the target's type", () => {
-    const container = buildContainer([PageExtension]);
+  it("throws when no registered link target type matches the target's type", () => {
+    const container = buildContainer([PageTargetType]);
 
     expect(() =>
       serializeLinkTarget({ type: "email", config: {} }, container),
@@ -143,8 +139,8 @@ describe("serializeLinkTarget", () => {
 });
 
 describe("resourceReferenceToLinkTarget", () => {
-  it("returns the type contributed by the first matching extension, in order", () => {
-    const container = buildContainer([CatchAllExtension, PageExtension]);
+  it("returns the type contributed by the first matching link target type, in order", () => {
+    const container = buildContainer([CatchAllTargetType, PageTargetType]);
 
     const target = resourceReferenceToLinkTarget(
       { type: "doc", typed: true, reference: "Some.Page", parameters: {} },
@@ -154,10 +150,10 @@ describe("resourceReferenceToLinkTarget", () => {
     expect(target).toEqual({ type: "page", config: { ref: "Some.Page" } });
   });
 
-  it("skips extensions that don't implement tryParseReference", () => {
+  it("skips the link target types that don't implement tryParseReference", () => {
     const container = buildContainer([
-      NoReferenceSupportExtension,
-      PageExtension,
+      NoReferenceSupportTargetType,
+      PageTargetType,
     ]);
 
     const target = resourceReferenceToLinkTarget(
@@ -168,8 +164,8 @@ describe("resourceReferenceToLinkTarget", () => {
     expect(target).toEqual({ type: "page", config: { ref: "Some.Page" } });
   });
 
-  it("returns an unsupported target holding a copy of the reference when no extension claims its type", () => {
-    const container = buildContainer([PageExtension]);
+  it("returns an unsupported target holding a copy of the reference when no link target type claims its type", () => {
+    const container = buildContainer([PageTargetType]);
     const reference = {
       type: "interwiki",
       typed: true,
@@ -200,8 +196,8 @@ describe("resourceReferenceToLinkTarget", () => {
 });
 
 describe("linkTargetToResourceReference", () => {
-  it("converts using the extension matching the target's type", () => {
-    const container = buildContainer([CatchAllExtension, PageExtension]);
+  it("converts using the link target type matching the target's type", () => {
+    const container = buildContainer([CatchAllTargetType, PageTargetType]);
 
     const reference = linkTargetToResourceReference(
       { type: "page", config: { ref: "Some.Page" } },
@@ -216,8 +212,8 @@ describe("linkTargetToResourceReference", () => {
     });
   });
 
-  it("returns undefined when the matching extension doesn't implement configToReference", () => {
-    const container = buildContainer([NoReferenceSupportExtension]);
+  it("returns undefined when the matching link target type doesn't implement configToReference", () => {
+    const container = buildContainer([NoReferenceSupportTargetType]);
 
     const reference = linkTargetToResourceReference(
       { type: "no-reference-support", config: { ref: "x" } },
@@ -228,7 +224,7 @@ describe("linkTargetToResourceReference", () => {
   });
 
   it("returns the reference held by an unsupported target, keeping its type, typed flag and parameters", () => {
-    const container = buildContainer([PageExtension]);
+    const container = buildContainer([PageTargetType]);
     const reference = {
       type: "interwiki",
       typed: false,
@@ -245,7 +241,7 @@ describe("linkTargetToResourceReference", () => {
   });
 
   it("returns undefined for an unsupported target with an empty reference", () => {
-    const container = buildContainer([PageExtension]);
+    const container = buildContainer([PageTargetType]);
 
     expect(
       linkTargetToResourceReference(
@@ -265,8 +261,8 @@ describe("linkTargetToResourceReference", () => {
     ).toBeUndefined();
   });
 
-  it("returns undefined when no registered extension matches the target's type", () => {
-    const container = buildContainer([PageExtension]);
+  it("returns undefined when no registered link target type matches the target's type", () => {
+    const container = buildContainer([PageTargetType]);
 
     const reference = linkTargetToResourceReference(
       { type: "email", config: {} },

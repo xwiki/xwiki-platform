@@ -23,7 +23,7 @@ import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
   LinkData,
-  LinkTargetTypeExtension,
+  LinkTargetType,
   PlainTextLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
 import type { Component, PropType } from "vue";
@@ -32,10 +32,10 @@ import type { Component, PropType } from "vue";
  * Create the form of a link target type registered without a form: its configuration is a plain text location (see
  * `PlainTextLinkTargetConfig`), edited with a plain text field labelled with the label of the link target type.
  *
- * @param extension - the link target type registered without a form
+ * @param targetType - the link target type registered without a form
  * @returns the form component
  */
-function plainTextFallbackForm(extension: LinkTargetTypeExtension): Component {
+function plainTextFallbackForm(targetType: LinkTargetType): Component {
   return defineComponent({
     props: {
       linkData: { type: Object as PropType<LinkData>, required: true },
@@ -47,14 +47,14 @@ function plainTextFallbackForm(extension: LinkTargetTypeExtension): Component {
     emits: ["update:modelValue"],
     setup(props, { emit }) {
       const { locale } = useI18n();
-      const labels = useLinkTargetTypeLabels([extension], locale);
+      const labels = useLinkTargetTypeLabels([targetType], locale);
       return () =>
         h(PlainTextLinkTargetForm, {
           linkData: props.linkData,
           modelValue: props.modelValue,
           "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
             emit("update:modelValue", config),
-          fieldLabel: labels.value[extension.type],
+          fieldLabel: labels.value[targetType.type],
           dataTest: "linkLocation",
         });
     },

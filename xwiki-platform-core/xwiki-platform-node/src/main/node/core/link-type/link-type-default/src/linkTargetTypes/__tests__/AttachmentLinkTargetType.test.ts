@@ -35,13 +35,13 @@ const attachmentRef = {
   type: EntityType.ATTACHMENT,
 } as unknown as AttachmentReference;
 
-// The extension resolves its services through the providers each time it uses them, so the mocks can be reset
+// The link target type resolves its services through the providers each time it uses them, so the mocks can be reset
 // between the tests.
 const remoteURLParser = mock<RemoteURLParser>();
 const remoteURLSerializer = mock<RemoteURLSerializer>();
 const modelReferenceParser = mock<ModelReferenceParser>();
 const modelReferenceSerializer = mock<ModelReferenceSerializer>();
-const extension = new AttachmentLinkTargetType(
+const targetType = new AttachmentLinkTargetType(
   { get: () => remoteURLParser },
   { get: () => remoteURLSerializer },
   { get: () => modelReferenceParser },
@@ -57,14 +57,14 @@ describe("AttachmentLinkTargetType", () => {
   });
 
   it("has the expected identity", async () => {
-    expect(extension.type).toBe("attachment");
-    await expect(extension.getLabel("en")).resolves.toBe("Attachment");
+    expect(targetType.type).toBe("attachment");
+    await expect(targetType.getLabel("en")).resolves.toBe("Attachment");
   });
 
   it("parses an attachment URL, including its query string", () => {
     remoteURLParser.parse.mockReturnValue(attachmentRef);
 
-    const config = extension.tryParseURL(
+    const config = targetType.tryParseURL(
       "https://xwiki.org/xwiki/bin/download/Some/Page/file.png?foo=bar",
     );
 
@@ -74,7 +74,7 @@ describe("AttachmentLinkTargetType", () => {
   it("does not match a non-attachment URL", () => {
     remoteURLParser.parse.mockReturnValue(undefined);
 
-    expect(extension.tryParseURL("https://example.org")).toBeNull();
+    expect(targetType.tryParseURL("https://example.org")).toBeNull();
   });
 
   it("serializes an attachment config back into a URL, including its query string", () => {
@@ -82,7 +82,7 @@ describe("AttachmentLinkTargetType", () => {
       "https://xwiki.org/xwiki/bin/download/Some/Page/file.png",
     );
 
-    const url = extension.serializeURL({
+    const url = targetType.serializeURL({
       ref: attachmentRef,
       queryString: "?foo=bar",
     });
@@ -95,7 +95,7 @@ describe("AttachmentLinkTargetType", () => {
   it("parses an attachment reference", () => {
     modelReferenceParser.parse.mockReturnValue(attachmentRef);
 
-    const config = extension.tryParseReference?.({
+    const config = targetType.tryParseReference?.({
       type: "attach",
       typed: true,
       reference: "Some.Page@file.png",
@@ -107,7 +107,7 @@ describe("AttachmentLinkTargetType", () => {
 
   it("does not match a non-attachment reference", () => {
     expect(
-      extension.tryParseReference?.({
+      targetType.tryParseReference?.({
         type: "doc",
         typed: true,
         reference: "Some.Page",
@@ -121,7 +121,7 @@ describe("AttachmentLinkTargetType", () => {
       "attach:Some.Page@file.png",
     );
 
-    const reference = extension.configToReference?.({ ref: attachmentRef });
+    const reference = targetType.configToReference?.({ ref: attachmentRef });
 
     expect(reference).toEqual({
       type: "attach",
@@ -132,6 +132,6 @@ describe("AttachmentLinkTargetType", () => {
   });
 
   it("returns undefined when converting to a reference with no attachment selected", () => {
-    expect(extension.configToReference?.({ ref: null })).toBeUndefined();
+    expect(targetType.configToReference?.({ ref: null })).toBeUndefined();
   });
 });

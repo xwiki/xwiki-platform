@@ -29,10 +29,7 @@ import {
   useTemplateRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import type {
-  LinkData,
-  LinkTargetTypeExtension,
-} from "@xwiki/platform-link-type-api";
+import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
 
 const props = defineProps<{ linkData: LinkData }>();
 
@@ -45,10 +42,8 @@ defineSlots<{
 const { t, locale } = useI18n({ messages: translations });
 
 // Provided by `LinkModal.vue`: the list of registered, enabled link target types, already resolved from the
-// shared component manager — see `@xwiki/platform-link-type-api`'s `LinkTargetTypeExtension`.
-const extensions = inject<LinkTargetTypeExtension[]>(
-  "linkTargetTypeExtensions",
-)!;
+// shared component manager — see `@xwiki/platform-link-type-api`'s `LinkTargetType`.
+const targetTypes = inject<LinkTargetType[]>("linkTargetTypes")!;
 
 const linkData = ref(props.linkData);
 
@@ -57,23 +52,23 @@ const linkData = ref(props.linkData);
 const linkTargetType = computed({
   get: () => linkData.value.target.type,
   set: (type: string) => {
-    const extension = extensions.find((extension) => extension.type === type);
+    const targetType = targetTypes.find((candidate) => candidate.type === type);
 
-    if (extension) {
+    if (targetType) {
       linkData.value.target = {
-        type: extension.type,
-        config: extension.createDefaultConfig(),
+        type: targetType.type,
+        config: targetType.createDefaultConfig(),
       };
     }
   },
 });
 
-const labels = useLinkTargetTypeLabels(extensions, locale);
+const labels = useLinkTargetTypeLabels(targetTypes, locale);
 
 const linkTargetTypeItems = computed(() =>
-  extensions.map((extension) => ({
-    value: extension.type,
-    label: labels.value[extension.type] ?? extension.type,
+  targetTypes.map((targetType) => ({
+    value: targetType.type,
+    label: labels.value[targetType.type] ?? targetType.type,
   })),
 );
 

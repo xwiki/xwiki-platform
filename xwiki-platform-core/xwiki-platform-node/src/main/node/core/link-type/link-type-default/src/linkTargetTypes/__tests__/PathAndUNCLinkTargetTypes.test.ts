@@ -23,41 +23,41 @@ import { describe, expect, it } from "vitest";
 
 describe.each([
   {
-    extension: new PathLinkTargetType(),
+    targetType: new PathLinkTargetType(),
     type: "path",
     order: 300,
     label: "Path",
     location: "/xwiki/bin/view/Main/",
   },
   {
-    extension: new UNCLinkTargetType(),
+    targetType: new UNCLinkTargetType(),
     type: "unc",
     order: 400,
     label: "UNC path",
     location: "\\\\server\\share",
   },
 ])(
-  "$extension.constructor.name",
-  ({ extension, type, order, label, location }) => {
+  "$targetType.constructor.name",
+  ({ targetType, type, order, label, location }) => {
     it("has the expected identity, between the e-mail and the URL link target types", async () => {
-      expect(extension.type).toBe(type);
-      expect(extension.order).toBe(order);
-      await expect(extension.getLabel("en")).resolves.toBe(label);
+      expect(targetType.type).toBe(type);
+      expect(targetType.order).toBe(order);
+      await expect(targetType.getLabel("en")).resolves.toBe(label);
     });
 
     it("doesn't parse URLs, which are handled by the URL link target type", () => {
-      expect(extension.tryParseURL(location)).toBeNull();
+      expect(targetType.tryParseURL(location)).toBeNull();
     });
 
     it("uses the location as URL", () => {
-      expect(extension.serializeURL({ location })).toBe(location);
+      expect(targetType.serializeURL({ location })).toBe(location);
     });
 
     it("matches only the references of its own resource type", () => {
       ["url", "doc", "unknown", type === "path" ? "unc" : "path"].forEach(
         (otherType) => {
           expect(
-            extension.tryParseReference({
+            targetType.tryParseReference({
               type: otherType,
               typed: true,
               reference: location,
@@ -67,7 +67,7 @@ describe.each([
         },
       );
       expect(
-        extension.tryParseReference({
+        targetType.tryParseReference({
           type,
           typed: true,
           reference: location,
@@ -78,13 +78,13 @@ describe.each([
 
     it("converts its config back into a typed reference of its own resource type", () => {
       // Untyped, the location would be parsed back as a document reference.
-      expect(extension.configToReference({ location })).toEqual({
+      expect(targetType.configToReference({ location })).toEqual({
         type,
         typed: true,
         reference: location,
         parameters: {},
       });
-      expect(extension.configToReference({ location: " " })).toBeUndefined();
+      expect(targetType.configToReference({ location: " " })).toBeUndefined();
     });
   },
 );

@@ -19,7 +19,7 @@
  */
 
 import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
-import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
+import { linkTargetTypeRole } from "@xwiki/platform-link-type-api";
 import {
   AttachmentLinkTargetType,
   ComponentInit as LinkTypeDefaultComponentInit,
@@ -170,7 +170,7 @@ function withBuiltInLinkTargetTypes(
     ),
   ] as const;
   container.getAll
-    .calledWith(linkTargetTypeExtensionRole)
+    .calledWith(linkTargetTypeRole)
     .mockReturnValue([
       new PageLinkTargetType(...providers),
       new AttachmentLinkTargetType(...providers),

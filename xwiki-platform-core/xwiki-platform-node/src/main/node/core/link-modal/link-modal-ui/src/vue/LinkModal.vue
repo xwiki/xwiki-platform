@@ -27,7 +27,7 @@ import { plainTextFallbackForm } from "../plainTextFallbackForm";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import {
-  listLinkTargetTypeExtensions,
+  listLinkTargetTypes,
   unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
 import { computed, markRaw, provide } from "vue";
@@ -35,7 +35,7 @@ import { useI18n } from "vue-i18n";
 import type { LinkTargetTypeForm } from "../linkTargetTypeForm";
 import type {
   LinkData,
-  LinkTargetTypeExtension,
+  LinkTargetType,
   UnsupportedLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
@@ -61,7 +61,7 @@ const linkData = typedRef(props.current);
 // When the edited link points to a resource that no registered link target type supports, its own link target type is
 // offered first, so that the user can keep editing the reference as plain text, or switch back to it (restoring the
 // original reference) after selecting another type.
-const linkExtensions: LinkTargetTypeExtension[] = [
+const linkTargetTypes: LinkTargetType[] = [
   ...(props.current.target.type === unsupportedLinkTargetType
     ? [
         new UnsupportedLinkTargetType(
@@ -69,20 +69,20 @@ const linkExtensions: LinkTargetTypeExtension[] = [
         ),
       ]
     : []),
-  ...listLinkTargetTypeExtensions(props.depsContainer),
+  ...listLinkTargetTypes(props.depsContainer),
 ];
 
 // The link target types offered by the link type selector, which always include the type of the edited link, so that
 // the user can switch back to it after selecting another type: this list is computed once, from the type of the edited
 // link when the modal is opened.
 const initialLinkTargetType = props.current.target.type;
-const offeredLinkExtensions = linkExtensions.filter(
-  (extension) =>
-    extension.type === initialLinkTargetType ||
-    !props.excludedLinkTargetTypes?.includes(extension.type),
+const offeredLinkTargetTypes = linkTargetTypes.filter(
+  (targetType) =>
+    targetType.type === initialLinkTargetType ||
+    !props.excludedLinkTargetTypes?.includes(targetType.type),
 );
 
-provide("linkTargetTypeExtensions", offeredLinkExtensions);
+provide("linkTargetTypes", offeredLinkTargetTypes);
 
 // The forms of the link target types, registered separately from the link target types themselves so that these don't
 // depend on the UI framework of the link modal.
@@ -110,11 +110,13 @@ const activeForm = computed(() => {
     };
   }
 
-  const extension = linkExtensions.find((e) => e.type === type);
+  const targetType = linkTargetTypes.find(
+    (candidate) => candidate.type === type,
+  );
 
-  // The extension providing this type is not (or no longer) registered/enabled: nothing to render.
-  return extension
-    ? { component: markRaw(plainTextFallbackForm(extension)) }
+  // The link target type is not (or no longer) registered/enabled: nothing to render.
+  return targetType
+    ? { component: markRaw(plainTextFallbackForm(targetType)) }
     : undefined;
 });
 

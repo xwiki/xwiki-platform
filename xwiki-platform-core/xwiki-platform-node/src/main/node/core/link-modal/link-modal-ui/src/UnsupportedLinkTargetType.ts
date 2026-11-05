@@ -19,7 +19,7 @@
  */
 import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
 import type {
-  LinkTargetTypeExtension,
+  LinkTargetType,
   UnsupportedLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
 
@@ -30,7 +30,7 @@ import type {
  * of the linked resource as plain text (see `UnsupportedLinkTargetForm`).
  */
 class UnsupportedLinkTargetType
-  implements LinkTargetTypeExtension<UnsupportedLinkTargetConfig>
+  implements LinkTargetType<UnsupportedLinkTargetConfig>
 {
   readonly type = unsupportedLinkTargetType;
 

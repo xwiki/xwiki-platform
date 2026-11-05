@@ -23,18 +23,15 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, test } from "vitest";
 import { nextTick } from "vue";
 import { createI18n } from "vue-i18n";
-import type {
-  LinkData,
-  LinkTargetTypeExtension,
-} from "@xwiki/platform-link-type-api";
+import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
 
 // LinkForm.vue only uses the registered link target types to fill the type selector and to reset the link target
 // when another type is selected; the parsing/serializing part of the contract is never exercised here.
-function extensionStub(
+function targetTypeStub(
   type: string,
-  getLabel: LinkTargetTypeExtension["getLabel"],
+  getLabel: LinkTargetType["getLabel"],
   defaultConfig: unknown = {},
-): LinkTargetTypeExtension {
+): LinkTargetType {
   return {
     type,
     getLabel,
@@ -44,7 +41,7 @@ function extensionStub(
   };
 }
 
-const urlExtensionStub = extensionStub("url", async () => "URL", { url: "" });
+const urlTargetTypeStub = targetTypeStub("url", async () => "URL", { url: "" });
 
 function buildLinkData(): LinkData {
   return {
@@ -63,7 +60,7 @@ async function settle(): Promise<void> {
 }
 
 function mountLinkForm(
-  extensions: LinkTargetTypeExtension[] = [urlExtensionStub],
+  targetTypes: LinkTargetType[] = [urlTargetTypeStub],
   linkData: LinkData = buildLinkData(),
 ) {
   // LinkForm.vue calls useI18n() with its own local `messages`, but vue-i18n still requires a global instance to
@@ -77,7 +74,7 @@ function mountLinkForm(
       plugins: [i18n],
       // Normally provided by LinkModal.vue, which resolves the registered link target types out of the
       // depsContainer before rendering LinkForm.
-      provide: { linkTargetTypeExtensions: extensions },
+      provide: { linkTargetTypes: targetTypes },
       components: dsComponentStubs,
     },
   });
@@ -116,9 +113,9 @@ describe("LinkForm.vue", () => {
 
   test("identifies the link target types by their type, even when they have the same label", async () => {
     const wrapper = mountLinkForm([
-      urlExtensionStub,
-      extensionStub("first", async () => "Same label"),
-      extensionStub("second", async () => "Same label"),
+      urlTargetTypeStub,
+      targetTypeStub("first", async () => "Same label"),
+      targetTypeStub("second", async () => "Same label"),
     ]);
 
     await flushPromises();
@@ -137,11 +134,11 @@ describe("LinkForm.vue", () => {
   test("displays the type of a link target type until its label is resolved, or when it fails to resolve", async () => {
     let resolveLabel: (label: string) => void = () => {};
     const wrapper = mountLinkForm([
-      extensionStub(
+      targetTypeStub(
         "url",
         () => new Promise((resolve) => (resolveLabel = resolve)),
       ),
-      extensionStub("broken", async () => {
+      targetTypeStub("broken", async () => {
         throw new Error("Failed to load the translation");
       }),
     ]);
@@ -166,9 +163,9 @@ describe("LinkForm.vue", () => {
     };
     const wrapper = mountLinkForm(
       [
-        urlExtensionStub,
-        extensionStub("first", async () => "Same label", { first: true }),
-        extensionStub("second", async () => "Same label", { second: true }),
+        urlTargetTypeStub,
+        targetTypeStub("first", async () => "Same label", { first: true }),
+        targetTypeStub("second", async () => "Same label", { second: true }),
       ],
       linkData,
     );

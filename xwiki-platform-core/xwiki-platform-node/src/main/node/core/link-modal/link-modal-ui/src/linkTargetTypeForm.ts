@@ -21,7 +21,7 @@ import type { Component } from "vue";
 
 /**
  * Inversify role used to register the {@link LinkTargetTypeForm} of a link target type, next to the link target type
- * itself (see `linkTargetTypeExtensionRole` in `@xwiki/platform-link-type-api`). Like the link target types, the forms
+ * itself (see `linkTargetTypeRole` in `@xwiki/platform-link-type-api`). Like the link target types, the forms
  * are unconstrained multi-bindings, matched to their link target type by their `type` field.
  *
  * @since 18.10.0RC1
@@ -31,7 +31,7 @@ const linkTargetTypeFormRole = "LinkTargetTypeForm";
 
 /**
  * The form used by the link modal to edit the links of a link target type. It's the UI counterpart of the
- * framework-independent `LinkTargetTypeExtension` (see `@xwiki/platform-link-type-api`), registered separately so
+ * framework-independent `LinkTargetType` (see `@xwiki/platform-link-type-api`), registered separately so
  * that the link target types don't depend on the UI framework of the link modal. A link target type without a form is
  * edited with a plain text field (see `PlainTextLinkTargetConfig`).
  *
@@ -40,7 +40,7 @@ const linkTargetTypeFormRole = "LinkTargetTypeForm";
  */
 interface LinkTargetTypeForm {
   /**
-   * The type of the link target type that this form edits (see `LinkTargetTypeExtension.type`).
+   * The type of the link target type that this form edits (see `LinkTargetType.type`).
    */
   readonly type: string;
 

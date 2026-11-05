@@ -20,18 +20,18 @@
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
- * Inversify role used to register {@link LinkTargetTypeExtension} implementations against the shared
+ * Inversify role used to register {@link LinkTargetType} implementations against the shared
  * `depsContainer` (the same container already used to resolve other domain services, e.g.
  * `LinkSuggestService`). Multiple, independent packages can each bind their own implementation to this same
- * role — see {@link LinkTargetTypeExtension} for the registration example — and every registered implementation
- * is returned by `container.getAll(linkTargetTypeExtensionRole)`. This mirrors the existing `"SyntaxConfig"` role
+ * role — see {@link LinkTargetType} for the registration example — and every registered implementation
+ * is returned by `container.getAll(linkTargetTypeRole)`. This mirrors the existing `"SyntaxConfig"` role
  * (see `@xwiki/platform-syntaxes-config`): an unconstrained (no `.whenNamed()`/`.whenDefault()`) multi-binding,
  * disambiguated by a plain `type` field on each resolved object rather than by an Inversify name/tag.
  *
  * @since 18.10.0RC1
  * @beta
  */
-const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
+const linkTargetTypeRole = "LinkTargetType";
 
 /**
  * Contract implemented by a link target type, i.e., a kind of link that can be created and edited from the link
@@ -52,29 +52,29 @@ const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
  * @since 18.10.0RC1
  * @beta
  */
-interface LinkTargetTypeExtension<TConfig = unknown> {
+interface LinkTargetType<TConfig = unknown> {
   /**
    * Stable identifier of this link target type, used as the corresponding {@link LinkTarget}'s `type` field.
-   * Since bindings to {@link linkTargetTypeExtensionRole} are unconstrained, this is the only thing
+   * Since bindings to {@link linkTargetTypeRole} are unconstrained, this is the only thing
    * disambiguating one registered implementation from another.
    */
   readonly type: string;
 
   /**
    * Ordering hint, used both to sort the link type selector and to decide in which order
-   * {@link LinkTargetTypeExtension.tryParseURL} is attempted against a raw URL (lower runs/shows first). Defaults
+   * {@link LinkTargetType.tryParseURL} is attempted against a raw URL (lower runs/shows first). Defaults
    * to `1000` when unset. A permissive catch-all implementation (e.g., the built-in `"url"` type) should use a
    * very high value so it is only ever picked once every other type has failed to match.
    */
   readonly order?: number;
 
   /**
-   * Each extension resolves its own label, since there is no mechanism for an extension to register its translations
-   * where the link modal could find them. Implementations cannot rely on the Vue composition API (`useI18n()`) since
-   * they are plain objects, not Vue component instances: they can resolve the label from translations bundled with
-   * the extension, or fetch it from the server (hence the promise). The label is only displayed: the link type
-   * selector identifies the selected link target type by its {@link LinkTargetTypeExtension."type"}, so labels don't
-   * have to be unique.
+   * Each link target type resolves its own label, since there is no mechanism for an extension to register its
+   * translations where the link modal could find them. Implementations cannot rely on the Vue composition API
+   * (`useI18n()`) since they are plain objects, not Vue component instances: they can resolve the label from
+   * translations bundled with the extension, or fetch it from the server (hence the promise). The label is only
+   * displayed: the link type selector identifies the selected link target type by its {@link LinkTargetType."type"},
+   * so labels don't have to be unique.
    *
    * @param locale - the locale to resolve the label for (e.g., `"en"`)
    * @returns a promise resolving to a localized, human-readable label for this link target type, displayed in the
@@ -109,7 +109,7 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
    *   return `undefined` for resource types with no matching link target and let the caller fall back to
    *   {@link parseLinkTarget}.
    *
-   * Optional: extensions that don't implement it are simply skipped by `resourceReferenceToLinkTarget`.
+   * Optional: link target types that don't implement it are simply skipped by `resourceReferenceToLinkTarget`.
    */
   tryParseReference?(reference: ResourceReference): TConfig | null;
 
@@ -123,5 +123,5 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
   configToReference?(config: TConfig): ResourceReference | undefined;
 }
 
-export { linkTargetTypeExtensionRole };
-export type { LinkTargetTypeExtension };
+export { linkTargetTypeRole };
+export type { LinkTargetType };

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { LinkTargetTypeExtension } from "./linkTargetType";
+import type { LinkTargetType } from "./linkTargetType";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
@@ -41,7 +41,7 @@ type PlainTextLinkTargetConfig = {
  * @beta
  */
 abstract class AbstractPlainTextLinkTargetType
-  implements LinkTargetTypeExtension<PlainTextLinkTargetConfig>
+  implements LinkTargetType<PlainTextLinkTargetConfig>
 {
   abstract readonly type: string;
 

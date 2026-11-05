@@ -8,7 +8,7 @@ import { Container } from 'inversify';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
-export abstract class AbstractPlainTextLinkTargetType implements LinkTargetTypeExtension<PlainTextLinkTargetConfig> {
+export abstract class AbstractPlainTextLinkTargetType implements LinkTargetType<PlainTextLinkTargetConfig> {
     // (undocumented)
     configToReference(input: PlainTextLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
@@ -46,7 +46,7 @@ export type LinkTarget = {
 export function linkTargetToResourceReference(target: LinkTarget, container: Container): ResourceReference | undefined;
 
 // @beta
-export interface LinkTargetTypeExtension<TConfig = unknown> {
+export interface LinkTargetType<TConfig = unknown> {
     configToReference?(config: TConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): TConfig;
@@ -61,10 +61,10 @@ export interface LinkTargetTypeExtension<TConfig = unknown> {
 }
 
 // @beta
-export const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
+export const linkTargetTypeRole = "LinkTargetType";
 
 // @beta (undocumented)
-export function listLinkTargetTypeExtensions(container: Container): LinkTargetTypeExtension[];
+export function listLinkTargetTypes(container: Container): LinkTargetType[];
 
 // @beta
 export function parseLinkTarget(url: string, container: Container): LinkTarget;

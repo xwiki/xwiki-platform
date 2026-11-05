@@ -20,13 +20,13 @@
 <script setup lang="ts">
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
-import type { AttachmentLinkTargetConfig } from "../data/linkType";
 import type { LinkData } from "@xwiki/platform-link-type-api";
+import type { PageLinkTargetConfig } from "@xwiki/platform-link-type-default";
 
 // The option fields of a link of this type, displayed in the "Options" section of the link form.
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<AttachmentLinkTargetConfig>({
+const model = defineModel<PageLinkTargetConfig>({
   required: true,
 });
 
@@ -35,8 +35,14 @@ const { t } = useI18n({ messages: translations });
 
 <template>
   <x-text-field
-    v-bind="{ 'data-test': 'linkAttachmentQueryString' }"
-    :label="t('link-type.target-types.attachment.query-string')"
+    v-bind="{ 'data-test': 'linkPageQueryString' }"
+    :label="t('link-type.target-types.page.query-string')"
     v-model="model.queryString"
+  />
+
+  <x-text-field
+    v-bind="{ 'data-test': 'linkPageAnchor' }"
+    :label="t('link-type.target-types.page.anchor')"
+    v-model="model.anchor"
   />
 </template>

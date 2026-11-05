@@ -18,11 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ComponentInit } from "../componentInit";
-import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
 import { linkTargetTypeRole } from "@xwiki/platform-link-type-api";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
-import type { LinkTargetTypeForm } from "@xwiki/platform-link-modal-ui";
 import type { LinkTargetType } from "@xwiki/platform-link-type-api";
 
 /**
@@ -82,21 +80,6 @@ describe("ComponentInit", () => {
       "page",
       "path",
       "unc",
-      "url",
-    ]);
-  });
-
-  it("registers the forms of the built-in link target types, except the path and UNC path ones", () => {
-    const container = new Container();
-    new ComponentInit(container);
-
-    const forms = container.getAll<LinkTargetTypeForm>(linkTargetTypeFormRole);
-
-    // The path and UNC path link target types are edited with the plain text form of the link modal.
-    expect(forms.map((form) => form.type).sort()).toEqual([
-      "attachment",
-      "email",
-      "page",
       "url",
     ]);
   });

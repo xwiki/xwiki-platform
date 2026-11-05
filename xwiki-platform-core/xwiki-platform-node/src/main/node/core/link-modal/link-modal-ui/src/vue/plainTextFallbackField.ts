@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import PlainTextLinkTargetField from "./PlainTextLinkTargetField.vue";
 import { useLinkTargetTypeLabels } from "./linkTargetTypeLabels";
-import PlainTextLinkTargetField from "./vue/PlainTextLinkTargetField.vue";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
 import type {

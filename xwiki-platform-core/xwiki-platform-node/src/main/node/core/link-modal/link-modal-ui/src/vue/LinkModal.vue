@@ -20,10 +20,10 @@
 <script setup lang="ts">
 import LinkForm from "./LinkForm.vue";
 import UnsupportedLinkTargetField from "./UnsupportedLinkTargetField.vue";
+import { plainTextFallbackField } from "./plainTextFallbackField";
 import { UnsupportedLinkTargetType } from "../UnsupportedLinkTargetType";
 import { createLinkEditionContext } from "../linkEditionContext";
 import { linkTargetTypeFormRole } from "../linkTargetTypeForm";
-import { plainTextFallbackField } from "../plainTextFallbackField";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import {

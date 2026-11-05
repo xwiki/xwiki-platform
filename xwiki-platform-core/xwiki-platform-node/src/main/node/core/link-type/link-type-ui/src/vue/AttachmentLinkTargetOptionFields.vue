@@ -20,12 +20,13 @@
 <script setup lang="ts">
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
-import type { EmailLinkTargetConfig } from "../data/linkType";
 import type { LinkData } from "@xwiki/platform-link-type-api";
+import type { AttachmentLinkTargetConfig } from "@xwiki/platform-link-type-default";
 
+// The option fields of a link of this type, displayed in the "Options" section of the link form.
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<EmailLinkTargetConfig>({
+const model = defineModel<AttachmentLinkTargetConfig>({
   required: true,
 });
 
@@ -34,10 +35,8 @@ const { t } = useI18n({ messages: translations });
 
 <template>
   <x-text-field
-    v-bind="{ 'data-test': 'linkEmailAddress' }"
-    :label="t('link-type.target-types.email.address')"
-    type="email"
-    v-model="model.address"
-    required
+    v-bind="{ 'data-test': 'linkAttachmentQueryString' }"
+    :label="t('link-type.target-types.attachment.query-string')"
+    v-model="model.queryString"
   />
 </template>

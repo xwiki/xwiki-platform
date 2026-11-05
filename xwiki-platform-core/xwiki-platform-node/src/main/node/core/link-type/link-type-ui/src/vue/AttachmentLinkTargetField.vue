@@ -27,13 +27,13 @@ import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
 import { inject } from "vue";
 import { useI18n } from "vue-i18n";
-import type { AttachmentLinkTargetConfig } from "../data/linkType";
 import type {
   LinkEditionContext,
   SearchBoxSource,
 } from "@xwiki/platform-link-modal-ui";
 import type { Link } from "@xwiki/platform-link-suggest-api";
 import type { LinkData } from "@xwiki/platform-link-type-api";
+import type { AttachmentLinkTargetConfig } from "@xwiki/platform-link-type-default";
 import type { AttachmentReference } from "@xwiki/platform-model-api";
 
 defineProps<{ linkData: LinkData }>();

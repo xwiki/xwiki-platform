@@ -18,9 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { generateConfigVue } from "@xwiki/platform-tool-viteconfig";
-import { UserConfig } from "vite";
+import { generateConfig } from "@xwiki/platform-tool-viteconfig";
 
-const config: UserConfig = generateConfigVue(import.meta.url);
-
-export default config;
+export default generateConfig(import.meta.url);

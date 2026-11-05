@@ -20,8 +20,8 @@
 <script setup lang="ts">
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
-import type { EmailLinkTargetConfig } from "../data/linkType";
 import type { LinkData } from "@xwiki/platform-link-type-api";
+import type { EmailLinkTargetConfig } from "@xwiki/platform-link-type-default";
 
 // The option fields of a link of this type, displayed in the "Options" section of the link form.
 defineProps<{ linkData: LinkData }>();

@@ -34,26 +34,20 @@
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "vitest --run",
-    "typecheck": "vue-tsc"
+    "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-icons": "workspace:*",
-    "@xwiki/platform-link-modal-ui": "workspace:*",
-    "@xwiki/platform-link-suggest-api": "workspace:*",
     "@xwiki/platform-link-type-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
-    "@xwiki/platform-rendering-api": "workspace:*",
-    "vue-i18n": "catalog:"
+    "@xwiki/platform-rendering-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "8.x",
-    "reflect-metadata": "0.x",
-    "vue": "3.x"
+    "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
@@ -68,9 +62,7 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "vitest-mock-extended": "catalog:",
-    "vue": "catalog:",
-    "vue-tsc": "catalog:"
+    "vitest-mock-extended": "catalog:"
   },
   "publishConfig": {
     "exports": {

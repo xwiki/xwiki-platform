@@ -68,6 +68,7 @@
     "@vue/compiler-dom": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-link-type-default": "workspace:*",
+    "@xwiki/platform-link-type-ui": "workspace:*",
     "@xwiki/platform-syntaxes-config": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",

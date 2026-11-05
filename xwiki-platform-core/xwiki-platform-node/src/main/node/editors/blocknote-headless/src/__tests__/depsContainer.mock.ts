@@ -24,6 +24,7 @@ import {
   linkTargetTypeManagerRole,
 } from "@xwiki/platform-link-type-api";
 import { ComponentInit as LinkTypeDefaultComponentInit } from "@xwiki/platform-link-type-default";
+import { ComponentInit as LinkTypeUIComponentInit } from "@xwiki/platform-link-type-ui";
 import {
   AttachmentReference,
   DocumentReference,
@@ -168,6 +169,7 @@ function withBuiltInLinkTargetTypes(
   }
   new LinkTypeComponentInit(builtInContainer);
   new LinkTypeDefaultComponentInit(builtInContainer);
+  new LinkTypeUIComponentInit(builtInContainer);
 
   container.get
     .calledWith(linkTargetTypeManagerRole)

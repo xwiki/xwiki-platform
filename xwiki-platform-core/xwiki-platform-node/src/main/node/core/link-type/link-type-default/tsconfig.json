@@ -3,10 +3,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "isolatedDeclarations": false,
-    "resolveJsonModule": true,
-    "types": [
-      "@xwiki/platform-dsapi"
-    ]
+    "resolveJsonModule": true
   },
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
   "include": [

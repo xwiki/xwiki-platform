@@ -41,6 +41,7 @@
     <module>xwiki-platform-store-filesystem</module>
     <module>xwiki-platform-store-filesystem-migrations</module>
     <module>xwiki-platform-store-filesystem-oldcore</module>
+    <module>xwiki-platform-store-hibernate-core</module>
     <module>xwiki-platform-store-merge</module>
   </modules>
 </project>

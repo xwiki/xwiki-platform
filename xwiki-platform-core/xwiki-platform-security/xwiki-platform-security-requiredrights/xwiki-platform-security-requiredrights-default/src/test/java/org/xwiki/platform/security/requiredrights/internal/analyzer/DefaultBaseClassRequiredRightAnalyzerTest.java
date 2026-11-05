@@ -262,7 +262,7 @@ class DefaultBaseClassRequiredRightAnalyzerTest
         when(this.hibernate.getConfiguration()).thenReturn(mock());
         when(this.hibernate.getConfiguration().getNamedQueries()).thenReturn(Map.of(queryName, mock()));
         when(this.hibernate.getConfiguration().getNamedQueries()
-            .get(queryName).getQuery()).thenReturn(hqlQuery);
+            .get(queryName).getHqlString()).thenReturn(hqlQuery);
 
         when(this.hqlStatementValidator.isSafe(hqlQuery)).thenReturn(safe);
 

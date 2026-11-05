@@ -102,7 +102,7 @@ public class LogCaptureValidator
         new Line("com.xpn.xwiki.XWikiException: Error number 13006 in 3: Exception while locking document for lock"
             + " [userName = [XWiki.superadmin], docId = [6152552094868048244],"
             + " date = [Tue Jun 18 12:21:51 CEST 2019]]"),
-        new Line("Caused by: javax.persistence.PersistenceException:"
+        new Line("Caused by: jakarta.persistence.PersistenceException:"
             + " org.hibernate.exception.ConstraintViolationException: could not execute statement"),
         new Line("Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement"),
         new Line("Caused by: java.sql.SQLIntegrityConstraintViolationException: integrity constraint violation: "

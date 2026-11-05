@@ -19,298 +19,81 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.legacy;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Locale;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Set;
 
-import javax.persistence.Parameter;
-import javax.persistence.TemporalType;
-
-import org.hibernate.query.Query;
 import org.hibernate.query.spi.QueryImplementor;
-import org.hibernate.type.Type;
-
-import com.xpn.xwiki.internal.store.hibernate.QueryImplementorDelegate;
 
 /**
  * Wrap a QueryImplementor to convert the positional parameters from legacy 0-based Hibernate parameters to 1-based JPA
  * parameters.
- * 
+ *
  * @param <R> query result type
  * @version $Id$
  * @since 11.5RC1
  * @deprecated
  */
 @Deprecated
-public class LegacyQueryImplementor<R> extends QueryImplementorDelegate<R>
+public final class LegacyQueryImplementor<R> implements InvocationHandler
 {
     /**
-     * @param delegate the actual query
+     * The methods taking an int as first parameter which is not a parameter position.
      */
-    public LegacyQueryImplementor(QueryImplementor<R> delegate)
+    private static final Set<String> NOT_POSITION_METHODS = Set.of("setFirstResult", "setMaxResults",
+        "setFetchSize", "setTimeout", "setHibernateFirstResult", "setHibernateMaxResults");
+
+    private final QueryImplementor<R> delegate;
+
+    private LegacyQueryImplementor(QueryImplementor<R> delegate)
     {
-        super(delegate);
+        this.delegate = delegate;
+    }
+
+    /**
+     * @param <R> query result type
+     * @param delegate the actual query
+     * @return the query converting the positional parameters
+     * @since 18.10.0RC1
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> QueryImplementor<R> wrap(QueryImplementor<R> delegate)
+    {
+        return (QueryImplementor<R>) Proxy.newProxyInstance(QueryImplementor.class.getClassLoader(),
+            new Class<?>[] {QueryImplementor.class}, new LegacyQueryImplementor<>(delegate));
+    }
+
+    private static boolean isPositionMethod(Method method)
+    {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (parameterTypes.length == 0 || parameterTypes[0] != int.class) {
+            return false;
+        }
+
+        String name = method.getName();
+
+        return (name.startsWith("set") || name.startsWith("getParameter")) && !NOT_POSITION_METHODS.contains(name);
     }
 
     @Override
-    public Query<R> setParameter(int position, Calendar value, TemporalType temporalType)
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        return super.setParameter(position + 1, value, temporalType);
-    }
+        Object[] actualArgs = args;
+        if (isPositionMethod(method)) {
+            actualArgs = args.clone();
+            actualArgs[0] = (Integer) args[0] + 1;
+        }
 
-    @Override
-    public Query<R> setParameter(int position, Date value, TemporalType temporalType)
-    {
-        return super.setParameter(position + 1, value, temporalType);
-    }
+        Object result;
+        try {
+            result = method.invoke(this.delegate, actualArgs);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
 
-    @Override
-    public Query<R> setParameter(int position, Instant value, TemporalType temporalType)
-    {
-        return super.setParameter(position + 1, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, LocalDateTime value, TemporalType temporalType)
-    {
-        return super.setParameter(position + 1, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Object val, TemporalType temporalType)
-    {
-        return super.setParameter(position + 1, val, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Object val, Type type)
-    {
-        return super.setParameter(position + 1, val, type);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Object value)
-    {
-        return super.setParameter(position + 1, value);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, OffsetDateTime value, TemporalType temporalType)
-    {
-        return super.setParameter(position + 1, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, ZonedDateTime value, TemporalType temporalType)
-    {
-        return super.setParameter(position + 1, value, temporalType);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setBigDecimal(int position, BigDecimal val)
-    {
-        return super.setBigDecimal(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setBigInteger(int position, BigInteger val)
-    {
-        return super.setBigInteger(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setBinary(int position, byte[] val)
-    {
-        return super.setBinary(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setBoolean(int position, boolean val)
-    {
-        return super.setBoolean(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setByte(int position, byte val)
-    {
-        return super.setByte(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setCalendar(int position, Calendar val)
-    {
-        return super.setCalendar(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setCalendarDate(int position, Calendar val)
-    {
-        return super.setCalendarDate(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setCharacter(int position, char val)
-    {
-        return super.setCharacter(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setDate(int position, Date val)
-    {
-        return super.setDate(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setDouble(int position, double val)
-    {
-        return super.setDouble(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setEntity(int position, Object val)
-    {
-        return super.setEntity(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setFloat(int position, float val)
-    {
-        return super.setFloat(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setInteger(int position, int val)
-    {
-        return super.setInteger(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setLocale(int position, Locale val)
-    {
-        return super.setLocale(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setLong(int position, long val)
-    {
-        return super.setLong(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Collection values)
-    {
-        return super.setParameterList(position + 1, values);
-    }
-
-    @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Collection values, Type type)
-    {
-        return super.setParameterList(position + 1, values, type);
-    }
-
-    @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Object[] values)
-    {
-        return super.setParameterList(position + 1, values);
-    }
-
-    @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Object[] values, Type type)
-    {
-        return super.setParameterList(position + 1, values, type);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setSerializable(int position, Serializable val)
-    {
-        return super.setSerializable(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setShort(int position, short val)
-    {
-        return super.setShort(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setString(int position, String val)
-    {
-        return super.setString(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setText(int position, String val)
-    {
-        return super.setText(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setTime(int position, Date val)
-    {
-        return super.setTime(position + 1, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setTimestamp(int position, Date val)
-    {
-        return super.setTimestamp(position + 1, val);
-    }
-
-    @Override
-    public Parameter<?> getParameter(int position)
-    {
-        return super.getParameter(position + 1);
-    }
-
-    @Override
-    public <T> Parameter<T> getParameter(int position, Class<T> type)
-    {
-        return super.getParameter(position + 1, type);
-    }
-
-    @Override
-    public Object getParameterValue(int position)
-    {
-        return super.getParameterValue(position + 1);
-    }
-
-    @Override
-    @Deprecated
-    public Type determineProperBooleanType(int position, Object value, Type defaultType)
-    {
-        return super.determineProperBooleanType(position + 1, value, defaultType);
+        // Keep the fluent API going through the proxy
+        return result == this.delegate ? proxy : result;
     }
 }

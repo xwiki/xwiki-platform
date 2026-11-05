@@ -30,10 +30,11 @@ import type { Component } from "vue";
 const linkTargetTypeFormRole = "LinkTargetTypeForm";
 
 /**
- * The form used by the link modal to edit the links of a link target type. It's the UI counterpart of the
- * framework-independent `LinkTargetType` (see `@xwiki/platform-link-type-api`), registered separately so
- * that the link target types don't depend on the UI framework of the link modal. A link target type without a form is
- * edited with a plain text field (see `PlainTextLinkTargetConfig`).
+ * The part of the link form that is specific to a link target type: the field designating the target of the link, and
+ * the fields setting the options of the link. It's the UI counterpart of the framework-independent `LinkTargetType`
+ * (see `@xwiki/platform-link-type-api`), registered separately so that the link target types don't depend on the UI
+ * framework of the link modal. A link target type without a form is edited with a plain text field (see
+ * `PlainTextLinkTargetConfig`).
  *
  * @since 18.10.0RC1
  * @beta
@@ -45,18 +46,22 @@ interface LinkTargetTypeForm {
   readonly type: string;
 
   /**
-   * @returns the Vue component rendering the fields of this link target type in the link form, below the fields shared
-   *   by all the link target types (display text and link type), which the link modal renders itself. It receives the
-   *   edited link data (`linkData` prop) and the configuration of the link target (`v-model`).
+   * The field designating the target of the link (e.g. a page search box, an e-mail address field, a URL field).
+   *
+   * @returns the Vue component rendering the field in the link form, below the fields shared by all the link target
+   *   types (display text and link type), which the link modal renders itself. It receives the edited link data
+   *   (`linkData` prop) and the configuration of the link target (`v-model`).
    */
-  component(): Component;
+  targetField(): Component;
 
   /**
-   * @returns the Vue component rendering the options of this link target type in the "Options" section of the link
-   *   form, below the options shared by all the link target types; it receives the same props as {@link component}.
-   *   Optional: a link target type without specific options doesn't need it.
+   * The fields setting the options of the link that are specific to this link target type (e.g. the anchor of a page
+   * link, the subject of an e-mail link). Optional: a link target type without specific options doesn't need it.
+   *
+   * @returns the Vue component rendering the fields in the "Options" section of the link form, below the options
+   *   shared by all the link target types; it receives the same props as {@link LinkTargetTypeForm.targetField}
    */
-  optionsComponent?(): Component;
+  optionFields?(): Component;
 }
 
 export { linkTargetTypeFormRole };

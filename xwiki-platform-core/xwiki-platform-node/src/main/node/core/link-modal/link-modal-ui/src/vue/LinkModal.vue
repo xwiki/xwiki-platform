@@ -92,7 +92,7 @@ provide("linkTargetTypes", offeredLinkTargetTypes);
 const linkTargetTypeForms: LinkTargetTypeForm[] = [
   {
     type: unsupportedLinkTargetType,
-    component: () => UnsupportedLinkTargetForm,
+    targetField: () => UnsupportedLinkTargetForm,
   },
   ...(props.depsContainer.isBound(linkTargetTypeFormRole)
     ? props.depsContainer.getAll<LinkTargetTypeForm>(linkTargetTypeFormRole)
@@ -106,10 +106,10 @@ const activeForm = computed(() => {
   const type = linkData.value.target.type;
   const form = linkTargetTypeForms.find((form) => form.type === type);
   if (form) {
-    const options = form.optionsComponent?.();
+    const optionFields = form.optionFields?.();
     return {
-      component: markRaw(form.component()),
-      optionsComponent: options ? markRaw(options) : undefined,
+      targetField: markRaw(form.targetField()),
+      optionFields: optionFields ? markRaw(optionFields) : undefined,
     };
   }
 
@@ -119,7 +119,7 @@ const activeForm = computed(() => {
 
   // The link target type is not (or no longer) registered/enabled: nothing to render.
   return targetType
-    ? { component: markRaw(plainTextFallbackForm(targetType)) }
+    ? { targetField: markRaw(plainTextFallbackForm(targetType)) }
     : undefined;
 });
 
@@ -128,12 +128,12 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
 
 <template>
   <div :class="$style.container">
-    <!-- The fields shared by all the link target types, with the fields and options of the selected one. -->
+    <!-- The fields shared by all the link target types, with the target and option fields of the selected one. -->
     <LinkForm :link-data="linkData">
-      <template #config>
+      <template #target>
         <component
           v-if="activeForm"
-          :is="activeForm.component"
+          :is="activeForm.targetField"
           v-model="linkData.target.config"
           :link-data="linkData"
         />
@@ -141,8 +141,8 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
 
       <template #options>
         <component
-          v-if="activeForm?.optionsComponent"
-          :is="activeForm.optionsComponent"
+          v-if="activeForm?.optionFields"
+          :is="activeForm.optionFields"
           v-model="linkData.target.config"
           :link-data="linkData"
         />

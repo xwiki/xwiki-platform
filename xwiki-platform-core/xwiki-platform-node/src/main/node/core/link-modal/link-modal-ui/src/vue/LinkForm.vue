@@ -34,7 +34,14 @@ import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
 const props = defineProps<{ linkData: LinkData }>();
 
 defineSlots<{
-  config(): void;
+  /**
+   * The field designating the target of the link, specific to the selected link target type.
+   */
+  target(): void;
+
+  /**
+   * The fields setting the options of the link that are specific to the selected link target type.
+   */
   options(): void;
 }>();
 
@@ -110,7 +117,7 @@ onMounted(() => {
     required
   />
 
-  <slot name="config" />
+  <slot name="target" />
 
   <details>
     <summary>{{ t("link-modal.config.options") }}</summary>

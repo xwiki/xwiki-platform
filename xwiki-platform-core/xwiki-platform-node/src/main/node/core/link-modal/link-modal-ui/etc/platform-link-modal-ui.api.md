@@ -55,10 +55,8 @@ onCancel?: (() => any) | undefined;
 
 // @beta
 export interface LinkTargetTypeForm {
-    // (undocumented)
-    component(): Component;
-    // (undocumented)
-    optionsComponent?(): Component;
+    optionFields?(): Component;
+    targetField(): Component;
     readonly type: string;
 }
 

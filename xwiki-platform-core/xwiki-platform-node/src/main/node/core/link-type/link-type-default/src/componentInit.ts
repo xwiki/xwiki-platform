@@ -76,13 +76,13 @@ class ComponentInit {
 function bindForm(
   container: Container,
   type: string,
-  form: Component,
-  options?: Component,
+  targetField: Component,
+  optionFields?: Component,
 ): void {
   container.bind<LinkTargetTypeForm>(linkTargetTypeFormRole).toConstantValue({
     type,
-    component: () => form,
-    ...(options ? { optionsComponent: () => options } : {}),
+    targetField: () => targetField,
+    ...(optionFields ? { optionFields: () => optionFields } : {}),
   });
 }
 

@@ -32,10 +32,10 @@ import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 import type { Component } from "vue";
 
-// A fake link target type, along with its form and options, if any.
+// A fake link target type, along with the target field and option fields of its form, if any.
 type FakeLinkTargetType = LinkTargetType & {
-  fakeForm?: Component;
-  fakeOptions?: Component;
+  fakeTargetField?: Component;
+  fakeOptionFields?: Component;
 };
 
 // `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetType`s and their forms, out
@@ -55,13 +55,13 @@ function fakeDepsContainer(targetTypes: FakeLinkTargetType[]): Container {
     [linkTargetTypeManagerRole]: { list: () => targetTypes },
   };
   const forms = targetTypes.flatMap((targetType) =>
-    targetType.fakeForm
+    targetType.fakeTargetField
       ? [
           {
             type: targetType.type,
-            component: () => targetType.fakeForm,
-            optionsComponent: targetType.fakeOptions
-              ? () => targetType.fakeOptions
+            targetField: () => targetType.fakeTargetField,
+            optionFields: targetType.fakeOptionFields
+              ? () => targetType.fakeOptionFields
               : undefined,
           },
         ]
@@ -76,14 +76,15 @@ function fakeDepsContainer(targetTypes: FakeLinkTargetType[]): Container {
 }
 
 /**
- * @param form - the form of the link target type, or `undefined` to register it without a form
- * @param options - the options of the link target type, if any
+ * @param targetField - the target field of the form of the link target type, or `undefined` to register it without a
+ *   form
+ * @param optionFields - the option fields of the form of the link target type, if any
  */
 function fakeLinkTargetType(
   type: string,
   label: string,
-  form?: Component,
-  options?: Component,
+  targetField?: Component,
+  optionFields?: Component,
 ): FakeLinkTargetType {
   return {
     type,
@@ -91,8 +92,8 @@ function fakeLinkTargetType(
     createDefaultConfig: () => ({}),
     fromURL: () => null,
     toURL: () => "",
-    fakeForm: form,
-    fakeOptions: options,
+    fakeTargetField: targetField,
+    fakeOptionFields: optionFields,
   };
 }
 

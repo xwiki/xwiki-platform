@@ -17,10 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  PathLinkTargetForm,
-  UNCLinkTargetForm,
-} from "../../vue/plainTextLinkTargetForms";
 import { PathLinkTargetType } from "../PathLinkTargetType";
 import { UNCLinkTargetType } from "../UNCLinkTargetType";
 import { describe, expect, it } from "vitest";
@@ -31,7 +27,6 @@ describe.each([
     type: "path",
     order: 300,
     label: "Path",
-    form: PathLinkTargetForm,
     location: "/xwiki/bin/view/Main/",
   },
   {
@@ -39,17 +34,15 @@ describe.each([
     type: "unc",
     order: 400,
     label: "UNC path",
-    form: UNCLinkTargetForm,
     location: "\\\\server\\share",
   },
 ])(
   "$extension.constructor.name",
-  ({ extension, type, order, label, form, location }) => {
+  ({ extension, type, order, label, location }) => {
     it("has the expected identity, between the e-mail and the URL link target types", async () => {
       expect(extension.type).toBe(type);
       expect(extension.order).toBe(order);
       await expect(extension.getLabel("en")).resolves.toBe(label);
-      expect(extension.component()).toBe(form);
     });
 
     it("doesn't parse URLs, which are handled by the URL link target type", () => {

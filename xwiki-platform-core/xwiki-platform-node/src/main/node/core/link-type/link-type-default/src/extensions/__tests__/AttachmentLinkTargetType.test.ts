@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import AttachmentLinkTargetForm from "../../vue/AttachmentLinkTargetForm.vue";
 import { AttachmentLinkTargetType } from "../AttachmentLinkTargetType";
 import { EntityType } from "@xwiki/platform-model-api";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -60,7 +59,6 @@ describe("AttachmentLinkTargetType", () => {
   it("has the expected identity", async () => {
     expect(extension.type).toBe("attachment");
     await expect(extension.getLabel("en")).resolves.toBe("Attachment");
-    expect(extension.component()).toBe(AttachmentLinkTargetForm);
   });
 
   it("parses an attachment URL, including its query string", () => {

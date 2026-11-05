@@ -17,19 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import UnsupportedLinkTargetForm from "./vue/UnsupportedLinkTargetForm.vue";
 import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
 import type {
   LinkTargetTypeExtension,
   UnsupportedLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
-import type { Component } from "vue";
 
 /**
  * The link target type of the edited link when it points to a resource that no registered link target type supports
  * (see `unsupportedLinkTargetType`). It's not registered in the container: the link modal creates it for the edited
- * link only, so that the link type selector offers it next to the registered types, and the reference of the linked
- * resource is edited as plain text.
+ * link only, so that the link type selector offers it next to the registered types. The link modal edits the reference
+ * of the linked resource as plain text (see `UnsupportedLinkTargetForm`).
  */
 class UnsupportedLinkTargetType
   implements LinkTargetTypeExtension<UnsupportedLinkTargetConfig>
@@ -60,10 +58,6 @@ class UnsupportedLinkTargetType
    */
   createDefaultConfig(): UnsupportedLinkTargetConfig {
     return copyConfig(this.originalConfig);
-  }
-
-  component(): Component {
-    return UnsupportedLinkTargetForm;
   }
 
   /**

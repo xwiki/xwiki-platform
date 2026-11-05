@@ -22,7 +22,6 @@ import {
   entityResourceReference,
   parseEntityReference,
 } from "./referenceHelpers";
-import PageLinkTargetForm from "../vue/PageLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
@@ -38,7 +37,6 @@ import type {
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-import type { Component } from "vue";
 
 /**
  * Built-in link target type for links to an internal wiki page.
@@ -68,10 +66,6 @@ class PageLinkTargetType
 
   createDefaultConfig(): PageLinkTargetConfig {
     return { ref: null };
-  }
-
-  component(): Component {
-    return PageLinkTargetForm;
   }
 
   tryParseURL(url: string): PageLinkTargetConfig | null {

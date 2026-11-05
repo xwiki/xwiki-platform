@@ -31,5 +31,4 @@ export type {
   AttachmentLinkTargetConfig,
   EmailLinkTargetConfig,
   PageLinkTargetConfig,
-  PlainTextLinkTargetConfig,
 } from "./data/linkType";

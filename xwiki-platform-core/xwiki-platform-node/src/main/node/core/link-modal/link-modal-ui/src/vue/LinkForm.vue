@@ -18,6 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { useLinkTargetTypeLabels } from "../linkTargetTypeLabels";
 import { translations } from "../translations";
 import {
   computed,
@@ -26,7 +27,6 @@ import {
   onMounted,
   ref,
   useTemplateRef,
-  watch,
 } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
@@ -68,30 +68,7 @@ const linkTargetType = computed({
   },
 });
 
-// The labels are resolved asynchronously (an extension may fetch its label from the server), so the type is displayed
-// until its label is resolved, or when it fails to resolve.
-const labels = ref<Record<string, string>>({});
-
-watch(
-  locale,
-  async (locale, _, onCleanup) => {
-    let superseded = false;
-    onCleanup(() => (superseded = true));
-
-    const resolvedLabels = await Promise.all(
-      extensions.map(async (extension) => [
-        extension.type,
-        await extension.getLabel(locale).catch(() => extension.type),
-      ]),
-    );
-
-    // Ignore the labels resolved for a locale that changed in the meantime.
-    if (!superseded) {
-      labels.value = Object.fromEntries(resolvedLabels);
-    }
-  },
-  { immediate: true },
-);
+const labels = useLinkTargetTypeLabels(extensions, locale);
 
 const linkTargetTypeItems = computed(() =>
   extensions.map((extension) => ({

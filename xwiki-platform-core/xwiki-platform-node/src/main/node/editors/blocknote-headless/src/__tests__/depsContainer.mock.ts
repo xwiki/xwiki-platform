@@ -18,9 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
 import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
 import {
   AttachmentLinkTargetType,
+  ComponentInit as LinkTypeDefaultComponentInit,
   EmailLinkTargetType,
   PageLinkTargetType,
   PathLinkTargetType,
@@ -33,6 +35,7 @@ import {
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
+import { Container as InversifyContainer } from "inversify";
 import { mock } from "vitest-mock-extended";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
@@ -176,6 +179,14 @@ function withBuiltInLinkTargetTypes(
       new UNCLinkTargetType(),
       new URLLinkTargetType(),
     ]);
+
+  // The forms of the built-in link target types, registered by the same component initializer as in production.
+  const builtInContainer = new InversifyContainer();
+  new LinkTypeDefaultComponentInit(builtInContainer);
+  container.isBound.calledWith(linkTargetTypeFormRole).mockReturnValue(true);
+  container.getAll
+    .calledWith(linkTargetTypeFormRole)
+    .mockReturnValue(builtInContainer.getAll(linkTargetTypeFormRole));
 
   return container;
 }

@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { URLLinkTargetForm } from "../../vue/plainTextLinkTargetForms";
 import { URLLinkTargetType } from "../URLLinkTargetType";
 import { describe, expect, it } from "vitest";
 
@@ -28,7 +27,6 @@ describe("URLLinkTargetType", () => {
     expect(extension.type).toBe("url");
     expect(extension.order).toBe(Number.MAX_SAFE_INTEGER);
     await expect(extension.getLabel("en")).resolves.toBe("URL");
-    expect(extension.component()).toBe(URLLinkTargetForm);
   });
 
   it("matches any URL, unconditionally", () => {

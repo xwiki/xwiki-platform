@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import EmailLinkTargetForm from "../../vue/EmailLinkTargetForm.vue";
 import { EmailLinkTargetType } from "../EmailLinkTargetType";
 import { describe, expect, it } from "vitest";
 
@@ -27,7 +26,6 @@ describe("EmailLinkTargetType", () => {
   it("has the expected identity", async () => {
     expect(extension.type).toBe("email");
     await expect(extension.getLabel("en")).resolves.toBe("E-mail");
-    expect(extension.component()).toBe(EmailLinkTargetForm);
   });
 
   it("parses a mailto: URL, including its subject and body", () => {

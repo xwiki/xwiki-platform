@@ -20,6 +20,7 @@
 
 import { default as _LinkForm } from "./vue/LinkForm.vue";
 import { default as _LinkModal } from "./vue/LinkModal.vue";
+import { default as _PlainTextLinkTargetForm } from "./vue/PlainTextLinkTargetForm.vue";
 import { default as _SearchBox } from "./vue/SearchBox.vue";
 
 /**
@@ -51,7 +52,20 @@ const LinkForm = _LinkForm;
  */
 const SearchBox = _SearchBox;
 
-export { LinkForm, LinkModal, SearchBox };
+/**
+ * Form of the link target types designated by a plain text location (see `PlainTextLinkTargetConfig`), with props for
+ * the label, the `data-test` attribute and the type of its location field. The link modal also uses it for the link
+ * target types registered without a form. Re-exported so that the form of such a link target type can customize its
+ * field.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+const PlainTextLinkTargetForm = _PlainTextLinkTargetForm;
+
+export { LinkForm, LinkModal, PlainTextLinkTargetForm, SearchBox };
 
 export type { SearchBoxItem, SearchBoxSource } from "./vue/SearchBox.vue";
 export type { LinkEditionContext } from "./linkEditionContext";
+export { linkTargetTypeFormRole } from "./linkTargetTypeForm";
+export type { LinkTargetTypeForm } from "./linkTargetTypeForm";

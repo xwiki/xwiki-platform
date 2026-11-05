@@ -143,7 +143,8 @@ test("Editing the title of a path link keeps its reference, even when path links
   await expect(
     page.locator('[data-test="linkTargetType"] option[value="unc"]'),
   ).toHaveCount(0);
-  await expect(page.locator('[data-test="linkPath"]')).toHaveValue(
+  // Path links are edited with the plain text form of the link modal, since no form is registered for them.
+  await expect(page.locator('[data-test="linkLocation"]')).toHaveValue(
     "/xwiki/bin/view/Main/",
   );
 

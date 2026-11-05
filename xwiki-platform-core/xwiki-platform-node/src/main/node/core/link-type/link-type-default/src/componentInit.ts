@@ -23,14 +23,25 @@ import { PageLinkTargetType } from "./extensions/PageLinkTargetType";
 import { PathLinkTargetType } from "./extensions/PathLinkTargetType";
 import { UNCLinkTargetType } from "./extensions/UNCLinkTargetType";
 import { URLLinkTargetType } from "./extensions/URLLinkTargetType";
+import AttachmentLinkTargetForm from "./vue/AttachmentLinkTargetForm.vue";
+import EmailLinkTargetForm from "./vue/EmailLinkTargetForm.vue";
+import PageLinkTargetForm from "./vue/PageLinkTargetForm.vue";
+import { URLLinkTargetForm } from "./vue/URLLinkTargetForm";
+import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
 import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
+import type { LinkTargetTypeForm } from "@xwiki/platform-link-modal-ui";
 import type { Container } from "inversify";
+import type { Component } from "vue";
 
 /**
  * Registers the built-in link target types (page, attachment, email, path, UNC path, URL) against the given
  * `depsContainer`, as unconstrained bindings of {@link linkTargetTypeExtensionRole} — see
  * `@xwiki/platform-link-type-api`'s `LinkTargetTypeExtension` for the rationale (mirrors
  * `@xwiki/platform-markdown-syntax-config` and its siblings' own `"SyntaxConfig"` registration).
+ *
+ * Registers also the forms of these link target types, as bindings of `linkTargetTypeFormRole` (see
+ * `@xwiki/platform-link-modal-ui`), except for the path and UNC path ones, which are edited with the plain text form
+ * that the link modal uses for the link target types without a form.
  *
  * A consumer that does not want one (or several) of the built-in link target types (e.g. to offer a reduced set)
  * should simply not instantiate this class, and instead register only the extensions it wants, the same way.
@@ -46,7 +57,18 @@ class ComponentInit {
     container.bind(linkTargetTypeExtensionRole).to(PathLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(UNCLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(URLLinkTargetType);
+
+    bindForm(container, "page", PageLinkTargetForm);
+    bindForm(container, "attachment", AttachmentLinkTargetForm);
+    bindForm(container, "email", EmailLinkTargetForm);
+    bindForm(container, "url", URLLinkTargetForm);
   }
+}
+
+function bindForm(container: Container, type: string, form: Component): void {
+  container
+    .bind<LinkTargetTypeForm>(linkTargetTypeFormRole)
+    .toConstantValue({ type, component: () => form });
 }
 
 export { ComponentInit };

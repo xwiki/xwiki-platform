@@ -18,8 +18,11 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import UnsupportedLinkTargetForm from "./UnsupportedLinkTargetForm.vue";
 import { UnsupportedLinkTargetType } from "../UnsupportedLinkTargetType";
 import { createLinkEditionContext } from "../linkEditionContext";
+import { linkTargetTypeFormRole } from "../linkTargetTypeForm";
+import { plainTextFallbackForm } from "../plainTextFallbackForm";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import {
@@ -28,6 +31,7 @@ import {
 } from "@xwiki/platform-link-type-api";
 import { computed, markRaw, provide } from "vue";
 import { useI18n } from "vue-i18n";
+import type { LinkTargetTypeForm } from "../linkTargetTypeForm";
 import type {
   LinkData,
   LinkTargetTypeExtension,
@@ -79,16 +83,32 @@ const offeredLinkExtensions = linkExtensions.filter(
 
 provide("linkTargetTypeExtensions", offeredLinkExtensions);
 
-// The form of the currently selected link target type. `markRaw()` excludes it from Vue's reactivity tracking
-// (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a dynamically registered
-// component).
+// The forms of the link target types, registered separately from the link target types themselves so that these don't
+// depend on the UI framework of the link modal.
+const linkTargetTypeForms: LinkTargetTypeForm[] = [
+  {
+    type: unsupportedLinkTargetType,
+    component: () => UnsupportedLinkTargetForm,
+  },
+  ...(props.depsContainer.isBound(linkTargetTypeFormRole)
+    ? props.depsContainer.getAll<LinkTargetTypeForm>(linkTargetTypeFormRole)
+    : []),
+];
+
+// The form of the currently selected link target type, or a plain text form for a link target type registered without
+// a form. `markRaw()` excludes it from Vue's reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of
+// `markRaw()` for the same reason, for a dynamically registered component).
 const activeFormComponent = computed(() => {
-  const extension = linkExtensions.find(
-    (e) => e.type === linkData.value.target.type,
-  );
+  const type = linkData.value.target.type;
+  const form = linkTargetTypeForms.find((form) => form.type === type);
+  if (form) {
+    return markRaw(form.component());
+  }
+
+  const extension = linkExtensions.find((e) => e.type === type);
 
   // The extension providing this type is not (or no longer) registered/enabled: nothing to render.
-  return extension ? markRaw(extension.component()) : null;
+  return extension ? markRaw(plainTextFallbackForm(extension)) : null;
 });
 
 defineEmits<{ submit: [LinkData]; cancel: [] }>();

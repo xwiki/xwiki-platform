@@ -4,9 +4,30 @@
 
 ```ts
 
-import { Component } from 'vue';
 import { Container } from 'inversify';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
+
+// @beta
+export abstract class AbstractPlainTextLinkTargetType implements LinkTargetTypeExtension<PlainTextLinkTargetConfig> {
+    // (undocumented)
+    configToReference(input: PlainTextLinkTargetConfig): ResourceReference | undefined;
+    // (undocumented)
+    createDefaultConfig(): PlainTextLinkTargetConfig;
+    // (undocumented)
+    abstract getLabel(locale: string): Promise<string>;
+    // (undocumented)
+    abstract readonly order: number;
+    protected abstract readonly resourceType: string;
+    // (undocumented)
+    serializeURL(input: PlainTextLinkTargetConfig): string;
+    // (undocumented)
+    tryParseReference(reference: ResourceReference): PlainTextLinkTargetConfig | null;
+    // (undocumented)
+    tryParseURL(url: string): PlainTextLinkTargetConfig | null;
+    // (undocumented)
+    abstract readonly type: string;
+    protected abstract readonly typedReference: boolean;
+}
 
 // @beta
 export type LinkData = {
@@ -26,8 +47,6 @@ export function linkTargetToResourceReference(target: LinkTarget, container: Con
 
 // @beta
 export interface LinkTargetTypeExtension<TConfig = unknown> {
-    // (undocumented)
-    component(): Component;
     configToReference?(config: TConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): TConfig;
@@ -49,6 +68,11 @@ export function listLinkTargetTypeExtensions(container: Container): LinkTargetTy
 
 // @beta
 export function parseLinkTarget(url: string, container: Container): LinkTarget;
+
+// @beta
+export type PlainTextLinkTargetConfig = {
+    location: string;
+};
 
 // @beta
 export function resourceReferenceToLinkTarget(reference: ResourceReference, container: Container): LinkTarget;

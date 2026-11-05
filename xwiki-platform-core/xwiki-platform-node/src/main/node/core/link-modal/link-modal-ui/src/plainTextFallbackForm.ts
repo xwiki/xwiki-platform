@@ -17,28 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import PlainTextLinkTargetForm from "./PlainTextLinkTargetForm.vue";
+import { useLinkTargetTypeLabels } from "./linkTargetTypeLabels";
+import PlainTextLinkTargetForm from "./vue/PlainTextLinkTargetForm.vue";
 import { defineComponent, h } from "vue";
-import type { PlainTextLinkTargetConfig } from "../data/linkType";
-import type { TextFieldProps } from "@xwiki/platform-dsapi";
-import type { LinkData } from "@xwiki/platform-link-type-api";
+import { useI18n } from "vue-i18n";
+import type {
+  LinkData,
+  LinkTargetTypeExtension,
+  PlainTextLinkTargetConfig,
+} from "@xwiki/platform-link-type-api";
 import type { Component, PropType } from "vue";
 
 /**
- * Create the form of a link target type designated by a plain text location. The link modal passes only the link data
- * and the configuration (`v-model`) to the form of a link target type, so the created form passes them on to the
- * shared form, along with what differs between these link target types.
+ * Create the form of a link target type registered without a form: its configuration is a plain text location (see
+ * `PlainTextLinkTargetConfig`), edited with a plain text field labelled with the label of the link target type.
  *
- * @param fieldLabelKey - the translation key of the label of the location field
- * @param dataTest - the value of the `data-test` attribute of the location field
- * @param inputType - the type of the location field
+ * @param extension - the link target type registered without a form
  * @returns the form component
  */
-function plainTextLinkTargetForm(
-  fieldLabelKey: string,
-  dataTest: string,
-  inputType?: TextFieldProps["type"],
-): Component {
+function plainTextFallbackForm(extension: LinkTargetTypeExtension): Component {
   return defineComponent({
     props: {
       linkData: { type: Object as PropType<LinkData>, required: true },
@@ -49,34 +46,19 @@ function plainTextLinkTargetForm(
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
+      const { locale } = useI18n();
+      const labels = useLinkTargetTypeLabels([extension], locale);
       return () =>
         h(PlainTextLinkTargetForm, {
           linkData: props.linkData,
           modelValue: props.modelValue,
           "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
             emit("update:modelValue", config),
-          fieldLabelKey,
-          dataTest,
-          inputType,
+          fieldLabel: labels.value[extension.type],
+          dataTest: "linkLocation",
         });
     },
   });
 }
 
-const URLLinkTargetForm = plainTextLinkTargetForm(
-  "link-type.target-types.url.url",
-  "linkUrl",
-  "url",
-);
-
-const PathLinkTargetForm = plainTextLinkTargetForm(
-  "link-type.target-types.path.path",
-  "linkPath",
-);
-
-const UNCLinkTargetForm = plainTextLinkTargetForm(
-  "link-type.target-types.unc.path",
-  "linkUNCPath",
-);
-
-export { PathLinkTargetForm, UNCLinkTargetForm, URLLinkTargetForm };
+export { plainTextFallbackForm };

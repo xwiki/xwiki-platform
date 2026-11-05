@@ -17,11 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AbstractPlainTextLinkTargetType } from "./AbstractPlainTextLinkTargetType";
-import { PathLinkTargetForm } from "../vue/plainTextLinkTargetForms";
+import { labelFromTranslations } from "./labels";
+import { AbstractPlainTextLinkTargetType } from "@xwiki/platform-link-type-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { Component } from "vue";
 
 /**
  * Built-in link target type for links to a path relative to the server (e.g. `/xwiki/bin/view/Main/`).
@@ -40,10 +39,8 @@ class PathLinkTargetType extends AbstractPlainTextLinkTargetType {
   // An untyped path is parsed back as a document reference.
   protected readonly typedReference = true;
 
-  protected readonly labelKey = "link-type.target-types.path.label";
-
-  component(): Component {
-    return PathLinkTargetForm;
+  getLabel(locale: string): Promise<string> {
+    return labelFromTranslations("link-type.target-types.path.label")(locale);
   }
 }
 

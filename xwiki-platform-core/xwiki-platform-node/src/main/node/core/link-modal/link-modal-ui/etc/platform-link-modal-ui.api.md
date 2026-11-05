@@ -6,6 +6,7 @@
 
 import { AllowedComponentProps } from 'vue';
 import { AttachmentsService } from '@xwiki/platform-attachments-api';
+import { Component } from 'vue';
 import { ComponentCustomProps } from 'vue';
 import { ComponentOptionsBase } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
@@ -24,6 +25,7 @@ import { MethodOptions } from 'vue';
 import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
+import { PlainTextLinkTargetConfig } from '@xwiki/platform-link-type-api';
 import { PublicProps } from 'vue';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
 import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
@@ -104,6 +106,37 @@ excludedLinkTargetTypes?: string[];
 onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
+
+// @beta
+export interface LinkTargetTypeForm {
+    // (undocumented)
+    component(): Component;
+    readonly type: string;
+}
+
+// @beta
+export const linkTargetTypeFormRole = "LinkTargetTypeForm";
+
+// @beta
+export const PlainTextLinkTargetForm: DefineComponent<    {
+modelValue: PlainTextLinkTargetConfig;
+} & {
+linkData: LinkData;
+fieldLabel: string;
+dataTest: string;
+inputType?: TextFieldProps["type"];
+}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
+"update:modelValue": (value: PlainTextLinkTargetConfig) => any;
+}, string, PublicProps, Readonly<{
+modelValue: PlainTextLinkTargetConfig;
+} & {
+linkData: LinkData;
+fieldLabel: string;
+dataTest: string;
+inputType?: TextFieldProps["type"];
+}> & Readonly<{
+"onUpdate:modelValue"?: ((value: PlainTextLinkTargetConfig) => any) | undefined;
+}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
 
 // @beta
 export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_setup>>["props"], __VLS_ctx?: {

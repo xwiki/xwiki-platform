@@ -42,8 +42,7 @@
   },
   "peerDependencies": {
     "inversify": "8.x",
-    "reflect-metadata": "0.x",
-    "vue": "3.x"
+    "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
@@ -58,8 +57,7 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "vitest-mock-extended": "catalog:",
-    "vue": "catalog:"
+    "vitest-mock-extended": "catalog:"
   },
   "publishConfig": {
     "exports": {

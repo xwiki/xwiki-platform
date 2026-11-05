@@ -4,13 +4,14 @@
 
 ```ts
 
+import { AbstractPlainTextLinkTargetType } from '@xwiki/platform-link-type-api';
 import { AttachmentReference } from '@xwiki/platform-model-api';
-import { Component } from 'vue';
 import { Container } from 'inversify';
 import { DocumentReference } from '@xwiki/platform-model-api';
 import { LinkTargetTypeExtension } from '@xwiki/platform-link-type-api';
 import { ModelReferenceParserProvider } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceSerializerProvider } from '@xwiki/platform-model-reference-api';
+import { PlainTextLinkTargetConfig } from '@xwiki/platform-link-type-api';
 import { RemoteURLParserProvider } from '@xwiki/platform-model-remote-url-api';
 import { RemoteURLSerializerProvider } from '@xwiki/platform-model-remote-url-api';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
@@ -24,8 +25,6 @@ export type AttachmentLinkTargetConfig = {
 // @beta
 export class AttachmentLinkTargetType implements LinkTargetTypeExtension<AttachmentLinkTargetConfig> {
     constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
-    // (undocumented)
-    component(): Component;
     // (undocumented)
     configToReference(input: AttachmentLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
@@ -59,8 +58,6 @@ export type EmailLinkTargetConfig = {
 // @beta
 export class EmailLinkTargetType implements LinkTargetTypeExtension<EmailLinkTargetConfig> {
     // (undocumented)
-    component(): Component;
-    // (undocumented)
     configToReference(input: EmailLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): EmailLinkTargetConfig;
@@ -89,8 +86,6 @@ export type PageLinkTargetConfig = {
 export class PageLinkTargetType implements LinkTargetTypeExtension<PageLinkTargetConfig> {
     constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
     // (undocumented)
-    component(): Component;
-    // (undocumented)
     configToReference(input: PageLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): PageLinkTargetConfig;
@@ -108,14 +103,10 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<PageLinkTarge
     readonly type = "page";
 }
 
-// Warning: (ae-forgotten-export) The symbol "AbstractPlainTextLinkTargetType" needs to be exported by the entry point index.d.ts
-//
 // @beta
 export class PathLinkTargetType extends AbstractPlainTextLinkTargetType {
     // (undocumented)
-    component(): Component;
-    // (undocumented)
-    protected readonly labelKey = "link-type.target-types.path.label";
+    getLabel(locale: string): Promise<string>;
     // (undocumented)
     readonly order = 300;
     // (undocumented)
@@ -127,16 +118,9 @@ export class PathLinkTargetType extends AbstractPlainTextLinkTargetType {
 }
 
 // @beta
-export type PlainTextLinkTargetConfig = {
-    location: string;
-};
-
-// @beta
 export class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {
     // (undocumented)
-    component(): Component;
-    // (undocumented)
-    protected readonly labelKey = "link-type.target-types.unc.label";
+    getLabel(locale: string): Promise<string>;
     // (undocumented)
     readonly order = 400;
     // (undocumented)
@@ -150,9 +134,7 @@ export class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {
 // @beta
 export class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
     // (undocumented)
-    component(): Component;
-    // (undocumented)
-    protected readonly labelKey = "link-type.target-types.url.label";
+    getLabel(locale: string): Promise<string>;
     // (undocumented)
     readonly order: number;
     // (undocumented)

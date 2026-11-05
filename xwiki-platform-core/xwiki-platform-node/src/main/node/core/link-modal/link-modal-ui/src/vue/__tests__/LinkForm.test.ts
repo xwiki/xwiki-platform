@@ -21,7 +21,7 @@ import { dsComponentStubs } from "./dsStubs";
 import LinkForm from "../LinkForm.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, test } from "vitest";
-import { defineComponent, nextTick } from "vue";
+import { nextTick } from "vue";
 import { createI18n } from "vue-i18n";
 import type {
   LinkData,
@@ -39,7 +39,6 @@ function extensionStub(
     type,
     getLabel,
     createDefaultConfig: () => defaultConfig,
-    component: () => defineComponent({ template: "<div />" }),
     tryParseURL: () => null,
     serializeURL: () => "",
   };

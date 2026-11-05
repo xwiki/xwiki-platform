@@ -18,20 +18,20 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { translations } from "../translations";
-import { LinkForm } from "@xwiki/platform-link-modal-ui";
-import { useI18n } from "vue-i18n";
-import type { PlainTextLinkTargetConfig } from "../data/linkType";
+import LinkForm from "./LinkForm.vue";
 import type { TextFieldProps } from "@xwiki/platform-dsapi";
-import type { LinkData } from "@xwiki/platform-link-type-api";
+import type {
+  LinkData,
+  PlainTextLinkTargetConfig,
+} from "@xwiki/platform-link-type-api";
 
 defineProps<{
   linkData: LinkData;
 
   /**
-   * The translation key of the label of the location field.
+   * The (translated) label of the location field.
    */
-  fieldLabelKey: string;
+  fieldLabel: string;
 
   /**
    * The value of the `data-test` attribute of the location field.
@@ -47,17 +47,16 @@ defineProps<{
 const model = defineModel<PlainTextLinkTargetConfig>({
   required: true,
 });
-
-const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
-  <!-- The form of the link target types designated by a plain text location (URL, path, UNC path). -->
+  <!-- The form of the link target types designated by a plain text location (e.g. URL, path, UNC path), and of the
+       link target types registered without a form. -->
   <LinkForm :link-data>
     <template #config>
       <x-text-field
         v-bind="{ 'data-test': dataTest }"
-        :label="t(fieldLabelKey)"
+        :label="fieldLabel"
         :type="inputType ?? 'text'"
         v-model="model.location"
         required

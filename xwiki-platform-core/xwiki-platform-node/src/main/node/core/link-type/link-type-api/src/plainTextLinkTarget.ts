@@ -17,19 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { labelFromTranslations } from "./labels";
-import {
-  typedResourceReference,
-  untypedResourceReference,
-} from "./referenceHelpers";
-import type { PlainTextLinkTargetConfig } from "../data/linkType";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
+import type { LinkTargetTypeExtension } from "./linkTargetType";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-import type { Component } from "vue";
+
+/**
+ * Configuration for a link to a resource designated by a plain text location: a URL, a path or a UNC path for
+ * instance. It's also the configuration expected from the link target types registered without a form, which are
+ * edited with a plain text field.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type PlainTextLinkTargetConfig = {
+  location: string;
+};
 
 /**
  * Base class of the link target types designated by a plain text location (e.g. a URL, a path or a UNC path), which
- * differ only by the type of the resource references they handle and how they are presented.
+ * differ only by the type of the resource references they handle and how they are presented. Such a link target type
+ * doesn't need a form: it can be edited with a plain text field.
  *
  * @since 18.10.0RC1
  * @beta
@@ -53,16 +59,7 @@ abstract class AbstractPlainTextLinkTargetType
    */
   protected abstract readonly typedReference: boolean;
 
-  /**
-   * The translation key of the label of this link target type.
-   */
-  protected abstract readonly labelKey: string;
-
-  abstract component(): Component;
-
-  getLabel(locale: string): Promise<string> {
-    return labelFromTranslations(this.labelKey)(locale);
-  }
+  abstract getLabel(locale: string): Promise<string>;
 
   createDefaultConfig(): PlainTextLinkTargetConfig {
     return { location: "" };
@@ -93,13 +90,16 @@ abstract class AbstractPlainTextLinkTargetType
   configToReference({
     location,
   }: PlainTextLinkTargetConfig): ResourceReference | undefined {
-    if (location.trim() === "") {
-      return undefined;
-    }
-    return this.typedReference
-      ? typedResourceReference(this.resourceType, location)
-      : untypedResourceReference(this.resourceType, location);
+    return location.trim() === ""
+      ? undefined
+      : {
+          type: this.resourceType,
+          typed: this.typedReference,
+          reference: location,
+          parameters: {},
+        };
   }
 }
 
 export { AbstractPlainTextLinkTargetType };
+export type { PlainTextLinkTargetConfig };

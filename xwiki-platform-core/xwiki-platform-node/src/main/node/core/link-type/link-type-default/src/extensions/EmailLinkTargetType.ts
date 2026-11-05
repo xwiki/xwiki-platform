@@ -19,14 +19,12 @@
  */
 import { labelFromTranslations } from "./labels";
 import { typedResourceReference } from "./referenceHelpers";
-import EmailLinkTargetForm from "../vue/EmailLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
 import type { EmailLinkTargetConfig } from "../data/linkType";
 import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-import type { Component } from "vue";
 
 /**
  * Built-in link target type for `mailto:` links.
@@ -45,10 +43,6 @@ class EmailLinkTargetType
 
   createDefaultConfig(): EmailLinkTargetConfig {
     return { address: "" };
-  }
-
-  component(): Component {
-    return EmailLinkTargetForm;
   }
 
   tryParseURL(url: string): EmailLinkTargetConfig | null {

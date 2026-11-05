@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { dsComponentStubs } from "./dsStubs";
+import { linkTargetTypeFormRole } from "../../linkTargetTypeForm";
 import LinkForm from "../LinkForm.vue";
 import LinkModal from "../LinkModal.vue";
 import { flushPromises, mount } from "@vue/test-utils";
@@ -30,11 +31,15 @@ import type {
   LinkTargetTypeExtension,
 } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
+import type { Component } from "vue";
 
-// `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetTypeExtension`s, out of the
-// same `depsContainer`; a minimal fake satisfying every lookup it performs is enough since none of the domain
-// services are exercised in this test (the fake configuration components below don't use them).
-function fakeDepsContainer(extensions: LinkTargetTypeExtension[]): Container {
+// A fake link target type, along with its form, if any.
+type FakeExtension = LinkTargetTypeExtension & { fakeForm?: Component };
+
+// `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetTypeExtension`s and their forms, out
+// of the same `depsContainer`; a minimal fake satisfying every lookup it performs is enough since none of the domain
+// services are exercised in this test (the fake forms below don't use them).
+function fakeDepsContainer(extensions: FakeExtension[]): Container {
   const noopProvider = { get: () => null };
   const providers: Record<string, unknown> = {
     LinkSuggestServiceProvider: noopProvider,
@@ -46,30 +51,41 @@ function fakeDepsContainer(extensions: LinkTargetTypeExtension[]): Container {
     AttachmentsService: {},
     DocumentService: {},
   };
+  const forms = extensions.flatMap((extension) =>
+    extension.fakeForm
+      ? [{ type: extension.type, component: () => extension.fakeForm }]
+      : [],
+  );
   return {
     get: (token: string) => providers[token],
-    getAll: () => extensions,
+    isBound: (token: string) =>
+      token === linkTargetTypeFormRole ? forms.length > 0 : true,
+    getAll: (token: string) =>
+      token === linkTargetTypeFormRole ? forms : extensions,
   } as unknown as Container;
 }
 
+/**
+ * @param form - the form of the link target type, or `undefined` to register it without a form
+ */
 function fakeExtension(
   type: string,
   label: string,
-  component: ReturnType<typeof defineComponent>,
-): LinkTargetTypeExtension {
+  form?: Component,
+): FakeExtension {
   return {
     type,
     getLabel: async () => label,
     createDefaultConfig: () => ({}),
-    component: () => component,
     tryParseURL: () => null,
     serializeURL: () => "",
+    fakeForm: form,
   };
 }
 
 function mountLinkModal(
   current: LinkData,
-  extensions: LinkTargetTypeExtension[] = [],
+  extensions: FakeExtension[] = [],
   excludedLinkTargetTypes?: string[],
 ) {
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
@@ -87,10 +103,7 @@ function mountLinkModal(
 /**
  * @returns a fake link target type whose form renders the link type selector (see LinkForm)
  */
-function fakeExtensionWithLinkForm(
-  type: string,
-  label: string,
-): LinkTargetTypeExtension {
+function fakeExtensionWithLinkForm(type: string, label: string): FakeExtension {
   return fakeExtension(
     type,
     label,
@@ -301,5 +314,28 @@ describe("LinkModal", () => {
       ["a", "A"],
       ["b", "B"],
     ]);
+  });
+
+  it("edits a link target type registered without a form with a plain text field labelled with its label", async () => {
+    const wrapper = mountLinkModal(
+      {
+        displayText: "",
+        target: { type: "jira", config: { location: "XWIKI-1" } },
+      },
+      [fakeExtension("jira", "Jira issue")],
+    );
+    await flushPromises();
+
+    const field = wrapper.get("[data-test='linkLocation']");
+    expect((field.element as HTMLInputElement).value).toBe("XWIKI-1");
+    expect(
+      field.element.parentElement?.querySelector("label")?.textContent,
+    ).toBe("Jira issue");
+
+    await field.setValue("XWIKI-2");
+    await wrapper.find("[data-test='linkSubmit']").trigger("click");
+    expect(wrapper.emitted("submit")?.[0]?.[0]).toMatchObject({
+      target: { type: "jira", config: { location: "XWIKI-2" } },
+    });
   });
 });

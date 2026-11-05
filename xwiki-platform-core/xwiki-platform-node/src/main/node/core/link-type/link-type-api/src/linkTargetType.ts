@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-import type { Component } from "vue";
 
 /**
  * Inversify role used to register {@link LinkTargetTypeExtension} implementations against the shared
@@ -42,6 +41,11 @@ const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
  * Implementations are components, instantiated by the container they are registered in: they get the services they
  * need through constructor injection. Services that depend on the current wiki (e.g. the model reference parser)
  * should be resolved through their provider (e.g. `ModelReferenceParserProvider`) each time they are used.
+ *
+ * This contract doesn't depend on any UI framework: the form used to edit a link of this type in the link modal is
+ * registered separately (see `LinkTargetTypeForm` in `@xwiki/platform-link-modal-ui`). A link target type registered
+ * without a form is edited with a plain text field, so its configuration must then be a
+ * {@link PlainTextLinkTargetConfig} (see {@link AbstractPlainTextLinkTargetType}).
  *
  * @typeParam TConfig - the shape of this link target type's configuration
  *
@@ -82,12 +86,6 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
    * @returns a fresh default configuration, used when the user switches the link type selector to this type.
    */
   createDefaultConfig(): TConfig;
-
-  /**
-   * @returns the Vue component rendering the link form for this type in the link modal, usually by wrapping this
-   *   type's fields with the `LinkForm` component of `@xwiki/platform-link-modal-ui`.
-   */
-  component(): Component;
 
   /**
    * @param url - a raw URL, as found in a link

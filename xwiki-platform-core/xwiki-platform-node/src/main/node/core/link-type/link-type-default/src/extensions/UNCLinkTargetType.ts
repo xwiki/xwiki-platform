@@ -17,11 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AbstractPlainTextLinkTargetType } from "./AbstractPlainTextLinkTargetType";
-import { UNCLinkTargetForm } from "../vue/plainTextLinkTargetForms";
+import { labelFromTranslations } from "./labels";
+import { AbstractPlainTextLinkTargetType } from "@xwiki/platform-link-type-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { Component } from "vue";
 
 /**
  * Built-in link target type for links to a network resource designated by a UNC path (e.g. `\\server\share`).
@@ -40,10 +39,8 @@ class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {
   // An untyped UNC path is parsed back as a document reference.
   protected readonly typedReference = true;
 
-  protected readonly labelKey = "link-type.target-types.unc.label";
-
-  component(): Component {
-    return UNCLinkTargetForm;
+  getLabel(locale: string): Promise<string> {
+    return labelFromTranslations("link-type.target-types.unc.label")(locale);
   }
 }
 

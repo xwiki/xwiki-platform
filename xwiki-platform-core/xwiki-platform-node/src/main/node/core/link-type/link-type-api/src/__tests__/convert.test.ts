@@ -36,9 +36,6 @@ class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
   readonly order = Number.MAX_SAFE_INTEGER;
   getLabel = async () => "URL";
   createDefaultConfig = () => ({ url: "" });
-  component = () => {
-    throw new Error("not used in this test");
-  };
   tryParseURL = (url: string) => ({ url });
   serializeURL = (config: { url: string }) => config.url;
   // Unlike tryParseURL, this is deliberately NOT a catch-all — see URLLinkTargetType.
@@ -58,9 +55,6 @@ class PageExtension implements LinkTargetTypeExtension<{ ref: string }> {
   readonly order = 0;
   getLabel = async () => "Page";
   createDefaultConfig = () => ({ ref: "" });
-  component = () => {
-    throw new Error("not used in this test");
-  };
   tryParseURL = (url: string) =>
     url.startsWith("page:") ? { ref: url.slice("page:".length) } : null;
   serializeURL = (config: { ref: string }) => `page:${config.ref}`;
@@ -84,9 +78,6 @@ class NoReferenceSupportExtension
   readonly order = 50;
   getLabel = async () => "No reference support";
   createDefaultConfig = () => ({ ref: "" });
-  component = () => {
-    throw new Error("not used in this test");
-  };
   tryParseURL = () => null;
   serializeURL = (config: { ref: string }) => config.ref;
 }

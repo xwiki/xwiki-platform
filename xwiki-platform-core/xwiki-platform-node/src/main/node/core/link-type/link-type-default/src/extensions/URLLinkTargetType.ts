@@ -17,12 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AbstractPlainTextLinkTargetType } from "./AbstractPlainTextLinkTargetType";
-import { URLLinkTargetForm } from "../vue/plainTextLinkTargetForms";
+import { labelFromTranslations } from "./labels";
+import { AbstractPlainTextLinkTargetType } from "@xwiki/platform-link-type-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { PlainTextLinkTargetConfig } from "../data/linkType";
-import type { Component } from "vue";
+import type { PlainTextLinkTargetConfig } from "@xwiki/platform-link-type-api";
 
 /**
  * Built-in link target type for links to an external URL.
@@ -42,10 +41,8 @@ class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
   // An untyped URL is parsed back as a URL, thanks to its scheme.
   protected readonly typedReference = false;
 
-  protected readonly labelKey = "link-type.target-types.url.label";
-
-  component(): Component {
-    return URLLinkTargetForm;
+  getLabel(locale: string): Promise<string> {
+    return labelFromTranslations("link-type.target-types.url.label")(locale);
   }
 
   /**

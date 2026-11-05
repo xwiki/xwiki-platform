@@ -22,7 +22,6 @@ import {
   entityResourceReference,
   parseEntityReference,
 } from "./referenceHelpers";
-import AttachmentLinkTargetForm from "../vue/AttachmentLinkTargetForm.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
@@ -38,7 +37,6 @@ import type {
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-import type { Component } from "vue";
 
 /**
  * Built-in link target type for links to an attachment.
@@ -68,10 +66,6 @@ class AttachmentLinkTargetType
 
   createDefaultConfig(): AttachmentLinkTargetConfig {
     return { ref: null };
-  }
-
-  component(): Component {
-    return AttachmentLinkTargetForm;
   }
 
   tryParseURL(url: string): AttachmentLinkTargetConfig | null {

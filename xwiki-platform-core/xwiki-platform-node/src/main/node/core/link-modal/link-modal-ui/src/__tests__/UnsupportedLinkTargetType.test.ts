@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { UnsupportedLinkTargetType } from "../UnsupportedLinkTargetType";
-import UnsupportedLinkTargetForm from "../vue/UnsupportedLinkTargetForm.vue";
 import { describe, expect, it } from "vitest";
 import type { UnsupportedLinkTargetConfig } from "@xwiki/platform-link-type-api";
 
@@ -34,11 +33,10 @@ function interwikiConfig(): UnsupportedLinkTargetConfig {
 }
 
 describe("UnsupportedLinkTargetType", () => {
-  it("is labelled with the type of the linked resource, as is, and edited with a plain text form", async () => {
+  it("is labelled with the type of the linked resource, as is", async () => {
     const linkTargetType = new UnsupportedLinkTargetType(interwikiConfig());
 
     await expect(linkTargetType.getLabel()).resolves.toBe("interwiki");
-    expect(linkTargetType.component()).toBe(UnsupportedLinkTargetForm);
   });
 
   it("restores the original configuration, even after it or a previous default configuration was modified", () => {

@@ -103,18 +103,6 @@ public class HttpServletResponseStub implements HttpServletResponse
     }
 
     @Override
-    public String encodeUrl(String url)
-    {
-        return url;
-    }
-
-    @Override
-    public String encodeRedirectUrl(String url)
-    {
-        return url;
-    }
-
-    @Override
     public void sendError(int sc, String msg) throws IOException
     {
         // Nothing to do, this stub does not send any response.
@@ -170,12 +158,6 @@ public class HttpServletResponseStub implements HttpServletResponse
 
     @Override
     public void setStatus(int sc)
-    {
-        // Nothing to do, this stub does not send any response.
-    }
-
-    @Override
-    public void setStatus(int sc, String sm)
     {
         // Nothing to do, this stub does not send any response.
     }

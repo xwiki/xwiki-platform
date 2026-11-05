@@ -38,20 +38,11 @@ type FakeLinkTargetType = LinkTargetType & {
   fakeOptionFields?: Component;
 };
 
-// `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetType`s and their forms, out
-// of the same `depsContainer`; a minimal fake satisfying every lookup it performs is enough since none of the domain
-// services are exercised in this test (the fake forms below don't use them).
+// `LinkModal.vue` resolves the registered `LinkTargetType`s (through the link target type manager) and their forms out
+// of the `depsContainer`, which it passes to the fields; a minimal fake satisfying these lookups is enough since the
+// fake fields below don't resolve anything.
 function fakeDepsContainer(targetTypes: FakeLinkTargetType[]): Container {
-  const noopProvider = { get: () => null };
-  const providers: Record<string, unknown> = {
-    LinkSuggestServiceProvider: noopProvider,
-    ModelReferenceParserProvider: noopProvider,
-    ModelReferenceSerializerProvider: noopProvider,
-    ModelReferenceHandlerProvider: noopProvider,
-    RemoteURLParserProvider: noopProvider,
-    RemoteURLSerializerProvider: noopProvider,
-    AttachmentsService: {},
-    DocumentService: {},
+  const components: Record<string, unknown> = {
     [linkTargetTypeManagerRole]: { list: () => targetTypes },
   };
   const forms = targetTypes.flatMap((targetType) =>
@@ -68,7 +59,7 @@ function fakeDepsContainer(targetTypes: FakeLinkTargetType[]): Container {
       : [],
   );
   return {
-    get: (token: string) => providers[token],
+    get: (token: string) => components[token],
     isBound: (token: string) =>
       token === linkTargetTypeFormRole ? forms.length > 0 : true,
     getAll: (token: string) => (token === linkTargetTypeFormRole ? forms : []),
@@ -372,5 +363,29 @@ describe("LinkModal", () => {
     await wrapper.get("[data-test='linkTargetType']").setValue("b");
     expect(wrapper.text()).toContain("form-b");
     expect(wrapper.text()).not.toContain("options-a");
+  });
+
+  it("passes its container to the target and option fields, to resolve the services they need", async () => {
+    const targetField = defineComponent({
+      props: ["depsContainer"],
+      template: "<div>fields-a</div>",
+    });
+    const optionFields = defineComponent({
+      props: ["depsContainer"],
+      template: "<div>options-a</div>",
+    });
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "a", config: {} } },
+      [fakeLinkTargetType("a", "A", targetField, optionFields)],
+    );
+    await flushPromises();
+
+    const depsContainer = wrapper.props("depsContainer");
+    expect(wrapper.getComponent(targetField).props("depsContainer")).toBe(
+      depsContainer,
+    );
+    expect(wrapper.getComponent(optionFields).props("depsContainer")).toBe(
+      depsContainer,
+    );
   });
 });

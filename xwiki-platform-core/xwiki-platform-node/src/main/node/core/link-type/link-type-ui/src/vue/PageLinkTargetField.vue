@@ -25,38 +25,47 @@ import { CIcon, Size } from "@xwiki/platform-icons";
 import { SearchBox } from "@xwiki/platform-link-modal-ui";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
-import { inject } from "vue";
 import { useI18n } from "vue-i18n";
+import type { SearchBoxSource } from "@xwiki/platform-link-modal-ui";
 import type {
-  LinkEditionContext,
-  SearchBoxSource,
-} from "@xwiki/platform-link-modal-ui";
-import type { Link } from "@xwiki/platform-link-suggest-api";
-import type { LinkData } from "@xwiki/platform-link-type-api";
+  Link,
+  LinkSuggestServiceProvider,
+} from "@xwiki/platform-link-suggest-api";
 import type { PageLinkTargetConfig } from "@xwiki/platform-link-type-default";
 import type { DocumentReference } from "@xwiki/platform-model-api";
+import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type { Container } from "inversify";
 
-defineProps<{ linkData: LinkData }>();
+const { depsContainer } = defineProps<{ depsContainer: Container }>();
 
 const model = defineModel<PageLinkTargetConfig>({
   required: true,
 });
 
-const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
+const modelReferenceParser = depsContainer
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get()!;
+const modelReferenceSerializer = depsContainer
+  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+  .get()!;
+const linkSuggestService = depsContainer
+  .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
+  .get();
 
 /**
  * @param reference - a serialized page reference, typed by the user or held by a link suggestion
  * @returns the parsed page reference, or `null` when it doesn't designate a page
  */
 function parseReference(reference: string): DocumentReference | null {
-  const ref = tryFallible(() =>
-    linkEditionCtx.modelReferenceParser.parse(reference),
-  );
+  const ref = tryFallible(() => modelReferenceParser.parse(reference));
   return ref?.type === EntityType.DOCUMENT ? ref : null;
 }
 
 const getSuggestions: SearchBoxSource<DocumentReference, Link> = (query) =>
-  suggestLinks(linkEditionCtx, query, LinkType.PAGE, (link) =>
+  suggestLinks(linkSuggestService, query, LinkType.PAGE, (link) =>
     parseReference(link.reference),
   );
 
@@ -72,9 +81,7 @@ const { t } = useI18n({ messages: translations });
     v-bind="{ 'data-test': 'linkPageReference' }"
     :label="t('link-type.target-types.page.reference')"
     :initial-value="
-      model.ref !== null
-        ? linkEditionCtx.modelReferenceSerializer.serialize(model.ref)!
-        : null
+      model.ref !== null ? modelReferenceSerializer.serialize(model.ref)! : null
     "
     :get-suggestions
     :parse-query="parseReference"

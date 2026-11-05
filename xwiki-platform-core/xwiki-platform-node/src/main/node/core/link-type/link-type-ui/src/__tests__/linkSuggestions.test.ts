@@ -20,7 +20,6 @@
 import { suggestLinks } from "../linkSuggestions";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { describe, expect, it, vi } from "vitest";
-import type { LinkEditionContext } from "@xwiki/platform-link-modal-ui";
 import type {
   Link,
   LinkSuggestService,
@@ -37,19 +36,16 @@ function link(reference: string, label: string, type = LinkType.PAGE): Link {
   };
 }
 
-// suggestLinks only uses the link suggestion service of the link edition context.
-function linkEditionContext(
-  getLinks: LinkSuggestService["getLinks"] | null,
-): LinkEditionContext {
-  return {
-    linkSuggestService: getLinks ? { getLinks } : null,
-  } as LinkEditionContext;
+function linkSuggestService(
+  getLinks: LinkSuggestService["getLinks"],
+): LinkSuggestService {
+  return { getLinks };
 }
 
 describe("suggestLinks", () => {
   it("returns false when there is no link suggestion service", async () => {
     await expect(
-      suggestLinks(linkEditionContext(null), "query", LinkType.PAGE, () => 1),
+      suggestLinks(undefined, "query", LinkType.PAGE, () => 1),
     ).resolves.toBe(false);
   });
 
@@ -61,7 +57,7 @@ describe("suggestLinks", () => {
     ]);
 
     const items = await suggestLinks(
-      linkEditionContext(getLinks),
+      linkSuggestService(getLinks),
       "some",
       LinkType.PAGE,
       (link) => `value of ${link.reference}`,
@@ -86,7 +82,7 @@ describe("suggestLinks", () => {
 
   it("leaves out the links of another type and the links without a value", async () => {
     const items = await suggestLinks(
-      linkEditionContext(async () => [
+      linkSuggestService(async () => [
         link("Space.Page@file.png", "file.png", LinkType.ATTACHMENT),
         link("Space.Invalid", "Invalid"),
         link("Space.Page", "Page"),
@@ -107,7 +103,7 @@ describe("suggestLinks", () => {
 
     try {
       const items = await suggestLinks(
-        linkEditionContext(async () => {
+        linkSuggestService(async () => {
           throw error;
         }),
         "query",

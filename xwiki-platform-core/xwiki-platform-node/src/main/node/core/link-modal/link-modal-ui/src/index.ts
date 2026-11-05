@@ -53,6 +53,5 @@ const PlainTextLinkTargetField = _PlainTextLinkTargetField;
 export { LinkModal, PlainTextLinkTargetField, SearchBox };
 
 export type { SearchBoxItem, SearchBoxSource } from "./vue/SearchBox.vue";
-export type { LinkEditionContext } from "./linkEditionContext";
 export { linkTargetTypeFormRole } from "./linkTargetTypeForm";
 export type { LinkTargetTypeForm } from "./linkTargetTypeForm";

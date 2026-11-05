@@ -22,10 +22,10 @@ import { useLinkTargetTypeLabels } from "./linkTargetTypeLabels";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
-  LinkData,
   LinkTargetType,
   PlainTextLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
+import type { Container } from "inversify";
 import type { Component, PropType } from "vue";
 
 /**
@@ -38,7 +38,8 @@ import type { Component, PropType } from "vue";
 function plainTextFallbackField(targetType: LinkTargetType): Component {
   return defineComponent({
     props: {
-      linkData: { type: Object as PropType<LinkData>, required: true },
+      // Declared although unused, so that it doesn't fall through as an attribute of the location field.
+      depsContainer: { type: Object as PropType<Container>, required: true },
       modelValue: {
         type: Object as PropType<PlainTextLinkTargetConfig>,
         required: true,
@@ -50,12 +51,11 @@ function plainTextFallbackField(targetType: LinkTargetType): Component {
       const labels = useLinkTargetTypeLabels([targetType], locale);
       return () =>
         h(PlainTextLinkTargetField, {
-          linkData: props.linkData,
           modelValue: props.modelValue,
           "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
             emit("update:modelValue", config),
           fieldLabel: labels.value[targetType.type],
-          dataTest: "linkLocation",
+          "data-test": "linkLocation",
         });
     },
   });

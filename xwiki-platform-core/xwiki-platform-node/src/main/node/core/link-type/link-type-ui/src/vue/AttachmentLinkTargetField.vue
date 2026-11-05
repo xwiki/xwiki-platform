@@ -25,24 +25,35 @@ import { CIcon, Size } from "@xwiki/platform-icons";
 import { SearchBox } from "@xwiki/platform-link-modal-ui";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
-import { inject } from "vue";
 import { useI18n } from "vue-i18n";
+import type { SearchBoxSource } from "@xwiki/platform-link-modal-ui";
 import type {
-  LinkEditionContext,
-  SearchBoxSource,
-} from "@xwiki/platform-link-modal-ui";
-import type { Link } from "@xwiki/platform-link-suggest-api";
-import type { LinkData } from "@xwiki/platform-link-type-api";
+  Link,
+  LinkSuggestServiceProvider,
+} from "@xwiki/platform-link-suggest-api";
 import type { AttachmentLinkTargetConfig } from "@xwiki/platform-link-type-default";
 import type { AttachmentReference } from "@xwiki/platform-model-api";
+import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type { Container } from "inversify";
 
-defineProps<{ linkData: LinkData }>();
+const { depsContainer } = defineProps<{ depsContainer: Container }>();
 
 const model = defineModel<AttachmentLinkTargetConfig>({
   required: true,
 });
 
-const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
+const modelReferenceParser = depsContainer
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get()!;
+const modelReferenceSerializer = depsContainer
+  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+  .get()!;
+const linkSuggestService = depsContainer
+  .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
+  .get();
 
 /**
  * @param reference - a serialized attachment reference, typed by the user or held by a link suggestion
@@ -50,15 +61,13 @@ const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
  */
 function parseReference(reference: string): AttachmentReference | null {
   const ref = tryFallible(() =>
-    linkEditionCtx.modelReferenceParser.parse(reference, {
-      type: EntityType.ATTACHMENT,
-    }),
+    modelReferenceParser.parse(reference, { type: EntityType.ATTACHMENT }),
   );
   return ref?.type === EntityType.ATTACHMENT ? ref : null;
 }
 
 const getSuggestions: SearchBoxSource<AttachmentReference, Link> = (query) =>
-  suggestLinks(linkEditionCtx, query, LinkType.ATTACHMENT, (link) =>
+  suggestLinks(linkSuggestService, query, LinkType.ATTACHMENT, (link) =>
     parseReference(link.reference),
   );
 
@@ -74,9 +83,7 @@ const { t } = useI18n({ messages: translations });
     v-bind="{ 'data-test': 'linkAttachmentReference' }"
     :label="t('link-type.target-types.attachment.reference')"
     :initial-value="
-      model.ref !== null
-        ? linkEditionCtx.modelReferenceSerializer.serialize(model.ref)!
-        : null
+      model.ref !== null ? modelReferenceSerializer.serialize(model.ref)! : null
     "
     :get-suggestions
     :parse-query="parseReference"

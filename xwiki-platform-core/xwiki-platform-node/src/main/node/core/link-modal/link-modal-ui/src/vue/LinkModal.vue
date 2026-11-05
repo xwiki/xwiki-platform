@@ -22,7 +22,6 @@ import LinkForm from "./LinkForm.vue";
 import UnsupportedLinkTargetField from "./UnsupportedLinkTargetField.vue";
 import { plainTextFallbackField } from "./plainTextFallbackField";
 import { UnsupportedLinkTargetType } from "../UnsupportedLinkTargetType";
-import { createLinkEditionContext } from "../linkEditionContext";
 import { linkTargetTypeFormRole } from "../linkTargetTypeForm";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
@@ -54,8 +53,6 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n({ messages: translations });
-
-provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
 
 const linkData = typedRef(props.current);
 
@@ -136,7 +133,7 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
           v-if="activeForm"
           :is="activeForm.targetField"
           v-model="linkData.target.config"
-          :link-data="linkData"
+          :deps-container
         />
       </template>
 
@@ -145,7 +142,7 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
           v-if="activeForm?.optionFields"
           :is="activeForm.optionFields"
           v-model="linkData.target.config"
-          :link-data="linkData"
+          :deps-container
         />
       </template>
     </LinkForm>

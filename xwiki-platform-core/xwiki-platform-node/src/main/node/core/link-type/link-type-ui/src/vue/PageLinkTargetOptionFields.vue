@@ -20,11 +20,13 @@
 <script setup lang="ts">
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
-import type { LinkData } from "@xwiki/platform-link-type-api";
 import type { PageLinkTargetConfig } from "@xwiki/platform-link-type-default";
+import type { Container } from "inversify";
 
 // The option fields of a link of this type, displayed in the "Options" section of the link form.
-defineProps<{ linkData: LinkData }>();
+// The container of the link modal (see `LinkTargetTypeForm`), declared although unused, so that it doesn't fall
+// through as an attribute.
+defineProps<{ depsContainer: Container }>();
 
 const model = defineModel<PageLinkTargetConfig>({
   required: true,

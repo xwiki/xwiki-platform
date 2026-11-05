@@ -46,6 +46,7 @@
     "@xwiki/platform-link-type-api": "workspace:*",
     "@xwiki/platform-link-type-default": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
+    "@xwiki/platform-model-reference-api": "workspace:*",
     "vue-i18n": "catalog:"
   },
   "peerDependencies": {

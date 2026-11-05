@@ -18,17 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { filterMap } from "@xwiki/platform-fn-utils";
+import type { SearchBoxItem } from "@xwiki/platform-link-modal-ui";
 import type {
-  LinkEditionContext,
-  SearchBoxItem,
-} from "@xwiki/platform-link-modal-ui";
-import type { Link, LinkType } from "@xwiki/platform-link-suggest-api";
+  Link,
+  LinkSuggestService,
+  LinkType,
+} from "@xwiki/platform-link-suggest-api";
 
 /**
  * Search the links of a given type matching a query, as items of the search box. The links are listed as returned by
  * the link suggestion service, which is in charge of matching them against the query.
  *
- * @param linkEditionCtx - provides the link suggestion service
+ * @param linkSuggestService - the link suggestion service, if any
  * @param query - the text to search for
  * @param type - the type of the links to search for
  * @param toValue - converts a link into the value emitted when it is selected, or returns `null` to leave the link out
@@ -37,7 +38,7 @@ import type { Link, LinkType } from "@xwiki/platform-link-suggest-api";
  *   service
  */
 async function suggestLinks<T>(
-  { linkSuggestService }: LinkEditionContext,
+  linkSuggestService: LinkSuggestService | undefined,
   query: string,
   type: LinkType,
   toValue: (link: Link) => T | null,

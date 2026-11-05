@@ -49,8 +49,11 @@ interface LinkTargetTypeForm {
    * The field designating the target of the link (e.g. a page search box, an e-mail address field, a URL field).
    *
    * @returns the Vue component rendering the field in the link form, below the fields shared by all the link target
-   *   types (display text and link type), which the link modal renders itself. It receives the edited link data
-   *   (`linkData` prop) and the configuration of the link target (`v-model`).
+   *   types (display text and link type), which the link modal renders itself. It receives the configuration of the
+   *   link target (`v-model`), and the container of the link modal (`depsContainer` prop), to resolve the services it
+   *   needs. Services that depend on the current wiki should be resolved through their provider (e.g.
+   *   `ModelReferenceParserProvider`). It must declare the `depsContainer` prop even when it doesn't use it, so that
+   *   the container doesn't fall through as an attribute of its root element.
    */
   targetField(): Component;
 

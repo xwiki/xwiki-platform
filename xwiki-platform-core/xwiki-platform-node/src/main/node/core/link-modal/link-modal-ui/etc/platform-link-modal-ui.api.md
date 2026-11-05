@@ -4,37 +4,17 @@
 
 ```ts
 
-import { AttachmentsService } from '@xwiki/platform-attachments-api';
 import { Component } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
 import { DefineComponent } from 'vue';
-import { DocumentService } from '@xwiki/platform-document-api';
 import { LinkData } from '@xwiki/platform-link-type-api';
-import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
-import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { PlainTextLinkTargetConfig } from '@xwiki/platform-link-type-api';
 import { PublicProps } from 'vue';
-import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
-import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 import { ShallowUnwrapRef } from 'vue';
 import { TextFieldProps } from '@xwiki/platform-dsapi';
 import { VNode } from 'vue';
-
-// @beta
-export type LinkEditionContext = {
-    linkSuggestService: LinkSuggestService | null;
-    modelReferenceParser: ModelReferenceParser;
-    modelReferenceSerializer: ModelReferenceSerializer;
-    modelReferenceHandler: ModelReferenceHandler;
-    remoteURLParser: RemoteURLParser;
-    remoteURLSerializer: RemoteURLSerializer;
-    attachmentsService: AttachmentsService;
-    documentService: DocumentService;
-};
 
 // @beta
 export const LinkModal: DefineComponent<    {
@@ -67,18 +47,14 @@ export const linkTargetTypeFormRole = "LinkTargetTypeForm";
 export const PlainTextLinkTargetField: DefineComponent<    {
 modelValue: PlainTextLinkTargetConfig;
 } & {
-linkData: LinkData;
 fieldLabel: string;
-dataTest: string;
 inputType?: TextFieldProps["type"];
 }, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "update:modelValue": (value: PlainTextLinkTargetConfig) => any;
 }, string, PublicProps, Readonly<{
 modelValue: PlainTextLinkTargetConfig;
 } & {
-linkData: LinkData;
 fieldLabel: string;
-dataTest: string;
 inputType?: TextFieldProps["type"];
 }> & Readonly<{
 "onUpdate:modelValue"?: ((value: PlainTextLinkTargetConfig) => any) | undefined;

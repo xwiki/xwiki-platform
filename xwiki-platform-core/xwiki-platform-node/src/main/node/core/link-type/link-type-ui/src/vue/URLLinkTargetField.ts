@@ -21,10 +21,8 @@ import { translations } from "../translations";
 import { PlainTextLinkTargetField } from "@xwiki/platform-link-modal-ui";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
-import type {
-  LinkData,
-  PlainTextLinkTargetConfig,
-} from "@xwiki/platform-link-type-api";
+import type { PlainTextLinkTargetConfig } from "@xwiki/platform-link-type-api";
+import type { Container } from "inversify";
 import type { PropType } from "vue";
 
 /**
@@ -32,7 +30,8 @@ import type { PropType } from "vue";
  */
 const URLLinkTargetField = defineComponent({
   props: {
-    linkData: { type: Object as PropType<LinkData>, required: true },
+    // Declared although unused, so that it doesn't fall through as an attribute of the location field.
+    depsContainer: { type: Object as PropType<Container>, required: true },
     modelValue: {
       type: Object as PropType<PlainTextLinkTargetConfig>,
       required: true,
@@ -43,12 +42,11 @@ const URLLinkTargetField = defineComponent({
     const { t } = useI18n({ messages: translations });
     return () =>
       h(PlainTextLinkTargetField, {
-        linkData: props.linkData,
         modelValue: props.modelValue,
         "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
           emit("update:modelValue", config),
         fieldLabel: t("link-type.target-types.url.url"),
-        dataTest: "linkUrl",
+        "data-test": "linkUrl",
         inputType: "url",
       });
   },

@@ -20,10 +20,12 @@
 <script setup lang="ts">
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
-import type { LinkData } from "@xwiki/platform-link-type-api";
 import type { EmailLinkTargetConfig } from "@xwiki/platform-link-type-default";
+import type { Container } from "inversify";
 
-defineProps<{ linkData: LinkData }>();
+// The container of the link modal (see `LinkTargetTypeForm`), declared although unused, so that it doesn't fall
+// through as an attribute.
+defineProps<{ depsContainer: Container }>();
 
 const model = defineModel<EmailLinkTargetConfig>({
   required: true,

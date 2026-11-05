@@ -19,25 +19,16 @@
 -->
 <script setup lang="ts">
 import type { TextFieldProps } from "@xwiki/platform-dsapi";
-import type {
-  LinkData,
-  PlainTextLinkTargetConfig,
-} from "@xwiki/platform-link-type-api";
+import type { PlainTextLinkTargetConfig } from "@xwiki/platform-link-type-api";
 
 // The target field of the link target types designated by a plain text location (e.g. URL, path, UNC path), and of
-// the link target types registered without a form.
+// the link target types registered without a form. Its attributes (e.g. `data-test`) fall through to the location
+// field.
 defineProps<{
-  linkData: LinkData;
-
   /**
    * The (translated) label of the location field.
    */
   fieldLabel: string;
-
-  /**
-   * The value of the `data-test` attribute of the location field.
-   */
-  dataTest: string;
 
   /**
    * The type of the location field (e.g. "url" to validate it as a URL).
@@ -52,7 +43,6 @@ const model = defineModel<PlainTextLinkTargetConfig>({
 
 <template>
   <x-text-field
-    v-bind="{ 'data-test': dataTest }"
     :label="fieldLabel"
     :type="inputType ?? 'text'"
     v-model="model.location"

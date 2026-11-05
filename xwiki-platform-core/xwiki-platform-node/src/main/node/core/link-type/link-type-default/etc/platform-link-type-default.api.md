@@ -4,44 +4,15 @@
 
 ```ts
 
-import { AbstractPlainTextLinkTargetType } from '@xwiki/platform-link-type-api';
 import { AttachmentReference } from '@xwiki/platform-model-api';
 import { Container } from 'inversify';
 import { DocumentReference } from '@xwiki/platform-model-api';
-import { LinkTargetType } from '@xwiki/platform-link-type-api';
-import { ModelReferenceParserProvider } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceSerializerProvider } from '@xwiki/platform-model-reference-api';
-import { PlainTextLinkTargetConfig } from '@xwiki/platform-link-type-api';
-import { RemoteURLParserProvider } from '@xwiki/platform-model-remote-url-api';
-import { RemoteURLSerializerProvider } from '@xwiki/platform-model-remote-url-api';
-import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
 export type AttachmentLinkTargetConfig = {
     ref: AttachmentReference | null;
     queryString?: string;
 };
-
-// @beta
-export class AttachmentLinkTargetType implements LinkTargetType<AttachmentLinkTargetConfig> {
-    constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
-    // (undocumented)
-    createDefaultConfig(): AttachmentLinkTargetConfig;
-    // (undocumented)
-    fromReference(reference: ResourceReference): AttachmentLinkTargetConfig | null;
-    // (undocumented)
-    fromURL(url: string): AttachmentLinkTargetConfig | null;
-    // (undocumented)
-    getLabel(locale: string): Promise<string>;
-    // (undocumented)
-    readonly order = 100;
-    // (undocumented)
-    toReference(input: AttachmentLinkTargetConfig): ResourceReference | undefined;
-    // (undocumented)
-    toURL(input: AttachmentLinkTargetConfig): string;
-    // (undocumented)
-    readonly type = "attachment";
-}
 
 // @beta
 export class ComponentInit {
@@ -56,96 +27,11 @@ export type EmailLinkTargetConfig = {
 };
 
 // @beta
-export class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
-    // (undocumented)
-    createDefaultConfig(): EmailLinkTargetConfig;
-    // (undocumented)
-    fromReference(reference: ResourceReference): EmailLinkTargetConfig | null;
-    // (undocumented)
-    fromURL(url: string): EmailLinkTargetConfig | null;
-    // (undocumented)
-    getLabel(locale: string): Promise<string>;
-    // (undocumented)
-    readonly order = 200;
-    // (undocumented)
-    toReference(input: EmailLinkTargetConfig): ResourceReference | undefined;
-    // (undocumented)
-    toURL(input: EmailLinkTargetConfig): string;
-    // (undocumented)
-    readonly type = "email";
-}
-
-// @beta
 export type PageLinkTargetConfig = {
     ref: DocumentReference | null;
     queryString?: string;
     anchor?: string;
 };
-
-// @beta
-export class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
-    constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
-    // (undocumented)
-    createDefaultConfig(): PageLinkTargetConfig;
-    // (undocumented)
-    fromReference(reference: ResourceReference): PageLinkTargetConfig | null;
-    // (undocumented)
-    fromURL(url: string): PageLinkTargetConfig | null;
-    // (undocumented)
-    getLabel(locale: string): Promise<string>;
-    // (undocumented)
-    readonly order = 0;
-    // (undocumented)
-    toReference(input: PageLinkTargetConfig): ResourceReference | undefined;
-    // (undocumented)
-    toURL(input: PageLinkTargetConfig): string;
-    // (undocumented)
-    readonly type = "page";
-}
-
-// @beta
-export class PathLinkTargetType extends AbstractPlainTextLinkTargetType {
-    // (undocumented)
-    getLabel(locale: string): Promise<string>;
-    // (undocumented)
-    readonly order = 300;
-    // (undocumented)
-    protected readonly resourceType: string;
-    // (undocumented)
-    readonly type = "path";
-    // (undocumented)
-    protected readonly typedReference = true;
-}
-
-// @beta
-export class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {
-    // (undocumented)
-    getLabel(locale: string): Promise<string>;
-    // (undocumented)
-    readonly order = 400;
-    // (undocumented)
-    protected readonly resourceType: string;
-    // (undocumented)
-    readonly type = "unc";
-    // (undocumented)
-    protected readonly typedReference = true;
-}
-
-// @beta
-export class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
-    // (undocumented)
-    fromURL(url: string): PlainTextLinkTargetConfig;
-    // (undocumented)
-    getLabel(locale: string): Promise<string>;
-    // (undocumented)
-    readonly order: number;
-    // (undocumented)
-    protected readonly resourceType: string;
-    // (undocumented)
-    readonly type = "url";
-    // (undocumented)
-    protected readonly typedReference = false;
-}
 
 // (No @packageDocumentation comment for this package)
 

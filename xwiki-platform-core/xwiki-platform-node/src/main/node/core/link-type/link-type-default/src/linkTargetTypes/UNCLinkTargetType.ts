@@ -24,9 +24,6 @@ import { injectable } from "inversify";
 
 /**
  * Built-in link target type for links to a network resource designated by a UNC path (e.g. `\\server\share`).
- *
- * @since 18.10.0RC1
- * @beta
  */
 @injectable()
 class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {

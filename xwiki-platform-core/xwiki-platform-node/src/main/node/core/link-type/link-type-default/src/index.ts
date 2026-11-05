@@ -20,13 +20,6 @@
 
 export { ComponentInit } from "./componentInit";
 
-export { PageLinkTargetType } from "./linkTargetTypes/PageLinkTargetType";
-export { AttachmentLinkTargetType } from "./linkTargetTypes/AttachmentLinkTargetType";
-export { EmailLinkTargetType } from "./linkTargetTypes/EmailLinkTargetType";
-export { PathLinkTargetType } from "./linkTargetTypes/PathLinkTargetType";
-export { UNCLinkTargetType } from "./linkTargetTypes/UNCLinkTargetType";
-export { URLLinkTargetType } from "./linkTargetTypes/URLLinkTargetType";
-
 export type { AttachmentLinkTargetConfig } from "./linkTargetTypes/AttachmentLinkTargetType";
 export type { EmailLinkTargetConfig } from "./linkTargetTypes/EmailLinkTargetType";
 export type { PageLinkTargetConfig } from "./linkTargetTypes/PageLinkTargetType";

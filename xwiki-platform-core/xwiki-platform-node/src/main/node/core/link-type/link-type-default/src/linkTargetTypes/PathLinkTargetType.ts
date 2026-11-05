@@ -24,9 +24,6 @@ import { injectable } from "inversify";
 
 /**
  * Built-in link target type for links to a path relative to the server (e.g. `/xwiki/bin/view/Main/`).
- *
- * @since 18.10.0RC1
- * @beta
  */
 @injectable()
 class PathLinkTargetType extends AbstractPlainTextLinkTargetType {

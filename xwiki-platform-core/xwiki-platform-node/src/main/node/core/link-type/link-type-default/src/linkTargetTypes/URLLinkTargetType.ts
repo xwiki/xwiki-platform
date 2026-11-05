@@ -25,9 +25,6 @@ import type { PlainTextLinkTargetConfig } from "@xwiki/platform-link-type-api";
 
 /**
  * Built-in link target type for links to an external URL.
- *
- * @since 18.10.0RC1
- * @beta
  */
 @injectable()
 class URLLinkTargetType extends AbstractPlainTextLinkTargetType {

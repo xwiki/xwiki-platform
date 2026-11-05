@@ -39,9 +39,6 @@ type EmailLinkTargetConfig = {
 
 /**
  * Built-in link target type for `mailto:` links.
- *
- * @since 18.10.0RC1
- * @beta
  */
 @injectable()
 class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {

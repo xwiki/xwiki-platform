@@ -51,9 +51,6 @@ type AttachmentLinkTargetConfig = {
 
 /**
  * Built-in link target type for links to an attachment.
- *
- * @since 18.10.0RC1
- * @beta
  */
 @injectable()
 class AttachmentLinkTargetType

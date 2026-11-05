@@ -20,15 +20,17 @@
 import { AttachmentLinkTargetType } from "./extensions/AttachmentLinkTargetType";
 import { EmailLinkTargetType } from "./extensions/EmailLinkTargetType";
 import { PageLinkTargetType } from "./extensions/PageLinkTargetType";
+import { PathLinkTargetType } from "./extensions/PathLinkTargetType";
+import { UNCLinkTargetType } from "./extensions/UNCLinkTargetType";
 import { URLLinkTargetType } from "./extensions/URLLinkTargetType";
 import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 /**
- * Registers the built-in link target types (page, attachment, url, email) against the given `depsContainer`, as
- * unconstrained bindings of {@link linkTargetTypeExtensionRole} — see `@xwiki/platform-link-type-api`'s
- * `LinkTargetTypeExtension` for the rationale (mirrors `@xwiki/platform-markdown-syntax-config` and its
- * siblings' own `"SyntaxConfig"` registration).
+ * Registers the built-in link target types (page, attachment, email, path, UNC path, URL) against the given
+ * `depsContainer`, as unconstrained bindings of {@link linkTargetTypeExtensionRole} — see
+ * `@xwiki/platform-link-type-api`'s `LinkTargetTypeExtension` for the rationale (mirrors
+ * `@xwiki/platform-markdown-syntax-config` and its siblings' own `"SyntaxConfig"` registration).
  *
  * A consumer that does not want one (or several) of the built-in link target types (e.g. to offer a reduced set)
  * should simply not instantiate this class, and instead register only the extensions it wants, the same way.
@@ -41,6 +43,8 @@ class ComponentInit {
     container.bind(linkTargetTypeExtensionRole).to(PageLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(AttachmentLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(EmailLinkTargetType);
+    container.bind(linkTargetTypeExtensionRole).to(PathLinkTargetType);
+    container.bind(linkTargetTypeExtensionRole).to(UNCLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(URLLinkTargetType);
   }
 }

@@ -107,6 +107,50 @@ test("Editing the title of a link to an unsupported resource keeps its reference
   );
 });
 
+test("Editing the title of a path link keeps its reference", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const url = "/xwiki/bin/view/Main/";
+  const reference = {
+    type: "path",
+    typed: true,
+    reference: "/xwiki/bin/view/Main/",
+    parameters: {},
+  };
+  const component = await mountBlockNoteHeadless(mount, {
+    editorContent: buildParagraphWithLink(url),
+    editorProps: {
+      syntax: FULL_SYNTAX,
+    },
+    macros: false,
+    linkReferences: { [url]: reference },
+  });
+
+  const editorEl = component.locator(".bn-editor");
+  const linkEl = editorEl.locator(`a[href="${url}"]`);
+  await linkEl.waitFor({ state: "attached" });
+
+  await openLinkEditor(page, editorEl);
+
+  await expect(
+    page.locator('[data-test="linkTargetType"] option:checked'),
+  ).toHaveText("Path");
+  await expect(page.locator('[data-test="linkPath"]')).toHaveValue(
+    "/xwiki/bin/view/Main/",
+  );
+
+  await page.locator('[data-test="linkDisplayText"]').fill("2nd");
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  await expect(linkEl).toHaveText("2nd");
+  // The link is still a typed path reference: untyped, it would be parsed back as a document reference.
+  await expect(page.locator('[data-test="submittedLinkReference"]')).toHaveText(
+    JSON.stringify(reference),
+  );
+});
+
 /**
  * Open the link modal on the link of the paragraph built by {@link buildParagraphWithLink}.
  */

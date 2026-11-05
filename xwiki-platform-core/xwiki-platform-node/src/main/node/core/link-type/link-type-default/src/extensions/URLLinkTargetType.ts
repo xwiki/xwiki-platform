@@ -17,73 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { labelFromTranslations } from "./labels";
-import { untypedResourceReference } from "./referenceHelpers";
-import URLLinkTargetForm from "../vue/URLLinkTargetForm.vue";
+import { AbstractPlainTextLinkTargetType } from "./AbstractPlainTextLinkTargetType";
+import { URLLinkTargetForm } from "../vue/plainTextLinkTargetForms";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { URLLinkTargetConfig } from "../data/linkType";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
-import type { ResourceReference } from "@xwiki/platform-rendering-api";
+import type { PlainTextLinkTargetConfig } from "../data/linkType";
 import type { Component } from "vue";
 
 /**
- * Built-in link target type for a plain, arbitrary URL. Acts as the catch-all: it always matches, so it must be
- * registered with the lowest priority (highest {@link order} value) among all registered link target types, so
- * that every other, more specific type gets a chance to match first.
+ * Built-in link target type for links to an external URL.
  *
  * @since 18.10.0RC1
  * @beta
  */
 @injectable()
-class URLLinkTargetType
-  implements LinkTargetTypeExtension<URLLinkTargetConfig>
-{
+class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
   readonly type = "url";
+
+  // Last, since it parses any URL (see tryParseURL).
   readonly order = Number.MAX_SAFE_INTEGER;
 
-  getLabel = labelFromTranslations("link-type.target-types.url.label");
+  protected readonly resourceType = ResourceType.URL;
 
-  createDefaultConfig(): URLLinkTargetConfig {
-    return { url: "" };
-  }
+  // An untyped URL is parsed back as a URL, thanks to its scheme.
+  protected readonly typedReference = false;
+
+  protected readonly labelKey = "link-type.target-types.url.label";
 
   component(): Component {
     return URLLinkTargetForm;
   }
 
-  tryParseURL(url: string): URLLinkTargetConfig | null {
-    return { url };
-  }
-
-  serializeURL({ url }: URLLinkTargetConfig): string {
-    return url;
-  }
-
   /**
-   * Unlike {@link tryParseURL}, this is NOT a catch-all: it only claims the resource types that
-   * genuinely designate a bare URL, so that {@link resourceReferenceToLinkTarget} correctly falls
-   * through to `undefined` (and the caller to {@link parseLinkTarget}) for resource types with no
-   * matching link target (e.g. interwiki, space, user).
+   * @returns the URL as is: this is the catch-all link target type, used for any URL that no other link target type
+   *   matches
    */
-  tryParseReference(reference: ResourceReference): URLLinkTargetConfig | null {
-    switch (reference.type) {
-      case ResourceType.URL:
-      case ResourceType.PATH:
-      case ResourceType.UNC:
-      case ResourceType.UNKNOWN:
-        return { url: reference.reference };
-      default:
-        return null;
-    }
-  }
-
-  configToReference({
-    url,
-  }: URLLinkTargetConfig): ResourceReference | undefined {
-    return url.trim() === ""
-      ? undefined
-      : untypedResourceReference(ResourceType.URL, url);
+  override tryParseURL(url: string): PlainTextLinkTargetConfig {
+    return { location: url };
   }
 }
 

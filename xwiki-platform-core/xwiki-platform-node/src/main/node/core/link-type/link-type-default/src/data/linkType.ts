@@ -46,13 +46,13 @@ type AttachmentLinkTargetConfig = {
 };
 
 /**
- * Configuration for an URL link
+ * Configuration for a link to a resource designated by a plain text location: a URL, a path or a UNC path.
  *
  * @since 18.10.0RC1
  * @beta
  */
-type URLLinkTargetConfig = {
-  url: string;
+type PlainTextLinkTargetConfig = {
+  location: string;
 };
 
 /**
@@ -71,5 +71,5 @@ export type {
   AttachmentLinkTargetConfig,
   EmailLinkTargetConfig,
   PageLinkTargetConfig,
-  URLLinkTargetConfig,
+  PlainTextLinkTargetConfig,
 };

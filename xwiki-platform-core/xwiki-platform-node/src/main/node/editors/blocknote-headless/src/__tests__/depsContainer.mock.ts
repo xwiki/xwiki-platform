@@ -23,6 +23,8 @@ import {
   AttachmentLinkTargetType,
   EmailLinkTargetType,
   PageLinkTargetType,
+  PathLinkTargetType,
+  UNCLinkTargetType,
   URLLinkTargetType,
 } from "@xwiki/platform-link-type-default";
 import {
@@ -170,6 +172,8 @@ function withBuiltInLinkTargetTypes(
       new PageLinkTargetType(...providers),
       new AttachmentLinkTargetType(...providers),
       new EmailLinkTargetType(),
+      new PathLinkTargetType(),
+      new UNCLinkTargetType(),
       new URLLinkTargetType(),
     ]);
 

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import URLLinkTargetForm from "../../vue/URLLinkTargetForm.vue";
+import { URLLinkTargetForm } from "../../vue/plainTextLinkTargetForms";
 import { URLLinkTargetType } from "../URLLinkTargetType";
 import { describe, expect, it } from "vitest";
 
@@ -35,31 +35,29 @@ describe("URLLinkTargetType", () => {
     expect(
       extension.tryParseURL("anything at all, not even a valid URL"),
     ).toEqual({
-      url: "anything at all, not even a valid URL",
+      location: "anything at all, not even a valid URL",
     });
   });
 
   it("serializes back to the exact same URL", () => {
-    expect(extension.serializeURL({ url: "https://example.org" })).toBe(
+    expect(extension.serializeURL({ location: "https://example.org" })).toBe(
       "https://example.org",
     );
   });
 
-  it("converts references with no dedicated configuration into a bare URL", () => {
-    ["url", "path", "unc", "unknown"].forEach((type) => {
-      expect(
-        extension.tryParseReference?.({
-          type,
-          typed: false,
-          reference: "some/target",
-          parameters: {},
-        }),
-      ).toEqual({ url: "some/target" });
-    });
+  it("converts a URL reference into its URL", () => {
+    expect(
+      extension.tryParseReference?.({
+        type: "url",
+        typed: false,
+        reference: "https://example.org",
+        parameters: {},
+      }),
+    ).toEqual({ location: "https://example.org" });
   });
 
-  it("does not match resource types with their own dedicated link target, unlike tryParseURL", () => {
-    ["doc", "attach", "mailto", "interwiki", "space", "user"].forEach(
+  it("matches only URL references, unlike tryParseURL", () => {
+    ["doc", "attach", "mailto", "path", "unc", "unknown", "interwiki"].forEach(
       (type) => {
         expect(
           extension.tryParseReference?.({
@@ -75,7 +73,7 @@ describe("URLLinkTargetType", () => {
 
   it("converts a URL config back into an untyped reference", () => {
     expect(
-      extension.configToReference?.({ url: "https://example.org" }),
+      extension.configToReference?.({ location: "https://example.org" }),
     ).toEqual({
       type: "url",
       typed: false,
@@ -85,6 +83,6 @@ describe("URLLinkTargetType", () => {
   });
 
   it("returns undefined when converting to a reference with an empty URL", () => {
-    expect(extension.configToReference?.({ url: "  " })).toBeUndefined();
+    expect(extension.configToReference?.({ location: "  " })).toBeUndefined();
   });
 });

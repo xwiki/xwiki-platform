@@ -23,11 +23,13 @@ export { ComponentInit } from "./componentInit";
 export { PageLinkTargetType } from "./extensions/PageLinkTargetType";
 export { AttachmentLinkTargetType } from "./extensions/AttachmentLinkTargetType";
 export { EmailLinkTargetType } from "./extensions/EmailLinkTargetType";
+export { PathLinkTargetType } from "./extensions/PathLinkTargetType";
+export { UNCLinkTargetType } from "./extensions/UNCLinkTargetType";
 export { URLLinkTargetType } from "./extensions/URLLinkTargetType";
 
 export type {
   AttachmentLinkTargetConfig,
   EmailLinkTargetConfig,
   PageLinkTargetConfig,
-  URLLinkTargetConfig,
+  PlainTextLinkTargetConfig,
 } from "./data/linkType";

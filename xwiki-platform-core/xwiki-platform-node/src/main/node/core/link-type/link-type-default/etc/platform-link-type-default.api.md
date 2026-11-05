@@ -108,30 +108,61 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<PageLinkTarge
     readonly type = "page";
 }
 
+// Warning: (ae-forgotten-export) The symbol "AbstractPlainTextLinkTargetType" needs to be exported by the entry point index.d.ts
+//
 // @beta
-export type URLLinkTargetConfig = {
-    url: string;
-};
-
-// @beta
-export class URLLinkTargetType implements LinkTargetTypeExtension<URLLinkTargetConfig> {
+export class PathLinkTargetType extends AbstractPlainTextLinkTargetType {
     // (undocumented)
     component(): Component;
     // (undocumented)
-    configToReference(input: URLLinkTargetConfig): ResourceReference | undefined;
+    protected readonly labelKey = "link-type.target-types.path.label";
     // (undocumented)
-    createDefaultConfig(): URLLinkTargetConfig;
+    readonly order = 300;
     // (undocumented)
-    getLabel: (locale: string) => Promise<string>;
+    protected readonly resourceType: string;
+    // (undocumented)
+    readonly type = "path";
+    // (undocumented)
+    protected readonly typedReference = true;
+}
+
+// @beta
+export type PlainTextLinkTargetConfig = {
+    location: string;
+};
+
+// @beta
+export class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {
+    // (undocumented)
+    component(): Component;
+    // (undocumented)
+    protected readonly labelKey = "link-type.target-types.unc.label";
+    // (undocumented)
+    readonly order = 400;
+    // (undocumented)
+    protected readonly resourceType: string;
+    // (undocumented)
+    readonly type = "unc";
+    // (undocumented)
+    protected readonly typedReference = true;
+}
+
+// @beta
+export class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
+    // (undocumented)
+    component(): Component;
+    // (undocumented)
+    protected readonly labelKey = "link-type.target-types.url.label";
     // (undocumented)
     readonly order: number;
     // (undocumented)
-    serializeURL(input: URLLinkTargetConfig): string;
-    tryParseReference(reference: ResourceReference): URLLinkTargetConfig | null;
+    protected readonly resourceType: string;
     // (undocumented)
-    tryParseURL(url: string): URLLinkTargetConfig | null;
+    tryParseURL(url: string): PlainTextLinkTargetConfig;
     // (undocumented)
     readonly type = "url";
+    // (undocumented)
+    protected readonly typedReference = false;
 }
 
 // (No @packageDocumentation comment for this package)

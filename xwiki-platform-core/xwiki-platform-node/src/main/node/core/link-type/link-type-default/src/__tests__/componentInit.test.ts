@@ -41,7 +41,7 @@ function containerWithModelServices(): Container {
 }
 
 describe("ComponentInit", () => {
-  it("registers exactly the 4 built-in link target types", () => {
+  it("registers exactly the 6 built-in link target types", () => {
     const container = containerWithModelServices();
     new ComponentInit(container);
 
@@ -53,6 +53,8 @@ describe("ComponentInit", () => {
       "attachment",
       "email",
       "page",
+      "path",
+      "unc",
       "url",
     ]);
   });
@@ -83,6 +85,8 @@ describe("ComponentInit", () => {
       "custom",
       "email",
       "page",
+      "path",
+      "unc",
       "url",
     ]);
   });

@@ -2,6 +2,12 @@
   "link-type.target-types.url.label": "URL",
   "link-type.target-types.url.url": "URL",
 
+  "link-type.target-types.path.label": "Path",
+  "link-type.target-types.path.path": "Path",
+
+  "link-type.target-types.unc.label": "UNC path",
+  "link-type.target-types.unc.path": "UNC path",
+
   "link-type.target-types.email.label": "E-mail",
   "link-type.target-types.email.address": "E-mail address",
   "link-type.target-types.email.subject": "Message subject",

@@ -21,12 +21,30 @@
 import { translations } from "../translations";
 import { LinkForm } from "@xwiki/platform-link-modal-ui";
 import { useI18n } from "vue-i18n";
-import type { URLLinkTargetConfig } from "../data/linkType";
+import type { PlainTextLinkTargetConfig } from "../data/linkType";
+import type { TextFieldProps } from "@xwiki/platform-dsapi";
 import type { LinkData } from "@xwiki/platform-link-type-api";
 
-defineProps<{ linkData: LinkData }>();
+defineProps<{
+  linkData: LinkData;
 
-const model = defineModel<URLLinkTargetConfig>({
+  /**
+   * The translation key of the label of the location field.
+   */
+  fieldLabelKey: string;
+
+  /**
+   * The value of the `data-test` attribute of the location field.
+   */
+  dataTest: string;
+
+  /**
+   * The type of the location field (e.g. "url" to validate it as a URL).
+   */
+  inputType?: TextFieldProps["type"];
+}>();
+
+const model = defineModel<PlainTextLinkTargetConfig>({
   required: true,
 });
 
@@ -34,13 +52,14 @@ const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
+  <!-- The form of the link target types designated by a plain text location (URL, path, UNC path). -->
   <LinkForm :link-data>
     <template #config>
       <x-text-field
-        v-bind="{ 'data-test': 'linkUrl' }"
-        :label="t('link-type.target-types.url.url')"
-        type="url"
-        v-model="model.url"
+        v-bind="{ 'data-test': dataTest }"
+        :label="t(fieldLabelKey)"
+        :type="inputType ?? 'text'"
+        v-model="model.location"
         required
       />
     </template>

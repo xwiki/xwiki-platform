@@ -22,7 +22,13 @@ package org.xwiki.extension.distribution.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.icon.IconException;
+import org.xwiki.icon.IconSetManager;
+import org.xwiki.icon.internal.context.IconSetContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,6 +55,8 @@ public class DistributionAction extends XWikiAction
      */
     public static final String DISTRIBUTION_ACTION = "distribution";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DistributionAction.class);
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -57,6 +65,10 @@ public class DistributionAction extends XWikiAction
         // Make sure DW skip all skins
         context.put(XWiki.CKEY_SKIN, XWiki.DEFAULT_SKIN);
         context.put(XWiki.CKEY_BASESKIN, "");
+
+        // Make sure DW skips all icon themes: those are stored in wiki pages which might not be compatible with the
+        // running code yet (e.g. pages from an old flavor referring to resources which don't exist anymore)
+        useDefaultIconSet();
 
         // Disallow template override with xpage parameter.
         if (!DISTRIBUTION_ACTION.equals(Utils.getPage(context.getRequest(), DISTRIBUTION_ACTION))) {
@@ -77,6 +89,17 @@ public class DistributionAction extends XWikiAction
         }
 
         return true;
+    }
+
+    private void useDefaultIconSet()
+    {
+        try {
+            Utils.getComponent(IconSetContext.class)
+                .setIconSet(Utils.getComponent(IconSetManager.class).getDefaultIconSet());
+        } catch (IconException e) {
+            LOGGER.warn("Failed to force the default icon set in the Distribution Wizard: {}",
+                ExceptionUtils.getRootCauseMessage(e));
+        }
     }
 
     @Override

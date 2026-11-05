@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { labelFromTranslations } from "./labels";
+import { translateLabel } from "./labels";
 import { typedResourceReference } from "./referenceHelpers";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { ResourceType } from "@xwiki/platform-rendering-api";
@@ -48,7 +48,9 @@ class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
   readonly type = "email";
   readonly order = 200;
 
-  getLabel = labelFromTranslations("link-type.target-types.email.label");
+  getLabel(locale: string): Promise<string> {
+    return translateLabel("link-type.target-types.email.label", locale);
+  }
 
   createDefaultConfig(): EmailLinkTargetConfig {
     return { address: "" };

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { labelFromTranslations } from "./labels";
+import { translateLabel } from "./labels";
 import { AbstractPlainTextLinkTargetType } from "@xwiki/platform-link-type-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
@@ -40,7 +40,7 @@ class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {
   protected readonly typedReference = true;
 
   getLabel(locale: string): Promise<string> {
-    return labelFromTranslations("link-type.target-types.unc.label")(locale);
+    return translateLabel("link-type.target-types.unc.label", locale);
   }
 }
 

@@ -68,13 +68,10 @@ function mountLinkForm(
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
 
   return mount(LinkForm, {
-    props: { linkData },
+    props: { linkData, linkTargetTypes: targetTypes },
     attachTo: document.body,
     global: {
       plugins: [i18n],
-      // Normally provided by LinkModal.vue, which resolves the registered link target types out of the
-      // depsContainer before rendering LinkForm.
-      provide: { linkTargetTypes: targetTypes },
       components: dsComponentStubs,
     },
   });

@@ -20,19 +20,17 @@
 import { translations } from "../translations";
 
 /**
- * Build a {@link LinkTargetType.getLabel} implementation resolving a label from this package's own
- * bundled translations, given `LinkTargetType` implementations are plain objects and cannot rely on the
- * Vue composition API (`useI18n()`) to resolve their own label.
+ * Resolve the label of a built-in link target type from this package's own bundled translations, for its
+ * `LinkTargetType.getLabel` implementation: link target types are plain objects and can't rely on the Vue composition
+ * API (`useI18n()`) to resolve their label.
  *
- * @param key - the translation key to resolve
- * @returns a function resolving the translated label for a given locale, falling back to English; it resolves
- *   immediately, since the translations are bundled
+ * @param key - the translation key of the label
+ * @param locale - the locale to resolve the label for
+ * @returns the translated label, falling back to English, then to the key itself; it resolves immediately, since the
+ *   translations are bundled
  */
-function labelFromTranslations(
-  key: string,
-): (locale: string) => Promise<string> {
-  return async (locale: string): Promise<string> =>
-    translations[locale]?.[key] ?? translations.en[key] ?? key;
+async function translateLabel(key: string, locale: string): Promise<string> {
+  return translations[locale]?.[key] ?? translations.en[key] ?? key;
 }
 
-export { labelFromTranslations };
+export { translateLabel };

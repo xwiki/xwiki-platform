@@ -20,18 +20,18 @@
 <script setup lang="ts">
 import { useLinkTargetTypeLabels } from "./linkTargetTypeLabels";
 import { translations } from "../translations";
-import {
-  computed,
-  inject,
-  nextTick,
-  onMounted,
-  ref,
-  useTemplateRef,
-} from "vue";
+import { computed, nextTick, onMounted, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
 
-const props = defineProps<{ linkData: LinkData }>();
+const props = defineProps<{
+  linkData: LinkData;
+
+  /**
+   * The link target types offered by the link type selector, in the order they are offered.
+   */
+  linkTargetTypes: LinkTargetType[];
+}>();
 
 defineSlots<{
   /**
@@ -48,10 +48,6 @@ defineSlots<{
 // TODO: use modern localization system (server-side)
 const { t, locale } = useI18n({ messages: translations });
 
-// Provided by `LinkModal.vue`: the list of registered, enabled link target types, already resolved from the
-// shared component manager — see `@xwiki/platform-link-type-api`'s `LinkTargetType`.
-const targetTypes = inject<LinkTargetType[]>("linkTargetTypes")!;
-
 const linkData = ref(props.linkData);
 
 // The link type selector identifies the link target types by their type, the labels are only displayed. Selecting
@@ -59,7 +55,9 @@ const linkData = ref(props.linkData);
 const linkTargetType = computed({
   get: () => linkData.value.target.type,
   set: (type: string) => {
-    const targetType = targetTypes.find((candidate) => candidate.type === type);
+    const targetType = props.linkTargetTypes.find(
+      (candidate) => candidate.type === type,
+    );
 
     if (targetType) {
       linkData.value.target = {
@@ -70,10 +68,10 @@ const linkTargetType = computed({
   },
 });
 
-const labels = useLinkTargetTypeLabels(targetTypes, locale);
+const labels = useLinkTargetTypeLabels(props.linkTargetTypes, locale);
 
 const linkTargetTypeItems = computed(() =>
-  targetTypes.map((targetType) => ({
+  props.linkTargetTypes.map((targetType) => ({
     value: targetType.type,
     label: labels.value[targetType.type] ?? targetType.type,
   })),

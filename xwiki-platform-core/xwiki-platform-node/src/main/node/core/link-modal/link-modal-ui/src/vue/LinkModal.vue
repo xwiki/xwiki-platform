@@ -29,7 +29,7 @@ import {
   linkTargetTypeManagerRole,
   unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
-import { computed, markRaw, provide } from "vue";
+import { computed, markRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkTargetTypeForm } from "../linkTargetTypeForm";
 import type {
@@ -82,8 +82,6 @@ const offeredLinkTargetTypes = linkTargetTypes.filter(
     !props.excludedLinkTargetTypes?.includes(targetType.type),
 );
 
-provide("linkTargetTypes", offeredLinkTargetTypes);
-
 // The forms of the link target types, registered separately from the link target types themselves so that these don't
 // depend on the UI framework of the link modal.
 const linkTargetTypeForms: LinkTargetTypeForm[] = [
@@ -127,7 +125,7 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
 <template>
   <div :class="$style.container">
     <!-- The fields shared by all the link target types, with the target and option fields of the selected one. -->
-    <LinkForm :link-data="linkData">
+    <LinkForm :link-data="linkData" :link-target-types="offeredLinkTargetTypes">
       <template #target>
         <component
           v-if="activeForm"

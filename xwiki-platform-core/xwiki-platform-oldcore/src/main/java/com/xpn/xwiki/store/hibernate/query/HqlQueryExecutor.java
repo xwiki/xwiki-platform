@@ -34,9 +34,8 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
+import org.hibernate.boot.query.NamedNativeQueryDefinition;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.spi.NamedQueryDefinition;
-import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.query.NativeQuery;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -127,18 +126,17 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
                     Set<String> safeQueries = new HashSet<>();
 
                     // Gather the list of allowed named queries
-                    Collection<NamedQueryDefinition> namedQueries =
-                        this.hibernate.getConfigurationMetadata().getNamedQueryDefinitions();
-                    for (NamedQueryDefinition definition : namedQueries) {
+                    this.hibernate.getConfigurationMetadata().visitNamedHqlQueryDefinitions(definition -> {
                         try {
-                            if (this.queryValidator.isSafe(definition.getQuery())) {
-                                safeQueries.add(definition.getName());
+                            if (this.queryValidator.isSafe(definition.getHqlString())) {
+                                safeQueries.add(definition.getRegistrationName());
                             }
                         } catch (QueryException e) {
                             this.logger.warn("Failed to validate named query [{}] with statement [{}]: [{}]",
-                                definition.getName(), definition.getQuery(), ExceptionUtils.getRootCauseMessage(e));
+                                definition.getRegistrationName(), definition.getHqlString(),
+                                ExceptionUtils.getRootCauseMessage(e));
                         }
-                    }
+                    });
 
                     this.safeNamedQueries = safeQueries;
                 }
@@ -370,12 +368,14 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
             }, language);
 
             if (isNative) {
-                hQuery = session.createSQLQuery(filteredQuery.getStatement());
                 // Copy the information about the return column types, if possible.
-                NamedSQLQueryDefinition definition =
-                    this.hibernate.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement());
-                if (!StringUtils.isEmpty(definition.getResultSetRef())) {
-                    ((NativeQuery<T>) hQuery).setResultSetMapping(definition.getResultSetRef());
+                NamedNativeQueryDefinition<?> definition =
+                    this.hibernate.getConfigurationMetadata().getNamedNativeQueryMapping(query.getStatement());
+                if (!StringUtils.isEmpty(definition.getResultSetMappingName())) {
+                    hQuery = session.createNativeQuery(filteredQuery.getStatement(),
+                        definition.getResultSetMappingName());
+                } else {
+                    hQuery = session.createSQLQuery(filteredQuery.getStatement());
                 }
             } else {
                 hQuery = session.createQuery(filteredQuery.getStatement());

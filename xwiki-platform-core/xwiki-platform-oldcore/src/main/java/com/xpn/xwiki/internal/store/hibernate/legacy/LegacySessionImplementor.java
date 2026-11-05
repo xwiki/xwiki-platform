@@ -19,13 +19,11 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.legacy;
 
-import java.util.Collections;
 import java.util.regex.Pattern;
 
-import org.hibernate.QueryException;
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.hql.spi.QueryTranslator;
+import org.hibernate.query.ParameterLabelException;
 import org.hibernate.query.spi.QueryImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +47,7 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(LegacySessionImplementor.class);
 
-    private static final String LEGACY_ORDINAL_PARAMS_PREFIX =
-        QueryTranslator.ERROR_LEGACY_ORDINAL_PARAMS_NO_LONGER_SUPPORTED.substring(0, 115);
+    private static final String LEGACY_ORDINAL_PARAMS_ERROR = "Unlabeled ordinal parameter";
 
     private static final Pattern LEGACY_MATCHER = Pattern.compile("\\?($|[^\\d])");
 
@@ -101,9 +98,9 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
             // session is dead (marked as rollback only) and it's not possible to avoid it without reimplementing a lot
             // of stuff.
             try {
-                getFactory().getQueryPlanCache().getHQLQueryPlan(statement, false, Collections.emptyMap());
-            } catch (QueryException e) {
-                if (e.getMessage() != null && e.getMessage().contains(LEGACY_ORDINAL_PARAMS_PREFIX)) {
+                getFactory().getQueryEngine().getHqlTranslator().translate(statement, null);
+            } catch (ParameterLabelException e) {
+                if (e.getMessage() != null && e.getMessage().contains(LEGACY_ORDINAL_PARAMS_ERROR)) {
                     return replaceLegacyQueryParameters(statement);
                 }
 
@@ -120,7 +117,7 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
         String convertedStatement = checkStatement(queryString);
 
         if (convertedStatement != null) {
-            return new LegacyQueryImplementor(super.createQuery(convertedStatement));
+            return LegacyQueryImplementor.wrap(super.createQuery(convertedStatement));
 
         } else {
             return super.createQuery(queryString);
@@ -133,7 +130,7 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
         String convertedStatement = checkStatement(queryString);
 
         if (convertedStatement != null) {
-            return new LegacyQueryImplementor(super.createQuery(convertedStatement, resultType));
+            return LegacyQueryImplementor.wrap(super.createQuery(convertedStatement, resultType));
 
         } else {
             return super.createQuery(queryString, resultType);

@@ -18,14 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($pageIcon = $services.icon.getMetaData('page_white'))
 #set ($webHome = $services.model.getEntityReference('DOCUMENT', 'default').name)
 #[[*/
 // Start JavaScript-only code.
-(function(pageIcon, webHome) {
+(function(webHome) {
   "use strict";
 
-define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'xwiki-selectize'], function($) {
+define('xwiki-suggestChildPages-icons', {
+  icons: ['page_white']
+});
+
+define('xwiki-suggestChildPages', ['jquery', 'xwiki-icon!xwiki-suggestChildPages-icons', 'jquery-ui',
+    'xwiki-selectize'], function($, icons) {
   webHome = webHome || 'WebHome';
 
   function getSelectizeOptions(select) {
@@ -126,7 +130,7 @@ define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'xwiki-selectize'], fu
     return {
       value: childPageName,
       label: childPage.title,
-      icon: pageIcon,
+      icon: icons.page_white, // jshint ignore:line
       url: new XWiki.Document(childPageReference).getURL()
     };
   }
@@ -150,4 +154,4 @@ require(['jquery', 'xwiki-suggestChildPages', 'xwiki-events-bridge'], function($
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$pageIcon, $webHome]));
+}).apply(']]#', $jsontool.serialize([$webHome]));

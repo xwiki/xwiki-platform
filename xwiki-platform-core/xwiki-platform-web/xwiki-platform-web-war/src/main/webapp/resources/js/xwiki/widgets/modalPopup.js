@@ -21,6 +21,10 @@ var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 var widgets = XWiki.widgets = XWiki.widgets || {};
 
+define('xwiki-modal-popup-icons', {
+  icons: ['cross']
+});
+
 function createElement(tagName, classNames) {
   const element = document.createElement(tagName);
   addClassNames(element, classNames);
@@ -105,7 +109,7 @@ class ModalPopup {
     if (this.options.displayCloseButton) {
       const closeButton = createElement('button', 'close xdialog-close');
       closeButton.title = 'Close';
-      closeButton.innerHTML = "$!escapetool.javascript($services.icon.renderHTML('cross'))";
+      require(['xwiki-icon!xwiki-modal-popup-icons'], icons => closeButton.replaceChildren(icons.cross.render()));
       closeButton.addEventListener('click', event => this.closeDialog(event));
       if (this.options.title) {
         title.append(closeButton);

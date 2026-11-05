@@ -18,15 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($iconNames = ['check', 'remove', 'error', 'cross'])
-#set ($icons = {})
-#foreach ($name in $iconNames)
-#set ($discard = $icons.put($name, $services.icon.renderHTML($name)))
-#end
 #set($maxAttachmentSize = "$!escapetool.javascript($xwiki.getSpacePreference('upload_maxsize'))")
 #[[*/
 // Start JavaScript-only code.
-(function(icons, maxAttachmentSize) {
+(function(maxAttachmentSize) {
   "use strict";
 define('upload-translations', {
   prefix: 'core.widgets.html5upload.',
@@ -49,7 +44,11 @@ define('upload-translations', {
     'status.finished'
   ]
 });
-define('xwiki-upload', ['jquery', 'xwiki-l10n!upload-translations', 'xwiki-events-bridge'], function($, l10n) {
+define('upload-icons', {
+  icons: ['check', 'remove', 'error', 'cross']
+});
+define('xwiki-upload', ['jquery', 'xwiki-l10n!upload-translations', 'xwiki-icon!upload-icons', 'xwiki-events-bridge'],
+    function($, l10n, icons) {
   /**
    * Internal small utility functions.
    */
@@ -219,10 +218,10 @@ define('xwiki-upload', ['jquery', 'xwiki-l10n!upload-translations', 'xwiki-event
         statusUI.FILE_SIZE_CONTAINER.append(statusUI.FILE_SIZE);
         statusUI.FILE_SIZE_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['status.fileSize']);
         statusUI.FILE_SIZE.append(statusUI.FILE_SIZE_ALTERNATIVE);
-        statusUI.FILE_CANCEL = UploadUtils.createButton(icons['cross'], event => this.cancelUpload(event));
+        statusUI.FILE_CANCEL = UploadUtils.createButton('', event => this.cancelUpload(event));
         statusUI.FILE_CANCEL.classList.add('upload-cancel');
         statusUI.FILE_CANCEL_ALTERNATIVE = UploadUtils.createSpan('sr-only', l10n['item.cancel']);
-        statusUI.FILE_CANCEL.append(statusUI.FILE_CANCEL_ALTERNATIVE);
+        statusUI.FILE_CANCEL.append(icons.cross.render(), statusUI.FILE_CANCEL_ALTERNATIVE);
         // We want to put the button next to everything else.
         statusUI.UPLOAD_STATUS.append(statusUI.FILE_CANCEL);
         statusUI.FILE_INFO.append(statusUI.FILE_NAME, statusUI.FILE_SIZE_CONTAINER);
@@ -267,15 +266,15 @@ define('xwiki-upload', ['jquery', 'xwiki-l10n!upload-translations', 'xwiki-event
       // Set up the icons and their text alternatives
       // The inprogress icon is a special case, we set the content using a GIF background in CSS
       statusUI.STATUS_UPLOAD_RESULT = UploadUtils.createSpan('upload-result');
-      statusUI.RESULT_DONE = UploadUtils.createDiv('result-done', icons['check']);
+      statusUI.RESULT_DONE = UploadUtils.createDiv('result-done');
       statusUI.RESULT_DONE_TEXT = UploadUtils.createSpan('', l10n['status.icon.done']);
-      statusUI.RESULT_DONE.append(statusUI.RESULT_DONE_TEXT);
-      statusUI.RESULT_CANCELED = UploadUtils.createDiv('result-canceled', icons['remove']);
+      statusUI.RESULT_DONE.append(icons.check.render(), statusUI.RESULT_DONE_TEXT);
+      statusUI.RESULT_CANCELED = UploadUtils.createDiv('result-canceled');
       statusUI.RESULT_CANCELED_TEXT = UploadUtils.createSpan('', l10n['status.icon.canceled']);
-      statusUI.RESULT_CANCELED.append(statusUI.RESULT_CANCELED_TEXT);
-      statusUI.RESULT_ERROR = UploadUtils.createDiv('result-error', icons['error']);
+      statusUI.RESULT_CANCELED.append(icons.remove.render(), statusUI.RESULT_CANCELED_TEXT);
+      statusUI.RESULT_ERROR = UploadUtils.createDiv('result-error');
       statusUI.RESULT_ERROR_TEXT = UploadUtils.createSpan('', l10n['status.icon.error']);
-      statusUI.RESULT_ERROR.append(statusUI.RESULT_ERROR_TEXT);
+      statusUI.RESULT_ERROR.append(icons.error.render(), statusUI.RESULT_ERROR_TEXT);
       statusUI.STATUS_UPLOAD_RESULT.append(statusUI.RESULT_DONE, statusUI.RESULT_CANCELED, statusUI.RESULT_ERROR);
       statusUI.UPLOAD_STATUS_MAIN.append(statusUI.STATUS_UPLOAD_RESULT);
 
@@ -780,4 +779,4 @@ define('xwiki-upload', ['jquery', 'xwiki-l10n!upload-translations', 'xwiki-event
   return FileUploader;
 });
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons, $maxAttachmentSize]));
+}).apply(']]#', $jsontool.serialize([$maxAttachmentSize]));

@@ -30,8 +30,8 @@ import javax.inject.Named;
 
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.query.NamedNativeQueryDefinition;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.query.NativeQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -320,18 +320,16 @@ class HqlQueryExecutorTest
         when(filter.filterQuery(any(Query.class))).then(returnsFirstArg());
 
         NativeQuery finalQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("bar")).thenReturn(finalQuery);
+        when(session.createNativeQuery("bar", "someResultSet")).thenReturn(finalQuery);
 
-        NamedSQLQueryDefinition definition = mock(NamedSQLQueryDefinition.class);
-        when(definition.getResultSetRef()).thenReturn("someResultSet");
-        when(definition.getName()).thenReturn(query.getStatement());
+        NamedNativeQueryDefinition<?> definition = mock(NamedNativeQueryDefinition.class);
+        when(definition.getResultSetMappingName()).thenReturn("someResultSet");
+        when(definition.getRegistrationName()).thenReturn(query.getStatement());
 
-        when(this.hibernateStore.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement()))
-            .thenReturn(definition);
+        when(this.hibernateStore.getConfigurationMetadata().getNamedNativeQueryMapping(query.getStatement()))
+            .thenAnswer(i -> definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
-
-        verify(finalQuery).setResultSetMapping(definition.getResultSetRef());
     }
 
     @Test

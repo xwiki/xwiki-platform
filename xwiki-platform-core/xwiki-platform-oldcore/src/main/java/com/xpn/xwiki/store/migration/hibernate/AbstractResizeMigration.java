@@ -166,7 +166,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         Map<String, String> rowFormats, StringBuilder builder, Session session)
         throws SQLException, HibernateStoreException
     {
-        int expectedLenght = column.getLength();
+        int expectedLenght = HibernateStore.getLength(column);
 
         if (expectedLenght >= MAXSIZE_MIN && expectedLenght <= MAXSIZE_MAX) {
             Integer databaseSize = getDatabaseSize(column, databaseMetaData);
@@ -426,7 +426,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 builder);
             appendXmlAttribute("columnName", this.hibernateStore.getConfiguredColumnName(column), builder);
             appendXmlAttribute("newDataType",
-                column.getSqlType(this.hibernateStore.getDialect(), this.hibernateStore.getConfigurationMetadata()),
+                column.getSqlType(this.hibernateStore.getConfigurationMetadata()),
                 builder);
             builder.append("/>");
         }
@@ -436,7 +436,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     {
         Dialect dialect = this.hibernateStore.getDialect();
 
-        StringBuilder builder = new StringBuilder(column.getSqlType(dialect, configurationMetadata));
+        StringBuilder builder = new StringBuilder(column.getSqlType(configurationMetadata));
 
         if (column.isNullable()) {
             builder.append(dialect.getNullColumnString());

@@ -64,6 +64,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
@@ -1261,6 +1262,18 @@ public class HibernateStore implements Disposable, Initializable
         return result;
     }
 
+    /**
+     * @param column the column
+     * @return the length of the column, or the Hibernate default length if none is explicitly set
+     * @since 18.10.0RC1
+     */
+    public static int getLength(Column column)
+    {
+        Long length = column.getLength();
+
+        return length != null ? length.intValue() : (int) Size.DEFAULT_LENGTH;
+    }
+
     public int getLimitSize(Class<?> entityType, String propertyName)
     {
         int result = metadataTableOrColumn(entityType, propertyName, -1, resultSet -> resultSet.getInt("COLUMN_SIZE"));
@@ -1268,7 +1281,7 @@ public class HibernateStore implements Disposable, Initializable
         if (result == -1) {
             PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
             Column column2 = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            result = column2.getLength();
+            result = getLength(column2);
             this.logger.warn(
                 "Error while getting the size limit for entity [{}] and propertyName [{}]. "
                     + "The length value set by hibernate [{}] will be used.",

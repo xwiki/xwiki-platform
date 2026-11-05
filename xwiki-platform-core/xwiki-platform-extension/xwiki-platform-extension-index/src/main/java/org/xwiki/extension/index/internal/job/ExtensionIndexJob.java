@@ -633,7 +633,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
             this.progress.startStep(repositories);
             if (repository instanceof Searchable searchableRepository) {
                 try {
-                    updated |= addRemoteExtensions(searchableRepository, indexedExtensions);
+                    updated |= addRemoteExtensions(repository, searchableRepository, indexedExtensions);
                 } catch (Exception e) {
                     checkDisposed(e);
 
@@ -649,65 +649,103 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
     }
 
-    private boolean addRemoteExtensions(Searchable searchableRepository,
+    private boolean addRemoteExtensions(ExtensionRepository repository, Searchable searchableRepository,
         Map<String, SortedSet<Version>> indexedExtensions) throws SearchException, SolrServerException, IOException
     {
         boolean updated = false;
 
-        for (int offset = 0; true; offset += SEARCH_BATCH_SIZE) {
-            // Get remote extensions ids
-            IterableResult<Extension> result = searchableRepository.search("", offset, SEARCH_BATCH_SIZE);
+        // The total number of extensions announced by the repository (-1 as long as it's unknown)
+        int totalHits = -1;
+        boolean morePages = true;
+        for (int offset = 0; morePages; offset += SEARCH_BATCH_SIZE) {
+            IterableResult<Extension> result = searchRemoteExtensions(repository, searchableRepository, offset,
+                totalHits);
 
-            for (Extension extension : result) {
-                if (!this.invalidFlavors.contains(extension.getId().getId())
-                    && !this.coreExtensions.exists(extension.getId()) && !this.localExtensions.exists(extension.getId())
-                    && !this.indexStore.exists(extension.getId())) {
-                    // TODO: Resolve the complete extension but it very expensive...
+            if (result != null) {
+                totalHits = result.getTotalHits();
 
-                    // Add the extension to the index
-                    this.indexStore.add(extension, true);
+                updated |= addRemoteExtensions(result, indexedExtensions);
 
-                    add(extension.getId(), indexedExtensions);
+                // A page can contain less extensions than requested even if it's not the last one (for example when
+                // the repository client skipped invalid extensions), so also rely on the announced total
+                morePages = result.getSize() >= SEARCH_BATCH_SIZE || offset + SEARCH_BATCH_SIZE < totalHits;
+            } else {
+                morePages = offset + SEARCH_BATCH_SIZE < totalHits;
+            }
+        }
 
-                    // Make sure only one version is tagged as "last"
-                    SolrQuery solrQuery = new SolrQuery();
-                    solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
-                        + this.solrUtils.toCompleteFilterQueryString(extension.getId().getId()));
-                    solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
-                    for (ExtensionId extensionid : this.indexStore.searchExtensionIds(solrQuery)) {
-                        boolean last =
-                            indexedExtensions.get(extension.getId().getId()).last().equals(extensionid.getVersion());
-                        if (!extensionid.getVersion().equals(extension.getId().getVersion())) {
-                            // Update the "last" flag of the already indexed extensions
-                            this.indexStore.updateLast(extensionid, last);
-                        } else if (!last) {
-                            // The new extension is actually not the last one (maybe some local extension is more
-                            // recent)
-                            this.indexStore.updateLast(extensionid, false);
+        return updated;
+    }
 
-                        }
-                    }
-
-                    updated = true;
-                    getStatus().setExtensionAdded(true);
-                }
-
-                // Update recommended and rating
-                if (extension instanceof RemoteExtension remoteExtension) {
-                    SortedSet<Version> versions = indexedExtensions.get(extension.getId().getId());
-                    if (versions != null) {
-                        for (Version version : versions) {
-                            this.indexStore.update(new ExtensionId(extension.getId().getId(), version),
-                                remoteExtension);
-
-                            updated = true;
-                        }
-                    }
-                }
+    private IterableResult<Extension> searchRemoteExtensions(ExtensionRepository repository,
+        Searchable searchableRepository, int offset, int totalHits) throws SearchException
+    {
+        try {
+            return searchableRepository.search("", offset, SEARCH_BATCH_SIZE);
+        } catch (Exception e) {
+            // Without a first successful page there is no way to know if there is any other page to get
+            if (totalHits < 0) {
+                throw e;
             }
 
-            if (result.getSize() < SEARCH_BATCH_SIZE) {
-                break;
+            // Don't let a single failing page prevent indexing the following ones
+            this.logger.warn("Failed to get remote extensions from offset [{}] in repository [{}]: [{}]", offset,
+                repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
+
+            return null;
+        }
+    }
+
+    private boolean addRemoteExtensions(IterableResult<Extension> result,
+        Map<String, SortedSet<Version>> indexedExtensions) throws SolrServerException, IOException
+    {
+        boolean updated = false;
+
+        for (Extension extension : result) {
+            if (!this.invalidFlavors.contains(extension.getId().getId())
+                && !this.coreExtensions.exists(extension.getId()) && !this.localExtensions.exists(extension.getId())
+                && !this.indexStore.exists(extension.getId())) {
+                // TODO: Resolve the complete extension but it very expensive...
+
+                // Add the extension to the index
+                this.indexStore.add(extension, true);
+
+                add(extension.getId(), indexedExtensions);
+
+                // Make sure only one version is tagged as "last"
+                SolrQuery solrQuery = new SolrQuery();
+                solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID + ':'
+                    + this.solrUtils.toCompleteFilterQueryString(extension.getId().getId()));
+                solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST + ':' + true);
+                for (ExtensionId extensionid : this.indexStore.searchExtensionIds(solrQuery)) {
+                    boolean last =
+                        indexedExtensions.get(extension.getId().getId()).last().equals(extensionid.getVersion());
+                    if (!extensionid.getVersion().equals(extension.getId().getVersion())) {
+                        // Update the "last" flag of the already indexed extensions
+                        this.indexStore.updateLast(extensionid, last);
+                    } else if (!last) {
+                        // The new extension is actually not the last one (maybe some local extension is more
+                        // recent)
+                        this.indexStore.updateLast(extensionid, false);
+
+                    }
+                }
+
+                updated = true;
+                getStatus().setExtensionAdded(true);
+            }
+
+            // Update recommended and rating
+            if (extension instanceof RemoteExtension remoteExtension) {
+                SortedSet<Version> versions = indexedExtensions.get(extension.getId().getId());
+                if (versions != null) {
+                    for (Version version : versions) {
+                        this.indexStore.update(new ExtensionId(extension.getId().getId(), version),
+                            remoteExtension);
+
+                        updated = true;
+                    }
+                }
             }
         }
 

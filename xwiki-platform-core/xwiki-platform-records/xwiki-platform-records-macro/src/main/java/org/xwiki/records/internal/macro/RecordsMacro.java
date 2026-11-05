@@ -589,15 +589,15 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         Map<String, String> sourceParameters = new LinkedHashMap<>();
         sourceParameters.put(CLASS_NAME_PARAMETER, dataType);
         sourceParameters.put(TRANSLATION_PREFIX_PARAMETER, DOC_TRANSLATION_PREFIX);
+        // Entries are created from the edit mode, so the creation parameters are ignored without it.
         if (parameters.isAllowEditMode()) {
             sourceParameters.put(EDIT_MODE_PARAMETER, Boolean.TRUE.toString());
-        }
-        String strategy = parameters.getCreationStrategy();
-        if (StringUtils.isNotBlank(strategy)
-            && canCreate(parameters, strategy, sourceParameters, properties, warnings)) {
-            sourceParameters.put(NAMING_STRATEGY_PARAMETER, strategy);
-            sourceParameters.put(NEW_ROW_LOCATION_PARAMETER,
-                this.entityReferenceSerializer.serialize(getNewEntriesLocation(parameters, context)));
+            String strategy = parameters.getCreationStrategy();
+            if (StringUtils.isNotBlank(strategy) && canCreate(strategy, sourceParameters, properties, warnings)) {
+                sourceParameters.put(NAMING_STRATEGY_PARAMETER, strategy);
+                sourceParameters.put(NEW_ROW_LOCATION_PARAMETER,
+                    this.entityReferenceSerializer.serialize(getNewEntriesLocation(parameters, context)));
+            }
         }
 
         return sourceParameters.entrySet().stream()
@@ -608,20 +608,15 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     /**
      * Checks whether entries can be created with the picked strategy.
      *
-     * @param parameters the macro parameters
      * @param strategy the hint of the strategy the author picked
      * @param sourceParameters the source parameters set so far
      * @param properties the columns displayed
      * @param warnings receives a warning when entries cannot be created
      * @return whether the strategy can be passed to the source
      */
-    private boolean canCreate(RecordsMacroParameters parameters, String strategy, Map<String, String> sourceParameters,
-        String properties, List<Block> warnings) throws MacroExecutionException
+    private boolean canCreate(String strategy, Map<String, String> sourceParameters, String properties,
+        List<Block> warnings) throws MacroExecutionException
     {
-        if (!parameters.isAllowEditMode()) {
-            warnings.add(this.messages.warning("warning.creationWithoutEditMode"));
-            return false;
-        }
         Optional<Set<String>> mandatoryProperties =
             this.creationStrategies.getMandatoryProperties(strategy, new HashMap<>(sourceParameters));
         if (mandatoryProperties.isEmpty()) {

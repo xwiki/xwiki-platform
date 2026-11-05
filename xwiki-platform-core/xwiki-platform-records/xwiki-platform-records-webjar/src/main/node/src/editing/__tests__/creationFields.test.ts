@@ -224,13 +224,13 @@ describe("updateCreationFields, following the columns", () => {
     );
   });
 
-  it("keeps the saved strategy and location when the dialog opens without the edit mode", () => {
+  it("disables a saved strategy and its location when the dialog opens without the edit mode", () => {
     const scope = givenDialog({ strategy: "uuid" });
 
     updateCreationFields(scope, false);
 
-    expect(strategySelect().disabled).toBe(false);
-    expect(locationInput().disabled).toBe(false);
+    expect(strategySelect().disabled).toBe(true);
+    expect(locationInput().disabled).toBe(true);
   });
 
   it("turns creation off when the columns no longer allow the picked strategy", () => {
@@ -300,14 +300,15 @@ describe("wireCreationFields", () => {
     expect(locationButton().disabled).toBe(true);
   });
 
-  it("keeps a strategy picked without the edit mode in a dialog opened with a saved one", () => {
-    givenWiredDialog({ strategy: "uuid" });
+  it("gives back the strategy picked before the edit mode was turned off once it is allowed again", () => {
+    givenWiredDialog({ editMode: true, strategy: "uuid" });
+    allowEditMode(false);
 
-    strategySelect().value = "title";
-    change(strategySelect());
+    allowEditMode();
 
     expect(strategySelect().disabled).toBe(false);
-    expect(strategySelect().value).toBe("title");
+    expect(strategySelect().value).toBe("uuid");
+    expect(locationInput().disabled).toBe(false);
   });
 
   it("turns creation off when a column the picked strategy needs is removed", () => {

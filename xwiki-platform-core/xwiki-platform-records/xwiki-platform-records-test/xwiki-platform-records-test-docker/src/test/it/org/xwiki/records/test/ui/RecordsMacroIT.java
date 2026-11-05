@@ -159,13 +159,12 @@ class RecordsMacroIT extends AbstractCKEditorIT
             {{records class="%s" id="%s" properties="%s" creationStrategy="missing"/}}"""
             .formatted(className, LIVE_DATA_ID, STATUS));
         RecordsMacroEditModal macroEditModal = editMacro().openTab(EDITING_TAB);
+        // The saved strategy is disabled while the edit mode is off, and given back once it is allowed.
         assertEquals("missing", macroEditModal.getCreationStrategy());
-        assertTrue(macroEditModal.isCreationStrategyEnabled());
-        macroEditModal.setAllowEditMode(true);
-        macroEditModal.setAllowEditMode(false);
         assertFalse(macroEditModal.isCreationStrategyEnabled());
         macroEditModal.setAllowEditMode(true);
         assertTrue(macroEditModal.isCreationStrategyEnabled());
+        assertEquals("missing", macroEditModal.getCreationStrategy());
         assertFalse(macroEditModal.isCreationStrategyAvailable(TITLE_STRATEGY));
         assertEquals("\"" + TITLE_STRATEGY + "\" cannot be used because the table does not display Page Title.",
             macroEditModal.getCreationStrategyWarning());

@@ -94,6 +94,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -347,7 +348,7 @@ class RecordsMacroTest
     }
 
     @Test
-    void executeDoesNotCreateEntriesWithoutTheEditModeAndSaysSo() throws Exception
+    void executeIgnoresTheCreationStrategyWithoutTheEditMode() throws Exception
     {
         RecordsMacroParameters parameters = newParameters();
         parameters.setCreationStrategy("uuid");
@@ -355,8 +356,8 @@ class RecordsMacroTest
         List<Block> blocks = this.macro.execute(parameters, null, this.context);
 
         assertEquals(SOURCE_PARAMETERS, capture().getSourceParameters());
-        assertEquals(List.of(warning("rendering.macro.records.warning.creationWithoutEditMode[]"), this.renderedBlock),
-            blocks);
+        assertEquals(List.of(this.renderedBlock), blocks);
+        verifyNoInteractions(this.creationStrategies);
     }
 
     @Test

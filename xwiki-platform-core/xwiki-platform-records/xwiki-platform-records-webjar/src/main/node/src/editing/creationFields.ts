@@ -27,7 +27,7 @@ import { metadataLabels, translate } from "../common/translations";
  * Creating entries needs the edit mode, so the creation strategy is disabled while the edit mode is not allowed, and
  * the location is disabled while there is no strategy. A strategy is also disabled when the table does not display
  * the columns it names the new pages after, with the reason in a warning below the dropdown. The macro editor does not
- * save a disabled field, so a saved strategy stays enabled until the author turns the edit mode off.
+ * save a disabled field, so turning the edit mode off drops the strategy and the location.
  */
 
 const EDIT_MODE_PARAMETER = "allowEditMode";
@@ -182,9 +182,7 @@ function updateCreationFields(scope: ParentNode, reset: boolean): void {
   }
   // The macro editor does not save a disabled option.
   strategy.selectedOptions[0]?.removeAttribute("disabled");
-  strategy.disabled =
-    findEditModeInput(scope)?.checked === false &&
-    (strategy.disabled || strategy.value === "");
+  strategy.disabled = findEditModeInput(scope)?.checked === false;
   setLocationEnabled(scope, !strategy.disabled && strategy.value !== "");
   showStrategyProblems(strategy, problems);
 }
@@ -217,20 +215,13 @@ function showStrategyProblems(
  */
 function wireCreationFields(scope: ParentNode, listen: ChangeListener): void {
   updateCreationFields(scope, false);
-  const editMode = findEditModeInput(scope);
-  const strategy = findStrategySelect(scope);
-  if (editMode !== null && strategy !== null) {
-    listen(editMode, () => {
-      // Turning the edit mode off turns creation off.
-      strategy.disabled = !editMode.checked;
-      updateCreationFields(scope, true);
-    });
-  }
-  [STRATEGY_PARAMETER, COLUMNS_PARAMETER].forEach((name) => {
-    scope.querySelectorAll(`[name="${name}"]`).forEach((field) => {
-      listen(field, () => updateCreationFields(scope, true));
-    });
-  });
+  [EDIT_MODE_PARAMETER, STRATEGY_PARAMETER, COLUMNS_PARAMETER].forEach(
+    (name) => {
+      scope.querySelectorAll(`[name="${name}"]`).forEach((field) => {
+        listen(field, () => updateCreationFields(scope, true));
+      });
+    },
+  );
 }
 
 export { updateCreationFields, wireCreationFields };

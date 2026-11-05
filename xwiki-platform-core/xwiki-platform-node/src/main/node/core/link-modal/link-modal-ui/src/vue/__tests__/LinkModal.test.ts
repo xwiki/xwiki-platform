@@ -70,13 +70,36 @@ function fakeExtension(
 function mountLinkModal(
   current: LinkData,
   extensions: LinkTargetTypeExtension[] = [],
+  excludedLinkTargetTypes?: string[],
 ) {
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
 
   return mount(LinkModal, {
-    props: { current, depsContainer: fakeDepsContainer(extensions) },
+    props: {
+      current,
+      depsContainer: fakeDepsContainer(extensions),
+      excludedLinkTargetTypes,
+    },
     global: { plugins: [i18n], components: dsComponentStubs },
   });
+}
+
+/**
+ * @returns a fake link target type whose form renders the link type selector (see LinkForm)
+ */
+function fakeExtensionWithLinkForm(
+  type: string,
+  label: string,
+): LinkTargetTypeExtension {
+  return fakeExtension(
+    type,
+    label,
+    defineComponent({
+      components: { LinkForm },
+      props: ["linkData"],
+      template: '<LinkForm :link-data="linkData" />',
+    }),
+  );
 }
 
 /**
@@ -220,15 +243,7 @@ describe("LinkModal", () => {
   it("offers an unsupported resource type first, as is, and restores its reference when reselected", async () => {
     // A link target type whose form renders the link type selector, to switch back to the unsupported type.
     const wrapper = mountLinkModal(unsupportedLinkData(), [
-      fakeExtension(
-        "a",
-        "A",
-        defineComponent({
-          components: { LinkForm },
-          props: ["linkData"],
-          template: '<LinkForm :link-data="linkData" />',
-        }),
-      ),
+      fakeExtensionWithLinkForm("a", "A"),
     ]);
     await flushPromises();
     expect(linkTypeOptions(wrapper)).toEqual([
@@ -246,5 +261,44 @@ describe("LinkModal", () => {
       (wrapper.get("[data-test='linkReference']").element as HTMLInputElement)
         .value,
     ).toBe("wikipedia:XWiki");
+  });
+
+  it("doesn't offer the excluded link target types, ignoring the unknown ones", async () => {
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "a", config: {} } },
+      ["a", "b", "c"].map((type) =>
+        fakeExtensionWithLinkForm(type, type.toUpperCase()),
+      ),
+      ["b", "unknown"],
+    );
+    await flushPromises();
+
+    expect(linkTypeOptions(wrapper)).toEqual([
+      ["a", "A"],
+      ["c", "C"],
+    ]);
+  });
+
+  it("offers the type of the edited link even when it's excluded, to edit the link with it", async () => {
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "b", config: {} } },
+      ["a", "b"].map((type) =>
+        fakeExtensionWithLinkForm(type, type.toUpperCase()),
+      ),
+      ["b"],
+    );
+    await flushPromises();
+    expect(linkTypeOptions(wrapper)).toEqual([
+      ["a", "A"],
+      ["b", "B"],
+    ]);
+
+    // Still offered after switching to another link target type, so that the user can switch back.
+    await wrapper.get("[data-test='linkTargetType']").setValue("a");
+    await flushPromises();
+    expect(linkTypeOptions(wrapper)).toEqual([
+      ["a", "A"],
+      ["b", "B"],
+    ]);
   });
 });

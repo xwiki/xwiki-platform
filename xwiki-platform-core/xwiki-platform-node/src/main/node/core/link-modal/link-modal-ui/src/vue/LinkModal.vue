@@ -38,6 +38,13 @@ import type { Container } from "inversify";
 const props = defineProps<{
   current: LinkData;
   depsContainer: Container;
+
+  /**
+   * The link target types (by type) that the link type selector doesn't offer, e.g. because their links are rarely
+   * created from the link modal. They are still used to edit the links they handle, and offered when the edited link
+   * is of an excluded type. Unknown types are ignored.
+   */
+  excludedLinkTargetTypes?: string[];
 }>();
 
 const { t } = useI18n({ messages: translations });
@@ -60,7 +67,17 @@ const linkExtensions: LinkTargetTypeExtension[] = [
   ...listLinkTargetTypeExtensions(props.depsContainer),
 ];
 
-provide("linkTargetTypeExtensions", linkExtensions);
+// The link target types offered by the link type selector, which always include the type of the edited link, so that
+// the user can switch back to it. The form of each link target type renders its own selector, so this list is computed
+// once, from the type of the edited link when the modal is opened.
+const initialLinkTargetType = props.current.target.type;
+const offeredLinkExtensions = linkExtensions.filter(
+  (extension) =>
+    extension.type === initialLinkTargetType ||
+    !props.excludedLinkTargetTypes?.includes(extension.type),
+);
+
+provide("linkTargetTypeExtensions", offeredLinkExtensions);
 
 // The form of the currently selected link target type. `markRaw()` excludes it from Vue's reactivity tracking
 // (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a dynamically registered

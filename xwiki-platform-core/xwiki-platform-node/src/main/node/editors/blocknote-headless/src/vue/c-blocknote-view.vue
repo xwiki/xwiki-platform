@@ -79,6 +79,12 @@ type Props = {
 
   /** Container to inject dependencies from */
   depsContainer: Container;
+
+  /**
+   * The link target types (by type) that the link modal doesn't offer for new links, while still using them to edit
+   * the links they handle. Unknown types are ignored.
+   */
+  excludedLinkTargetTypes?: string[];
 };
 
 const {
@@ -87,6 +93,7 @@ const {
   macros,
   collaboration = undefined,
   depsContainer,
+  excludedLinkTargetTypes = undefined,
 } = defineProps<Props>();
 
 const editorRef = shallowRef<EditorType | null>(null);
@@ -250,6 +257,7 @@ onUnmounted(() => {
     <LinkModal
       :current="currentLinkData"
       :deps-container="depsContainer"
+      :excluded-link-target-types="excludedLinkTargetTypes"
       @submit="submitEditedLink"
       @cancel="editingLink = null"
     />

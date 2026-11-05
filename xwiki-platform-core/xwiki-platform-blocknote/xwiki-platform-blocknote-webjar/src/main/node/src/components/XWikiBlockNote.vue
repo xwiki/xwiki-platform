@@ -26,6 +26,7 @@
         :editor-props
         :editor-content
         :deps-container="container"
+        :excluded-link-target-types="excludedLinkTargetTypes"
         :macros
         :collaboration
         @instant-change="dirty = true"
@@ -292,6 +293,10 @@ const imageEditionHooks: ImageEditionHooks = {
     }
   },
 };
+
+// Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new links, to
+// keep the link type selector short. Existing path and UNC path links are still edited with their own link type.
+const excludedLinkTargetTypes = ["path", "unc"];
 
 const linkEdition: LinkEditionHooks = {
   // Runs before the link editor is opened on an existing link. The reference of the linked resource is kept as link

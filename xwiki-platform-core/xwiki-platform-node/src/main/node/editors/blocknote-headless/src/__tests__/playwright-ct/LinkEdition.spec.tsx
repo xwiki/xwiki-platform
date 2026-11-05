@@ -107,7 +107,7 @@ test("Editing the title of a link to an unsupported resource keeps its reference
   );
 });
 
-test("Editing the title of a path link keeps its reference", async ({
+test("Editing the title of a path link keeps its reference, even when path links are not offered", async ({
   mount,
   page,
   // eslint-disable-next-line max-statements
@@ -126,6 +126,8 @@ test("Editing the title of a path link keeps its reference", async ({
     },
     macros: false,
     linkReferences: { [url]: reference },
+    // Like the XWiki integration.
+    excludedLinkTargetTypes: ["path", "unc"],
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -134,9 +136,13 @@ test("Editing the title of a path link keeps its reference", async ({
 
   await openLinkEditor(page, editorEl);
 
+  // The path link is edited with its own link target type, even if it's excluded, unlike the UNC path one.
   await expect(
     page.locator('[data-test="linkTargetType"] option:checked'),
   ).toHaveText("Path");
+  await expect(
+    page.locator('[data-test="linkTargetType"] option[value="unc"]'),
+  ).toHaveCount(0);
   await expect(page.locator('[data-test="linkPath"]')).toHaveValue(
     "/xwiki/bin/view/Main/",
   );

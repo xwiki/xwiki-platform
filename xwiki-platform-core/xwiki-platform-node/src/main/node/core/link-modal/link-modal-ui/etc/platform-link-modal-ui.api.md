@@ -92,12 +92,14 @@ linkData: LinkData;
 export const LinkModal: DefineComponent<    {
 current: LinkData;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
 }, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 submit: (args_0: LinkData) => any;
 cancel: () => any;
 }, string, PublicProps, Readonly<{
 current: LinkData;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
 }> & Readonly<{
 onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;

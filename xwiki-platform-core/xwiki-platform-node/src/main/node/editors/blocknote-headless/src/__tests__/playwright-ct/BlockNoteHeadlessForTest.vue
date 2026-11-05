@@ -59,6 +59,8 @@ const props = defineProps<{
    * editing the corresponding links, like the XWiki integration does from the link metadata.
    */
   linkReferences?: Record<string, ResourceReference>;
+
+  excludedLinkTargetTypes?: string[];
 }>();
 
 defineEmits<{
@@ -107,6 +109,7 @@ defineExpose({
       :editor-content
       :collaboration
       :deps-container="depsContainer"
+      :excluded-link-target-types="excludedLinkTargetTypes"
       @instant-change="$emit('instant-change')"
       @debounced-change="(content) => $emit('debounced-change', content)"
     />

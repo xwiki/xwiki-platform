@@ -322,6 +322,11 @@
 #end
 
 #macro (displayExtensionHistoryRecord $record $selector $hideDate)
+  ## HTML identifiers cannot contain whitespace, which could come from the namespaces included in the record id.
+  #set ($recordIdPrefix = $record.id.replaceAll('\s', '-'))
+  #set ($recordIdPrefix = "extension-history-record-$recordIdPrefix")
+  #set ($recordExtensionsId = "${recordIdPrefix}-extensions")
+  #set ($recordUserId = "${recordIdPrefix}-user")
   <div>
     ##
     ## Selector
@@ -329,7 +334,11 @@
     #if ($selector)
       $selector
     #else
-      <input type="checkbox" name="extensionHistoryRecord" value="$escapetool.xml($record.id)" />
+      ## The checkbox is labelled by both the extensions and the user and date of the record. The same extensions can
+      ## be listed by several records, so adding the user and date is the most convenient way to get a label that is
+      ## unique to each record.
+      <input type="checkbox" name="extensionHistoryRecord" value="$escapetool.xml($record.id)"
+        aria-labelledby="$escapetool.xml("$recordExtensionsId $recordUserId")" />
     #end
     ##
     ## Icon
@@ -352,7 +361,7 @@
     #foreach ($extensionId in $record.request.extensions)
       #set ($discard = $extensions.add("#displayExtensionHistoryRecord_extension($extensionId)"))
     #end
-    <span>$stringtool.join($extensions, ', ')</span>
+    <span id="$escapetool.xml($recordExtensionsId)">$stringtool.join($extensions, ', ')</span>
     ##
     ## Namespaces
     ##
@@ -373,7 +382,7 @@
   ##
   #set ($userReference = $record.request.getProperty('user.reference'))
   #set ($label = "extension.history.record.${record.jobType}User#if (!$hideDate)AndDate#end")
-  <div class="extension-history-record-user">
+  <div class="extension-history-record-user" id="$escapetool.xml($recordUserId)">
     $services.localization.render($label, [$xwiki.getUserName("$!userReference"), $xwiki.formatDate($record.endDate)])
   </div>
 #end

@@ -240,7 +240,7 @@ public class BlockNoteLinkModal extends BaseElement
             + "[.//span[contains(@class, 'suggestion-title') and . = '%s']]", dataTest, suggestionTitle);
         if (suggestionHint != null) {
             suggestionXPath +=
-                String.format("[.//span[contains(@class, 'segment') and contains(., '%s')]]", suggestionHint);
+                String.format("[.//*[contains(@class, 'suggestion-hint') and contains(., '%s')]]", suggestionHint);
         }
         By suggestionLocator = By.xpath(suggestionXPath);
         // There's a race between the target page/attachment being saved and its indexing actually being queued, so

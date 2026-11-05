@@ -72,12 +72,11 @@ public class DistributionAction extends XWikiAction
     {
         context.put("action", DISTRIBUTION_ACTION);
 
-        // Make sure DW skip all skins
+        // Make sure DW is not impacted by skins and icon themes: those are stored in wiki pages which might not be
+        // compatible with the running code yet (e.g. pages from an old flavor referring to resources which don't exist
+        // anymore)
         context.put(XWiki.CKEY_SKIN, XWiki.DEFAULT_SKIN);
         context.put(XWiki.CKEY_BASESKIN, "");
-
-        // Make sure DW skips all icon themes: those are stored in wiki pages which might not be compatible with the
-        // running code yet (e.g. pages from an old flavor referring to resources which don't exist anymore)
         useDefaultIconSet();
 
         // Disallow template override with xpage parameter.

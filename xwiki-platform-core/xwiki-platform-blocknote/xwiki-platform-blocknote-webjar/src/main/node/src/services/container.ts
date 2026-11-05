@@ -35,6 +35,9 @@ import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platfor
 import { ComponentInit as DocumentXWikiComponentList } from "@xwiki/platform-document-xwiki";
 import { ComponentInit as LinkSuggestComponentList } from "@xwiki/platform-link-suggest-api";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
+import { ComponentInit as LinkTypeComponentInit } from "@xwiki/platform-link-type-api";
+import { ComponentInit as LinkTypeDefaultComponentInit } from "@xwiki/platform-link-type-default";
+import { ComponentInit as LinkTypeUIComponentInit } from "@xwiki/platform-link-type-ui";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
 import { ComponentInit as ModelReferenceComponentList } from "@xwiki/platform-model-reference-api";
@@ -72,6 +75,9 @@ new CollaborationComponentList(container);
 new XWikiCollaborationComponentList(container);
 new LinkSuggestComponentList(container);
 new LinkSuggestXWikiComponentList(container);
+new LinkTypeComponentInit(container);
+new LinkTypeDefaultComponentInit(container);
+new LinkTypeUIComponentInit(container);
 
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);

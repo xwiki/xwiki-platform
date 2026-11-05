@@ -67,6 +67,32 @@ describe("XSelect", () => {
   );
 
   runTest(
+    "render items with a value distinct from their label",
+    accessibilityMount({
+      props: {
+        label: "Select Label",
+        items: [
+          { value: "v1", label: "Same label" },
+          { value: "v2", label: "Same label" },
+          "i3",
+        ],
+      } satisfies SelectProps,
+    }),
+    (wrapper) => {
+      expect(wrapper.html()).toEqual(`<dl>
+  <dt><label for="v-0">Select Label</label>
+    <!--v-if-->
+  </dt>
+  <dd><select id="v-0">
+      <option value="v1">Same label</option>
+      <option value="v2">Same label</option>
+      <option value="i3">i3</option>
+    </select></dd>
+</dl>`);
+    },
+  );
+
+  runTest(
     "render required",
     accessibilityMount({
       props: {

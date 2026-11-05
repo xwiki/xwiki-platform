@@ -49,7 +49,7 @@ test("Inserting a link from the slash menu focuses the display text field", asyn
   ).toHaveText("Link");
 
   // Select the (only remaining) "Link" item, opening the link modal. The rich text editor still holds focus right
-  // after this (it just handled the Enter keypress), which is exactly the race LinkConfig.vue's onMounted guards
+  // after this (it just handled the Enter keypress), which is exactly the race LinkForm.vue's onMounted guards
   // against: the display text field must reclaim focus once settled.
   await pressKeySettled(page, "Enter");
 

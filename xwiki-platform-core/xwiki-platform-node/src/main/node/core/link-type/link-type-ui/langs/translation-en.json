@@ -1,0 +1,14 @@
+{
+  "link-type.target-types.url.url": "URL",
+
+  "link-type.target-types.email.address": "E-mail address",
+  "link-type.target-types.email.subject": "Message subject",
+  "link-type.target-types.email.body": "Message body",
+
+  "link-type.target-types.page.reference": "Page reference",
+  "link-type.target-types.page.query-string": "Query string",
+  "link-type.target-types.page.anchor": "Anchor",
+
+  "link-type.target-types.attachment.reference": "Attachment reference",
+  "link-type.target-types.attachment.query-string": "Query string"
+}

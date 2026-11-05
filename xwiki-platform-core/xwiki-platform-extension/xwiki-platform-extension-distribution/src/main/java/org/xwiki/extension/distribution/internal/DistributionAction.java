@@ -19,12 +19,12 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSetManager;
@@ -55,7 +55,17 @@ public class DistributionAction extends XWikiAction
      */
     public static final String DISTRIBUTION_ACTION = "distribution";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DistributionAction.class);
+    @Inject
+    private DistributionManager distributionManager;
+
+    @Inject
+    private IconSetManager iconSetManager;
+
+    @Inject
+    private IconSetContext iconSetContext;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -77,8 +87,7 @@ public class DistributionAction extends XWikiAction
         }
 
         // Make sure the user has the right to access the distribution action
-        DistributionManager distributionManager = Utils.getComponent(DistributionManager.class);
-        if (!distributionManager.canDisplayDistributionWizard()) {
+        if (!this.distributionManager.canDisplayDistributionWizard()) {
             if (context.getUserReference() == null) {
                 context.getWiki().getAuthService().showLogin(context);
                 return false;
@@ -94,10 +103,9 @@ public class DistributionAction extends XWikiAction
     private void useDefaultIconSet()
     {
         try {
-            Utils.getComponent(IconSetContext.class)
-                .setIconSet(Utils.getComponent(IconSetManager.class).getDefaultIconSet());
+            this.iconSetContext.setIconSet(this.iconSetManager.getDefaultIconSet());
         } catch (IconException e) {
-            LOGGER.warn("Failed to force the default icon set in the Distribution Wizard: {}",
+            this.logger.warn("Failed to force the default icon set in the Distribution Wizard: {}",
                 ExceptionUtils.getRootCauseMessage(e));
         }
     }

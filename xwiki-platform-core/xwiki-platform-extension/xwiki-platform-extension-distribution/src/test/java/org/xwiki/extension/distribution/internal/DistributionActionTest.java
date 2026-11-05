@@ -29,6 +29,7 @@ import org.xwiki.icon.internal.context.IconSetContext;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
@@ -70,7 +71,8 @@ class DistributionActionTest
 
     private XWikiContext xcontext;
 
-    private final DistributionAction action = new DistributionAction();
+    @InjectMockComponents
+    private DistributionAction action;
 
     @BeforeEach
     void beforeEach() throws Exception

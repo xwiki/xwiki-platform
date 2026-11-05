@@ -68,7 +68,7 @@ class AttachmentLinkTargetType
     return { ref: null };
   }
 
-  tryParseURL(url: string): AttachmentLinkTargetConfig | null {
+  fromURL(url: string): AttachmentLinkTargetConfig | null {
     const ref = tryFallible(() =>
       this.remoteURLParserProvider.get()?.parse(url),
     );
@@ -85,7 +85,7 @@ class AttachmentLinkTargetType
     };
   }
 
-  serializeURL({ ref, queryString }: AttachmentLinkTargetConfig): string {
+  toURL({ ref, queryString }: AttachmentLinkTargetConfig): string {
     const base = this.remoteURLSerializerProvider
       .get()
       ?.serialize(ref ?? undefined);
@@ -93,7 +93,7 @@ class AttachmentLinkTargetType
     return `${base ?? ""}${queryString ?? ""}`;
   }
 
-  tryParseReference(
+  fromReference(
     reference: ResourceReference,
   ): AttachmentLinkTargetConfig | null {
     if (reference.type !== ResourceType.ATTACHMENT) {
@@ -109,7 +109,7 @@ class AttachmentLinkTargetType
     return ref?.type === EntityType.ATTACHMENT ? { ref } : null;
   }
 
-  configToReference({
+  toReference({
     ref,
   }: AttachmentLinkTargetConfig): ResourceReference | undefined {
     return entityResourceReference(

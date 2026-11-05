@@ -71,15 +71,15 @@ abstract class AbstractPlainTextLinkTargetType
    */
   // The URL is a parameter so that the URL link target type can override this method.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  tryParseURL(url: string): PlainTextLinkTargetConfig | null {
+  fromURL(url: string): PlainTextLinkTargetConfig | null {
     return null;
   }
 
-  serializeURL({ location }: PlainTextLinkTargetConfig): string {
+  toURL({ location }: PlainTextLinkTargetConfig): string {
     return location;
   }
 
-  tryParseReference(
+  fromReference(
     reference: ResourceReference,
   ): PlainTextLinkTargetConfig | null {
     return reference.type === this.resourceType
@@ -87,7 +87,7 @@ abstract class AbstractPlainTextLinkTargetType
       : null;
   }
 
-  configToReference({
+  toReference({
     location,
   }: PlainTextLinkTargetConfig): ResourceReference | undefined {
     return location.trim() === ""

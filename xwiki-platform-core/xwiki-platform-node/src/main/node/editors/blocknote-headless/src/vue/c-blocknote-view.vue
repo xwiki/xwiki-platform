@@ -22,10 +22,7 @@ import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import { LinkModal } from "@xwiki/platform-link-modal-ui";
 import {
-  linkTargetToResourceReference,
-  parseLinkTarget,
-  resourceReferenceToLinkTarget,
-  serializeLinkTarget,
+  linkTargetTypeManagerRole,
   unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
 import { Container } from "inversify";
@@ -49,7 +46,11 @@ import type {
   LinkEditionData,
   LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkData, LinkTarget } from "@xwiki/platform-link-type-api";
+import type {
+  LinkData,
+  LinkTarget,
+  LinkTargetTypeManager,
+} from "@xwiki/platform-link-type-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
 type Props = {
@@ -164,14 +165,23 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
+/**
+ * @returns the link target type manager, resolved each time it's needed, so that it uses the link target types
+ *   registered at that time
+ */
+function getLinkTargetTypeManager(): LinkTargetTypeManager {
+  return depsContainer.get<LinkTargetTypeManager>(linkTargetTypeManagerRole);
+}
+
 const submitEditedLink = ({ displayText, target }: LinkData) => {
+  const linkTargetTypeManager = getLinkTargetTypeManager();
   // The URL of a resource that no link target type supports can't be computed client-side, so keep the URL of the
   // edited link. It's only a preview anyway: the link is saved from its reference.
   const url =
     target.type === unsupportedLinkTargetType
       ? (editingLink.value?.current.url ?? "")
-      : serializeLinkTarget(target, depsContainer);
-  const reference = linkTargetToResourceReference(target, depsContainer);
+      : linkTargetTypeManager.toURL(target);
+  const reference = linkTargetTypeManager.toReference(target);
 
   editingLink.value?.onSubmit({
     title: displayText,
@@ -196,9 +206,10 @@ const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
  * is), and fall back on reverse-engineering the URL otherwise.
  */
 function currentLinkTarget(current: LinkEditionData): LinkTarget {
+  const linkTargetTypeManager = getLinkTargetTypeManager();
   return current.reference
-    ? resourceReferenceToLinkTarget(current.reference, depsContainer)
-    : parseLinkTarget(current.url, depsContainer);
+    ? linkTargetTypeManager.fromReference(current.reference)
+    : linkTargetTypeManager.fromURL(current.url);
 }
 
 const currentLinkData = computed<LinkData | null>(() => {

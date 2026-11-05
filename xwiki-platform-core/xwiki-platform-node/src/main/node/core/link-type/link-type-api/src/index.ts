@@ -19,13 +19,9 @@
  */
 
 export type { LinkData, LinkTarget } from "./data/linkType";
-export {
-  linkTargetToResourceReference,
-  listLinkTargetTypes,
-  parseLinkTarget,
-  resourceReferenceToLinkTarget,
-  serializeLinkTarget,
-} from "./convert";
+export { ComponentInit } from "./componentInit";
+export { linkTargetTypeManagerRole } from "./linkTargetTypeManager";
+export type { LinkTargetTypeManager } from "./linkTargetTypeManager";
 export { linkTargetTypeRole } from "./linkTargetType";
 export type { LinkTargetType } from "./linkTargetType";
 export { unsupportedLinkTargetType } from "./unsupportedLinkTarget";

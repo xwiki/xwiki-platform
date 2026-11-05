@@ -21,7 +21,10 @@ import { dsComponentStubs } from "./dsStubs";
 import { linkTargetTypeFormRole } from "../../linkTargetTypeForm";
 import LinkModal from "../LinkModal.vue";
 import { flushPromises, mount } from "@vue/test-utils";
-import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
+import {
+  linkTargetTypeManagerRole,
+  unsupportedLinkTargetType,
+} from "@xwiki/platform-link-type-api";
 import { describe, expect, it } from "vitest";
 import { defineComponent, reactive } from "vue";
 import { createI18n } from "vue-i18n";
@@ -49,6 +52,7 @@ function fakeDepsContainer(targetTypes: FakeLinkTargetType[]): Container {
     RemoteURLSerializerProvider: noopProvider,
     AttachmentsService: {},
     DocumentService: {},
+    [linkTargetTypeManagerRole]: { list: () => targetTypes },
   };
   const forms = targetTypes.flatMap((targetType) =>
     targetType.fakeForm
@@ -67,8 +71,7 @@ function fakeDepsContainer(targetTypes: FakeLinkTargetType[]): Container {
     get: (token: string) => providers[token],
     isBound: (token: string) =>
       token === linkTargetTypeFormRole ? forms.length > 0 : true,
-    getAll: (token: string) =>
-      token === linkTargetTypeFormRole ? forms : targetTypes,
+    getAll: (token: string) => (token === linkTargetTypeFormRole ? forms : []),
   } as unknown as Container;
 }
 
@@ -86,8 +89,8 @@ function fakeLinkTargetType(
     type,
     getLabel: async () => label,
     createDefaultConfig: () => ({}),
-    tryParseURL: () => null,
-    serializeURL: () => "",
+    fromURL: () => null,
+    toURL: () => "",
     fakeForm: form,
     fakeOptions: options,
   };

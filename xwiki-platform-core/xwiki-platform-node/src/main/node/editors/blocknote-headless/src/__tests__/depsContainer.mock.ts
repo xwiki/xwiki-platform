@@ -19,16 +19,11 @@
  */
 
 import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
-import { linkTargetTypeRole } from "@xwiki/platform-link-type-api";
 import {
-  AttachmentLinkTargetType,
-  ComponentInit as LinkTypeDefaultComponentInit,
-  EmailLinkTargetType,
-  PageLinkTargetType,
-  PathLinkTargetType,
-  UNCLinkTargetType,
-  URLLinkTargetType,
-} from "@xwiki/platform-link-type-default";
+  ComponentInit as LinkTypeComponentInit,
+  linkTargetTypeManagerRole,
+} from "@xwiki/platform-link-type-api";
+import { ComponentInit as LinkTypeDefaultComponentInit } from "@xwiki/platform-link-type-default";
 import {
   AttachmentReference,
   DocumentReference,
@@ -154,35 +149,29 @@ export function depsContainerMock(): Container {
 }
 
 /**
- * The link modal resolves the link target types it can offer out of the container, so the built-in ones must be
- * registered here the same way the BlockNote webjar registers them in production (see its container.ts).
+ * The link modal and the editor resolve the link target type manager, and the forms of the link target types, out of
+ * the container, so the built-in link target types must be registered the same way the BlockNote webjar registers
+ * them in production (see its container.ts). They are registered in a real container, which resolves them with the
+ * providers returned by the container mock.
  */
 function withBuiltInLinkTargetTypes(
   container: MockProxy<Container>,
 ): Container {
-  // The page and attachment link target types inject the same providers that the container mock returns.
-  const providers = [
-    container.get<RemoteURLParserProvider>("RemoteURLParserProvider"),
-    container.get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider"),
-    container.get<ModelReferenceParserProvider>("ModelReferenceParserProvider"),
-    container.get<ModelReferenceSerializerProvider>(
-      "ModelReferenceSerializerProvider",
-    ),
-  ] as const;
-  container.getAll
-    .calledWith(linkTargetTypeRole)
-    .mockReturnValue([
-      new PageLinkTargetType(...providers),
-      new AttachmentLinkTargetType(...providers),
-      new EmailLinkTargetType(),
-      new PathLinkTargetType(),
-      new UNCLinkTargetType(),
-      new URLLinkTargetType(),
-    ]);
-
-  // The forms of the built-in link target types, registered by the same component initializer as in production.
   const builtInContainer = new InversifyContainer();
+  for (const provider of [
+    "RemoteURLParserProvider",
+    "RemoteURLSerializerProvider",
+    "ModelReferenceParserProvider",
+    "ModelReferenceSerializerProvider",
+  ]) {
+    builtInContainer.bind(provider).toConstantValue(container.get(provider));
+  }
+  new LinkTypeComponentInit(builtInContainer);
   new LinkTypeDefaultComponentInit(builtInContainer);
+
+  container.get
+    .calledWith(linkTargetTypeManagerRole)
+    .mockReturnValue(builtInContainer.get(linkTargetTypeManagerRole));
   container.isBound.calledWith(linkTargetTypeFormRole).mockReturnValue(true);
   container.getAll
     .calledWith(linkTargetTypeFormRole)

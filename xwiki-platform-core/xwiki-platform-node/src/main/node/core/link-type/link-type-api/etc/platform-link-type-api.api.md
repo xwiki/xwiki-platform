@@ -10,23 +10,28 @@ import { ResourceReference } from '@xwiki/platform-rendering-api';
 // @beta
 export abstract class AbstractPlainTextLinkTargetType implements LinkTargetType<PlainTextLinkTargetConfig> {
     // (undocumented)
-    configToReference(input: PlainTextLinkTargetConfig): ResourceReference | undefined;
-    // (undocumented)
     createDefaultConfig(): PlainTextLinkTargetConfig;
+    // (undocumented)
+    fromReference(reference: ResourceReference): PlainTextLinkTargetConfig | null;
+    // (undocumented)
+    fromURL(url: string): PlainTextLinkTargetConfig | null;
     // (undocumented)
     abstract getLabel(locale: string): Promise<string>;
     // (undocumented)
     abstract readonly order: number;
     protected abstract readonly resourceType: string;
     // (undocumented)
-    serializeURL(input: PlainTextLinkTargetConfig): string;
+    toReference(input: PlainTextLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
-    tryParseReference(reference: ResourceReference): PlainTextLinkTargetConfig | null;
-    // (undocumented)
-    tryParseURL(url: string): PlainTextLinkTargetConfig | null;
+    toURL(input: PlainTextLinkTargetConfig): string;
     // (undocumented)
     abstract readonly type: string;
     protected abstract readonly typedReference: boolean;
+}
+
+// @beta
+export class ComponentInit {
+    constructor(container: Container);
 }
 
 // @beta
@@ -43,42 +48,37 @@ export type LinkTarget = {
 };
 
 // @beta
-export function linkTargetToResourceReference(target: LinkTarget, container: Container): ResourceReference | undefined;
-
-// @beta
 export interface LinkTargetType<TConfig = unknown> {
-    configToReference?(config: TConfig): ResourceReference | undefined;
     // (undocumented)
     createDefaultConfig(): TConfig;
+    fromReference?(reference: ResourceReference): TConfig | null;
+    fromURL(url: string): TConfig | null;
     getLabel(locale: string): Promise<string>;
     readonly order?: number;
-    serializeURL(config: TConfig): string;
-    // (undocumented)
-    tryParseReference?(reference: ResourceReference): TConfig | null;
-    // (undocumented)
-    tryParseURL(url: string): TConfig | null;
+    toReference?(config: TConfig): ResourceReference | undefined;
+    toURL(config: TConfig): string;
     readonly type: string;
 }
 
 // @beta
-export const linkTargetTypeRole = "LinkTargetType";
-
-// @beta (undocumented)
-export function listLinkTargetTypes(container: Container): LinkTargetType[];
+export interface LinkTargetTypeManager {
+    fromReference(reference: ResourceReference): LinkTarget;
+    fromURL(url: string): LinkTarget;
+    list(): LinkTargetType[];
+    toReference(target: LinkTarget): ResourceReference | undefined;
+    toURL(target: LinkTarget): string;
+}
 
 // @beta
-export function parseLinkTarget(url: string, container: Container): LinkTarget;
+export const linkTargetTypeManagerRole = "LinkTargetTypeManager";
+
+// @beta
+export const linkTargetTypeRole = "LinkTargetType";
 
 // @beta
 export type PlainTextLinkTargetConfig = {
     location: string;
 };
-
-// @beta
-export function resourceReferenceToLinkTarget(reference: ResourceReference, container: Container): LinkTarget;
-
-// @beta
-export function serializeLinkTarget(target: LinkTarget, container: Container): string;
 
 // @beta
 export type UnsupportedLinkTargetConfig = {

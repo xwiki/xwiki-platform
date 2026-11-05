@@ -26,19 +26,19 @@ export type AttachmentLinkTargetConfig = {
 export class AttachmentLinkTargetType implements LinkTargetType<AttachmentLinkTargetConfig> {
     constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
     // (undocumented)
-    configToReference(input: AttachmentLinkTargetConfig): ResourceReference | undefined;
-    // (undocumented)
     createDefaultConfig(): AttachmentLinkTargetConfig;
+    // (undocumented)
+    fromReference(reference: ResourceReference): AttachmentLinkTargetConfig | null;
+    // (undocumented)
+    fromURL(url: string): AttachmentLinkTargetConfig | null;
     // (undocumented)
     getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 100;
     // (undocumented)
-    serializeURL(input: AttachmentLinkTargetConfig): string;
+    toReference(input: AttachmentLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
-    tryParseReference(reference: ResourceReference): AttachmentLinkTargetConfig | null;
-    // (undocumented)
-    tryParseURL(url: string): AttachmentLinkTargetConfig | null;
+    toURL(input: AttachmentLinkTargetConfig): string;
     // (undocumented)
     readonly type = "attachment";
 }
@@ -58,19 +58,19 @@ export type EmailLinkTargetConfig = {
 // @beta
 export class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
     // (undocumented)
-    configToReference(input: EmailLinkTargetConfig): ResourceReference | undefined;
-    // (undocumented)
     createDefaultConfig(): EmailLinkTargetConfig;
+    // (undocumented)
+    fromReference(reference: ResourceReference): EmailLinkTargetConfig | null;
+    // (undocumented)
+    fromURL(url: string): EmailLinkTargetConfig | null;
     // (undocumented)
     getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 200;
     // (undocumented)
-    serializeURL(input: EmailLinkTargetConfig): string;
+    toReference(input: EmailLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
-    tryParseReference(reference: ResourceReference): EmailLinkTargetConfig | null;
-    // (undocumented)
-    tryParseURL(url: string): EmailLinkTargetConfig | null;
+    toURL(input: EmailLinkTargetConfig): string;
     // (undocumented)
     readonly type = "email";
 }
@@ -86,19 +86,19 @@ export type PageLinkTargetConfig = {
 export class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     constructor(remoteURLParserProvider: RemoteURLParserProvider, remoteURLSerializerProvider: RemoteURLSerializerProvider, modelReferenceParserProvider: ModelReferenceParserProvider, modelReferenceSerializerProvider: ModelReferenceSerializerProvider);
     // (undocumented)
-    configToReference(input: PageLinkTargetConfig): ResourceReference | undefined;
-    // (undocumented)
     createDefaultConfig(): PageLinkTargetConfig;
+    // (undocumented)
+    fromReference(reference: ResourceReference): PageLinkTargetConfig | null;
+    // (undocumented)
+    fromURL(url: string): PageLinkTargetConfig | null;
     // (undocumented)
     getLabel: (locale: string) => Promise<string>;
     // (undocumented)
     readonly order = 0;
     // (undocumented)
-    serializeURL(input: PageLinkTargetConfig): string;
+    toReference(input: PageLinkTargetConfig): ResourceReference | undefined;
     // (undocumented)
-    tryParseReference(reference: ResourceReference): PageLinkTargetConfig | null;
-    // (undocumented)
-    tryParseURL(url: string): PageLinkTargetConfig | null;
+    toURL(input: PageLinkTargetConfig): string;
     // (undocumented)
     readonly type = "page";
 }
@@ -134,13 +134,13 @@ export class UNCLinkTargetType extends AbstractPlainTextLinkTargetType {
 // @beta
 export class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
     // (undocumented)
+    fromURL(url: string): PlainTextLinkTargetConfig;
+    // (undocumented)
     getLabel(locale: string): Promise<string>;
     // (undocumented)
     readonly order: number;
     // (undocumented)
     protected readonly resourceType: string;
-    // (undocumented)
-    tryParseURL(url: string): PlainTextLinkTargetConfig;
     // (undocumented)
     readonly type = "url";
     // (undocumented)

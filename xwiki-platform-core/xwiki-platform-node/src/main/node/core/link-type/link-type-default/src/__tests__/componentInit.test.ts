@@ -65,8 +65,8 @@ describe("ComponentInit", () => {
       readonly type = "custom";
       getLabel = async () => "Custom";
       createDefaultConfig = () => undefined;
-      tryParseURL = () => null;
-      serializeURL = () => "";
+      fromURL = () => null;
+      toURL = () => "";
     }
 
     const container = containerWithModelServices();

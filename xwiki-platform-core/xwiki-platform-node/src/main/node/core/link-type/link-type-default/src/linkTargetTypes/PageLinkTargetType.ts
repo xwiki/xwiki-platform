@@ -66,7 +66,7 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     return { ref: null };
   }
 
-  tryParseURL(url: string): PageLinkTargetConfig | null {
+  fromURL(url: string): PageLinkTargetConfig | null {
     if (url.trim() === "") {
       return { ref: null };
     }
@@ -88,7 +88,7 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     };
   }
 
-  serializeURL({ ref, queryString, anchor }: PageLinkTargetConfig): string {
+  toURL({ ref, queryString, anchor }: PageLinkTargetConfig): string {
     const base = this.remoteURLSerializerProvider
       .get()
       ?.serialize(ref ?? undefined);
@@ -96,7 +96,7 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     return `${base ?? ""}${queryString ?? ""}${anchor ?? ""}`;
   }
 
-  tryParseReference(reference: ResourceReference): PageLinkTargetConfig | null {
+  fromReference(reference: ResourceReference): PageLinkTargetConfig | null {
     if (reference.type !== ResourceType.DOCUMENT) {
       return null;
     }
@@ -110,9 +110,7 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     return ref?.type === EntityType.DOCUMENT ? { ref } : null;
   }
 
-  configToReference({
-    ref,
-  }: PageLinkTargetConfig): ResourceReference | undefined {
+  toReference({ ref }: PageLinkTargetConfig): ResourceReference | undefined {
     return entityResourceReference(
       ResourceType.DOCUMENT,
       ref,

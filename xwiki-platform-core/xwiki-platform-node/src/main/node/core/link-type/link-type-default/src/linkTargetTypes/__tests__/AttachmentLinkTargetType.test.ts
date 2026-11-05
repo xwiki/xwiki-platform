@@ -64,7 +64,7 @@ describe("AttachmentLinkTargetType", () => {
   it("parses an attachment URL, including its query string", () => {
     remoteURLParser.parse.mockReturnValue(attachmentRef);
 
-    const config = targetType.tryParseURL(
+    const config = targetType.fromURL(
       "https://xwiki.org/xwiki/bin/download/Some/Page/file.png?foo=bar",
     );
 
@@ -74,7 +74,7 @@ describe("AttachmentLinkTargetType", () => {
   it("does not match a non-attachment URL", () => {
     remoteURLParser.parse.mockReturnValue(undefined);
 
-    expect(targetType.tryParseURL("https://example.org")).toBeNull();
+    expect(targetType.fromURL("https://example.org")).toBeNull();
   });
 
   it("serializes an attachment config back into a URL, including its query string", () => {
@@ -82,7 +82,7 @@ describe("AttachmentLinkTargetType", () => {
       "https://xwiki.org/xwiki/bin/download/Some/Page/file.png",
     );
 
-    const url = targetType.serializeURL({
+    const url = targetType.toURL({
       ref: attachmentRef,
       queryString: "?foo=bar",
     });
@@ -95,7 +95,7 @@ describe("AttachmentLinkTargetType", () => {
   it("parses an attachment reference", () => {
     modelReferenceParser.parse.mockReturnValue(attachmentRef);
 
-    const config = targetType.tryParseReference?.({
+    const config = targetType.fromReference?.({
       type: "attach",
       typed: true,
       reference: "Some.Page@file.png",
@@ -107,7 +107,7 @@ describe("AttachmentLinkTargetType", () => {
 
   it("does not match a non-attachment reference", () => {
     expect(
-      targetType.tryParseReference?.({
+      targetType.fromReference?.({
         type: "doc",
         typed: true,
         reference: "Some.Page",
@@ -121,7 +121,7 @@ describe("AttachmentLinkTargetType", () => {
       "attach:Some.Page@file.png",
     );
 
-    const reference = targetType.configToReference?.({ ref: attachmentRef });
+    const reference = targetType.toReference?.({ ref: attachmentRef });
 
     expect(reference).toEqual({
       type: "attach",
@@ -132,6 +132,6 @@ describe("AttachmentLinkTargetType", () => {
   });
 
   it("returns undefined when converting to a reference with no attachment selected", () => {
-    expect(targetType.configToReference?.({ ref: null })).toBeUndefined();
+    expect(targetType.toReference?.({ ref: null })).toBeUndefined();
   });
 });

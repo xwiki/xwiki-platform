@@ -33,7 +33,7 @@ import type { PlainTextLinkTargetConfig } from "@xwiki/platform-link-type-api";
 class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
   readonly type = "url";
 
-  // Last, since it parses any URL (see tryParseURL).
+  // Last, since it parses any URL (see fromURL).
   readonly order = Number.MAX_SAFE_INTEGER;
 
   protected readonly resourceType = ResourceType.URL;
@@ -49,7 +49,7 @@ class URLLinkTargetType extends AbstractPlainTextLinkTargetType {
    * @returns the URL as is: this is the catch-all link target type, used for any URL that no other link target type
    *   matches
    */
-  override tryParseURL(url: string): PlainTextLinkTargetConfig {
+  override fromURL(url: string): PlainTextLinkTargetConfig {
     return { location: url };
   }
 }

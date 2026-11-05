@@ -20,13 +20,10 @@
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
- * Inversify role used to register {@link LinkTargetType} implementations against the shared
- * `depsContainer` (the same container already used to resolve other domain services, e.g.
- * `LinkSuggestService`). Multiple, independent packages can each bind their own implementation to this same
- * role — see {@link LinkTargetType} for the registration example — and every registered implementation
- * is returned by `container.getAll(linkTargetTypeRole)`. This mirrors the existing `"SyntaxConfig"` role
- * (see `@xwiki/platform-syntaxes-config`): an unconstrained (no `.whenNamed()`/`.whenDefault()`) multi-binding,
- * disambiguated by a plain `type` field on each resolved object rather than by an Inversify name/tag.
+ * Inversify role used to register {@link LinkTargetType} implementations. Multiple, independent packages can each
+ * bind their own implementation to this role, without a name or a tag (no `.whenNamed()`/`.whenDefault()`): the
+ * implementations are told apart by their {@link LinkTargetType."type"} field. Use the {@link LinkTargetTypeManager}
+ * to access the registered implementations.
  *
  * @since 18.10.0RC1
  * @beta
@@ -62,7 +59,7 @@ interface LinkTargetType<TConfig = unknown> {
 
   /**
    * Ordering hint, used both to sort the link type selector and to decide in which order
-   * {@link LinkTargetType.tryParseURL} is attempted against a raw URL (lower runs/shows first). Defaults
+   * {@link LinkTargetType.fromURL} is attempted against a raw URL (lower runs/shows first). Defaults
    * to `1000` when unset. A permissive catch-all implementation (e.g., the built-in `"url"` type) should use a
    * very high value so it is only ever picked once every other type has failed to match.
    */
@@ -88,39 +85,43 @@ interface LinkTargetType<TConfig = unknown> {
   createDefaultConfig(): TConfig;
 
   /**
+   * Convert a URL into the configuration of a link of this type.
+   *
    * @param url - a raw URL, as found in a link
-   * @returns the parsed configuration if `url` belongs to this link target type, `null` otherwise
+   * @returns the configuration of the link if `url` belongs to this link target type, `null` otherwise
    */
-  tryParseURL(url: string): TConfig | null;
+  fromURL(url: string): TConfig | null;
 
   /**
-   * The reverse operation of {@link tryParseURL}: turns a configuration of this type back into a raw URL.
+   * Convert the configuration of a link of this type into a URL. The reverse of {@link LinkTargetType.fromURL}.
    *
-   * @param config - this type's configuration
-   * @returns the serialized URL
+   * @param config - the configuration of the link
+   * @returns the URL of the link
    */
-  serializeURL(config: TConfig): string;
+  toURL(config: TConfig): string;
 
   /**
+   * Convert the reference of a linked resource into the configuration of a link of this type. Unlike
+   * {@link LinkTargetType.fromURL}, implementations must not act as a catch-all here: they must only accept the
+   * resource types they represent, so that the reference of a resource that no link target type supports is
+   * preserved (see {@link unsupportedLinkTargetType}).
+   *
+   * Optional: the link target types that don't implement it are skipped when converting a reference.
+   *
    * @param reference - the reference of a linked resource
-   * @returns the parsed configuration if `reference` belongs to this link target type, `null` otherwise.
-   *   Unlike {@link tryParseURL}, implementations MUST NOT act as a catch-all here: they must only claim
-   *   the specific resource type(s) they actually represent, so that `resourceReferenceToLinkTarget` can
-   *   return `undefined` for resource types with no matching link target and let the caller fall back to
-   *   {@link parseLinkTarget}.
-   *
-   * Optional: link target types that don't implement it are simply skipped by `resourceReferenceToLinkTarget`.
+   * @returns the configuration of the link if `reference` belongs to this link target type, `null` otherwise
    */
-  tryParseReference?(reference: ResourceReference): TConfig | null;
+  fromReference?(reference: ResourceReference): TConfig | null;
 
   /**
-   * The reverse of {@link tryParseReference}. Returns `undefined`, not a placeholder reference, when the
-   * configuration doesn't designate a resource yet (e.g. no page selected, empty URL). Optional, for the
-   * same reason as {@link tryParseReference}.
+   * Convert the configuration of a link of this type into the reference of the linked resource. The reverse of
+   * {@link LinkTargetType.fromReference}, optional for the same reason.
    *
-   * @param config - this type's configuration
+   * @param config - the configuration of the link
+   * @returns the reference of the linked resource, or `undefined` (not a placeholder reference) when the
+   *   configuration doesn't designate a resource yet (e.g. no page selected, empty URL)
    */
-  configToReference?(config: TConfig): ResourceReference | undefined;
+  toReference?(config: TConfig): ResourceReference | undefined;
 }
 
 export { linkTargetTypeRole };

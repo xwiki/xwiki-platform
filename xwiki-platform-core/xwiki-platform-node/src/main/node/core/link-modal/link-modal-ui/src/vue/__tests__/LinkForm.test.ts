@@ -36,8 +36,8 @@ function targetTypeStub(
     type,
     getLabel,
     createDefaultConfig: () => defaultConfig,
-    tryParseURL: () => null,
-    serializeURL: () => "",
+    fromURL: () => null,
+    toURL: () => "",
   };
 }
 

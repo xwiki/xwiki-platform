@@ -46,18 +46,18 @@ describe.each([
     });
 
     it("doesn't parse URLs, which are handled by the URL link target type", () => {
-      expect(targetType.tryParseURL(location)).toBeNull();
+      expect(targetType.fromURL(location)).toBeNull();
     });
 
     it("uses the location as URL", () => {
-      expect(targetType.serializeURL({ location })).toBe(location);
+      expect(targetType.toURL({ location })).toBe(location);
     });
 
     it("matches only the references of its own resource type", () => {
       ["url", "doc", "unknown", type === "path" ? "unc" : "path"].forEach(
         (otherType) => {
           expect(
-            targetType.tryParseReference({
+            targetType.fromReference({
               type: otherType,
               typed: true,
               reference: location,
@@ -67,7 +67,7 @@ describe.each([
         },
       );
       expect(
-        targetType.tryParseReference({
+        targetType.fromReference({
           type,
           typed: true,
           reference: location,
@@ -78,13 +78,13 @@ describe.each([
 
     it("converts its config back into a typed reference of its own resource type", () => {
       // Untyped, the location would be parsed back as a document reference.
-      expect(targetType.configToReference({ location })).toEqual({
+      expect(targetType.toReference({ location })).toEqual({
         type,
         typed: true,
         reference: location,
         parameters: {},
       });
-      expect(targetType.configToReference({ location: " " })).toBeUndefined();
+      expect(targetType.toReference({ location: " " })).toBeUndefined();
     });
   },
 );

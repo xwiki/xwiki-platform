@@ -62,13 +62,13 @@ describe("PageLinkTargetType", () => {
   });
 
   it("parses an empty URL as a page link with no reference selected yet", () => {
-    expect(targetType.tryParseURL("")).toEqual({ ref: null });
+    expect(targetType.fromURL("")).toEqual({ ref: null });
   });
 
   it("parses a document URL, including its query string and anchor", () => {
     remoteURLParser.parse.mockReturnValue(documentRef);
 
-    const config = targetType.tryParseURL(
+    const config = targetType.fromURL(
       "https://xwiki.org/xwiki/bin/view/Some/Page?foo=bar#Anchor",
     );
 
@@ -82,7 +82,7 @@ describe("PageLinkTargetType", () => {
   it("does not match a non-document URL", () => {
     remoteURLParser.parse.mockReturnValue(undefined);
 
-    expect(targetType.tryParseURL("https://example.org")).toBeNull();
+    expect(targetType.fromURL("https://example.org")).toBeNull();
   });
 
   it("serializes a page config back into a URL, including query string and anchor", () => {
@@ -90,7 +90,7 @@ describe("PageLinkTargetType", () => {
       "https://xwiki.org/xwiki/bin/view/Some/Page",
     );
 
-    const url = targetType.serializeURL({
+    const url = targetType.toURL({
       ref: documentRef,
       queryString: "?foo=bar",
       anchor: "#Anchor",
@@ -104,7 +104,7 @@ describe("PageLinkTargetType", () => {
   it("parses a document reference", () => {
     modelReferenceParser.parse.mockReturnValue(documentRef);
 
-    const config = targetType.tryParseReference?.({
+    const config = targetType.fromReference?.({
       type: "doc",
       typed: true,
       reference: "Some.Page",
@@ -116,7 +116,7 @@ describe("PageLinkTargetType", () => {
 
   it("does not match a non-document reference", () => {
     expect(
-      targetType.tryParseReference?.({
+      targetType.fromReference?.({
         type: "attach",
         typed: true,
         reference: "Some.Page@file.png",
@@ -128,7 +128,7 @@ describe("PageLinkTargetType", () => {
   it("converts a page config back into a reference, dropping the type prefix added by the serializer", () => {
     modelReferenceSerializer.serialize.mockReturnValue("doc:Some.Page");
 
-    const reference = targetType.configToReference?.({ ref: documentRef });
+    const reference = targetType.toReference?.({ ref: documentRef });
 
     expect(reference).toEqual({
       type: "doc",
@@ -139,7 +139,7 @@ describe("PageLinkTargetType", () => {
   });
 
   it("returns undefined when converting to a reference with no page selected", () => {
-    expect(targetType.configToReference?.({ ref: null })).toBeUndefined();
+    expect(targetType.toReference?.({ ref: null })).toBeUndefined();
   });
 });
 
@@ -154,10 +154,10 @@ describe("PageLinkTargetType without the services of the current wiki", () => {
     );
 
     expect(
-      targetTypeWithoutServices.tryParseURL("https://example.org/Some/Page"),
+      targetTypeWithoutServices.fromURL("https://example.org/Some/Page"),
     ).toBeNull();
     expect(
-      targetTypeWithoutServices.tryParseReference({
+      targetTypeWithoutServices.fromReference({
         type: "doc",
         typed: true,
         reference: "Some.Page",
@@ -165,7 +165,7 @@ describe("PageLinkTargetType without the services of the current wiki", () => {
       }),
     ).toBeNull();
     expect(
-      targetTypeWithoutServices.configToReference({ ref: documentRef }),
+      targetTypeWithoutServices.toReference({ ref: documentRef }),
     ).toBeUndefined();
   });
 });

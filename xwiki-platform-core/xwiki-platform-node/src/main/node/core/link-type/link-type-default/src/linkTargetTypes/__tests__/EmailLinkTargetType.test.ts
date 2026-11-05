@@ -29,7 +29,7 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("parses a mailto: URL, including its subject and body", () => {
-    const config = targetType.tryParseURL(
+    const config = targetType.fromURL(
       "mailto:jdoe@example.org?subject=Hello&body=Hi%20there",
     );
 
@@ -41,7 +41,7 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("parses a mailto: URL with no subject/body as undefined, not empty string", () => {
-    const config = targetType.tryParseURL("mailto:jdoe@example.org");
+    const config = targetType.fromURL("mailto:jdoe@example.org");
 
     expect(config).toEqual({
       address: "jdoe@example.org",
@@ -51,11 +51,11 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("does not match a non-mailto: URL", () => {
-    expect(targetType.tryParseURL("https://example.org")).toBeNull();
+    expect(targetType.fromURL("https://example.org")).toBeNull();
   });
 
   it("round-trips address, subject and body when serializing", () => {
-    const url = targetType.serializeURL({
+    const url = targetType.toURL({
       address: "jdoe@example.org",
       messageSubject: "Hello",
       messageBody: "Hi there",
@@ -65,7 +65,7 @@ describe("EmailLinkTargetType", () => {
   });
 
   it("omits subject/body from the URL when unset", () => {
-    const url = targetType.serializeURL({ address: "jdoe@example.org" });
+    const url = targetType.toURL({ address: "jdoe@example.org" });
 
     expect(url).toBe("mailto:jdoe@example.org");
   });
@@ -76,7 +76,7 @@ describe("EmailLinkTargetType reference conversion", () => {
 
   it("parses a mailto reference", () => {
     expect(
-      targetType.tryParseReference?.({
+      targetType.fromReference?.({
         type: "mailto",
         typed: true,
         reference: "jdoe@example.org",
@@ -87,7 +87,7 @@ describe("EmailLinkTargetType reference conversion", () => {
 
   it("does not match a non-mailto reference", () => {
     expect(
-      targetType.tryParseReference?.({
+      targetType.fromReference?.({
         type: "url",
         typed: false,
         reference: "https://example.org",
@@ -97,9 +97,7 @@ describe("EmailLinkTargetType reference conversion", () => {
   });
 
   it("converts an e-mail config back into a typed mailto reference", () => {
-    expect(
-      targetType.configToReference?.({ address: "jdoe@example.org" }),
-    ).toEqual({
+    expect(targetType.toReference?.({ address: "jdoe@example.org" })).toEqual({
       type: "mailto",
       typed: true,
       reference: "jdoe@example.org",
@@ -108,6 +106,6 @@ describe("EmailLinkTargetType reference conversion", () => {
   });
 
   it("returns undefined when converting to a reference with no address set", () => {
-    expect(targetType.configToReference?.({ address: "" })).toBeUndefined();
+    expect(targetType.toReference?.({ address: "" })).toBeUndefined();
   });
 });

@@ -27,7 +27,7 @@ import { plainTextFallbackForm } from "../plainTextFallbackForm";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import {
-  listLinkTargetTypes,
+  linkTargetTypeManagerRole,
   unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
 import { computed, markRaw, provide } from "vue";
@@ -36,6 +36,7 @@ import type { LinkTargetTypeForm } from "../linkTargetTypeForm";
 import type {
   LinkData,
   LinkTargetType,
+  LinkTargetTypeManager,
   UnsupportedLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
@@ -69,7 +70,9 @@ const linkTargetTypes: LinkTargetType[] = [
         ),
       ]
     : []),
-  ...listLinkTargetTypes(props.depsContainer),
+  ...props.depsContainer
+    .get<LinkTargetTypeManager>(linkTargetTypeManagerRole)
+    .list(),
 ];
 
 // The link target types offered by the link type selector, which always include the type of the edited link, so that

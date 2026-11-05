@@ -63,7 +63,7 @@ class UnsupportedLinkTargetType
   /**
    * @returns `null`: this type is never used to parse a URL, since it's not registered in the container
    */
-  tryParseURL(): null {
+  fromURL(): null {
     return null;
   }
 
@@ -71,7 +71,7 @@ class UnsupportedLinkTargetType
    * @returns an empty string: the URL of a resource that no link target type supports can't be computed client-side,
    *   so the callers keep the URL of the edited link
    */
-  serializeURL(): string {
+  toURL(): string {
     return "";
   }
 }

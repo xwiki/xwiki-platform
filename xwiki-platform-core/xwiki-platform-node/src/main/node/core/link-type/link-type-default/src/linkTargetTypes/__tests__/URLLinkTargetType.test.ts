@@ -30,22 +30,22 @@ describe("URLLinkTargetType", () => {
   });
 
   it("matches any URL, unconditionally", () => {
-    expect(
-      targetType.tryParseURL("anything at all, not even a valid URL"),
-    ).toEqual({
-      location: "anything at all, not even a valid URL",
-    });
+    expect(targetType.fromURL("anything at all, not even a valid URL")).toEqual(
+      {
+        location: "anything at all, not even a valid URL",
+      },
+    );
   });
 
   it("serializes back to the exact same URL", () => {
-    expect(targetType.serializeURL({ location: "https://example.org" })).toBe(
+    expect(targetType.toURL({ location: "https://example.org" })).toBe(
       "https://example.org",
     );
   });
 
   it("converts a URL reference into its URL", () => {
     expect(
-      targetType.tryParseReference?.({
+      targetType.fromReference?.({
         type: "url",
         typed: false,
         reference: "https://example.org",
@@ -54,11 +54,11 @@ describe("URLLinkTargetType", () => {
     ).toEqual({ location: "https://example.org" });
   });
 
-  it("matches only URL references, unlike tryParseURL", () => {
+  it("matches only URL references, unlike fromURL", () => {
     ["doc", "attach", "mailto", "path", "unc", "unknown", "interwiki"].forEach(
       (type) => {
         expect(
-          targetType.tryParseReference?.({
+          targetType.fromReference?.({
             type,
             typed: true,
             reference: "Space.Page",
@@ -71,7 +71,7 @@ describe("URLLinkTargetType", () => {
 
   it("converts a URL config back into an untyped reference", () => {
     expect(
-      targetType.configToReference?.({ location: "https://example.org" }),
+      targetType.toReference?.({ location: "https://example.org" }),
     ).toEqual({
       type: "url",
       typed: false,
@@ -81,6 +81,6 @@ describe("URLLinkTargetType", () => {
   });
 
   it("returns undefined when converting to a reference with an empty URL", () => {
-    expect(targetType.configToReference?.({ location: "  " })).toBeUndefined();
+    expect(targetType.toReference?.({ location: "  " })).toBeUndefined();
   });
 });

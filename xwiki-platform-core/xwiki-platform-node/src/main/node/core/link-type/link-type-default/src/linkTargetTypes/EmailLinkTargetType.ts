@@ -43,7 +43,7 @@ class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
     return { address: "" };
   }
 
-  tryParseURL(url: string): EmailLinkTargetConfig | null {
+  fromURL(url: string): EmailLinkTargetConfig | null {
     const parsedURL = tryFallible(() => new URL(url));
 
     if (parsedURL?.protocol !== "mailto:") {
@@ -57,7 +57,7 @@ class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
     };
   }
 
-  serializeURL({
+  toURL({
     address,
     messageSubject,
     messageBody,
@@ -75,15 +75,13 @@ class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
     return url.toString();
   }
 
-  tryParseReference(
-    reference: ResourceReference,
-  ): EmailLinkTargetConfig | null {
+  fromReference(reference: ResourceReference): EmailLinkTargetConfig | null {
     return reference.type === ResourceType.MAILTO
       ? { address: reference.reference }
       : null;
   }
 
-  configToReference({
+  toReference({
     address,
   }: EmailLinkTargetConfig): ResourceReference | undefined {
     return address.trim() === ""

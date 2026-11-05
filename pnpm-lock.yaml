@@ -407,6 +407,9 @@ importers:
       '@xwiki/platform-link-suggest-xwiki':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-xwiki
+      '@xwiki/platform-link-type-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/link-type/link-type-api
       '@xwiki/platform-link-type-default':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/link-type/link-type-default

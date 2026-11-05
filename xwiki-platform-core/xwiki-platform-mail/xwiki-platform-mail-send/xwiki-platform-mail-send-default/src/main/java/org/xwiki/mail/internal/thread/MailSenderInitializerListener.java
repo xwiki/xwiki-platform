@@ -141,6 +141,7 @@ public class MailSenderInitializerListener implements EventListener, Disposable
         try {
             stopMailThreads();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             SHUTDOWN_LOGGER.debug("Mail threads shutdown has been interrupted", e);
         }
     }

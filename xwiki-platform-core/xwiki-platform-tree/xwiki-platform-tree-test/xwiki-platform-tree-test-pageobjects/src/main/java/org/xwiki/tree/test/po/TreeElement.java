@@ -149,7 +149,11 @@ public class TreeElement extends BaseElement
         return this;
     }
 
-    protected WebElement getElement()
+    /**
+     * @return the element that represents the tree, e.g. to take a screenshot of the tree
+     * @since 18.10.0RC1
+     */
+    public WebElement getElement()
     {
         return this.element;
     }

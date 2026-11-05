@@ -18,8 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/* Breadcrumbs */
-
 .breadcrumb {
   > li {
     max-width: 100%;
@@ -77,9 +75,10 @@
   }
 }
 
-/* The breadcrumbs are ordered lists. Matching the list element makes this rule more specific than the Bootstrap one,
-  which is loaded after this file. */
+/* Display the separator without the non-breaking space that Bootstrap adds after it. The breadcrumbs are ordered
+  lists, so matching the list element makes this rule more specific than the Bootstrap one, which is loaded after this
+  file. */
 ol.breadcrumb > li + li::before {
-  /* No additional space needed. The variable must hold a quoted CSS string, otherwise the separator is not displayed. */
+  /* The variable must hold a quoted CSS string, otherwise the separator is not displayed. */
   content: var(--breadcrumb-separator);
 }

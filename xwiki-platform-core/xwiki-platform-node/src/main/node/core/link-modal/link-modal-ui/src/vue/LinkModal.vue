@@ -18,6 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import LinkForm from "./LinkForm.vue";
 import UnsupportedLinkTargetForm from "./UnsupportedLinkTargetForm.vue";
 import { UnsupportedLinkTargetType } from "../UnsupportedLinkTargetType";
 import { createLinkEditionContext } from "../linkEditionContext";
@@ -72,8 +73,8 @@ const linkExtensions: LinkTargetTypeExtension[] = [
 ];
 
 // The link target types offered by the link type selector, which always include the type of the edited link, so that
-// the user can switch back to it. The form of each link target type renders its own selector, so this list is computed
-// once, from the type of the edited link when the modal is opened.
+// the user can switch back to it after selecting another type: this list is computed once, from the type of the edited
+// link when the modal is opened.
 const initialLinkTargetType = props.current.target.type;
 const offeredLinkExtensions = linkExtensions.filter(
   (extension) =>
@@ -96,19 +97,25 @@ const linkTargetTypeForms: LinkTargetTypeForm[] = [
 ];
 
 // The form of the currently selected link target type, or a plain text form for a link target type registered without
-// a form. `markRaw()` excludes it from Vue's reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of
-// `markRaw()` for the same reason, for a dynamically registered component).
-const activeFormComponent = computed(() => {
+// a form. `markRaw()` excludes its components from Vue's reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use
+// of `markRaw()` for the same reason, for a dynamically registered component).
+const activeForm = computed(() => {
   const type = linkData.value.target.type;
   const form = linkTargetTypeForms.find((form) => form.type === type);
   if (form) {
-    return markRaw(form.component());
+    const options = form.optionsComponent?.();
+    return {
+      component: markRaw(form.component()),
+      optionsComponent: options ? markRaw(options) : undefined,
+    };
   }
 
   const extension = linkExtensions.find((e) => e.type === type);
 
   // The extension providing this type is not (or no longer) registered/enabled: nothing to render.
-  return extension ? markRaw(plainTextFallbackForm(extension)) : null;
+  return extension
+    ? { component: markRaw(plainTextFallbackForm(extension)) }
+    : undefined;
 });
 
 defineEmits<{ submit: [LinkData]; cancel: [] }>();
@@ -116,12 +123,26 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
 
 <template>
   <div :class="$style.container">
-    <component
-      v-if="activeFormComponent"
-      :is="activeFormComponent"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
+    <!-- The fields shared by all the link target types, with the fields and options of the selected one. -->
+    <LinkForm :link-data="linkData">
+      <template #config>
+        <component
+          v-if="activeForm"
+          :is="activeForm.component"
+          v-model="linkData.target.config"
+          :link-data="linkData"
+        />
+      </template>
+
+      <template #options>
+        <component
+          v-if="activeForm?.optionsComponent"
+          :is="activeForm.optionsComponent"
+          v-model="linkData.target.config"
+          :link-data="linkData"
+        />
+      </template>
+    </LinkForm>
 
     <div :class="$style.actions">
       <!-- NOTE: 'v-bind' is used here as it is more flexible

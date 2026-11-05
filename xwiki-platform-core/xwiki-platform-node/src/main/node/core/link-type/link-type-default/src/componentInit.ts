@@ -24,8 +24,11 @@ import { PathLinkTargetType } from "./extensions/PathLinkTargetType";
 import { UNCLinkTargetType } from "./extensions/UNCLinkTargetType";
 import { URLLinkTargetType } from "./extensions/URLLinkTargetType";
 import AttachmentLinkTargetForm from "./vue/AttachmentLinkTargetForm.vue";
+import AttachmentLinkTargetOptions from "./vue/AttachmentLinkTargetOptions.vue";
 import EmailLinkTargetForm from "./vue/EmailLinkTargetForm.vue";
+import EmailLinkTargetOptions from "./vue/EmailLinkTargetOptions.vue";
 import PageLinkTargetForm from "./vue/PageLinkTargetForm.vue";
+import PageLinkTargetOptions from "./vue/PageLinkTargetOptions.vue";
 import { URLLinkTargetForm } from "./vue/URLLinkTargetForm";
 import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
 import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
@@ -58,17 +61,29 @@ class ComponentInit {
     container.bind(linkTargetTypeExtensionRole).to(UNCLinkTargetType);
     container.bind(linkTargetTypeExtensionRole).to(URLLinkTargetType);
 
-    bindForm(container, "page", PageLinkTargetForm);
-    bindForm(container, "attachment", AttachmentLinkTargetForm);
-    bindForm(container, "email", EmailLinkTargetForm);
+    bindForm(container, "page", PageLinkTargetForm, PageLinkTargetOptions);
+    bindForm(
+      container,
+      "attachment",
+      AttachmentLinkTargetForm,
+      AttachmentLinkTargetOptions,
+    );
+    bindForm(container, "email", EmailLinkTargetForm, EmailLinkTargetOptions);
     bindForm(container, "url", URLLinkTargetForm);
   }
 }
 
-function bindForm(container: Container, type: string, form: Component): void {
-  container
-    .bind<LinkTargetTypeForm>(linkTargetTypeFormRole)
-    .toConstantValue({ type, component: () => form });
+function bindForm(
+  container: Container,
+  type: string,
+  form: Component,
+  options?: Component,
+): void {
+  container.bind<LinkTargetTypeForm>(linkTargetTypeFormRole).toConstantValue({
+    type,
+    component: () => form,
+    ...(options ? { optionsComponent: () => options } : {}),
+  });
 }
 
 export { ComponentInit };

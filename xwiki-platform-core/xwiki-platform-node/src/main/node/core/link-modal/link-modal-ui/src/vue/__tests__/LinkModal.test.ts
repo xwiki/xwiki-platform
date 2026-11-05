@@ -19,7 +19,6 @@
  */
 import { dsComponentStubs } from "./dsStubs";
 import { linkTargetTypeFormRole } from "../../linkTargetTypeForm";
-import LinkForm from "../LinkForm.vue";
 import LinkModal from "../LinkModal.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import { unsupportedLinkTargetType } from "@xwiki/platform-link-type-api";
@@ -33,8 +32,11 @@ import type {
 import type { Container } from "inversify";
 import type { Component } from "vue";
 
-// A fake link target type, along with its form, if any.
-type FakeExtension = LinkTargetTypeExtension & { fakeForm?: Component };
+// A fake link target type, along with its form and options, if any.
+type FakeExtension = LinkTargetTypeExtension & {
+  fakeForm?: Component;
+  fakeOptions?: Component;
+};
 
 // `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetTypeExtension`s and their forms, out
 // of the same `depsContainer`; a minimal fake satisfying every lookup it performs is enough since none of the domain
@@ -53,7 +55,15 @@ function fakeDepsContainer(extensions: FakeExtension[]): Container {
   };
   const forms = extensions.flatMap((extension) =>
     extension.fakeForm
-      ? [{ type: extension.type, component: () => extension.fakeForm }]
+      ? [
+          {
+            type: extension.type,
+            component: () => extension.fakeForm,
+            optionsComponent: extension.fakeOptions
+              ? () => extension.fakeOptions
+              : undefined,
+          },
+        ]
       : [],
   );
   return {
@@ -67,11 +77,13 @@ function fakeDepsContainer(extensions: FakeExtension[]): Container {
 
 /**
  * @param form - the form of the link target type, or `undefined` to register it without a form
+ * @param options - the options of the link target type, if any
  */
 function fakeExtension(
   type: string,
   label: string,
   form?: Component,
+  options?: Component,
 ): FakeExtension {
   return {
     type,
@@ -80,6 +92,7 @@ function fakeExtension(
     tryParseURL: () => null,
     serializeURL: () => "",
     fakeForm: form,
+    fakeOptions: options,
   };
 }
 
@@ -101,18 +114,13 @@ function mountLinkModal(
 }
 
 /**
- * @returns a fake link target type whose form renders the link type selector (see LinkForm)
+ * @returns a fake link target type with a form displaying its label
  */
-function fakeExtensionWithLinkForm(type: string, label: string): FakeExtension {
+function fakeExtensionWithForm(type: string, label: string): FakeExtension {
   return fakeExtension(
     type,
     label,
-    defineComponent({
-      components: { LinkForm },
-      // The link modal passes the configuration (v-model) to the form, which this fake doesn't use.
-      props: ["linkData", "modelValue"],
-      template: '<LinkForm :link-data="linkData" />',
-    }),
+    defineComponent({ template: `<div>form-${type}</div>` }),
   );
 }
 
@@ -255,9 +263,8 @@ describe("LinkModal", () => {
   });
 
   it("offers an unsupported resource type first, as is, and restores its reference when reselected", async () => {
-    // A link target type whose form renders the link type selector, to switch back to the unsupported type.
     const wrapper = mountLinkModal(unsupportedLinkData(), [
-      fakeExtensionWithLinkForm("a", "A"),
+      fakeExtensionWithForm("a", "A"),
     ]);
     await flushPromises();
     expect(linkTypeOptions(wrapper)).toEqual([
@@ -281,7 +288,7 @@ describe("LinkModal", () => {
     const wrapper = mountLinkModal(
       { displayText: "", target: { type: "a", config: {} } },
       ["a", "b", "c"].map((type) =>
-        fakeExtensionWithLinkForm(type, type.toUpperCase()),
+        fakeExtensionWithForm(type, type.toUpperCase()),
       ),
       ["b", "unknown"],
     );
@@ -296,9 +303,7 @@ describe("LinkModal", () => {
   it("offers the type of the edited link even when it's excluded, to edit the link with it", async () => {
     const wrapper = mountLinkModal(
       { displayText: "", target: { type: "b", config: {} } },
-      ["a", "b"].map((type) =>
-        fakeExtensionWithLinkForm(type, type.toUpperCase()),
-      ),
+      ["a", "b"].map((type) => fakeExtensionWithForm(type, type.toUpperCase())),
       ["b"],
     );
     await flushPromises();
@@ -337,5 +342,29 @@ describe("LinkModal", () => {
     expect(wrapper.emitted("submit")?.[0]?.[0]).toMatchObject({
       target: { type: "jira", config: { location: "XWIKI-2" } },
     });
+  });
+
+  it("renders the shared fields once, and the fields and options of the selected link target type", async () => {
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "a", config: {} } },
+      [
+        fakeExtension(
+          "a",
+          "A",
+          defineComponent({ template: "<div>fields-a</div>" }),
+          defineComponent({ template: "<div>options-a</div>" }),
+        ),
+        fakeExtensionWithForm("b", "B"),
+      ],
+    );
+    await flushPromises();
+
+    expect(wrapper.findAll("[data-test='linkTargetType']")).toHaveLength(1);
+    expect(wrapper.text()).toContain("fields-a");
+    expect(wrapper.get("details").text()).toContain("options-a");
+
+    await wrapper.get("[data-test='linkTargetType']").setValue("b");
+    expect(wrapper.text()).toContain("form-b");
+    expect(wrapper.text()).not.toContain("options-a");
   });
 });

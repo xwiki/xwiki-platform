@@ -18,13 +18,14 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import LinkForm from "./LinkForm.vue";
 import type { TextFieldProps } from "@xwiki/platform-dsapi";
 import type {
   LinkData,
   PlainTextLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
 
+// The fields of the link target types designated by a plain text location (e.g. URL, path, UNC path), and of the link
+// target types registered without a form.
 defineProps<{
   linkData: LinkData;
 
@@ -50,17 +51,11 @@ const model = defineModel<PlainTextLinkTargetConfig>({
 </script>
 
 <template>
-  <!-- The form of the link target types designated by a plain text location (e.g. URL, path, UNC path), and of the
-       link target types registered without a form. -->
-  <LinkForm :link-data>
-    <template #config>
-      <x-text-field
-        v-bind="{ 'data-test': dataTest }"
-        :label="fieldLabel"
-        :type="inputType ?? 'text'"
-        v-model="model.location"
-        required
-      />
-    </template>
-  </LinkForm>
+  <x-text-field
+    v-bind="{ 'data-test': dataTest }"
+    :label="fieldLabel"
+    :type="inputType ?? 'text'"
+    v-model="model.location"
+    required
+  />
 </template>

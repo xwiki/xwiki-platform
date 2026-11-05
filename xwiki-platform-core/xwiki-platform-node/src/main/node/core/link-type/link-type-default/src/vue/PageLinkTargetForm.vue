@@ -22,7 +22,7 @@ import { suggestLinks } from "../linkSuggestions";
 import { translations } from "../translations";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { CIcon, Size } from "@xwiki/platform-icons";
-import { LinkForm, SearchBox } from "@xwiki/platform-link-modal-ui";
+import { SearchBox } from "@xwiki/platform-link-modal-ui";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
 import { inject } from "vue";
@@ -73,44 +73,26 @@ const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
-  <link-form :link-data>
-    <template #config>
-      <search-box
-        v-bind="{ 'data-test': 'linkPageReference' }"
-        :label="t('link-type.target-types.page.reference')"
-        :initial-value="
-          model.ref !== null
-            ? linkEditionCtx.modelReferenceSerializer.serialize(model.ref)!
-            : null
-        "
-        :get-suggestions
-        @select="submit"
-        :try-submit-raw="trySelectRaw"
-      >
-        <template #renderSuggestion="{ renderingData: { label, hint } }">
-          <div class="suggestion-label">
-            <c-icon name="file-earmark" :size="Size.Small" />
-            <span class="suggestion-title">{{ label }}</span>
-          </div>
-          <div class="suggestion-hint" v-if="hint">{{ hint }}</div>
-        </template>
-      </search-box>
+  <search-box
+    v-bind="{ 'data-test': 'linkPageReference' }"
+    :label="t('link-type.target-types.page.reference')"
+    :initial-value="
+      model.ref !== null
+        ? linkEditionCtx.modelReferenceSerializer.serialize(model.ref)!
+        : null
+    "
+    :get-suggestions
+    @select="submit"
+    :try-submit-raw="trySelectRaw"
+  >
+    <template #renderSuggestion="{ renderingData: { label, hint } }">
+      <div class="suggestion-label">
+        <c-icon name="file-earmark" :size="Size.Small" />
+        <span class="suggestion-title">{{ label }}</span>
+      </div>
+      <div class="suggestion-hint" v-if="hint">{{ hint }}</div>
     </template>
-
-    <template #options>
-      <x-text-field
-        v-bind="{ 'data-test': 'linkPageQueryString' }"
-        :label="t('link-type.target-types.page.query-string')"
-        v-model="model.queryString"
-      />
-
-      <x-text-field
-        v-bind="{ 'data-test': 'linkPageAnchor' }"
-        :label="t('link-type.target-types.page.anchor')"
-        v-model="model.anchor"
-      />
-    </template>
-  </link-form>
+  </search-box>
 </template>
 
 <style scoped>

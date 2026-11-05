@@ -4,24 +4,15 @@
 
 ```ts
 
-import { AllowedComponentProps } from 'vue';
 import { AttachmentsService } from '@xwiki/platform-attachments-api';
 import { Component } from 'vue';
-import { ComponentCustomProps } from 'vue';
-import { ComponentOptionsBase } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
-import { ComputedOptions } from 'vue';
 import { Container } from 'inversify';
-import { CreateComponentPublicInstanceWithMixins } from 'vue';
 import { DefineComponent } from 'vue';
 import { DocumentService } from '@xwiki/platform-document-api';
-import { GlobalComponents } from 'vue';
-import { GlobalDirectives } from 'vue';
-import { InputHTMLAttributes } from 'vue';
 import { LinkData } from '@xwiki/platform-link-type-api';
 import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
-import { MethodOptions } from 'vue';
 import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
@@ -32,7 +23,6 @@ import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 import { ShallowUnwrapRef } from 'vue';
 import { TextFieldProps } from '@xwiki/platform-dsapi';
 import { VNode } from 'vue';
-import { VNodeProps } from 'vue';
 
 // @beta
 export type LinkEditionContext = {
@@ -45,50 +35,6 @@ export type LinkEditionContext = {
     attachmentsService: AttachmentsService;
     documentService: DocumentService;
 };
-
-// @beta
-export const LinkForm: {
-    new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<{
-    linkData: LinkData;
-    }> & Readonly<{}>, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, PublicProps, {}, false, {}, {}, GlobalComponents, GlobalDirectives, string, {
-    displayTextField: CreateComponentPublicInstanceWithMixins<Readonly<TextFieldProps & InputHTMLAttributes>, {}, {}, ComputedOptions, MethodOptions, ComponentOptionsMixin, ComponentOptionsMixin, {}, PublicProps, {
-    value?: any;
-    inlist?: any;
-    }, true, {}, {}, GlobalComponents, GlobalDirectives, string, {}, any, ComponentProvideOptions, {
-    P: {};
-    B: {};
-    D: {};
-    C: {};
-    M: {};
-    Defaults: {};
-    }, Readonly<TextFieldProps & InputHTMLAttributes>, {}, {}, ComputedOptions, MethodOptions, {
-    value?: any;
-    inlist?: any;
-    }> | null;
-    }, any, ComponentProvideOptions, {
-    P: {};
-    B: {};
-    D: {};
-    C: {};
-    M: {};
-    Defaults: {};
-    }, Readonly<{
-    linkData: LinkData;
-    }> & Readonly<{}>, {}, {}, {}, {}, {}>;
-    __isFragment?: never;
-    __isTeleport?: never;
-    __isSuspense?: never;
-} & ComponentOptionsBase<Readonly<{
-linkData: LinkData;
-}> & Readonly<{}>, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, {}, {}, string, {}, GlobalComponents, GlobalDirectives, string, ComponentProvideOptions> & VNodeProps & AllowedComponentProps & ComponentCustomProps & (new () => {
-    $slots: Readonly<{
-        config(): void;
-        options(): void;
-    }> & {
-        config(): void;
-        options(): void;
-    };
-});
 
 // @beta
 export const LinkModal: DefineComponent<    {
@@ -111,6 +57,8 @@ onCancel?: (() => any) | undefined;
 export interface LinkTargetTypeForm {
     // (undocumented)
     component(): Component;
+    // (undocumented)
+    optionsComponent?(): Component;
     readonly type: string;
 }
 

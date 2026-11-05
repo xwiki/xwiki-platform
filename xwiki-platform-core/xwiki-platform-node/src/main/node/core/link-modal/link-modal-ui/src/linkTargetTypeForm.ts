@@ -45,10 +45,18 @@ interface LinkTargetTypeForm {
   readonly type: string;
 
   /**
-   * @returns the Vue component rendering the form, which receives the edited link data (`linkData` prop) and the
-   *   configuration of the link target (`v-model`)
+   * @returns the Vue component rendering the fields of this link target type in the link form, below the fields shared
+   *   by all the link target types (display text and link type), which the link modal renders itself. It receives the
+   *   edited link data (`linkData` prop) and the configuration of the link target (`v-model`).
    */
   component(): Component;
+
+  /**
+   * @returns the Vue component rendering the options of this link target type in the "Options" section of the link
+   *   form, below the options shared by all the link target types; it receives the same props as {@link component}.
+   *   Optional: a link target type without specific options doesn't need it.
+   */
+  optionsComponent?(): Component;
 }
 
 export { linkTargetTypeFormRole };

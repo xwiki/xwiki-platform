@@ -18,7 +18,6 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import LinkForm from "./LinkForm.vue";
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
 import type {
@@ -26,6 +25,8 @@ import type {
   UnsupportedLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
 
+// The fields of the links pointing to a resource that no link target type supports: the reference of the linked
+// resource can only be edited as plain text.
 defineProps<{ linkData: LinkData }>();
 
 const model = defineModel<UnsupportedLinkTargetConfig>({
@@ -36,16 +37,10 @@ const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
-  <!-- The form of the links pointing to a resource that no link target type supports: the reference of the linked
-       resource can only be edited as plain text. -->
-  <LinkForm :link-data>
-    <template #config>
-      <x-text-field
-        v-bind="{ 'data-test': 'linkReference' }"
-        :label="t('link-modal.unsupported.reference')"
-        v-model="model.reference.reference"
-        required
-      />
-    </template>
-  </LinkForm>
+  <x-text-field
+    v-bind="{ 'data-test': 'linkReference' }"
+    :label="t('link-modal.unsupported.reference')"
+    v-model="model.reference.reference"
+    required
+  />
 </template>

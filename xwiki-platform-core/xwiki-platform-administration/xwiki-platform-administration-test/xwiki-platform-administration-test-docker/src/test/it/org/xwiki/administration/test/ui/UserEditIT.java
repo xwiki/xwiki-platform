@@ -81,9 +81,11 @@ class UserEditIT
         editUserModal.clickSave();
 
         usersPage.waitForNotificationSuccessMessage("Saved");
-        usersPage.getUsersLiveData().getTableLayout().waitUntilReady();
 
-        // Reopen the modal to verify the first name was saved.
+        // Reload the users list so that the row is displayed with the new first name, then verify that the user is
+        // still listed under its username and that the first name was saved.
+        usersPage = UsersAdministrationSectionPage.gotoPage();
+        usersPage.getUsersLiveData().getTableLayout().filterColumn("User", userName);
         rowNumber = usersPage.getRowNumberByUsername(userName);
         editUserModal = usersPage.clickEditUser(rowNumber);
         editUserModal.waitUntilReady();

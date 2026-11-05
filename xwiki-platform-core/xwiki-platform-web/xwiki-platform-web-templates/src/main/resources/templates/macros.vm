@@ -247,6 +247,8 @@ $xwiki.getUserName("xwiki:${username}")
  *                    // for a fully rounded avatar
  *   displayName: true // @since 18.9.0RC1 ; whether to visually display the name
  *   disabled: false // @since 18.10.0RC1 whether the user is disabled or not; disabled users are displayed distinctly
+ *   aliasAsName: false // @since 18.10.0RC1 ; whether to display the user alias, i.e. the name of the user page,
+ *                      // instead of the user full name
  * }
  *#
 #macro (displayUser $arg $options)
@@ -266,7 +268,8 @@ $xwiki.getUserName("xwiki:${username}")
     'displayLink': true,
     'avatarClass': '',
     'displayName': true,
-    'disabled': false
+    'disabled': false,
+    'aliasAsName': false
   })
   #if ($options.entrySet())
     #set ($discard = $macro.options.putAll($options))
@@ -304,6 +307,9 @@ $xwiki.getUserName("xwiki:${username}")
     #else
       #set ($macro.type = 'user')
       #set ($userName = $xwiki.getPlainUserName($userReference))
+    #end
+    #if ($macro.options.aliasAsName)
+      #set ($userName = $userAlias)
     #end
     #set ($discard = $types.add("${macro.type}s"))
     #set ($userAliasDisplay = '')
@@ -388,7 +394,7 @@ $xwiki.getUserName("xwiki:${username}")
  * This is not an API, avoid relying on it.
  *#
 #macro (_displayUserAliasWithAvatar $userReference $disabled)
-  #displayUser($userReference {'useInlineHTML': true, 'wrapAvatar': true, 'disabled': $disabled})
+  #displayUser($userReference {'useInlineHTML': true, 'wrapAvatar': true, 'disabled': $disabled, 'aliasAsName': true})
 #end
 
 

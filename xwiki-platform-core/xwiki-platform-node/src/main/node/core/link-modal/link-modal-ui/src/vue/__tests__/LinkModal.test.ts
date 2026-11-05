@@ -96,7 +96,8 @@ function fakeExtensionWithLinkForm(
     label,
     defineComponent({
       components: { LinkForm },
-      props: ["linkData"],
+      // The link modal passes the configuration (v-model) to the form, which this fake doesn't use.
+      props: ["linkData", "modelValue"],
       template: '<LinkForm :link-data="linkData" />',
     }),
   );

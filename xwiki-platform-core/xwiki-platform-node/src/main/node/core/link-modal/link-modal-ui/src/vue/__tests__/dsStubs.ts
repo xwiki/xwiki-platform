@@ -19,10 +19,11 @@
  */
 import { defineComponent } from "vue";
 
-// Minimal stand-ins for the design system components used by the link forms. XTextFieldStub mirrors the contract
-// the real component (and the one used by the blocknote-headless Playwright fixtures) must honor: a *single* root
-// element (inheritAttrs: false, so a stray attribute doesn't land twice) wrapping the actual focusable input -- this
-// is exactly the shape LinkForm.vue's onMounted hook relies on via `$el.querySelector("input, textarea, select")`.
+// Minimal stand-ins for the design system components used by the link modal and the link forms. XTextFieldStub mirrors
+// the contract the real component (and the one used by the blocknote-headless Playwright fixtures) must honor: a
+// *single* root element (inheritAttrs: false, so a stray attribute doesn't land twice) wrapping the actual focusable
+// input -- this is exactly the shape LinkForm.vue's onMounted hook relies on via
+// `$el.querySelector("input, textarea, select")`.
 const XTextFieldStub = defineComponent({
   inheritAttrs: false,
   props: ["modelValue", "label"],
@@ -58,13 +59,21 @@ const XCheckboxStub = defineComponent({
   `,
 });
 
+// The attributes (e.g. data-test) and the click listener of the button fall through to its root element.
+const XBtnStub = defineComponent({
+  props: ["variant"],
+  template: `<button type="button"><slot /></button>`,
+});
+
 /**
- * The design system components used by the link forms, to pass as global components when mounting them.
+ * The design system components used by the link modal and the link forms, to pass as global components when mounting
+ * them.
  */
 const dsComponentStubs = {
   "x-text-field": XTextFieldStub,
   "x-select": XSelectStub,
   "x-checkbox": XCheckboxStub,
+  "x-btn": XBtnStub,
 };
 
 export { dsComponentStubs };

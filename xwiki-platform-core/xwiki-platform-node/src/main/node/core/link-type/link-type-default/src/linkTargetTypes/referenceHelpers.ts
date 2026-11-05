@@ -61,13 +61,6 @@ function typedResourceReference(
   return { type, typed: true, reference, parameters: {} };
 }
 
-function untypedResourceReference(
-  type: string,
-  reference: string,
-): ResourceReference {
-  return { type, typed: false, reference, parameters: {} };
-}
-
 function parseEntityReference(
   reference: string,
   type: EntityType,
@@ -84,5 +77,4 @@ export {
   entityResourceReference,
   parseEntityReference,
   typedResourceReference,
-  untypedResourceReference,
 };

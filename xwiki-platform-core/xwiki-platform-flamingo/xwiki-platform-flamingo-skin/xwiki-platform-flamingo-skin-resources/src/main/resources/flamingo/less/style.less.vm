@@ -28,7 +28,6 @@
 @import "action-menus";
 @import "admin";
 @import "buttons";
-@import "breadcrumbs";
 @import "edit";
 @import "figure";
 @import "forms";

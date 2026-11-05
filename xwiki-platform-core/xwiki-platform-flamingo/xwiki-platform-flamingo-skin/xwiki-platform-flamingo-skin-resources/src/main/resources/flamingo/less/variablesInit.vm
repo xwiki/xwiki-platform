@@ -219,6 +219,12 @@
 ])
 #set($discard = $mappedVariables.removeAll($preventMapping))
 #foreach($variableName in $mappedVariables)
+  #if ($flamingoColorThemeVariables.get($variableName) == 'escapedText')
+    ## Interpolate the text in a LESS string, so that the CSS property always holds a quoted CSS string, even when the
+    ## LESS variable is not quoted, e.g. when the lessCode of the color theme sets it with ~"...".
+  -/**/-$variableName: "@{${variableName}}";
+  #else
   -/**/-$variableName: @$variableName;
+  #end
 #end
 }

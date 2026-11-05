@@ -23,13 +23,13 @@ import { PageLinkTargetType } from "./linkTargetTypes/PageLinkTargetType";
 import { PathLinkTargetType } from "./linkTargetTypes/PathLinkTargetType";
 import { UNCLinkTargetType } from "./linkTargetTypes/UNCLinkTargetType";
 import { URLLinkTargetType } from "./linkTargetTypes/URLLinkTargetType";
-import AttachmentLinkTargetForm from "./vue/AttachmentLinkTargetForm.vue";
-import AttachmentLinkTargetOptions from "./vue/AttachmentLinkTargetOptions.vue";
-import EmailLinkTargetForm from "./vue/EmailLinkTargetForm.vue";
-import EmailLinkTargetOptions from "./vue/EmailLinkTargetOptions.vue";
-import PageLinkTargetForm from "./vue/PageLinkTargetForm.vue";
-import PageLinkTargetOptions from "./vue/PageLinkTargetOptions.vue";
-import { URLLinkTargetForm } from "./vue/URLLinkTargetForm";
+import AttachmentLinkTargetField from "./vue/AttachmentLinkTargetField.vue";
+import AttachmentLinkTargetOptionFields from "./vue/AttachmentLinkTargetOptionFields.vue";
+import EmailLinkTargetField from "./vue/EmailLinkTargetField.vue";
+import EmailLinkTargetOptionFields from "./vue/EmailLinkTargetOptionFields.vue";
+import PageLinkTargetField from "./vue/PageLinkTargetField.vue";
+import PageLinkTargetOptionFields from "./vue/PageLinkTargetOptionFields.vue";
+import { URLLinkTargetField } from "./vue/URLLinkTargetField";
 import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
 import { linkTargetTypeRole } from "@xwiki/platform-link-type-api";
 import type { LinkTargetTypeForm } from "@xwiki/platform-link-modal-ui";
@@ -43,8 +43,8 @@ import type { Component } from "vue";
  * `@xwiki/platform-markdown-syntax-config` and its siblings' own `"SyntaxConfig"` registration).
  *
  * Registers also the forms of these link target types, as bindings of `linkTargetTypeFormRole` (see
- * `@xwiki/platform-link-modal-ui`), except for the path and UNC path ones, which are edited with the plain text form
- * that the link modal uses for the link target types without a form.
+ * `@xwiki/platform-link-modal-ui`), except for the path and UNC path ones, which are edited with the plain text target
+ * field that the link modal uses for the link target types without a form.
  *
  * A consumer that does not want one (or several) of the built-in link target types (e.g. to offer a reduced set)
  * should simply not instantiate this class, and instead register only the link target types it wants, the same way.
@@ -61,15 +61,25 @@ class ComponentInit {
     container.bind(linkTargetTypeRole).to(UNCLinkTargetType);
     container.bind(linkTargetTypeRole).to(URLLinkTargetType);
 
-    bindForm(container, "page", PageLinkTargetForm, PageLinkTargetOptions);
+    bindForm(
+      container,
+      "page",
+      PageLinkTargetField,
+      PageLinkTargetOptionFields,
+    );
     bindForm(
       container,
       "attachment",
-      AttachmentLinkTargetForm,
-      AttachmentLinkTargetOptions,
+      AttachmentLinkTargetField,
+      AttachmentLinkTargetOptionFields,
     );
-    bindForm(container, "email", EmailLinkTargetForm, EmailLinkTargetOptions);
-    bindForm(container, "url", URLLinkTargetForm);
+    bindForm(
+      container,
+      "email",
+      EmailLinkTargetField,
+      EmailLinkTargetOptionFields,
+    );
+    bindForm(container, "url", URLLinkTargetField);
   }
 }
 

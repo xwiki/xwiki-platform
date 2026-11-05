@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { useLinkTargetTypeLabels } from "./linkTargetTypeLabels";
-import PlainTextLinkTargetForm from "./vue/PlainTextLinkTargetForm.vue";
+import PlainTextLinkTargetField from "./vue/PlainTextLinkTargetField.vue";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
@@ -29,13 +29,13 @@ import type {
 import type { Component, PropType } from "vue";
 
 /**
- * Create the form of a link target type registered without a form: its configuration is a plain text location (see
- * `PlainTextLinkTargetConfig`), edited with a plain text field labelled with the label of the link target type.
+ * Create the target field of a link target type registered without a form: its configuration is a plain text location
+ * (see `PlainTextLinkTargetConfig`), edited with a plain text field labelled with the label of the link target type.
  *
  * @param targetType - the link target type registered without a form
- * @returns the form component
+ * @returns the target field component
  */
-function plainTextFallbackForm(targetType: LinkTargetType): Component {
+function plainTextFallbackField(targetType: LinkTargetType): Component {
   return defineComponent({
     props: {
       linkData: { type: Object as PropType<LinkData>, required: true },
@@ -49,7 +49,7 @@ function plainTextFallbackForm(targetType: LinkTargetType): Component {
       const { locale } = useI18n();
       const labels = useLinkTargetTypeLabels([targetType], locale);
       return () =>
-        h(PlainTextLinkTargetForm, {
+        h(PlainTextLinkTargetField, {
           linkData: props.linkData,
           modelValue: props.modelValue,
           "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
@@ -61,4 +61,4 @@ function plainTextFallbackForm(targetType: LinkTargetType): Component {
   });
 }
 
-export { plainTextFallbackForm };
+export { plainTextFallbackField };

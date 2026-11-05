@@ -19,11 +19,11 @@
 -->
 <script setup lang="ts">
 import LinkForm from "./LinkForm.vue";
-import UnsupportedLinkTargetForm from "./UnsupportedLinkTargetForm.vue";
+import UnsupportedLinkTargetField from "./UnsupportedLinkTargetField.vue";
 import { UnsupportedLinkTargetType } from "../UnsupportedLinkTargetType";
 import { createLinkEditionContext } from "../linkEditionContext";
 import { linkTargetTypeFormRole } from "../linkTargetTypeForm";
-import { plainTextFallbackForm } from "../plainTextFallbackForm";
+import { plainTextFallbackField } from "../plainTextFallbackField";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import {
@@ -92,16 +92,17 @@ provide("linkTargetTypes", offeredLinkTargetTypes);
 const linkTargetTypeForms: LinkTargetTypeForm[] = [
   {
     type: unsupportedLinkTargetType,
-    targetField: () => UnsupportedLinkTargetForm,
+    targetField: () => UnsupportedLinkTargetField,
   },
   ...(props.depsContainer.isBound(linkTargetTypeFormRole)
     ? props.depsContainer.getAll<LinkTargetTypeForm>(linkTargetTypeFormRole)
     : []),
 ];
 
-// The form of the currently selected link target type, or a plain text form for a link target type registered without
-// a form. `markRaw()` excludes its components from Vue's reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use
-// of `markRaw()` for the same reason, for a dynamically registered component).
+// The form of the currently selected link target type, with its components resolved, or a fallback form with a plain
+// text target field for a link target type registered without a form. `markRaw()` excludes its components from Vue's
+// reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a dynamically
+// registered component).
 const activeForm = computed(() => {
   const type = linkData.value.target.type;
   const form = linkTargetTypeForms.find((form) => form.type === type);
@@ -119,7 +120,7 @@ const activeForm = computed(() => {
 
   // The link target type is not (or no longer) registered/enabled: nothing to render.
   return targetType
-    ? { targetField: markRaw(plainTextFallbackForm(targetType)) }
+    ? { targetField: markRaw(plainTextFallbackField(targetType)) }
     : undefined;
 });
 

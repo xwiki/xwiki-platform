@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { translations } from "../translations";
-import { PlainTextLinkTargetForm } from "@xwiki/platform-link-modal-ui";
+import { PlainTextLinkTargetField } from "@xwiki/platform-link-modal-ui";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
@@ -28,9 +28,9 @@ import type {
 import type { PropType } from "vue";
 
 /**
- * The form of the URL link target type: the plain text form of the link modal, with a URL field.
+ * The target field of the URL link target type: the plain text target field of the link modal, as a URL field.
  */
-const URLLinkTargetForm = defineComponent({
+const URLLinkTargetField = defineComponent({
   props: {
     linkData: { type: Object as PropType<LinkData>, required: true },
     modelValue: {
@@ -42,7 +42,7 @@ const URLLinkTargetForm = defineComponent({
   setup(props, { emit }) {
     const { t } = useI18n({ messages: translations });
     return () =>
-      h(PlainTextLinkTargetForm, {
+      h(PlainTextLinkTargetField, {
         linkData: props.linkData,
         modelValue: props.modelValue,
         "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
@@ -54,4 +54,4 @@ const URLLinkTargetForm = defineComponent({
   },
 });
 
-export { URLLinkTargetForm };
+export { URLLinkTargetField };

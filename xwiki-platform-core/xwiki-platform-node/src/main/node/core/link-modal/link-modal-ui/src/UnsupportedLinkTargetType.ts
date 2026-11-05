@@ -27,7 +27,7 @@ import type {
  * The link target type of the edited link when it points to a resource that no registered link target type supports
  * (see `unsupportedLinkTargetType`). It's not registered in the container: the link modal creates it for the edited
  * link only, so that the link type selector offers it next to the registered types. The link modal edits the reference
- * of the linked resource as plain text (see `UnsupportedLinkTargetForm`).
+ * of the linked resource as plain text (see `UnsupportedLinkTargetField`).
  */
 class UnsupportedLinkTargetType
   implements LinkTargetType<UnsupportedLinkTargetConfig>

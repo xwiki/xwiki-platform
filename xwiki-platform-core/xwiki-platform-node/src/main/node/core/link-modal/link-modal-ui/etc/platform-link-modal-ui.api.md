@@ -64,7 +64,7 @@ export interface LinkTargetTypeForm {
 export const linkTargetTypeFormRole = "LinkTargetTypeForm";
 
 // @beta
-export const PlainTextLinkTargetForm: DefineComponent<    {
+export const PlainTextLinkTargetField: DefineComponent<    {
 modelValue: PlainTextLinkTargetConfig;
 } & {
 linkData: LinkData;

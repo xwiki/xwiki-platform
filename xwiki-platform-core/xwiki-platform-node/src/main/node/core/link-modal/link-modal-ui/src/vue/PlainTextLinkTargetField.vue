@@ -18,25 +18,44 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { translations } from "../translations";
-import { useI18n } from "vue-i18n";
-import type { AttachmentLinkTargetConfig } from "../data/linkType";
-import type { LinkData } from "@xwiki/platform-link-type-api";
+import type { TextFieldProps } from "@xwiki/platform-dsapi";
+import type {
+  LinkData,
+  PlainTextLinkTargetConfig,
+} from "@xwiki/platform-link-type-api";
 
-// The options of a link of this type, displayed in the "Options" section of the link form.
-defineProps<{ linkData: LinkData }>();
+// The target field of the link target types designated by a plain text location (e.g. URL, path, UNC path), and of
+// the link target types registered without a form.
+defineProps<{
+  linkData: LinkData;
 
-const model = defineModel<AttachmentLinkTargetConfig>({
+  /**
+   * The (translated) label of the location field.
+   */
+  fieldLabel: string;
+
+  /**
+   * The value of the `data-test` attribute of the location field.
+   */
+  dataTest: string;
+
+  /**
+   * The type of the location field (e.g. "url" to validate it as a URL).
+   */
+  inputType?: TextFieldProps["type"];
+}>();
+
+const model = defineModel<PlainTextLinkTargetConfig>({
   required: true,
 });
-
-const { t } = useI18n({ messages: translations });
 </script>
 
 <template>
   <x-text-field
-    v-bind="{ 'data-test': 'linkAttachmentQueryString' }"
-    :label="t('link-type.target-types.attachment.query-string')"
-    v-model="model.queryString"
+    v-bind="{ 'data-test': dataTest }"
+    :label="fieldLabel"
+    :type="inputType ?? 'text'"
+    v-model="model.location"
+    required
   />
 </template>

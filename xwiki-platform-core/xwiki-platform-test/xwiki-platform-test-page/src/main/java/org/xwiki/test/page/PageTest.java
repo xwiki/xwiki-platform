@@ -27,6 +27,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
@@ -50,6 +51,10 @@ import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.test.page.accessibility.WCAG;
+import org.xwiki.test.page.accessibility.WCAGCustomizer;
+import org.xwiki.test.page.accessibility.WCAGExtension;
+import org.xwiki.test.page.accessibility.WCAGValidator;
 import org.xwiki.velocity.VelocityManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -135,6 +140,13 @@ public class PageTest
     protected MockitoComponentManager componentManager;
 
     /**
+     * Collects the pages rendered during a test method annotated with {@link WCAG} (directly or through its
+     * class), for their validation at the end of the test. Stays inactive without the annotation.
+     */
+    @RegisterExtension
+    private final WCAGExtension wcagExtension = new WCAGExtension();
+
+    /**
      * Used to ensure that we don't pop the rendering context if we haven't pushed to it. This is to workaround a
      * limitation of {@link MutableRenderingContext} which doesn't have a {@code peek()} or {@code isEmpty()} method.
      */
@@ -208,7 +220,10 @@ public class PageTest
         // Set up the current doc in the context so that $doc is bound in scripts
         context.setDoc(doc);
 
-        return doc.getRenderedContent(this.context);
+        String renderedContent = doc.getRenderedContent(this.context);
+        this.wcagExtension.collect(renderedContent, reference.toString());
+
+        return renderedContent;
     }
 
     /**
@@ -246,7 +261,35 @@ public class PageTest
      */
     protected Document renderHTMLPage(XWikiDocument document) throws Exception
     {
-        return Jsoup.parse(document.getRenderedContent(this.context));
+        String renderedContent = document.getRenderedContent(this.context);
+        this.wcagExtension.collect(renderedContent, document.getDocumentReference().toString());
+        return Jsoup.parse(renderedContent);
+    }
+
+    /**
+     * Validates a rendered page against the WCAG rules taken into account by the page test framework, failing
+     * the test with a readable report when it contains violations. Incomplete checks are only logged: jsdom
+     * cannot always resolve them. When the axe-core Node.js bridge is not available the validation is skipped
+     * with a warning, unless the {@code xwiki.testPage.wcag.strict} system property is set to {@code true}.
+     *
+     * @param pageHTML the rendered HTML of the page to validate
+     * @since 18.10.0RC1
+     */
+    protected void assertWCAG(String pageHTML)
+    {
+        assertWCAG(pageHTML, new WCAGCustomizer());
+    }
+
+    /**
+     * Same as {@link #assertWCAG(String)}, with a custom configuration of the validation.
+     *
+     * @param pageHTML the rendered HTML of the page to validate
+     * @param customizer the configuration of the validation: extra disabled rules, tags override, page label
+     * @since 18.10.0RC1
+     */
+    protected void assertWCAG(String pageHTML, WCAGCustomizer customizer)
+    {
+        WCAGValidator.validate(pageHTML, customizer);
     }
 
     /**

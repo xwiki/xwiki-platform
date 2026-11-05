@@ -1,0 +1,11 @@
+{
+  "name": "@xwiki/platform-test-page-accessibility",
+  "version": "18.10.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
+  "private": true,
+  "description": "Node dependencies of the axe-core bridge used by the page test framework to validate WCAG",
+  "dependencies": {
+    "axe-core": "catalog:",
+    "jsdom": "catalog:"
+  }
+}

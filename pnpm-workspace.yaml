@@ -9,6 +9,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-webjar/src/main/node
   - xwiki-platform-core/xwiki-platform-realtime/xwiki-platform-realtime-toolbar-webjar/src/main/node
+  - xwiki-platform-core/xwiki-platform-test/xwiki-platform-test-page/src/main/node
   - xwiki-platform-core/xwiki-platform-node/src/main/node
   - xwiki-platform-core/xwiki-platform-node/src/main/node/api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-api

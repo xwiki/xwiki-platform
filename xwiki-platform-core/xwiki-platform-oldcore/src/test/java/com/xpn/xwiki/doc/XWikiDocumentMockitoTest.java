@@ -39,6 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Named;
@@ -2090,11 +2091,50 @@ class XWikiDocumentMockitoTest
         }
     }
 
+    @Test
+    void getPreparedXDOMOfEachOtherWhilePreparing() throws Exception
+    {
+        when(this.parser.parse(any(), any(), any()))
+            .thenAnswer(invocation -> new XDOM(List.of(new WordBlock(invocation.getArgument(0)))));
+        Transformation macroTransformation =
+            this.oldcore.getMocker().registerMockComponent(Transformation.class, "macro");
+        XWikiDocument documentA = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "A"));
+        documentA.setContent("A");
+        XWikiDocument documentB = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "B"));
+        documentB.setContent("B");
+        Map<String, XWikiDocument> otherDocuments = Map.of("A", documentB, "B", documentA);
+        Map<String, AtomicBoolean> firstPreparations = Map.of("A", new AtomicBoolean(), "B", new AtomicBoolean());
+        CountDownLatch preparing = new CountDownLatch(2);
+        doAnswer(invocation -> {
+            String word = ((WordBlock) invocation.<XDOM>getArgument(0).getChildren().get(0)).getWord();
+            // Only the first preparation of each document needs the prepared content of the other one, once both
+            // documents are being prepared.
+            if (firstPreparations.get(word).compareAndSet(false, true)) {
+                preparing.countDown();
+                assertTrue(preparing.await(10, TimeUnit.SECONDS));
+                XWikiDocument otherDocument = otherDocuments.get(word);
+                assertEquals(new XDOM(List.of(new WordBlock(otherDocument.getContent()))),
+                    otherDocument.getPreparedXDOM());
+            }
+            return null;
+        }).when(macroTransformation).prepare(any());
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<XDOM> preparedA = executor.submit(documentA::getPreparedXDOM);
+            Future<XDOM> preparedB = executor.submit(documentB::getPreparedXDOM);
+
+            assertEquals(new XDOM(List.of(new WordBlock("A"))), preparedA.get(10, TimeUnit.SECONDS));
+            assertEquals(new XDOM(List.of(new WordBlock("B"))), preparedB.get(10, TimeUnit.SECONDS));
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
     private boolean isWaitingInGetPreparedXDOM(Thread thread)
     {
-        // Blocked when waiting for the lock of the preparation, waiting when preparing the content too.
-        Thread.State state = thread.getState();
-        return (state == Thread.State.BLOCKED || state == Thread.State.WAITING)
+        // Waiting either for the lock of the preparation or, when preparing the content too, in the preparation.
+        return thread.getState() == Thread.State.WAITING
             && Arrays.stream(thread.getStackTrace())
                 .anyMatch(element -> element.getMethodName().equals("getPreparedXDOM"));
     }

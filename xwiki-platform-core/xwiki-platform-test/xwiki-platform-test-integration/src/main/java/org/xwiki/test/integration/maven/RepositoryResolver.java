@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.integration.maven;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -37,6 +36,7 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.util.repository.JreProxySelector;
 
 /**
  * Handle Repository-related code.
@@ -76,8 +76,8 @@ public class RepositoryResolver
     {
         this.isOffline = isOffline;
         this.system = newRepositorySystem();
-        this.repositories = newRemoteRepositories();
         this.systemSession = newSession(this.system);
+        this.repositories = newRemoteRepositories();
     }
 
     /**
@@ -151,6 +151,11 @@ public class RepositoryResolver
             session.setOffline(true);
         }
 
+        // Use the proxy configured for the JVM (the http(s).proxyHost, http(s).proxyPort and http.nonProxyHosts system
+        // properties, or the system proxies when java.net.useSystemProxies is true), since this resolver doesn't read
+        // the proxies from the Maven settings.
+        session.setProxySelector(new JreProxySelector());
+
         return session;
     }
 
@@ -174,6 +179,9 @@ public class RepositoryResolver
             .setSnapshotPolicy(REPOSITORY_POLICY_ENABLED)
             .build();
 
-        return Arrays.asList(mavenXWiki, mavenCentral, mavenXWikiSnapshot);
+        // Apply the proxy selector of the session to the repositories, since the resolver uses the proxy of each
+        // repository passed in a request as is.
+        return this.system.newResolutionRepositories(this.systemSession,
+            List.of(mavenXWiki, mavenCentral, mavenXWikiSnapshot));
     }
 }

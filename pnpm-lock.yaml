@@ -340,7 +340,7 @@ overrides:
   chainpad>json.sortify: '-'
   chainpad>nthen: '-'
   chainpad>xmhell: '-'
-  nx>undici: 7.30.1
+  nx>undici: 7.30.2
   eslint-plugin-tsdoc>@typescript-eslint/utils: 8.70.1
 
 importers:
@@ -6078,6 +6078,11 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
 
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
@@ -8477,8 +8482,8 @@ packages:
   undici-types@8.10.2:
     resolution: {integrity: sha512-7/+aSjzkUoLc92hV22bTW4aGanXf800zbwguhcICs0OAoCF9wDOE4wkopQ+SqfhXZm8mCK8gHpdTs7pZUWzK3w==}
 
-  undici@7.30.1:
-    resolution: {integrity: sha512-03KrMbjIFDWQR5RNPrSw3bd1r12JpyFQl9/yxjUbJtqkjmllqC5lFjZh6ujeuJCKr8EOQvRW872Oy/az+nLYxg==}
+  undici@7.30.2:
+    resolution: {integrity: sha512-mLyPQnHwUxaM/rideoK/+KL8DaAJLRl4aBCfmX444aCSLnIaomqPLtNRe2jdCYcsk5wZzXrDIQC8ZeYNRAYyIA==}
     engines: {node: '>=20.18.1'}
 
   undici@8.12.3:
@@ -12162,7 +12167,7 @@ snapshots:
       tmp: 0.2.7
       tsconfig-paths: 4.2.0
       tslib: 2.8.1
-      undici: 7.30.1
+      undici: 7.30.2
       util-deprecate: 1.0.2
       wcwidth: 1.0.1
       which: 3.0.1
@@ -13126,7 +13131,7 @@ snapshots:
 
   undici-types@8.10.2: {}
 
-  undici@7.30.1: {}
+  undici@7.30.2: {}
 
   undici@8.12.3: {}
 

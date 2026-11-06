@@ -36,6 +36,10 @@
     <!-- Name & Category to display by the Extension Manager -->
     <xwiki.extension.name>Office Macro</xwiki.extension.name>
     <xwiki.extension.category>macro</xwiki.extension.category>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/office
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

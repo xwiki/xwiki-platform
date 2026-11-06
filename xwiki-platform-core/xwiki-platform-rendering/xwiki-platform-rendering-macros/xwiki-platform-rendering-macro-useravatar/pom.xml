@@ -36,6 +36,10 @@
     <xwiki.extension.name>User Avatar Macro</xwiki.extension.name>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/useravatar
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

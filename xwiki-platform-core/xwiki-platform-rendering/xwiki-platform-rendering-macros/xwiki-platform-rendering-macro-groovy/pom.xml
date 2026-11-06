@@ -34,6 +34,10 @@
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Groovy Macro</xwiki.extension.name>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/groovy
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <!-- Note: We could only depend on xwiki-commons-groovy but since we want everyone to depend on the Groovy Macro

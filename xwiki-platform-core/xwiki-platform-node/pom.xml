@@ -34,9 +34,6 @@
   <properties>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
-    <!-- Set to true to check that the packages can be published without publishing them. The release script sets it,
-      then publishes the npm packages itself with the two-factor authentication of the release manager. -->
-    <xwiki.npm.publish.dryRun>false</xwiki.npm.publish.dryRun>
   </properties>
   <build>
     <plugins>
@@ -142,20 +139,6 @@
               <arguments>run publint</arguments>
               <workingDirectory>${basedir}/src/main/node</workingDirectory>
               <installDirectory>${basedir}/target</installDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <phase>deploy</phase>
-            <goals>
-              <goal>pnpm</goal>
-            </goals>
-            <configuration>
-              <arguments>run deploy ${xwiki.npm.snapshot.registry} ${xwiki.npm.release.registry} ${basedir}/src/main/node</arguments>
-              <workingDirectory>${basedir}/src/main/node</workingDirectory>
-              <installDirectory>${basedir}/target</installDirectory>
-              <environmentVariables>
-                <XWIKI_NPM_PUBLISH_DRY_RUN>${xwiki.npm.publish.dryRun}</XWIKI_NPM_PUBLISH_DRY_RUN>
-              </environmentVariables>
             </configuration>
           </execution>
         </executions>

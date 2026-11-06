@@ -119,13 +119,9 @@ define('xwiki-reorder-controls', ['jquery'], function ($) {
    * @return {jQuery} the button moving the given item in the given direction
    */
   function createButton(item, options, direction) {
-    const labels = options.labels(item, direction);
-    const button = $('<button></button>').attr({
-      'type': 'button',
-      'title': labels.title
-    }).addClass('reorder-control reorder-control-' + direction).addClass(options.buttonClass);
+    const button = $('<button></button>').attr('type', 'button').addClass('reorder-control reorder-control-' + direction).addClass(options.buttonClass);
     $('<span></span>').attr('aria-hidden', 'true').html(options.icons[direction]).appendTo(button);
-    $('<span></span>').addClass('sr-only').text(labels.text).appendTo(button);
+    $('<span></span>').addClass('sr-only').text(options.label(item, direction)).appendTo(button);
     button.on('click', function (event) {
       // The button sits among the other actions of the item, whose container may react to a click of its own.
       event.stopPropagation();
@@ -162,8 +158,8 @@ define('xwiki-reorder-controls', ['jquery'], function ($) {
    *            <dt>buttonClass</dt><dd>the CSS classes to set on both buttons</dd>
    *            <dt>icons</dt><dd>the HTML of the icon displayed inside each button, as an object with an up and a down
    *              entry</dd>
-   *            <dt>labels</dt><dd>a callback, called with an item and a direction, returning the accessible name of the
-   *              button as text and its tooltip as title</dd>
+   *            <dt>label</dt><dd>a callback, called with an item and a direction, returning the accessible name of the
+   *              button</dd>
    *            <dt>onMove</dt><dd>an optional callback, called with the moved item and its old and new indexes, that
    *              persists the new order</dd>
    *            <dt>announce</dt><dd>an optional callback, called with the moved item, its new index and the number of

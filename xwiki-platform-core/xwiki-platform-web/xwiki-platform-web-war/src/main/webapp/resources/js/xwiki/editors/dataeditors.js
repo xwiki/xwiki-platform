@@ -45,10 +45,8 @@
       'object.loadObject.done',
       'object.loadObject.failed',
       'class.moveProperty.up.text',
-      'class.moveProperty.up.tooltip',
       'class.moveProperty.up.boundary',
       'class.moveProperty.down.text',
-      'class.moveProperty.down.tooltip',
       'class.moveProperty.down.boundary',
       'class.moveProperty.moved',
       'class.switchClass.confirm'
@@ -752,12 +750,9 @@
               up: icons['up'],
               down: icons['down']
             },
-            labels: function (item, direction) {
+            label: function (item, direction) {
               let propertyName = item.attr('id').substring('xproperty_'.length);
-              return {
-                text: l10n['class.moveProperty.' + direction + '.text'],
-                title: l10n.get('class.moveProperty.' + direction + '.tooltip', propertyName)
-              };
+              return l10n.get('class.moveProperty.' + direction + '.text', propertyName);
             },
             onMove: function () {
               self.updateOrder($('#xclassContent'));

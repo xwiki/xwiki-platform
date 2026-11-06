@@ -225,8 +225,7 @@ public class ClassEditPage extends EditPage
 
     /**
      * @param propertyName the name of a property of this class
-     * @return the accessible name of the button moving the given property up, which is displayed to screen readers
-     *     only
+     * @return the accessible name of the button moving the given property up, which names the property
      * @since 18.10.0RC1
      */
     public String getMovePropertyUpButtonName(String propertyName)
@@ -236,33 +235,12 @@ public class ClassEditPage extends EditPage
 
     /**
      * @param propertyName the name of a property of this class
-     * @return the accessible name of the button moving the given property down, which is displayed to screen readers
-     *     only
+     * @return the accessible name of the button moving the given property down, which names the property
      * @since 18.10.0RC1
      */
     public String getMovePropertyDownButtonName(String propertyName)
     {
         return getButtonName(getMovePropertyDownButton(propertyName));
-    }
-
-    /**
-     * @param propertyName the name of a property of this class
-     * @return the tooltip of the button moving the given property up
-     * @since 18.10.0RC1
-     */
-    public String getMovePropertyUpButtonTooltip(String propertyName)
-    {
-        return getMovePropertyUpButton(propertyName).getDomAttribute("title");
-    }
-
-    /**
-     * @param propertyName the name of a property of this class
-     * @return the tooltip of the button moving the given property down
-     * @since 18.10.0RC1
-     */
-    public String getMovePropertyDownButtonTooltip(String propertyName)
-    {
-        return getMovePropertyDownButton(propertyName).getDomAttribute("title");
     }
 
     /**

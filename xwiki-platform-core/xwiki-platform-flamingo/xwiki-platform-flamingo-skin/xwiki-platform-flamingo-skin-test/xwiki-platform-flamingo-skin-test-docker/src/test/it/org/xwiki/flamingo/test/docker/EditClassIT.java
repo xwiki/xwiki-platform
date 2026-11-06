@@ -222,13 +222,10 @@ class EditClassIT
         classEditPage = setup.editClass(reference);
         assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
 
-        // Both move controls are buttons, and each one has an accessible name and a tooltip naming the property it
-        // moves.
+        // Both move controls are buttons, and each one has an accessible name naming the property it moves.
         assertEquals("button", classEditPage.getMovePropertyUpButton("testC").getTagName());
-        assertEquals("move up", classEditPage.getMovePropertyUpButtonName("testC"));
-        assertEquals("Move property testC up", classEditPage.getMovePropertyUpButtonTooltip("testC"));
-        assertEquals("move down", classEditPage.getMovePropertyDownButtonName("testA"));
-        assertEquals("Move property testA down", classEditPage.getMovePropertyDownButtonTooltip("testA"));
+        assertEquals("Move property testC up", classEditPage.getMovePropertyUpButtonName("testC"));
+        assertEquals("Move property testA down", classEditPage.getMovePropertyDownButtonName("testA"));
 
         // A single click moves the property, and the button keeps the focus so that several moves can be performed in
         // a row.

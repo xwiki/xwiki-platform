@@ -17,12 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($icons = {'up': $services.icon.renderHTML('up'), 'down': $services.icon.renderHTML('down')})
-#[[*/
-// Start JavaScript-only code.
-
-(function(icons) {
+(function() {
   "use strict";
   define('dataeditors-translations', {
     prefix: 'core.editors.',
@@ -746,10 +741,6 @@
             item: '.xproperty',
             buttonContainer: '.xproperty-title .tools',
             buttonClass: 'tool move',
-            icons: {
-              up: icons['up'],
-              down: icons['down']
-            },
             label: function (item, direction) {
               let propertyName = item.attr('id').substring('xproperty_'.length);
               return l10n.get('class.moveProperty.' + direction + '.text', propertyName);
@@ -846,6 +837,4 @@
     }
     $(init);
   });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons]));
+})();

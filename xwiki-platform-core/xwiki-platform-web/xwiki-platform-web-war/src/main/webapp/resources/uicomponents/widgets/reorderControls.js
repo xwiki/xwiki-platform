@@ -18,6 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+define('xwiki-reorder-controls-icons', {
+  icons: ['up', 'down']
+});
+
 /**
  * Makes a list of items reorderable without dragging, by adding a move up button and a move down button to each item.
  * Both buttons move the item with a single click or tap, and both also answer the up and down arrow keys once focused,
@@ -28,7 +32,7 @@
  *
  * @since 18.10.0RC1
  */
-define('xwiki-reorder-controls', ['jquery'], function ($) {
+define('xwiki-reorder-controls', ['jquery', 'xwiki-icon!xwiki-reorder-controls-icons'], function ($, icons) {
   'use strict';
 
   const liveRegionId = 'reorder-controls-live-region';
@@ -121,7 +125,7 @@ define('xwiki-reorder-controls', ['jquery'], function ($) {
   function createButton(item, options, direction) {
     const button = $('<button></button>').attr('type', 'button')
       .addClass('reorder-control reorder-control-' + direction).addClass(options.buttonClass);
-    $('<span></span>').attr('aria-hidden', 'true').html(options.icons[direction]).appendTo(button);
+    $('<span></span>').attr('aria-hidden', 'true').append(icons[direction]?.render()).appendTo(button);
     $('<span></span>').addClass('sr-only').text(options.label(item, direction)).appendTo(button);
     button.on('click', function (event) {
       // The button sits among the other actions of the item, whose container may react to a click of its own.
@@ -157,8 +161,6 @@ define('xwiki-reorder-controls', ['jquery'], function ($) {
    *            <dt>buttonContainer</dt><dd>the selector, relative to an item, of the element the buttons are appended
    *              to</dd>
    *            <dt>buttonClass</dt><dd>the CSS classes to set on both buttons</dd>
-   *            <dt>icons</dt><dd>the HTML of the icon displayed inside each button, as an object with an up and a down
-   *              entry</dd>
    *            <dt>label</dt><dd>a callback, called with an item and a direction, returning the accessible name of the
    *              button</dd>
    *            <dt>onMove</dt><dd>an optional callback, called with the moved item and its old and new indexes, that

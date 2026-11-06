@@ -24,8 +24,12 @@ define('xwiki-reorder-controls-icons', {
 
 /**
  * Makes a list of items reorderable without dragging, by adding a move up button and a move down button to each item.
- * Both buttons move the item with a single click or tap, and both also answer the up and down arrow keys once focused,
- * so that a series of moves can be performed without leaving the button.
+ * Both buttons move the item with a single click or tap, which is the accessible way to reorder the list, including
+ * for screen reader users.
+ *
+ * Once a button is focused, the up and down arrow keys move the item too, as a shortcut for performing a series of
+ * moves without leaving the button. This shortcut is a convenience for keyboard users only: screen readers in browse
+ * mode keep the arrow keys for their own navigation, and nothing advertises it.
  *
  * Lists that can also be reordered by dragging and dropping keep their own drag and drop implementation and pass the
  * same persistence callback to it, so that the two paths stay in sync.
@@ -133,8 +137,8 @@ define('xwiki-reorder-controls', ['jquery', 'xwiki-icon!xwiki-reorder-controls-i
       moveItem(button, options, direction);
     });
     button.on('keydown', function (event) {
-      // Both buttons answer both arrow keys, so that an item moved one position too far can be moved back without
-      // moving the focus to the other button.
+      // The arrow keys are a shortcut on top of the buttons. Both buttons answer both keys, so that an item moved one
+      // position too far can be moved back without moving the focus to the other button.
       if (event.key === 'ArrowUp') {
         moveItem(button, options, 'up');
       } else if (event.key === 'ArrowDown') {
@@ -172,7 +176,7 @@ define('xwiki-reorder-controls', ['jquery', 'xwiki-icon!xwiki-reorder-controls-i
    *              towards</dd>
    *          </dl>
    */
-  return function (scope, options) {
+  function addReorderControls(scope, options) {
     // The region is created before the first move, because a region that is inserted and filled in the same task is
     // not announced.
     getLiveRegion();
@@ -185,5 +189,7 @@ define('xwiki-reorder-controls', ['jquery', 'xwiki-icon!xwiki-reorder-controls-i
       }
       buttonContainer.append(createButton(item, options, 'up'), createButton(item, options, 'down'));
     });
-  };
+  }
+
+  return addReorderControls;
 });

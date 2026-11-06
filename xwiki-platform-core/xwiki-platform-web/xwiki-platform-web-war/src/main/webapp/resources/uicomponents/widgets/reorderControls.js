@@ -34,6 +34,9 @@ define('xwiki-reorder-controls-icons', {
  * Lists that can also be reordered by dragging and dropping keep their own drag and drop implementation and pass the
  * same persistence callback to it, so that the two paths stay in sync.
  *
+ * This widget is internal: it is only used by the class editor for now, and its options may change without notice.
+ * Sharing it with Live Data is tracked by XWIKI-25689.
+ *
  * @since 18.10.0RC1
  */
 define('xwiki-reorder-controls', ['jquery', 'xwiki-icon!xwiki-reorder-controls-icons'], function ($, icons) {

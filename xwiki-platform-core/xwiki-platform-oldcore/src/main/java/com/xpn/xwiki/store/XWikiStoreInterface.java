@@ -390,6 +390,8 @@ public interface XWikiStoreInterface
      * @since 1.1.2
      * @since 1.2M2
      */
+    // Published store API (@since 1.1.2) implemented outside the platform: the signature cannot change.
+    @SuppressWarnings("java:S107")
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 

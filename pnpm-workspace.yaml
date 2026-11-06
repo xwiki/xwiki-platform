@@ -122,7 +122,7 @@ catalog:
   # TypeScript 7 ships only the native tsc binary, with no JavaScript API. It owns the tsc command, while the typescript
   # entry below provides the TypeScript 6 API that typescript-eslint, vue-tsc, Volar and the dts tooling require.
   "@typescript/native": npm:typescript@7.0.2
-  "@vitejs/plugin-react": 6.1.2
+  "@vitejs/plugin-react": 6.2.1
   "@vitejs/plugin-vue": 6.0.10
   "@vitest/eslint-plugin": 1.6.28
   "@vue/compiler-dom": 3.5.43

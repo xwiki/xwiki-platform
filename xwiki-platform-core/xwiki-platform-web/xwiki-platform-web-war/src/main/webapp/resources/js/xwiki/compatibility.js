@@ -494,7 +494,7 @@ XWiki.makeRenderingErrorsExpandable = function(content) {
   require(['jquery'], function($) {
     $(document).trigger('xwiki:dom:updated', {'elements': $(content || 'body').toArray()});
   });
-}
+};
 
 /**
  * Add some deprecated <meta> tags in the header of the page so that old script can still work. It is added via the

@@ -100,14 +100,14 @@ define('xwiki-reorder-controls', ['jquery'], function ($) {
       announce(options.announceBoundary?.(item, direction));
       return;
     }
+    // The neighbor is moved rather than the item, so that the focused button never leaves the DOM. This keeps the focus
+    // on it for the next move, and screen readers don't announce the button again on top of the live region.
+    const neighbor = items.eq(newIndex);
     if (offset < 0) {
-      item.insertBefore(items.eq(newIndex));
+      neighbor.insertAfter(item);
     } else {
-      item.insertAfter(items.eq(newIndex));
+      neighbor.insertBefore(item);
     }
-    // Moving the item in the DOM moves the button with it, which makes some browsers drop the focus, so we set it back
-    // on the button in order to let the user perform several moves in a row.
-    button.trigger('focus');
     options.onMove?.(item, oldIndex, newIndex);
     announce(options.announce?.(item, newIndex, items.length));
   }

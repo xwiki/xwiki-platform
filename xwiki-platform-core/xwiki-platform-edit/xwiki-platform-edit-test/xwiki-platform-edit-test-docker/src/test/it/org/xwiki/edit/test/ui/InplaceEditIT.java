@@ -70,6 +70,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 class InplaceEditIT
 {
+    private static final String TREE_DESCRIPTION = "Expand and collapse this tree nodes respectively with the right "
+        + "and left arrow keys. Navigate between the nodes with the up and down arrow keys.";
+
     @BeforeAll
     static void beforeAll(TestUtils setup)
     {
@@ -345,7 +348,7 @@ class InplaceEditIT
         // Wait until the children macro has loaded the tree content.
         richTextArea.waitUntilTextContains("No pages found");
 
-        assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
+        assertEquals("a first line\nNo pages found\n" + TREE_DESCRIPTION + "\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }
 
@@ -585,7 +588,7 @@ class InplaceEditIT
             ckeditor.getToolBar().insertOtherMacro().filterByText("Children", 1).clickSelect();
         macroEditModal.clickSubmit();
         richTextArea.waitUntilTextContains("Child Title");
-        assertEquals("children:\nChild Title", richTextArea.getText());
+        assertEquals("children:\nChild Title\n" + TREE_DESCRIPTION, richTextArea.getText());
 
         viewPage.cancel();
     }

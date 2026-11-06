@@ -201,6 +201,21 @@ public class TreeElement extends BaseElement
     }
 
     /**
+     * @return the text that describes this tree to assistive technologies, or {@code null} if the tree has no
+     *         description
+     * @since 18.10.0RC1
+     */
+    public String getDescription()
+    {
+        String descriptionId = this.element.getAttribute("aria-describedby");
+        if (descriptionId == null || descriptionId.isEmpty()) {
+            return null;
+        }
+        // The description is visually hidden, so read its text content instead of its visible text.
+        return getDriver().findElementWithoutWaiting(By.id(descriptionId)).getAttribute("textContent");
+    }
+
+    /**
      * @return the DOM ids of the labels of the loaded nodes, in document order
      * @since 18.8.0RC1
      */

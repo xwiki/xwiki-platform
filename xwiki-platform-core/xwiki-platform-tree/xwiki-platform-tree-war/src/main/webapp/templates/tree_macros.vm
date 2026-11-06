@@ -49,8 +49,8 @@
 #macro (treeAttributes $options $isWikiSyntax)
   #set ($attributes = {})
   #getTreeAttributes($options $attributes)
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
-    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.jsfx.use("uicomponents/widgets/tree#if ($services.debug.minify).min#end.js", {
     'forceSkinAction': true,
     'wysiwyg': true

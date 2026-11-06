@@ -745,7 +745,7 @@
         }, {
           group: 'Layout',
           id: 'macro-info',
-          name: editor.localization.get('xwiki-toolbar.infoBox'),
+          name: editor.localization.get('xwiki-macro.name.info'),
           iconClass: 'fa fa-info-circle',
           description: editor.localization.get('xwiki-slash.action.info.hint'),
           command: {
@@ -760,7 +760,7 @@
         }, {
           group: 'Layout',
           id: 'macro-success',
-          name: editor.localization.get('xwiki-toolbar.successBox'),
+          name: editor.localization.get('xwiki-macro.name.success'),
           iconClass: 'fa fa-check-circle',
           description: editor.localization.get('xwiki-slash.action.success.hint'),
           command: {
@@ -775,7 +775,7 @@
         }, {
           group: 'Layout',
           id: 'macro-warning',
-          name: editor.localization.get('xwiki-toolbar.warningBox'),
+          name: editor.localization.get('xwiki-macro.name.warning'),
           iconClass: 'fa fa-exclamation-triangle',
           description: editor.localization.get('xwiki-slash.action.warning.hint'),
           command: {
@@ -790,7 +790,7 @@
         }, {
           group: 'Layout',
           id: 'macro-error',
-          name: editor.localization.get('xwiki-toolbar.errorBox'),
+          name: editor.localization.get('xwiki-macro.name.error'),
           iconClass: 'fa fa-exclamation-circle',
           description: editor.localization.get('xwiki-slash.action.error.hint'),
           command: {
@@ -855,7 +855,7 @@
         }, {
           group: 'Content',
           id: 'macro-include',
-          name: editor.localization.get('xwiki-toolbar.include'),
+          name: editor.localization.get('xwiki-macro.name.include'),
           iconClass: 'fa fa-file-text-o',
           description: editor.localization.get('xwiki-slash.action.include.hint'),
           command: {
@@ -872,7 +872,7 @@
         {
           group: 'Formatting',
           id: 'macro-code',
-          name: editor.localization.get('xwiki-toolbar.code'),
+          name: editor.localization.get('xwiki-macro.name.code'),
           iconClass: 'fa fa-code',
           description: editor.localization.get('xwiki-slash.action.code.hint'),
           command: {
@@ -889,7 +889,7 @@
         {
           group: 'Navigation',
           id: 'macro-toc',
-          name: editor.localization.get('xwiki-toolbar.toc'),
+          name: editor.localization.get('xwiki-macro.name.toc'),
           iconClass: 'fa fa-list',
           description: editor.localization.get('xwiki-slash.action.toc.hint'),
           command: {

@@ -124,7 +124,7 @@ define('xwiki-reorder-controls', ['jquery'], function ($) {
       'type': 'button',
       'title': labels.title
     }).addClass('reorder-control reorder-control-' + direction).addClass(options.buttonClass);
-    $('<span></span>').attr('role', 'presentation').html(options.icons[direction]).appendTo(button);
+    $('<span></span>').attr('aria-hidden', 'true').html(options.icons[direction]).appendTo(button);
     $('<span></span>').addClass('sr-only').text(labels.text).appendTo(button);
     button.on('click', function (event) {
       // The button sits among the other actions of the item, whose container may react to a click of its own.

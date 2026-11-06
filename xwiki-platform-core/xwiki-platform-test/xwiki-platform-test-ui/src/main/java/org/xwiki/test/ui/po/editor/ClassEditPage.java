@@ -282,7 +282,7 @@ public class ClassEditPage extends EditPage
      */
     private String getButtonName(WebElement button)
     {
-        return button.findElement(By.className("sr-only")).getDomProperty("textContent");
+        return button.getAccessibleName();
     }
 
     /**

@@ -26,6 +26,8 @@ import { createI18n } from "vue-i18n";
 // @ts-expect-error xwiki-platform-localization does not export types
 import { resolver } from "xwiki-platform-localization-webjar";
 
+// Counts the live data applications created in the page, to give each its own identifier prefix.
+let liveDataCount = 0;
 
 /**
  * The init function of the logic script
@@ -76,12 +78,16 @@ function init(element, $) {
     }, {once: true});
   });
 
-  createApp(XWikiLivedata, {
+  const app = createApp(XWikiLivedata, {
     data,
     liveDataSource: new XWikiLiveDataSource($),
     contentTrusted,
     resolveTranslations: buildTranslations(locale, i18n),
-  })
+  });
+  // The identifiers generated with useId are only unique in their application, and there is one application per live
+  // data.
+  app.config.idPrefix = `xwiki-livedata-${++liveDataCount}`;
+  app
     .mixin({
       mounted() {
         element.classList.remove("loading");

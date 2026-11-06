@@ -20,14 +20,18 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.index.tree.test.po.BreadcrumbTree;
+import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.BreadcrumbElement;
 import org.xwiki.test.ui.po.DrawerMenu;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -56,6 +60,13 @@ import org.xwiki.test.ui.po.ViewPage;
 class SkinVisualIT
 {
     private static final String SPACE = "SkinVisualIT";
+
+    private static final LocalDocumentReference LONG_TITLE_PAGE =
+        new LocalDocumentReference(List.of(SPACE, "Breadcrumbs"), "LongTitle");
+
+    private static final String LONG_TITLE = "Page with a title too long to fit on one line of the breadcrumb, even on "
+        + "a line of its own and on a wide screen, so that its breadcrumb item has to wrap on more than one line, which "
+        + "is the case the screenshot of the breadcrumb is meant to cover";
 
     @BeforeAll
     void beforeAll(TestUtils setup) throws Exception
@@ -89,5 +100,26 @@ class SkinVisualIT
         DrawerMenu drawerMenu = viewPage.getDrawerMenu();
         drawerMenu.show();
         screenshots.assertMatches("drawer", drawerMenu.getContainer());
+    }
+
+    /**
+     * Verify the layout of the breadcrumb: the separators, the tree toggles, the current page item that wraps because
+     * it's too long to fit on one line, and the tree opened from an item.
+     */
+    @Test
+    @Order(3)
+    void breadcrumbs(TestUtils setup, ScreenshotComparator screenshots) throws Exception
+    {
+        setup.rest().savePage(new LocalDocumentReference(List.of(SPACE, "Breadcrumbs"), "WebHome"), "", "Breadcrumbs");
+        setup.rest().savePage(LONG_TITLE_PAGE, "", LONG_TITLE);
+
+        ViewPage viewPage = setup.gotoPage(LONG_TITLE_PAGE);
+        BreadcrumbElement breadcrumb = viewPage.getBreadcrumb();
+        screenshots.assertMatches("breadcrumb", breadcrumb.getContainer());
+
+        // The tree opened from the current page item only shows the pages of this test, not the other pages of the
+        // space.
+        DocumentTreeElement tree = BreadcrumbTree.open(LONG_TITLE);
+        screenshots.assertMatches("breadcrumbTree", tree.getElement());
     }
 }

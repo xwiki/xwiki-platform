@@ -41,6 +41,15 @@ public class BreadcrumbElement extends BaseElement
         this.container = container;
     }
 
+    /**
+     * @return the element that holds the breadcrumb items, e.g. to take a screenshot of the breadcrumb
+     * @since 18.10.0RC1
+     */
+    public WebElement getContainer()
+    {
+        return this.container;
+    }
+
     public List<String> getPath()
     {
         // Look for direct children because each path element may toggle a breadcrumb tree which has nested list items.

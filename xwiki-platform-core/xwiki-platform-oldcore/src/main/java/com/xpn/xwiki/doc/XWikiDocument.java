@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +52,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -222,6 +224,11 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class XWikiDocument implements DocumentModelBridge, Cloneable, DisposableCacheValue
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
+
+    /**
+     * Set while the current thread holds the preparation lock of the content of a document.
+     */
+    private static final ThreadLocal<Boolean> PREPARING_CONTENT = new ThreadLocal<>();
 
     private static final String DOCUMENT = "document";
 
@@ -497,6 +504,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         XDOM xdom;
 
         volatile LocalDateTime prepareDate;
+
+        /**
+         * Held while preparing the XDOM, shared by the clones of the document like the cached XDOM.
+         */
+        final ReentrantLock prepareLock = new ReentrantLock();
 
         Content(String content, Syntax syntax)
         {
@@ -9174,36 +9186,97 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     @Override
     public XDOM getPreparedXDOM()
     {
-        LocalDateTime xdomPrepareDate = this.content.prepareDate;
-        XDOM xdom = this.content.xdom;
+        // Work on a single content, which is replaced when the content of the document changes.
+        Content currentContent = this.content;
 
-        // If the content is prepared and it's allowed to use the cache, return it
-        if (xdomPrepareDate != null) {
-            if (getCacheControl().isCacheReadAllowed(xdomPrepareDate)) {
-                return xdom.clone();
-            }
+        XDOM xdom = getCachedPreparedXDOM(currentContent);
 
-            // Start from scratch if it's not allowed to reuse the already prepared XDOM
-            xdom = null;
+        if (xdom == null) {
+            xdom = prepareXDOMOnce(currentContent);
         }
 
-        // Parse the content if not already done
-        if (xdom == null) {
+        return xdom.clone();
+    }
+
+    private XDOM prepareXDOMOnce(Content currentContent)
+    {
+        // Lock the content, so that the threads needing the prepared content at the same time wait for a single
+        // preparation instead of each running it, which can be expensive (e.g. syntax highlighting).
+        boolean outermost = PREPARING_CONTENT.get() == null;
+        if (outermost) {
+            currentContent.prepareLock.lock();
+            PREPARING_CONTENT.set(Boolean.TRUE);
+        } else if (!currentContent.prepareLock.tryLock()) {
+            // This thread already holds the preparation lock of another document, as a macro prepared there needs
+            // the prepared content of this one. Waiting here could block forever if the thread preparing this
+            // document needs the prepared content of the other one. Only threads that don't hold a preparation lock
+            // wait, so no cycle can form. This doesn't cover a preparation waiting for another thread.
+            return prepareXDOMWithoutLock();
+        }
+
+        try {
+            // Another thread might have prepared the content while this one was waiting.
+            XDOM xdom = getCachedPreparedXDOM(currentContent);
+
+            if (xdom == null) {
+                xdom = prepareXDOM(currentContent);
+            }
+
+            return xdom;
+        } finally {
+            if (outermost) {
+                PREPARING_CONTENT.remove();
+            }
+            currentContent.prepareLock.unlock();
+        }
+    }
+
+    private XDOM prepareXDOMWithoutLock()
+    {
+        // Parse the content instead of cloning the cached XDOM, which the thread holding the lock might replace by a
+        // prepared one at the same time. Don't cache the result either, so that only the thread holding the lock
+        // updates the cached XDOM and its preparation date.
+        XDOM xdom = parseContentNoException();
+        getMacroTransformation().prepare(xdom);
+
+        return xdom;
+    }
+
+    private XDOM getCachedPreparedXDOM(Content currentContent)
+    {
+        // Read the date before the XDOM since the date is set after it.
+        LocalDateTime xdomPrepareDate = currentContent.prepareDate;
+
+        // Reuse the prepared content only when the cache control allows it, e.g. a request might ask for content
+        // prepared after its start.
+        if (xdomPrepareDate != null && getCacheControl().isCacheReadAllowed(xdomPrepareDate)) {
+            return currentContent.xdom;
+        }
+
+        return null;
+    }
+
+    private XDOM prepareXDOM(Content currentContent)
+    {
+        XDOM xdom;
+        if (currentContent.prepareDate != null || currentContent.xdom == null) {
+            // Start from scratch if the content was never parsed or if it's not allowed to reuse the already prepared
+            // XDOM
             xdom = parseContentNoException();
         } else {
             // Clone the XDOM to avoid concurrent modifications during the preparation
-            xdom = xdom.clone();
+            xdom = currentContent.xdom.clone();
         }
 
-        // Prepare the content
-        xdomPrepareDate = LocalDateTime.now();
+        // Prepare the content, recording the date in the time zone the cache control compares it in
+        LocalDateTime xdomPrepareDate = LocalDateTime.now(ZoneId.systemDefault());
         getMacroTransformation().prepare(xdom);
 
         // Update the cached XDOM
-        this.content.xdom = xdom;
-        this.content.prepareDate = xdomPrepareDate;
+        currentContent.xdom = xdom;
+        currentContent.prepareDate = xdomPrepareDate;
 
-        return this.content.xdom.clone();
+        return xdom;
     }
 
     /**

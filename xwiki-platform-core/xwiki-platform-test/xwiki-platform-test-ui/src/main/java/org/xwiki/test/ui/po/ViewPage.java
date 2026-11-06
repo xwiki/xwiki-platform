@@ -616,4 +616,13 @@ public class ViewPage extends BasePage
     {
         return getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }
+
+    /**
+     * This function assumes that the breadcrumb is visible on the current page.
+     * @since 18.3.0RC1
+     */
+    public boolean isUsingFA()
+    {
+        return !getDriver().findElements(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isEmpty();
+    }
 }

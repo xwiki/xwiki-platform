@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
@@ -1208,6 +1209,18 @@ public class TestConfiguration
     public boolean isCluster()
     {
         return getXWikiInstances().value() > 1;
+    }
+
+    /**
+     * @return {@code true} if the XWiki instances of the test share a filesystem blob store, i.e. when they form a
+     *     cluster using the filesystem blob store, {@code false} otherwise
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     */
+    @Unstable
+    public boolean isSharedFileSystemBlobStore()
+    {
+        return isCluster() && getBlobStore() == BlobStore.FILESYSTEM;
     }
 
     /**

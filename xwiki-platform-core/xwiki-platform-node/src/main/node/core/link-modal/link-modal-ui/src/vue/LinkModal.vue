@@ -18,57 +18,132 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import AttachmentConfig from "./linkTypes/AttachmentConfig.vue";
-import EmailConfig from "./linkTypes/EmailConfig.vue";
-import PageConfig from "./linkTypes/PageConfig.vue";
-import UrlConfig from "./linkTypes/UrlConfig.vue";
-import { createLinkEditionContext } from "../linkSuggest.js";
+import LinkForm from "./LinkForm.vue";
+import UnsupportedLinkTargetField from "./UnsupportedLinkTargetField.vue";
+import { plainTextFallbackField } from "./plainTextFallbackField";
+import { UnsupportedLinkTargetType } from "../UnsupportedLinkTargetType";
+import { linkTargetTypeFormRole } from "../linkTargetTypeForm";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
-import { provide } from "vue";
+import {
+  linkTargetTypeManagerRole,
+  unsupportedLinkTargetType,
+} from "@xwiki/platform-link-type-api";
+import { computed, markRaw } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkData } from "../data/linkType";
+import type { LinkTargetTypeForm } from "../linkTargetTypeForm";
+import type {
+  LinkData,
+  LinkTargetType,
+  LinkTargetTypeManager,
+  UnsupportedLinkTargetConfig,
+} from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 const props = defineProps<{
   current: LinkData;
   depsContainer: Container;
+
+  /**
+   * The link target types (by type) that the link type selector doesn't offer, e.g. because their links are rarely
+   * created from the link modal. They are still used to edit the links they handle, and offered when the edited link
+   * is of an excluded type. Unknown types are ignored.
+   */
+  excludedLinkTargetTypes?: string[];
 }>();
 
 const { t } = useI18n({ messages: translations });
 
-provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
-
 const linkData = typedRef(props.current);
+
+// When the edited link points to a resource that no registered link target type supports, its own link target type is
+// offered first, so that the user can keep editing the reference as plain text, or switch back to it (restoring the
+// original reference) after selecting another type.
+const linkTargetTypes: LinkTargetType[] = [
+  ...(props.current.target.type === unsupportedLinkTargetType
+    ? [
+        new UnsupportedLinkTargetType(
+          props.current.target.config as UnsupportedLinkTargetConfig,
+        ),
+      ]
+    : []),
+  ...props.depsContainer
+    .get<LinkTargetTypeManager>(linkTargetTypeManagerRole)
+    .list(),
+];
+
+// The link target types offered by the link type selector, which always include the type of the edited link, so that
+// the user can switch back to it after selecting another type: this list is computed once, from the type of the edited
+// link when the modal is opened.
+const initialLinkTargetType = props.current.target.type;
+const offeredLinkTargetTypes = linkTargetTypes.filter(
+  (targetType) =>
+    targetType.type === initialLinkTargetType ||
+    !props.excludedLinkTargetTypes?.includes(targetType.type),
+);
+
+// The forms of the link target types, registered separately from the link target types themselves so that these don't
+// depend on the UI framework of the link modal.
+const linkTargetTypeForms: LinkTargetTypeForm[] = [
+  {
+    type: unsupportedLinkTargetType,
+    targetField: () => UnsupportedLinkTargetField,
+  },
+  ...(props.depsContainer.isBound(linkTargetTypeFormRole)
+    ? props.depsContainer.getAll<LinkTargetTypeForm>(linkTargetTypeFormRole)
+    : []),
+];
+
+// The form of the currently selected link target type, with its components resolved, or a fallback form with a plain
+// text target field for a link target type registered without a form. `markRaw()` excludes its components from Vue's
+// reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a dynamically
+// registered component).
+const activeForm = computed(() => {
+  const type = linkData.value.target.type;
+  const form = linkTargetTypeForms.find((form) => form.type === type);
+  if (form) {
+    const optionFields = form.optionFields?.();
+    return {
+      targetField: markRaw(form.targetField()),
+      optionFields: optionFields ? markRaw(optionFields) : undefined,
+    };
+  }
+
+  const targetType = linkTargetTypes.find(
+    (candidate) => candidate.type === type,
+  );
+
+  // The link target type is not (or no longer) registered/enabled: nothing to render.
+  return targetType
+    ? { targetField: markRaw(plainTextFallbackField(targetType)) }
+    : undefined;
+});
 
 defineEmits<{ submit: [LinkData]; cancel: [] }>();
 </script>
 
 <template>
   <div :class="$style.container">
-    <url-config
-      v-if="linkData.target.type === 'url'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
+    <!-- The fields shared by all the link target types, with the target and option fields of the selected one. -->
+    <LinkForm :link-data="linkData" :link-target-types="offeredLinkTargetTypes">
+      <template #target>
+        <component
+          v-if="activeForm"
+          :is="activeForm.targetField"
+          v-model="linkData.target.config"
+          :deps-container
+        />
+      </template>
 
-    <page-config
-      v-if="linkData.target.type === 'page'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
-
-    <attachment-config
-      v-if="linkData.target.type === 'attachment'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
-
-    <email-config
-      v-if="linkData.target.type === 'email'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
+      <template #options>
+        <component
+          v-if="activeForm?.optionFields"
+          :is="activeForm.optionFields"
+          v-model="linkData.target.config"
+          :deps-container
+        />
+      </template>
+    </LinkForm>
 
     <div :class="$style.actions">
       <!-- NOTE: 'v-bind' is used here as it is more flexible

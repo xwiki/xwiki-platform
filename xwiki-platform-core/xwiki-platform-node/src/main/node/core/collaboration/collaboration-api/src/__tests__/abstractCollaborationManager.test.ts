@@ -20,7 +20,7 @@
 
 import { AbstractCollaborationManager } from "../abstractCollaborationManager";
 import { ConnectionStatus } from "../connectionStatus";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 import { Awareness } from "y-protocols/awareness";
 import { Doc } from "yjs";
@@ -45,6 +45,13 @@ type FakeProvider = { doc: Doc; awareness: Awareness };
  * managers do, from the awareness states.
  */
 class TestCollaborationManager extends AbstractCollaborationManager {
+  /**
+   * The number of next connections that fail.
+   */
+  connectionFailures = 0;
+
+  readonly disconnected: Collaboration[] = [];
+
   constructor() {
     super(
       {
@@ -58,6 +65,10 @@ class TestCollaborationManager extends AbstractCollaborationManager {
   }
 
   protected override async createProvider(): Promise<FakeProvider> {
+    if (this.connectionFailures > 0) {
+      this.connectionFailures--;
+      throw new Error("Connection failed.");
+    }
     const doc = new Doc();
     return { doc, awareness: new Awareness(doc) };
   }
@@ -94,7 +105,9 @@ class TestCollaborationManager extends AbstractCollaborationManager {
     return collaboration;
   }
 
-  protected override disconnect(): void {}
+  protected override disconnect(collaboration: Collaboration): void {
+    this.disconnected.push(collaboration);
+  }
 }
 
 describe("AbstractCollaborationManager", () => {
@@ -117,5 +130,58 @@ describe("AbstractCollaborationManager", () => {
         color: collaboration.collaborator.color,
       },
     ]);
+  });
+
+  it("retries the connection when joining again after a failed join", async () => {
+    const manager = new TestCollaborationManager();
+    manager.connectionFailures = 1;
+
+    await expect(manager.join({} as DocumentReference)).rejects.toThrow(
+      "Connection failed.",
+    );
+    const collaboration = await manager.join({} as DocumentReference);
+
+    expect(collaboration.collaborator.user).toEqual(ALICE);
+  });
+
+  it("shares the failure with all the editors that joined the session meanwhile", async () => {
+    const manager = new TestCollaborationManager();
+    manager.connectionFailures = 1;
+
+    const first = manager.join({} as DocumentReference);
+    const second = manager.join({} as DocumentReference);
+
+    await expect(first).rejects.toThrow("Connection failed.");
+    await expect(second).rejects.toThrow("Connection failed.");
+  });
+
+  it("leaves a session whose connection failed", async () => {
+    const manager = new TestCollaborationManager();
+    manager.connectionFailures = 1;
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const joined = manager.join({} as DocumentReference);
+    manager.leave({} as DocumentReference);
+    await expect(joined).rejects.toThrow("Connection failed.");
+    // Let the disconnection finish.
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(manager.disconnected).toEqual([]);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it("disconnects when the last editor leaves", async () => {
+    const manager = new TestCollaborationManager();
+    const collaboration = await manager.join({} as DocumentReference);
+    await manager.join({} as DocumentReference);
+
+    manager.leave({} as DocumentReference);
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(manager.disconnected).toEqual([]);
+
+    manager.leave({} as DocumentReference);
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(manager.disconnected).toEqual([collaboration]);
   });
 });

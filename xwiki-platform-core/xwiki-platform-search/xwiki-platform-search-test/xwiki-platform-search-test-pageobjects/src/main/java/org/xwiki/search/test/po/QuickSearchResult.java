@@ -20,10 +20,13 @@
 package org.xwiki.search.test.po;
 
 import java.util.List;
+import java.util.Set;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Page object representing a quick search result.
@@ -63,5 +66,35 @@ public class QuickSearchResult extends BaseElement
     public List<String> getHighlights()
     {
         return this.container.findElements(By.cssSelector(".value em")).stream().map(WebElement::getText).toList();
+    }
+
+    /**
+     * Opens this quick search result in the current tab, by clicking it.
+     *
+     * @return the page of this quick search result
+     * @since 18.10.0RC1
+     */
+    public ViewPage open()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        this.container.click();
+        getDriver().waitUntilPageIsReloaded();
+        return new ViewPage();
+    }
+
+    /**
+     * Opens this quick search result in a new tab, by clicking it while holding the Ctrl key. The current tab stays
+     * the active one.
+     *
+     * @return the handle of the new tab
+     * @since 18.10.0RC1
+     */
+    public String openInNewTab()
+    {
+        Set<String> existingTabHandles = getDriver().getWindowHandles();
+        getDriver().createActions().keyDown(Keys.CONTROL).click(this.container).keyUp(Keys.CONTROL).perform();
+        getDriver().waitUntilCondition(driver -> driver.getWindowHandles().size() > existingTabHandles.size());
+        return getDriver().getWindowHandles().stream().filter(handle -> !existingTabHandles.contains(handle))
+            .findFirst().orElseThrow();
     }
 }

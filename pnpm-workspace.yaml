@@ -39,6 +39,9 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-xwiki
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-default
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-ui
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-componentstore
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-ui
@@ -48,7 +51,6 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-default
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-resolvers/localization-resolver-xwiki-rest
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api
-  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
@@ -67,6 +69,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-react-jsx
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils
   - xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config
@@ -101,11 +104,11 @@ catalog:
   "@jridgewell/remapping": 2.3.5
   "@mantine/core": 9.6.3
   "@mantine/hooks": 9.6.3
-  "@microsoft/api-extractor": 7.59.4
-  "@oxc-project/runtime": 0.151.0
+  "@microsoft/api-extractor": 7.60.0
+  "@oxc-project/runtime": 0.156.0
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
-  "@playwright/test": 1.63.0
+  "@playwright/test": 1.64.1
   "@tsconfig/node24": 24.0.5
   "@types/jquery": 4.0.1
   "@types/jsdom": 30.0.0
@@ -115,26 +118,30 @@ catalog:
   "@types/react": 19.3.0
   "@types/react-dom": 19.3.0
   "@types/requirejs": 2.1.37
-  "@types/sinon": 22.0.0
-  "@vitejs/plugin-react": 6.1.1
-  "@vitejs/plugin-vue": 6.0.9
-  "@vitest/eslint-plugin": 1.6.27
+  "@types/sinon": 22.0.2
+  # TypeScript 7 ships only the native tsc binary, with no JavaScript API. It owns the tsc command, while the typescript
+  # entry below provides the TypeScript 6 API that typescript-eslint, vue-tsc, Volar and the dts tooling require.
+  "@typescript/native": npm:typescript@7.0.2
+  "@vitejs/plugin-react": 6.1.2
+  "@vitejs/plugin-vue": 6.0.10
+  "@vitest/eslint-plugin": 1.6.28
   "@vue/compiler-dom": 3.5.43
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.9.0
   "@vue/test-utils": 2.5.1
   "@vue/tsconfig": 0.9.1
   axe-core: 4.13.0
-  bootstrap-icons: 1.13.1
+  bootstrap-icons: 1.13.2
   chainpad: 5.3.2
   cross-env: 10.1.0
   diff-dom: 5.2.1
-  dompurify: 3.4.16
+  dompurify: 3.4.17
+  esbuild: 0.28.2
   eslint: 10.12.0
   eslint-import-resolver-typescript: 4.4.5
-  eslint-plugin-headers: 1.3.4
+  eslint-plugin-headers: 1.3.5
   eslint-plugin-import-x: 4.17.1
-  eslint-plugin-prettier: 5.5.6
+  eslint-plugin-prettier: 5.5.7
   eslint-plugin-promise: 7.3.0
   eslint-plugin-tsdoc: 0.5.4
   eslint-plugin-vue: 10.11.0
@@ -145,8 +152,8 @@ catalog:
   inversify: 8.2.3
   jiti: 2.7.0
   jquery: 4.0.0
-  jsdom: 30.1.1
-  lib0: 0.2.118
+  jsdom: 30.1.3
+  lib0: 0.2.119
   lodash-es: 4.18.1
   lz-string: 1.5.0
   mdast-util-gfm-strikethrough: 2.0.1
@@ -157,13 +164,13 @@ catalog:
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-package-json-lint: 11.0.0
   npm-run-all: 4.1.5
-  npm-run-all2: 9.0.3
-  nx: 23.2.1
-  pinia: 4.0.3
+  npm-run-all2: 9.0.4
+  nx: 24.0.0
+  pinia: 4.1.0
   postcss: 8.5.28
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  publint: 0.3.24
+  publint: 0.3.25
   qunit: 2.26.0
   react: 19.3.0
   react-dom: 19.3.0
@@ -172,18 +179,19 @@ catalog:
   reflect-metadata: 0.2.2
   remark-parse: 11.0.0
   rimraf: 6.1.3
+  semver: 7.8.5
   sinon: 22.1.0
   tippy.js: 6.3.7
   tom-select: 2.6.2
-  typescript: 5.9.3
+  typescript: npm:@typescript/typescript6@6.0.2
   typescript-eslint: 8.70.1
   u-node: 0.0.8
   unified: 11.0.5
   utility-types: 3.11.0
-  vite: 8.3.1
-  vite-plugin-css-injected-by-js: 5.0.2
+  vite: 8.3.4
+  vite-plugin-css-injected-by-js: 5.0.3
   vite-plugin-dts: 4.5.4
-  vitest: 5.0.2
+  vitest: 5.0.5
   vitest-mock-extended: 5.1.1
   vue: 3.5.44
   vue-eslint-parser: 10.4.1
@@ -211,5 +219,10 @@ overrides:
   chainpad>json.sortify: "-"
   chainpad>nthen: "-"
   chainpad>xmhell: "-"
+  # nx pins a vulnerable undici version. Remove this override once nx depends on undici 7.30.1 or later.
+  nx>undici: 7.30.1
+  # eslint-plugin-tsdoc pins @typescript-eslint/utils ~8.56.0, which does not accept TypeScript 6. Align it with the
+  # typescript-eslint version of the catalog. Remove this override once eslint-plugin-tsdoc supports TypeScript 6.
+  eslint-plugin-tsdoc>@typescript-eslint/utils: 8.70.1
 minimumReleaseAgeExclude:
   - chainpad@5.3.2

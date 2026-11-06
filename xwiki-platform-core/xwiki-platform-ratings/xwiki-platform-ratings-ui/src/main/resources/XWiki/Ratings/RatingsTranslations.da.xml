@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Ratings.RatingsTranslations" locale="da">
+  <web>XWiki.Ratings</web>
+  <name>RatingsTranslations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Ratings.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.ratings=Bedømmelser
+rating.rate=Bedøm!
+rating.saveexception=Der opstod en fejl, da bedømmelsen skulle gemmes.
+rating.votenotvalid=Du kan ikke stemme med værdien 0.
+rating.voteoutofbounds=Stemmen ligger uden for skalaen.
+rating.setvote.inprogress=Din stemme gemmes...
+rating.setvote.success=Din stemme er gemt!
+rating.setvote.error=Der opstod en fejl, da din stemme skulle gemmes.
+XWiki.Ratings.RatingsConfigurationClass_enabled=Slå bedømmelser til
+XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Når bedømmelser er slået til, kan brugerne stemme på sider og se gennemsnittet. Når de slås fra, fjernes eksisterende stemmer ikke; brugerfladen skjules bare.
+
+#@deprecatedstart
+
+## until 12.9RC1
+admin.ratings.activateratings=Slå bedømmelser til i denne wiki
+admin.ratings.activateratingsinfo=Når bedømmelser er slået til i denne wiki, vises en gennemsnitlig bedømmelse (stjerner) øverst til højre på hver side i wikien (undtagen siderne i området *XWiki*). Brugere, der er logget på, kan bedømme sider ved at klikke på stjernerne. Alternativt kan du bruge *panelet Bedømmelser*, fx hvis bedømmelser kun skal være slået til i bestemte områder. Panelet sættes op i administrationens afsnit *Panelguide*.
+admin.ratings.resetratings=Nulstil alle bedømmelser i denne wiki. Alle sider starter forfra uden stemmer. Bemærk, at handlingen ikke kan fortrydes, ud over at hver side kan rulles tilbage enkeltvis. Det kan tage et stykke tid at nulstille alle bedømmelser, hvis wikien har mange sider, der allerede er bedømt.
+admin.ratings.uninstallratings=Når programmet Bedømmelser afinstalleres, slettes de sider, programmet består af, men *alle stemmer på bedømte sider bevares*. Hvis du geninstallerer programmet senere, starter siderne med den gemte gennemsnitlige bedømmelse, de havde før afinstallationen. Endelig *fjernes kategorien Bedømmelser* fra wikiens administration.
+admin.ratings.ratingsactivated=Bedømmelser er slået til
+admin.ratings.ratingsdeactivated=Bedømmelser er slået fra
+admin.ratings.illegalrequest=Ugyldig anmodning
+rating.yourvote=Din stemme
+rating.logintorate=Log på for at bedømme
+rating.novotes=Ingen stemmer endnu
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

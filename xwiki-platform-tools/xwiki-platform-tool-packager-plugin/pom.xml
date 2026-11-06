@@ -35,7 +35,7 @@
     as a Maven2 plugin or directly from the command line.
    </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
     <!-- It might be causing issue with this plugin build but not sure why and it's quite random -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
@@ -207,6 +207,12 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>4.3.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

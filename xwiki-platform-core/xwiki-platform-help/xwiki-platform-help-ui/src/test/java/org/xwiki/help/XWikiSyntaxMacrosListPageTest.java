@@ -99,6 +99,8 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
 
     private DefaultWikiMacro myMacro;
 
+    private Query query;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -106,21 +108,13 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         this.xwiki.initializeMandatoryDocuments(this.context);
 
         // Mock the database.
-        Query query = mock(Query.class);
+        this.query = mock(Query.class);
         QueryManagerScriptService queryManagerScriptService =
             this.componentManager.registerMockComponent(ScriptService.class, "query", QueryManagerScriptService.class,
                 false);
-        when(queryManagerScriptService.xwql(any())).thenReturn(query);
-        when(query.execute()).thenReturn(List.of("xwiki:XWiki.MyMacro"));
+        when(queryManagerScriptService.xwql(any())).thenReturn(this.query);
 
-        // Create a wiki macro.
-        XWikiDocument myMacroDocument = this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "MyMacro"),
-            this.context);
-        myMacroDocument.setSyntax(Syntax.XWIKI_2_1);
-        BaseObject macroObject = myMacroDocument.newXObject(WIKI_MACRO_CLASS_REFERENCE, this.context);
-        macroObject.setStringValue(MACRO_VISIBILITY_PROPERTY, "WIKI");
-        macroObject.setStringValue(MACRO_ID_PROPERTY, "mymacro");
-        this.xwiki.saveDocument(myMacroDocument, this.context);
+        createWikiMacroDocument(new DocumentReference("xwiki", "XWiki", "MyMacro"));
 
         // Register the wiki macro component.
         this.myMacro =
@@ -184,6 +178,35 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         assertNotNull(myMacroTr);
         assertWikiMacro(myMacroTr, "mymacro", "/xwiki/bin/view/XWiki/MyMacro", unescapedString, Set.of(unescapedString),
             unescapedString, "XWiki.WikiMacroClass_visibility_WIKI");
+    }
+
+    @Test
+    void checkLinkTargetEscaping() throws Exception
+    {
+        // The page name closes the link target and injects a macro call when the target is not escaped.
+        createWikiMacroDocument(new DocumentReference("xwiki", "XWiki", "My]]{{noscript /}}[[Macro"));
+
+        DefaultMacroDescriptor macroDescriptor = new DefaultMacroDescriptor(new MacroId("mymacro"), "My Macro",
+            "My Macro Description");
+        when(this.myMacro.getDescriptor()).thenReturn(macroDescriptor);
+
+        Document document = renderHTMLPage(DOCUMENT_REFERENCE);
+
+        Element myMacroTr = document.select("tr").get(3);
+        assertWikiMacro(myMacroTr, "mymacro", "/xwiki/bin/view/XWiki/My%5D%5D%7B%7Bnoscript%20%2F%7D%7D%5B%5BMacro",
+            "My Macro", Set.of(""), "My Macro Description", "XWiki.WikiMacroClass_visibility_WIKI");
+    }
+
+    private void createWikiMacroDocument(DocumentReference documentReference) throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of(documentReference.toString()));
+
+        XWikiDocument macroDocument = this.xwiki.getDocument(documentReference, this.context);
+        macroDocument.setSyntax(Syntax.XWIKI_2_1);
+        BaseObject macroObject = macroDocument.newXObject(WIKI_MACRO_CLASS_REFERENCE, this.context);
+        macroObject.setStringValue(MACRO_VISIBILITY_PROPERTY, "WIKI");
+        macroObject.setStringValue(MACRO_ID_PROPERTY, "mymacro");
+        this.xwiki.saveDocument(macroDocument, this.context);
     }
 
     private void assertWikiMacro(Element rowElement, String id, String link, String name, Set<String> categories,

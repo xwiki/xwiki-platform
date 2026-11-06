@@ -109,9 +109,15 @@ interface EntityTypeApi {
 interface ModelApi {
   /**
    * @param entityReference - the entity reference to serialize
+   * @param baseReference - (since 18.10.0RC1) the reference to serialize the given entity reference relative to,
+   *   omitting the leading entities they have in common (e.g. `cat.png` for an attachment of the base document); when
+   *   not specified the given entity reference is fully serialized
    * @returns the string representation of the given entity reference, the empty string when no reference is given
    */
-  serialize(entityReference?: EntityReference | null): string;
+  serialize(
+    entityReference?: EntityReference | null,
+    baseReference?: EntityReference | null,
+  ): string;
 
   /**
    * @param representation - the string representation of an entity reference
@@ -1181,13 +1187,36 @@ class EntityReferenceResolver {
 class EntityReferenceSerializer {
   /**
    * @param entityReference - the entity reference to serialize
+   * @param baseReference - (since 18.10.0RC1) the reference to serialize the given entity reference relative to, like
+   *   the server-side compact serializer does: the leading entities that the given entity reference has in common with
+   *   the base reference are omitted, as long as the result resolves to the same entity relative to the base
+   *   reference; the multiple spaces of a nested space are either all omitted or all kept, since a space reference
+   *   can't be resolved relative to its parent space; when not specified the given entity reference is fully
+   *   serialized
    * @returns the string representation of the given entity reference
    */
-  public serialize(entityReference?: EntityReference | null): string {
-    return entityReference
-      ? this.serialize(entityReference.parent) +
-          this._serializeComponent(entityReference)
-      : "";
+  public serialize(
+    entityReference?: EntityReference | null,
+    baseReference?: EntityReference | null,
+  ): string {
+    if (!entityReference) {
+      return "";
+    } else if (!baseReference) {
+      return (
+        this.serialize(entityReference.parent) +
+        this._serializeComponent(entityReference)
+      );
+    }
+
+    const components = entityReference.getReversedReferenceChain();
+    return components
+      .slice(skipCommonEntityTypes(components, baseReference))
+      .map((component, index) =>
+        index === 0
+          ? this._serializeName(component)
+          : this._serializeComponent(component),
+      )
+      .join("");
   }
 
   /**
@@ -1197,27 +1226,96 @@ class EntityReferenceSerializer {
    */
   public _serializeComponent(entityReference: EntityReference): string {
     let representation = "";
-    const escapes = ESCAPES[entityReference.type];
 
     // Add the separator if this is not the first component.
     if (entityReference.parent) {
       representation +=
-        entityReference.parent.type === EntityType.WIKI ? WIKISEP : escapes[0];
+        entityReference.parent.type === EntityType.WIKI
+          ? WIKISEP
+          : ESCAPES[entityReference.type][0];
     }
+
+    return representation + this._serializeName(entityReference);
+  }
+
+  /**
+   * @param entityReference - the entity reference whose own name has to be serialized
+   * @returns the escaped name of the given entity reference, without any separator
+   * @internal
+   */
+  public _serializeName(entityReference: EntityReference): string {
+    const escapes = ESCAPES[entityReference.type];
 
     // The root reference doesn't have to escape its separator because the reference is parsed from the right.
     if (escapes.length > 0) {
-      representation += replaceEach(
+      return replaceEach(
         entityReference.name,
         escapes,
         REPLACEMENTS[entityReference.type],
       );
     } else {
-      representation += entityReference.name.replaceAll(ESCAPE, DBLESCAPE);
+      return entityReference.name.replaceAll(ESCAPE, DBLESCAPE);
     }
-
-    return representation;
   }
+}
+
+/**
+ * Skips the leading entity types whose entities are the same in the given reference chain and in the base reference.
+ *
+ * @param components - the reference chain to serialize, from the root entity down to the serialized entity
+ * @param baseReference - the reference to serialize the reference chain relative to
+ * @returns the position of the first component to serialize
+ */
+function skipCommonEntityTypes(
+  components: EntityReference[],
+  baseReference: EntityReference,
+): number {
+  let start = 0;
+  while (start < components.length) {
+    // Look for the last component of the same type, e.g. the last space of a nested space.
+    let end = start;
+    while (
+      end + 1 < components.length &&
+      components[end + 1].type === components[start].type
+    ) {
+      end++;
+    }
+    // The last entity type is always serialized, otherwise the result would be empty.
+    if (
+      end === components.length - 1 ||
+      !sameEntityTypeChain(
+        components[end],
+        baseReference.extractReference(components[end].type),
+      )
+    ) {
+      break;
+    }
+    start = end + 1;
+  }
+  return start;
+}
+
+/**
+ * @param reference - an entity reference
+ * @param otherReference - another entity reference
+ * @returns whether the given references have the same chain of entities of their own type, e.g. the same nested space,
+ *   regardless of their parents of other types
+ */
+function sameEntityTypeChain(
+  reference: EntityReference,
+  otherReference?: EntityReference | null,
+): boolean {
+  let current: EntityReference | null | undefined = reference;
+  let other: EntityReference | null | undefined = otherReference;
+  while (current?.type === reference.type && other?.type === reference.type) {
+    if (current.name !== other.name) {
+      return false;
+    }
+    current = current.parent;
+    other = other.parent;
+  }
+  // Both chains must end at the same time, e.g. the nested space "X.A.B" is not the same as the nested space "A.B".
+  return current?.type !== reference.type && other?.type !== reference.type;
 }
 
 const resolver = new EntityReferenceResolver();
@@ -1230,8 +1328,11 @@ const serializer = new EntityReferenceSerializer();
  * @beta
  */
 const Model: ModelApi = {
-  serialize: function (entityReference?: EntityReference | null): string {
-    return serializer.serialize(entityReference);
+  serialize: function (
+    entityReference?: EntityReference | null,
+    baseReference?: EntityReference | null,
+  ): string {
+    return serializer.serialize(entityReference, baseReference);
   },
 
   resolve: function (

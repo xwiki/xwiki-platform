@@ -67,7 +67,7 @@ function renderIcon(icons: ResolvedIcons, name: string): string {
  */
 async function createXWikiToolbarEnvironment(): Promise<ToolbarEnvironment> {
   (globalThis as unknown as { define: Define }).define(ICON_QUERY_ID, {
-    icons: ["check", "clock"],
+    icons: ["check", "clock", "warning"],
   });
   const [$, moment, , xwikiMeta, icons] = await loadById<
     [JQuery, MomentFactory, unknown, XWikiMeta, ResolvedIcons]
@@ -87,6 +87,7 @@ async function createXWikiToolbarEnvironment(): Promise<ToolbarEnvironment> {
     icons: {
       check: renderIcon(icons, "check"),
       clock: renderIcon(icons, "clock"),
+      warning: renderIcon(icons, "warning"),
     },
     getSaveOptions(form) {
       // The version summary and minor edit fields are rendered (by editactions.vm) only when they are enabled in the

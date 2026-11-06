@@ -39,10 +39,10 @@ public class WCAGUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(WCAGUtils.class);
 
-    private static final String FILENAME_OVERVIEW = "wcagOverview.txt";
-    private static final String FILENAME_INCOMPLETE = "wcagIncompletes.txt";
-    private static final String FILENAME_WARNING = "wcagWarnings.txt";
-    private static final String FILENAME_FAILING = "wcagFails.txt";
+    private static final String FILENAME_OVERVIEW = "wcagOverview";
+    private static final String FILENAME_INCOMPLETE = "wcagIncompletes";
+    private static final String FILENAME_WARNING = "wcagWarnings";
+    private static final String FILENAME_FAILING = "wcagFails";
 
     /**
      * Cached accessibility results.
@@ -98,11 +98,13 @@ public class WCAGUtils
     }
 
     /**
-     * Writes the WCAG validation results into report files. There are four files:
-     * * wcagOverview : overview of the results, contains stats and will always be generated.
-     * * wcagIncomplete : list of the results that are Incomplete and need further manual inspection.
-     * * wcagWarnings : list of the results that are violations, not failing the build.
-     * * wcagFails : list of the results that are violations, failing the build.
+     * Writes the WCAG validation results into report files, suffixed with the simple name of the test class, so that
+     * the reports of several test classes executed with the same configuration don't overwrite each other. There are
+     * four files:
+     * * wcagOverview-[TestClass].txt : overview of the results, contains stats and will always be generated.
+     * * wcagIncompletes-[TestClass].txt : list of the results that are Incomplete and need further manual inspection.
+     * * wcagWarnings-[TestClass].txt : list of the results that are violations, not failing the build.
+     * * wcagFails-[TestClass].txt : list of the results that are violations, failing the build.
      * @throws IOException if the directory creation fails
      */
     public void writeWCAGResults() throws IOException
@@ -111,32 +113,39 @@ public class WCAGUtils
         LOGGER.info("Time spent on WCAG validation for [{}]: [{}] (in s)",
             getWCAGContext().getTestClassName(), totalTime);
 
+        // The directory already exists when another test class has been executed before with the same configuration.
         File wcagDir = new File(getWCAGReportPathOnHost());
-        Files.createDirectory(wcagDir.toPath());
-        File overviewFile = new File(wcagDir, WCAGUtils.FILENAME_OVERVIEW);
-        WCAGContext.writeWCAGReportToFile(overviewFile, this.wcagContext.buildOverview());
+        Files.createDirectories(wcagDir.toPath());
+        WCAGContext.writeWCAGReportToFile(getReportFile(wcagDir, FILENAME_OVERVIEW),
+            this.wcagContext.buildOverview());
 
         if (this.wcagContext.hasWCAGIncomplete()) {
-            LOGGER.error(
-                "There are [{}] incomplete accessibility checks in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGIncompleteCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_INCOMPLETE);
-            File incompleteFile = new File(wcagDir, WCAGUtils.FILENAME_INCOMPLETE);
+            File incompleteFile = getReportFile(wcagDir, FILENAME_INCOMPLETE);
+            LOGGER.info("There are [{}] incomplete accessibility checks in the test suite. See [{}] for more details.",
+                this.wcagContext.getWCAGIncompleteCount(), incompleteFile);
             WCAGContext.writeWCAGReportToFile(incompleteFile, this.wcagContext.buildIncompleteReport());
         }
         if (this.wcagContext.hasWCAGWarnings()) {
-            LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_WARNING);
+            File warningsFile = getReportFile(wcagDir, FILENAME_WARNING);
+            LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}] for more details.",
+                this.wcagContext.getWCAGWarnCount(), warningsFile);
             logViolationCount(false);
-            File warningsFile = new File(wcagDir, WCAGUtils.FILENAME_WARNING);
             WCAGContext.writeWCAGReportToFile(warningsFile, this.wcagContext.buildWarningsReport());
         }
         if (this.wcagContext.hasWCAGFails()) {
-            LOGGER.error("There are [{}] accessibility fails in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGFailCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_FAILING);
+            File failsFile = getReportFile(wcagDir, FILENAME_FAILING);
+            LOGGER.error("There are [{}] accessibility fails in the test suite. See [{}] for more details.",
+                this.wcagContext.getWCAGFailCount(), failsFile);
             logViolationCount(true);
-            File failsFile = new File(wcagDir, WCAGUtils.FILENAME_FAILING);
             WCAGContext.writeWCAGReportToFile(failsFile, this.wcagContext.buildFailsReport());
         }
+    }
+
+    private File getReportFile(File wcagDir, String reportName)
+    {
+        String testClassName = this.wcagContext.getTestClassName();
+        String testClassSimpleName = testClassName.substring(testClassName.lastIndexOf('.') + 1);
+        return new File(wcagDir, String.format("%s-%s.txt", reportName, testClassSimpleName));
     }
 
     /**

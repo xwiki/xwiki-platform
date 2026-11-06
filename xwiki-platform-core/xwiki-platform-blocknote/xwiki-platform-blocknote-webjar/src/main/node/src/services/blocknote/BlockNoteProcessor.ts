@@ -51,6 +51,36 @@ class BlockNoteDocument {
     }
     return metadata;
   }
+
+  /**
+   * Associates a server-rendered macro output with a macro call. The macro output is kept outside the edited content
+   * because it can contain information that only the current user is allowed to view (macros are rendered with the
+   * rights of the current user), so it must not be shared with the other realtime collaborators.
+   *
+   * @param id - identifies the macro call: the block id for a block macro, the `id` property otherwise
+   * @param call - the macro call (JSON) that produced the given output
+   * @param output - the macro output
+   * @since 18.10.0RC1
+   */
+  public setMacroOutput(id: string, call: string, output: unknown[]): void {
+    const metadata = this.getMetadata(id, true)!;
+    metadata.macroCall = call;
+    metadata.macroOutput = output;
+  }
+
+  /**
+   * @param id - identifies the macro call: the block id for a block macro, the `id` property otherwise
+   * @param call - the current macro call (JSON)
+   * @returns the output of the specified macro call, or undefined if the macro call doesn't have an output or if it
+   *   was modified since its output was rendered
+   * @since 18.10.0RC1
+   */
+  public getMacroOutput(id: string, call: string): unknown[] | undefined {
+    const metadata = this.metadata[id];
+    return metadata?.macroCall === call
+      ? (metadata.macroOutput as unknown[])
+      : undefined;
+  }
 }
 
 /**

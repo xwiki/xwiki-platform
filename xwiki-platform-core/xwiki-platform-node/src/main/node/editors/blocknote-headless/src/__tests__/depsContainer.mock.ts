@@ -18,12 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
+import {
+  ComponentInit as LinkTypeComponentInit,
+  linkTargetTypeManagerRole,
+} from "@xwiki/platform-link-type-api";
+import { ComponentInit as LinkTypeDefaultComponentInit } from "@xwiki/platform-link-type-default";
+import { ComponentInit as LinkTypeUIComponentInit } from "@xwiki/platform-link-type-ui";
 import {
   AttachmentReference,
   DocumentReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
+import { Container as InversifyContainer } from "inversify";
 import { mock } from "vitest-mock-extended";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
@@ -37,6 +45,7 @@ import type {
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
+import type { MockProxy } from "vitest-mock-extended";
 
 export function depsContainerMock(): Container {
   const container = mock<Container>();
@@ -136,6 +145,39 @@ export function depsContainerMock(): Container {
 
   container.get.calledWith("AttachmentsService").mockReturnValue(null);
   container.get.calledWith("DocumentService").mockReturnValue(null);
+
+  return withBuiltInLinkTargetTypes(container);
+}
+
+/**
+ * The link modal and the editor resolve the link target type manager, and the forms of the link target types, out of
+ * the container, so the built-in link target types must be registered the same way the BlockNote webjar registers
+ * them in production (see its container.ts). They are registered in a real container, which resolves them with the
+ * providers returned by the container mock.
+ */
+function withBuiltInLinkTargetTypes(
+  container: MockProxy<Container>,
+): Container {
+  const builtInContainer = new InversifyContainer();
+  for (const provider of [
+    "RemoteURLParserProvider",
+    "RemoteURLSerializerProvider",
+    "ModelReferenceParserProvider",
+    "ModelReferenceSerializerProvider",
+  ]) {
+    builtInContainer.bind(provider).toConstantValue(container.get(provider));
+  }
+  new LinkTypeComponentInit(builtInContainer);
+  new LinkTypeDefaultComponentInit(builtInContainer);
+  new LinkTypeUIComponentInit(builtInContainer);
+
+  container.get
+    .calledWith(linkTargetTypeManagerRole)
+    .mockReturnValue(builtInContainer.get(linkTargetTypeManagerRole));
+  container.isBound.calledWith(linkTargetTypeFormRole).mockReturnValue(true);
+  container.getAll
+    .calledWith(linkTargetTypeFormRole)
+    .mockReturnValue(builtInContainer.getAll(linkTargetTypeFormRole));
 
   return container;
 }

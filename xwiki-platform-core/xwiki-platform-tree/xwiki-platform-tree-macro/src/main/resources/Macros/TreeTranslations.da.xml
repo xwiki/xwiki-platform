@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="da">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=Træ
+rendering.macro.tree.description=Viser et træhierarki, der er defineret af makroens indhold eller parameteren source.
+rendering.macro.tree.parameter.reference.name=Henvisning
+rendering.macro.tree.parameter.reference.description=Henvisning til den ressource, der beskriver træstrukturen og dens genvejsmenu, og som kaldes for at udføre handlingerne på træets knuder. Ressourcen bruges til at indlæse træet dynamisk (efter behov), når en knude åbnes, og til at hente genvejsmenuen, når brugeren højreklikker på en knude, der har en. Ressourcen er altså ikke statisk. Til statiske træer skal du i stedet bruge makroens indhold. Henvisningen kan være en sidehenvisning eller en URL/sti.
+rendering.macro.tree.parameter.root.name=Rod
+rendering.macro.tree.parameter.root.description=Id for rodknuden. Det er nyttigt, hvis du kun vil vise efterkommerne af en bestemt knude (den angivne rod). Træet viser rodknudens underknuder på første niveau, så selve rodknuden vises ikke. Hele træet vises, hvis der ikke er angivet en rodknude.
+rendering.macro.tree.parameter.showRoot.name=Vis rod
+rendering.macro.tree.parameter.showRoot.description=Om rodknuden skal vises. Rodknuden vises ikke som standard, fordi den som regel fremgår af sammenhængen, træet vises i (fx en etiket over træet). I nogle tilfælde vil du dog måske vise rodknuden: for at kunne oprette en ny knude under roden.
+rendering.macro.tree.parameter.dragAndDrop.name=Træk og slip
+rendering.macro.tree.parameter.dragAndDrop.description=Angiver, om brugeren skal kunne trække og slippe træets knuder.
+rendering.macro.tree.parameter.contextMenu.name=Genvejsmenu
+rendering.macro.tree.parameter.contextMenu.description=Om genvejsmenuen skal vises, når brugeren højreklikker på en knude.
+rendering.macro.tree.parameter.class.name=Klasse
+rendering.macro.tree.parameter.class.description=Yderligere CSS-klasser, der føjes til træets øverste HTML-element.
+rendering.macro.tree.parameter.icons.name=Ikoner
+rendering.macro.tree.parameter.icons.description=Om knudernes ikoner skal vises. Du kan skjule ikonerne, hvis alle knuder er af samme type, eller hvis du vil spare vandret plads.
+rendering.macro.tree.parameter.edges.name=Forbindelseslinjer
+rendering.macro.tree.parameter.edges.description=Om de linjer, der forbinder søskendeknuder med hinanden og med deres overordnede knude, skal vises.
+rendering.macro.tree.parameter.links.name=Links
+rendering.macro.tree.parameter.links.description=Angiver, om knudernes etiketter skal se ud og opføre sig som links (ankre).
+rendering.macro.tree.parameter.checkboxes.name=Afkrydsningsfelter
+rendering.macro.tree.parameter.checkboxes.description=Om der skal vises et afkrydsningsfelt foran hver knude, så brugeren kan vælge flere knuder.
+rendering.macro.tree.parameter.openTo.name=Åbn ved
+rendering.macro.tree.parameter.openTo.description=Id for den knude, træet skal åbnes ved. Alle overordnede knuder til den angivne knude helt op til træets rod åbnes også.
+rendering.macro.tree.parameter.finder.name=Søgefelt
+rendering.macro.tree.parameter.finder.description=Vis et tekstfelt, der kan bruges til at finde knuder i træet. Feltet vises over træet og giver forslag ud fra træets indhold, mens du skriver. Når et forslag vælges, foldes træet ud til den tilsvarende knude.
+rendering.macro.tree.parameter.limit.name=Begrænsning
+rendering.macro.tree.parameter.limit.description=Det højeste antal underknuder, der vises, når en overordnet knude foldes ud første gang. Resten af underknuderne kan nås via linket "mere ...". Parameteren bruges til at dele underknuderne op i sider og hjælper dermed træet, når der er mange underknuder. Træet sender parameteren videre til træets kilde, så den virker kun med dynamiske træer, hvis kilde understøtter en grænse for antallet af underknuder.
+rendering.macro.tree.content.description=Du kan bruge indlejrede HTML-punktopstillinger til at beskrive træstrukturen. Se http://www.jstree.com/docs/html/ for flere oplysninger.
+tree.macro.editModeWarning=Træet kan ikke vises i redigeringstilstand.
+</content>
+</xwikidoc>

@@ -116,7 +116,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     {
         return !getUsersLiveData()
             .getTableLayout()
-            .findElementsInRow(rowNumber, By.cssSelector("td[data-title='User'] div.user.disabled")).isEmpty();
+            .findElementsInRow(rowNumber, By.cssSelector("td[data-title='User'] .user.disabled")).isEmpty();
     }
 
     public boolean canDisableUser(int rowNumber)

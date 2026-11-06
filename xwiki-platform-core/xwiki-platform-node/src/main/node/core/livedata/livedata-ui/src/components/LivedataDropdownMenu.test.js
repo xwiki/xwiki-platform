@@ -65,6 +65,8 @@ function initWrapper({ maximized = false } = {}) {
       },
     },
   });
+  // The test DOM doesn't implement popovers, and a click on an action closes the menu popover.
+  wrapper.find(".dropdown-menu").element.hidePopover = () => {};
   return { wrapper, changeLayout, toggleMaximized };
 }
 
@@ -124,9 +126,17 @@ describe("LivedataDropdownMenu.vue", () => {
 
   it("Is not expanded by default", () => {
     const { wrapper } = initWrapper();
-    expect(
-      wrapper.find('[data-toggle="dropdown"]').attributes("aria-expanded"),
-    ).toBe("false");
+    expect(wrapper.find(".dropdown-toggle").attributes("aria-expanded")).toBe(
+      "false",
+    );
+  });
+
+  it("Opens its menu as a popover aligned with the right of its button", () => {
+    const { wrapper } = initWrapper();
+    const menu = wrapper.find(".dropdown-menu");
+
+    expect(menu.attributes()).toHaveProperty("popover");
+    expect(menu.classes()).toContain("dropdown-menu-right");
   });
 
   it("Offers to maximize the Live Data when it is not maximized", () => {

@@ -76,10 +76,10 @@ class SchedulerIT
     {
         setup.loginAsSuperAdmin();
 
-        // Make sure the job doesn't exist. Note that we don't delete the job after the test is executed (@After)
-        // because we want to remain on the same page in case of a test failure so that our TestDebugger rule can
-        // collect accurate information about the failure. It's not a problem if the job remains scheduled because it
-        // does nothing. Other tests should not rely on the number of scheduler jobs though.
+        // Make sure the job doesn't exist. Note that we don't delete the job after the test is executed (@AfterEach)
+        // because we want to remain on the same page in case of a test failure so that the test framework can
+        // collect accurate information about the failure (e.g. a screenshot). It's not a problem if the job remains
+        // scheduled because it does nothing. Other tests should not rely on the number of scheduler jobs though.
         setup.deletePage("Scheduler", "Scheduler]]TestJob");
 
         // Create Job

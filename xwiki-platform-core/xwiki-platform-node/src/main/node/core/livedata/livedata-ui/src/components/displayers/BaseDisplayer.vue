@@ -208,6 +208,9 @@ export default {
     isEditMode() {
       return this.logic.isEditMode();
     },
+    isEditorShown() {
+      return !this.isView && !this.isLoading;
+    },
   },
 
   // The following methods are only used by the BaseDisplayer component
@@ -242,6 +245,15 @@ export default {
 
       // Switches to view mode.
       this.$emit("update:isView", true);
+    },
+    // Tell assistive technologies which fields an entry cannot be created without.
+    markMandatoryFields() {
+      const editBlock = this.$refs["editBlock"];
+      if (editBlock && this.propertyDescriptor?.mandatory) {
+        editBlock
+          .querySelectorAll("input:not([type=hidden]), select, textarea")
+          .forEach((field) => field.setAttribute("aria-required", "true"));
+      }
     },
     closePopover() {
       this.$refs.tippy.tippy.hide();
@@ -325,7 +337,8 @@ export default {
       const wasNew = this.entry?._new;
       await this.applyEdit();
       await this.logic.getEditBus().whenSaved();
-      if (addNewEntry && wasNew) {
+      // A row still waiting for a mandatory value has no entry yet, so it stays the row to fill.
+      if (addNewEntry && wasNew && !this.entry?._new) {
         this.logic.addEntry();
       }
     },
@@ -337,6 +350,17 @@ export default {
     });
   },
   watch: {
+    isEditorShown: {
+      // A displayer can start in edit mode.
+      immediate: true,
+      async handler(shown) {
+        if (shown) {
+          // The editor fields are only in the DOM once rendered.
+          await this.$nextTick();
+          this.markMandatoryFields();
+        }
+      },
+    },
     // The disable prop behaves weirdly, so we handle that manually instead.
     isEditMode(newValue) {
       if (newValue) {

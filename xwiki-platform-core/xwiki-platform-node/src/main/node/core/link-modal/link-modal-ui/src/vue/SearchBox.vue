@@ -22,18 +22,50 @@
 // Given the types defined here are only relevant to this specific component, extracting
 // to a separate file would mean more code scatter.
 
-type SearchLinkSuggestion<T, U> = {
+/**
+ * An item listed by the search box, i.e. one of the results of a search.
+ *
+ * @typeParam T - the type of the value emitted when the item is selected
+ * @typeParam U - the type of the data used to render the item
+ * @since 18.10.0RC1
+ * @beta
+ */
+type SearchBoxItem<T, U> = {
+  /**
+   * The value emitted when the item is selected.
+   */
   value: T;
+
+  /**
+   * The data passed to the slot rendering the item.
+   */
   renderingData: U;
+
+  /**
+   * Identifies the item among the search results.
+   */
   key: string;
+
+  /**
+   * The text written in the search field when the item is selected.
+   */
   equivalentQuery: string;
 };
 
-type SearchLinkSuggestor<T, U> = (
+/**
+ * Searches the items matching a query.
+ *
+ * @typeParam T - the type of the value emitted when an item is selected
+ * @typeParam U - the type of the data used to render an item
+ * @returns the items matching the query, or `false` when searching is not supported
+ * @since 18.10.0RC1
+ * @beta
+ */
+type SearchBoxSource<T, U> = (
   query: string,
-) => Promise<SearchLinkSuggestion<T, U>[] | false>;
+) => Promise<SearchBoxItem<T, U>[] | false>;
 
-export type { SearchLinkSuggestion, SearchLinkSuggestor };
+export type { SearchBoxItem, SearchBoxSource };
 </script>
 
 <script setup lang="ts" generic="T, U">
@@ -42,7 +74,7 @@ import { debounce } from "lodash-es";
 import { ref, shallowRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-const { initialValue, getSuggestions, trySubmitRaw } = defineProps<{
+const { initialValue, getSuggestions, parseQuery } = defineProps<{
   /**
    * Input field label
    */
@@ -65,30 +97,32 @@ const { initialValue, getSuggestions, trySubmitRaw } = defineProps<{
    *
    * @returns Suggestions matching the provided query
    */
-  getSuggestions: SearchLinkSuggestor<T, U>;
+  getSuggestions: SearchBoxSource<T, U>;
 
   /**
-   * Triggered when the user tries to submit a raw input (e.g. an URL)
+   * Convert the text typed in the search field into a value, when the user presses Enter without picking a
+   * suggestion (e.g. to select a reference typed by hand). Without it, pressing Enter does nothing in that case.
    *
-   * @param raw - The raw input text field
+   * @param query - The text typed in the search field
    *
-   * @returns `true` in case of valid input, `false` to keep the list open
+   * @returns The value to select, or `null` when the text doesn't designate one, to keep the suggestions open
    */
-  trySubmitRaw?: (raw: string) => boolean;
+  parseQuery?: (query: string) => T | null;
 }>();
 
 defineSlots<{
   /**
    * Render a single suggestion
    */
-  renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+  renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
 }>();
 
 const emit = defineEmits<{
   /**
-   * Triggered when a result is selected in the list of suggestions
+   * Triggered when a value is selected: either a suggestion picked from the list, or the text typed in the search
+   * field, converted by `parseQuery`
    */
-  select: [suggestion: T];
+  select: [value: T];
 }>();
 
 const { t } = useI18n({ messages: translations });
@@ -103,7 +137,7 @@ const suggestions = shallowRef<
   | { status: "uninitialized" }
   | {
       status: "resolved";
-      results: SearchLinkSuggestion<T, U>[];
+      results: SearchBoxItem<T, U>[];
     }
   | {
       status: "backendSearchUnsupported";
@@ -133,7 +167,7 @@ const performSearch = debounce(async (search: string) => {
       : { status: "resolved", results: results };
 });
 
-function selectSuggestion(suggestion: SearchLinkSuggestion<T, U>): void {
+function selectSuggestion(suggestion: SearchBoxItem<T, U>): void {
   justDynamicallyUpdatedQuery.value = true;
   query.value = suggestion.equivalentQuery;
   closeSuggestions();
@@ -199,8 +233,16 @@ function onEnterKey(): void {
     }
 
     selectSuggestion(suggestion);
-  } else if (trySubmitRaw?.(query.value)) {
+  } else {
+    selectQuery();
+  }
+}
+
+function selectQuery(): void {
+  const value = parseQuery?.(query.value) ?? null;
+  if (value !== null) {
     closeSuggestions();
+    emit("select", value);
   }
 }
 

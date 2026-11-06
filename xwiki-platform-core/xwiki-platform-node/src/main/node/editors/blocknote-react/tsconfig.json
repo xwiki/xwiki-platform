@@ -2,6 +2,8 @@
   "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
 
   "compilerOptions": {
+    "rootDir": "src",
+
     /* Bundler mode */
     "jsx": "react-jsx",
 

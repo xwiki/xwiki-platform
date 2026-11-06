@@ -1737,8 +1737,9 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# into account as a fall back in case this configuration is not set.
 # export.pdf.xwikiURI = host.xwiki.internal
 
-#-# The Docker image used to create the Docker container running the headless Chrome web browser.
-# export.pdf.chromeDockerImage = zenika/alpine-chrome:latest
+#-# The Docker image used to create the Docker container running the headless Chrome web browser. The default image
+#-# uses a fixed Chrome version, known to work with this version of XWiki, which can change when XWiki is upgraded.
+# export.pdf.chromeDockerImage = femtopixel/google-chrome-headless:144.0.7524.3
 
 #-# The name of the Docker container running the headless Chrome web browser. This is especially useful when reusing an
 #-# existing container.

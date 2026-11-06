@@ -780,7 +780,7 @@
       <messageBodyTemplate>{{velocity}}
 #set($discard = "#template('colorThemeInit.vm')")
 #if("$!theme" == "")
- #set($theme = {"linkColor":"#4791BC", "notificationErrorColor":"#ca302c"}})
+ #set($theme = {"linkColor":"#4791BC", "notificationErrorColor":"#ca302c"})
 #end
 #set($userName = $xwiki.getUserName($xcontext.getUser(), false))
 #set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))
@@ -796,7 +796,8 @@ $services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoi
 {{html clean=false}}
 #if("$!messageBody" != "")
   &lt;p style="$bigText"&gt;
-  $!escapetool.xml($!messageBody)
+  ## Escape first, then turn the line breaks typed by the user into HTML ones.
+  $!escapetool.xml($!messageBody).replaceAll('\r?\n', '&lt;br/&gt;')
   &lt;/p&gt;
 #end
 &lt;p style="margin-top:30px"&gt;

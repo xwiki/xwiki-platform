@@ -1,0 +1,203 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Code.Translations" locale="da">
+  <web>Help.Code</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>help.applications.blog.description=Med Blog-programmet kan du udgive dine oplysninger og dele dem med hele verden.
+help.applications.blog.title=Blog
+help.applications.browse.description=Vælg mellem programmer, som fællesskabet har bidraget med, og installer dem i din wiki.
+help.applications.browse.tip={0}Udvidelseshåndtering{1} hjælper dig med at administrere dine programmer (installere, opdatere og afinstallere).
+help.applications.browse.title=Gennemse programmer
+help.applications.create.demo.label=Demo
+help.applications.create.description=Definer strukturen for dine data, tilpas den, og opret det program, du vil have.
+help.applications.create.tip=Med {0}App Within Minutes{1} kan du bygge programmer uden tekniske forudsætninger.
+help.applications.create.title=Opret dit eget program
+help.applications.description=Med programmer kan du samle strukturerede sider, der hører sammen.
+help.applications.description1=Brug for hjælp, eller er du i tvivl om nogle af vores programmer? Læs deres dokumentation, og få mere at vide om, hvad de kan.
+help.applications.fileManager.description=Filhåndtering administrerer dine filer med fremvisning af understøttede filer, en nøgleordssky og filtrering.
+help.applications.fileManager.title=Filhåndtering
+help.applications.forum.description=Med Forum-programmet kan du oprette nye kategorier og diskutere emner i dem.
+help.applications.forum.title=Forum
+help.applications.ideas.description=Med Idéer-programmet kan du indsende idéer, som dit team kan stemme om.
+help.applications.ideas.title=Idéer
+help.applications.link=Se flere programmer
+help.applications.meetings.description=Møder-programmet holder styr på dine møder med dato, sted, deltagere osv.
+help.applications.meetings.title=Møder
+help.applications.menu.description=Med Menu-programmet kan du oprette navigationsmenuer og vise dem i din installation.
+help.applications.menu.title=Menu
+help.applications.movie.title=Film
+help.applications.title=Programmer
+help.applications.title1=Eksempler
+help.browse.label=Gennemse
+help.description1=XWiki har mange effektive funktioner, som du kan bruge til at oprette, organisere og finde indhold. Dette afsnit viser dig, hvordan du bruger de grundlæggende funktioner i XWiki.
+help.description2=Tillykke med din XWiki-installation. XWiki er meget alsidig og kan bruges til vidensbaser, intranet eller enhver anden form for forretningsprogram. Det er muligt, fordi XWiki kan tilpasses meget – allerede fra den enkelte side og fra enkel til mere avanceret brug.
+help.edit.description=Brug en effektiv {0}WYSIWYG{1}-editor eller {2}syntaks{1} til at oprette indholdsrige wikisider.
+help.edit.title=Redigering af sider
+help.example.label=Se eksempler
+help.history.description=Se tidligere versioner af en side, sammenlign versioner, eller rul tilbage til en tidligere version.
+help.history.title1=Historik
+help.history.title=Versionsstyring
+help.history.version11.content=Skak
+help.history.version11.comment=Første version
+help.history.version21.title=Sidehistorik
+help.history.version21.content=Skakmat
+help.history.version22.title=Historik
+help.history.version22.content=Se {0}historikken{0}.
+help.history.version22.comment=Mindre ændring
+help.history.version31.content=Se fanen {0}Historik{0}.
+help.history.version31.content1=Sammenlign versionerne.
+help.import.description=Importér indhold fra forskellige kilder, og eksportér det i et åbent format (XML, HTML, PDF, ODT).
+help.import.title=Import/eksport
+help.macros.box=Boks-makro
+help.macros.box.description=Viser en meddelelse i en formateret boks.
+help.macros.box.description1={0}Boks-makroen{1} viser en meddelelse i en formateret boks.
+help.macros.box.description2=Der findes flere specialiserede boks-makroer:
+help.macros.box.message=Dette er en meddelelse i en boks
+help.macros.box.subtitle=Boksens titel
+help.macros.box.title=Boks
+help.macros.browseMacros.description=Vælg mellem makroer, som fællesskabet har bidraget med, og installer dem i din wiki.
+help.macros.browseMacros.tip={0}Makroindekset{1} viser de makroer, der allerede er installeret og klar til brug på dine sider.
+help.macros.browseMacros.title=Gennemse makroer
+help.macros.chart={0}Diagram-makroen{1} viser diagrammer ud fra forskellige datakilder.
+help.macros.chart.bar=Søjlediagram
+help.macros.chart.description=Laver diagrammer ud fra datakilder.
+help.macros.chart.pie=Cirkeldiagram
+help.macros.chart.time=Tidsseriediagram
+help.macros.chart.title=Diagram
+help.macros.description=Makroer er funktioner, der kan genbruges og indsættes på en side.
+help.macros.error=Fejl-makro
+help.macros.error.message=Dette er en fejlmeddelelse
+help.macros.example=Eksempel
+help.macros.examples.description=Brug for hjælp, eller er du i tvivl om nogle af vores makroer? Læs deres dokumentation, og få mere at vide om, hvad de kan.
+help.macros.examples.title=Eksempler
+help.macros.gallery={0}Galleri-makroen{1} viser en række billeder i et galleri som diasshow.
+help.macros.gallery.description=Viser en række billeder i et galleri som diasshow.
+help.macros.gallery.title=Galleri
+help.macros.header=Afsnit
+help.macros.header1=Underafsnit
+help.macros.info=Info-makro
+help.macros.info.message=Dette er en informationsmeddelelse
+help.macros.more=Se flere makroer
+help.macros.notifications.activity.title1=Aktivitet i wikien
+help.macros.notifications.activity.title2=Den aktuelle brugers aktivitet
+help.macros.notifications.content={0}Notifikations-makroen{0} giver oplysninger om brugernes seneste aktiviteter.
+help.macros.notifications.description=Viser brugernes seneste aktiviteter på sider.
+help.macros.notifications.title=Notifikationer
+help.macros.success=Succes-makro
+help.macros.success.message=Dette er en succesmeddelelse
+help.macros.title=Makroer
+help.macros.toc={0}Indholdsfortegnelses-makroen{0} laver en indholdsfortegnelse ud fra sidens overskrifter.
+help.macros.toc.description.content=Følgende eksempler bruger den aktuelle sides struktur, der består af to afsnit og tre underafsnit. Få mere at vide om at opbygge en side med overskrifter {0}på siden om syntaks.{1}
+help.macros.toc.description=Laver en indholdsfortegnelse ud fra sidens overskrifter.
+help.macros.toc.description.title=Beskrivelse
+help.macros.toc.examples.title=Eksempler på indholdsfortegnelses-makroen
+help.macros.toc.insideBox=Indholdsfortegnelse i en boks
+help.macros.toc.simple=Enkel indholdsfortegnelse
+help.macros.toc.startingPoint=Indholdsfortegnelse med et startpunkt
+help.macros.toc.title=Indholdsfortegnelse
+help.macros.tree.description=Viser sidernes hierarki.
+help.macros.tree.subtitle=Træ
+help.macros.tree.pageDescription={0}Sidetræ-makroen{0} viser sidernes hierarki.
+help.macros.tree.title=Sidetræ
+help.macros.tree.header1=Træ over sidehierarkiet
+help.macros.tree.header2=Kompakt træ over sidehierarkiet
+help.macros.tree.header3=Sidetræ: wiki {0} område {0} side
+help.macros.tree.header4=Træ med alle elementer
+help.macros.useMacros.description=Makroer er funktioner, der kan genbruges og indsættes på sider.
+help.macros.useMacros.tip=Med {0}WYSIWYG-editoren{1} kan du indsætte makroer og tilpasse deres parametre, når du redigerer sider. Kig efter knappen {2} på værktøjslinjen.
+help.macros.useMacros.title=Brug makroer
+help.macros.warning=Advarsels-makro
+help.macros.warning.message=Dette er en advarsel
+help.more.label=Få mere at vide
+help.organization.description=Organiser dit indhold i sider med et hierarki, samlet i en eller flere (under)wikier.
+help.organization.title=Organisering af indhold
+help.start.description=Nemme trin til at komme i gang med XWiki.
+help.start.title=Kom godt i gang
+help.templates.article.description=Artikelside
+help.templates.article.title=Artikel
+help.templates.create.description=Byg struktur og makroer ind i en eksisterende side, og gør den til en skabelon.
+help.templates.create.tip={0}Skabelonudbydere{1} gør skabeloner tilgængelige i dialogen Opret side, så brugerne kan bruge dem.
+help.templates.create.title=Opret din egen skabelon
+help.templates.description=Skabeloner er færdige sider, der kopieres, når du opretter en ny side.
+help.templates.encyclopedia.description=Opslagsværksside
+help.templates.encyclopedia.title=Opslagsværk
+help.templates.examples.description=Vil du starte med en færdig skabelon? Her er nogle eksempler på skabeloner, der findes i XWiki
+help.templates.examples.title=Eksempler
+help.templates.meeting.title=Mødereferat
+help.templates.meeting.description=Dagsorden og noter
+help.templates.simple.description=Med indholdsfortegnelse
+help.templates.simple.title=Enkel side
+help.templates.more=Se flere skabeloner
+help.templates.title=Skabeloner
+help.templates.useTemplates.description=Skabeloner er færdige sider, der kan kopieres, når du opretter en ny side.
+help.templates.useTemplates.tip=Når du {0}opretter sider{1} ud fra skabeloner, går det hurtigere at tilpasse færdigt indhold til dine behov.
+help.templates.useTemplates.title=Brug skabeloner
+help.title=Hjælp
+help.title1=Hvordan bruger man XWiki?
+help.title2=XWikis vigtigste funktioner
+help.try.label=Prøv det!
+help.videos.description=Se vores samling af videovejledninger.
+help.videos.more=Se flere videoer
+help.videos.title=Videoer
+help.videos.videoCard1.title=Overblik over startsiden
+help.videos.videoCard1.topic1=Lær de elementer at kende, der vises på din startside
+help.videos.videoCard1.topic2=Begynd at gennemse din wiki
+help.videos.videoCard2.title=Tilpasning af startsiden
+help.videos.videoCard2.topic1=Lær, hvordan du ændrer din wikis farveskema
+help.videos.videoCard2.topic2=Lær, hvordan du tilføjer paneler og kolonner til din wiki
+help.videos.videoCard2.topic3=Lær, hvordan du tilføjer widgets til en wiki
+help.videos.videoCard3.title=Oprettelse af sider og indhold
+help.videos.videoCard3.topic1=Se, hvordan du opretter en side
+help.videos.videoCard3.topic2=Lær, hvordan du bruger WYSIWYG-editoren
+help.videos.videoCard3.topic3=Lær visnings- og redigeringstilstandene at kende
+help.videos.videoCard4.title=Import af Office-dokumenter til XWiki
+help.videos.videoCard4.topic1=Se, hvordan du importerer Office-dokumenter til din wiki
+help.videos.videoCard4.topic2=Lær, hvordan du bruger makroen "Indholdsfortegnelse"
+help.videos.videoCard5.title=App Within Minutes
+help.videos.videoCard5.topic1=Se, hvordan du opretter et program
+help.videos.videoCard5.topic2=Lær, hvordan du bruger dit program
+help.videos.videoCard6.title=Tilføj/fjern udvidelser
+help.videos.videoCard6.topic1=Se, hvordan du tilføjer og fjerner udvidelser med Udvidelseshåndtering
+help.videos.videoCard6.topic2=Lær XWikis administrationsbrugerflade at kende
+help.videos.hint=Videoen viser XWikis funktioner i en skærmoptagelse med undertekster og uden lyd. Linkene til dokumentationen nedenfor er et tekstalternativ til videoen.
+help.videos.watch=Se video
+
+## Example Macro
+rendering.macro.example.name=Eksempel
+rendering.macro.example.description=Viser et eksempel og dets kildekode.
+rendering.macro.example.content.description=Eksempelkoden.
+</content>
+</xwikidoc>

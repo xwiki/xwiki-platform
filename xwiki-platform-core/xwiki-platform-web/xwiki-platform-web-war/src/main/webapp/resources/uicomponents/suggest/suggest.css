@@ -86,7 +86,7 @@ div.suggestItems div.info span.legend {
 }
 
 ul.suggestList {
-  margin:0px !important;
+  margin:0px;
   text-transform:none;
   color:$theme.textColor;
   font-weight:normal;

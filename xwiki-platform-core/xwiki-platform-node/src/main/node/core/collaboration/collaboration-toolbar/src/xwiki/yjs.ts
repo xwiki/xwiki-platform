@@ -22,7 +22,12 @@ import { createXWikiToolbarEnvironment } from "./environment";
 import { loadXWikiToolbarTranslations } from "./translations";
 import { Toolbar } from "../ui/Toolbar";
 import { watch } from "vue";
-import type { ToolbarStatus, ToolbarUser, ToolbarVersion } from "../ui/types";
+import type {
+  ToolbarStatus,
+  ToolbarUser,
+  ToolbarVersion,
+  ToolbarWarning,
+} from "../ui/types";
 import type { Saver } from "@xwiki/platform-autosave-api";
 import type {
   DocumentVersion,
@@ -30,6 +35,7 @@ import type {
 } from "@xwiki/platform-autosave-xwiki";
 import type {
   Collaboration,
+  CollaborationWarning,
   Collaborator,
 } from "@xwiki/platform-collaboration-api";
 import type { XWikiDocument } from "@xwiki/platform-document-xwiki";
@@ -131,9 +137,33 @@ function toToolbarVersion(
 }
 
 /**
+ * Translates a translation key of the realtime toolbar.
+ */
+type Translate = (key: string) => string;
+
+/**
+ * @param warning - a warning reported by the collaboration session
+ * @param translate - used to translate the warning title and message
+ * @returns the warning to display on the toolbar
+ */
+function toToolbarWarning(
+  warning: CollaborationWarning,
+  translate: Translate,
+): ToolbarWarning {
+  const key = `realtime.${warning}Warning`;
+  return {
+    id: warning,
+    title: translate(key),
+    message: translate(`${key}.message`),
+  };
+}
+
+/**
  * Creates the toolbar, making sure the edit form doesn't have one already.
  */
-async function createToolbar(options: YjsToolbarOptions): Promise<Toolbar> {
+async function createToolbar(
+  options: YjsToolbarOptions,
+): Promise<[Toolbar, Translate]> {
   const { form } = options;
   if (formsWithToolbar.has(form)) {
     throw new Error("The edit form already has a realtime toolbar.");
@@ -147,12 +177,14 @@ async function createToolbar(options: YjsToolbarOptions): Promise<Toolbar> {
   }
 }
 
-async function loadToolbar(options: YjsToolbarOptions): Promise<Toolbar> {
+async function loadToolbar(
+  options: YjsToolbarOptions,
+): Promise<[Toolbar, Translate]> {
   const [environment, i18n] = await Promise.all([
     createXWikiToolbarEnvironment(),
     loadXWikiToolbarTranslations(),
   ]);
-  return new Toolbar({
+  const toolbar = new Toolbar({
     form: options.form,
     document: options.document,
     session: {
@@ -160,10 +192,17 @@ async function loadToolbar(options: YjsToolbarOptions): Promise<Toolbar> {
         options.saver.save({
           action: continueEditing ? "saveAndContinue" : "saveAndView",
         }),
+      // The document is saved over HTTP, independently of the collaboration server, and the saver is elected locally
+      // when we're alone (which is the case while disconnected).
+      canSaveWhileDisconnected: true,
     },
     environment,
     i18n,
   });
+  // The translation function has a different signature depending on the vue-i18n mode (legacy or composition), but we
+  // only use the common subset.
+  const translate = i18n.global.t as Translate;
+  return [toolbar, (key) => translate(key)];
 }
 
 /**
@@ -173,6 +212,7 @@ async function loadToolbar(options: YjsToolbarOptions): Promise<Toolbar> {
  */
 function connectToolbar(
   toolbar: Toolbar,
+  translate: Translate,
   { collaboration, saver }: YjsToolbarOptions,
 ): () => void {
   const stopWatchers = [
@@ -189,6 +229,20 @@ function connectToolbar(
       collaboration.collaborators,
       (collaborators) =>
         toolbar.onUserListChange(collaborators.map(toToolbarUser)),
+      { immediate: true },
+    ),
+    watch(
+      () => collaboration.warnings?.value ?? [],
+      (warnings, previousWarnings = []) => {
+        previousWarnings
+          .filter((warning) => !warnings.includes(warning))
+          .forEach((warning) => toolbar.removeWarning(warning));
+        warnings
+          .filter((warning) => !previousWarnings.includes(warning))
+          .forEach((warning) =>
+            toolbar.addWarning(toToolbarWarning(warning, translate)),
+          );
+      },
       { immediate: true },
     ),
   ];
@@ -221,8 +275,8 @@ async function createYjsToolbar(
   options: YjsToolbarOptions,
 ): Promise<YjsToolbar> {
   const { form, collaboration } = options;
-  const toolbar = await createToolbar(options);
-  const disconnect = connectToolbar(toolbar, options);
+  const [toolbar, translate] = await createToolbar(options);
+  const disconnect = connectToolbar(toolbar, translate, options);
 
   const onCreateVersion = (version: DocumentVersion) =>
     toolbar.onCreateVersion(

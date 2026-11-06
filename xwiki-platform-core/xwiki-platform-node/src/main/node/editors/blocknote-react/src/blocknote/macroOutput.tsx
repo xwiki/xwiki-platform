@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { applyXWikiParameters } from "./parameters";
-import { Fragment, createElement } from "react";
-import type { MacroCall } from "./utils";
+import { MacrosContext } from "../contexts";
+import { Fragment, createElement, useContext } from "react";
+import type { ContextForMacros, MacroCall } from "./utils";
 import type { CSSProperties, ReactNode } from "react";
 
 /**
@@ -215,9 +216,9 @@ function renderNode(
     case "xwikiEditable":
       return renderEditable(node, call, inline, depth);
     case "xwikiMacroBlock":
-      return renderNestedMacro(node, false, depth);
+      return <NestedMacro node={node} inline={false} depth={depth} />;
     case "xwikiInlineMacro":
-      return renderNestedMacro(node, true, depth);
+      return <NestedMacro node={node} inline={true} depth={depth} />;
     case "xwikiGroup":
       return (
         <div ref={xwikiParamsRef(node.props?.xwikiParameters)}>
@@ -346,15 +347,22 @@ function editableValue(value: unknown, inline: boolean): unknown {
  * Renders a nested macro call by rendering its own server output against its own call. Only the outermost macro is
  * editable, so nested macros carry no edit affordance or double-click handler; a double-click inside bubbles up to the
  * outermost macro's wrapper. `call` / `output` are read as objects here (nested macro nodes are not JSON-stringified,
- * unlike the top-level macro block props).
+ * unlike the top-level macro block props). A macro nested in the output of another macro carries its own output, but a
+ * macro nested in the parameters or content of another macro call (i.e. in an `xwikiEditable` value) doesn't, because
+ * the macro call is part of the edited content (shared with the other users when editing in realtime) while the macro
+ * output is rendered for the current user; its output is retrieved through the macro context, using its `id` property.
  */
-function renderNestedMacro(
-  node: RawNode,
-  inline: boolean,
-  depth: number,
-): ReactNode {
+function NestedMacro({
+  node,
+  inline,
+  depth,
+}: {
+  readonly node: RawNode;
+  readonly inline: boolean;
+  readonly depth: number;
+}): ReactNode {
   const call = (node.props?.call ?? {}) as MacroCall;
-  const output = (node.props?.output ?? []) as OutputNode[];
+  const output = getNestedMacroOutput(node, call, useContext(MacrosContext));
   const tag = inline ? "span" : "div";
   if (!output.length) {
     return createElement(
@@ -373,6 +381,35 @@ function renderNestedMacro(
       depth={depth + 1}
     />,
   );
+}
+
+/**
+ * @param node - a nested macro node
+ * @param call - the nested macro call
+ * @param macros - the macro context, used to retrieve the output of a macro nested in the parameters or content of
+ *   another macro call
+ * @returns the output of the given nested macro, or an empty array if not available
+ */
+function getNestedMacroOutput(
+  node: RawNode,
+  call: MacroCall,
+  macros: ContextForMacros | null,
+): OutputNode[] {
+  // A macro nested in the output of another macro carries its own output, because the whole output of the top-level
+  // macro was rendered for the current user and is kept outside the edited content.
+  const output = node.props?.output;
+  if (output) {
+    return output as OutputNode[];
+  }
+  // A macro nested in the parameters or content of another macro call (i.e. in an xwikiEditable value) is part of the
+  // edited content, which is shared with the other users when editing in realtime, so it doesn't carry its output
+  // (rendered for the current user). Its output, if available, is kept by the macro context, under the macro id.
+  const id = node.props?.id;
+  if (typeof id === "string" && id) {
+    return (macros?.getMacroOutput?.(id, JSON.stringify(call)) ??
+      []) as OutputNode[];
+  }
+  return [];
 }
 
 /**

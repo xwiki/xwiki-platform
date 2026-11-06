@@ -88,6 +88,7 @@ describe("createXWikiToolbarEnvironment", () => {
       "xwiki-icon!xwiki-realtime-toolbar-icons": {
         check: createIcon("check"),
         clock: createIcon("clock"),
+        warning: createIcon("warning"),
       },
     });
     documentReferences = [];
@@ -131,10 +132,11 @@ describe("createXWikiToolbarEnvironment", () => {
     const iconQuery = await loadById<{ icons: string[] }>(
       "xwiki-realtime-toolbar-icons",
     );
-    expect(iconQuery.icons).toEqual(["check", "clock"]);
+    expect(iconQuery.icons).toEqual(["check", "clock", "warning"]);
     expect(environment.icons).toEqual({
       check: '<span class="icon-check"></span>',
       clock: '<span class="icon-clock"></span>',
+      warning: '<span class="icon-warning"></span>',
     });
     expect(environment.defaultAvatarURL).toBe(
       "/xwiki/bin/skin/resources/icons/xwiki/noavatar.png",
@@ -146,7 +148,7 @@ describe("createXWikiToolbarEnvironment", () => {
     requireJS.set("xwiki-meta", {});
     requireJS.set("xwiki-icon!xwiki-realtime-toolbar-icons", {});
     const environment = await createXWikiToolbarEnvironment();
-    expect(environment.icons).toEqual({ check: "", clock: "" });
+    expect(environment.icons).toEqual({ check: "", clock: "", warning: "" });
     expect(environment.formatDate(1)).toBe("1 as moment(yyyy/MM/dd HH:mm)");
   });
 

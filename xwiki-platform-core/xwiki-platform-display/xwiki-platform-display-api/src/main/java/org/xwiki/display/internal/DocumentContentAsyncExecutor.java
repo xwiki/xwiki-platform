@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -66,6 +67,12 @@ public class DocumentContentAsyncExecutor
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
+    /**
+     * The context property holding the document whose content author is used to check the script and programming
+     * rights.
+     */
+    private static final String SECURE_DOCUMENT = "sdoc";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -95,6 +102,18 @@ public class DocumentContentAsyncExecutor
 
     private DocumentModelBridge document;
 
+    /**
+     * The document the executed content is taken from: either {@link #document} or one of its translations. It's
+     * remembered so that the content is executed with the author of this document, which can differ from the author
+     * of the displayed document. Like the other fields, it's set once in
+     * {@link #initialize(String, DocumentModelBridge, DocumentDisplayerParameters, boolean)} and only read afterwards,
+     * possibly from another thread when the execution is asynchronous; this component is instantiated per lookup, so
+     * the field isn't shared between displays.
+     */
+    private DocumentModelBridge contentDocument;
+
+    private DocumentModelBridge asyncDocument;
+
     private Syntax syntax;
 
     private String transformationId;
@@ -103,19 +122,27 @@ public class DocumentContentAsyncExecutor
      * @param transformationId the transformation identifier
      * @param document the document to execute
      * @param parameters display parameters
+     * @param asyncAllowed {@code true} if the document might be executed asynchronously
      */
     public void initialize(String transformationId, DocumentModelBridge document,
-        DocumentDisplayerParameters parameters)
+        DocumentDisplayerParameters parameters, boolean asyncAllowed)
     {
         this.parameters = parameters;
 
         this.transformationId = transformationId;
         // The executed content can be the one of a translation, which can have a syntax of its own.
-        DocumentModelBridge contentSource = getContentSource(document, parameters);
-        this.xdom = getPreparedContent(contentSource, parameters);
+        this.contentDocument = getContentSource(document, parameters);
+        this.xdom = getPreparedContent(this.contentDocument, parameters);
         this.documentReference = document.getDocumentReference();
-        this.syntax = contentSource.getSyntax();
+        this.syntax = this.contentDocument.getSyntax();
         this.document = document;
+
+        // The asynchronous execution sets the displayed document as context document, and thus as secure document, in
+        // another thread. Copy it now so that the content is executed with the author of this version of the document
+        // even if the document instance is modified in the meantime.
+        if (asyncAllowed && parameters.isExecutionContextIsolated()) {
+            this.asyncDocument = ObjectUtils.cloneIfPossible(document);
+        }
     }
 
     /**
@@ -289,15 +316,20 @@ public class DocumentContentAsyncExecutor
         Map<String, Object> backupObjects = new HashMap<>();
         EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
-            // The following method call also clones the execution context.
-            if (async || this.document == null) {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, this.documentReference);
-            } else {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, this.document);
-            }
+            // Execute the content in the context of the document it comes from, so that it's executed with the rights
+            // of the author of that content. The following method call also clones the execution context.
+            this.documentAccessBridge.pushDocumentInContext(backupObjects,
+                async && this.asyncDocument != null ? this.asyncDocument : this.document);
 
             // Make sure to synchronize the context wiki with the context document's wiki.
             this.modelContext.setCurrentEntityReference(this.documentReference.getWikiReference());
+
+            // Changing the context document also resets the secure document to the context document. Make sure that
+            // translated content is executed with the rights of its own author and not with the rights of the author
+            // of the default translation.
+            if (this.contentDocument != this.document) {
+                getXWikiContextMap().put(SECURE_DOCUMENT, this.contentDocument);
+            }
 
             executeInCurrentExecutionContext(async);
         } catch (Exception e) {

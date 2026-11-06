@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -61,4 +62,19 @@ public interface DataSource
      * @return the {@link ChartModel} for the dataset.
      */
     ChartModel getChartModel();
+
+    /**
+     * {@link #buildDataset} must be called before this method.
+     *
+     * @return the reference of the document holding the data, or {@code null} if the data is located in the current
+     *         document
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     * @since 16.10.20
+     */
+    default DocumentReference getDocumentReference()
+    {
+        return null;
+    }
 }

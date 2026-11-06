@@ -19,18 +19,25 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.rest.model.jaxb.Attachment;
+import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.rest.resources.attachments.AttachmentsResource;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -42,6 +49,8 @@ import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,7 +64,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(
     properties = {
         // The Image Wizard needs this to be able to upload images.
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+
+        // The image suggestions execute a Solr query from XWiki.SuggestSolrService / XWiki.SuggestSolrMacros, which
+        // requires programming right. These pages are authored by a user that has programming right in a normal wiki,
+        // but the test wiki blocks programming right by default, so we need to explicitly exclude them.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
     },
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
@@ -66,7 +80,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // core extension so we need to make the extension index also core.
         "org.xwiki.platform:xwiki-platform-extension-index",
 
-        // Solr search is used to get suggestions for the link quick action.
+        // Solr search is used to get suggestions for the image quick action.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
     },
     servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
@@ -77,7 +91,6 @@ class ImageIT extends AbstractBlockNoteIT
     @Order(1)
     void editImage(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference, """
             before
@@ -202,6 +215,253 @@ class ImageIT extends AbstractBlockNoteIT
         File file = setup.getResourceFile("/image.gif");
         byte[] uploadedAttachmentContent = setup.rest()
             .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
-        assertTrue(Arrays.equals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent));
+        assertArrayEquals(FileUtils.readFileToByteArray(file), uploadedAttachmentContent);
+    }
+
+    @Test
+    @Order(2)
+    void pasteImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
+        textArea.click().moveCaretTo(2).pasteFile("/image.gif");
+        // Shown only once uploaded, since that's when the URL is known.
+        textArea.waitUntilImageIsLoaded(0);
+
+        page.save();
+        String savedContent = page.editWiki().getContent();
+
+        // Untyped reference, and renamed: browsers name a pasted file after its media type, so a second paste would
+        // otherwise overwrite this attachment. The caret was in the middle of "before", yet the image goes after the
+        // whole paragraph, since BlockNote inserts the file block after the current block instead of splitting it.
+        assertThat(savedContent, matchesPattern("before\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"));
+
+        String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference(attachmentName, EntityType.ATTACHMENT, testReference));
+        assertArrayEquals(content, uploaded);
+    }
+
+    @Test
+    @Order(3)
+    void dropFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        // Unlike a pasted file, a dropped file keeps the name the user gave it.
+        textArea.click().dropFile("/notes.txt");
+        // The link replaces the inserted block only once uploaded.
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // The file block is saved as a macro call, but that macro doesn't exist yet, so the file becomes an
+        // attachment link instead, in a block of its own after the paragraph that held the caret.
+        assertEquals("""
+            before
+
+            [[attach:notes.txt]]""", page.editWiki().getContent());
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertArrayEquals(content, uploaded);
+    }
+
+    @Test
+    @Order(4)
+    void dropFileWithExistingName(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // An attachment the dropped file is going to collide with.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+        byte[] before = "before".getBytes(StandardCharsets.UTF_8);
+        setup.rest().attachFile(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference),
+            new ByteArrayInputStream(before), true);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] after = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        textArea.click().dropFile("/notes.txt");
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
+        assertEquals("""
+            before
+
+            [[attach:notes.txt]]""", page.editWiki().getContent());
+
+        // A single attachment, so the upload overwrote the existing one rather than adding another.
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(1, attachments.getAttachments().size());
+        Attachment notes = attachments.getAttachments().get(0);
+        assertEquals("notes.txt", notes.getName());
+        assertEquals("1.2", notes.getVersion());
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertArrayEquals(after, uploaded);
+    }
+
+    @Test
+    @Order(5)
+    void dropFileWithoutRealtime(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        // The editor loads even when it can't reach the collaboration server, which is also what happens for a user
+        // who can't edit the document (e.g. with Change Request).
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage();
+        page.simulateUnreachableCollaborationServer().edit();
+        page.waitForInplaceEditor(false);
+        assertFalse(page.getToolbar().isConnected());
+
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        textArea.click().dropFile("/notes.txt");
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        // Out of a realtime session the file waits in the temporary store, so it isn't attached yet.
+        Attachments beforeSave = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(0, beforeSave.getAttachments().size());
+
+        page.save();
+
+        assertEquals("""
+            before
+
+            [[attach:notes.txt]]""", page.editWiki().getContent());
+
+        // The save is what attaches the file.
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(1, attachments.getAttachments().size());
+        assertEquals("notes.txt", attachments.getAttachments().get(0).getName());
+        assertArrayEquals(content, setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference)));
+    }
+
+    @Test
+    @Order(6)
+    void missingImageShowsItsName(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "[[image:missing.png]]");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        // The image can't be displayed, so the editor labels it with its file name, otherwise the block would look
+        // empty and there would be nothing to select.
+        assertEquals("missing.png", textArea.getImage(0).getDomAttribute("alt"));
+
+        page.save();
+
+        // The label is only displayed, so nothing is added to the source: an alt is saved only when the user sets it.
+        assertEquals("[[image:missing.png]]", page.editWiki().getContent());
+    }
+
+    @Test
+    @Order(7)
+    void pasteFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.click().moveCaretTo(2).pasteFile("/notes.txt");
+        textArea.waitUntilLinkIsPresent();
+
+        page.save();
+
+        // Renamed like a pasted image, and like it the link lands after the paragraph that held the caret.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("before\n\n\\[\\[attach:\\d+-\\d+\\.txt\\]\\]"));
+    }
+
+    @Test
+    @Order(8)
+    void insertImageFromSuggestions(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh, with a page holding an image, and wait for the image to be indexed, since the image suggestions
+        // are based on Solr indexation.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+        String imageName = "image.gif";
+        setup.attachFile(testReference, imageName, getClass().getResourceAsStream('/' + imageName), false);
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The image quick action shows the image suggestions.
+        textArea.click().sendKeys("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("image");
+        slashMenu.waitForItemSelected("Image");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        // Search the image by its name (as a real user would), but pick the suggestion using its location, since other
+        // tests running in the same wiki may also attach an image with the same name.
+        textArea.sendKeys(imageName);
+        new SlashMenu().clickItem(imageName, testReference.getLastSpaceReference().getName());
+        textArea.waitUntilImageIsLoaded(0);
+
+        // Save and check the source: the image is saved with its reference rather than with its URL, relative to the
+        // edited page.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("[[image:%s]]".formatted(imageName), wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(9)
+    void insertImageFromImageWizard(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // The image quick action shows the action to browse the images first, selected.
+        textArea.click().sendKeys("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("image");
+        slashMenu.waitForItemSelected("Image");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+        slashMenu = new SlashMenu().waitForItemSelected("Browse images...");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        // Browsing the images opens the image wizard, where we upload a new image and insert it.
+        ImageDialogSelectModal imageSelectModal = new ImageDialogSelectModal();
+        imageSelectModal.switchToUploadTab().upload("/image.gif");
+        imageSelectModal.clickSelect().clickInsert();
+        textArea.waitUntilImageIsLoaded(0);
+
+        // Save and check the source: the image is saved with the reference provided by the image wizard.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("[[image:image.gif]]", wikiEditor.getContent());
     }
 }

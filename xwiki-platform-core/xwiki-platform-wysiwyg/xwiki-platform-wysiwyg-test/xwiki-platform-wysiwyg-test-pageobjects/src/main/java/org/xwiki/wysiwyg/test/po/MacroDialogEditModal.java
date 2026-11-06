@@ -19,6 +19,7 @@
  */
 package org.xwiki.wysiwyg.test.po;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.openqa.selenium.By;
@@ -43,6 +44,13 @@ public class MacroDialogEditModal extends BaseElement
      * We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
      */
     private static final By SUBMIT_BUTTON = By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary");
+
+    /**
+     * The parameters a user can choose from to provide a macro feature, with the feature name as argument.
+     */
+    private static final String FEATURE_CHOICES = "[class*=-editor-modal] .feature-container#feature-%s";
+
+    private static final String DATA_ID = "data-id";
 
     private final Consumer<Runnable> submitHandler;
 
@@ -161,6 +169,101 @@ public class MacroDialogEditModal extends BaseElement
     public SuggestInputElement getMacroParameterSuggestInput(String name)
     {
         return new SuggestInputElement(getMacroParameterInput(name));
+    }
+
+    /**
+     * @param name the name of a macro parameter
+     * @return the element displaying the parameter, with its name, its description and its value
+     * @since 18.10.0RC1
+     */
+    public WebElement getMacroParameterElement(String name)
+    {
+        return getDriver().findElementWithoutWaitingWithoutScrolling(By.cssSelector(
+            String.format("[class*=-editor-modal] .macro-parameter[data-id='%s']", name)));
+    }
+
+    /**
+     * @param name the name of a macro parameter
+     * @return {@code true} if the parameter is displayed, {@code false} if it's hidden, e.g. a deprecated parameter
+     *     without a value
+     * @since 18.10.0RC1
+     */
+    public boolean isMacroParameterDisplayed(String name)
+    {
+        return getMacroParameterElement(name).isDisplayed();
+    }
+
+    /**
+     * @param name the name of a macro parameter
+     * @return {@code true} if the parameter is marked as required, {@code false} otherwise
+     * @since 18.10.0RC1
+     */
+    public boolean isMacroParameterRequired(String name)
+    {
+        return getMacroParameterElement(name).getDomAttribute("class").contains("mandatory");
+    }
+
+    /**
+     * @param feature the name of a macro feature, which several parameters can provide
+     * @return the element displaying the parameters the user can choose from to provide the feature
+     * @since 18.10.0RC1
+     */
+    public WebElement getMacroParameterChoicesElement(String feature)
+    {
+        return getDriver().findElementWithoutWaitingWithoutScrolling(
+            By.cssSelector(String.format(FEATURE_CHOICES, feature)));
+    }
+
+    /**
+     * @param feature the name of a macro feature, which several parameters can provide
+     * @return the names of the displayed parameters the user can choose from to provide the feature, empty when the
+     *     feature is not displayed as a choice
+     * @since 18.10.0RC1
+     */
+    public List<String> getMacroParameterChoices(String feature)
+    {
+        return getDriver()
+            .findElementsWithoutWaiting(
+                By.cssSelector(String.format(FEATURE_CHOICES + " .feature-parameter .macro-parameter", feature)))
+            .stream().filter(WebElement::isDisplayed).map(parameter -> parameter.getDomAttribute(DATA_ID)).toList();
+    }
+
+    /**
+     * @param feature the name of a macro feature, which several parameters can provide
+     * @return the name of the parameter currently chosen to provide the feature, or {@code null} if none is chosen
+     * @since 18.10.0RC1
+     */
+    public String getSelectedMacroParameterChoice(String feature)
+    {
+        return getDriver()
+            .findElementsWithoutWaiting(By.cssSelector(String.format(FEATURE_CHOICES + " .feature-parameter", feature)))
+            .stream().filter(choice -> choice.findElement(By.className("feature-radio")).isSelected()).findFirst()
+            .map(choice -> choice.findElement(By.className("macro-parameter")).getDomAttribute(DATA_ID))
+            .orElse(null);
+    }
+
+    /**
+     * Remove the focus from the field that the modal focuses when it opens, after waiting for that field to get it.
+     * This is useful before taking a screenshot of the modal, which shouldn't depend on the focus. The modal must have
+     * at least one field.
+     *
+     * @return this modal
+     * @since 18.10.0RC1
+     */
+    public MacroDialogEditModal clearFocus()
+    {
+        // The modal focuses its first field once the macro parameters are displayed, which can happen after the modal
+        // is shown, e.g. when that field is a picker.
+        getDriver().waitUntilCondition(driver -> {
+            WebElement focusedElement = driver.switchTo().activeElement();
+            return focusedElement.isDisplayed()
+                && !focusedElement.findElements(By.xpath("ancestor::*[contains(@class, '-editor-modal')]")).isEmpty();
+        });
+        getDriver().executeScript("document.activeElement.blur()");
+        // The field doesn't look focused anymore only once the transition of its border is over.
+        getDriver().waitUntilCondition(driver -> (Boolean) getDriver().executeScript(
+            "return document.querySelector('[class*=-editor-modal]').getAnimations({subtree: true}).length === 0"));
+        return this;
     }
 
     /**

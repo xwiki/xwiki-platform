@@ -1,0 +1,84 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="da">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=E-mail
+admin.email.description=Konfigurer parametre for afsendelse af e-mail, og se status for e-mails.
+admin.emailgeneral=Avanceret
+admin.emailgeneral.description=Konfigurer avancerede e-mailparametre, fx tilsløring af e-mailadresser.
+admin.emailsend=Afsendelse af e-mail
+admin.emailsend.description=Konfigurer parametre for afsendelse af e-mail.
+admin.emailstatus=Status for afsendelse af e-mail
+admin.emailstatus.description=Se status for sendte e-mails, og send dem, der mislykkedes, igen.
+admin.emailstatus.hint=Hvis du ikke kan finde status for en e-mail, kan det skyldes, at det, der sendte den, ikke angav, at status skulle gemmes.
+Mail.GeneralMailConfigClass_obfuscate=Tilslør e-mailadresser
+Mail.GeneralMailConfigClass_obfuscate.hint=Det gælder kun e-mailadresser, der er gemt i objektegenskaber af typen E-mail, så længe standardvisningen for egenskabstypen E-mail ikke er overskrevet. Eksempel: a...@domain.org
+Mail.SendMailConfigClass_from=Afsenderens e-mailadresse
+Mail.SendMailConfigClass_from.hint=Den e-mailadresse, som notifikations-e-mails som standard sendes fra
+Mail.SendMailConfigClass_bcc=BCC-e-mailadresser
+Mail.SendMailConfigClass_bcc.hint=En kommasepareret standardliste over BCC-e-mailadresser, der bruges, når der sendes e-mail
+Mail.SendMailConfigClass_host=E-mailserver
+Mail.SendMailConfigClass_host.hint=Den SMTP-server, der skal sendes til. Standard er "localhost"
+Mail.SendMailConfigClass_port=E-mailserverens port
+Mail.SendMailConfigClass_port.hint=Porten på den SMTP-server, der skal bruges. Standard er 25
+Mail.SendMailConfigClass_username=Brugernavn til e-mailserveren
+Mail.SendMailConfigClass_username.hint=Brugernavnet til forbindelsen til SMTP-serveren, kun når der kræves godkendelse
+Mail.SendMailConfigClass_password=Adgangskode til e-mailserveren
+Mail.SendMailConfigClass_password.hint=Adgangskoden til forbindelsen til SMTP-serveren, kun når der kræves godkendelse
+Mail.SendMailConfigClass_properties=Yderligere egenskaber
+Mail.SendMailConfigClass_properties.hint=Listen over yderligere JavaMail-egenskaber, der skal bruges (fx "mail.smtp.starttls.enable=true" til TLS)
+Mail.SendMailConfigClass_sendWaitTime=Ventetid mellem afsendelser
+Mail.SendMailConfigClass_sendWaitTime.hint=Ventetiden mellem hver afsendt e-mail i millisekunder (standard er 8 sekunder)
+Mail.SendMailConfigClass_discardSuccessStatuses=Kassér successtatus?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Om status skal gemmes eller ej for e-mails, der er sendt korrekt (standard er true)
+Mail.SendMailStatus_livetable.date=Dato
+Mail.SendMailStatus_livetable.batchId=Batch-id
+Mail.SendMailStatus_livetable.type=Type
+Mail.SendMailStatus_livetable.recipients=Modtagere
+Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Fejl
+Mail.SendMailStatus_livetable.actions=Handlinger
+Mail.SendMailStatus_livetable.resend=Send igen
+Mail.SendMailStatus_livetable.delete=Slet
+mailSender.admin.resendSuccess=E-mailen er sendt igen
+mailSender.admin.resendFailure=E-mailen kunne ikke sendes igen. Klik for flere oplysninger.
+mailSender.admin.deleteSuccess=E-mailen er slettet
+mailSender.admin.deleteFailure=E-mailen kunne ikke slettes. Klik for flere oplysninger.
+mailSender.admin.invalidCSRF=Ugyldigt CSRF-token. Opdater siden, og prøv igen.
+</content>
+</xwikidoc>

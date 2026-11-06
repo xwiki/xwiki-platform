@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.office;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
+import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -91,6 +92,7 @@ public class OfficeMacroParameters
     @PropertyDescription("The office attachment to be viewed. Use an attachment string reference to specify which "
         + "office file should be viewed: file.ppt, Page@file.doc, Space.Page@file.xls or wiki:Space.Page@file.odt.")
     @PropertyDisplayType(AttachmentReference.class)
+    @PropertyFeature(value = "reference", mandatory = true)
     @Deprecated
     public void setAttachment(String attachment)
     {
@@ -119,6 +121,7 @@ public class OfficeMacroParameters
         + " attach:file.ppt, attach:Page@file.doc, attach:Space.Page@file.xls, attach:wiki:Space.Page@file.odt,"
         + " url:http://some/remote/file.ppt.")
     @PropertyDisplayType(OfficeResourceReference.class)
+    @PropertyFeature(value = "reference", mandatory = true)
     public void setReference(ResourceReference reference)
     {
         this.reference = reference;

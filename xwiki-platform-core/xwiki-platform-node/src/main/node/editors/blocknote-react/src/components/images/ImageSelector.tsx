@@ -17,18 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DepsContainerContext } from "../../contexts";
+import { DepsContainerContext, EditedDocumentContext } from "../../contexts";
+import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { SearchBox } from "../SearchBox";
 import {
   Box,
   Breadcrumbs,
   Button,
-  FileInput,
   Flex,
   Space,
   Stack,
   Text,
-  VisuallyHidden,
 } from "@mantine/core";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
@@ -37,32 +36,31 @@ import {
   DocumentReference,
   EntityType,
 } from "@xwiki/platform-model-api";
-import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
 import type { LinkSuggestion } from "../SearchBox";
-import type { AttachmentsService } from "@xwiki/platform-attachments-api";
-import type { DocumentService } from "@xwiki/platform-document-api";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
-import type {
-  ModelReferenceHandlerProvider,
-  ModelReferenceParserProvider,
-} from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
+import type { ModelReferenceHandlerProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type ImageSelectorProps = {
   currentSelection?: string;
-  onSelected: (url: string) => void;
+  /**
+   * Called when the user selects an image.
+   *
+   * @param url - the URL of the selected image
+   * @param reference - the resource reference of the selected image, when known (e.g. for a suggested or an uploaded
+   *   image)
+   */
+  onSelected: (url: string, reference?: ResourceReference) => void;
 };
 
-export const ImageSelector: React.FC<ImageSelectorProps> = ({
+export function ImageSelector({
   currentSelection,
   onSelected,
-  // eslint-disable-next-line max-statements
-}) => {
+}: ImageSelectorProps) {
   const depsContainer = useContext(DepsContainerContext)!;
 
   const remoteURLParser = depsContainer
@@ -72,19 +70,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   const modelReferenceHandler = depsContainer
     .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
     .get()!;
-
-  const modelReferenceParser = depsContainer
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!;
-
-  const remoteURLSerializer = depsContainer
-    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-    .get()!;
-
-  const documentService = depsContainer.get<DocumentService>("DocumentService");
-
-  const attachmentsService =
-    depsContainer.get<AttachmentsService>("AttachmentsService")!;
 
   const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
@@ -115,42 +100,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
 
   const { t } = useTranslation();
 
-  const fileUploadRef = useRef<HTMLButtonElement>(null);
-
-  const triggerUpload = useCallback(() => {
-    fileUploadRef?.current?.click();
-  }, [fileUploadRef]);
-
-  const fileSelected = useCallback(
-    async (file: File) => {
-      const currentPageName =
-        documentService.getCurrentDocumentReferenceString().value ?? "";
-
-      const uploadedFilesUrls = await attachmentsService.upload(
-        currentPageName,
-        [file],
-      );
-
-      let url: string | undefined;
-      if (uploadedFilesUrls && uploadedFilesUrls[0]) {
-        url = uploadedFilesUrls[0];
-      } else {
-        const parser = modelReferenceParser?.parse(currentPageName, {
-          relative: false,
-        });
-
-        url = remoteURLSerializer?.serialize(
-          new AttachmentReference(file.name, parser as DocumentReference),
-        );
-      }
-
-      if (url) {
-        onSelected(url);
-      }
-    },
-    [onSelected],
-  );
-
   const searchAttachments = useCallback(
     async (query: string) => {
       if (!linkSuggestService) {
@@ -163,51 +112,39 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
         "image/*",
       );
 
-      return results.map((link): LinkSuggestion => {
-        const attachmentReference = modelReferenceParser?.parse(
-          link.reference,
-          { relative: false },
-        ) as AttachmentReference;
-
-        const documentReference = attachmentReference.document;
-        const segments = documentReference.space?.names.slice(0) ?? [];
-
-        if (documentReference.terminal) {
-          segments.push(documentReference.name);
-        }
-
-        return {
+      return results.map(
+        (link): LinkSuggestion => ({
           type: link.type,
           title: link.label,
           reference: link.reference,
           url: link.url,
-          segments,
-        };
-      });
+          hint: link.hint,
+        }),
+      );
     },
-    [modelReferenceParser, linkSuggestService],
+    [linkSuggestService],
   );
 
-  // Start a first empty search on the first load, to not let the results empty.
-  useEffect(() => {
-    searchAttachments(initialQuery);
-  }, []);
+  const editedDocumentReference = useContext(EditedDocumentContext);
+
+  const uploadImage = useCallback(async () => {
+    const image = await triggerUserImageUpload(
+      depsContainer,
+      editedDocumentReference,
+    );
+
+    if (image) {
+      onSelected(image.url, image.reference);
+    }
+  }, [depsContainer, editedDocumentReference, onSelected]);
 
   return (
     <Box>
-      <Button variant="default" onClick={triggerUpload}>
+      <Button variant="default" onClick={uploadImage}>
         {t("blocknote.imageSelector.uploadButton")}
       </Button>
 
       <Space h="sm" />
-
-      <VisuallyHidden>
-        <FileInput
-          ref={fileUploadRef}
-          accept="image/*"
-          onChange={(file) => file && fileSelected(file)}
-        />
-      </VisuallyHidden>
 
       <SearchBox
         placeholder={t("blocknote.imageSelector.placeholder")}
@@ -227,16 +164,14 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
               <Text>
                 <RiAttachmentLine /> {suggestion.title}
               </Text>
-              <Breadcrumbs c="gray">
-                {suggestion.segments.map((segment, i) => (
-                  <Text key={`${i}${segment}`}>{segment}</Text>
-                ))}
-              </Breadcrumbs>
+              {suggestion.hint && <Text c="gray">{suggestion.hint}</Text>}
             </Stack>
           </Flex>
         )}
         onSelect={onSelected}
-        onSubmit={onSelected}
+        // The search box builds a page reference from an entered entity reference, so only keep the URL of an entered
+        // value.
+        onSubmit={(url) => onSelected(url)}
       />
 
       {selectedEntityPath && (
@@ -250,4 +185,4 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
       )}
     </Box>
   );
-};
+}

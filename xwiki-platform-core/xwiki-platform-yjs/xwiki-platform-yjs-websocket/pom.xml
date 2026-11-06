@@ -42,6 +42,10 @@
       <artifactId>jakarta.websocket-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-websocket</artifactId>
       <version>${commons.version}</version>

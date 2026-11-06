@@ -20,6 +20,7 @@
 package org.xwiki.web;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -42,6 +43,7 @@ import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -181,6 +183,20 @@ class CreateInlinePageTest extends PageTest
                 provider, allowedSpaces);
         }
         assertEquals(expectedMessage, errormessage.text());
+    }
+
+    @Test
+    void closeButtonHasLabel() throws Exception
+    {
+        // The template only renders the modal, and so its close button, for an AJAX request.
+        this.request = new XWikiServletRequestStub.Builder()
+            .setHeaders(Map.of("X-Requested-With", List.of("XMLHttpRequest"))).build();
+        this.context.setRequest(this.request);
+
+        Document document = Jsoup.parse(this.templateManager.render(CREATE_INLINE_VM));
+        Element closeButton = document.selectFirst(".modal-header button.close");
+        assertNotNull(closeButton);
+        assertEquals("core.modal.close", closeButton.attr("aria-label"));
     }
 
     static Stream<List<String>> allowedSpacesProvider()

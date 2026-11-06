@@ -68,15 +68,19 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -141,28 +145,6 @@ public class TestUtils
      * @since 5.1M1
      */
     public static final XWikiCredentials SUPER_ADMIN_CREDENTIALS = new XWikiCredentials("superadmin", "pass");
-
-    /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT
-        + XWikiExecutor.DEFAULT_CONTEXT + "/";
-
-    /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseBinURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_BIN_URL = BASE_URL + "bin/";
-
-    /**
-     * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
-     */
-    @Deprecated
-    public static final String BASE_REST_URL = BASE_URL + "rest/";
 
     /**
      * @since 7.3M1
@@ -337,6 +319,33 @@ public class TestUtils
     public XWikiWebDriver getDriver()
     {
         return TestUtils.context.getDriver();
+    }
+
+    /**
+     * Resizes the browser window to the specified width, e.g. to display the page as on a small screen, and waits for
+     * the page to be laid out at that width. Call {@link #maximizeBrowserWindow()} afterwards, since the browser is
+     * shared by the tests.
+     *
+     * @param width the width of the browser window, in pixels, which is a bit larger than the width available to the
+     *            page
+     * @since 18.10.0RC1
+     */
+    public void setBrowserWindowWidth(int width)
+    {
+        XWikiWebDriver driver = getDriver();
+        int height = driver.manage().window().getSize().getHeight();
+        driver.manage().window().setSize(new Dimension(width, height));
+        driver.waitUntilCondition(d -> ((Number) driver.executeScript("return window.innerWidth")).intValue() <= width);
+    }
+
+    /**
+     * Restores the size of the browser window after a call to {@link #setBrowserWindowWidth(int)}.
+     *
+     * @since 18.10.0RC1
+     */
+    public void maximizeBrowserWindow()
+    {
+        getDriver().manage().window().maximize();
     }
 
     /**
@@ -2795,6 +2804,31 @@ public class TestUtils
     {
         return this.httpClient.getClient().execute(request,
             this.httpClient.getHttpClientContext(request, getDefaultCredentials()));
+    }
+
+    /**
+     * Submit a form to an action of a document with the HTTP client (so without the browser), using the default
+     * credentials and adding the cached anti-CSRF token to the form fields. Useful for form data too big to be typed
+     * in the browser in a reasonable time or to be passed in the URL of a GET request.
+     *
+     * @param reference the document to submit the form to
+     * @param action the action handling the form (e.g. {@code save})
+     * @param fields the form fields
+     * @return the status code of the response
+     * @throws IOException when failing to execute the request
+     * @since 18.10.0RC1
+     */
+    public int submitForm(EntityReference reference, String action, Map<String, String> fields) throws IOException
+    {
+        List<NameValuePair> parameters = new ArrayList<>();
+        fields.forEach((name, value) -> parameters.add(new BasicNameValuePair(name, value)));
+        parameters.add(new BasicNameValuePair("form_token", getSecretToken()));
+
+        HttpPost request = new HttpPost(getCurrentExecutor().getHttpClientBaseURL() + getPath(reference, action, ""));
+        request.setEntity(new UrlEncodedFormEntity(parameters, StandardCharsets.UTF_8));
+        try (CloseableHttpResponse response = execute(request)) {
+            return response.getCode();
+        }
     }
 
     // REST

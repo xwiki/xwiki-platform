@@ -34,6 +34,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.MessageBoxElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
@@ -290,7 +291,12 @@ class MacroIT extends AbstractCKEditorIT
 
         MacroDialogEditModal macroEditModal =
             this.editor.getToolBar().insertOtherMacro().filterByText("Display other pages", 1).clickSelect();
-        macroEditModal.getMacroParameterSuggestInput("reference").sendKeys("Displayed").selectByIndex(0);
+        // Submitting without the required reference keeps the modal open and gives the focus to the reference picker.
+        macroEditModal.clickSubmit(false);
+        SuggestInputElement referencePicker = macroEditModal.getMacroParameterSuggestInput("reference");
+        assertTrue(referencePicker.hasFocus());
+
+        referencePicker.sendKeys("Displayed").selectByIndex(0);
         macroEditModal.clickSubmit();
         assertThat(this.textArea.getText(), containsString("Displayed page content"));
 

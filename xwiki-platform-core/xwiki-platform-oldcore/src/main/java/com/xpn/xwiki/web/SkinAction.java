@@ -654,6 +654,11 @@ public class SkinAction extends XWikiAction
         response.setDateHeader("Last-Modified", lastChanged.getTime());
         // Cache for one month (30 days)
         response.setHeader("Cache-Control", "public");
+        // Make sure browsers honor the declared content type. Skin scripts and style sheets are served with a
+        // JavaScript or CSS content type (see the mime mappings declared in web.xml), which browsers require for them
+        // when this header is sent.
+        response.setHeader(XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_HEADER,
+            XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_NOSNIFF);
         response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
         setContentLength(response, length);
     }

@@ -82,6 +82,12 @@ const eslintConfig: Config[] = defineConfig([
   importFlatConfigs.recommended,
   pluginPromise.configs["flat/recommended"],
   {
+    rules: {
+      // Prefer async/await over promise chaining.
+      "promise/prefer-await-to-then": "error",
+    },
+  },
+  {
     plugins: {
       tsdoc: eslintPluginTsdoc,
     },

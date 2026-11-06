@@ -52,6 +52,8 @@ public class LightboxPage extends ViewPage
      * @return {@code true} when the page currently displayed in the browser has been rendered with the lightbox
      *     enabled, i.e. when hovering one of its images is expected to display an {@link ImagePopover}
      * @since 18.8.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
      */
     public static boolean isLightboxEnabled()
     {

@@ -139,6 +139,9 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
           isEditable() {
             return true;
           },
+          getPropertyDescriptor(propertyId) {
+            return { id: propertyId };
+          },
           getDisplayerDescriptor() {
             return {
               actions: ["jump", "dance"],

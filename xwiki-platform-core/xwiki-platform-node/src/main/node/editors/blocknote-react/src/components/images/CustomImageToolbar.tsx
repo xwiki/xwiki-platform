@@ -27,11 +27,13 @@ import { assertUnreachable } from "@xwiki/platform-fn-utils";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
+import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { BlockOfType } from "../../blocknote";
 
 type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
+  imageEditionHooks?: ImageEditionHooks;
 };
 
 /**
@@ -58,6 +60,7 @@ type ImageUpdateResult =
 export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   currentBlock,
   imageEditionOverrideFn,
+  imageEditionHooks,
 }) => {
   const Components = useComponentsContext()!;
   const portalElement = usePortalElement();
@@ -114,7 +117,10 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
           className="bn-popover-content bn-form-popover"
           variant="form-popover"
         >
-          <ImageFilePanel currentBlock={currentBlock} />
+          <ImageFilePanel
+            currentBlock={currentBlock}
+            imageEditionHooks={imageEditionHooks}
+          />
         </Components.Generic.Popover.Content>
       </Components.Generic.Popover.Root>
 

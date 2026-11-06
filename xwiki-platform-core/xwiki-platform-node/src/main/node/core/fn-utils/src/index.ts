@@ -264,6 +264,86 @@ function escapeHtml(str: string): string {
   return new XMLSerializer().serializeToString(document.createTextNode(str));
 }
 
+const XML_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+};
+
+/**
+ * Unescape an XML escaped string, i.e. decode its character references and predefined entities
+ *
+ * Invalid character references and unknown entities are kept as they are.
+ *
+ * @param str - The XML escaped string
+ *
+ * @returns - The unescaped string
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+function unescapeXML(str: string): string {
+  return str.replace(
+    /&(?:#(\d+)|#x([\da-f]+)|(amp|lt|gt|quot|apos));/gi,
+    (match, decimal?: string, hexadecimal?: string, name?: string) => {
+      if (name) {
+        return XML_ENTITIES[name.toLowerCase()];
+      }
+      const codePoint = decimal
+        ? Number.parseInt(decimal, 10)
+        : Number.parseInt(hexadecimal!, 16);
+      return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : match;
+    },
+  );
+}
+
+/**
+ * Debounce an async function: the function is called only once no new call was made for `delay`
+ * milliseconds, with the arguments of the last call.
+ *
+ * The calls made while waiting are merged: the promises they returned all settle with the outcome
+ * of that single function call (they never get rejected only because a newer call superseded them).
+ *
+ * @param fn - Function to call (can return a promise)
+ * @param delay - Delay in milliseconds
+ * @returns The debounced function
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+function debounceAsync<Args extends unknown[], R>(
+  fn: (...args: Args) => Promise<R> | R,
+  delay = 100,
+): (...args: Args) => Promise<R> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let waitingCalls: {
+    resolve: (result: R) => void;
+    reject: (reason: unknown) => void;
+  }[] = [];
+
+  return (...args: Args): Promise<R> =>
+    new Promise<R>((resolve, reject) => {
+      clearTimeout(timeoutId);
+      waitingCalls.push({ resolve, reject });
+
+      timeoutId = setTimeout(async () => {
+        // Calls made from now on wait for a new function call.
+        const calls = waitingCalls;
+        waitingCalls = [];
+        timeoutId = undefined;
+
+        try {
+          const result = await fn(...args);
+          calls.forEach((call) => call.resolve(result));
+        } catch (error) {
+          calls.forEach((call) => call.reject(error));
+        }
+      }, delay);
+    });
+}
+
 /**
  * Generic tree structure type.
  * @since 18.0.0RC1
@@ -276,6 +356,7 @@ type TreeNode<T> = T & {
 export {
   assertInArray,
   assertUnreachable,
+  debounceAsync,
   escapeHtml,
   filterMap,
   objectEntries,
@@ -284,6 +365,7 @@ export {
   tryFallible,
   tryFallibleOrError,
   tryFalliblePromiseOrError,
+  unescapeXML,
 };
 
 export type { TreeNode };

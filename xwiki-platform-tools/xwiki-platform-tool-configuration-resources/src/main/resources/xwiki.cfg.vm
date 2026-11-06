@@ -459,6 +459,16 @@ xwiki.plugins=$!xwikiCfgPlugins
 
 xwiki.plugin.image.cache.capacity=30
 
+#-# The compression quality used when an image is resized on the server side (e.g. an image inserted with a width,
+#-# see the "rendering.imageDimensionsIncludedInImageURL" configuration parameter in xwiki.properties) and no "quality"
+#-# parameter is specified in the image URL. The value must be between 0 (lowest quality, smallest file) and 1 (highest
+#-# quality, largest file); values outside this range are clamped. It only has a visible effect on lossy image formats,
+#-# such as JPEG. Increase it if resized images look blurry or show compression artifacts.
+#-# Blur on high-density (HiDPI) screens is better addressed by setting
+#-# "rendering.imageDimensionsIncludedInImageURL" to false in xwiki.properties.
+#-# The default value is 0.5.
+# xwiki.plugin.image.defaultQuality=0.5
+
 #---------------------------------------
 # Watchlist Plugin
 #

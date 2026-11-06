@@ -97,7 +97,8 @@ public class ObjectPropertyResourceImpl extends BaseObjectsResource implements O
     // Needs a lot of parameters to bind path and query parameters
     @SuppressWarnings("checkstyle:ParameterNumber")
     public Response updateObjectProperty(String wikiName, String spaceName, String pageName, String className,
-        Integer objectNumber, String propertyName, Boolean minorRevision, Property property) throws XWikiRestException
+        Integer objectNumber, String propertyName, Boolean minorRevision, String comment, Property property)
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -116,7 +117,7 @@ public class ObjectPropertyResourceImpl extends BaseObjectsResource implements O
 
             xwikiObject.set(propertyName, property.getValue());
 
-            doc.save("", Boolean.TRUE.equals(minorRevision));
+            saveDocument(doc, comment, minorRevision);
 
             BaseObject baseObject = getBaseObject(doc, className, xwikiObject.getNumber());
 

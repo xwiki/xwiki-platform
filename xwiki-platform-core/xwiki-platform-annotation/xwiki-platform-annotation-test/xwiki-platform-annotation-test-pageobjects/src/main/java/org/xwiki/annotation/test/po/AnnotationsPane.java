@@ -120,6 +120,15 @@ public class AnnotationsPane extends BaseElement
     }
 
     /**
+     * @return the element containing the annotation settings, e.g. to take a screenshot of it
+     * @since 18.10.0RC1
+     */
+    public WebElement getContainer()
+    {
+        return getDriver().findElement(PANE_CONTAINER);
+    }
+
+    /**
      * @return {@code true} if the annotation settings pane is displayed, {@code false} otherwise
      * @since 12.10.9
      * @since 13.4.1

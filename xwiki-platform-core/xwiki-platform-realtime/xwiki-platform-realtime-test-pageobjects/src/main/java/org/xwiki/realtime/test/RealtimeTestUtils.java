@@ -30,7 +30,8 @@ import org.xwiki.rest.resources.objects.ObjectPropertyResource;
 import org.xwiki.test.ui.TestUtils;
 
 /**
- * Utility class for Realtime tests.
+ * Utility class for Realtime tests. Note that it applies only to the editors using ChainPad / Netflux for realtime
+ * synchronization (CKEditor, wiki editor).
  *
  * @version $Id$
  * @since 17.7.0RC1

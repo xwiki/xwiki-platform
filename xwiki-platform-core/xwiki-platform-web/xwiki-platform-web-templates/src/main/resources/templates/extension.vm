@@ -1056,7 +1056,10 @@ $namespace##
               </span>
             </$supporterElementName>
           #else
-            <$supporterElementName class="supporter support-multi-plan dropdown">
+            ## The supporter element holds the support plans dialog, which contains block content (heading, flex
+            ## container), so it must be a div even when the supporters are displayed inline (a span can only hold
+            ## phrasing content). The inline display is then obtained through CSS.
+            <div class="supporter support-multi-plan dropdown#if (!$supporterList) supporter-inline#end">
               <button class="supporter-name support-multi-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 $escapetool.xml($extensionSupporter.name)
                 <span class="caret"></span>
@@ -1072,7 +1075,7 @@ $namespace##
                   #end
                 </div>
               </div>
-            </$supporterElementName>
+            </div>
           #end
         #end
       </div>

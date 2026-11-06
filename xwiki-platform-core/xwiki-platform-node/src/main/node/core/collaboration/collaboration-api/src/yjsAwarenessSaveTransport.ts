@@ -130,25 +130,14 @@ class YjsAwarenessSaveTransport<
   }
 
   public override async toBeReady(): Promise<void> {
-    if (!this.provider.wsconnected) {
-      await new Promise<void>((resolve) => {
-        const onStatus = ({ status }: { status: string }): void => {
-          if (status === "connected") {
-            this.provider.off("status", onStatus);
-            resolve();
-          }
-        };
-        this.provider.on("status", onStatus);
-        this.revertList.push(() => {
-          this.provider.off("status", onStatus);
-        });
-      });
-    }
-
     // Let the other clients know that we joined the save election. Note that awareness has no counterpart to the
     // document synchronization event, so we cannot tell whether we already know every other client's state at this
     // point. It doesn't matter: the states of the room reach us right after we join, which is orders of magnitude
     // before the first save election.
+    //
+    // We don't wait for the connection: the user must be able to save (and the content must be auto-saved) even if
+    // the connection to the collaboration server can't be established. The provider broadcasts our awareness state
+    // each time it connects, so the other clients learn about our saver state as soon as we join them.
     await this.updateLocalState({}, { push: true });
   }
 

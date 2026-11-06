@@ -250,6 +250,11 @@ public class UpgradeTest extends AbstractTest
         // Make sure it's possible to create a page with 768 characters in the reference
         getUtil().rest()
             .savePage(new LocalDocumentReference("Upgrade", StringUtils.repeat("a", 768 - "Upgrade".length() - 1)));
+        // TODO: Remove once XWIKI-18536 (Data too long for column 'nfp_page_only' error when saving a page with 768
+        // characters when it must be added as a filter preference) is fixed. When the page is automatically watched,
+        // its reference is stored with the wiki prefix, which doesn't fit in the 768 characters of the column.
+        validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "right truncation ; size limit: 768 table: NOTIFICATION_FILTER_PREFS column: NFP_PAGE_ONLY");
 
         // Make sure the 'meta' field is set to the empty field by R170400000XWIKI23160DataMigrationTest
         assertEquals("",

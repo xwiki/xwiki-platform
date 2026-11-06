@@ -246,6 +246,9 @@ $xwiki.getUserName("xwiki:${username}")
  *                    // are "small-avatar"/"medium-avatar"/"large-avatar" for the size and "circle-avatar"
  *                    // for a fully rounded avatar
  *   displayName: true // @since 18.9.0RC1 ; whether to visually display the name
+ *   disabled: false // @since 18.10.0RC1 whether the user is disabled or not; disabled users are displayed distinctly
+ *   aliasAsName: false // @since 18.10.0RC1 ; whether to display the user alias, i.e. the name of the user page,
+ *                      // instead of the user full name
  * }
  *#
 #macro (displayUser $arg $options)
@@ -264,7 +267,9 @@ $xwiki.getUserName("xwiki:${username}")
     'wrapAvatar': false,
     'displayLink': true,
     'avatarClass': '',
-    'displayName': true
+    'displayName': true,
+    'disabled': false,
+    'aliasAsName': false
   })
   #if ($options.entrySet())
     #set ($discard = $macro.options.putAll($options))
@@ -291,30 +296,35 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($userAlias = $userReference.lastSpaceReference.name)
     #end
     #set ($userDocument = $xwiki.getDocument($userReference))
+    ## Keep the type in the macro scope: the skin calls this macro before rendering the page content, and a global
+    ## $type would be seen by that content (e.g. the property displayers, for which $type is the display mode).
     #if ($userDocument.getObject('XWiki.XWikiGroups'))
-      #set ($type = 'group')
+      #set ($macro.type = 'group')
       #set ($userName = $userDocument.plainTitle)
       #if ("$!userName" == '')
         #set ($userName = $userAlias)
       #end
     #else
-      #set ($type = 'user')
+      #set ($macro.type = 'user')
       #set ($userName = $xwiki.getPlainUserName($userReference))
     #end
-    #set ($discard = $types.add("${type}s"))
+    #if ($macro.options.aliasAsName)
+      #set ($userName = $userAlias)
+    #end
+    #set ($discard = $types.add("${macro.type}s"))
     #set ($userAliasDisplay = '')
     #if ($macro.options.showAlias && $userAlias != $userName)
-      #set ($userAliasDisplay = " <span class=""${type}-alias"">(" + $escapetool.xml($userAlias) + ')</span>')
+      #set ($userAliasDisplay = " <span class=""${macro.type}-alias"">(" + $escapetool.xml($userAlias) + ')</span>')
     #end
     #set ($escapedUserName = $escapetool.xml($userName))
     #getUserAvatarURL($userReference $avatarURL 120)
     #set ($avatarWrapperStart = '')
     #set ($avatarWrapperEnd = '')
     #if ($macro.options.wrapAvatar)
-      #set ($avatarWrapperStart = "<span class=""${type}-avatar-wrapper"">")
+      #set ($avatarWrapperStart = "<span class=""${macro.type}-avatar-wrapper"">")
       #set ($avatarWrapperEnd = '</span>')
     #end
-    #set ($avatarClass = "${type}-avatar")
+    #set ($avatarClass = "${macro.type}-avatar")
     #if ("$!macro.options.avatarClass" != '')
       #set ($avatarClass = "$avatarClass $macro.options.avatarClass")
     #end
@@ -333,16 +343,20 @@ $xwiki.getUserName("xwiki:${username}")
       #end
       #set ($displayedUserName = "<span class=""sr-only"">$accessibleUserName</span>")
     #end
-    #set($userNameTagAttributes = "class=""${type}-name""")
+    #set($userNameTagAttributes = "class=""${macro.type}-name""")
     #if ($macro.options.displayLink)
       #set($userNameTag = 'a')
       #set($userNameTagAttributes = "$userNameTagAttributes href=""$escapetool.xml($xwiki.getURL($userReference))""")
     #else
       #set($userNameTag = 'span')
     #end
+    #set($userClasses = $macro.type)
+    #if($macro.options.disabled)
+      #set($userClasses = "${userClasses} disabled")
+    #end
     ## We avoid the whitespace because the users are displayed as inline blocks.
     #set ($discard = $output.addAll([
-      "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
+      "<$userTag class=""$escapetool.xml($userClasses)"" data-reference=""$escapetool.xml($userReference)"">",
         "<$userNameTag $userNameTagAttributes>",
         $avatarWrapperStart,
           "<img class=""$escapetool.xml($avatarClass)""$avatarExtraAttributes src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
@@ -373,6 +387,14 @@ $xwiki.getUserName("xwiki:${username}")
  *#
 #macro (displayGroup $arg $options)
   #displayUser($arg $options)
+#end
+
+#**
+ * Utility macro used to display users in a specific way in a couple of places in XWiki Standard.
+ * This is not an API, avoid relying on it.
+ *#
+#macro (_displayUserAliasWithAvatar $userReference $disabled)
+  #displayUser($userReference {'useInlineHTML': true, 'wrapAvatar': true, 'disabled': $disabled, 'aliasAsName': true})
 #end
 
 
@@ -2740,6 +2762,46 @@ $string##
 #end
 
 #**
+* Pulls all the JavaScript and CSS resources needed by the space picker.
+*
+* @since 18.9.0RC1
+*#
+#macro (spacePicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestSpaces.js'))
+#end
+
+#**
+* Outputs a suggest input for picking one or more spaces. The value of the input is the serialized space reference,
+* relative to the wiki of the document where the value is saved, or the list of such references when multiple selection
+* is enabled.
+*
+* @param $parameters the parameters, most of them being output as HTML attributes of the suggest input:
+*   'name' the name of the form field holding the value;
+*   'value' the initially selected spaces, as serialized space references;
+*   'multiple' set it to 'multiple' to allow selecting more than one space;
+*   'data-document-reference' the document where the value is saved, defaults to the current document;
+*   'data-search-scope' where to look for spaces, either 'wiki:wikiName' or 'space:spaceReference', defaults to the
+*     current wiki
+* @since 18.9.0RC1
+*#
+#macro (spacePicker $parameters)
+  #spacePicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-spaces"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.spacePicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.spacePicker.single.title')))
+  #end
+  #suggestInput($parameters)
+#end
+
+#**
 * Pulls all the JavaScript and CSS resources needed by the attachment picker.
 *#
 #macro (attachmentPicker_import)
@@ -3072,8 +3134,16 @@ Recursive title display detected!##
   #set ($discard = $response.writer.print($data))
   ## The content length is measured in bytes and one character can use more than one byte.
   #set ($discard = $response.setContentLength($data.getBytes($characterEncoding).size()))
-  ## Make sure the entire content is sent back to the client.
-  #set ($discard = $response.flushBuffer())
+  ## Make sure the entire content is sent back to the client. This fails when the client closed the connection in the
+  ## meantime (e.g. the user left the page, cancelling the request): there's nothing more to do then, and it's not an
+  ## error of the server.
+  #try ('rawResponseException')
+    #set ($discard = $response.flushBuffer())
+  #end
+  #if ($rawResponseException)
+    #set ($discard = $services.logging.getLogger('macros.vm').debug(
+      'Failed to send the response, the connection was probably closed by the client.', $rawResponseException))
+  #end
   ## Make sure XWiki doesn't write any more content to the response.
   #set ($discard = $xcontext.setFinished(true))
 #end

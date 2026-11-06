@@ -26,6 +26,7 @@
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "cross-env": "catalog:",
+    "esbuild": "catalog:",
     "eslint": "catalog:",
     "npm-run-all": "catalog:",
     "typescript": "catalog:",

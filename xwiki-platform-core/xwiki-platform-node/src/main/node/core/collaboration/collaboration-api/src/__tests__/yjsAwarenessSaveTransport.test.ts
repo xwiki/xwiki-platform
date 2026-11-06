@@ -308,14 +308,10 @@ describe("YjsAwarenessSaveTransport", () => {
   });
 
   describe("session lifecycle", () => {
-    it("waits for the connection then publishes the initial state", async () => {
+    it("publishes the initial state without waiting for the connection", async () => {
       client.provider.wsconnected = false;
-      const ready = transport.toBeReady();
 
-      expect(getPublishedState()).toBeUndefined();
-      client.provider.wsconnected = true;
-      client.provider.emitStatus("connected");
-      await ready;
+      await transport.toBeReady();
 
       expect(getPublishedState()).toBeDefined();
     });

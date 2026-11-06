@@ -23,9 +23,9 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteLinkModal;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
-import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -76,9 +76,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first second third", "");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
@@ -104,8 +104,8 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar (we can't click the link
@@ -131,9 +131,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first second third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
@@ -164,9 +164,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal,
@@ -202,9 +202,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first second third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
@@ -242,9 +242,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first second third", "");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
@@ -274,9 +274,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first second third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
@@ -302,9 +302,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
@@ -329,9 +329,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
@@ -370,9 +370,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.createPage(testReference,
             "first [[second>>doc:%s]] third".formatted(setup.serializeReference(oldTargetPage)));
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
@@ -412,9 +412,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.createPage(testReference,
             "first [[second>>attach:%s@%s]] third".formatted(setup.serializeReference(oldTargetPage), attachmentName));
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
@@ -443,9 +443,9 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first [[second>>mailto:second@xwiki.org]] third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
 
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
@@ -473,8 +473,8 @@ class LinkIT extends AbstractBlockNoteIT
         // labels that are not modified are not persisted.
         setup.createPage(testReference, "one [[Users.Alice]] two [[Users.Bob]] three");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Place the caret after the first link.
@@ -504,8 +504,8 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "first [[second>>doc:Users.Alice||class=\"foo\"]] third");
 
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
-        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal

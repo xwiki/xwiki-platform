@@ -37,7 +37,7 @@ public class RegistrationPage extends AbstractRegistrationPage
     /** The locator of the message displayed when the registration succeeds. */
     private static final By SUCCESS_MESSAGE_LOCATOR = By.xpath(
         "//*[(contains(@class, 'infomessage') or contains(@class, 'registration-success-headline')) and "
-            + "(contains(., 'Registration successful.') or contains(., 'Welcome '))]");
+            + "(contains(., 'Registration successful.') or contains(., 'Welcome, '))]");
 
     /** The locator of a server-side error (e.g. the user already exists on a closed wiki). */
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector("div.errormessage");

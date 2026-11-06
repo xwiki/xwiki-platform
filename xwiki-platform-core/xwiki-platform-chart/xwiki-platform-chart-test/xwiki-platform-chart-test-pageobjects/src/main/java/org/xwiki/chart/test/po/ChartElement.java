@@ -67,4 +67,39 @@ public class ChartElement extends BaseElement
     {
         return this.image.getDomAttribute("alt");
     }
+
+    /**
+     * Waits for the browser to finish loading the chart image, successfully or not.
+     *
+     * @return {@code true} if the chart image has been loaded, {@code false} if it failed to load
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     * @since 16.10.20
+     */
+    public boolean isImageLoaded()
+    {
+        getDriver().waitUntilJavascriptCondition("return arguments[0].complete", this.image);
+        return Boolean.TRUE.equals(getDriver().executeScript("return arguments[0].naturalWidth > 0", this.image));
+    }
+
+    /**
+     * Opens the chart image in the browser, as a user would by following a link to it. This leaves the current page,
+     * so this chart element can't be used anymore afterwards.
+     *
+     * @return {@code true} if the browser displays the chart image, {@code false} otherwise (e.g. if it displays an
+     *         error page instead)
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     * @since 16.10.20
+     */
+    public boolean openImage()
+    {
+        getUtil().gotoPage(this.image.getDomProperty("src"));
+        return Boolean.TRUE.equals(getDriver().executeScript("""
+            const image = document.images[0];
+            return document.contentType.startsWith('image/') && image?.complete && image.naturalWidth > 0;
+            """));
+    }
 }

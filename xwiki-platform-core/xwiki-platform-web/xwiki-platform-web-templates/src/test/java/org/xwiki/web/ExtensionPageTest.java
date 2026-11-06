@@ -19,15 +19,27 @@
  */
 package org.xwiki.web;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
+import javax.script.ScriptContext;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.extension.DefaultExtensionSupportPlan;
+import org.xwiki.extension.DefaultExtensionSupportPlans;
+import org.xwiki.extension.DefaultExtensionSupporter;
+import org.xwiki.extension.ExtensionSupporter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.template.script.TemplateScriptService;
@@ -41,6 +53,9 @@ import org.xwiki.xml.html.script.HTMLScriptService;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -158,6 +173,75 @@ class ExtensionPageTest extends PageTest
             .parseToSafeURI(backURL);
 
         assertEquals(DEFAULT_BACK_URL, getBackURL());
+    }
+
+    @Test
+    void displayInlineSupportPlansWithValidHTML() throws Exception
+    {
+        Document document = renderSupportPlans(false);
+
+        // A span can only hold phrasing content, so the support plans dialog (which holds a heading and a div) must not
+        // be put inside a span, even when the supporters are displayed inline.
+        assertTrue(document.select(".supporter-listing span :is(div, h4)").isEmpty());
+        Element multiPlanSupporter = assertMultiPlanSupporter(document);
+        assertTrue(multiPlanSupporter.hasClass("supporter-inline"));
+        assertEquals("span", document.selectFirst(".supporter.support-single-plan").tagName());
+    }
+
+    @Test
+    void displayListedSupportPlansWithValidHTML() throws Exception
+    {
+        Document document = renderSupportPlans(true);
+
+        assertTrue(document.select(".supporter-listing span :is(div, h4)").isEmpty());
+        Element multiPlanSupporter = assertMultiPlanSupporter(document);
+        assertFalse(multiPlanSupporter.hasClass("supporter-inline"));
+        assertEquals("div", document.selectFirst(".supporter.support-single-plan").tagName());
+    }
+
+    private Element assertMultiPlanSupporter(Document document)
+    {
+        Element multiPlanSupporter = document.selectFirst(".supporter.support-multi-plan");
+        assertNotNull(multiPlanSupporter);
+        assertEquals("div", multiPlanSupporter.tagName());
+        Element supportDialog = multiPlanSupporter.selectFirst("> .support-dialog.dropdown-menu");
+        assertNotNull(supportDialog);
+        assertNotNull(supportDialog.selectFirst("> h4"));
+        assertEquals(2, supportDialog.select(".support-flex > .plan-name").size());
+        return multiPlanSupporter;
+    }
+
+    private Document renderSupportPlans(boolean supporterList) throws Exception
+    {
+        ExtensionSupporter multiPlanSupporter =
+            new DefaultExtensionSupporter("Multi Supporter", toURL("https://multi.example.org/"));
+        ExtensionSupporter singlePlanSupporter =
+            new DefaultExtensionSupporter("Single Supporter", toURL("https://single.example.org/"));
+        DefaultExtensionSupportPlans supportPlans = new DefaultExtensionSupportPlans(List.of(
+            new DefaultExtensionSupportPlan(multiPlanSupporter, "Basic", toURL("https://multi.example.org/basic"),
+                false),
+            new DefaultExtensionSupportPlan(multiPlanSupporter, "Gold", toURL("https://multi.example.org/gold"), true),
+            new DefaultExtensionSupportPlan(singlePlanSupporter, "Community",
+                toURL("https://single.example.org/community"), false)));
+
+        ScriptContext scriptContext =
+            this.componentManager.<ScriptContextManager>getInstance(ScriptContextManager.class)
+                .getCurrentScriptContext();
+        scriptContext.setAttribute("supportPlans", supportPlans, ScriptContext.ENGINE_SCOPE);
+        scriptContext.setAttribute("supporterList", supporterList, ScriptContext.ENGINE_SCOPE);
+
+        this.currentDocument.setContent("""
+            {{velocity}}
+            #template('extension.vm')
+            {{html clean="false"}}#displayExtensionSupportPlans($supportPlans $supporterList){{/html}}
+            {{/velocity}}""");
+        this.currentDocument.setSyntax(Syntax.XWIKI_2_1);
+        return Jsoup.parse(this.currentDocument.getRenderedContent(this.context));
+    }
+
+    private static URL toURL(String url) throws MalformedURLException
+    {
+        return URI.create(url).toURL();
     }
 
     private String getBackURL() throws Exception

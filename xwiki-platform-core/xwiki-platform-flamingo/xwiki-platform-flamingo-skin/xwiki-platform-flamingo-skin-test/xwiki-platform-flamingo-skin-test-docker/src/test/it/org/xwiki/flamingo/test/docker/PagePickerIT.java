@@ -114,8 +114,8 @@ class PagePickerIT
         String pageName = reference.getLastSpaceReference().getName();
 
         String title = "École hôtelière";
-        setup.rest().savePage(new DocumentReference("ÄhmTöst", reference.getLastSpaceReference()), "Content",
-            title);
+        DocumentReference documentReference = new DocumentReference("ÄhmTöst", reference.getLastSpaceReference());
+        setup.rest().savePage(documentReference, "Content", title);
 
         setup.rest().delete(reference);
         setup.createPage(reference, String.format(PICKER_TEMPLATE, PICKER_ID), pageName);
@@ -123,9 +123,15 @@ class PagePickerIT
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
 
+        // The picker suggests matching pages from the whole wiki, including the ones created by other tests, so we
+        // ignore the suggestions located outside the test space.
+        String testSpacePrefix = setup.serializeLocalReference(reference.getLastSpaceReference()) + '.';
         List<SuggestInputElement.SuggestionElement> suggestions =
-            pagePicker.sendKeys(searchText).waitForNonTypedSuggestions().getSuggestions();
-        assertEquals(1, suggestions.size(), "Didn't find anything searching for %s".formatted(searchText));
+            pagePicker.sendKeys(searchText).waitForNonTypedSuggestions().getSuggestions().stream()
+                .filter(suggestion -> suggestion.getValue().startsWith(testSpacePrefix)).toList();
+        assertEquals(List.of(setup.serializeLocalReference(documentReference)),
+            suggestions.stream().map(SuggestInputElement.SuggestionElement::getValue).toList(),
+            "Didn't find the page searching for %s".formatted(searchText));
         assertEquals(title, suggestions.get(0).getLabel());
     }
 }

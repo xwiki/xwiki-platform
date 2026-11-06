@@ -198,7 +198,7 @@ class LiveTableLiveDataEntryStoreTest
     void saveNewEntry() throws Exception
     {
         DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "uuid");
-        when(this.namingStrategy.generate(any())).thenReturn(newReference);
+        when(this.namingStrategy.generate(any(), any())).thenReturn(newReference);
         when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.uuid");
 
         this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
@@ -206,6 +206,38 @@ class LiveTableLiveDataEntryStoreTest
 
         assertEquals(Optional.of("NewEntries.uuid"), this.entryStore.save(entry));
         verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true);
+        // The naming strategy can name the entry after the values it is created with.
+        verify(this.namingStrategy).generate(this.entryStore.getParameters(), entry);
+    }
+
+    @Test
+    void saveNewEntryWithMandatoryProperties() throws Exception
+    {
+        DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "My entry");
+        when(this.namingStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title"));
+        when(this.namingStrategy.generate(any(), any())).thenReturn(newReference);
+        when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.My entry");
+
+        this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("doc.title", "My entry");
+
+        assertEquals(Optional.of("NewEntries.My entry"), this.entryStore.save(entry));
+        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true);
+    }
+
+    @Test
+    void saveNewEntryWithBlankMandatoryProperty()
+    {
+        when(this.namingStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title", "status"));
+
+        this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("doc.title", " ");
+
+        LiveDataException exception = assertThrows(LiveDataException.class, () -> this.entryStore.save(entry));
+        assertEquals("Cannot create an entry without a value for [doc.title, status].", exception.getMessage());
+        verifyNoInteractions(this.modelBridge);
     }
 
     @Test

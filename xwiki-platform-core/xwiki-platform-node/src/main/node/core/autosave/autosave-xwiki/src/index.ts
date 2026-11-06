@@ -23,5 +23,6 @@ export type { XWikiFormSaveTargetConfig } from "./XWikiFormSaveTarget";
 export type {
   DocumentVersion,
   DocumentVersionAuthor,
+  XWikiFormSaveAction,
   XWikiFormSaveContext,
 } from "./types";

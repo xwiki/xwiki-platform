@@ -192,10 +192,12 @@ export default {
       this.$refs.selectPropertiesNone.selected = true;
     },
     // Event handler called when sort entries are dragged and dropped
-    reorderSorts(e) {
-      this.logic
-        .reorderSort(e.moved.element.property, e.moved.newIndex)
-        .catch((err) => console.warn(err));
+    async reorderSorts(e) {
+      try {
+        this.logic.reorderSort(e.moved.element.property, e.moved.newIndex);
+      } catch (err) {
+        console.warn(err);
+      }
     },
   },
 };

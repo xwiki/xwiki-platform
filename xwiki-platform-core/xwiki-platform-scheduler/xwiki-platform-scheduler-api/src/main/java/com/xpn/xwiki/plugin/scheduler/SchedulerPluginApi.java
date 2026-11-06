@@ -107,25 +107,42 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      * This function allow to retrieve a com.xpn.xwiki.objects.BaseObject from a com.xpn.xwiki.api.Object without that
      * the current user needs programming rights (as in com.xpn.xwiki.api.Object#getXWikiObject(). The function is used
      * internally by this api class and allows wiki users to call methods from the scheduler without having programming
-     * right. The programming right is only needed at script execution time.
-     * 
+     * right. The programming right is only needed at script execution time. The message of the exception thrown when
+     * the object cannot be retrieved is pushed in the context, so that the callers don't need to do it.
+     *
      * @return object the unwrapped version of the passed api object
      */
     private BaseObject retrieveBaseObject(Object object) throws SchedulerPluginException
     {
         BaseObjectReference reference = object.getReference();
 
+        BaseObject baseObject;
         try {
             XWikiDocument jobHolder = this.context.getWiki().getDocument(reference, this.context);
 
             // Avoid modifying the cache document
             jobHolder = jobHolder.clone();
 
-            return jobHolder.getXObject(reference);
+            baseObject = jobHolder.getXObject(reference);
         } catch (XWikiException e) {
-            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB,
-                "Job with reference [" + reference + "] could not be retrieved.", e);
+            throw pushError(
+                new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB,
+                    "Job with reference [" + reference + "] could not be retrieved.", e));
         }
+
+        if (baseObject == null) {
+            throw pushError(
+                new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB,
+                    "Job with reference [" + reference + "] could not be found."));
+        }
+
+        return baseObject;
+    }
+
+    private SchedulerPluginException pushError(SchedulerPluginException exception)
+    {
+        this.context.put(ERROR, exception.getMessage());
+        return exception;
     }
 
     /**

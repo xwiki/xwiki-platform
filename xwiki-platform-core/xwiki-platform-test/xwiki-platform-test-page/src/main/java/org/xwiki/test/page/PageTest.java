@@ -59,7 +59,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.test.MockitoOldcore;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
@@ -164,7 +163,7 @@ public class PageTest
 
     /**
      * Set up of Components after the Components declared in {@link org.xwiki.test.annotation.ComponentList} have been
-     * handled but before {@link MockitoOldcoreRule#before(Class)} has been called (i.e. before it has created Mocks
+     * handled but before {@link MockitoOldcore#before(Class)} has been called (i.e. before it has created Mocks
      * and configured Components).
      *
      * @param componentManager the component manager

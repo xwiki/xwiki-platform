@@ -247,9 +247,22 @@ define('xwiki-realtime-wikiEditor', [
     }
 
     async resetContent() {
-      const data = await $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'})));
-      this.hideChangesFromSaver(this.setValueWithCursor.bind(this, data.content));
+      const savedContent = await this.getSavedContent();
+      this.hideChangesFromSaver(this.setValueWithCursor.bind(this, savedContent));
       this.onLocal();
+    }
+
+    async getSavedContent() {
+      try {
+        const data = await $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'})));
+        return data.content;
+      } catch (error) {
+        if (error?.status === 404) {
+          // The edited document was never saved.
+          return '';
+        }
+        throw error;
+      }
     }
 
     hideChangesFromSaver(task) {
@@ -401,12 +414,48 @@ define('xwiki-realtime-wikiEditor', [
 
     async beforeReconnecting(callback) {
       try {
+        const oldChannel = this.channel;
         await this.updateKeys();
-        callback(this.channel, this.editor.getValue());
+        if (this.channel === oldChannel) {
+          // The channel used before the WebSocket connection closed is still available so we can continue to use it.
+          callback(this.channel, this.editor.getValue());
+        } else {
+          await this.restartRealtimeSync();
+        }
       } catch (error) {
         // We failed to fetch the channels (e.g. because the user session has expired).
         this.onRealtimeError(error);
       }
+    }
+
+    /**
+     * Called when the channel used before the WebSocket connection closed is not available anymore (it was removed
+     * because we were the only one using it). ChainPad-Netflux would join the new channel using the same ChainPad
+     * instance, whose history exists only in the removed channel, so the users joining the new channel would get an
+     * empty history: they wouldn't see our content and would ignore our next changes, whose parent they don't know.
+     * We start a new realtime synchronization instead. Its initial state is the saved content, i.e. the content the
+     * users joining after us start with, because ChainPad requires all the users to have the same initial state (and
+     * it sends the initial state only along with the first change). Our content, which may have unsaved changes, is
+     * recorded as a local change before the channel history is received, so that ChainPad merges it with the changes
+     * made by the users that joined the new channel before us, if any.
+     */
+    async restartRealtimeSync() {
+      const initialState = this.canonicalize(await this.getSavedContent() || '');
+      try {
+        this.realtimeInput.stop();
+      } catch (error) {
+        // The WebSocket connection used by the previous realtime synchronization is already closed.
+        console.debug('Failed to stop the previous realtime synchronization.', error);
+      }
+      this.realtimeInput = ChainPadNetflux.start({
+        ...this.getRealtimeOptions(),
+        initialState,
+        onInit: info => {
+          this.onInit(info);
+          // Called before the channel history is requested.
+          info.realtime.contentUpdate(this.canonicalize(this.editor.getValue()));
+        }
+      });
     }
 
     onConnectionChange(info) {

@@ -163,9 +163,12 @@ export class EditBusService {
   save(entry: Values, propertyId: string, content: unknown) {
     this.saveEvent(entry, propertyId);
     // A new row only gets an id once the save creating its entry is done, so the id is read here, not when queueing.
-    this.runningSave = this.runningSave.then(() =>
-      this._save(this.logic.getEntryId(entry) as string, content),
-    );
+    const previousSave = this.runningSave;
+    // Chain on the previous save so that saves run one at a time.
+    this.runningSave = (async () => {
+      await previousSave;
+      await this._save(this.logic.getEntryId(entry) as string, content);
+    })();
     return this.runningSave;
   }
 

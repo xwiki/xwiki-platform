@@ -26,6 +26,7 @@ ctx: ContextForMacros;
 editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
 }, {
 getContent: () => BlockType[];
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
@@ -41,6 +42,7 @@ ctx: ContextForMacros;
 editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: BlockType[]) => any) | undefined;

@@ -202,6 +202,14 @@ interface XWikiGlobal {
   docsyntax: string;
 
   /**
+   * The edit mode in use, e.g. `wysiwyg`, or an empty string when the page is not being edited. The in-place editor
+   * resets it when it switches back to view mode.
+   *
+   * @since 18.9.0RC1
+   */
+  editor?: string;
+
+  /**
    * The behaviour of the save buttons. Available only in edit mode.
    */
   actionButtons?: {
@@ -214,10 +222,17 @@ interface XWikiGlobal {
    * @since 18.9.0RC1
    */
   widgets: {
-    Notification: new (
+    Notification: (new (
       text: string,
       type?: LegacyNotificationType,
-    ) => LegacyNotification;
+    ) => LegacyNotification) & {
+      /**
+       * Displays a notification, the preferred alternative to the constructor.
+       *
+       * @since 18.10.0RC1
+       */
+      show(text: string, type?: LegacyNotificationType): LegacyNotification;
+    };
 
     /**
      * Displays a modal dialog asking the user to confirm, as soon as it is created.

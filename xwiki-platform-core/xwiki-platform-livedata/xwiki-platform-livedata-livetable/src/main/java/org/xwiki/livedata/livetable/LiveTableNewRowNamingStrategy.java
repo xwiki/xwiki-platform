@@ -21,6 +21,7 @@ package org.xwiki.livedata.livetable;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.livedata.LiveDataException;
@@ -44,11 +45,14 @@ public interface LiveTableNewRowNamingStrategy
      * Generates a document reference for a new livetable entry.
      *
      * @param parameters the livedata source parameters
+     * @param entryValues the values the entry is created with, by live data property id
      * @return the generated document reference
      * @throws LiveDataException if the reference cannot be generated
      * @throws XWikiException if there is a wiki-level error
+     * @since 18.10.0RC1
      */
-    DocumentReference generate(Map<String, Object> parameters) throws LiveDataException, XWikiException;
+    DocumentReference generate(Map<String, Object> parameters, Map<String, Object> entryValues)
+        throws LiveDataException, XWikiException;
 
     /**
      * Checks if the current user is allowed to create a new entry based on the provided source parameters.
@@ -69,5 +73,17 @@ public interface LiveTableNewRowNamingStrategy
     default Optional<SpaceReference> getNewEntryLocation(Map<String, Object> parameters)
     {
         return Optional.empty();
+    }
+
+    /**
+     * Returns the properties this strategy needs a value for, which no entry can be created without.
+     *
+     * @param parameters the live data source parameters
+     * @return the live data ids of the properties that must hold a value, empty when the strategy needs none
+     * @since 18.10.0RC1
+     */
+    default Set<String> getMandatoryProperties(Map<String, Object> parameters)
+    {
+        return Set.of();
     }
 }

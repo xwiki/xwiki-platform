@@ -82,4 +82,17 @@ public class BaseObjectsResource extends XWikiResource
         // XWikiDocument#getXObjects return internal list so we make sure to return a safe one
         return xwikiObjects != null ? new ArrayList<>(xwikiObjects) : Collections.emptyList();
     }
+
+    /**
+     * Saves the document modified by an object write request, creating a new page version.
+     *
+     * @param doc the document to save
+     * @param comment the comment of the created page version, or {@code null} for an empty comment
+     * @param minorRevision {@code true} to create a minor version, {@code null} or {@code false} for a major one
+     * @throws XWikiException if saving the document fails
+     */
+    protected void saveDocument(Document doc, String comment, Boolean minorRevision) throws XWikiException
+    {
+        doc.save(comment != null ? comment : "", Boolean.TRUE.equals(minorRevision));
+    }
 }

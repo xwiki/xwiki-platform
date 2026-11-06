@@ -24,7 +24,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test of {@link RangeObject}.
@@ -58,6 +60,18 @@ class RangeObjectTest
         eventObject.setLastAffected("last");
         this.rangeObject.setEvents(List.of(new EventObject(), new EventObject(), eventObject));
         assertEquals("last", this.rangeObject.getEnd());
+        assertTrue(this.rangeObject.isEndInclusive());
+    }
+
+    @Test
+    void isEndInclusiveWithFixed()
+    {
+        EventObject fixed = new EventObject();
+        fixed.setFixed("fix");
+        EventObject lastAffected = new EventObject();
+        lastAffected.setLastAffected("last");
+        this.rangeObject.setEvents(List.of(lastAffected, fixed));
+        assertFalse(this.rangeObject.isEndInclusive());
     }
 
 }

@@ -140,16 +140,15 @@ export class XWikiLiveDataSource implements LiveDataSource {
     );
   }
 
-  addEntry(source: Source, values: unknown): Promise<Values | undefined> {
-    return Promise.resolve(
-      this.$.ajax({
-        type: "POST",
-        url: this.getEntriesURL(source),
-        contentType: "application/json",
-        dataType: "json",
-        data: JSON.stringify({ values }),
-      }),
-    ).then((newEntry) => newEntry?.values);
+  async addEntry(source: Source, values: unknown): Promise<Values | undefined> {
+    const newEntry = await this.$.ajax({
+      type: "POST",
+      url: this.getEntriesURL(source),
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify({ values }),
+    });
+    return newEntry?.values;
   }
 
   async removeEntry(source: Source, entryId: string): Promise<void> {

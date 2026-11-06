@@ -1243,6 +1243,22 @@ class ImageIT extends AbstractCKEditorIT
         assertEquals("Proudly Powered by XWiki", viewPage.getContent());
     }
 
+    @Test
+    @Order(28)
+    void dropWebPImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        loginStandardUser(setup);
+        WYSIWYGEditPage editPage = edit(setup, testReference);
+
+        // Dropping a WebP image uploads it as an attachment and inserts it as an image (not as a link).
+        this.textArea.dropFile("/image.webp");
+        assertSourceEquals("[[image:image.webp]]");
+
+        editPage.clickSaveAndView();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("image.webp"));
+    }
+
     /**
      * Initialize a page with some HTML content and then, copy its displayed content to the clipboard.
      *

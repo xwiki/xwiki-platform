@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.test;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +60,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ObjectsResourceIT extends AbstractHttpIT
 {
+    private static final String COMMENT_PARAMETER = "comment";
+
     private String wikiName;
 
     private List<String> spaces;
@@ -143,6 +147,15 @@ class ObjectsResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getCode(), getHttpResponseInfo(getMethod));
     }
 
+    private Page getTestPage() throws Exception
+    {
+        CloseableHttpResponse getMethod =
+            executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
+
+        return (Page) unmarshaller.unmarshal(getMethod.getEntity().getContent());
+    }
+
     private Property getProperty(Object object, String propertyName)
     {
         for (Property property : object.getProperties()) {
@@ -166,14 +179,17 @@ class ObjectsResourceIT extends AbstractHttpIT
         object.setClassName("XWiki.TagClass");
         object.getProperties().add(property);
 
-        CloseableHttpResponse postMethod =
-            executePostXml(buildURI(ObjectsResource.class, getWiki(), this.spaces, this.pageName).toString(), object,
-                TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        String comment = "Added a tag";
+        CloseableHttpResponse postMethod = executePostXml(
+            buildURI(ObjectsResource.class, List.of(getWiki(), this.spaces, this.pageName),
+                Map.of(COMMENT_PARAMETER, comment)),
+            object, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
         assertEquals(HttpStatus.SC_CREATED, postMethod.getCode(), getHttpResponseInfo(postMethod));
 
         object = (Object) unmarshaller.unmarshal(postMethod.getEntity().getContent());
 
         assertEquals(TAG_VALUE, getProperty(object, "tags").getValue());
+        assertEquals(comment, getTestPage().getComment());
 
         CloseableHttpResponse getMethod =
             executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
@@ -234,9 +250,10 @@ class ObjectsResourceIT extends AbstractHttpIT
         Object objectSummary = (Object) unmarshaller.unmarshal(getMethod.getEntity().getContent());
         getProperty(objectSummary, "tags").setValue(TAG_VALUE);
 
+        String comment = "Changed the tags";
         CloseableHttpResponse putMethod = executePutXml(
-            buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, objectToBePut.getClassName(),
-                objectToBePut.getNumber()).toString(),
+            buildURI(ObjectResource.class, List.of(getWiki(), this.spaces, this.pageName,
+                objectToBePut.getClassName(), objectToBePut.getNumber()), Map.of(COMMENT_PARAMETER, comment)),
             objectSummary, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
         assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode(), getHttpResponseInfo(putMethod));
@@ -246,6 +263,7 @@ class ObjectsResourceIT extends AbstractHttpIT
         assertEquals(TAG_VALUE, getProperty(updatedObjectSummary, "tags").getValue());
         assertEquals(objectSummary.getClassName(), updatedObjectSummary.getClassName());
         assertEquals(objectSummary.getNumber(), updatedObjectSummary.getNumber());
+        assertEquals(comment, getTestPage().getComment());
     }
 
     @Test
@@ -282,12 +300,21 @@ class ObjectsResourceIT extends AbstractHttpIT
     void testDELETEObject() throws Exception
     {
         Object objectToBeDeleted = createObjectIfDoesNotExists("XWiki.TagClass", this.spaces, this.pageName);
+        Page pageBeforeDelete = getTestPage();
 
+        String comment = "Removed the tags";
         CloseableHttpResponse deleteMethod = executeDelete(
-            buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName, objectToBeDeleted.getClassName(),
-                objectToBeDeleted.getNumber()).toString(),
+            buildURI(ObjectResource.class, List.of(getWiki(), this.spaces, this.pageName,
+                objectToBeDeleted.getClassName(), objectToBeDeleted.getNumber()),
+                Map.of(COMMENT_PARAMETER, comment, "minorRevision", true)),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
         assertEquals(HttpStatus.SC_NO_CONTENT, deleteMethod.getCode(), getHttpResponseInfo(deleteMethod));
+
+        // The deletion is saved as a minor version holding the given comment.
+        Page pageAfterDelete = getTestPage();
+        assertEquals(comment, pageAfterDelete.getComment());
+        assertEquals(pageBeforeDelete.getMajorVersion(), pageAfterDelete.getMajorVersion());
+        assertEquals(pageBeforeDelete.getMinorVersion() + 1, pageAfterDelete.getMinorVersion());
 
         CloseableHttpResponse getMethod =
             executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
@@ -361,9 +388,13 @@ class ObjectsResourceIT extends AbstractHttpIT
         Property newTags = objectFactory.createProperty();
         newTags.setValue(TAG_VALUE);
 
-        CloseableHttpResponse putMethod = executePutXml(tagsPropertyLink.getHref(), newTags,
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        String comment = "Changed the tags property";
+        CloseableHttpResponse putMethod = executePutXml(
+            String.format("%s?%s=%s", tagsPropertyLink.getHref(), COMMENT_PARAMETER,
+                URLEncoder.encode(comment, StandardCharsets.UTF_8)),
+            newTags, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
         assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getCode(), getHttpResponseInfo(putMethod));
+        assertEquals(comment, getTestPage().getComment());
 
         getMethod = executeGet(buildURI(ObjectResource.class, getWiki(), this.spaces, this.pageName,
             currentObject.getClassName(), currentObject.getNumber()).toString());

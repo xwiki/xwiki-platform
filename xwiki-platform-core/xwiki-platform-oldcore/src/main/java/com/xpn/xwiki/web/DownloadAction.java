@@ -79,9 +79,10 @@ public class DownloadAction extends XWikiAction
     /** List of authorized attachment mimetypes. */
     public static final List<String> MIMETYPE_WHITELIST =
         List.of("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
-            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
-            "image/png", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf", "video/mpeg",
-            "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
+            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/avif", "image/gif", "image/jpeg",
+            "image/jxl", "image/pjpeg", "image/png", "image/tiff", "image/webp", "text/csv", "text/plain", "text/xml",
+            "text/rtf", "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska",
+            "video/x-ms-wmv", "video/x-flv");
 
     /** Key of the whitelist in xwiki.properties. */
     public static final String WHITELIST_PROPERTY = "attachment.download.whitelist";
@@ -481,6 +482,9 @@ public class DownloadAction extends XWikiAction
         boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
         response.addHeader("Content-disposition",
             attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(), shouldBeDownloaded));
+        // Make sure browsers honor the declared content type, from which the content disposition is also computed.
+        response.setHeader(XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_HEADER,
+            XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_NOSNIFF);
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Advertise that downloads can be resumed

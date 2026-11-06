@@ -202,6 +202,12 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     }
 
     @Override
+    public DocumentReference getDocumentReference()
+    {
+        return this.documentReference;
+    }
+
+    @Override
     protected boolean setParameter(String key, String value) throws MacroExecutionException
     {
         if (DOCUMENT_PARAM.equals(key)) {

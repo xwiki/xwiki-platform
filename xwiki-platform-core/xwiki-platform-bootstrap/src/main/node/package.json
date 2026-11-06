@@ -14,10 +14,12 @@
     "@eslint/js": "catalog:",
     "@playwright/test": "catalog:",
     "cross-env": "catalog:",
+    "esbuild": "catalog:",
     "eslint": "catalog:",
     "globals": "catalog:",
     "jquery": "catalog:",
     "qunit": "catalog:",
+    "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:"
   }

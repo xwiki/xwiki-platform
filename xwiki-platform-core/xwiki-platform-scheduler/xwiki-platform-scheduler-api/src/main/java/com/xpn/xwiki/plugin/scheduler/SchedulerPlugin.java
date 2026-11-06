@@ -669,8 +669,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         // Get current state of the job
         JobState currentState = getCurrentJobState(jobID);
 
-        // If no job exist in the scheduler by this id, there is nothing to do
-        if (currentState != null) {
+        // If no job exist in the scheduler by this id, there is nothing to do (Quartz returns NONE for an unknown
+        // trigger)
+        if (currentState != null && currentState.getQuartzState() != TriggerState.NONE) {
             // Rebuild the job
             JobDetail job = buildJobDetails(jobObject, context);
 
@@ -693,12 +694,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                         // Pause it
                         getScheduler().pauseJob(new JobKey(jobID));
                         break;
-                    case NORMAL:
-                        // Scheduler the job
+                    case NORMAL, BLOCKED, ERROR:
+                        // A blocked job is currently running and does not allow concurrent executions: Quartz keeps
+                        // the new trigger blocked until the end of the current execution. A job in error could not be
+                        // instantiated: the reloaded job gets a new chance.
                         getScheduler().scheduleJob(buildTrigger(jobObject));
                         break;
                     default:
-                        // do nothing
+                        // A complete trigger won't fire anymore, so there is nothing to schedule
                 }
             } catch (SchedulerException e) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,
@@ -942,24 +945,30 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             } else if (isJobDefinitionModified(originalJobObj, jobObj)) {
-                // Modified job. The scheduler holds the job xobject that was passed to it when the job was registered,
-                // so the new definition is only taken into account once the job has been registered again.
-                try {
-                    // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition
-                    // when it's scheduled.
-                    JobState state = getCurrentJobState(jobObj);
-                    if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
-                        // We get the document from the store as we don't want to corrupt the document instance
-                        // associated with the event
-                        BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
-
-                        reloadJob(jobObject, xcontext);
-                    }
-                } catch (Exception e) {
-                    LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
+                // Modified job
+                onJobModified(jobObj, document, xcontext);
             }
+        }
+    }
+
+    private void onJobModified(BaseObject jobObj, XWikiDocument document, XWikiContext xcontext)
+    {
+        // The scheduler holds the job xobject that was passed to it when the job was registered, so the new definition
+        // is only taken into account once the job has been registered again.
+        try {
+            // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition when it's
+            // scheduled.
+            JobState state = getCurrentJobState(jobObj);
+            if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
+                // We get the document from the store as we don't want to corrupt the document instance associated
+                // with the event
+                BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
+
+                reloadJob(jobObject, xcontext);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

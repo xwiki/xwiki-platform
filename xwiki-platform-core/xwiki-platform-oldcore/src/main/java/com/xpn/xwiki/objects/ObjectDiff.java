@@ -111,7 +111,7 @@ public class ObjectDiff
      * @param newValue the new value of the property.
      */
     @Deprecated
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     public ObjectDiff(String className, int number, String guid, String action, String propName, String propType,
         Object prevValue, Object newValue)
     {
@@ -137,7 +137,7 @@ public class ObjectDiff
      * @param prevValue the previous value of the property.
      * @param newValue the new value of the property.
      */
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     public ObjectDiff(DocumentReference xClassReference, int number, String guid, String action, String propName,
         String propType, Object prevValue, Object newValue)
     {
@@ -160,7 +160,7 @@ public class ObjectDiff
      * @since 18.2.0RC1
      */
     @Unstable
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     public ObjectDiff(DocumentReference xClassReference, int number, String guid, String action, String propName,
         String propType, Object prevValue, Object newValue, boolean sensitive)
     {

@@ -43,12 +43,12 @@ import {
   blockTypeSelectItems,
   useBlockNoteEditor,
   useComponentsContext,
-  useDictionary,
   useEditorState,
 } from "@blocknote/react";
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
+import type { ImageEditionHooks } from "./images/imageEditionHooks";
 import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { ContextForMacros } from "../blocknote/utils";
 import type { LinkEditionHandler } from "./links/linkEdition";
@@ -103,6 +103,7 @@ type CustomFormattingToolbarProps = {
   macros: { ctx: ContextForMacros } | false;
   linkEditionHandler: LinkEditionHandler;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
+  imageEditionHooks?: ImageEditionHooks;
   linkEditionHooks?: LinkEditionHooks;
 };
 
@@ -112,12 +113,12 @@ export const CustomFormattingToolbar: React.FC<
   formattingToolbarProps,
   additionalBlockTypes,
   imageEditionOverrideFn,
+  imageEditionHooks,
   linkEditionHooks,
   macros,
   linkEditionHandler,
 }) => {
   const Components = useComponentsContext()!;
-  const dict = useDictionary();
   const { t } = useTranslation();
 
   const editor = useEditor();
@@ -126,7 +127,7 @@ export const CustomFormattingToolbar: React.FC<
   const currentBlock = editor.getTextCursorPosition().block;
 
   const combinedBlockTypeSelectItems = (
-    formattingToolbarProps.blockTypeSelectItems ?? blockTypeSelectItems(dict)
+    formattingToolbarProps.blockTypeSelectItems ?? blockTypeSelectItems(editor)
   ).concat(additionalBlockTypes);
 
   return (
@@ -138,6 +139,7 @@ export const CustomFormattingToolbar: React.FC<
         <CustomImageToolbar
           currentBlock={currentBlock}
           imageEditionOverrideFn={imageEditionOverrideFn}
+          imageEditionHooks={imageEditionHooks}
         />
       ) : (
         // For others, simply show the "normal", default toolbar

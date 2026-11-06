@@ -29,6 +29,10 @@ depsContainer: Container;
 excludedLinkTargetTypes?: string[];
 }, {
 getContent: () => BlockType[];
+insertInlineContent: (content: Parameters<EditorType["insertInlineContent"]>[0], coordinates?: {
+left: number;
+top: number;
+}) => void;
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
 "debounced-change": (content: BlockType[]) => any;

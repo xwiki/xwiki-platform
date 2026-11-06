@@ -19,6 +19,7 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
+import { moveCaretTo } from "./caret";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import { LinkModal } from "@xwiki/platform-link-modal-ui";
 import {
@@ -122,8 +123,32 @@ function getContent(): BlockType[] {
   return editorRef.value!.document;
 }
 
+/**
+ * Inserts inline content where the user is, for the integrations that insert content of their own rather than
+ * through BlockNote.
+ *
+ * @param content - what to insert
+ * @param coordinates - where the pointer is, for an insertion that follows a drop, since a drop leaves the caret
+ *   behind
+ */
+function insertInlineContent(
+  content: Parameters<EditorType["insertInlineContent"]>[0],
+  coordinates?: { left: number; top: number },
+): void {
+  const editor = editorRef.value;
+  if (!editor) {
+    return;
+  }
+  if (coordinates) {
+    moveCaretTo(editor, coordinates);
+  }
+  // updateSelection leaves the caret after the content, so a second insertion lines up behind the first.
+  editor.insertInlineContent(content, { updateSelection: true });
+}
+
 defineExpose({
   getContent,
+  insertInlineContent,
 });
 
 /**

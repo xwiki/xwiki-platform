@@ -37,6 +37,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.deque.html.axecore.args.AxeRuleOptions;
+import com.deque.html.axecore.args.AxeRunOnlyOptions;
+import com.deque.html.axecore.args.AxeRunOptions;
 import com.deque.html.axecore.results.Results;
 import com.deque.html.axecore.results.Rule;
 import com.deque.html.axecore.selenium.AxeBuilder;
@@ -125,6 +128,9 @@ public class WCAGContext
             entry("select-name", true),
             entry("server-side-image-map", true),
             entry("svg-img-alt", true),
+            // Experimental rule, see ENABLED_RULES.
+            // Set to true once the build doesn't fail this rule anymore
+            entry("td-has-header", false),
             entry("td-headers-attr", true),
             entry("th-has-data-cells", true),
             entry("valid-lang", true),
@@ -151,6 +157,13 @@ public class WCAGContext
      * Rules to disable during axe-core validation.
      */
     private static final List<String> DISABLED_RULES = List.of();
+
+    /**
+     * Rules to enable during axe-core validation, on top of the ones selected by {@link #VALIDATE_TAGS}.
+     * A tag-based selection never includes the rules tagged as experimental by axe-core, so they need to be listed
+     * here to be validated.
+     */
+    private static final List<String> ENABLED_RULES = List.of("td-has-header");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WCAGContext.class);
 
@@ -315,12 +328,37 @@ public class WCAGContext
      */
     public AxeBuilder getAxeBuilder()
     {
-        AxeBuilder axeBuilder = new AxeBuilder();
-        axeBuilder.withTags(VALIDATE_TAGS);
-        if (!DISABLED_RULES.isEmpty()) {
-            axeBuilder.disableRules(DISABLED_RULES);
-        }
-        return axeBuilder;
+        return new AxeBuilder().withOptions(getAxeRunOptions());
+    }
+
+    /**
+     * Build the options of the axe-core validation. The enabled and disabled rules are set in a single map because
+     * {@link AxeBuilder#withRules(List)} and {@link AxeBuilder#disableRules(List)} each replace the rules set by the
+     * other one.
+     *
+     * @return the options of the axe-core validation
+     */
+    private AxeRunOptions getAxeRunOptions()
+    {
+        AxeRunOnlyOptions runOnly = new AxeRunOnlyOptions();
+        runOnly.setType("tag");
+        runOnly.setValues(VALIDATE_TAGS);
+
+        Map<String, AxeRuleOptions> rules = new HashMap<>();
+        ENABLED_RULES.forEach(rule -> rules.put(rule, getAxeRuleOptions(true)));
+        DISABLED_RULES.forEach(rule -> rules.put(rule, getAxeRuleOptions(false)));
+
+        AxeRunOptions runOptions = new AxeRunOptions();
+        runOptions.setRunOnly(runOnly);
+        runOptions.setRules(rules);
+        return runOptions;
+    }
+
+    private static AxeRuleOptions getAxeRuleOptions(boolean enabled)
+    {
+        AxeRuleOptions ruleOptions = new AxeRuleOptions();
+        ruleOptions.setEnabled(enabled);
+        return ruleOptions;
     }
 
     /**

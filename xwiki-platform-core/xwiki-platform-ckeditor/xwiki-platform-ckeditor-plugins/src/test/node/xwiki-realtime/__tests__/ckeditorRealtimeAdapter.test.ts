@@ -20,7 +20,7 @@
 
 import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import * as DiffDOM from "diff-dom";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { RequireJSMock } from "@xwiki/platform-test-requirejs";
@@ -54,12 +54,15 @@ type Updater = (content: HTMLElement) => unknown;
 
 type CKEditorAdapter = {
   updateContent(updater: Updater, isLocalChange: boolean): Promise<void>;
+  restoreSelection(ranges: Range[] | null): void;
 };
 
 let requirejs: RequireJSMock;
 let content: HTMLElement;
 let customData: Map<string, unknown>;
 let adapter: CKEditorAdapter;
+let restoreSelection: ReturnType<typeof vi.fn>;
+let execCommand: ReturnType<typeof vi.fn>;
 
 function loadAdapter(): new (
   ckeditor: unknown,
@@ -128,14 +131,30 @@ describe("CKEditorAdapter", () => {
       getCustomData: (key: string) => customData.get(key) ?? null,
       removeCustomData: (key: string) => customData.delete(key),
     };
+    execCommand = vi.fn();
     const ckeditor = {
       mode: "wysiwyg",
       on: () => {},
       fire: () => {},
       editable: () => editable,
-      widgets: { instances: {}, checkWidgets: () => {} },
+      execCommand,
+      plugins: {
+        "xwiki-macro": {
+          onceAfterRefresh: (_editor: unknown, callback: () => void) =>
+            callback(),
+        },
+      },
+      widgets: {
+        instances: {},
+        checkWidgets: () => {},
+        checkSelection: () => {},
+      },
     };
-    const CKEDITOR = { dom: { selection: { FILLING_CHAR_SEQUENCE } } };
+    restoreSelection = vi.fn();
+    const CKEDITOR = {
+      dom: { selection: { FILLING_CHAR_SEQUENCE } },
+      plugins: { xwikiSelection: { restoreSelection } },
+    };
     const CKEditorAdapter = loadAdapter();
     adapter = new CKEditorAdapter(ckeditor, CKEDITOR);
   });
@@ -242,6 +261,49 @@ describe("CKEditorAdapter", () => {
       await adapter.updateContent(patchTo("<p>one</p>"), false);
 
       expect(customData.has("cke-fillingChar")).toBe(false);
+    });
+  });
+  describe("restoreSelection", () => {
+    it("scrolls the restored selection into view, if needed, after a remote change", async () => {
+      content.innerHTML = "<p>one</p>";
+
+      await adapter.updateContent(patchTo("<p>one</p><p>two</p>"), false);
+      adapter.restoreSelection(null);
+
+      expect(execCommand).not.toHaveBeenCalled();
+      expect(restoreSelection).toHaveBeenCalledWith(expect.anything(), {
+        ranges: null,
+        async: false,
+        preventScroll: undefined,
+      });
+    });
+
+    it("doesn't scroll the restored selection into view after a remote change that refreshes the content", async () => {
+      // A remote user inserted a macro, which has to be rendered.
+      content.innerHTML =
+        "<xwiki-widget-xwiki-macro></xwiki-widget-xwiki-macro>";
+
+      await adapter.updateContent(() => [content.firstChild], false);
+      adapter.restoreSelection(null);
+
+      expect(execCommand).toHaveBeenCalledWith("xwiki-refresh", {
+        preserveSelection: false,
+      });
+      expect(restoreSelection).toHaveBeenCalledWith(expect.anything(), {
+        ranges: null,
+        async: false,
+        preventScroll: true,
+      });
+
+      // The next remote change doesn't refresh the content.
+      await adapter.updateContent(patchTo("<p>one</p>"), false);
+      adapter.restoreSelection(null);
+
+      expect(restoreSelection).toHaveBeenLastCalledWith(expect.anything(), {
+        ranges: null,
+        async: false,
+        preventScroll: undefined,
+      });
     });
   });
 });

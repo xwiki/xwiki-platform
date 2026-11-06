@@ -40,6 +40,10 @@ import {
   setMessages,
   translate,
 } from "./common/translations";
+import {
+  updateCreationFields,
+  wireCreationFields,
+} from "./editing/creationFields";
 import { filterSuggestions } from "./filters/filterSuggestions";
 import { sortSuggestions } from "./sort/sortSuggestions";
 import { loadById } from "@xwiki/platform-xwiki-utils";
@@ -47,7 +51,8 @@ import type { Suggester, Suggestions } from "./common/suggester";
 import type { Messages } from "./common/translations";
 
 /**
- * Wires the Records macro dialog: the field picker, and the two behaviours that depend on the data type.
+ * Wires the Records macro dialog: the field picker, the two behaviours that depend on the data type, and the creation
+ * fields that depend on the edit mode and the columns.
  *
  * jQuery and the suggest widget are loaded through RequireJS rather than imported, so that they stay the single
  * instances the rest of the page already uses and nothing is bundled twice.
@@ -153,11 +158,15 @@ function enhancePickers(
  * @param $ - the page's jQuery instance
  * @param picker - the columns picker element
  */
+// eslint-disable-next-line max-statements
 function wire($: JQueryStatic, picker: Element): void {
   const scope = findScope(picker);
   const dataTypeInput = findDataTypeInput(scope);
 
   enhancePickers($, picker, scope);
+  wireCreationFields(scope, (field, handler) => {
+    $(field).on("change", handler);
+  });
 
   // The tabs are all derived from the data type, so there is nothing to show until one is picked.
   setTabsVisible(scope, dataTypeInput !== null && dataTypeInput.value !== "");
@@ -170,6 +179,7 @@ function wire($: JQueryStatic, picker: Element): void {
   }
 
   let previous = dataTypeInput.value;
+  // eslint-disable-next-line max-statements
   $(dataTypeInput).on("change", () => {
     const current = dataTypeInput.value;
     if (current === previous) {
@@ -182,6 +192,8 @@ function wire($: JQueryStatic, picker: Element): void {
     }
     resetDerivedParameters(scope);
     clearMessages(scope);
+    // The columns were reset silently, which the creation fields have to follow.
+    updateCreationFields(scope, true);
     setTabsVisible(scope, current !== "");
     previous = current;
   });

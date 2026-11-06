@@ -21,20 +21,28 @@ package org.xwiki.livedata.script.livetable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.livedata.script.LiveDataScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Scripting APIs for the Live Data implementation based on Live Table.
@@ -64,6 +72,13 @@ public class LiveTableScriptService implements ScriptService
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
 
     /**
+     * Used to list the installed row naming strategies.
+     */
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    /**
      * Converts the Live Table configuration into Live Data configuration, also adding the default values.
      * 
      * @param id the live table id
@@ -88,5 +103,32 @@ public class LiveTableScriptService implements ScriptService
                 id, columns, columnProperties, options, ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
+    }
+
+    /**
+     * Lists the naming strategies for newly created pages through Live Data, including the set of properties
+     * required for each when no source parameter is given. A strategy that cannot be loaded is left out.
+     *
+     * @return the properties each installed strategy needs, by strategy hint
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public Map<String, Set<String>> getNewRowNamingStrategies()
+    {
+        ComponentManager componentManager = this.componentManagerProvider.get();
+        Map<String, Set<String>> strategies = new TreeMap<>();
+        for (ComponentDescriptor<LiveTableNewRowNamingStrategy> descriptor : componentManager
+            .getComponentDescriptorList(LiveTableNewRowNamingStrategy.class)) {
+            String hint = descriptor.getRoleHint();
+            try {
+                LiveTableNewRowNamingStrategy strategy =
+                    componentManager.getInstance(LiveTableNewRowNamingStrategy.class, hint);
+                strategies.put(hint, strategy.getMandatoryProperties(Map.of()));
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Failed to load the new row naming strategy [{}]. Root cause is [{}].", hint,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+        return strategies;
     }
 }

@@ -44,7 +44,6 @@
     <!-- The versions used by Solr, which are different from the ones managed by XWiki (Jersey 2) -->
     <solr.jersey.version>3.1.12</solr.jersey.version>
     <solr.hk2.version>3.1.1</solr.hk2.version>
-    <solr.osgi-resource-locator.version>1.0.4</solr.osgi-resource-locator.version>
   </properties>
   <dependencies>
     <!-- The solr-core jar itself, only used as an input of the shading (optional so that it's never visible to the
@@ -117,13 +116,12 @@
       <version>${solr.hk2.version}</version>
       <optional>true</optional>
     </dependency>
+    <!-- The dependencies of the embedded Jersey which are not embedded themselves -->
     <dependency>
+      <!-- Not embedded since the same version can be shared with the Jersey 2 used by XWiki -->
       <groupId>org.glassfish.hk2</groupId>
       <artifactId>osgi-resource-locator</artifactId>
-      <version>${solr.osgi-resource-locator.version}</version>
-      <optional>true</optional>
     </dependency>
-    <!-- The dependencies of the embedded Jersey which are not embedded themselves -->
     <dependency>
       <groupId>org.javassist</groupId>
       <artifactId>javassist</artifactId>
@@ -319,6 +317,9 @@
                   <include>org.glassfish.hk2:*</include>
                   <include>org.glassfish.hk2.external:*</include>
                 </includes>
+                <excludes>
+                  <exclude>org.glassfish.hk2:osgi-resource-locator</exclude>
+                </excludes>
               </artifactSet>
               <relocations>
                 <relocation>
@@ -328,6 +329,10 @@
                 <relocation>
                   <pattern>org.glassfish.hk2</pattern>
                   <shadedPattern>${solr.shaded.prefix}.org.glassfish.hk2</shadedPattern>
+                  <excludes>
+                    <!-- Not embedded, see the osgi-resource-locator dependency -->
+                    <exclude>org.glassfish.hk2.osgiresourcelocator.**</exclude>
+                  </excludes>
                 </relocation>
                 <relocation>
                   <pattern>org.jvnet.hk2</pattern>

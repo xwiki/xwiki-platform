@@ -1109,6 +1109,13 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Shared by the Jersey 2 used by XWiki and the Jersey 3 embedded in the shaded Solr core (it has the same API in
+           both lines) -->
+      <dependency>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>osgi-resource-locator</artifactId>
+        <version>3.0.0</version>
+      </dependency>
       <dependency>
         <groupId>aopalliance</groupId>
         <artifactId>aopalliance</artifactId>

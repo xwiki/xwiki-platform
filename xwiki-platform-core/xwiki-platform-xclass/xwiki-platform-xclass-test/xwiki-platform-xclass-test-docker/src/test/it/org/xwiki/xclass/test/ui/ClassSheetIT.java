@@ -24,7 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
+import org.xwiki.pagetemplate.test.po.TemplatesAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -148,8 +148,7 @@ class ClassSheetIT
         // The created template provider must be listed in the "Available Template Providers" list of the Page
         // Templates administration section.
         TemplatesAdministrationSectionPage templatesAdminPage = TemplatesAdministrationSectionPage.gotoPage();
-        assertTrue(templatesAdminPage.getExistingTemplatesLinks().stream()
-            .anyMatch(link -> (className + " Template Provider").equals(link.getText())));
+        assertTrue(templatesAdminPage.getExistingTemplateNames().contains(className + " Template Provider"));
 
         // Go back to the class page to create a document based on the class template.
         setup.gotoPage(spaceName, classDocName);

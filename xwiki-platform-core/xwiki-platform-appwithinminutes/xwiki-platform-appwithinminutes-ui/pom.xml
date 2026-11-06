@@ -68,9 +68,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <!-- We need the template provider class. -->
+      <!-- We need the template provider class and sheet. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <artifactId>xwiki-platform-pagetemplate-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>

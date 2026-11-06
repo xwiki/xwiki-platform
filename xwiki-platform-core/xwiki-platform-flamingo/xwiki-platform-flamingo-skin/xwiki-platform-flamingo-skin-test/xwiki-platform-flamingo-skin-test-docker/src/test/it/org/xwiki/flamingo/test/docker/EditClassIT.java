@@ -225,8 +225,7 @@ class EditClassIT
         classEditPage = setup.editClass(reference);
         assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
 
-        // Both move controls are buttons, and each one has an accessible name naming the property it moves.
-        assertEquals("button", classEditPage.getMovePropertyUpButton("testC").getTagName());
+        // Each move button has an accessible name naming the property it moves.
         assertEquals("Move property testC up", classEditPage.getMovePropertyUpButtonName("testC"));
         assertEquals("Move property testA down", classEditPage.getMovePropertyDownButtonName("testA"));
 

@@ -196,9 +196,8 @@ public class ClassEditPage extends EditPage
     /**
      * @param propertyName the name of a property of this class
      * @return the button moving the given property one position up
-     * @since 18.10.0RC1
      */
-    public WebElement getMovePropertyUpButton(String propertyName)
+    private WebElement getMovePropertyUpButton(String propertyName)
     {
         return getPropertyContainer(propertyName).findElement(By.cssSelector(".reorder-control-up"));
     }
@@ -206,9 +205,8 @@ public class ClassEditPage extends EditPage
     /**
      * @param propertyName the name of a property of this class
      * @return the button moving the given property one position down
-     * @since 18.10.0RC1
      */
-    public WebElement getMovePropertyDownButton(String propertyName)
+    private WebElement getMovePropertyDownButton(String propertyName)
     {
         return getPropertyContainer(propertyName).findElement(By.cssSelector(".reorder-control-down"));
     }

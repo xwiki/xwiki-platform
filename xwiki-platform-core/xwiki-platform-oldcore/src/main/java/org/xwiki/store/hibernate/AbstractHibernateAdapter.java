@@ -20,7 +20,9 @@
 package org.xwiki.store.hibernate;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -31,11 +33,20 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Table;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
+import org.hibernate.tool.schema.internal.ExceptionHandlerCollectingImpl;
+import org.hibernate.tool.schema.spi.CommandAcceptanceException;
+import org.hibernate.tool.schema.spi.ContributableMatcher;
+import org.hibernate.tool.schema.spi.SchemaManagementTool;
+import org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator;
+import org.hibernate.tool.schema.spi.ScriptTargetOutput;
+import org.hibernate.tool.schema.spi.TargetDescriptor;
 import org.slf4j.Logger;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -216,9 +227,29 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
 
     private void updateDatabaseStandard(Metadata metadata) throws HibernateStoreException
     {
-        SchemaUpdate updater = new SchemaUpdate();
-        updater.execute(EnumSet.of(TargetType.DATABASE), metadata);
-        List<Exception> exceptions = updater.getExceptions();
+        StandardServiceRegistry serviceRegistry =
+            ((MetadataImplementor) metadata).getMetadataBuildingOptions().getServiceRegistry();
+        Map<String, Object> settings =
+            new HashMap<>(serviceRegistry.requireService(ConfigurationService.class).getSettings());
+        ExceptionHandlerCollectingImpl exceptionHandler = new ExceptionHandlerCollectingImpl();
+
+        serviceRegistry.requireService(SchemaManagementTool.class).getSchemaMigrator(settings).doMigration(metadata,
+            SchemaManagementToolCoordinator.buildExecutionOptions(settings, exceptionHandler), ContributableMatcher.ALL,
+            new TargetDescriptor()
+            {
+                @Override
+                public EnumSet<TargetType> getTargetTypes()
+                {
+                    return EnumSet.of(TargetType.DATABASE);
+                }
+
+                @Override
+                public ScriptTargetOutput getScriptTargetOutput()
+                {
+                    return null;
+                }
+            });
+        List<CommandAcceptanceException> exceptions = exceptionHandler.getExceptions();
 
         if (!exceptions.isEmpty()) {
             // Print the errors

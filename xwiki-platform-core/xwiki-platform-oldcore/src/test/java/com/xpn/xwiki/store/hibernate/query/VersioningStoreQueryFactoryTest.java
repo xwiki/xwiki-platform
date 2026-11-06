@@ -24,20 +24,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.hibernate.query.criteria.internal.CriteriaBuilderImpl;
-import org.hibernate.query.criteria.internal.OrderImpl;
-import org.hibernate.query.criteria.internal.expression.LiteralExpression;
-import org.hibernate.query.criteria.internal.predicate.BetweenPredicate;
-import org.hibernate.query.criteria.internal.predicate.ComparisonPredicate;
-import org.hibernate.query.criteria.internal.predicate.NullnessPredicate;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
+import org.hibernate.query.criteria.JpaCriteriaQuery;
+import org.hibernate.query.criteria.JpaOrder;
+import org.hibernate.query.criteria.JpaPath;
+import org.hibernate.query.criteria.JpaPredicate;
+import org.hibernate.query.criteria.JpaRoot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,7 +55,6 @@ import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -77,16 +75,16 @@ class VersioningStoreQueryFactoryTest
     private Session session;
 
     @Mock
-    private CriteriaBuilderImpl builder;
+    private HibernateCriteriaBuilder builder;
 
     @Mock
-    private Root<XWikiRCSNodeInfo> root;
+    private JpaRoot<XWikiRCSNodeInfo> root;
 
     @Mock
-    private CriteriaQuery<XWikiRCSNodeInfo> criteriaQueryNodeInfo;
+    private JpaCriteriaQuery<XWikiRCSNodeInfo> criteriaQueryNodeInfo;
 
     @Mock
-    private CriteriaQuery<Long> criteriaQueryLong;
+    private JpaCriteriaQuery<Long> criteriaQueryLong;
 
     @Mock
     private Query<XWikiRCSNodeInfo> queryNodeInfo;
@@ -111,39 +109,23 @@ class VersioningStoreQueryFactoryTest
         when(this.builder.createQuery(XWikiRCSNodeInfo.class)).thenReturn(this.criteriaQueryNodeInfo);
         when(this.builder.createQuery(Long.class)).thenReturn(this.criteriaQueryLong);
 
-        when(this.builder.equal(any(), any(Object.class))).thenAnswer(i -> {
-            ComparisonPredicate predicate = mock(ComparisonPredicate.class);
-            when(predicate.getComparisonOperator()).thenReturn(ComparisonPredicate.ComparisonOperator.EQUAL);
-            when(predicate.getLeftHandOperand()).thenReturn(i.getArgument(0));
-            when(predicate.getRightHandOperand()).thenReturn(new LiteralExpression(null, i.getArgument(1)));
-            return predicate;
-        });
-
-        when(this.builder.isNotNull(any())).thenAnswer(i -> {
-            NullnessPredicate predicate = mock(NullnessPredicate.class);
-            when(predicate.getOperand()).thenReturn(i.getArgument(0));
-            when(predicate.isNegated()).thenReturn(true);
-            return predicate;
-        });
-
-        when(this.builder.between(Mockito.<Path<Date>>any(), Mockito.<Date>any(), any())).thenAnswer(i -> {
-            BetweenPredicate<?> predicate = mock(BetweenPredicate.class);
-            when(predicate.getExpression()).thenReturn(i.getArgument(0));
-            when(predicate.getLowerBound()).thenReturn(new LiteralExpression(null, i.getArgument(1)));
-            when(predicate.getUpperBound()).thenReturn(new LiteralExpression(null, i.getArgument(2)));
-            return predicate;
-        });
-
-        when(this.builder.asc(any())).thenAnswer(i -> new OrderImpl(i.getArgument(0), true));
-        when(this.builder.desc(any())).thenAnswer(i -> new OrderImpl(i.getArgument(0), false));
+        // The predicates and orders are described by their toString() to check what was created
+        when(this.builder.equal(any(), any(Object.class)))
+            .thenAnswer(i -> predicate(i.getArgument(0) + " = " + i.getArgument(1)));
+        when(this.builder.isNotNull(any())).thenAnswer(i -> predicate(i.getArgument(0) + " is not null"));
+        when(this.builder.between(Mockito.<Path<Date>>any(), Mockito.<Date>any(), any()))
+            .thenAnswer(i -> predicate(i.getArgument(0) + " between " + i.getArgument(1, Date.class).getTime()
+                + " and " + i.getArgument(2, Date.class).getTime()));
+        when(this.builder.asc(Mockito.<Expression<?>>any())).thenAnswer(i -> order(i.getArgument(0), true));
+        when(this.builder.desc(Mockito.<Expression<?>>any())).thenAnswer(i -> order(i.getArgument(0), false));
 
         // With this mock we rely on toString() to check that the relative path is correct.
         when(this.root.get(anyString())).thenAnswer(i -> {
-            Path<?> path = mock(Path.class);
+            JpaPath<?> path = mock(JpaPath.class);
             String pString = "mocked " + i.getArgument(0, String.class);
             when(path.toString()).thenReturn(pString);
             when(path.get(anyString())).thenAnswer(i3 -> {
-                Path<?> path2 = mock(Path.class);
+                JpaPath<?> path2 = mock(JpaPath.class);
                 when(path2.toString()).thenReturn(pString + "." + i3.getArgument(0, String.class));
                 return path2;
             });
@@ -156,6 +138,21 @@ class VersioningStoreQueryFactoryTest
         when(this.session.createQuery(this.criteriaQueryLong)).thenReturn(this.queryLong);
         when(this.session.createQuery(anyString())).thenReturn(this.queryAny);
         when(this.queryAny.setParameter(anyString(), any())).thenReturn(this.queryAny);
+    }
+
+    private static JpaPredicate predicate(String description)
+    {
+        JpaPredicate predicate = mock(JpaPredicate.class);
+        when(predicate.toString()).thenReturn(description);
+        return predicate;
+    }
+
+    private static JpaOrder order(Expression<?> path, boolean ascending)
+    {
+        JpaOrder order = mock(JpaOrder.class);
+        when(order.getExpression()).thenAnswer(i -> path);
+        when(order.isAscending()).thenReturn(ascending);
+        return order;
     }
 
     @Test
@@ -176,15 +173,8 @@ class VersioningStoreQueryFactoryTest
         List<Predicate> predicates = Arrays.asList(this.predicatesCaptor.getValue());
         assertEquals(2, predicates.size());
 
-        ComparisonPredicate idPredicate = (ComparisonPredicate) predicates.get(0);
-        LiteralExpression<Long> idExpression = (LiteralExpression<Long>) idPredicate.getRightHandOperand();
-        assertEquals(ComparisonPredicate.ComparisonOperator.EQUAL, idPredicate.getComparisonOperator());
-        assertEquals("mocked id.docId", idPredicate.getLeftHandOperand().toString());
-        assertEquals(42L, idExpression.getLiteral());
-
-        NullnessPredicate nonNullDiffPredicate = (NullnessPredicate) predicates.get(1);
-        assertTrue(nonNullDiffPredicate.isNegated());
-        assertEquals("mocked diff", nonNullDiffPredicate.getOperand().toString());
+        assertEquals("mocked id.docId = 42", predicates.get(0).toString());
+        assertEquals("mocked diff is not null", predicates.get(1).toString());
     }
 
     @Test
@@ -197,18 +187,8 @@ class VersioningStoreQueryFactoryTest
         List<Predicate> predicates = Arrays.asList(this.predicatesCaptor.getValue());
         assertEquals(4, predicates.size());
 
-        ComparisonPredicate authorPredicate = (ComparisonPredicate) predicates.get(2);
-        LiteralExpression<String> authorExpression = (LiteralExpression<String>) authorPredicate.getRightHandOperand();
-        assertEquals(ComparisonPredicate.ComparisonOperator.EQUAL, authorPredicate.getComparisonOperator());
-        assertEquals("mocked author", authorPredicate.getLeftHandOperand().toString());
-        assertEquals("TestAuthor", authorExpression.getLiteral());
-
-        BetweenPredicate<Date> datePredicate = (BetweenPredicate<Date>) predicates.get(3);
-        LiteralExpression<Date> dateLowerExpression = (LiteralExpression<Date>) datePredicate.getLowerBound();
-        LiteralExpression<Date> dateUpperExpression = (LiteralExpression<Date>) datePredicate.getUpperBound();
-        assertEquals("mocked date", datePredicate.getExpression().toString());
-        assertEquals(new Date(0L), dateLowerExpression.getLiteral());
-        assertEquals(new Date(Integer.MAX_VALUE * 1000L), dateUpperExpression.getLiteral());
+        assertEquals("mocked author = TestAuthor", predicates.get(2).toString());
+        assertEquals("mocked date between 0 and " + (Integer.MAX_VALUE * 1000L), predicates.get(3).toString());
     }
 
     @Test
@@ -221,12 +201,7 @@ class VersioningStoreQueryFactoryTest
         List<Predicate> predicates = Arrays.asList(this.predicatesCaptor.getValue());
         assertEquals(3, predicates.size());
 
-        BetweenPredicate<Date> datePredicate = (BetweenPredicate<Date>) predicates.get(2);
-        LiteralExpression<Date> dateLowerExpression = (LiteralExpression<Date>) datePredicate.getLowerBound();
-        LiteralExpression<Date> dateUpperExpression = (LiteralExpression<Date>) datePredicate.getUpperBound();
-        assertEquals("mocked date", datePredicate.getExpression().toString());
-        assertEquals(new Date(1000L), dateLowerExpression.getLiteral());
-        assertEquals(new Date(2000L), dateUpperExpression.getLiteral());
+        assertEquals("mocked date between 1000 and 2000", predicates.get(2).toString());
     }
 
     @Test
@@ -238,15 +213,8 @@ class VersioningStoreQueryFactoryTest
         List<Predicate> predicates = Arrays.asList(this.predicatesCaptor.getValue());
         assertEquals(2, predicates.size());
 
-        ComparisonPredicate idPredicate = (ComparisonPredicate) predicates.get(0);
-        LiteralExpression<Long> idExpression = (LiteralExpression<Long>) idPredicate.getRightHandOperand();
-        assertEquals(ComparisonPredicate.ComparisonOperator.EQUAL, idPredicate.getComparisonOperator());
-        assertEquals("mocked id.docId", idPredicate.getLeftHandOperand().toString());
-        assertEquals(42L, idExpression.getLiteral());
-
-        NullnessPredicate nonNullDiffPredicate = (NullnessPredicate) predicates.get(1);
-        assertTrue(nonNullDiffPredicate.isNegated());
-        assertEquals("mocked diff", nonNullDiffPredicate.getOperand().toString());
+        assertEquals("mocked id.docId = 42", predicates.get(0).toString());
+        assertEquals("mocked diff is not null", predicates.get(1).toString());
     }
 
     @Test
@@ -259,18 +227,8 @@ class VersioningStoreQueryFactoryTest
         List<Predicate> predicates = Arrays.asList(this.predicatesCaptor.getValue());
         assertEquals(4, predicates.size());
 
-        ComparisonPredicate authorPredicate = (ComparisonPredicate) predicates.get(2);
-        LiteralExpression<String> authorExpression = (LiteralExpression<String>) authorPredicate.getRightHandOperand();
-        assertEquals(ComparisonPredicate.ComparisonOperator.EQUAL, authorPredicate.getComparisonOperator());
-        assertEquals("mocked author", authorPredicate.getLeftHandOperand().toString());
-        assertEquals("TestAuthor", authorExpression.getLiteral());
-
-        BetweenPredicate<Date> datePredicate = (BetweenPredicate<Date>) predicates.get(3);
-        LiteralExpression<Date> dateLowerExpression = (LiteralExpression<Date>) datePredicate.getLowerBound();
-        LiteralExpression<Date> dateUpperExpression = (LiteralExpression<Date>) datePredicate.getUpperBound();
-        assertEquals("mocked date", datePredicate.getExpression().toString());
-        assertEquals(new Date(0L), dateLowerExpression.getLiteral());
-        assertEquals(new Date(Integer.MAX_VALUE * 1000L), dateUpperExpression.getLiteral());
+        assertEquals("mocked author = TestAuthor", predicates.get(2).toString());
+        assertEquals("mocked date between 0 and " + (Integer.MAX_VALUE * 1000L), predicates.get(3).toString());
     }
 
     @Test
@@ -283,12 +241,7 @@ class VersioningStoreQueryFactoryTest
         List<Predicate> predicates = Arrays.asList(this.predicatesCaptor.getValue());
         assertEquals(3, predicates.size());
 
-        BetweenPredicate<Date> datePredicate = (BetweenPredicate<Date>) predicates.get(2);
-        LiteralExpression<Date> dateLowerExpression = (LiteralExpression<Date>) datePredicate.getLowerBound();
-        LiteralExpression<Date> dateUpperExpression = (LiteralExpression<Date>) datePredicate.getUpperBound();
-        assertEquals("mocked date", datePredicate.getExpression().toString());
-        assertEquals(new Date(1000L), dateLowerExpression.getLiteral());
-        assertEquals(new Date(2000L), dateUpperExpression.getLiteral());
+        assertEquals("mocked date between 1000 and 2000", predicates.get(2).toString());
     }
 
     static Stream<Arguments> rangesProvider()

@@ -145,8 +145,9 @@
 
     <!-- Storage -->
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-hibernate-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Hibernate 5 seems to require (but don't declare) javax validation-->
     <dependency>
@@ -770,7 +771,6 @@
                 **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
                 **/internal/script/DebugScriptService.java,
                 **/internal/store/hibernate/HibernateStore.java,
-                **/internal/store/hibernate/QueryImplementorDelegate.java,
                 **/internal/skin/*.java,
                 **/internal/template/InternalTemplateManager.java,
                 **/internal/template/TemplateEnvironmentResource.java,

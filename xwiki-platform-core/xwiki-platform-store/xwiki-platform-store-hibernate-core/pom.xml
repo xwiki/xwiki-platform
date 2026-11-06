@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-store</artifactId>
+    <version>18.10.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-store-hibernate-core</artifactId>
+  <name>XWiki Platform - Store - Hibernate Core</name>
+  <description>
+    Hibernate ORM core, with the APIs removed since Hibernate 5 restored so that code compiled against Hibernate 5
+    keeps working.
+  </description>
+  <properties>
+    <!-- This JAR is Hibernate ORM and the Jakarta Persistence API (plus the restored APIs), so it provides their
+         extension ids -->
+    <xwiki.extension.features>
+      org.hibernate.orm:hibernate-core/${hibernate.version},
+      org.hibernate:hibernate-core/${hibernate.version},
+      jakarta.persistence:jakarta.persistence-api/${jakarta.persistence.version}
+    </xwiki.extension.features>
+    <xwiki.extension.name>Hibernate ORM Core</xwiki.extension.name>
+    <!-- The restored APIs follow the Hibernate naming and API (and cannot follow the XWiki ones) -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Spoon resolves the tests against the original Hibernate JAR instead of the patched classes -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
+    <!-- TODO: remove once a version of this module has been released -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+
+    <!-- The classes embedded in the JAR -->
+    <hibernate.patch.classes>${project.build.outputDirectory}</hibernate.patch.classes>
+  </properties>
+  <dependencies>
+    <!-- Embedded in the produced JAR (see the hibernate-patch execution below) -->
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Embedded in the produced JAR with each interface also implementing its javax.persistence twin, so that the code
+         compiled against Hibernate 5 (which was based on javax.persistence) keeps working -->
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Hibernate needs JAXB 4 (jakarta.xml.bind) to parse its XML files but org.glassfish.jaxb:jaxb-runtime is
+         currently pinned to 2.3.x (javax.xml.bind) for the REST API. JAXB 4 is embedded in the JAR (with the packages
+         it shares with JAXB 2.3 relocated) until everything moves to jakarta.xml.bind. -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>${jaxb4.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-core</artifactId>
+      <version>${jaxb4.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>txw2</artifactId>
+      <version>${jaxb4.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.istack</groupId>
+      <artifactId>istack-commons-runtime</artifactId>
+      <version>4.1.2</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- The dependencies of hibernate-core and of the embedded JAXB 4 -->
+    <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
+    </dependency>
+    <!-- The javax.persistence twins of the embedded jakarta.persistence classes, used by the code compiled against
+         Hibernate 5. It's also needed by the Java compiler when checking the overrides of the bridge methods. -->
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>javax.persistence-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.models</groupId>
+      <artifactId>hibernate-models</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-activation</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.inject</groupId>
+      <artifactId>jakarta.inject-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Only used by the build time patcher -->
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-commons</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-simple</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Expose the path of the JARs to embed as properties -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>hibernate-patch-properties</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Copy the embedded JARs content in the output directory, merging the mixins into the Hibernate classes -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>hibernate-patch</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>org.xwiki.store.hibernate.internal.patcher.HibernatePatcher</mainClass>
+              <classpathScope>compile</classpathScope>
+              <arguments>
+                <argument>${hibernate.patch.classes}</argument>
+                <argument>org/xwiki/store/hibernate/internal/mixin/</argument>
+                <argument>relocate:com/sun/istack/=org/xwiki/store/hibernate/internal/jaxb/istack/</argument>
+                <argument>relocate:com/sun/xml/txw2/=org/xwiki/store/hibernate/internal/jaxb/txw2/</argument>
+                <argument>bridge:jakarta/persistence/,javax/persistence/,${javax.persistence:javax.persistence-api:jar},org/hibernate/</argument>
+                <argument>jar:${org.hibernate.orm:hibernate-core:jar}</argument>
+                <argument>jar:${jakarta.persistence:jakarta.persistence-api:jar}</argument>
+                <argument>jar:${org.glassfish.jaxb:jaxb-runtime:jar}</argument>
+                <argument>jar:${org.glassfish.jaxb:jaxb-core:jar}</argument>
+                <argument>jar:${org.glassfish.jaxb:txw2:jar}</argument>
+                <argument>jar:${com.sun.istack:istack-commons-runtime:jar}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Build time only -->
+            <exclude>org/xwiki/store/hibernate/internal/patcher/**</exclude>
+            <!-- Merged into the Hibernate classes -->
+            <exclude>org/xwiki/store/hibernate/internal/mixin/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

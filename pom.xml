@@ -1158,7 +1158,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.1.12</version>
+        <version>11.4.18</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>

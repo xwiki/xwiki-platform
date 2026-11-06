@@ -165,7 +165,7 @@ catalog:
   npm-package-json-lint: 11.0.1
   npm-run-all: 4.1.5
   npm-run-all2: 9.0.4
-  nx: 24.0.0
+  nx: 24.0.4
   pinia: 4.1.0
   postcss: 8.5.28
   postcss-preset-mantine: 1.18.0
@@ -219,8 +219,6 @@ overrides:
   chainpad>json.sortify: "-"
   chainpad>nthen: "-"
   chainpad>xmhell: "-"
-  # nx pins a vulnerable undici version. Remove this override once nx depends on undici 7.30.1 or later.
-  nx>undici: 7.30.1
   # eslint-plugin-tsdoc pins @typescript-eslint/utils ~8.56.0, which does not accept TypeScript 6. Align it with the
   # typescript-eslint version of the catalog. Remove this override once eslint-plugin-tsdoc supports TypeScript 6.
   eslint-plugin-tsdoc>@typescript-eslint/utils: 8.70.1

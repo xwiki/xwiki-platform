@@ -34,12 +34,18 @@ import org.xwiki.test.ui.po.BaseModal;
  */
 public class NotificationsWatchModal extends BaseModal
 {
+    private static final By MODAL_SELECTOR = By.id("watchModal");
+
     /**
      * Default constructor.
      */
     public NotificationsWatchModal()
     {
-        super(By.id("watchModal"));
+        // The modal is fetched from the server when the watch button is clicked, so it is not part of the DOM before
+        // that: it can only be located once it is displayed, which also rules out the fade removal done by
+        // BaseModal(By) since that one only has an effect before the modal is opened.
+        getDriver().waitUntilElementIsVisible(MODAL_SELECTOR);
+        this.container = getDriver().findElement(MODAL_SELECTOR);
     }
 
     /**

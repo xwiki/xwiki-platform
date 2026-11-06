@@ -25,17 +25,12 @@ import {execSync} from 'child_process';
 import path from 'path';
 import {computeDistTag, needsPublishedVersions} from './lib/tags.js';
 import {readPublishedVersions} from './lib/registry.js';
+import {publishCommand} from './lib/publish.js';
 
-// Allow skipping the npm publication process. This is useful the case where the maven
-// release failed after the npm publication process passed successfully as we want to
-// avoid republishing the npm packages again (it would lead to errors).
-if (process.env.SKIP_NPM_PUBLICATION === "true") {
-  process.exit(0);
-}
-
-// Print the publication command instead of running it, to review what a release would do. The
-// registry is still read, so that the printed dist-tag is the one a real publication would use.
-const dryRun = process.env.DEPLOY_DRY_RUN === "true";
+// Run every check of the publication without sending anything to the registry. The release script
+// sets it for the Maven release, then publishes the release itself once the release manager is
+// there to approve the publication with their two-factor authentication.
+const dryRun = process.env.XWIKI_NPM_PUBLISH_DRY_RUN === "true";
 
 /**
  * Script to conditionally publish npm packages based on version type (SNAPSHOT vs release)
@@ -211,14 +206,8 @@ try {
 
 try {
   const registry = isSnapshotMode ? snapshotRegistry : releaseRegistry;
-  const access = isSnapshotMode ? '' : ' --access public';
-  const command = `pnpm -r publish --registry ${registry}${access} --tag ${distTag} --no-git-checks`;
-
-  if (dryRun) {
-    console.log(`[dry run] ${command}`);
-  } else {
-    execSync(command, { stdio: 'inherit', cwd: baseDirectory });
-  }
+  const command = publishCommand({registry, snapshot: isSnapshotMode, distTag, dryRun});
+  execSync(command, { stdio: 'inherit', cwd: baseDirectory });
 } catch (error) {
   console.error('Error during publication', error.message);
   process.exit(1);

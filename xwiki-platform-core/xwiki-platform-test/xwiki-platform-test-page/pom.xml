@@ -35,7 +35,7 @@
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- The macros of this test framework only exist for page tests and are never installed through the Extension
          Manager -->
-    <xwiki.extension.components.check.skip>true</xwiki.extension.components.check.skip>
+    <xwiki.extension.components.macros.check.skip>true</xwiki.extension.components.macros.check.skip>
   </properties>
   <dependencies>
     <dependency>

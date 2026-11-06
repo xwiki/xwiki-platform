@@ -40,11 +40,13 @@
     </xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Application</xwiki.extension.name>
-    <!-- Indicate to the XWiki Extension Manager that this extension contributes Macro components -->
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
     <xwiki.extension.components>
       org.xwiki.rendering.macro.Macro/wikis
-      org.xwiki.rendering.macro.Macro/workspaces
     </xwiki.extension.components>
+    <!-- Deprecated macro, replaced by the wikis macro, not declared in xwiki.extension.components so that the editor
+         doesn't suggest installing it -->
+    <xwiki.extension.components.macros.check.excluded>workspaces</xwiki.extension.components.macros.check.excluded>
   </properties>
   <dependencies>
     <dependency>

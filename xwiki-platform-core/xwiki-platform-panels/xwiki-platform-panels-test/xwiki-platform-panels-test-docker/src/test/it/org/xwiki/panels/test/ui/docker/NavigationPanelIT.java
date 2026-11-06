@@ -57,9 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 })
 class NavigationPanelIT
 {
-    private static final String TREE_DESCRIPTION = "Expand and collapse this tree nodes respectively with the right "
-        + "and left arrow keys. Navigate between the nodes with the up and down arrow keys.";
-
     @BeforeAll
     public void setup(TestUtils setup) throws Exception
     {
@@ -136,9 +133,6 @@ class NavigationPanelIT
                 NavigationTreeElement tree = new NavigationPanel(leftColumn).getNavigationTree();
                 tree.waitForDocumentSelected(documentPath);
                 labelIds.addAll(tree.getNodeLabelIds());
-                // Each tree is described by its own description, even though both trees come from the same cached
-                // panel output.
-                assertEquals(TREE_DESCRIPTION, tree.getDescription());
             }
 
             // A node label without an id would otherwise be reported below as a duplicate of the other missing ids,

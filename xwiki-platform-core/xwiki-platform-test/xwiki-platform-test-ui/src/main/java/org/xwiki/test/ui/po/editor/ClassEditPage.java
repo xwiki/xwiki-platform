@@ -290,6 +290,16 @@ public class ClassEditPage extends EditPage
 
     /**
      * @param propertyName the name of a property of this class
+     * @return whether the given property is collapsed, showing only its title
+     * @since 18.10.0RC1
+     */
+    public boolean isPropertyCollapsed(String propertyName)
+    {
+        return getPropertyContainer(propertyName).getDomAttribute("class").contains("collapsed");
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
      * @return the part of the property title a drag has to start from, the move buttons being operated by a click
      *     rather than by a drag
      */

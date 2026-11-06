@@ -709,9 +709,13 @@
         if(!startExpanded) {
           property.addClass('collapsed');
         }
-        // The click event is caught only on the icon and title to avoid breaking behaviour when using actions, 
-        // especially the move action which is dragAndDrop.
+        // The click event is caught only on the icon and title, so that the tools of the title, such as the delete
+        // and move buttons, don't expand or collapse the property. The title is also where a drag starts, and the
+        // click that ends a drag on it is ignored, so that reordering a property doesn't change its state.
         propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
+          if (property.data('_dragJustEnded')) {
+            return;
+          }
           propertyTitle.parent().toggleClass('collapsed');
         });
       }
@@ -788,8 +792,14 @@
         });
       }
 
-      endDrag() {
+      endDrag(event, ui) {
         $(this).removeClass('dragged');
+        // The click that follows the end of the drag is dispatched right after this callback, so the flag only has to
+        // last until the next task.
+        ui.item.data('_dragJustEnded', true);
+        setTimeout(function() {
+          ui.item.removeData('_dragJustEnded');
+        });
         $('#xclassContent').children().each(function() {
           let item = $(this);
           if (item.data('_expandedBeforeDrag')) {

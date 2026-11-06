@@ -215,8 +215,11 @@ class EditClassIT
         classEditPage = setup.editClass(reference);
         assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
 
+        // Dragging a property by its title doesn't expand or collapse it.
+        assertTrue(classEditPage.isPropertyCollapsed("testC"));
         classEditPage.movePropertyBefore("testC", "testB");
         assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        assertTrue(classEditPage.isPropertyCollapsed("testC"));
         classEditPage.clickSaveAndView();
 
         classEditPage = setup.editClass(reference);

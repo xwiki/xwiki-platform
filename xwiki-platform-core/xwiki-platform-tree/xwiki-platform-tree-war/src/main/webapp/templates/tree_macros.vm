@@ -37,13 +37,17 @@
 })
 
 #macro (tree $options)
-  ## The $attributes variable used below is defined by the #treeAttributes call.
-  <div #treeAttributes($options) aria-describedby="$escapetool.xml("$!{attributes.id}-description")"></div>
+  <div #treeAttributes($options)></div>
   #set ($macro.description = $options.description)
   #if ("$!macro.description" == '')
     #set ($macro.description = $services.localization.render('tree.macro.description'))
   #end
-  <p id="$escapetool.xml("$!{attributes.id}-description")" class="sr-only">$escapetool.xml($macro.description)</p>
+  ## The description is linked to the tree on the client side, where the tree id is generated when missing. Generating
+  ## the id here would give the same id to every copy of a cached tree output.
+  ## The description is hidden on purpose. Assistive technologies still announce it through the aria-describedby of
+  ## the tree, because a description is computed even from a hidden element, but it is never read on its own,
+  ## out of the context of the tree, and it stays out of the visible text of the page.
+  <p class="xtree-description" hidden>$escapetool.xml($macro.description)</p>
 #end
 
 #macro (treeAttributes $options $isWikiSyntax)
@@ -74,11 +78,9 @@
   #set ($macro.options = {})
   #set ($discard = $macro.options.putAll($defaultTreeOptions))
   #set ($discard = $macro.options.putAll($options))
-  ## Generate the default id here so that each tree of the page gets its own.
-  #if ("$!macro.options.id" == '')
-    #set ($macro.options.id = "xtree-${datetool.date.time}-${mathtool.random(100, 1000)}")
+  #if ($macro.options.id)
+    #set ($discard = $attributes.put('id', $macro.options.id))
   #end
-  #set ($discard = $attributes.put('id', $macro.options.id))
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)

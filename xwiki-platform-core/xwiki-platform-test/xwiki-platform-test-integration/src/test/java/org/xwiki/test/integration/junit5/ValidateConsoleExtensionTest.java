@@ -48,6 +48,7 @@ import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.ConsoleAppender;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 import static org.xwiki.test.integration.junit5.ValidateConsoleExtension.SKIP_PROPERTY;
 
@@ -151,7 +152,7 @@ class ValidateConsoleExtensionTest
             launcher.execute(request, summaryListener);
 
             TestExecutionSummary summary = summaryListener.getSummary();
-            assertResult(summary, errContentStream.toString());
+            assertResult(summary, outContentStream.toString(), errContentStream.toString());
         } finally {
             resetLogback();
             System.setOut(savedOut);
@@ -159,7 +160,7 @@ class ValidateConsoleExtensionTest
         }
     }
 
-    private void assertResult(TestExecutionSummary summary, String errContent)
+    private void assertResult(TestExecutionSummary summary, String outContent, String errContent)
     {
         assertEquals(1, summary.getFailures().size());
         // The error that is neither excluded nor expected fails the validation, like the deprecation.
@@ -169,8 +170,9 @@ class ValidateConsoleExtensionTest
             INFO  - Deprecated usage of something
             ]""", summary.getFailures().getFirst().getException().getMessage());
         // The expected error was found, and warnings are not validated so the excluded one is reported as not
-        // matched.
-        assertEquals("""
+        // matched. These warnings are logged after the capture is stopped, to the restored stdout, which also holds
+        // the captured content since the capture forwards it.
+        String expectedWarnings = """
             WARN  - The following excludes were not matched and could be candidates for removal \
             (beware of configs): [
             caught in beforeAll
@@ -180,7 +182,10 @@ class ValidateConsoleExtensionTest
             (beware of configs): [
             expected that didn't happen
             ]
-            """, errContent);
+            """;
+        assertTrue(outContent.endsWith(expectedWarnings), outContent);
+        // Nothing is logged to stderr, which is restored too.
+        assertEquals("", errContent);
     }
 
     /**

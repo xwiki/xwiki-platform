@@ -110,6 +110,13 @@
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
+    <!-- Provides rating_macros.vm, used by the rating displayer of ExtensionClass. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-templates</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Provides the component list for RenderingScriptService. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

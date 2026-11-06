@@ -315,7 +315,18 @@ define('xwiki-selectize', [
     const hadTabIndex = input.hasAttribute('tabindex');
     const originalTabIndex = input.getAttribute('tabindex');
 
-    const tomSelect = new TomSelect(input, getSettings($(input), settings));
+    // Tom Select drops the options it creates from the initial value of the input when the settings have their own,
+    // which unselects the initial value. Add the options from the settings after creating the widget instead, keeping
+    // their order.
+    const tomSelectSettings = getSettings($(input), settings);
+    const options = tomSelectSettings.options;
+    if (Array.isArray(options)) {
+      delete tomSelectSettings.options;
+    }
+    const tomSelect = new TomSelect(input, tomSelectSettings);
+    if (Array.isArray(options)) {
+      tomSelect.addOptions(options.map(option => ({...option, $order: ++tomSelect.order})));
+    }
 
     // Tom Select sets input.tabIndex (see above) AFTER firing its own 'destroy' event, so a 'destroy' listener runs
     // too early to fix this up (it would get overwritten right after). Wrap destroy() itself so our fix runs

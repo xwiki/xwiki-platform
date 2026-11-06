@@ -15,6 +15,7 @@
     "jiti": "catalog:",
     "jquery": "catalog:",
     "jsdom": "catalog:",
+    "tom-select": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
     "xwiki-platform-web-webjar": "workspace:*"

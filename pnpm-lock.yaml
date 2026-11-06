@@ -253,8 +253,8 @@ catalogs:
       specifier: 11.0.0
       version: 11.0.0
     rimraf:
-      specifier: 6.1.3
-      version: 6.1.3
+      specifier: 6.1.4
+      version: 6.1.4
     semver:
       specifier: 7.8.5
       version: 7.8.5
@@ -987,7 +987,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -1093,7 +1093,7 @@ importers:
         version: 0.2.2
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -1719,7 +1719,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -1842,7 +1842,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -2865,7 +2865,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -3406,7 +3406,7 @@ importers:
         version: 0.2.2
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -3449,7 +3449,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -3489,7 +3489,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -3523,7 +3523,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -3563,7 +3563,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -3673,7 +3673,7 @@ importers:
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
       rimraf:
         specifier: 'catalog:'
-        version: 6.1.3
+        version: 6.1.4
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
@@ -6080,6 +6080,11 @@ packages:
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
 
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
@@ -6824,6 +6829,10 @@ packages:
 
   glob@13.0.6:
     resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
+    engines: {node: 18 || 20 || >=22}
+
+  glob@14.0.3:
+    resolution: {integrity: sha512-A1vjIwC3qpdCso45Iw127gnp7sPhqgY8lUQhDrArIs+GbmfaaVPFuoyy7WyLT9EPZCRZ7j7aLdwUhQmHWesEow==}
     engines: {node: 18 || 20 || >=22}
 
   globals@17.12.0:
@@ -7694,6 +7703,10 @@ packages:
     resolution: {integrity: sha512-3O/iVVsJAPsOnpwWIeD+d6z/7PmqApyQePUtCndjatj/9I5LylHvt5qluFaBT3I5h3r1ejfR056c+FCv+NnNXg==}
     engines: {node: 18 || 20 || >=22}
 
+  path-scurry@3.0.0:
+    resolution: {integrity: sha512-1pTbQqH1wIwMi/eleQ5leFTTCkzFsPcgXNjwOA8YGGW/W4/kHT3dssE7Z6NH+zuqNLOzOB0uaD61yl7cAcVhgg==}
+    engines: {node: 18 || 20 || >=22}
+
   path-type@3.0.0:
     resolution: {integrity: sha512-T2ZUsdZFHgA3u4e5PfPbjd7HDDpxPnQb5jN0SrDsjNSuVXHJqtwTnWqG0B1jZrgmJ/7lj1EmVIByWt1gxGkWvg==}
     engines: {node: '>=4'}
@@ -8086,8 +8099,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rimraf@6.1.3:
-    resolution: {integrity: sha512-LKg+Cr2ZF61fkcaK1UdkH2yEBBKnYjTyWzTJT6KNPcSPaiT7HSdhtMXQuN5wkTX0Xu72KQ1l8S42rlmexS2hSA==}
+  rimraf@6.1.4:
+    resolution: {integrity: sha512-Fk3reQDVPZUMbEm7Zwxz03BWQMW3V5buSk9aU8OckTrO8A1nQtbqvYsAantGNermwsIsXcuOBqcoJ3HuMELctw==}
     engines: {node: 20 || >=22}
     hasBin: true
 
@@ -11244,6 +11257,12 @@ snapshots:
       minipass: 7.1.3
       path-scurry: 2.0.2
 
+  glob@14.0.3:
+    dependencies:
+      minimatch: 11.0.2
+      minipass: 7.1.3
+      path-scurry: 3.0.0
+
   globals@17.12.0: {}
 
   globalthis@1.0.4:
@@ -12319,6 +12338,11 @@ snapshots:
       lru-cache: 11.5.3
       minipass: 7.1.3
 
+  path-scurry@3.0.0:
+    dependencies:
+      lru-cache: 11.5.3
+      minipass: 7.1.3
+
   path-type@3.0.0:
     dependencies:
       pify: 3.0.0
@@ -12695,9 +12719,9 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rimraf@6.1.3:
+  rimraf@6.1.4:
     dependencies:
-      glob: 13.0.6
+      glob: 14.0.3
       package-json-from-dist: 1.0.1
 
   rolldown@1.2.14:

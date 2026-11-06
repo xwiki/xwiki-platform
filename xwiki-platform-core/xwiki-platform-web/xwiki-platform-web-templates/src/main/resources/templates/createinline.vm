@@ -273,8 +273,12 @@
       #end
     #end
     <dt>
-      <span class='label'>$services.localization.render('core.create.type')</span>
-      <span class="xHint">$escapetool.xml($services.localization.render('core.create.type.hint'))</span>
+      <span id="createType-label">
+        $escapetool.xml($services.localization.render('core.create.type'))
+      </span>
+      <span id="createType-hint" class="xHint">
+        $escapetool.xml($services.localization.render('core.create.type.hint'))
+      </span>
     </dt>
     #set ($defaultValue = $request.type)
     #if ("$!defaultValue" == '')
@@ -284,7 +288,8 @@
         #set ($defaultValue = 'blank')
       #end
     #end
-    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-adaptable-medium page-type', '', true)</dd>
+    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-adaptable-medium page-type',
+      'createType', true)</dd>
   #else
     <input type="hidden" name="template" value="$escapetool.xml($template)" />
   #end
@@ -401,9 +406,9 @@
           ## need to show this information elsewhere. Even if the target page reference can't be modified by the user,
           ## they should still see where the page is going to be created.
           <dt>
-            <span class='label'>$escapetool.xml($services.localization.render('core.create.pageTitle'))</span>
+            <span>$escapetool.xml($services.localization.render('core.create.pageTitle'))</span>
           </dt>
-          <dl>
+          <dd>
             ## We are creating a top level space.
             #if ("$!spaceReference" == '' && $isSpace)
               #set ($targetDocumentReference = $services.model.createDocumentReference('WebHome', $name))
@@ -411,7 +416,7 @@
               #set ($targetDocumentReference = $services.model.createDocumentReference($name, $spaceReference))
             #end
             #hierarchy($targetDocumentReference)
-          </dl>
+          </dd>
         #end
         ## ---------------------------------------------------------------------------------------------------------
         ## Page type

@@ -119,7 +119,8 @@ define('xwiki-reorder-controls', ['jquery'], function ($) {
    * @return {jQuery} the button moving the given item in the given direction
    */
   function createButton(item, options, direction) {
-    const button = $('<button></button>').attr('type', 'button').addClass('reorder-control reorder-control-' + direction).addClass(options.buttonClass);
+    const button = $('<button></button>').attr('type', 'button')
+      .addClass('reorder-control reorder-control-' + direction).addClass(options.buttonClass);
     $('<span></span>').attr('aria-hidden', 'true').html(options.icons[direction]).appendTo(button);
     $('<span></span>').addClass('sr-only').text(options.label(item, direction)).appendTo(button);
     button.on('click', function (event) {

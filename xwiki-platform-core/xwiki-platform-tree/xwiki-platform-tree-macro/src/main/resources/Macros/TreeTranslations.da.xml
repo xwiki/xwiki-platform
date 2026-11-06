@@ -66,5 +66,6 @@ rendering.macro.tree.parameter.limit.name=Begrænsning
 rendering.macro.tree.parameter.limit.description=Det højeste antal underknuder, der vises, når en overordnet knude foldes ud første gang. Resten af underknuderne kan nås via linket "mere ...". Parameteren bruges til at dele underknuderne op i sider og hjælper dermed træet, når der er mange underknuder. Træet sender parameteren videre til træets kilde, så den virker kun med dynamiske træer, hvis kilde understøtter en grænse for antallet af underknuder.
 rendering.macro.tree.content.description=Du kan bruge indlejrede HTML-punktopstillinger til at beskrive træstrukturen. Se http://www.jstree.com/docs/html/ for flere oplysninger.
 tree.macro.editModeWarning=Træet kan ikke vises i redigeringstilstand.
+tree.macro.description=Fold træets knuder ud og sammen med henholdsvis højre og venstre piletast. Gå mellem knuderne med pil op og pil ned.
 </content>
 </xwikidoc>

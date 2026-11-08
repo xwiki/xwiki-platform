@@ -1334,6 +1334,33 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# The default is 512 MB.
 # store.s3.multipartCopySizeMB = 512
 
+#-# [Since 18.10.0RC1]
+#-# Indicates whether the S3 service supports the conditional request XWiki sends with uploads: the "If-None-Match: *"
+#-# condition on PutObject and CompleteMultipartUpload (which also completes the copies of objects larger than
+#-# store.s3.multipartCopySizeMB), to create an object only if it doesn't exist yet. AWS S3 and SILO support it. Set it
+#-# to false for S3-compatible services that don't implement conditional writes (they answer "501 Not Implemented",
+#-# and the error names this property); a service that supports no conditional request at all needs both this
+#-# property and store.s3.conditionalCopies set to false. XWiki always checks whether an object exists before creating
+#-# it (which needs the permissions to read objects and to list the bucket); when this is disabled, that check is not
+#-# atomic: two nodes creating the same object at about the same time can overwrite each other.
+#-#
+#-# The default is true.
+# store.s3.conditionalWrites = true
+
+#-# [Since 18.10.0RC1]
+#-# Indicates whether the S3 service supports the conditional requests XWiki sends with copies and moves: the
+#-# "If-None-Match: *" condition on CopyObject (objects up to store.s3.multipartCopySizeMB), which copies an object
+#-# only if the target doesn't exist yet, and the "x-amz-copy-source-if-match" condition on UploadPartCopy (larger
+#-# objects), which makes sure that all parts are copied from the same version of the source. Some S3-compatible
+#-# services support the condition of uploads but not those of copies: OVHcloud Object Storage, for example, rejects
+#-# any condition on CopyObject with "501 Not Implemented" and fails "x-amz-copy-source-if-match" for objects uploaded
+#-# in several parts. Set it to false for them, and keep store.s3.conditionalWrites enabled. When disabled, the
+#-# existence check of the target of copies up to store.s3.multipartCopySizeMB is not atomic, and the source of a
+#-# larger copy is checked again before the copy is completed.
+#-#
+#-# The default is true.
+# store.s3.conditionalCopies = true
+
 #-------------------------------------------------------------------------------------
 # Mail
 #-------------------------------------------------------------------------------------

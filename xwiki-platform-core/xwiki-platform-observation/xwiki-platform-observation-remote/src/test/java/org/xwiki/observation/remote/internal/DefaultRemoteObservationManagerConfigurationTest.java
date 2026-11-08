@@ -22,12 +22,15 @@ package org.xwiki.observation.remote.internal;
 import java.io.File;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -48,17 +51,24 @@ class DefaultRemoteObservationManagerConfigurationTest
     @MockComponent
     private Environment environment;
 
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
     @XWikiTempDir
     private File tmpDir;
 
+    private MemoryConfigurationSource configurationSource;
+
     @BeforeComponent
-    public void configure()
+    public void configure() throws Exception
     {
         // getPermanentDirectory needs to be mocked before on remoteObservationManagerConfiguration during the component
         // initialization.
         when(this.environment.getPermanentDirectory()).thenReturn(this.tmpDir);
+
+        this.configurationSource = this.componentManager.registerMemoryConfigurationSource();
     }
-    
+
     @Test
     void initialize() throws Exception
     {
@@ -67,5 +77,15 @@ class DefaultRemoteObservationManagerConfigurationTest
         // Simulate a restart by re-initializing.
         this.remoteObservationManagerConfiguration.initialize();
         assertEquals(firstInitId, this.remoteObservationManagerConfiguration.getId());
+    }
+
+    @Test
+    void getClusterName()
+    {
+        assertEquals("event", this.remoteObservationManagerConfiguration.getClusterName());
+
+        this.configurationSource.setProperty("observation.remote.clusterName", "wiki1");
+
+        assertEquals("wiki1", this.remoteObservationManagerConfiguration.getClusterName());
     }
 }

@@ -78,7 +78,8 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 public class JGroupsNetworkChannel implements NetworkChannel, Receiver
 {
     /**
-     * Relative path where to find JGroups channels configurations.
+     * Relative path where to find JGroups channels configurations (in the {@code WEB-INF} folder of the web application
+     * or on the classpath).
      */
     public static final String CONFIGURATION_PATH = "observation/remote/jgroups/";
 
@@ -167,9 +168,16 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
             this.channelReceiver = this.componentManager.getInstance(JGroupsReceiver.class);
         }
 
+        String currentMemberId = this.configuration.getId();
+
         // Create the channel
         this.jchannel = new JChannel(channelConf);
         this.jchannel.setDiscardOwnMessages(true);
+        // Use the XWiki identifier of the instance as JGroups logical name so that the member addresses printed by
+        // JGroups (logs, View#toString(), JMX) show it. This is for display only: an Address does not carry its
+        // logical name (JGroups shares the names on a best effort basis), the identifiers used by XWiki come from the
+        // member identifier handshake.
+        this.jchannel.name(currentMemberId);
 
         // Register the channel
         this.channels.getChannels().put(getId(), this);
@@ -179,9 +187,7 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
         this.memberIdDispatcher.setReceiver(this);
 
         // Start the channel
-        this.jchannel.connect("event");
-
-        String currentMemberId = this.configuration.getId();
+        this.jchannel.connect(this.configuration.getClusterName());
 
         // Register the channel against the JMX Server
         try {
@@ -344,6 +350,11 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
         } catch (ComponentLookupException e) {
             // Environment not found, continue by fallbacking on JGroups's standard configuration.
             this.logger.debug("Failed to lookup the Environment component.", e);
+        }
+
+        if (is == null) {
+            // Fallback on the configurations shipped with XWiki
+            is = getClass().getClassLoader().getResourceAsStream(CONFIGURATION_PATH + channelFile);
         }
 
         if (is == null) {

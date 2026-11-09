@@ -26,7 +26,6 @@
 @import "variables"; // Bootstrap variables overridden by flamingo and XWiki specific LESS variables.
 @import "mixins"; // Mixins defined by flamingo
 @import "action-menus";
-@import "admin";
 @import "buttons";
 @import "breadcrumbs";
 @import "edit";

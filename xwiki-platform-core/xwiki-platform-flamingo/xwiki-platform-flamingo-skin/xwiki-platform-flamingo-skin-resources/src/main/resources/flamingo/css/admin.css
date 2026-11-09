@@ -1,0 +1,61 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/* Same layout as .col-xs-12.col-sm-3 for the menu and .col-xs-12.col-sm-9 for the content. */
+.admin-menu, .admin-category, #admin-page-content {
+  position: relative;
+  float: left;
+  width: 100%;
+  min-height: 1px;
+  padding-right: calc(var(--grid-gutter-width) / 2);
+  padding-left: calc(var(--grid-gutter-width) / 2);
+}
+
+/* 768px stands for @screen-sm-min. */
+@media (min-width: 768px) {
+  .admin-menu {
+    width: 25%;
+  }
+
+  .admin-category, #admin-page-content {
+    width: 75%;
+  }
+}
+
+/* 1200px stands for @screen-lg-min. */
+@media (min-width: 1200px) {
+  .admin-menu {
+    max-width: 300px;
+  }
+}
+
+/* 480px stands for @screen-xs-min. */
+@media (max-width: 480px) {
+  .admin-menu, .admin-category, #admin-page-content {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+/* Allow scrolling for containers that take a lot of space, like Rights or Livetables. */
+#admin-page-content #xwikieditcontent,
+#admin-page-content .xwiki-livetable-container {
+  overflow: auto;
+}

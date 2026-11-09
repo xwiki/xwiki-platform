@@ -355,12 +355,13 @@ $xwiki.get('ssx').use($doc.getFullName())##
 )))
 == $syntaxTitle: $services.rendering.escape($sectionName, 'xwiki/2.1') ==
 
-#verticalNavigation($syntaxMenu {'translationPrefix' : 'syntax.', 'crtItemId' : "$!crtItemId", 'cssClass' : 'syntax-menu'})
+(% class="row" %)(((
+#verticalNavigation($syntaxMenu {'translationPrefix' : 'syntax.', 'crtItemId' : "$!crtItemId", 'cssClass' : 'syntax-menu col-xs-12 col-sm-3'})
 ##-----------------------------------------
 ## syntax-page display
 ##-----------------------------------------
   #set ($subHeading = '===')
-  (% id="syntax-page-content" %)(((
+  (% id="syntax-page-content" class="col-xs-12 col-sm-9" %)(((
   #if(!$crtSection &amp;&amp; !$crtCategory)
     #syntax_displayCategories($syntaxMenu 'syntax.')
   #elseif (!$crtSection)
@@ -369,6 +370,7 @@ $xwiki.get('ssx').use($doc.getFullName())##
       #syntax_displaySection($crtSection 'syntax.' false)      
   #end
   ))) ## syntax-page-content
+)))
 {{/velocity}}</content>
   <object>
     <name>XWiki.XWikiSyntax</name>
@@ -582,9 +584,6 @@ document.observe('xwiki:dom:loaded', function() {
   margin: 0.5ex;
 }
 
-#syntax-page-content {
-  margin-left: 15em;
-}
 #syntax-page-content table {
   width: 99%;
 }

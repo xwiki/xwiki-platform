@@ -19,15 +19,27 @@
  */
 package org.xwiki.web;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
+import javax.script.ScriptContext;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.extension.DefaultExtensionSupportPlan;
+import org.xwiki.extension.DefaultExtensionSupportPlans;
+import org.xwiki.extension.DefaultExtensionSupporter;
+import org.xwiki.extension.ExtensionSupporter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.template.script.TemplateScriptService;
@@ -41,6 +53,8 @@ import org.xwiki.xml.html.script.HTMLScriptService;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -158,6 +172,45 @@ class ExtensionPageTest extends PageTest
             .parseToSafeURI(backURL);
 
         assertEquals(DEFAULT_BACK_URL, getBackURL());
+    }
+
+    @Test
+    void displaySingleSupportPlan() throws Exception
+    {
+        String supporterName = "<em>Supporter</em> & Co";
+        ExtensionSupporter supporter = new DefaultExtensionSupporter(supporterName, toURL("https://example.org/"));
+        DefaultExtensionSupportPlans supportPlans = new DefaultExtensionSupportPlans(List.of(
+            new DefaultExtensionSupportPlan(supporter, "Community", toURL("https://example.org/community"), false)));
+
+        Document document = renderSupportPlans(supportPlans, true);
+
+        Element supporterNameElement = document.selectFirst(".supporter.support-single-plan > .supporter-name");
+        assertNotNull(supporterNameElement);
+        assertEquals(supporterName + ":", supporterNameElement.text());
+        assertTrue(supporterNameElement.children().isEmpty());
+    }
+
+    private Document renderSupportPlans(DefaultExtensionSupportPlans supportPlans, boolean supporterList)
+        throws Exception
+    {
+        ScriptContext scriptContext =
+            this.componentManager.<ScriptContextManager>getInstance(ScriptContextManager.class)
+                .getCurrentScriptContext();
+        scriptContext.setAttribute("supportPlans", supportPlans, ScriptContext.ENGINE_SCOPE);
+        scriptContext.setAttribute("supporterList", supporterList, ScriptContext.ENGINE_SCOPE);
+
+        this.currentDocument.setContent("""
+            {{velocity}}
+            #template('extension.vm')
+            {{html clean="false"}}#displayExtensionSupportPlans($supportPlans $supporterList){{/html}}
+            {{/velocity}}""");
+        this.currentDocument.setSyntax(Syntax.XWIKI_2_1);
+        return Jsoup.parse(this.currentDocument.getRenderedContent(this.context));
+    }
+
+    private static URL toURL(String url) throws MalformedURLException
+    {
+        return URI.create(url).toURL();
     }
 
     private String getBackURL() throws Exception

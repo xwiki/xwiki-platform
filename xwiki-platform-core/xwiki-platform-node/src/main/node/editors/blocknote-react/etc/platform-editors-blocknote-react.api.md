@@ -17,6 +17,8 @@ import { Container } from 'inversify';
 import { CustomInlineContentConfig } from '@blocknote/core';
 import { DefaultInlineContentSchema } from '@blocknote/core';
 import { DefaultStyleSchema } from '@blocknote/core';
+import { Extension } from '@blocknote/core';
+import { ExtensionFactoryInstance } from '@blocknote/core';
 import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';

@@ -110,17 +110,16 @@
       <version>${solr.hk2.version}</version>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.glassfish.hk2.external</groupId>
-      <artifactId>aopalliance-repackaged</artifactId>
-      <version>${solr.hk2.version}</version>
-      <optional>true</optional>
-    </dependency>
     <!-- The dependencies of the embedded Jersey which are not embedded themselves -->
     <dependency>
       <!-- Not embedded since the same version can be shared with the Jersey 2 used by XWiki -->
       <groupId>org.glassfish.hk2</groupId>
       <artifactId>osgi-resource-locator</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Not embedded since the AOP Alliance API never changed and can be shared with the Jersey 2 used by XWiki -->
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
     </dependency>
     <dependency>
       <groupId>org.javassist</groupId>
@@ -315,7 +314,6 @@
                   <include>org.glassfish.jersey.media:*</include>
                   <include>org.glassfish.jersey.ext:*</include>
                   <include>org.glassfish.hk2:*</include>
-                  <include>org.glassfish.hk2.external:*</include>
                 </includes>
                 <excludes>
                   <exclude>org.glassfish.hk2:osgi-resource-locator</exclude>
@@ -337,10 +335,6 @@
                 <relocation>
                   <pattern>org.jvnet.hk2</pattern>
                   <shadedPattern>${solr.shaded.prefix}.org.jvnet.hk2</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>org.aopalliance</pattern>
-                  <shadedPattern>${solr.shaded.prefix}.org.aopalliance</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>jersey.repackaged</pattern>

@@ -19,6 +19,7 @@
  */
 import BaseDisplayer from "./BaseDisplayer.vue";
 import { initWrapper } from "./displayerTestsHelper";
+import { EditBusService } from "../services/editBus";
 import flushPromises from "flush-promises";
 import { fake, restore, stub } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
@@ -469,5 +470,46 @@ describe("BaseDisplayer.vue", () => {
 
       expect(wrapper.emitted().saveEdit).toBeUndefined();
     });
+  });
+});
+
+describe("BaseDisplayer.vue edit bus listener", () => {
+  afterEach(function () {
+    restore();
+  });
+
+  it("Unregisters its edit bus listener when unmounted", () => {
+    const listeners = new Set();
+    const wrapper = initWrapper(BaseDisplayer, {
+      logic: { isEditMode: () => false },
+      editBus: {
+        onAnyEvent: (callback) => listeners.add(callback),
+        offAnyEvent: (callback) => listeners.delete(callback),
+      },
+    });
+    expect(listeners.size).toBe(1);
+
+    wrapper.unmount();
+
+    expect(listeners.size).toBe(0);
+  });
+
+  it("Is not notified of the edit events once unmounted", () => {
+    const logic = { isEditMode: () => false, getEntryId: () => "entry-1" };
+    const editBus = new EditBusService(logic);
+    const initCell = () =>
+      initWrapper(BaseDisplayer, {
+        logic: { ...logic, getEditBus: () => editBus },
+      });
+    const unmountedCell = initCell();
+    unmountedCell.unmount();
+    // The helper stubs globals on each call, they must be restored before mounting another cell.
+    restore();
+    const displayedCell = initCell();
+
+    editBus.start({ color: "red" }, "color");
+
+    expect(displayedCell.vm.duringEditing).toBe(true);
+    expect(unmountedCell.vm.duringEditing).toBe(false);
   });
 });

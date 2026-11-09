@@ -1050,7 +1050,7 @@ $namespace##
           #if ($extensionSupporterPlans.size() == 1)
             <$supporterElementName class="supporter support-single-plan">
               #set ($extensionSupporterPlan = $extensionSupporterPlans.get(0))
-              <span class="supporter-name">$extensionSupporter.name: </span>
+              <span class="supporter-name">$escapetool.xml($extensionSupporter.name): </span>
               <span class="plan-name infomessage">
                 #displayExtensionSupportPlanName($extensionSupporterPlan)
               </span>

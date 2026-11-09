@@ -199,6 +199,22 @@ class ExtensionPageTest extends PageTest
         assertEquals("div", document.selectFirst(".supporter.support-single-plan").tagName());
     }
 
+    @Test
+    void displaySingleSupportPlan() throws Exception
+    {
+        String supporterName = "<em>Supporter</em> & Co";
+        ExtensionSupporter supporter = new DefaultExtensionSupporter(supporterName, toURL("https://example.org/"));
+        DefaultExtensionSupportPlans supportPlans = new DefaultExtensionSupportPlans(List.of(
+            new DefaultExtensionSupportPlan(supporter, "Community", toURL("https://example.org/community"), false)));
+
+        Document document = renderSupportPlans(supportPlans, true);
+
+        Element supporterNameElement = document.selectFirst(".supporter.support-single-plan > .supporter-name");
+        assertNotNull(supporterNameElement);
+        assertEquals(supporterName + ":", supporterNameElement.text());
+        assertTrue(supporterNameElement.children().isEmpty());
+    }
+
     private Element assertMultiPlanSupporter(Document document)
     {
         Element multiPlanSupporter = document.selectFirst(".supporter.support-multi-plan");
@@ -224,6 +240,12 @@ class ExtensionPageTest extends PageTest
             new DefaultExtensionSupportPlan(singlePlanSupporter, "Community",
                 toURL("https://single.example.org/community"), false)));
 
+        return renderSupportPlans(supportPlans, supporterList);
+    }
+
+    private Document renderSupportPlans(DefaultExtensionSupportPlans supportPlans, boolean supporterList)
+        throws Exception
+    {
         ScriptContext scriptContext =
             this.componentManager.<ScriptContextManager>getInstance(ScriptContextManager.class)
                 .getCurrentScriptContext();

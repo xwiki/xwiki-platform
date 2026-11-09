@@ -40,6 +40,10 @@
     <!-- Nothing to check: no source -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.skip>true</xwiki.jacoco.skip>
+    <!-- aopalliance-repackaged is only an (optional) input of the shading and is relocated in the produced jar, so it
+         never competes with the aopalliance:aopalliance used by XWiki. Maven Enforcer Plugin 3.7.0 started checking
+         optional dependencies too. -->
+    <xwiki.enforcer.enforce-aopalliance.skip>true</xwiki.enforcer.enforce-aopalliance.skip>
     <solr.shaded.prefix>org.xwiki.search.solr.shaded</solr.shaded.prefix>
     <!-- The versions used by Solr, which are different from the ones managed by XWiki (Jersey 2) -->
     <solr.jersey.version>3.1.12</solr.jersey.version>

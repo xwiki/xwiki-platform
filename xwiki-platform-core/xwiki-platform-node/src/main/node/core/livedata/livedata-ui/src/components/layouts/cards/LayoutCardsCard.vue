@@ -140,6 +140,15 @@ export default {
       type: Number,
       required: true,
     },
+    /**
+     * The descriptors of the displayed properties, computed once by the layout for all its entries. When missing,
+     * they are computed from the logic.
+     * @since 18.10.0RC1
+     */
+    propertyDescriptors: {
+      type: Array,
+      default: undefined,
+    },
   },
 
   computed: {
@@ -148,7 +157,11 @@ export default {
     },
 
     properties() {
-      return this.logic.getPropertyDescriptors();
+      // The draggable component reorders the list it is given in place, so each card works on its own copy of the
+      // descriptors shared by the layout.
+      return this.propertyDescriptors
+        ? [...this.propertyDescriptors]
+        : this.logic.getPropertyDescriptors();
     },
 
     // The id of the property that is going to be in the card title

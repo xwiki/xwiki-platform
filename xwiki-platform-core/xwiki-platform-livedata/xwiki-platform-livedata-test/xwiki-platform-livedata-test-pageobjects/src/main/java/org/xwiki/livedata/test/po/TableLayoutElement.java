@@ -1237,6 +1237,19 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * @param columnLabel the label of a column, for instance {@code "Title"}
+     * @return {@code true} if the cells of that column are displayed, {@code false} if the column is hidden or if
+     *     there are no cells to display
+     * @since 18.10.0RC1
+     */
+    public boolean isColumnDisplayed(String columnLabel)
+    {
+        List<WebElement> cells = getDriver().findElementsWithoutWaiting(getRoot(),
+            By.cssSelector(String.format("tbody tr td.cell[data-title='%s']", columnLabel)));
+        return !cells.isEmpty() && cells.stream().allMatch(WebElement::isDisplayed);
+    }
+
+    /**
      * Return the {@link WebElement} of the dropdown button.
      *
      * @return the {@link WebElement} of the dropdown button

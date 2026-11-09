@@ -78,6 +78,7 @@
             :key="entryKeys[idx]"
             :entry="entry"
             :entry-idx="idx"
+            :property-descriptors="properties"
           />
 
           <!-- Component to create a new entry -->

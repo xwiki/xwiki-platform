@@ -64,6 +64,7 @@
         :key="entryKeys[idx]"
         :entry="entry"
         :entry-idx="idx"
+        :property-descriptors="properties"
       />
 
       <!-- Component to create a new entry -->
@@ -125,6 +126,10 @@ export default {
     },
     canAddEntry() {
       return this.logic.canAddEntry();
+    },
+    // Computed once for all the cards, instead of once per card.
+    properties() {
+      return this.logic.getPropertyDescriptors();
     },
   },
 

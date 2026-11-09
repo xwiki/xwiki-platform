@@ -22,7 +22,7 @@ import { FootnotesService } from "./footnote";
 import { i18nResolver } from "./i18nResolver";
 import { jsonMerge } from "./jsonMerge";
 import { componentStore } from "@xwiki/platform-livedata-componentstore";
-import { nextTick, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
   ActionDescriptor,
@@ -39,11 +39,25 @@ import type {
   Values,
 } from "@xwiki/platform-livedata-api";
 import type { Query, Translations } from "@xwiki/platform-localization-api";
-import type { Reactive, Ref } from "vue";
+import type { ComputedRef, Reactive, Ref } from "vue";
 import type { ComposerTranslation } from "vue-i18n";
 
 // Lists the properties whose value is submitted as HTML, which the server converts to their syntax.
 const HTML_CONVERSION_KEY = "RequiresHTMLConversion";
+
+/**
+ * @param descriptors - the descriptors to index
+ * @returns the descriptors by id, the first one winning when several share an id
+ */
+function indexById<T extends { id: string }>(descriptors: T[]): Map<string, T> {
+  const descriptorsById = new Map<string, T>();
+  for (const descriptor of descriptors) {
+    if (!descriptorsById.has(descriptor.id)) {
+      descriptorsById.set(descriptor.id, descriptor);
+    }
+  }
+  return descriptorsById;
+}
 
 /**
  * Defines the internal logic of the Live Data.
@@ -76,6 +90,26 @@ export class LiveDataLogic implements Logic {
   private readonly entryKeys = new Map<string, string>();
 
   private maximized: Ref<boolean> = ref(false);
+
+  // The descriptors resolved once per property, instead of once per displayed cell. These computed values track the
+  // meta data they read (property descriptors, property types, displayers) and are recomputed when it changes.
+  private readonly propertyDescriptorsById: ComputedRef<
+    Map<string, PropertyDescriptor>
+  > = computed(() => indexById(this.data.meta.propertyDescriptors));
+  private readonly propertyTypesById: ComputedRef<
+    Map<string, PropertyDescriptor>
+  > = computed(() => indexById(this.data.meta.propertyTypes));
+  private readonly displayerDescriptorsByPropertyId: ComputedRef<
+    Map<string, unknown>
+  > = computed(
+    () =>
+      new Map(
+        this.data.meta.propertyDescriptors.map((propertyDescriptor) => [
+          propertyDescriptor.id,
+          this.resolveDisplayerDescriptor(propertyDescriptor.id),
+        ]),
+      ),
+  );
 
   constructor(
     private readonly liveDataSource: LiveDataSource,
@@ -381,9 +415,8 @@ export class LiveDataLogic implements Logic {
    * @returns a property descriptor, or undefined when not found
    */
   getPropertyDescriptor(propertyId: string): PropertyDescriptor | undefined {
-    const propertyDescriptor = this.data.meta.propertyDescriptors.find(
-      (propertyDescriptor) => propertyDescriptor.id === propertyId,
-    );
+    const propertyDescriptor =
+      this.propertyDescriptorsById.value.get(propertyId);
     if (!propertyDescriptor) {
       console.error(
         "Property descriptor of property `" + propertyId + "` does not exist",
@@ -404,9 +437,7 @@ export class LiveDataLogic implements Logic {
     if (!propertyDescriptor) {
       return;
     }
-    return this.data.meta.propertyTypes.find(
-      (typeDescriptor) => typeDescriptor.id === propertyDescriptor.type,
-    );
+    return this.propertyTypesById.value.get(propertyDescriptor.type);
   }
 
   /**
@@ -421,11 +452,20 @@ export class LiveDataLogic implements Logic {
   }
 
   /**
-   * Get the displayer descriptor associated to a property id
+   * Get the displayer descriptor associated to a property id.
+   * The descriptor is resolved once per property and cached until the meta data changes. The returned object is
+   * shared by all the callers and must not be modified.
    * @param propertyId - a property id
    * @returns the displayer descriptor
    */
   getDisplayerDescriptor(propertyId: string) {
+    const displayerDescriptor =
+      this.displayerDescriptorsByPropertyId.value.get(propertyId);
+    // A property without descriptor is not cached, it falls back on the default displayer.
+    return displayerDescriptor ?? this.resolveDisplayerDescriptor(propertyId);
+  }
+
+  private resolveDisplayerDescriptor(propertyId: string) {
     // Property descriptor config
     const propertyDescriptor = this.getPropertyDescriptor(propertyId);
     // Property type descriptor config
@@ -492,7 +532,14 @@ export class LiveDataLogic implements Logic {
     this.triggerEvent("beforeEntryFetch");
     // Fetch entries from data source
     try {
-      const data = await this.liveDataSource.getEntries(this.data.query!);
+      // Load the registered displayers of the visible properties while the entries are fetched, so that the cells
+      // can render their displayer right away once the entries are displayed, instead of rendering empty first and
+      // again once their displayer is loaded. This is done before the end of the fetch so that the entries are
+      // displayed as soon as the fetch is reported as finished.
+      const [data] = await Promise.all([
+        this.liveDataSource.getEntries(this.data.query!),
+        this.loadVisibleDisplayers(true),
+      ]);
       data.entries = await this.restoreFrozenView(data.entries);
       return data;
     } finally {
@@ -514,23 +561,13 @@ export class LiveDataLogic implements Logic {
       this.data.data = data;
       // Remove the outdated footnotes, they will be recomputed by the new entries.
       this.footnotes.reset();
-      // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
-      // first.
-      // It turns out this is not enough when components are resolved asynchronously.
-      // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are
-      // cached, the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated
-      // have access to a fully rendered DOM. Note that this approach is not optimal, and we should aim for a
-      // mechanism that does not rely on direct DOM access. Instead, we should provide way to alter the data
-      // externally before starting the rendering. (see https://jira.xwiki.org/browse/XWIKI-23423)
-      const preloadDisplayer = this.getPropertyDescriptors()
-        .filter((it) => it != undefined && this.isPropertyVisible(it.id))
-        .map((it) =>
-          componentStore.load(
-            "displayer",
-            (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
-          ),
-        );
-      await Promise.all(preloadDisplayer);
+      // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated first.
+      // This is not enough for the displayers that are registered later on and that the cells resolve
+      // asynchronously, so we wait for them too. Listeners of entriesUpdated then have access to a fully rendered
+      // DOM. Note that this approach is not optimal, and we should aim for a mechanism that does not rely on direct
+      // DOM access. Instead, we should provide way to alter the data externally before starting the rendering.
+      // (see https://jira.xwiki.org/browse/XWIKI-23423)
+      await this.loadVisibleDisplayers(false);
       await nextTick();
       this.triggerEvent("entriesUpdated", {});
     } catch (err) {
@@ -548,6 +585,34 @@ export class LiveDataLogic implements Logic {
         console.error("Failed to fetch the entries", err);
       }
     }
+  }
+
+  /**
+   * Load the displayers of the visible properties.
+   * @param registeredOnly - true to skip the displayers that are not registered yet, instead of waiting for their
+   *   registration, which might never happen, and to ignore the displayers that fail to load, which the cells then
+   *   load and report on their own
+   */
+  private async loadVisibleDisplayers(registeredOnly: boolean) {
+    const displayerIds = new Set(
+      this.getPropertyDescriptors()
+        .filter((it) => it != undefined && this.isPropertyVisible(it.id))
+        .map(
+          (it) => (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
+        ),
+    );
+    await Promise.all(
+      [...displayerIds]
+        .filter(
+          (displayerId) =>
+            !registeredOnly ||
+            componentStore.isRegistered("displayer", displayerId),
+        )
+        .map((displayerId) => {
+          const loaded = componentStore.load("displayer", displayerId);
+          return registeredOnly ? loaded.catch(() => undefined) : loaded;
+        }),
+    );
   }
 
   /**

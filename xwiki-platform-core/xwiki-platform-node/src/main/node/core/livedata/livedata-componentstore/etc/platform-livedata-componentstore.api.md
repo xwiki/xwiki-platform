@@ -10,6 +10,8 @@ import { Component } from 'vue';
 export const componentStore: {
     register(kind: string, key: string, componentProvider: () => Promise<Component>): void;
     load(kind: string, key: string): Promise<Component | (() => Promise<Component>)>;
+    get(kind: string, key: string): Component | undefined;
+    isRegistered(kind: string, key: string): boolean;
 };
 
 // (No @packageDocumentation comment for this package)

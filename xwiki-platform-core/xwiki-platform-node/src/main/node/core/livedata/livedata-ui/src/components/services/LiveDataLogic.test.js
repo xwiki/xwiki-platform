@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { LiveDataLogic } from "./LiveDataLogic";
+import { componentStore } from "@xwiki/platform-livedata-componentstore";
 import flushPromises from "flush-promises";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, onTestFinished, vi } from "vitest";
 import { computed } from "vue";
 
 vi.mock("vue-i18n", () => ({
@@ -27,7 +28,10 @@ vi.mock("vue-i18n", () => ({
 }));
 
 vi.mock("@xwiki/platform-livedata-componentstore", () => ({
-  componentStore: { load: vi.fn().mockResolvedValue({}) },
+  componentStore: {
+    load: vi.fn().mockResolvedValue({}),
+    isRegistered: () => true,
+  },
 }));
 
 const SOURCE = { id: "liveTable" };
@@ -829,5 +833,166 @@ describe("Creating the entry of a new row with mandatory properties", () => {
       summary_syntax: "xwiki/2.1",
       RequiresHTMLConversion: "description,summary",
     });
+  });
+});
+
+describe("Resolving the descriptors of the properties", () => {
+  let logic;
+
+  beforeEach(() => {
+    ({ logic } = initLogic([]));
+    logic.data.meta.propertyTypes.push({
+      id: "number",
+      displayer: { id: "number" },
+    });
+    logic.data.meta.displayers.push({ id: "number", format: "0.00" });
+    logic.data.meta.displayers.push({ id: "html" });
+  });
+
+  it("resolves the displayer descriptor once per property", () => {
+    const descriptor = logic.getDisplayerDescriptor("name");
+
+    expect(descriptor).toStrictEqual({ id: "text" });
+    expect(logic.getDisplayerDescriptor("name")).toBe(descriptor);
+    expect(logic.getDisplayerDescriptor("status")).not.toBe(descriptor);
+  });
+
+  it("resolves the displayer descriptor again when the descriptor of the property changes", () => {
+    const descriptor = logic.getDisplayerDescriptor("name");
+
+    logic.data.meta.propertyDescriptors[0].displayer = { id: "html" };
+
+    expect(logic.getDisplayerDescriptor("name")).not.toBe(descriptor);
+    expect(logic.getDisplayerDescriptor("name")).toStrictEqual({ id: "html" });
+  });
+
+  it("resolves the displayer descriptor again when the type of the property changes", () => {
+    expect(logic.getDisplayerDescriptor("status")).toStrictEqual({
+      id: "text",
+    });
+
+    logic.data.meta.propertyDescriptors[1].type = "number";
+
+    expect(logic.getPropertyTypeDescriptor("status").id).toBe("number");
+    expect(logic.getDisplayerDescriptor("status")).toStrictEqual({
+      id: "number",
+      format: "0.00",
+    });
+  });
+
+  it("resolves the displayer descriptor again when a property type changes", () => {
+    logic.data.meta.propertyDescriptors[1].type = "number";
+    expect(logic.getDisplayerDescriptor("status").id).toBe("number");
+
+    logic.data.meta.propertyTypes[0].displayer.id = "html";
+
+    expect(logic.getDisplayerDescriptor("status")).toStrictEqual({
+      id: "html",
+    });
+  });
+
+  it("resolves the displayer descriptor again when the displayers change", () => {
+    expect(logic.getDisplayerDescriptor("name")).toStrictEqual({ id: "text" });
+
+    logic.data.meta.displayers[0].maxLength = 10;
+    expect(logic.getDisplayerDescriptor("name")).toStrictEqual({
+      id: "text",
+      maxLength: 10,
+    });
+
+    logic.data.meta.defaultDisplayer = "html";
+    expect(logic.getDisplayerDescriptor("name")).toStrictEqual({ id: "html" });
+  });
+
+  it("resolves the descriptors of a property added afterwards", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    expect(logic.getPropertyDescriptor("count")).toBeUndefined();
+    expect(consoleError).toHaveBeenCalledOnce();
+    consoleError.mockRestore();
+
+    logic.data.meta.propertyDescriptors.push({ id: "count", type: "number" });
+
+    expect(logic.getPropertyDescriptor("count").id).toBe("count");
+    expect(logic.getPropertyTypeDescriptor("count").id).toBe("number");
+    expect(logic.getDisplayerDescriptor("count").id).toBe("number");
+  });
+
+  it("returns the first descriptor when several properties share an id", () => {
+    logic.data.meta.propertyDescriptors.push({ id: "name", visible: false });
+
+    expect(logic.getPropertyDescriptor("name").visible).toBe(true);
+  });
+
+  it("falls back on the default displayer for an unknown property", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    expect(logic.getDisplayerDescriptor("unknown")).toStrictEqual({
+      id: "text",
+    });
+    expect(consoleError).toHaveBeenCalledWith(
+      "Property descriptor of property `unknown` does not exist",
+    );
+    consoleError.mockRestore();
+  });
+});
+
+describe("Loading the displayers of the fetched entries", () => {
+  let logic;
+  let liveDataSource;
+  let triggerEvent;
+
+  beforeEach(() => {
+    ({ logic, liveDataSource } = initLogic([]));
+    triggerEvent = vi.spyOn(logic, "triggerEvent").mockImplementation(() => {});
+    liveDataSource.getEntries.mockResolvedValue({
+      count: 1,
+      entries: [{ id: "1", name: "one" }],
+    });
+  });
+
+  it("ends the fetch once the displayers are loaded", async () => {
+    const { promise, resolve: resolveDisplayer } = Promise.withResolvers();
+    componentStore.load.mockReturnValueOnce(promise);
+
+    const updated = logic.updateEntries();
+    await flushPromises();
+
+    // The fetch is not reported as finished while the entries cannot be displayed yet.
+    expect(triggerEvent.mock.calls.map(([event]) => event)).toStrictEqual([
+      "beforeEntryFetch",
+    ]);
+    expect(displayedIds(logic)).toStrictEqual([]);
+
+    resolveDisplayer({});
+    await updated;
+
+    expect(triggerEvent).toHaveBeenCalledWith("afterEntryFetch");
+    expect(displayedIds(logic)).toStrictEqual(["1"]);
+  });
+
+  it("displays the entries when a displayer fails to load", async () => {
+    const error = new Error("Failed to load the chunk");
+    componentStore.load.mockRejectedValue(error);
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    onTestFinished(() => {
+      componentStore.load.mockResolvedValue({});
+      consoleError.mockRestore();
+    });
+
+    await logic.updateEntries();
+
+    expect(displayedIds(logic)).toStrictEqual(["1"]);
+    // The failure is still reported, and the entries are not reported as updated.
+    expect(consoleError).toHaveBeenCalledWith(
+      "Failed to fetch the entries",
+      error,
+    );
+    expect(triggerEvent).not.toHaveBeenCalledWith("entriesUpdated", {});
   });
 });

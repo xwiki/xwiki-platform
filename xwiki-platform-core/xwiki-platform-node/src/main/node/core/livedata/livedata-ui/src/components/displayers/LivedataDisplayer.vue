@@ -70,8 +70,17 @@ export default {
   inject: ["logic"],
 
   data() {
+    // Render the displayer on the first render when it is already loaded, which is the common case since the logic
+    // loads the displayers before displaying the entries. Waiting for a promise would render the cell empty first,
+    // and a second time once the displayer is resolved.
+    const displayerComponent = componentStore.get(
+      "displayer",
+      this.logic.getDisplayerDescriptor(this.propertyId).id,
+    );
     return {
-      displayerComponent: null,
+      displayerComponent: displayerComponent
+        ? markRaw(displayerComponent)
+        : null,
     };
   },
 
@@ -98,11 +107,13 @@ export default {
       return string[0].toUpperCase() + string.slice(1);
     },
   },
-  // On mounted, try to load the Filter corresponding to the passed props,
-  // or the default one as fallback
-  async mounted() {
-    const value = await componentStore.load("displayer", this.displayerId);
-    this.displayerComponent = markRaw(value);
+  // Load the displayer asynchronously only when it was not loaded yet, for instance because it is registered after
+  // the entries are displayed.
+  async created() {
+    if (!this.displayerComponent) {
+      const value = await componentStore.load("displayer", this.displayerId);
+      this.displayerComponent = markRaw(value);
+    }
   },
 };
 </script>

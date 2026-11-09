@@ -21,6 +21,7 @@ export const LinkModal: DefineComponent<    {
 current: LinkData;
 depsContainer: Container;
 excludedLinkTargetTypes?: string[];
+mode?: "createNew" | "editExisting";
 }, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 submit: (args_0: LinkData) => any;
 cancel: () => any;
@@ -28,10 +29,11 @@ cancel: () => any;
 current: LinkData;
 depsContainer: Container;
 excludedLinkTargetTypes?: string[];
+mode?: "createNew" | "editExisting";
 }> & Readonly<{
 onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;
-}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
+}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
 
 // @beta
 export interface LinkTargetTypeForm {

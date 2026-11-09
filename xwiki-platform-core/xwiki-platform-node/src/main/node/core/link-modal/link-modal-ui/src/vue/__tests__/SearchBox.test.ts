@@ -20,7 +20,7 @@
 import { dsComponentStubs } from "./dsStubs";
 import SearchBox from "../SearchBox.vue";
 import { mount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
 import type { SearchBoxItem } from "../SearchBox.vue";
 
@@ -38,6 +38,7 @@ function item(name: string): SearchBoxItem<Value, string> {
 function mountSearchBox(props: {
   suggestions?: SearchBoxItem<Value, string>[];
   parseQuery?: (query: string) => Value | null;
+  placeholder?: string;
 }) {
   return mount(SearchBox<Value, string>, {
     props: {
@@ -45,6 +46,7 @@ function mountSearchBox(props: {
       initialValue: null,
       getSuggestions: async () => props.suggestions ?? [],
       parseQuery: props.parseQuery,
+      placeholder: props.placeholder,
     },
     slots: {
       renderSuggestion: `<template #renderSuggestion="{ renderingData }">{{ renderingData }}</template>`,
@@ -57,6 +59,25 @@ function mountSearchBox(props: {
 }
 
 describe("SearchBox", () => {
+  // jsdom doesn't implement scrolling.
+  beforeEach(() => {
+    Element.prototype.scrollIntoView ??= vi.fn();
+  });
+
+  it("hints that typing searches, since the suggestions are only displayed once something is typed", () => {
+    const wrapper = mountSearchBox({});
+
+    expect(wrapper.get("input").attributes("placeholder")).toBe(
+      "Type to search...",
+    );
+  });
+
+  it("displays the given placeholder instead of the default one", () => {
+    const wrapper = mountSearchBox({ placeholder: "Page name" });
+
+    expect(wrapper.get("input").attributes("placeholder")).toBe("Page name");
+  });
+
   it("selects the value parsed from the typed text when Enter is pressed without picking a suggestion", async () => {
     const wrapper = mountSearchBox({
       parseQuery: (query) =>
@@ -107,5 +128,44 @@ describe("SearchBox", () => {
 
     expect(wrapper.emitted("select")).toEqual([[{ name: "Suggested.Page" }]]);
     expect(parseQuery).not.toHaveBeenCalled();
+  });
+
+  describe("suggestion list", () => {
+    const scrollIntoView = vi.fn();
+
+    beforeEach(() => {
+      Element.prototype.scrollIntoView = scrollIntoView;
+    });
+
+    afterEach(() => {
+      scrollIntoView.mockReset();
+      delete (Element.prototype as Partial<Element>).scrollIntoView;
+    });
+
+    async function showSuggestions(count: number) {
+      const wrapper = mountSearchBox({
+        suggestions: Array.from({ length: count }, (_, i) => item(`Page${i}`)),
+      });
+      await wrapper.get("input").setValue("Page");
+      await vi.waitFor(() =>
+        expect(wrapper.findAll("li.suggestion")).toHaveLength(count),
+      );
+      return wrapper;
+    }
+
+    it("scrolls the suggestion focused with the arrow keys into view", async () => {
+      const wrapper = await showSuggestions(7);
+      const input = wrapper.get("input");
+
+      for (let i = 0; i < 6; i++) {
+        await input.trigger("keydown", { key: "ArrowDown" });
+      }
+      await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(6));
+
+      const focused = wrapper.get("li.suggestion.focused");
+      expect(focused.text()).toBe("Page6");
+      expect(scrollIntoView.mock.contexts.at(-1)).toBe(focused.element);
+      expect(scrollIntoView).toHaveBeenLastCalledWith({ block: "nearest" });
+    });
   });
 });

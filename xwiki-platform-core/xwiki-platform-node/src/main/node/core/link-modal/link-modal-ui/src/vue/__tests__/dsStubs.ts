@@ -65,6 +65,31 @@ const XBtnStub = defineComponent({
   template: `<button type="button"><slot /></button>`,
 });
 
+// Renders its content only while open, like a real dialog, and exposes its props (e.g. persistent) to the tests, which
+// close it by emitting the model update a real dialog emits when closed with the Escape key or its close button.
+const XDialogStub = defineComponent({
+  props: {
+    modelValue: Boolean,
+    title: String,
+    width: [String, Number],
+    persistent: Boolean,
+  },
+  emits: ["update:modelValue"],
+  template: `
+    <div v-if="modelValue" role="dialog" :aria-label="title">
+      <slot />
+      <slot name="footer" />
+    </div>
+  `,
+});
+
+// The attributes (e.g. id, class) of the form fall through to its root element. As the real form, it emits formSubmit
+// when submitted with valid fields.
+const XFormStub = defineComponent({
+  emits: ["formSubmit"],
+  template: `<form @submit.prevent="$emit('formSubmit')"><slot /></form>`,
+});
+
 /**
  * The design system components used by the link modal and the link forms, to pass as global components when mounting
  * them.
@@ -74,6 +99,8 @@ const dsComponentStubs = {
   "x-select": XSelectStub,
   "x-checkbox": XCheckboxStub,
   "x-btn": XBtnStub,
+  "x-dialog": XDialogStub,
+  "x-form": XFormStub,
 };
 
-export { dsComponentStubs };
+export { XDialogStub, dsComponentStubs };

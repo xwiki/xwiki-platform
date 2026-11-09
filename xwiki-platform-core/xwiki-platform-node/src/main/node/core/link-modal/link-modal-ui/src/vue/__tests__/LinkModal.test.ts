@@ -17,15 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { dsComponentStubs } from "./dsStubs";
+import { XDialogStub, dsComponentStubs } from "./dsStubs";
 import { linkTargetTypeFormRole } from "../../linkTargetTypeForm";
 import LinkModal from "../LinkModal.vue";
-import { flushPromises, mount } from "@vue/test-utils";
+import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";
 import {
   linkTargetTypeManagerRole,
   unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { defineComponent, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
@@ -92,6 +92,7 @@ function mountLinkModal(
   current: LinkData,
   targetTypes: FakeLinkTargetType[] = [],
   excludedLinkTargetTypes?: string[],
+  mode?: "createNew" | "editExisting",
 ) {
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
 
@@ -100,10 +101,15 @@ function mountLinkModal(
       current,
       depsContainer: fakeDepsContainer(targetTypes),
       excludedLinkTargetTypes,
+      mode,
     },
     global: { plugins: [i18n], components: dsComponentStubs },
+    // The submit button designates its form by id, which requires them to be in the document.
+    attachTo: document.body,
   });
 }
+
+enableAutoUnmount(afterEach);
 
 /**
  * @returns a fake link target type with a form displaying its label
@@ -321,7 +327,7 @@ describe("LinkModal", () => {
   it("edits a link target type registered without a form with a plain text field labelled with its label", async () => {
     const wrapper = mountLinkModal(
       {
-        displayText: "",
+        displayText: "Issue",
         target: { type: "jira", config: { location: "XWIKI-1" } },
       },
       [fakeLinkTargetType("jira", "Jira issue")],
@@ -387,5 +393,78 @@ describe("LinkModal", () => {
     expect(wrapper.getComponent(optionFields).props("depsContainer")).toBe(
       depsContainer,
     );
+  });
+});
+
+describe("LinkModal dialog", () => {
+  it("is displayed in a dialog that stays open when clicking outside of it", () => {
+    const wrapper = mountLinkModal({
+      displayText: "hello",
+      target: { type: "a", config: {} },
+    });
+
+    const dialog = wrapper.findComponent(XDialogStub);
+    expect(dialog.props("modelValue")).toBe(true);
+    expect(dialog.props("persistent")).toBe(true);
+  });
+
+  it("emits cancel when the dialog is closed otherwise than with its buttons", async () => {
+    const wrapper = mountLinkModal({
+      displayText: "hello",
+      target: { type: "a", config: {} },
+    });
+
+    // E.g. with the Escape key or the close button of the dialog.
+    wrapper.findComponent(XDialogStub).vm.$emit("update:modelValue", false);
+    await flushPromises();
+
+    expect(wrapper.emitted("cancel")).toEqual([[]]);
+    expect(wrapper.emitted("submit")).toBeUndefined();
+  });
+
+  it("titles itself and labels its submit button after the creation or the edition of a link", () => {
+    const current: LinkData = {
+      displayText: "hello",
+      target: { type: "a", config: {} },
+    };
+
+    const insertModal = mountLinkModal(current);
+    expect(insertModal.getComponent(XDialogStub).props("title")).toBe(
+      "Insert link",
+    );
+    expect(insertModal.get("[data-test='linkSubmit']").text()).toBe("Insert");
+
+    const editModal = mountLinkModal(current, [], undefined, "editExisting");
+    expect(editModal.getComponent(XDialogStub).props("title")).toBe(
+      "Edit link",
+    );
+    expect(editModal.get("[data-test='linkSubmit']").text()).toBe("Update");
+  });
+
+  it("stays open, without emitting submit, while a required field is empty", async () => {
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "a", config: {} } },
+      [fakeLinkTargetTypeWithForm("a", "A")],
+    );
+
+    await wrapper.find("[data-test='linkSubmit']").trigger("click");
+    expect(wrapper.emitted("submit")).toBeUndefined();
+
+    await wrapper.get("[data-test='linkDisplayText']").setValue("hello");
+    await wrapper.find("[data-test='linkSubmit']").trigger("click");
+    expect(wrapper.emitted("submit")?.[0]?.[0]).toMatchObject({
+      displayText: "hello",
+    });
+  });
+
+  it("emits cancel when the cancel button is clicked", async () => {
+    const wrapper = mountLinkModal({
+      displayText: "hello",
+      target: { type: "a", config: {} },
+    });
+
+    await wrapper.find("[data-test='linkCancel']").trigger("click");
+
+    expect(wrapper.emitted("cancel")).toEqual([[]]);
   });
 });

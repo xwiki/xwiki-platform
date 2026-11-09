@@ -29,7 +29,7 @@ import {
   linkTargetTypeManagerRole,
   unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
-import { computed, markRaw } from "vue";
+import { computed, markRaw, ref, useId, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkTargetTypeForm } from "../linkTargetTypeForm";
 import type {
@@ -50,6 +50,14 @@ const props = defineProps<{
    * is of an excluded type. Unknown types are ignored.
    */
   excludedLinkTargetTypes?: string[];
+
+  /**
+   * Whether the modal creates a new link or edits an existing one, which sets its title and the label of its submit
+   * button.
+   * Default: createNew.
+   * @since 18.10.0RC1
+   */
+  mode?: "createNew" | "editExisting";
 }>();
 
 const { t } = useI18n({ messages: translations });
@@ -119,52 +127,99 @@ const activeForm = computed(() => {
     : undefined;
 });
 
-defineEmits<{ submit: [LinkData]; cancel: [] }>();
+const emit = defineEmits<{ submit: [LinkData]; cancel: [] }>();
+
+// The submit button is displayed in the footer of the dialog, outside of the form, which it designates by its id.
+const formId = useId();
+
+// The modal is shown as soon as it is mounted, and it's up to its parent to unmount it once submitted or cancelled.
+// Closing the dialog otherwise (e.g. with the Escape key or its close button) cancels the link edition.
+const open = ref(true);
+watch(open, (isOpen) => {
+  if (!isOpen) {
+    emit("cancel");
+  }
+});
 </script>
 
 <template>
-  <div :class="$style.container">
-    <!-- The fields shared by all the link target types, with the target and option fields of the selected one. -->
-    <LinkForm :link-data="linkData" :link-target-types="offeredLinkTargetTypes">
-      <template #target>
-        <component
-          v-if="activeForm"
-          :is="activeForm.targetField"
-          v-model="linkData.target.config"
-          :deps-container
-        />
-      </template>
-
-      <template #options>
-        <component
-          v-if="activeForm?.optionFields"
-          :is="activeForm.optionFields"
-          v-model="linkData.target.config"
-          :deps-container
-        />
-      </template>
-    </LinkForm>
-
-    <div :class="$style.actions">
-      <!-- NOTE: 'v-bind' is used here as it is more flexible
-                 'data-*' attributes would not be allowed due to not being present in `BtnProps` -->
-      <x-btn
-        v-bind="{ 'data-test': 'linkSubmit' }"
-        variant="success"
-        @click="$emit('submit', linkData)"
+  <!-- The dialog is persistent so that a click outside of it, e.g. back in the edited content, doesn't discard the
+       link being edited. -->
+  <x-dialog
+    v-model="open"
+    :title="
+      t(
+        mode === 'editExisting'
+          ? 'link-modal.title.edit'
+          : 'link-modal.title.insert',
+      )
+    "
+    persistent
+  >
+    <!-- The form gives the fields the form style of the design system, and is submitted only once they are valid (e.g.
+         the required ones are filled), otherwise the dialog stays open, showing what's invalid. -->
+    <x-form
+      :id="formId"
+      :class="$style.container"
+      @form-submit="emit('submit', linkData)"
+    >
+      <!-- The fields shared by all the link target types, with the target and option fields of the selected one. -->
+      <LinkForm
+        :link-data="linkData"
+        :link-target-types="offeredLinkTargetTypes"
       >
-        {{ t("link-modal.buttons.submit") }}
-      </x-btn>
+        <template #target>
+          <!-- Identifies the target field, whatever the selected link target type. -->
+          <div class="link-target">
+            <component
+              v-if="activeForm"
+              :is="activeForm.targetField"
+              v-model="linkData.target.config"
+              :deps-container
+            />
+          </div>
+        </template>
 
-      <x-btn
-        v-bind="{ 'data-test': 'linkCancel' }"
-        variant="neutral"
-        @click="$emit('cancel')"
-      >
-        {{ t("link-modal.buttons.cancel") }}
-      </x-btn>
-    </div>
-  </div>
+        <template #options>
+          <component
+            v-if="activeForm?.optionFields"
+            :is="activeForm.optionFields"
+            v-model="linkData.target.config"
+            :deps-container
+          />
+        </template>
+      </LinkForm>
+    </x-form>
+
+    <template #footer>
+      <div :class="$style.actions">
+        <!-- NOTE: 'v-bind' is used here as it is more flexible
+                   'data-*' attributes would not be allowed due to not being present in `BtnProps` -->
+        <x-btn
+          v-bind="{ 'data-test': 'linkCancel' }"
+          variant="neutral"
+          @click="emit('cancel')"
+        >
+          {{ t("link-modal.buttons.cancel") }}
+        </x-btn>
+
+        <x-btn
+          v-bind="{ 'data-test': 'linkSubmit' }"
+          variant="primary"
+          type="submit"
+          :form="formId"
+        >
+          {{
+            t(
+              mode === "editExisting"
+                ? "link-modal.buttons.update"
+                : "link-modal.buttons.insert",
+            )
+          }}
+        </x-btn>
+      </div>
+    </template>
+  </x-dialog>
 </template>
 
 <style module>
@@ -172,16 +227,9 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
   display: flex;
   flex-direction: column;
   gap: var(--cr-spacing-large);
-  position: absolute;
-  border: var(--cr-input-border-width) solid var(--cr-input-border-color);
-  border-radius: var(--cr-border-radius-large);
-  background: var(--cr-color-neutral-50);
-  padding: var(--cr-spacing-medium);
-  z-index: 99;
 }
 
 .actions {
-  padding: var(--cr-spacing-large);
   display: flex;
   justify-content: end;
   gap: var(--cr-spacing-medium);

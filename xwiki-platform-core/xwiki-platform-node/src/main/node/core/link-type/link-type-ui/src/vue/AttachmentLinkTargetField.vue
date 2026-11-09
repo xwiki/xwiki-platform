@@ -100,7 +100,15 @@ const { t } = useI18n({ messages: translations });
 </template>
 
 <style scoped>
+.suggestion-label {
+  display: flex;
+  align-items: center;
+  /* About the width of a space, which separates the icons from the labels in the menus of the skin. */
+  gap: 0.25em;
+}
+
 .suggestion-hint {
   color: var(--cr-color-neutral-500);
+  font-size: var(--cr-font-size-small);
 }
 </style>

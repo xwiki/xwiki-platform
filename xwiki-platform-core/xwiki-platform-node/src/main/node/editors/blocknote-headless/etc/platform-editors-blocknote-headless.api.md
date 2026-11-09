@@ -49,7 +49,6 @@ excludedLinkTargetTypes?: string[];
 "onLocal-instant-change"?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
-'link-modal-container': HTMLDivElement;
 }, any>;
 
 export { ContextForMacros }

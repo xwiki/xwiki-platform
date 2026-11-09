@@ -193,7 +193,6 @@ const submitEditedLink = ({ displayText, target }: LinkData) => {
 };
 
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
-const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
@@ -223,16 +222,6 @@ const currentLinkData = computed<LinkData | null>(() => {
   };
 });
 
-function handleLinkEditorOutsideClick(e: MouseEvent) {
-  if (!editingLink.value || !linkModalContainer.value) {
-    return;
-  }
-
-  if (!e.composedPath().includes(linkModalContainer.value)) {
-    editingLink.value = null;
-  }
-}
-
 onMounted(() => {
   if (!blockNoteContainer.value) {
     throw new Error("Missing DOM container for BlockNote!");
@@ -242,8 +231,6 @@ onMounted(() => {
     ...initializedEditorProps,
     content: editorContent,
   });
-
-  window.addEventListener("mousedown", handleLinkEditorOutsideClick);
 });
 
 onBeforeUnmount(() => {
@@ -255,7 +242,6 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener("mousedown", handleLinkEditorOutsideClick);
   unsubscribeFromLocalChanges?.();
   unsubscribeFromLocalChanges = undefined;
 });
@@ -264,15 +250,15 @@ onUnmounted(() => {
 <template>
   <div ref="blocknote-container" />
 
-  <div ref="link-modal-container" v-if="currentLinkData">
-    <LinkModal
-      :current="currentLinkData"
-      :deps-container="depsContainer"
-      :excluded-link-target-types="excludedLinkTargetTypes"
-      @submit="submitEditedLink"
-      @cancel="editingLink = null"
-    />
-  </div>
+  <LinkModal
+    v-if="currentLinkData"
+    :current="currentLinkData"
+    :deps-container="depsContainer"
+    :excluded-link-target-types="excludedLinkTargetTypes"
+    :mode="editingLink?.mode"
+    @submit="submitEditedLink"
+    @cancel="editingLink = null"
+  />
 </template>
 
 <style scoped>

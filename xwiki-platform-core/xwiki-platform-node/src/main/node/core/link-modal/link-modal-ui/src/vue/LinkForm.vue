@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { useLinkTargetTypeLabels } from "./linkTargetTypeLabels";
 import { translations } from "../translations";
-import { computed, nextTick, onMounted, ref, useTemplateRef } from "vue";
+import { computed, nextTick, onMounted, ref, useId, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
 
@@ -77,12 +77,15 @@ const linkTargetTypeItems = computed(() =>
   })),
 );
 
+const optionsLabelId = useId();
+
 const displayTextField = useTemplateRef("displayTextField");
 
 onMounted(() => {
   // The modal can open while a rich text editor still holds focus (e.g. after picking this action from a slash
   // menu), and that editor may reclaim focus synchronously right after opening it. Deferring past that with a
-  // double rAF (matching the settle delay used in this component's tests) ensures our focus request runs last.
+  // double rAF (matching the settle delay used in this component's tests) ensures our focus request runs last. The
+  // field is also marked with autofocus, for the dialogs that move the focus once their opening animation is done.
   nextTick(() => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -103,6 +106,7 @@ onMounted(() => {
     ref="displayTextField"
     v-bind="{ 'data-test': 'linkDisplayText' }"
     :label="t('link-modal.config.display-text')"
+    autofocus
     v-model="linkData.displayText"
     required
   />
@@ -117,19 +121,42 @@ onMounted(() => {
 
   <slot name="target" />
 
-  <details>
-    <summary>{{ t("link-modal.config.options") }}</summary>
+  <!-- The options are grouped in a box, to make it clear that the summary toggles the fields that follow it. -->
+  <details class="options">
+    <summary :id="optionsLabelId">{{ t("link-modal.config.options") }}</summary>
 
-    <x-checkbox
-      :label="t('link-modal.config.open-new-tab')"
-      v-model="linkData.newTab"
-    />
+    <!-- The summary names the group of option fields, since a legend can't be shared with it. -->
+    <fieldset class="options-fields" :aria-labelledby="optionsLabelId">
+      <x-checkbox
+        :label="t('link-modal.config.open-new-tab')"
+        v-model="linkData.newTab"
+      />
 
-    <slot name="options" />
+      <slot name="options" />
+    </fieldset>
   </details>
 </template>
 
 <style scoped>
+/* The options are boxed like a form field, using the variables of the skin when it defines them (e.g. XWiki), and
+   the ones of the design system otherwise. */
+.options {
+  border: var(--cr-input-border-width) solid
+    var(--input-border, var(--cr-input-border-color));
+  border-radius: var(--border-radius-base, var(--cr-border-radius-medium));
+  padding: var(--cr-spacing-x-large)
+    var(--padding-base-horizontal, var(--cr-spacing-large));
+}
+
+.options-fields {
+  /* Reset the default style of the fieldset: the box is drawn around the whole details element. */
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  /* Separate the fields from the summary as they are separated from each other by the form style, i.e. by a line. */
+  margin: 1lh 0 0;
+}
+
 summary {
   cursor: pointer;
   user-select: none;

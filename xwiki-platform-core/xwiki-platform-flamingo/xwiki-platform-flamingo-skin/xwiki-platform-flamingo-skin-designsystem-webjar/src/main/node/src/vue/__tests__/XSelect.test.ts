@@ -37,7 +37,9 @@ describe("XSelect", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
     <!--v-if-->
   </dt>
   <dd><select id="v-0">
@@ -58,7 +60,9 @@ describe("XSelect", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label><span class="xHint">The help</span></dt>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label><span class="xHint">The help</span></dt>
   <dd><select id="v-0">
       <option value="i1">i1</option>
     </select></dd>
@@ -80,7 +84,9 @@ describe("XSelect", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
     <!--v-if-->
   </dt>
   <dd><select id="v-0">
@@ -103,7 +109,9 @@ describe("XSelect", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
     <!--v-if-->
   </dt>
   <dd><select id="v-0" required="">

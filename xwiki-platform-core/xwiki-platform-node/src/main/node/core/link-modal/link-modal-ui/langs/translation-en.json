@@ -1,5 +1,9 @@
 {
-  "link-modal.buttons.submit": "OK",
+  "link-modal.title.insert": "Insert link",
+  "link-modal.title.edit": "Edit link",
+
+  "link-modal.buttons.insert": "Insert",
+  "link-modal.buttons.update": "Update",
   "link-modal.buttons.cancel": "Cancel",
 
   "link-modal.config.target-type": "Link type",
@@ -11,5 +15,6 @@
 
   "link-modal.search-box.backend-unsupported": "Backend search is unsupported.",
   "link-modal.search-box.loading": "Loading...",
-  "link-modal.search-box.no-result": "No result found"
+  "link-modal.search-box.no-result": "No result found",
+  "link-modal.search-box.placeholder": "Type to search..."
 }

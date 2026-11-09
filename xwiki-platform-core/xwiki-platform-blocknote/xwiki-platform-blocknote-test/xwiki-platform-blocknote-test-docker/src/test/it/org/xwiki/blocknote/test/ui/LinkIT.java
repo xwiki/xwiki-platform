@@ -142,7 +142,12 @@ class LinkIT extends AbstractBlockNoteIT
         // Open the link modal, fill it in, but cancel it instead of submitting.
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
         linkModal.selectTargetType("URL");
-        linkModal.setUrl("https://xwiki.org");
+        linkModal.setTarget("https://xwiki.org");
+
+        // Clicking outside the link modal doesn't close it, so that what was typed in it is not lost by accident.
+        linkModal.clickOutside();
+        assertEquals("https://xwiki.org", linkModal.getTarget());
+
         linkModal.cancel();
 
         // The content must be left untouched.

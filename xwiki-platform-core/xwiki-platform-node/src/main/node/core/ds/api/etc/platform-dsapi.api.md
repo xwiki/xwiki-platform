@@ -111,6 +111,7 @@ export type DialogProps = {
     title: string;
     width?: string | number | undefined;
     modelValue?: boolean;
+    persistent?: boolean;
 };
 
 // @beta

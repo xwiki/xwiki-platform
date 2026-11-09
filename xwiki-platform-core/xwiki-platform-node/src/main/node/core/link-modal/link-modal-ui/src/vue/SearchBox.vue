@@ -71,7 +71,7 @@ export type { SearchBoxItem, SearchBoxSource };
 <script setup lang="ts" generic="T, U">
 import { translations } from "../translations";
 import { debounce } from "lodash-es";
-import { ref, shallowRef, watch } from "vue";
+import { nextTick, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { initialValue, getSuggestions, parseQuery } = defineProps<{
@@ -86,7 +86,8 @@ const { initialValue, getSuggestions, parseQuery } = defineProps<{
   initialValue: string | null;
 
   /**
-   * The search box's placeholder (when empty)
+   * The search box's placeholder (when empty). Default: a hint that typing searches, since the suggestions are only
+   * displayed once something is typed.
    */
   placeholder?: string;
 
@@ -246,16 +247,27 @@ function selectQuery(): void {
   }
 }
 
+const suggestionList = useTemplateRef("suggestionList");
+
+async function moveFocus(relativeIdx: number): Promise<void> {
+  focusRelativeSuggestion(relativeIdx);
+  // The suggestion list may have to be scrolled to show the focused suggestion.
+  await nextTick();
+  suggestionList.value
+    ?.querySelector(".suggestion.focused")
+    ?.scrollIntoView({ block: "nearest" });
+}
+
 function onKeydown(event: KeyboardEvent): void {
   if (event.key === "Enter") {
     event.preventDefault();
     onEnterKey();
   } else if (event.key === "ArrowUp") {
     event.preventDefault();
-    focusRelativeSuggestion(-1);
+    moveFocus(-1);
   } else if (event.key === "ArrowDown") {
     event.preventDefault();
-    focusRelativeSuggestion(+1);
+    moveFocus(+1);
   }
 }
 
@@ -280,7 +292,7 @@ watch(suggestions, (suggestions) => {
   <div class="search-box">
     <x-text-field
       :label
-      :placeholder
+      :placeholder="placeholder ?? t('link-modal.search-box.placeholder')"
       v-model="query"
       @keydown="onKeydown"
       @focus="performSearch(query)"
@@ -320,6 +332,7 @@ watch(suggestions, (suggestions) => {
       <!-- NOTE: `@mousedown.prevent` prevents the `blur` event from the query `input` field above to trigger *before*
                   the suggestions' `click` handler -->
       <ul
+        ref="suggestionList"
         class="suggestions"
         @mousedown.prevent
         v-if="
@@ -353,39 +366,60 @@ watch(suggestions, (suggestions) => {
   position: relative;
 }
 
+/* The suggestions are listed like in the dropdown menus of the skin (e.g. the Bootstrap dropdown menus of XWiki), using
+   its variables when it defines them, and the ones of the design system otherwise. The values that Bootstrap
+   hard-codes, without a Less variable, are copied from its dropdowns.less (Bootstrap 3.4.1): the rule each one comes
+   from is given next to it, to check when Bootstrap is upgraded. */
+.suggestions-container {
+  position: absolute;
+  /* Right below the search field, whatever the margin that follows the field. */
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  /* .dropdown-menu { margin: 2px 0 0; } */
+  margin-top: 2px;
+  /* .dropdown-menu { padding: 5px 0; } */
+  padding: 5px 0;
+  border: 1px solid var(--dropdown-border, var(--cr-input-border-color));
+  border-radius: var(--border-radius-base, var(--cr-border-radius-medium));
+  background: var(--dropdown-bg, var(--cr-color-neutral-50));
+  /* .dropdown-menu { .box-shadow(0 6px 12px rgba(0, 0, 0, .175)); } */
+  box-shadow: 0 6px 12px rgb(0 0 0 / 17.5%);
+}
+
 .status-message {
+  font-size: inherit;
   font-weight: normal;
   font-style: italic;
   text-align: center;
-  padding: 0;
+  /* .dropdown-header { padding: 3px 20px; } */
+  padding: 3px 20px;
   margin: 0;
-}
-
-.suggestions-container {
-  position: absolute;
-  z-index: 100;
-  border: var(--cr-input-border-width) solid var(--cr-input-border-color);
-  border-radius: var(--cr-border-radius-large);
-  background: var(--cr-color-neutral-50);
-  padding: var(--cr-spacing-x-small);
-  width: calc(100% - var(--cr-spacing-x-small) * 4);
 }
 
 .suggestions {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  width: 100%;
+  /* Leave room for 5 suggestions, the others are reached by scrolling. A suggestion is assumed to have two lines (e.g.
+     a label and a hint) plus its vertical padding, i.e. the one of .suggestion below. */
+  max-height: calc(5 * (2lh + 2 * 3px));
+  overflow-y: auto;
 }
 
 .suggestion {
-  padding: var(--cr-spacing-medium);
-  border-radius: var(--cr-border-radius-medium);
+  /* .dropdown-menu > li > a { padding: 3px 20px; } */
+  padding: 3px 20px;
+  color: var(--dropdown-link-color, inherit);
   cursor: pointer;
-  width: 100%;
 
   &.focused {
-    background-color: var(--cr-color-neutral-300);
+    color: var(--dropdown-link-hover-color, inherit);
+    background-color: var(
+      --dropdown-link-hover-bg,
+      var(--cr-color-neutral-300)
+    );
   }
 }
 </style>

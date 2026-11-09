@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.po;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -39,6 +38,11 @@ import org.xwiki.test.ui.po.BaseElement;
 public class BlockNoteLinkModal extends BaseElement
 {
     /**
+     * The field designating the link target, whatever the selected target type.
+     */
+    private static final By TARGET_FIELD = By.cssSelector(".link-target input");
+
+    /**
      * Create a new instance, waiting for the link modal to be visible.
      */
     public BlockNoteLinkModal()
@@ -54,13 +58,7 @@ public class BlockNoteLinkModal extends BaseElement
      */
     public void setDisplayText(String title)
     {
-        WebElement displayTextInput = getDriver().findElement(By.cssSelector("[data-test='linkDisplayText']"));
-        // Focus the field explicitly by clicking it: the focus performed implicitly when sending keys doesn't always
-        // deliver the keys to the field. Send the selection, the field content and the submission key separately:
-        // the field is a Vue controlled input which can miss keys that are sent in a single burst.
-        displayTextInput.click();
-        displayTextInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        displayTextInput.sendKeys(title);
+        replaceText(By.cssSelector("[data-test='linkDisplayText']"), title);
     }
 
     /**
@@ -76,17 +74,27 @@ public class BlockNoteLinkModal extends BaseElement
     }
 
     /**
-     * Types the given URL in the URL field. The URL field is only available when the target type is set to
-     * {@code URL}.
+     * Replaces the content of the field designating the link target with the given text, whatever the selected target
+     * type: e.g. the URL or the e-mail address. For the target types designated through a search box (page and
+     * attachment), this only types the search query: use {@link #setPageReference(String, String)} or
+     * {@link #setAttachmentReference(String, String, String)} to select the target.
      *
-     * @param url the URL to type
+     * @param target the text to type
+     * @since 18.10.0RC1
      */
-    public void setUrl(String url)
+    public void setTarget(String target)
     {
-        WebElement urlInput = getDriver().findElement(By.cssSelector("[data-test='linkUrl']"));
-        urlInput.click();
-        urlInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        urlInput.sendKeys(url);
+        replaceText(TARGET_FIELD, target);
+    }
+
+    /**
+     * @return the content of the field designating the link target, whatever the selected target type: e.g. the URL,
+     *         the page or attachment reference, or the e-mail address
+     * @since 18.10.0RC1
+     */
+    public String getTarget()
+    {
+        return getDriver().findElement(TARGET_FIELD).getDomProperty("value");
     }
 
     /**
@@ -97,7 +105,7 @@ public class BlockNoteLinkModal extends BaseElement
     public void setTargetAndSubmit(String target)
     {
         selectTargetType("URL");
-        setUrl(target);
+        setTarget(target);
         submit();
     }
 
@@ -157,20 +165,6 @@ public class BlockNoteLinkModal extends BaseElement
     }
 
     /**
-     * Types the given address in the e-mail address field. The e-mail address field is only available when the
-     * target type is set to {@code E-mail}.
-     *
-     * @param address the e-mail address to type
-     */
-    public void setEmailAddress(String address)
-    {
-        WebElement addressInput = getDriver().findElement(By.cssSelector("[data-test='linkEmailAddress']"));
-        addressInput.click();
-        addressInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        addressInput.sendKeys(address);
-    }
-
-    /**
      * Selects the {@code E-mail} target type, types the given e-mail address and submits the modal.
      *
      * @param address the e-mail address to set as the link target
@@ -178,7 +172,7 @@ public class BlockNoteLinkModal extends BaseElement
     public void setEmailTargetAndSubmit(String address)
     {
         selectTargetType("E-mail");
-        setEmailAddress(address);
+        setTarget(address);
         submit();
     }
 
@@ -207,6 +201,33 @@ public class BlockNoteLinkModal extends BaseElement
     public void cancel()
     {
         getDriver().findElement(By.cssSelector("[data-test='linkCancel']")).click();
+    }
+
+    /**
+     * Clicks outside the link modal, on the backdrop that covers the rest of the page (e.g. the edited content).
+     *
+     * @since 18.10.0RC1
+     */
+    public void clickOutside()
+    {
+        // The dialog covers the whole viewport, with its content inset from its edges: its top left corner is on the
+        // backdrop.
+        WebElement dialog = getDriver().findElement(
+            By.xpath("//*[@data-test = 'linkDisplayText']/ancestor::*[@role = 'dialog'][last()]"));
+        getDriver().moveToTopLeftCornerOfTargetWithOffset(dialog, 5, 5, null).click().perform();
+    }
+
+    /**
+     * Replaces the content of the text field matching the given locator with the given text.
+     *
+     * @param locator the locator of the text field
+     * @param text the text to type
+     */
+    private void replaceText(By locator, String text)
+    {
+        WebElement input = getDriver().findElement(locator);
+        input.clear();
+        input.sendKeys(text);
     }
 
     /**
@@ -274,8 +295,8 @@ public class BlockNoteLinkModal extends BaseElement
         // The search box starts a new search for each character typed in the query input and renders the results of
         // each of them as they come back, so the suggestion list can still be re-rendered after the expected
         // suggestion showed up. Clicking during such a re-render either loses the suggestion (stale element
-        // reference) or sends the click where the suggestion no longer is, which is outside the link modal and thus
-        // closes it. Wait for the suggestion element to be the same across two consecutive checks before clicking it.
+        // reference) or sends the click where the suggestion no longer is. Wait for the suggestion element to be the
+        // same across two consecutive checks before clicking it.
         AtomicReference<WebElement> previousSuggestion = new AtomicReference<>();
         WebElement suggestion = getDriver().waitUntilCondition(driver -> {
             WebElement currentSuggestion =

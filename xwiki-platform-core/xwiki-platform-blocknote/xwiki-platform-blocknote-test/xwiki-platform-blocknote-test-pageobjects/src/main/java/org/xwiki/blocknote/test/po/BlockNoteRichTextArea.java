@@ -572,6 +572,10 @@ public class BlockNoteRichTextArea extends BaseElement
                 editor.dispatchEvent(new DragEvent('drop', {...eventInit, clientX: offset > 0 ? right : left,
                     clientY: top + height / 2, dataTransfer}));
             }
+            // The browser empties a real transfer once the event has been dispatched, so code that reads its items
+            // after awaiting an upload gets nothing. Do the same, otherwise the test passes against a transfer no
+            // browser ever hands the editor.
+            dataTransfer.items.clear();
             fileInputs.forEach((fileInput) => fileInput.remove());
             """;
         getDriver().executeScript(script, this.container, eventType, offset, fileInputs);

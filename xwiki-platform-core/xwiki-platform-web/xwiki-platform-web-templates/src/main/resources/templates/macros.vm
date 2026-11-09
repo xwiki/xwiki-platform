@@ -2934,8 +2934,12 @@ Recursive title display detected!##
 ### @param $defaultValue the default value to use
 ### @param $firstIsDefaultIfDefaultNull if defaultValue is null, select the first option
 ### @param $cssClass class to add to the div (could be 'xwiki-select-small', 'xwiki-select-medium', 'xwiki-select-tall' or any other class)
-### @param $id (optional) id to give to the widget
+### @param $id (optional) id to give to the widget, see below for the ids of its label and hint
 ### @param $enableFilter (optional) enable the filtering of the options
+###
+### When you give the widget an id, you must also display its label in an element with the id "<id>-label" and its
+### hint in an element with the id "<id>-hint". The select takes its accessible name and description from these two
+### elements. (since 18.10.0RC1)
 ###
 ### Example of use:
 ###
@@ -2954,13 +2958,17 @@ Recursive title display detected!##
 ###                     ]
 ###                   }
 ###                 ])
-### #xwikiSelect('nameOfTheField', $options, 'option1', false, 'xwiki-select-small', '', true)
+### <span id="nameOfTheField-label">Name of the field</span>
+### <span id="nameOfTheField-hint" class="xHint">Hint of the field</span>
+### #xwikiSelect('nameOfTheField', $options, 'option1', false, 'xwiki-select-small', 'nameOfTheField', true)
 #########################################################
 #macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass $id $enableFilter)
   ## TODO: put this in a webjar instead
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/select/select.css', {'forceSkinAction': true}))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/select/select.js' , {'forceSkinAction': true}))
-  #if ("$!id" == '')
+  ## The caller can only display a label and a hint for the widget when it knows its id.
+  #set ($hasCallerId = "$!id" != '')
+  #if (!$hasCallerId)
     #set ($id = "xwiki-select-$util.generateRandomString(3)")
   #end
   #set ($escapedId = $escapetool.xml($id))
@@ -2972,14 +2980,25 @@ Recursive title display detected!##
       <input type="text" id="${escapedId}-filter" class="xwiki-select-filter"
         placeholder="$escapetool.xml($services.localization.render('web.widgets.select.filter.placeholder'))" />
     </p>
-    <span id="${escapedId}-listbox-label" hidden>
-      $escapetool.xml($services.localization.render('web.widgets.select.listbox.label', [$fieldName]))
-    </span>
+    #set ($genericListboxLabel = $services.localization.render('web.widgets.select.listbox.label', [$fieldName]))
+    #if ($hasCallerId)
+      ## An aria-labelledby referencing only missing elements is ignored in favor of the aria-label, so the generic
+      ## label is used when the caller displays none. A missing hint is skipped the same way.
+      #set ($listboxLabelledBy = "${escapedId}-label")
+      #set ($listboxDescribedBy = "${escapedId}-hint ${escapedId}-listbox-description")
+    #else
+      #set ($listboxLabelledBy = "${escapedId}-listbox-label")
+      #set ($listboxDescribedBy = "${escapedId}-listbox-description")
+      <span id="$listboxLabelledBy" hidden>
+        $escapetool.xml($genericListboxLabel)
+      </span>
+    #end
     <span id="${escapedId}-listbox-description" hidden>
       $escapetool.xml($services.localization.render('web.widgets.select.listbox.description'))
     </span>
     <div id="${escapedId}-listbox" role='listbox' class='xwiki-select-options' tabindex='0'
-      aria-labelledby="${escapedId}-listbox-label" aria-describedby="${escapedId}-listbox-description"
+      aria-labelledby="$listboxLabelledBy" #if ($hasCallerId)aria-label="$escapetool.xml($genericListboxLabel)"#end
+      aria-describedby="$listboxDescribedBy"
       aria-activedescendant="${fieldName}_0_option">
       #set ($count = 0)
       #foreach ($category in $options)

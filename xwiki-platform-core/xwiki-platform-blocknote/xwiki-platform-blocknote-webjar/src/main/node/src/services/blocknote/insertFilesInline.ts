@@ -29,7 +29,7 @@ type LinkFor = (file: File, paste: boolean) => Promise<InlineLink | undefined>;
 
 // Inserts at the caret, or under the pointer when given coordinates, as a drop is.
 type InsertInlineContent = (
-  content: InlineLink[],
+  content: (InlineLink | string)[],
   coordinates?: { left: number; top: number },
 ) => void;
 
@@ -47,11 +47,14 @@ async function insertFilesInline(
   linkFor: LinkFor,
 ): Promise<void> {
   try {
+    let first = true;
     for (const file of files) {
       const link = await linkFor(file, paste);
       if (link) {
-        // Only the first file goes to the drop point: each insertion leaves the caret where the next one belongs.
-        insertInlineContent([link], coordinates);
+        // Only the first file goes to the drop point: each insertion leaves the caret where the next one belongs,
+        // separated by a space so that the links don't run into each other.
+        insertInlineContent(first ? [link] : [" ", link], coordinates);
+        first = false;
         coordinates = undefined;
       }
     }

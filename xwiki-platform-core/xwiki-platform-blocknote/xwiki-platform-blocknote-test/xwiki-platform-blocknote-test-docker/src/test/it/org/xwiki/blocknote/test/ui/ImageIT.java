@@ -94,6 +94,13 @@ class ImageIT extends AbstractBlockNoteIT
     // Right after "review", so that the file lands in the middle of the sentence rather than at its end.
     private static final int OFFSET = 13;
 
+    // The sentence with a neighbour on each side, so that a test can tell a block inserted next to it from one
+    // inserted at the start or the end of the page.
+    private static final String SURROUNDED_SENTENCE = "Before.\n\n" + SENTENCE + "\n\nAfter.";
+
+    // Long enough to wrap over several lines, so that a drop can land below the vertical middle of its block.
+    private static final String LONG_SENTENCE = SENTENCE.repeat(8);
+
     private static final String SENTENCE_WITH_LINK = "Please review[[attach:notes.txt]] before the meeting.";
 
     @Test
@@ -275,8 +282,8 @@ class ImageIT extends AbstractBlockNoteIT
 
         page.save();
 
-        // The file block is saved as a macro call, but that macro doesn't exist yet, so the file becomes an
-        // attachment link instead, inline where it landed rather than in a block of its own.
+        // A file that is not an image is attached and linked inline where it landed, rather than taking a block of
+        // its own.
         assertEquals(SENTENCE_WITH_LINK, page.editWiki().getContent());
 
         byte[] uploaded = setup.rest()
@@ -482,12 +489,167 @@ class ImageIT extends AbstractBlockNoteIT
 
         page.save();
 
-        // The links keep the order of the transfer, each one after the previous, rather than all at the drop point.
-        assertEquals("Please review[[attach:notes.txt]][[attach:agenda.txt]] before the meeting.",
+        // The links keep the order of the transfer, each one after the previous separated by a space, rather than
+        // all at the drop point.
+        assertEquals("Please review[[attach:notes.txt]] [[attach:agenda.txt]] before the meeting.",
             page.editWiki().getContent());
 
         Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
         assertEquals(List.of("agenda.txt", "notes.txt"),
             attachments.getAttachments().stream().map(Attachment::getName).sorted().toList());
+    }
+
+    @Test
+    @Order(11)
+    void pasteFiles(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.click().moveCaretTo(OFFSET).pasteFiles("/notes.txt", "/agenda.txt");
+        textArea.waitUntilLinkCountIs(2);
+
+        page.save();
+
+        // A paste lands at the caret rather than under the pointer, but is otherwise placed like a drop: both links
+        // inline, in the order of the transfer, separated by a space. Both files are renamed, as any pasted file is.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("Please review\\[\\[attach:\\d+-\\d+\\.txt\\]\\] "
+                + "\\[\\[attach:\\d+-\\d+\\.txt\\]\\] before the meeting\\."));
+    }
+
+    @Test
+    @Order(12)
+    void dropImageAndFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SURROUNDED_SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.clickBlock(1).moveCaretTo(0).dropFiles(OFFSET, "/image.gif", "/notes.txt");
+        textArea.waitUntilImageIsLoaded(0);
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // Once an image is in the transfer, BlockNote gives every file a block of its own, next to the paragraph
+        // the files landed in rather than at the start of the page. A drop in the upper half of that paragraph
+        // puts them above it. The file that is not an image gets a paragraph, since a link needs a block to live in.
+        assertEquals("""
+            Before.
+
+            [[image:image.gif]]
+
+            [[attach:notes.txt]]
+
+            Please review before the meeting.
+
+            After.""", page.editWiki().getContent());
+    }
+
+    @Test
+    @Order(13)
+    void pasteImageAndFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SURROUNDED_SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.clickBlock(1).moveCaretTo(OFFSET).pasteFiles("/image.gif", "/notes.txt");
+        textArea.waitUntilImageIsLoaded(0);
+        textArea.waitUntilLinkIsPresent();
+
+        page.save();
+
+        // Both files land next to the paragraph the caret was in, as they do for a drop. A paste has no pointer,
+        // so BlockNote always puts them after it, and each file is inserted after that same paragraph, which leaves
+        // them in the reverse order of the transfer. Both are renamed, as any pasted file is.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("Before\\.\n\nPlease review before the meeting\\.\n\n"
+                + "\\[\\[attach:\\d+-\\d+\\.txt\\]\\]\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"
+                + "\n\nAfter\\."));
+    }
+
+    @Test
+    @Order(14)
+    void dropImages(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SURROUNDED_SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.clickBlock(1).moveCaretTo(0).dropFiles(OFFSET, "/image.gif", "/picture.png");
+        textArea.waitUntilImageIsLoaded(1);
+
+        page.save();
+
+        // Each image gets a block of its own, above the paragraph they were dropped in since the pointer was in
+        // its upper half, and in the order of the transfer.
+        assertEquals("""
+            Before.
+
+            [[image:image.gif]]
+
+            [[image:picture.png]]
+
+            Please review before the meeting.
+
+            After.""", page.editWiki().getContent());
+    }
+
+    @Test
+    @Order(15)
+    void pasteImages(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SURROUNDED_SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.clickBlock(1).moveCaretTo(OFFSET).pasteFiles("/image.gif", "/picture.png");
+        textArea.waitUntilImageIsLoaded(1);
+
+        page.save();
+
+        // Both images get a block after the paragraph the caret was in, in the reverse order of the transfer since
+        // each one is inserted after that same paragraph. Both are renamed, as any pasted file is.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("Before\\.\n\nPlease review before the meeting\\.\n\n"
+                + "\\[\\[image:\\d+-\\d+\\.png\\]\\]\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"
+                + "\n\nAfter\\."));
+    }
+
+    @Test
+    @Order(16)
+    void dropImageAndFileBelowTheMiddle(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "Before.\n\n" + LONG_SENTENCE + "\n\nAfter.");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        // Drop on the last line of a paragraph that wraps, so that the pointer is below the middle of its block.
+        textArea.clickBlock(1).dropFiles(LONG_SENTENCE.length() - 2, "/image.gif", "/notes.txt");
+        textArea.waitUntilImageIsLoaded(0);
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // Dropped below the middle of the paragraph the blocks follow it, where a drop in its upper half puts them
+        // above it, and they come out in the reverse order of the transfer: each file is inserted after that same
+        // paragraph, so the next one lands between them.
+        assertEquals("Before.\n\n" + LONG_SENTENCE + "\n\n[[attach:notes.txt]]\n\n[[image:image.gif]]\n\nAfter.",
+            page.editWiki().getContent());
     }
 }

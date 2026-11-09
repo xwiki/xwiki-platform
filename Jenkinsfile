@@ -30,7 +30,8 @@ def builds = [
       name: 'Main',
       profiles: 'legacy,integration-tests,snapshot',
       properties:
-        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs'
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs',
+      publishNpmPackages: true
     )
   },
   // Can be used to manually trigger the main build with integration tests on the CI.
@@ -39,7 +40,8 @@ def builds = [
       name: 'Main with Integration Tests',
       profiles: 'legacy,integration-tests,snapshot',
       properties:
-        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
+      publishNpmPackages: true
     )
   },
   'Distribution' : {
@@ -231,6 +233,31 @@ private void build(map)
 {
   node(map.node ?: '') {
     buildInsideNode(map)
+    if (map.publishNpmPackages) {
+      publishNpmPackages()
+    }
+  }
+}
+
+// Publish the SNAPSHOT version of the npm packages built by the Maven build that just ran in this node: every package
+// of the pnpm workspace that is not private, to the snapshot registry of the pom. It uses the publication script of the
+// releases, from xwiki-dev-tools (xwiki-release-scripts/npm-publish/publish.sh).
+// Note: this step lives here because xwiki-platform is the only repository publishing npm packages. It can move to
+// xwikiBuild (xwiki-jenkins-pipeline), next to the Maven deploy, once another repository needs it.
+private void publishNpmPackages()
+{
+  // Publish exactly when xwikiBuild deployed the Maven artifacts. A failed Maven build stops before this step, while a
+  // build with failing tests (unstable) still deploys its artifacts, and thus publishes its npm packages too.
+  def branchName = env['BRANCH_NAME']
+  if (!isMasterBranch(branchName) && !isStableBranch(branchName) && !branchName?.startsWith('feature-deploy-')) {
+    return
+  }
+  stage('Publish npm packages') {
+    // Cloned outside of the workspace, so that it is never taken for a part of the project.
+    def devTools = "${pwd(tmp: true)}/xwiki-dev-tools"
+    sh "rm -rf '${devTools}' && git clone --depth 1 https://github.com/xwiki/xwiki-dev-tools.git '${devTools}'"
+    // A failed publication fails the build, like a failed Maven deploy.
+    sh "'${devTools}/xwiki-release-scripts/npm-publish/publish.sh' '${pwd()}'"
   }
 }
 

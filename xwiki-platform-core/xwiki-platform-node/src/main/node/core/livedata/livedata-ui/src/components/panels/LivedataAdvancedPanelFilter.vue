@@ -294,7 +294,7 @@ export default {
   margin-top: 1rem;
 }
 
-/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
 @media screen and (max-width: 767px) {
   .xwiki-livedata .livedata-advanced-panel-filter .delete-filter-group {
     /* Always show the delete icon on small screens because we can't rely on hover. */

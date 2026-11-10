@@ -367,6 +367,16 @@ public class LiveDataElement extends BaseElement
     }
 
     /**
+     * @return the element holding the advanced panels of this Live Data, e.g. to take a screenshot of the opened
+     *     panels
+     * @since 18.10.0RC1
+     */
+    public WebElement getAdvancedPanels()
+    {
+        return getRootElement().findElement(By.className("livedata-advanced-panels"));
+    }
+
+    /**
      * Clear all custom sorting that might have been put.
      */
     public void clearAllSort()

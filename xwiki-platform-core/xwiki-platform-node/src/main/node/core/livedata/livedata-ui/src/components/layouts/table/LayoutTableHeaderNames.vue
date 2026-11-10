@@ -436,7 +436,7 @@ export default {
   position: relative;
 }
 
-/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
 @media screen and (max-width: 767px) {
   .xwiki-livedata .layout-table th.draggable-item {
     /* Overwrite the draggable-item display in order to show the property names, which form the table header, as a

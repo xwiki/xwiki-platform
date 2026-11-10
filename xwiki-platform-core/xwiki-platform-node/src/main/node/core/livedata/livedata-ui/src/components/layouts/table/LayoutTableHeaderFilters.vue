@@ -98,7 +98,7 @@ export default {
   width: 0;
 }
 
-/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
 @media screen and (max-width: 767px) {
   .xwiki-livedata .layout-table .column-filters th {
     /* Overwrite the filters width so they don't overflow the table. */

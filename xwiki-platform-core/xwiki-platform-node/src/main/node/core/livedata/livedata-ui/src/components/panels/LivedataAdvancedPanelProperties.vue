@@ -160,7 +160,7 @@ export default {
   margin-left: 1rem;
 }
 
-/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
 @media screen and (max-width: 767px) {
   .xwiki-livedata .livedata-advanced-panel-properties .handle {
     /* Always show the drag handler on small screens because we cannot rely on hover. */

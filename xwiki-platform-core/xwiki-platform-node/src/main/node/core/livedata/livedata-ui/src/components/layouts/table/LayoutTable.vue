@@ -187,7 +187,7 @@ export default {
   padding-bottom: 1em;
 }
 
-/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
 @media screen and (max-width: 767px) {
   .xwiki-livedata .layout-table .responsive-table > thead {
     /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use grid display

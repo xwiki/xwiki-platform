@@ -100,6 +100,8 @@ class ImageIT extends AbstractBlockNoteIT
 
     private static final String SENTENCE_WITH_LINK = "Please review[[attach:notes.txt]] before the meeting.";
 
+    // The transfer tests run as drop and paste pairs, which @Order sets; the methods stay where they were.
+
     @Test
     @Order(1)
     void editImage(TestUtils setup, TestReference testReference) throws Exception
@@ -322,26 +324,6 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(5)
-    void pasteFile(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.deletePage(testReference);
-        setup.createPage(testReference, SENTENCE);
-
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-
-        textArea.click().moveCaretTo(OFFSET).pasteFiles("/notes.txt");
-        textArea.waitUntilLinkIsPresent();
-
-        page.save();
-
-        // The link goes where the caret was, splitting the text, rather than after the paragraph that held it.
-        assertThat(page.editWiki().getContent(),
-            matchesPattern("Please review\\[\\[attach:\\d+-\\d+\\.txt\\]\\] before the meeting\\."));
-    }
-
-    @Test
     @Order(6)
     void dropFileWithExistingName(TestUtils setup, TestReference testReference) throws Exception
     {
@@ -429,6 +411,26 @@ class ImageIT extends AbstractBlockNoteIT
 
         // The label is only displayed, so nothing is added to the source: an alt is saved only when the user sets it.
         assertEquals("[[image:missing.png]]", page.editWiki().getContent());
+    }
+
+    @Test
+    @Order(5)
+    void pasteFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.click().moveCaretTo(OFFSET).pasteFiles("/notes.txt");
+        textArea.waitUntilLinkIsPresent();
+
+        page.save();
+
+        // The link goes where the caret was, splitting the text, rather than after the paragraph that held it.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("Please review\\[\\[attach:\\d+-\\d+\\.txt\\]\\] before the meeting\\."));
     }
 
     @Test

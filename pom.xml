@@ -1015,6 +1015,11 @@
         <version>${lucene.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.opennlp</groupId>
+        <artifactId>opennlp-tools</artifactId>
+        <version>1.9.5</version>
+      </dependency>
+      <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
         <version>1.1.10.12</version>

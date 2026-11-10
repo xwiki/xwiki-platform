@@ -65,6 +65,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   border: none;
   cursor: default;
   background: transparent;
+  min-height: 24px;   /* Ensures minimum row height so vertically adjacent targets do not overlap */
 }
 
 .xobject:hover .xobject-title,
@@ -101,7 +102,12 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xobject-action {
   display: block;
   position: absolute;
-  top: 2px;
+  top: -5px;
+  padding: 7px;  /* Ensures the clickable area meets the WCAG 2.5.8 minimum target size of 24x24px */
+}
+
+.xobject-action.delete {
+   right: 0;
 }
 
 .xobject-title .delete {
@@ -110,7 +116,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 
 .xobject-title .edit {
-  right: 16px;
+  right: 28px;   /* Offset accounts for the delete button width plus its padding to prevent overlap */
 }
 
 /* XProperty definition */
@@ -230,8 +236,11 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
 .xproperty-title .tools .tool {
   width: 16px;
   height: 16px;
+  padding: 4px;   /* Extra padding increases the clickable area to meet WCAG 2.5.8 minimum target size */
+  box-sizing: content-box;
   float: left;
   background: transparent none center no-repeat;
+  margin-top: -4px;
 }
 
 .xproperty-title .tools .move {

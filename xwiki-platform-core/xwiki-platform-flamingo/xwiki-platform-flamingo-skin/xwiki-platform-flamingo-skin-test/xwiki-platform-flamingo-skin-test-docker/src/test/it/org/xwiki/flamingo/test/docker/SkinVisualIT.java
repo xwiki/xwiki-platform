@@ -90,4 +90,16 @@ class SkinVisualIT
         drawerMenu.show();
         screenshots.assertMatches("drawer", drawerMenu.getContainer());
     }
+
+    /**
+     * Verify the layout of the figures: the space between the image and its caption, the style of the caption and the
+     * space below it, before the next figure and before the next paragraph.
+     */
+    @Test
+    @Order(3)
+    void figures(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Figures"));
+        screenshots.assertMatches("figures", viewPage.getContentContainer());
+    }
 }

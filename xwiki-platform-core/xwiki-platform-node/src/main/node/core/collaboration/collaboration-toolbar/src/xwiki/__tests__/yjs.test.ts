@@ -21,12 +21,12 @@
 // Test suites and test scenarios are naturally made of many statements.
 /* eslint-disable max-statements */
 
-import { Toolbar } from "../../ui/Toolbar";
+import { Toolbar } from "../../vue/Toolbar";
 import { createXWikiToolbarEnvironment } from "../environment";
 import { createYjsToolbar } from "../yjs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick, ref } from "vue";
-import type { ToolbarOptions } from "../../ui/types";
+import type { ToolbarOptions } from "../../vue/types";
 import type { YjsToolbarOptions } from "../yjs";
 import type { Saver } from "@xwiki/platform-autosave-api";
 import type { XWikiFormSaveContext } from "@xwiki/platform-autosave-xwiki";
@@ -36,7 +36,7 @@ import type {
 } from "@xwiki/platform-collaboration-api";
 import type { XWikiDocument } from "@xwiki/platform-document-xwiki";
 
-vi.mock("../../ui/Toolbar", () => ({
+vi.mock("../../vue/Toolbar", () => ({
   Toolbar: vi.fn(
     class {
       onConnectionStatusChange = vi.fn();

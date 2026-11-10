@@ -20,14 +20,14 @@
 
 import { createXWikiToolbarEnvironment } from "./environment";
 import { loadXWikiToolbarTranslations } from "./translations";
-import { Toolbar } from "../ui/Toolbar";
+import { Toolbar } from "../vue/Toolbar";
 import { watch } from "vue";
 import type {
   ToolbarStatus,
   ToolbarUser,
   ToolbarVersion,
   ToolbarWarning,
-} from "../ui/types";
+} from "../vue/types";
 import type { Saver } from "@xwiki/platform-autosave-api";
 import type {
   DocumentVersion,

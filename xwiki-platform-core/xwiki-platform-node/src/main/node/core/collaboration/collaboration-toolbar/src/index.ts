@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export { Toolbar } from "./ui/Toolbar";
+export { Toolbar } from "./vue/Toolbar";
 export { createXWikiToolbarEnvironment } from "./xwiki/environment";
 export { findXWikiEditForm } from "./xwiki/form";
 export { loadXWikiToolbarTranslations } from "./xwiki/translations";
@@ -32,5 +32,5 @@ export type {
   ToolbarUser,
   ToolbarVersion,
   ToolbarWarning,
-} from "./ui/types";
+} from "./vue/types";
 export type { YjsToolbar, YjsToolbarOptions } from "./xwiki/yjs";

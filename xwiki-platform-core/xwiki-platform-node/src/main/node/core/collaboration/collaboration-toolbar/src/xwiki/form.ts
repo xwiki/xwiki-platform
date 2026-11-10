@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { STANDARD_TOOLBAR_SELECTOR } from "../ui/Toolbar";
+import { STANDARD_TOOLBAR_SELECTOR } from "../vue/Toolbar";
 
 /**
  * Finds the edit form of the current XWiki page, i.e. the form holding the standard edit toolbar (Save, Cancel, etc.)

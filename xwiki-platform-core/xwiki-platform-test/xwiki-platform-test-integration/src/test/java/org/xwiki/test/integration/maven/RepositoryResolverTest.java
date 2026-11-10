@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.integration.maven;
 
+import java.net.ProxySelector;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
@@ -45,9 +47,12 @@ class RepositoryResolverTest
 
     private final Map<String, String> savedProperties = new HashMap<>();
 
+    private ProxySelector savedProxySelector;
+
     @BeforeEach
     void saveProxyProperties()
     {
+        this.savedProxySelector = ProxySelector.getDefault();
         // The JVM running the tests may itself be configured to use a proxy.
         PROXY_PROPERTIES.forEach(name -> {
             this.savedProperties.put(name, System.getProperty(name));
@@ -58,6 +63,7 @@ class RepositoryResolverTest
     @AfterEach
     void restoreProxyProperties()
     {
+        ProxySelector.setDefault(this.savedProxySelector);
         this.savedProperties.forEach((name, value) -> {
             if (value == null) {
                 System.clearProperty(name);
@@ -78,6 +84,7 @@ class RepositoryResolverTest
         assertFalse(repositories.isEmpty());
         repositories.forEach(repository -> {
             Proxy proxy = repository.getProxy();
+            assertNotNull(proxy, repository.getId());
             assertEquals("proxy.example.org", proxy.getHost(), repository.getId());
             assertEquals(3128, proxy.getPort(), repository.getId());
         });
@@ -86,6 +93,10 @@ class RepositoryResolverTest
     @Test
     void repositoriesWithoutJVMProxy()
     {
+        // Clearing the proxy system properties isn't enough when the JVM uses the system proxies
+        // (java.net.useSystemProxies), so also install a JVM proxy selector that never returns a proxy.
+        ProxySelector.setDefault(ProxySelector.of(null));
+
         List<RemoteRepository> repositories = new RepositoryResolver(true).getRepositories();
 
         assertFalse(repositories.isEmpty());

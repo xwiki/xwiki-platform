@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.UITest;
@@ -89,5 +90,30 @@ class SkinVisualIT
         DrawerMenu drawerMenu = viewPage.getDrawerMenu();
         drawerMenu.show();
         screenshots.assertMatches("drawer", drawerMenu.getContainer());
+    }
+
+    /**
+     * Verify the layout of a Live Data on a small screen: the property names and the filters are displayed as two
+     * columns, the page size selector is hidden, and the actions that are otherwise only displayed on hover, in the
+     * table and in the advanced panels, are always displayed.
+     */
+    @Test
+    @Order(3)
+    void liveDataSmallScreen(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "LiveData"));
+        LiveDataElement liveData = new LiveDataElement("skinVisual");
+        liveData.getTableLayout().waitUntilRowCountEqualsTo(2);
+        setup.setBrowserWindowWidth(700);
+        try {
+            screenshots.assertMatches("liveData", viewPage.getContentContainer());
+
+            liveData.openPropertiesPanel();
+            liveData.openSortPanel();
+            liveData.openFiltersPanel();
+            screenshots.assertMatches("liveDataPanels", viewPage.getContentContainer());
+        } finally {
+            setup.maximizeBrowserWindow();
+        }
     }
 }

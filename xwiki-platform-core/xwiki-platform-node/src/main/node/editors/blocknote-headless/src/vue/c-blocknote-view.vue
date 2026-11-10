@@ -146,22 +146,28 @@ function insertInlineContent(
 }
 
 /**
- * Moves the caret under the pointer, for an insertion that follows a drop, since a drop leaves the caret behind.
- * Call it while the drop event is still live: the coordinates are in the viewport, so they point elsewhere once
- * the page has scrolled.
+ * Puts the caret where an insertion that follows a paste or a drop belongs: under the pointer for a drop, since a
+ * drop leaves the caret behind, and wherever it already is for a paste. Call it while the event is still live, the
+ * coordinates being in the viewport: once the page has scrolled they point at something else.
  *
- * @param coordinates - where the pointer is, in viewport coordinates
- * @returns false when the pointer is not over the editor content, which leaves the caret where it was
+ * @param coordinates - where the pointer is, in viewport coordinates, for a drop; nothing for a paste
+ * @returns false when there is no caret to insert at, because the pointer is not over the editor content or,
+ *   for a paste, because the editor doesn't hold the focus
  */
-function moveCaretTo(coordinates: { left: number; top: number }): boolean {
+function placeCaret(coordinates?: { left: number; top: number }): boolean {
   const editor = editorRef.value;
-  return !!editor && moveEditorCaretTo(editor, coordinates);
+  if (!editor) {
+    return false;
+  }
+  return coordinates
+    ? moveEditorCaretTo(editor, coordinates)
+    : editor.isFocused();
 }
 
 defineExpose({
   getContent,
   insertInlineContent,
-  moveCaretTo,
+  placeCaret,
 });
 
 /**

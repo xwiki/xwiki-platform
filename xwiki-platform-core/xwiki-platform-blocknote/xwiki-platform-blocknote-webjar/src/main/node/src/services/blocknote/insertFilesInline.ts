@@ -29,9 +29,9 @@ type LinkFor = (file: File, paste: boolean) => Promise<InlineLink | undefined>;
 
 type InsertInlineContent = (content: (InlineLink | string)[]) => void;
 
-// Returns false when there is nowhere to put the caret under the pointer, e.g. a drop on the chrome around the
-// content.
-type MoveCaretTo = (coordinates: { left: number; top: number }) => boolean;
+// Puts the caret where the insertion belongs, under the pointer for a drop and wherever it already is for a
+// paste, and returns false when the transfer didn't land on the content and so has no caret to go to.
+type PlaceCaret = (coordinates?: { left: number; top: number }) => boolean;
 
 function isImage(file: File): boolean {
   return file.type.startsWith("image/");
@@ -73,24 +73,24 @@ async function insertFilesInline(
  * is left to BlockNote as a whole, rather than being split over two code paths.
  *
  * @param insertInlineContent - inserts the links in the editor
- * @param moveCaretTo - moves the caret under the pointer, telling whether there was a place for it there
+ * @param placeCaret - puts the caret where the links belong, telling whether the transfer landed on the content
  * @param linkFor - attaches a file and returns the link to it, or nothing if that failed
  * @returns the handler the paste tracker calls to offer a transfer, true meaning that the transfer is ours now
  */
 function takeOverFileTransfers(
   insertInlineContent: InsertInlineContent,
-  moveCaretTo: MoveCaretTo,
+  placeCaret: PlaceCaret,
   linkFor: LinkFor,
 ): (transfer: FileTransfer) => boolean {
   return function takeOver(transfer) {
     if (transfer.files.some(isImage)) {
       return false;
     }
-    // The caret moves now rather than once the files are uploaded, because the coordinates are in the viewport:
-    // scrolling while a large file uploads would otherwise point them at whatever text has moved under them. A
-    // drop with nowhere to put the caret isn't on the content at all, e.g. on a dialog over the editor, so it
-    // goes back to BlockNote.
-    if (transfer.coordinates && !moveCaretTo(transfer.coordinates)) {
+    // Now rather than once the files are uploaded, because a drop's coordinates are in the viewport: scrolling
+    // while a large file uploads would point them at whatever text has moved under them. No caret means the
+    // transfer never landed on the content, e.g. a drop on a dialog over the editor or a paste into one of its
+    // fields, so it goes back to BlockNote.
+    if (!placeCaret(transfer.coordinates)) {
       return false;
     }
     // Not awaited: the handler has to answer while the event is still live, the uploads take far longer.
@@ -102,6 +102,6 @@ function takeOverFileTransfers(
 export {
   type InlineLink,
   type InsertInlineContent,
-  type MoveCaretTo,
+  type PlaceCaret,
   takeOverFileTransfers,
 };

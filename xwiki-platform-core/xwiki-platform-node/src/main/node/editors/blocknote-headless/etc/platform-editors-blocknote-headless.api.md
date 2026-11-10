@@ -32,7 +32,7 @@ linkContext?: LinkContext;
 }, {
 getContent: () => BlockType[];
 insertInlineContent: (content: Parameters<EditorType["insertInlineContent"]>[0]) => void;
-moveCaretTo: (coordinates: {
+placeCaret: (coordinates?: {
 left: number;
 top: number;
 }) => boolean;

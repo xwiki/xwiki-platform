@@ -31,7 +31,7 @@ import type { BlockNoteDocument } from "./BlockNoteProcessor";
 import type {
   InlineLink,
   InsertInlineContent,
-  MoveCaretTo,
+  PlaceCaret,
 } from "./insertFilesInline";
 import type { PageAttachment } from "@xwiki/platform-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
@@ -52,7 +52,7 @@ type FileUploaderDependencies = {
 
   insertInlineContent: InsertInlineContent;
 
-  moveCaretTo: MoveCaretTo;
+  placeCaret: PlaceCaret;
 
   // Whether the files are uploaded to the temporary store of the user session, from where the save request attaches
   // them to the document, rather than being attached right away.
@@ -97,7 +97,7 @@ function createFileUploader(
     getDocumentReference,
     getBlockNoteDocument,
     insertInlineContent,
-    moveCaretTo,
+    placeCaret,
     isTemporaryUpload,
     registerTemporaryAttachment,
     notifyUploadFailed,
@@ -110,7 +110,7 @@ function createFileUploader(
     eventTarget,
     takeOverFileTransfers(
       insertInlineContent,
-      moveCaretTo,
+      placeCaret,
       async (file, paste) => {
         const toUpload = toAttach(file, paste);
         // Only the upload is caught here: a link that can't be built is a bug rather than something to report as

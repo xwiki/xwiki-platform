@@ -29,7 +29,7 @@ function link(label) {
 }
 
 describe("takeOverFileTransfers", () => {
-  let insertInlineContent, moveCaretTo, linkFor, takeOver;
+  let insertInlineContent, placeCaret, linkFor, takeOver;
 
   function transfer(files, coordinates) {
     return { paste: !coordinates, files, coordinates };
@@ -43,9 +43,9 @@ describe("takeOverFileTransfers", () => {
 
   beforeEach(() => {
     insertInlineContent = vi.fn();
-    moveCaretTo = vi.fn(() => true);
+    placeCaret = vi.fn(() => true);
     linkFor = vi.fn(async (f) => link(f.name));
-    takeOver = takeOverFileTransfers(insertInlineContent, moveCaretTo, linkFor);
+    takeOver = takeOverFileTransfers(insertInlineContent, placeCaret, linkFor);
   });
 
   describe("the files it takes over", () => {
@@ -53,13 +53,19 @@ describe("takeOverFileTransfers", () => {
       expect(await take(file("report.pdf", "application/pdf"))).toBe(true);
     });
 
-    it("moves the caret under the pointer while the drop event is live, since dropping leaves it behind", () => {
-      // Not once the files are uploaded: the coordinates are in the viewport, so they rot as the page scrolls.
+    it("places the caret while the event is live, since a drop leaves it behind", () => {
+      // Not once the files are uploaded: a drop's coordinates are in the viewport, so they rot as the page scrolls.
       takeOver(
         transfer([file("report.pdf", "application/pdf")], { left: 5, top: 9 }),
       );
 
-      expect(moveCaretTo).toHaveBeenCalledWith({ left: 5, top: 9 });
+      expect(placeCaret).toHaveBeenCalledWith({ left: 5, top: 9 });
+    });
+
+    it("places the caret for a paste too, which has no pointer to go by", () => {
+      takeOver(transfer([file("report.pdf", "application/pdf")]));
+
+      expect(placeCaret).toHaveBeenCalledWith(undefined);
     });
 
     it("links a dropped file at the caret it moved under the pointer", async () => {
@@ -68,11 +74,10 @@ describe("takeOverFileTransfers", () => {
       expect(insertInlineContent).toHaveBeenCalledWith([link("report.pdf")]);
     });
 
-    it("links a pasted file at the caret, which a paste doesn't move", async () => {
+    it("links a pasted file at the caret", async () => {
       takeOver(transfer([file("report.pdf", "application/pdf")]));
       await vi.waitFor(() => expect(insertInlineContent).toHaveBeenCalled());
 
-      expect(moveCaretTo).not.toHaveBeenCalled();
       expect(insertInlineContent).toHaveBeenCalledWith([link("report.pdf")]);
     });
 
@@ -112,9 +117,10 @@ describe("takeOverFileTransfers", () => {
       expect(linkFor).not.toHaveBeenCalled();
     });
 
-    // A drop with nowhere to put the caret is on the chrome around the content, e.g. a dialog over the editor.
+    // A transfer with nowhere to put the caret never landed on the content: a drop on a dialog over the editor,
+    // or a paste into one of its fields.
     it("leaves a drop alone when the caret can't follow the pointer", () => {
-      moveCaretTo.mockReturnValue(false);
+      placeCaret.mockReturnValue(false);
 
       expect(
         takeOver(
@@ -124,6 +130,15 @@ describe("takeOverFileTransfers", () => {
           }),
         ),
       ).toBe(false);
+      expect(linkFor).not.toHaveBeenCalled();
+    });
+
+    it("leaves a paste alone when the editor doesn't hold the caret", () => {
+      placeCaret.mockReturnValue(false);
+
+      expect(takeOver(transfer([file("report.pdf", "application/pdf")]))).toBe(
+        false,
+      );
       expect(linkFor).not.toHaveBeenCalled();
     });
 

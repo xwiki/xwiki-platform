@@ -28,7 +28,11 @@ import {
 } from "@xwiki/platform-xwiki-model-api";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteDocument } from "./BlockNoteProcessor";
-import type { InlineLink, InsertInlineContent } from "./insertFilesInline";
+import type {
+  InlineLink,
+  InsertInlineContent,
+  MoveCaretTo,
+} from "./insertFilesInline";
 import type { PageAttachment } from "@xwiki/platform-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
@@ -47,6 +51,8 @@ type FileUploaderDependencies = {
   getBlockNoteDocument: () => BlockNoteDocument | undefined;
 
   insertInlineContent: InsertInlineContent;
+
+  moveCaretTo: MoveCaretTo;
 
   // Whether the files are uploaded to the temporary store of the user session, from where the save request attaches
   // them to the document, rather than being attached right away.
@@ -91,6 +97,7 @@ function createFileUploader(
     getDocumentReference,
     getBlockNoteDocument,
     insertInlineContent,
+    moveCaretTo,
     isTemporaryUpload,
     registerTemporaryAttachment,
     notifyUploadFailed,
@@ -101,15 +108,19 @@ function createFileUploader(
   // Pasted files are renamed, so we need to know how the file reached the editor.
   const pasteTracker = trackPaste(
     eventTarget,
-    takeOverFileTransfers(insertInlineContent, async (file, paste) => {
-      const toUpload = toAttach(file, paste);
-      try {
-        return linkTo(await attach(toUpload), toUpload.name);
-      } catch (error) {
-        notifyUploadFailed(toUpload.name, error);
-        return undefined;
-      }
-    }),
+    takeOverFileTransfers(
+      insertInlineContent,
+      moveCaretTo,
+      async (file, paste) => {
+        const toUpload = toAttach(file, paste);
+        try {
+          return linkTo(await attach(toUpload), toUpload.name);
+        } catch (error) {
+          notifyUploadFailed(toUpload.name, error);
+          return undefined;
+        }
+      },
+    ),
   );
 
   // The file is attached to the edited document, so its reference is serialized relative to that document, as the
@@ -186,8 +197,8 @@ function createFileUploader(
       if (file.type.startsWith("image/")) {
         return toImageBlock(attachment, blockId);
       }
-      // Only files of a transfer that also carries an image reach this: BlockNote did insert a block for them,
-      // so the link goes back as a paragraph, to replace it.
+      // Only the files BlockNote inserted a block for reach this, i.e. the file panel of a file block and the
+      // transfers that also carry an image, so the link goes back as a paragraph, to replace that block.
       return {
         type: "paragraph",
         content: [linkTo(attachment, toUpload.name)],

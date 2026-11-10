@@ -49,6 +49,7 @@ function uploadedAttachment(name) {
 describe("createFileUploader", () => {
   let blockNoteDocument,
     insertInlineContent,
+    moveCaretTo,
     saveAttachments,
     notifyUploadFailed,
     eventTarget,
@@ -63,6 +64,7 @@ describe("createFileUploader", () => {
       getDocumentReference: () => "Space.Page",
       getBlockNoteDocument: () => blockNoteDocument,
       insertInlineContent,
+      moveCaretTo,
       isTemporaryUpload: () => temporary,
       registerTemporaryAttachment,
       notifyUploadFailed,
@@ -73,6 +75,7 @@ describe("createFileUploader", () => {
     blockNoteDocument = new BlockNoteDocument([]);
     // What the insertion does with the links is covered by the insertFilesInline tests.
     insertInlineContent = vi.fn();
+    moveCaretTo = vi.fn(() => true);
     eventTarget = document.createElement("div");
     temporary = false;
     registerTemporaryAttachment = vi.fn();

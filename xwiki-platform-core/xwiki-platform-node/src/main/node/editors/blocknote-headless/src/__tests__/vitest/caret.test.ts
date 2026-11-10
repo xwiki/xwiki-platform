@@ -57,7 +57,7 @@ describe("moveCaretTo", () => {
       () => ({ offsetNode: text, offset: 2 }) as CaretPosition,
     );
 
-    moveCaretTo(editor, { left: 5, top: 9 });
+    expect(moveCaretTo(editor, { left: 5, top: 9 })).toBe(true);
 
     expect(document.caretPositionFromPoint).toHaveBeenCalledWith(5, 9);
     // ProseMirror only adopts the selection of a focused view.
@@ -86,17 +86,19 @@ describe("moveCaretTo", () => {
       () => ({ offsetNode: document.body, offset: 0 }) as CaretPosition,
     );
 
-    moveCaretTo(editor, { left: 5, top: 9 });
+    expect(moveCaretTo(editor, { left: 5, top: 9 })).toBe(false);
 
     expect(selection.collapse).not.toHaveBeenCalled();
     expect(flush).not.toHaveBeenCalled();
+    // Otherwise a drop on a dialog over the editor would steal the focus from it.
+    expect(editor.focus).not.toHaveBeenCalled();
   });
 
   it("leaves the caret alone when there is no position under the pointer", () => {
     const selection = document.getSelection()!;
     vi.spyOn(selection, "collapse");
 
-    moveCaretTo(editor, { left: 5, top: 9 });
+    expect(moveCaretTo(editor, { left: 5, top: 9 })).toBe(false);
 
     expect(selection.collapse).not.toHaveBeenCalled();
   });

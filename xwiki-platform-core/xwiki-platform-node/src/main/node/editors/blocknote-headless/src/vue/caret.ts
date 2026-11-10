@@ -36,20 +36,25 @@ function caretAt(left: number, top: number): [Node, number] | undefined {
  *
  * @param editor - the editor to move the caret in
  * @param coordinates - where the pointer is, in viewport coordinates
+ * @returns false when there is no place for the caret under the pointer, e.g. because it is over the chrome around
+ *   the content rather than over the content itself, which leaves the caret where it was
  */
 function moveCaretTo(
   editor: EditorType,
   coordinates: { left: number; top: number },
-): void {
-  editor.focus();
+): boolean {
   const caret = caretAt(coordinates.left, coordinates.top);
-  if (caret && editor.prosemirrorView.dom.contains(caret[0])) {
-    document.getSelection()?.collapse(...caret);
-    // ProseMirror reads a selection it didn't make only on a delayed flush, and would insert at the one it holds.
-    (
-      editor.prosemirrorView as unknown as { domObserver: { flush(): void } }
-    ).domObserver.flush();
+  if (!caret || !editor.prosemirrorView.dom.contains(caret[0])) {
+    return false;
   }
+  // ProseMirror only adopts the selection of a focused view, and focusing restores the old one, so focus first.
+  editor.focus();
+  document.getSelection()?.collapse(...caret);
+  // ProseMirror reads a selection it didn't make only on a delayed flush, and would insert at the one it holds.
+  (
+    editor.prosemirrorView as unknown as { domObserver: { flush(): void } }
+  ).domObserver.flush();
+  return true;
 }
 
 export { moveCaretTo };

@@ -19,7 +19,7 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import { moveCaretTo } from "./caret";
+import { moveCaretTo as moveEditorCaretTo } from "./caret";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import { LinkModal } from "@xwiki/platform-link-modal-ui";
 import {
@@ -133,31 +133,35 @@ function getContent(): BlockType[] {
 }
 
 /**
- * Inserts inline content where the user is, for the integrations that insert content of their own rather than
- * through BlockNote.
+ * Inserts inline content at the caret, for the integrations that insert content of their own rather than through
+ * BlockNote.
  *
  * @param content - what to insert
- * @param coordinates - where the pointer is, for an insertion that follows a drop, since a drop leaves the caret
- *   behind
  */
 function insertInlineContent(
   content: Parameters<EditorType["insertInlineContent"]>[0],
-  coordinates?: { left: number; top: number },
 ): void {
-  const editor = editorRef.value;
-  if (!editor) {
-    return;
-  }
-  if (coordinates) {
-    moveCaretTo(editor, coordinates);
-  }
   // updateSelection leaves the caret after the content, so a second insertion lines up behind the first.
-  editor.insertInlineContent(content, { updateSelection: true });
+  editorRef.value?.insertInlineContent(content, { updateSelection: true });
+}
+
+/**
+ * Moves the caret under the pointer, for an insertion that follows a drop, since a drop leaves the caret behind.
+ * Call it while the drop event is still live: the coordinates are in the viewport, so they point elsewhere once
+ * the page has scrolled.
+ *
+ * @param coordinates - where the pointer is, in viewport coordinates
+ * @returns false when the pointer is not over the editor content, which leaves the caret where it was
+ */
+function moveCaretTo(coordinates: { left: number; top: number }): boolean {
+  const editor = editorRef.value;
+  return !!editor && moveEditorCaretTo(editor, coordinates);
 }
 
 defineExpose({
   getContent,
   insertInlineContent,
+  moveCaretTo,
 });
 
 /**

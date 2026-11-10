@@ -29,7 +29,7 @@ function link(label) {
 }
 
 describe("takeOverFileTransfers", () => {
-  let insertInlineContent, linkFor, takeOver;
+  let insertInlineContent, moveCaretTo, linkFor, takeOver;
 
   function transfer(files, coordinates) {
     return { paste: !coordinates, files, coordinates };
@@ -43,8 +43,9 @@ describe("takeOverFileTransfers", () => {
 
   beforeEach(() => {
     insertInlineContent = vi.fn();
+    moveCaretTo = vi.fn(() => true);
     linkFor = vi.fn(async (f) => link(f.name));
-    takeOver = takeOverFileTransfers(insertInlineContent, linkFor);
+    takeOver = takeOverFileTransfers(insertInlineContent, moveCaretTo, linkFor);
   });
 
   describe("the files it takes over", () => {
@@ -52,23 +53,27 @@ describe("takeOverFileTransfers", () => {
       expect(await take(file("report.pdf", "application/pdf"))).toBe(true);
     });
 
-    it("links a dropped file under the pointer, since dropping leaves the caret behind", async () => {
-      await take(file("report.pdf", "application/pdf"));
+    it("moves the caret under the pointer while the drop event is live, since dropping leaves it behind", () => {
+      // Not once the files are uploaded: the coordinates are in the viewport, so they rot as the page scrolls.
+      takeOver(
+        transfer([file("report.pdf", "application/pdf")], { left: 5, top: 9 }),
+      );
 
-      expect(insertInlineContent).toHaveBeenCalledWith([link("report.pdf")], {
-        left: 5,
-        top: 9,
-      });
+      expect(moveCaretTo).toHaveBeenCalledWith({ left: 5, top: 9 });
     });
 
-    it("links a pasted file at the caret", async () => {
+    it("links a dropped file at the caret it moved under the pointer", async () => {
+      await take(file("report.pdf", "application/pdf"));
+
+      expect(insertInlineContent).toHaveBeenCalledWith([link("report.pdf")]);
+    });
+
+    it("links a pasted file at the caret, which a paste doesn't move", async () => {
       takeOver(transfer([file("report.pdf", "application/pdf")]));
       await vi.waitFor(() => expect(insertInlineContent).toHaveBeenCalled());
 
-      expect(insertInlineContent).toHaveBeenCalledWith(
-        [link("report.pdf")],
-        undefined,
-      );
+      expect(moveCaretTo).not.toHaveBeenCalled();
+      expect(insertInlineContent).toHaveBeenCalledWith([link("report.pdf")]);
     });
 
     it("links the files of one transfer in order, after the first one", async () => {
@@ -80,8 +85,8 @@ describe("takeOverFileTransfers", () => {
       // The caret follows the first link, so later files go after it rather than back at the drop point, each
       // preceded by a space.
       expect(insertInlineContent.mock.calls).toEqual([
-        [[link("first.pdf")], { left: 5, top: 9 }],
-        [[" ", link("second.pdf")], undefined],
+        [[link("first.pdf")]],
+        [[" ", link("second.pdf")]],
       ]);
     });
 
@@ -104,6 +109,21 @@ describe("takeOverFileTransfers", () => {
     // An image belongs in a block of its own, which is what BlockNote gives it.
     it("leaves a transfer of images alone", () => {
       expect(takeOver(transfer([file("photo.png", "image/png")]))).toBe(false);
+      expect(linkFor).not.toHaveBeenCalled();
+    });
+
+    // A drop with nowhere to put the caret is on the chrome around the content, e.g. a dialog over the editor.
+    it("leaves a drop alone when the caret can't follow the pointer", () => {
+      moveCaretTo.mockReturnValue(false);
+
+      expect(
+        takeOver(
+          transfer([file("report.pdf", "application/pdf")], {
+            left: 5,
+            top: 9,
+          }),
+        ),
+      ).toBe(false);
       expect(linkFor).not.toHaveBeenCalled();
     });
 

@@ -27,11 +27,11 @@ type InlineLink = {
 
 type LinkFor = (file: File, paste: boolean) => Promise<InlineLink | undefined>;
 
-// Inserts at the caret, or under the pointer when given coordinates, as a drop is.
-type InsertInlineContent = (
-  content: (InlineLink | string)[],
-  coordinates?: { left: number; top: number },
-) => void;
+type InsertInlineContent = (content: (InlineLink | string)[]) => void;
+
+// Returns false when there is nowhere to put the caret under the pointer, e.g. a drop on the chrome around the
+// content.
+type MoveCaretTo = (coordinates: { left: number; top: number }) => boolean;
 
 function isImage(file: File): boolean {
   return file.type.startsWith("image/");
@@ -43,19 +43,20 @@ function isImage(file: File): boolean {
  */
 async function insertFilesInline(
   insertInlineContent: InsertInlineContent,
-  { files, paste, coordinates }: FileTransfer,
+  { files, paste }: FileTransfer,
   linkFor: LinkFor,
 ): Promise<void> {
   try {
     let first = true;
     for (const file of files) {
+      // One upload at a time: two files renamed in the same tick would get the same generated name, since it is
+      // made of the current timestamp and a small random number.
       const link = await linkFor(file, paste);
       if (link) {
-        // Only the first file goes to the drop point: each insertion leaves the caret where the next one belongs,
-        // separated by a space so that the links don't run into each other.
-        insertInlineContent(first ? [link] : [" ", link], coordinates);
+        // Each insertion leaves the caret where the next file belongs, separated by a space so that the links
+        // don't run into each other.
+        insertInlineContent(first ? [link] : [" ", link]);
         first = false;
-        coordinates = undefined;
       }
     }
   } catch (error) {
@@ -72,21 +73,35 @@ async function insertFilesInline(
  * is left to BlockNote as a whole, rather than being split over two code paths.
  *
  * @param insertInlineContent - inserts the links in the editor
+ * @param moveCaretTo - moves the caret under the pointer, telling whether there was a place for it there
  * @param linkFor - attaches a file and returns the link to it, or nothing if that failed
  * @returns the handler the paste tracker calls to offer a transfer, true meaning that the transfer is ours now
  */
 function takeOverFileTransfers(
   insertInlineContent: InsertInlineContent,
+  moveCaretTo: MoveCaretTo,
   linkFor: LinkFor,
 ): (transfer: FileTransfer) => boolean {
   return function takeOver(transfer) {
-    const ours = !transfer.files.some(isImage);
-    if (ours) {
-      // Not awaited: the handler has to answer while the event is still live, the uploads take far longer.
-      void insertFilesInline(insertInlineContent, transfer, linkFor);
+    if (transfer.files.some(isImage)) {
+      return false;
     }
-    return ours;
+    // The caret moves now rather than once the files are uploaded, because the coordinates are in the viewport:
+    // scrolling while a large file uploads would otherwise point them at whatever text has moved under them. A
+    // drop with nowhere to put the caret isn't on the content at all, e.g. on a dialog over the editor, so it
+    // goes back to BlockNote.
+    if (transfer.coordinates && !moveCaretTo(transfer.coordinates)) {
+      return false;
+    }
+    // Not awaited: the handler has to answer while the event is still live, the uploads take far longer.
+    void insertFilesInline(insertInlineContent, transfer, linkFor);
+    return true;
   };
 }
 
-export { type InlineLink, type InsertInlineContent, takeOverFileTransfers };
+export {
+  type InlineLink,
+  type InsertInlineContent,
+  type MoveCaretTo,
+  takeOverFileTransfers,
+};

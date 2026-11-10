@@ -53,8 +53,8 @@ describe("takeOverFileTransfers", () => {
       expect(await take(file("report.pdf", "application/pdf"))).toBe(true);
     });
 
-    it("places the caret while the event is live, since a drop leaves it behind", () => {
-      // Not once the files are uploaded: a drop's coordinates are in the viewport, so they rot as the page scrolls.
+    it("places the caret before any upload, while the drop coordinates still point at the text they were dropped on", () => {
+      // Resolved after the upload they would point at whatever the page had scrolled to meanwhile.
       takeOver(
         transfer([file("report.pdf", "application/pdf")], { left: 5, top: 9 }),
       );

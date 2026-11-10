@@ -147,8 +147,9 @@ function insertInlineContent(
 
 /**
  * Puts the caret where an insertion that follows a paste or a drop belongs: under the pointer for a drop, since a
- * drop leaves the caret behind, and wherever it already is for a paste. Call it while the event is still live, the
- * coordinates being in the viewport: once the page has scrolled they point at something else.
+ * drop doesn't move the caret itself, and wherever it already is for a paste. Call it from the event handler
+ * rather than after the upload: the coordinates are viewport pixels, so they point at different text once the
+ * page has scrolled.
  *
  * @param coordinates - where the pointer is, in viewport coordinates, for a drop; nothing for a paste
  * @returns false when there is no caret to insert at, because the pointer is not over the editor content or,

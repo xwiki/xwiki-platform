@@ -86,10 +86,7 @@ function takeOverFileTransfers(
     if (transfer.files.some(isImage)) {
       return false;
     }
-    // Now rather than once the files are uploaded, because a drop's coordinates are in the viewport: scrolling
-    // while a large file uploads would point them at whatever text has moved under them. No caret means the
-    // transfer never landed on the content, e.g. a drop on a dialog over the editor or a paste into one of its
-    // fields, so it goes back to BlockNote.
+    // Before the uploads, while a drop's viewport coordinates still point at the text it landed on.
     if (!placeCaret(transfer.coordinates)) {
       return false;
     }

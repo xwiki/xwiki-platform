@@ -476,19 +476,6 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Pastes a file into the rich text area, at the caret.
-     *
-     * @param filePath the path of the file to paste, relative to the test resources
-     * @return this rich text area instance
-     * @throws URISyntaxException if the given file can't be located
-     * @since 18.10.0RC1
-     */
-    public BlockNoteRichTextArea pasteFile(String filePath) throws URISyntaxException
-    {
-        return insertFiles("paste", 0, filePath);
-    }
-
-    /**
      * Pastes several files at once into the rich text area, as one transfer, at the caret.
      *
      * @param filePaths the paths of the files to paste, relative to the test resources
@@ -499,20 +486,6 @@ public class BlockNoteRichTextArea extends BaseElement
     public BlockNoteRichTextArea pasteFiles(String... filePaths) throws URISyntaxException
     {
         return insertFiles("paste", 0, filePaths);
-    }
-
-    /**
-     * Drops a file over the rich text area, at the given offset of the line holding the caret.
-     *
-     * @param filePath the path of the file to drop, relative to the test resources
-     * @param offset how far from the start of that line the file lands
-     * @return this rich text area instance
-     * @throws URISyntaxException if the given file can't be located
-     * @since 18.10.0RC1
-     */
-    public BlockNoteRichTextArea dropFile(String filePath, int offset) throws URISyntaxException
-    {
-        return insertFiles("drop", offset, filePath);
     }
 
     /**

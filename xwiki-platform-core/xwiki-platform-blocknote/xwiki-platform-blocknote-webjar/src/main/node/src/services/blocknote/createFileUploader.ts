@@ -113,12 +113,13 @@ function createFileUploader(
       moveCaretTo,
       async (file, paste) => {
         const toUpload = toAttach(file, paste);
-        try {
-          return linkTo(await attach(toUpload), toUpload.name);
-        } catch (error) {
+        // Only the upload is caught here: a link that can't be built is a bug rather than something to report as
+        // a failed upload, and insertFilesInline logs it as one.
+        const attachment = await attach(toUpload).catch((error) => {
           notifyUploadFailed(toUpload.name, error);
           return undefined;
-        }
+        });
+        return attachment && linkTo(attachment, toUpload.name);
       },
     ),
   );

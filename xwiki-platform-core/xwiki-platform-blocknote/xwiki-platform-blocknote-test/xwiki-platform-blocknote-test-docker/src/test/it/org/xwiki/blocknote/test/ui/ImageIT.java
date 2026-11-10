@@ -245,7 +245,7 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
-        textArea.click().moveCaretTo(2).pasteFile("/image.gif");
+        textArea.click().moveCaretTo(2).pasteFiles("/image.gif");
         // Shown only once uploaded, since that's when the URL is known.
         textArea.waitUntilImageIsLoaded(0);
 
@@ -276,7 +276,7 @@ class ImageIT extends AbstractBlockNoteIT
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
         // A drop goes where the pointer is, so the caret stays at the start of the line to prove it.
         // Unlike a pasted file, a dropped file keeps the name the user gave it.
-        textArea.click().moveCaretTo(0).dropFile("/notes.txt", OFFSET);
+        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
         // The link replaces the inserted block only once uploaded.
         textArea.waitUntilLinkIsPresent("notes.txt");
 
@@ -306,7 +306,7 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
         byte[] after = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
-        textArea.click().moveCaretTo(0).dropFile("/notes.txt", OFFSET);
+        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
         textArea.waitUntilLinkIsPresent("notes.txt");
 
         page.save();
@@ -342,7 +342,7 @@ class ImageIT extends AbstractBlockNoteIT
 
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
         byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
-        textArea.click().moveCaretTo(0).dropFile("/notes.txt", OFFSET);
+        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
         textArea.waitUntilLinkIsPresent("notes.txt");
 
         // Out of a realtime session the file waits in the temporary store, so it isn't attached yet.
@@ -391,7 +391,7 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
         BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
 
-        textArea.click().moveCaretTo(OFFSET).pasteFile("/notes.txt");
+        textArea.click().moveCaretTo(OFFSET).pasteFiles("/notes.txt");
         textArea.waitUntilLinkIsPresent();
 
         page.save();

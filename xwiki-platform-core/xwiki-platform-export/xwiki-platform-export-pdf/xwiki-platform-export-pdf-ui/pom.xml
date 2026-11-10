@@ -95,7 +95,15 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- We publish a template provider and an administration section. -->
+    <!-- We publish a template provider. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-pagetemplate-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We publish an administration section. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>

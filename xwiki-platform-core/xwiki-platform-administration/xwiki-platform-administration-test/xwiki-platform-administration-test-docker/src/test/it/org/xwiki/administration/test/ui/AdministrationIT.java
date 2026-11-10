@@ -75,8 +75,8 @@ class AdministrationIT
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Administration UI extension.
         // Note: the global "Rights" section presence is verified by UsersGroupsRightsManagementIT (via
         // AdministrationPage.clickGlobalRightsSection()), so it's not re-checked here.
-        Stream.of("Users", "Groups", "Registration", "Themes", "Presentation", "Templates",
-            "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral")
+        Stream.of("Users", "Groups", "Registration", "Themes", "Presentation", "Localization", "Import", "Export",
+            "Editing", "emailSend", "emailStatus", "emailGeneral")
             .forEach(sectionId -> assertTrue(wikiAdministrationPage.hasSection(sectionId),
                 String.format("Menu section [%s] is missing.", sectionId)));
 
@@ -100,8 +100,8 @@ class AdministrationIT
         // UsersGroupsRightsManagementIT.rightsShowUsersAndGroups, so it's not re-checked here.
 
         // All these sections should not be present (they provide wiki-wide configuration).
-        Stream.of("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
-            "Editing", "emailSend", "emailStatus", "emailGeneral")
+        Stream.of("Users", "Groups", "Rights", "Registration", "Localization", "Import", "Export", "Editing",
+            "emailSend", "emailStatus", "emailGeneral")
             .forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
                 String.format("Menu section [%s] shouldn't be present.", sectionId)));
     }

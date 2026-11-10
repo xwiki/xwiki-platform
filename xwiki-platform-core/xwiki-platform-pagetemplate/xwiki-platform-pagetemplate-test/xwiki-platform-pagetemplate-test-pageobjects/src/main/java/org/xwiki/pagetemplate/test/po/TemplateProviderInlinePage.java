@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.po;
+package org.xwiki.pagetemplate.test.po;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.Select;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
- * Represents a template provider page in inline mode
+ * Represents a template provider page in inline mode.
  *
  * @version $Id$
  * @since 4.2M1
@@ -62,14 +62,14 @@ public class TemplateProviderInlinePage extends InlinePage
     @FindBy(name = "XWiki.TemplateProviderClass_0_action")
     private WebElement templateActionSelect;
 
-    private LocationPicker creationRestrictionsPicker =
-        new LocationPicker("XWiki.TemplateProviderClass_0_creationRestrictions");
+    private TemplateProviderRestrictionsPicker creationRestrictionsPicker =
+        new TemplateProviderRestrictionsPicker("XWiki.TemplateProviderClass_0_creationRestrictions");
 
     @FindBy(name = "XWiki.TemplateProviderClass_0_creationRestrictionsAreSuggestions")
     private WebElement creationRestrictionsAreSuggestionsCheckbox;
 
-    private LocationPicker visibilityRestrictionsPicker =
-        new LocationPicker("XWiki.TemplateProviderClass_0_visibilityRestrictions");
+    private TemplateProviderRestrictionsPicker visibilityRestrictionsPicker =
+        new TemplateProviderRestrictionsPicker("XWiki.TemplateProviderClass_0_visibilityRestrictions");
 
     private SuggestInputElement templateSuggestInput;
 

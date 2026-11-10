@@ -66,9 +66,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // The Image Wizard needs this to be able to upload images.
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
 
-        // The image suggestions execute a Solr query from XWiki.SuggestSolrService / XWiki.SuggestSolrMacros, which
-        // requires programming right. These pages are authored by a user that has programming right in a normal wiki,
-        // but the test wiki blocks programming right by default, so we need to explicitly exclude them.
+        // The page, attachment and image suggestions execute a Solr query from XWiki.SuggestSolrService /
+        // XWiki.SuggestSolrMacros, which requires programming right. These pages are authored by a user that has
+        // programming right in a normal wiki, but the test wiki blocks programming right by default, so we need to
+        // explicitly exclude them.
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
     },
     extraJARs = {
@@ -80,7 +81,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // core extension so we need to make the extension index also core.
         "org.xwiki.platform:xwiki-platform-extension-index",
 
-        // Solr search is used to get suggestions for the image quick action.
+        // Solr search is used to get suggestions for the link and image quick actions.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
     },
     servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS

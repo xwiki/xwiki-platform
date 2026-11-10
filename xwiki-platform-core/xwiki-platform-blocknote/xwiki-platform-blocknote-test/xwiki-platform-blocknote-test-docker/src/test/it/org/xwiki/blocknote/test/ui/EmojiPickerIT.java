@@ -41,9 +41,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 18.10.0RC1
  */
 @UITest(
+    properties = {
+        // The Image Wizard needs this to be able to upload images.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+
+        // The page, attachment and image suggestions execute a Solr query from XWiki.SuggestSolrService /
+        // XWiki.SuggestSolrMacros, which requires programming right. These pages are authored by a user that has
+        // programming right in a normal wiki, but the test wiki blocks programming right by default, so we need to
+        // explicitly exclude them.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
+    },
     extraJARs = {
-        "org.xwiki.platform:xwiki-platform-websocket"
-    }
+        // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
+        "org.xwiki.platform:xwiki-platform-websocket",
+
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index",
+
+        // Solr search is used to get suggestions for the link and image quick actions.
+        "org.xwiki.platform:xwiki-platform-search-solr-query"
+    },
+    servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
 )
 class EmojiPickerIT extends AbstractBlockNoteIT
 {

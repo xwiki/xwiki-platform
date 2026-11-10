@@ -19,6 +19,7 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
@@ -68,6 +69,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class EmojiPickerIT extends AbstractBlockNoteIT
 {
     @Test
+    @Order(1)
     void insertEmojiByTypingColon(TestUtils setup, TestReference testReference)
     {
         // Start fresh.
@@ -91,6 +93,7 @@ class EmojiPickerIT extends AbstractBlockNoteIT
     }
 
     @Test
+    @Order(2)
     void typeColonWithoutMatchingEmoji(TestUtils setup, TestReference testReference)
     {
         // Start fresh.
@@ -108,6 +111,7 @@ class EmojiPickerIT extends AbstractBlockNoteIT
     }
 
     @Test
+    @Order(3)
     void insertEmojiUsingSlashMenu(TestUtils setup, TestReference testReference)
     {
         // Start fresh.

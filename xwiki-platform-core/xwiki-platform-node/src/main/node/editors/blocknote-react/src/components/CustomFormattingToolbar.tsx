@@ -47,11 +47,11 @@ import {
 } from "@blocknote/react";
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
+import type { ContextForMacros } from "../blocknote/utils";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ImageEditionHooks } from "./images/imageEditionHooks";
-import type { LinkEditionHooks } from "./links/linkEditionHooks";
-import type { ContextForMacros } from "../blocknote/utils";
 import type { LinkEditionHandler } from "./links/linkEdition";
+import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,

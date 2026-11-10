@@ -24,8 +24,8 @@ import { loadDescriptors } from "../common/fields";
 import { loadTypes } from "../common/remote";
 import { reload } from "../common/suggester";
 import { metadataLabels, translate, withProblem } from "../common/translations";
-import type { DirectionLabels } from "./sortPicker";
 import type { Suggester, Suggestions } from "../common/suggester";
+import type { DirectionLabels } from "./sortPicker";
 
 /**
  * @returns the translated labels a sort criterion is offered under

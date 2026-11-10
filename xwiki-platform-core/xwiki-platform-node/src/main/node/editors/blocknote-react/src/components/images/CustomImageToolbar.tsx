@@ -27,8 +27,8 @@ import { assertUnreachable } from "@xwiki/platform-fn-utils";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
-import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { BlockOfType } from "../../blocknote";
+import type { ImageEditionHooks } from "./imageEditionHooks";
 
 type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;

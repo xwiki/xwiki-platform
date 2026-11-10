@@ -34,9 +34,9 @@ import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiFolderImageLine, RiUpload2Line } from "react-icons/ri";
+import type { BlockOfType, EditorType } from "../../blocknote";
 import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { ImageInsertionOverrideFn } from "./imageInsertionOverride";
-import type { BlockOfType, EditorType } from "../../blocknote";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   LinkSuggestService,

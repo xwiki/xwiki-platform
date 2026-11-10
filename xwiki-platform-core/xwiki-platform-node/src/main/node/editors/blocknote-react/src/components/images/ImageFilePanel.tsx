@@ -21,8 +21,8 @@ import { ImageSelector } from "./ImageSelector";
 import { useEditor } from "../../hooks";
 import { Paper } from "@mantine/core";
 import { useCallback } from "react";
-import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { BlockOfType } from "../../blocknote";
+import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type ImageFilePanelProps = {

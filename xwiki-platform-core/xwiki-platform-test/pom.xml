@@ -35,6 +35,9 @@
     <selenium.version>4.52.0</selenium.version>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- The macros of the test frameworks only exist for tests and are never installed through the Extension
+         Manager -->
+    <xwiki.extension.components.macros.check.skip>true</xwiki.extension.components.macros.check.skip>
   </properties>
   <modules>
     <!-- Sorted Alphabetically -->

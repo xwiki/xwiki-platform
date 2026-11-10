@@ -44,6 +44,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-integration</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <scope>test</scope>
@@ -88,10 +94,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <configuration> 
-          <!-- Display report on screen when all tests are completed -->  
+        <configuration>
+          <!-- Display report on screen when all tests are completed -->
           <useFile>false</useFile>
           <reportFormat>plain</reportFormat>
+          <includes combine.self="override">
+            <include>**/*Test.java</include>
+          </includes>
           <systemPropertyVariables>
             <whitelistedWCAGClasses>
               Panels.PanelClass

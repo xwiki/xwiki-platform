@@ -134,4 +134,12 @@ export default {
 .livedata-filter-container .delete-filter:active {
   background-color: unset;
 }
+
+/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .livedata-filter-container .delete-filter {
+    /* Always show the delete icon on small screens because we can't rely on hover. */
+    visibility: visible;
+  }
+}
 </style>

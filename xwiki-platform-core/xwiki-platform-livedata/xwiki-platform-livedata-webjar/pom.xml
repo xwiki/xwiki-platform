@@ -118,34 +118,4 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Copy the CSS file that is loaded separately from the Vite bundle. -->
-            <id>copy-css-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>
-                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}
-              </outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${basedir}/src/main/node/src</directory>
-                  <includes>
-                    <include>reactive.css</include>
-                  </includes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

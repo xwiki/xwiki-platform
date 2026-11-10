@@ -240,4 +240,12 @@ export default {
 .livedata-advanced-panel-sort .add-sort-select {
   margin-top: 1rem;
 }
+
+/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .livedata-advanced-panel-sort .delete-sort {
+    /* Always show the delete icon on small screens because we cannot rely on hover. */
+    visibility: visible;
+  }
+}
 </style>

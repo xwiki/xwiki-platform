@@ -186,4 +186,25 @@ export default {
   width: 100%;
   padding-bottom: 1em;
 }
+
+/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .layout-table .responsive-table > thead {
+    /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use grid display
+      because we have two rows, property names and filters, that we want to display as two equally sized columns. */
+    display: grid;
+    /* We want the property names column to have the same width as the filter column. */
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .xwiki-livedata .layout-table .responsive-table > thead > tr {
+    display: grid;
+    /* Align the property names column with the filter column. */
+    grid-template-rows: subgrid;
+    /* We need to set a span that is at least as large as the number of properties + 1, the extra one being for the
+      entry selector. */
+    grid-row: span calc(var(--livedata-property-count) + 1);
+  }
+}
 </style>

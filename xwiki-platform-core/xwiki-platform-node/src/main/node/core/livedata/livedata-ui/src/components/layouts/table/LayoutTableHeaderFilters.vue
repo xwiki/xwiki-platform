@@ -97,4 +97,13 @@ export default {
 .layout-table .column-filters th.entry-selector {
   width: 0;
 }
+
+/* Responsive mode. The max-width is the value of the @screen-xs-max LESS variable. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .layout-table .column-filters th {
+    /* Overwrite the filters width so they don't overflow the table. */
+    width: 100%;
+    border-top: none;
+  }
+}
 </style>

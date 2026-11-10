@@ -21,6 +21,7 @@ import { PageLinkTargetType } from "../PageLinkTargetType";
 import { EntityType } from "@xwiki/platform-model-api";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mock, mockReset } from "vitest-mock-extended";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceHandler,
@@ -295,5 +296,40 @@ describe("PageLinkTargetType without the services of the current wiki", () => {
     expect(
       targetTypeWithoutServices.getDefaultLabel({ ref: documentRef }),
     ).toBe("");
+  });
+
+  describe("relative to the source document of the link", () => {
+    const sourceDocument = {
+      type: EntityType.DOCUMENT,
+      name: "Source",
+    } as unknown as DocumentReference;
+    const context: LinkContext = { sourceDocument };
+
+    it("resolves the reference against the source document", () => {
+      modelReferenceParser.parse.mockReturnValue(documentRef);
+
+      const config = targetType.fromReference?.(
+        { type: "doc", typed: true, reference: "Other", parameters: {} },
+        context,
+      );
+
+      expect(config?.ref).toBe(documentRef);
+      expect(modelReferenceParser.parse).toHaveBeenCalledWith("Other", {
+        type: EntityType.DOCUMENT,
+        base: sourceDocument,
+      });
+    });
+
+    it("serializes the reference relative to the source document", () => {
+      modelReferenceSerializer.serialize.mockReturnValue("doc:Other");
+
+      const reference = targetType.toReference?.({ ref: documentRef }, context);
+
+      expect(reference?.reference).toBe("Other");
+      expect(modelReferenceSerializer.serialize).toHaveBeenCalledWith(
+        documentRef,
+        sourceDocument,
+      );
+    });
   });
 });

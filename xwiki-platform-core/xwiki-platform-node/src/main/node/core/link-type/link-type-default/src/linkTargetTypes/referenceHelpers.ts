@@ -19,6 +19,7 @@
  */
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParserProvider,
@@ -125,17 +126,22 @@ function linkReferenceParameters(parts: LinkURLParts): Record<string, string> {
  * all serializers add it though, so its presence is not assumed.
  *
  * @param parts - the query string and the anchor of the link, held by the parameters of the reference
+ * @param context - where the link is: the entity reference is serialized relative to the document holding the link,
+ *   when it's known, so that the link keeps working when that document is renamed or copied
  */
 function entityResourceReference(
   type: string,
   ref: EntityReference | null,
   modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
   parts: LinkURLParts = {},
+  context?: LinkContext,
 ): ResourceReference | undefined {
   const serialized =
     ref === null
       ? undefined
-      : modelReferenceSerializerProvider.get()?.serialize(ref);
+      : modelReferenceSerializerProvider
+          .get()
+          ?.serialize(ref, context?.sourceDocument);
   if (!serialized) {
     return undefined;
   }
@@ -158,14 +164,25 @@ function typedResourceReference(
   return { type, typed: true, reference, parameters: {} };
 }
 
+/**
+ * @param reference - the entity reference held by a resource reference
+ * @param type - the type of the referenced entity
+ * @param modelReferenceParserProvider - provides the parser of the entity reference
+ * @param context - where the link is: a relative entity reference is resolved against the document holding the link,
+ *   when it's known
+ * @returns the parsed entity reference, or `null` when it can't be parsed
+ */
 function parseEntityReference(
   reference: string,
   type: EntityType,
   modelReferenceParserProvider: ModelReferenceParserProvider,
+  context?: LinkContext,
 ): EntityReference | null {
   return (
     tryFallible(() =>
-      modelReferenceParserProvider.get()?.parse(reference, { type }),
+      modelReferenceParserProvider
+        .get()
+        ?.parse(reference, { type, base: context?.sourceDocument }),
     ) ?? null
   );
 }

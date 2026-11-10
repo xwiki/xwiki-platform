@@ -20,14 +20,21 @@
 <script setup lang="ts">
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
-import type { UnsupportedLinkTargetConfig } from "@xwiki/platform-link-type-api";
+import type {
+  LinkContext,
+  UnsupportedLinkTargetConfig,
+} from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 // The fields of the links pointing to a resource that no link target type supports: the reference of the linked
 // resource can only be edited as plain text. The link modal passes the container to every target field (see
 // `LinkTargetTypeForm`): it's declared although unused, so that it doesn't fall through as an attribute of the field.
-// The autofocus prop is passed to the reference field.
-defineProps<{ depsContainer: Container; autofocus?: boolean }>();
+// The same goes for the link context. The autofocus prop is passed to the reference field.
+defineProps<{
+  depsContainer: Container;
+  autofocus?: boolean;
+  linkContext?: LinkContext;
+}>();
 
 const model = defineModel<UnsupportedLinkTargetConfig>({
   required: true,

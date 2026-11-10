@@ -85,13 +85,14 @@ export function depsContainerMock(): Container {
 
   container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
     get: () => ({
-      serialize(reference) {
+      serialize(reference, base) {
         if (!reference) {
           throw new Error("Please provide a reference to serialize");
         }
 
         if (reference.type === EntityType.DOCUMENT) {
-          return "some page reference";
+          // Relative to the document holding the link, see parseModelReference.
+          return base ? RELATIVE_PAGE_REFERENCE : "some page reference";
         }
 
         if (reference.type === EntityType.ATTACHMENT) {
@@ -188,12 +189,19 @@ function withBuiltInLinkTargetTypes(
   return container;
 }
 
+/**
+ * The reference of the "some page" page relative to the document holding the link, which can only be resolved against
+ * that document.
+ */
+const RELATIVE_PAGE_REFERENCE = "some sibling page";
+
 const parseModelReference: ModelReferenceParser["parse"] = (
   reference,
   opts,
 ) => {
   if (
-    reference === "some page reference" &&
+    (reference === "some page reference" ||
+      (reference === RELATIVE_PAGE_REFERENCE && opts?.base)) &&
     (!opts?.type || opts?.type === EntityType.DOCUMENT)
   ) {
     return new DocumentReference("some page", new SpaceReference());

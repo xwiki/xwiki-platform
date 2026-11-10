@@ -26,13 +26,19 @@ import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-a
 
 @injectable()
 class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
-  public serialize(reference?: EntityReference): string | undefined {
+  public serialize(
+    reference?: EntityReference,
+    base?: EntityReference,
+  ): string | undefined {
     if (!reference) {
       return undefined;
     }
     return (
       this.getPrefix(reference.type) +
-      Model.serialize(toXWikiEntityReference(reference))
+      Model.serialize(
+        toXWikiEntityReference(reference),
+        base && toXWikiEntityReference(base),
+      )
     );
   }
 

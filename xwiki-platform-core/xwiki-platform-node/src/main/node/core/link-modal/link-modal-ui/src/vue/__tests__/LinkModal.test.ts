@@ -28,7 +28,11 @@ import {
 import { afterEach, describe, expect, it } from "vitest";
 import { defineComponent, reactive } from "vue";
 import { createI18n } from "vue-i18n";
-import type { LinkData, LinkTargetType } from "@xwiki/platform-link-type-api";
+import type {
+  LinkContext,
+  LinkData,
+  LinkTargetType,
+} from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 import type { Component } from "vue";
 
@@ -413,6 +417,26 @@ describe("LinkModal", () => {
 
       expect(wrapper.getComponent(targetField).props("autofocus")).toBe(true);
       expect(wrapper.getComponent(optionFields).props("autofocus")).toBe(false);
+    });
+
+    it("passes the link context to the target field, to display and parse the references relative to it", async () => {
+      const targetField = defineComponent({
+        props: ["linkContext"],
+        template: "<div>fields-a</div>",
+      });
+      const wrapper = mountLinkModal(
+        { displayText: "", target: { type: "a", config: {} } },
+        [fakeLinkTargetType("a", "A", targetField)],
+      );
+      const linkContext: LinkContext = {
+        sourceDocument: { name: "Source" } as LinkContext["sourceDocument"],
+      };
+      await wrapper.setProps({ linkContext });
+      await flushPromises();
+
+      expect(wrapper.getComponent(targetField).props("linkContext")).toEqual(
+        linkContext,
+      );
     });
   });
 });

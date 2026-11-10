@@ -22,6 +22,7 @@ import { FULL_SYNTAX } from "./syntax.mock";
 import { fillDisplayText, pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
 import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 
 // The Playwright page and locator types, taken from the test fixtures since the component testing package doesn't
 // export them.
@@ -99,6 +100,58 @@ test("Editing the title of a link to an unsupported resource keeps its reference
 
   await expect(linkEl).toHaveText("2nd");
   // The link still points to the same resource, with the same reference.
+  await expect(page.locator('[data-test="submittedLinkReference"]')).toHaveText(
+    JSON.stringify(reference),
+  );
+});
+
+test("Editing a page link resolves and saves its reference relative to the document holding the link", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const url = "https://example.org/some/page";
+  // Only resolved against the document holding the link, see the mocked model reference parser.
+  const reference = {
+    type: "doc",
+    typed: true,
+    reference: "some sibling page",
+    parameters: {},
+  };
+  const component = await mountBlockNoteHeadless(mount, {
+    editorContent: buildParagraphWithLink(url),
+    editorProps: {
+      syntax: FULL_SYNTAX,
+    },
+    macros: false,
+    linkReferences: { [url]: reference },
+    // Plain data, since the props are serialized to reach the browser: the mocked model reference services only check
+    // whether the source document is there.
+    linkContext: {
+      sourceDocument: {
+        name: "source",
+      } as unknown as DocumentReference,
+    },
+  });
+
+  const editorEl = component.locator(".bn-editor");
+  const linkEl = editorEl.locator(`a[href="${url}"]`);
+  await linkEl.waitFor({ state: "attached" });
+
+  await openLinkEditor(page, editorEl);
+
+  await expect(
+    page.locator('[data-test="linkTargetType"] option:checked'),
+  ).toHaveText("Page");
+  await expect(
+    page.locator('[data-test="linkPageReference"] input'),
+  ).toHaveValue("some sibling page");
+
+  // The page search box is focused when the link modal opens, which displays its suggestions over the options.
+  await page.keyboard.press("Escape");
+  await fillDisplayText(page, "2nd");
+  await page.locator('[data-test="linkSubmit"]').click();
+
   await expect(page.locator('[data-test="submittedLinkReference"]')).toHaveText(
     JSON.stringify(reference),
   );

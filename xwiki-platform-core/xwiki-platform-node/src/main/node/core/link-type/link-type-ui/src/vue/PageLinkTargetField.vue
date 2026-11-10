@@ -18,6 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { entityReferenceQuery } from "../entityReferenceQuery";
 import { suggestLinks } from "../linkSuggestions";
 import { translations } from "../translations";
 import { tryFallible } from "@xwiki/platform-fn-utils";
@@ -31,6 +32,7 @@ import type {
   Link,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { PageLinkTargetConfig } from "@xwiki/platform-link-type-default";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type {
@@ -39,13 +41,18 @@ import type {
 } from "@xwiki/platform-model-reference-api";
 import type { Container } from "inversify";
 
-const { depsContainer, autofocus } = defineProps<{
+const { depsContainer, autofocus, linkContext } = defineProps<{
   depsContainer: Container;
 
   /**
    * Whether the search box is focused when the link modal opens.
    */
   autofocus?: boolean;
+
+  /**
+   * Where the link is: the page references are displayed and parsed relative to the document holding it.
+   */
+  linkContext?: LinkContext;
 }>();
 
 const model = defineModel<PageLinkTargetConfig>({
@@ -72,15 +79,38 @@ type PageSelection = { ref: DocumentReference; title?: string };
  * @returns the parsed page reference, or `null` when it doesn't designate a page
  */
 function parseReference(reference: string): PageSelection | null {
-  const ref = tryFallible(() => modelReferenceParser.parse(reference));
+  const ref = tryFallible(() =>
+    modelReferenceParser.parse(reference, {
+      base: linkContext?.sourceDocument,
+    }),
+  );
   return ref?.type === EntityType.DOCUMENT ? { ref } : null;
 }
 
+/**
+ * @param ref - a page reference
+ * @returns the text of the search box designating the page
+ */
+function toQuery(ref: DocumentReference): string {
+  return entityReferenceQuery(
+    ref,
+    modelReferenceSerializer,
+    "doc:",
+    linkContext,
+  );
+}
+
 const getSuggestions: SearchBoxSource<PageSelection, Link> = (query) =>
-  suggestLinks(linkSuggestService, query, LinkType.PAGE, (link) => {
-    const selection = parseReference(link.reference);
-    return selection && { ...selection, title: link.label };
-  });
+  suggestLinks(
+    linkSuggestService,
+    query,
+    LinkType.PAGE,
+    (link) => {
+      const selection = parseReference(link.reference);
+      return selection && { ...selection, title: link.label };
+    },
+    ({ ref }) => toQuery(ref),
+  );
 
 function select(selection: PageSelection | null) {
   model.value = {
@@ -98,9 +128,7 @@ const { t } = useI18n({ messages: translations });
   <search-box
     v-bind="{ 'data-test': 'linkPageReference' }"
     :label="t('link-type.target-types.page.reference')"
-    :initial-value="
-      model.ref !== null ? modelReferenceSerializer.serialize(model.ref)! : null
-    "
+    :initial-value="model.ref !== null ? toQuery(model.ref) : null"
     :get-suggestions
     :autofocus
     :parse-query="parseReference"

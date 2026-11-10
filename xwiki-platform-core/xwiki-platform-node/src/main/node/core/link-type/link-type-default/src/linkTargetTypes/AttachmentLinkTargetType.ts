@@ -29,7 +29,10 @@ import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { inject, injectable } from "inversify";
-import type { LinkTargetType } from "@xwiki/platform-link-type-api";
+import type {
+  LinkContext,
+  LinkTargetType,
+} from "@xwiki/platform-link-type-api";
 import type { AttachmentReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParserProvider,
@@ -114,6 +117,7 @@ class AttachmentLinkTargetType
 
   fromReference(
     reference: ResourceReference,
+    context?: LinkContext,
   ): AttachmentLinkTargetConfig | null {
     if (reference.type !== ResourceType.ATTACHMENT) {
       return null;
@@ -123,6 +127,7 @@ class AttachmentLinkTargetType
       reference.reference,
       EntityType.ATTACHMENT,
       this.modelReferenceParserProvider,
+      context,
     );
 
     return ref?.type === EntityType.ATTACHMENT
@@ -130,15 +135,16 @@ class AttachmentLinkTargetType
       : null;
   }
 
-  toReference({
-    ref,
-    queryString,
-  }: AttachmentLinkTargetConfig): ResourceReference | undefined {
+  toReference(
+    { ref, queryString }: AttachmentLinkTargetConfig,
+    context?: LinkContext,
+  ): ResourceReference | undefined {
     return entityResourceReference(
       ResourceType.ATTACHMENT,
       ref,
       this.modelReferenceSerializerProvider,
       { queryString },
+      context,
     );
   }
 }

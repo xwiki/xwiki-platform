@@ -21,8 +21,14 @@ import { ComponentInit } from "../componentInit";
 import { linkTargetTypeRole } from "../linkTargetType";
 import { linkTargetTypeManagerRole } from "../linkTargetTypeManager";
 import { unsupportedLinkTargetType } from "../unsupportedLinkTarget";
+import {
+  DocumentReference,
+  SpaceReference,
+  WikiReference,
+} from "@xwiki/platform-model-api";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
+import type { LinkContext } from "../linkContext";
 import type { LinkTargetType } from "../linkTargetType";
 import type { LinkTargetTypeManager } from "../linkTargetTypeManager";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
@@ -64,6 +70,33 @@ class PageTargetType implements LinkTargetType<{ ref: string }> {
     parameters: {},
   });
 }
+
+// Prefixes the page references with the name of the source document of the link, to check that the link context
+// reaches the link target types.
+@injectable()
+class ContextAwarePageTargetType extends PageTargetType {
+  fromReference = (reference: ResourceReference, context?: LinkContext) =>
+    reference.type === "doc"
+      ? { ref: `${context?.sourceDocument?.name}/${reference.reference}` }
+      : null;
+  toReference = (
+    config: { ref: string },
+    context?: LinkContext,
+  ): ResourceReference => ({
+    type: "doc",
+    typed: true,
+    reference: config.ref.replace(`${context?.sourceDocument?.name}/`, ""),
+    parameters: {},
+  });
+}
+
+const linkContext: LinkContext = {
+  sourceDocument: new DocumentReference(
+    "Source",
+    new SpaceReference(new WikiReference("xwiki"), "Space"),
+    true,
+  ),
+};
 
 // Deliberately doesn't implement fromReference/toReference, to exercise the "link target type doesn't support
 // reference conversion" skip path.
@@ -227,6 +260,17 @@ describe("fromReference", () => {
     ).toEqual({ type: "page", config: { ref: "Some.Page" } });
   });
 
+  it("passes the link context to the link target types", () => {
+    const manager = getManager(buildContainer([ContextAwarePageTargetType]));
+
+    expect(
+      manager.fromReference(
+        { type: "doc", typed: true, reference: "Some.Page", parameters: {} },
+        linkContext,
+      ),
+    ).toEqual({ type: "page", config: { ref: "Source/Some.Page" } });
+  });
+
   it("returns an unsupported target holding a copy of the reference when no link target type accepts it", () => {
     const manager = getManager(buildContainer([PageTargetType]));
     const reference = {
@@ -272,6 +316,17 @@ describe("toReference", () => {
       reference: "Some.Page",
       parameters: {},
     });
+  });
+
+  it("passes the link context to the link target type", () => {
+    const manager = getManager(buildContainer([ContextAwarePageTargetType]));
+
+    expect(
+      manager.toReference(
+        { type: "page", config: { ref: "Source/Some.Page" } },
+        linkContext,
+      )?.reference,
+    ).toBe("Some.Page");
   });
 
   it("returns undefined when the matching link target type doesn't implement toReference", () => {

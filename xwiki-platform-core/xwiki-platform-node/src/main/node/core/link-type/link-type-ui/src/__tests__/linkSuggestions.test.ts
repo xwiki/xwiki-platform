@@ -120,4 +120,16 @@ describe("suggestLinks", () => {
       consoleError.mockRestore();
     }
   });
+
+  it("writes the text computed from the value of the selected link in the search field", async () => {
+    const items = await suggestLinks(
+      linkSuggestService(async () => [link("xwiki:Space.Page", "Some Page")]),
+      "page",
+      LinkType.PAGE,
+      (link) => link.reference,
+      (value) => value.replace("xwiki:Space.", ""),
+    );
+
+    expect(items && items[0].equivalentQuery).toBe("Page");
+  });
 });

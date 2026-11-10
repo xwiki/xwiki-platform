@@ -29,6 +29,7 @@ import type {
   LinkEditionData,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
 type ResourceReference = NonNullable<LinkEditionData["reference"]>;
@@ -61,6 +62,8 @@ const props = defineProps<{
   linkReferences?: Record<string, ResourceReference>;
 
   excludedLinkTargetTypes?: string[];
+
+  linkContext?: LinkContext;
 }>();
 
 defineEmits<{
@@ -110,6 +113,7 @@ defineExpose({
       :collaboration
       :deps-container="depsContainer"
       :excluded-link-target-types="excludedLinkTargetTypes"
+      :link-context
       @instant-change="$emit('instant-change')"
       @debounced-change="(content) => $emit('debounced-change', content)"
     />

@@ -20,12 +20,17 @@
 <script setup lang="ts">
 import { translations } from "../translations";
 import { useI18n } from "vue-i18n";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { EmailLinkTargetConfig } from "@xwiki/platform-link-type-default";
 import type { Container } from "inversify";
 
-// The container of the link modal (see `LinkTargetTypeForm`), declared although unused, so that it doesn't fall
-// through as an attribute.
-defineProps<{ depsContainer: Container; autofocus?: boolean }>();
+// The container of the link modal and the link context (see `LinkTargetTypeForm`), declared although unused, so that
+// they don't fall through as attributes.
+defineProps<{
+  depsContainer: Container;
+  autofocus?: boolean;
+  linkContext?: LinkContext;
+}>();
 
 const model = defineModel<EmailLinkTargetConfig>({
   required: true,

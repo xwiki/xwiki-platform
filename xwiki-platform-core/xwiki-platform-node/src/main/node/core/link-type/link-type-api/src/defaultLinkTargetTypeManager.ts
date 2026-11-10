@@ -20,6 +20,7 @@
 import { linkTargetTypeRole } from "./linkTargetType";
 import { unsupportedLinkTargetType } from "./unsupportedLinkTarget";
 import { injectable, multiInject, optional } from "inversify";
+import type { LinkContext } from "./linkContext";
 import type { LinkTarget } from "./linkData";
 import type { LinkTargetType } from "./linkTargetType";
 import type { LinkTargetTypeManager } from "./linkTargetTypeManager";
@@ -73,9 +74,12 @@ class DefaultLinkTargetTypeManager implements LinkTargetTypeManager {
     return linkTargetType.toURL(target.config);
   }
 
-  fromReference(reference: ResourceReference): LinkTarget {
+  fromReference(
+    reference: ResourceReference,
+    context?: LinkContext,
+  ): LinkTarget {
     for (const linkTargetType of this.linkTargetTypes) {
-      const config = linkTargetType.fromReference?.(reference) ?? null;
+      const config = linkTargetType.fromReference?.(reference, context) ?? null;
       if (config !== null) {
         return { type: linkTargetType.type, config };
       }
@@ -90,13 +94,16 @@ class DefaultLinkTargetTypeManager implements LinkTargetTypeManager {
     return { type: unsupportedLinkTargetType, config };
   }
 
-  toReference(target: LinkTarget): ResourceReference | undefined {
+  toReference(
+    target: LinkTarget,
+    context?: LinkContext,
+  ): ResourceReference | undefined {
     if (target.type === unsupportedLinkTargetType) {
       const { reference } = target.config as UnsupportedLinkTargetConfig;
       return reference.reference.trim() === "" ? undefined : reference;
     }
 
-    return this.get(target.type)?.toReference?.(target.config);
+    return this.get(target.type)?.toReference?.(target.config, context);
   }
 
   private get(type: string): LinkTargetType | undefined {

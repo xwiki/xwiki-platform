@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { LinkContext } from "./linkContext";
 import type { LinkTarget } from "./linkData";
 import type { LinkTargetType } from "./linkTargetType";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
@@ -72,22 +73,31 @@ interface LinkTargetTypeManager {
    * {@link LinkTargetType.order}, that accepts it (see {@link LinkTargetType.fromReference}).
    *
    * @param reference - the reference of a linked resource
+   * @param context - (since 18.10.0RC1) where the link is, e.g. the document that a relative reference is resolved
+   *   against
    * @returns the target of the link, or a target of the {@link unsupportedLinkTargetType} type holding a copy of the
    *   reference when no registered link target type accepts it, so that the link can be edited without changing the
    *   type of the linked resource
    */
-  fromReference(reference: ResourceReference): LinkTarget;
+  fromReference(
+    reference: ResourceReference,
+    context?: LinkContext,
+  ): LinkTarget;
 
   /**
    * Convert a link target into the reference of the linked resource, using the link target type matching its type.
    * The reverse of {@link LinkTargetTypeManager.fromReference}.
    *
    * @param target - the target of a link
+   * @param context - (since 18.10.0RC1) where the link is, e.g. the document that the reference is made relative to
    * @returns the reference of the linked resource (for a target of the {@link unsupportedLinkTargetType} type, the
    *   reference it holds), or `undefined` when the target doesn't designate a resource yet (e.g. no page selected,
    *   empty URL), or when no registered link target type converts it (see {@link LinkTargetType.toReference})
    */
-  toReference(target: LinkTarget): ResourceReference | undefined;
+  toReference(
+    target: LinkTarget,
+    context?: LinkContext,
+  ): ResourceReference | undefined;
 }
 
 export { linkTargetTypeManagerRole };

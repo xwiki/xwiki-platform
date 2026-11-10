@@ -9,6 +9,7 @@ import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
 import { DefineComponent } from 'vue';
+import { LinkContext } from '@xwiki/platform-link-type-api';
 import { LinkData } from '@xwiki/platform-link-type-api';
 import { PlainTextLinkTargetConfig } from '@xwiki/platform-link-type-api';
 import { PublicProps } from 'vue';
@@ -22,6 +23,7 @@ current: LinkData;
 depsContainer: Container;
 excludedLinkTargetTypes?: string[];
 mode?: "createNew" | "editExisting";
+linkContext?: LinkContext;
 }, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 submit: (args_0: LinkData) => any;
 cancel: () => any;
@@ -30,6 +32,7 @@ current: LinkData;
 depsContainer: Container;
 excludedLinkTargetTypes?: string[];
 mode?: "createNew" | "editExisting";
+linkContext?: LinkContext;
 }> & Readonly<{
 onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;

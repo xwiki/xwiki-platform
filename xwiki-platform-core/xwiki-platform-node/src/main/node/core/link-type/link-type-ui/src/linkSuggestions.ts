@@ -34,6 +34,8 @@ import type {
  * @param type - the type of the links to search for
  * @param toValue - converts a link into the value emitted when it is selected, or returns `null` to leave the link out
  *   (e.g. when its reference can't be parsed)
+ * @param toQuery - computes the text written in the search field when a link is selected, from its value (e.g. its
+ *   reference relative to the document holding the edited link); the reference of the link by default
  * @returns the search box items, rendered from the links themselves, or `false` when there is no link suggestion
  *   service
  */
@@ -42,6 +44,7 @@ async function suggestLinks<T>(
   query: string,
   type: LinkType,
   toValue: (link: Link) => T | null,
+  toQuery?: (value: T) => string,
 ): Promise<SearchBoxItem<T, Link>[] | false> {
   if (!linkSuggestService) {
     return false;
@@ -63,7 +66,7 @@ async function suggestLinks<T>(
           key: link.url,
           value,
           renderingData: link,
-          equivalentQuery: link.reference,
+          equivalentQuery: toQuery?.(value) ?? link.reference,
         };
   });
 }

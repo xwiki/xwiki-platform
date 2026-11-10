@@ -2371,6 +2371,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-api:
     dependencies:
+      '@xwiki/platform-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
       '@xwiki/platform-rendering-api':
         specifier: workspace:*
         version: link:../../rendering/rendering-api

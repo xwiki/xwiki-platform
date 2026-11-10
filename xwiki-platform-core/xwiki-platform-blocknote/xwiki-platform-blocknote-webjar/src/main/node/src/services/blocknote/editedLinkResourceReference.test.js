@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { editedLinkResourceReference } from "./editedLinkResourceReference";
+import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { describe, expect, it } from "vitest";
 
 function pageReference(reference, parameters = {}, typed = true) {
@@ -75,5 +76,39 @@ describe("editedLinkResourceReference", () => {
         false,
       ),
     );
+  });
+
+  it("keeps the reference of the edited link when it's written differently but points to the same resource", () => {
+    const previous = pageReference("xwiki:Space.Page", { rel: "nofollow" });
+
+    expect(
+      editedLinkResourceReference(
+        previous,
+        pageReference("Page", { anchor: "HSection" }),
+        Model.resolve("xwiki:Space.Other", EntityType.DOCUMENT),
+      ),
+    ).toEqual(
+      pageReference("xwiki:Space.Page", {
+        rel: "nofollow",
+        anchor: "HSection",
+      }),
+    );
+  });
+
+  it("tells apart the resources whose references are written alike but resolve differently", () => {
+    const edited = {
+      type: "attach",
+      typed: true,
+      reference: "cat.png",
+      parameters: {},
+    };
+
+    expect(
+      editedLinkResourceReference(
+        { ...edited, reference: "xwiki:Space.Other@cat.png" },
+        edited,
+        Model.resolve("xwiki:Space.Page", EntityType.DOCUMENT),
+      ),
+    ).toBe(edited);
   });
 });

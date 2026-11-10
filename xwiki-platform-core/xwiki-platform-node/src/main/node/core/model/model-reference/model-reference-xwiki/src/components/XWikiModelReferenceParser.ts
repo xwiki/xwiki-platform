@@ -18,7 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { EntityType } from "@xwiki/platform-model-api";
-import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
+import {
+  toCristalEntityReference,
+  toXWikiEntityReference,
+} from "@xwiki/platform-model-xwiki";
 import {
   EntityType as XWikiEntityType,
   Model,
@@ -52,7 +55,11 @@ class XWikiModelReferenceParser implements ModelReferenceParser {
     });
     const entityType = this.getEntityType(resourceReference);
     if (entityType) {
-      return this.parseEntityReference(resourceReference.reference, entityType);
+      return this.parseEntityReference(
+        resourceReference.reference,
+        entityType,
+        options?.base,
+      );
     } else {
       throw new Error(`[${reference}] is not an entity reference.`);
     }
@@ -83,8 +90,11 @@ class XWikiModelReferenceParser implements ModelReferenceParser {
   private parseEntityReference(
     reference: string,
     type: number,
+    base?: EntityReference,
   ): EntityReference {
-    return toCristalEntityReference(Model.resolve(reference, type))!;
+    return toCristalEntityReference(
+      Model.resolve(reference, type, base && toXWikiEntityReference(base)),
+    )!;
   }
 }
 

@@ -5,6 +5,7 @@
 ```ts
 
 import { Container } from 'inversify';
+import { DocumentReference } from '@xwiki/platform-model-api';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
@@ -37,6 +38,11 @@ export class ComponentInit {
 }
 
 // @beta
+export type LinkContext = {
+    sourceDocument?: DocumentReference;
+};
+
+// @beta
 export type LinkData = {
     displayText: string;
     target: LinkTarget;
@@ -52,22 +58,22 @@ export type LinkTarget = {
 export interface LinkTargetType<TConfig = unknown> {
     // (undocumented)
     createDefaultConfig(): TConfig;
-    fromReference?(reference: ResourceReference): TConfig | null;
+    fromReference?(reference: ResourceReference, context?: LinkContext): TConfig | null;
     fromURL(url: string): TConfig | null;
     getDefaultLabel?(config: TConfig): string;
     getLabel(locale: string): Promise<string>;
     readonly order?: number;
-    toReference?(config: TConfig): ResourceReference | undefined;
+    toReference?(config: TConfig, context?: LinkContext): ResourceReference | undefined;
     toURL(config: TConfig): string;
     readonly type: string;
 }
 
 // @beta
 export interface LinkTargetTypeManager {
-    fromReference(reference: ResourceReference): LinkTarget;
+    fromReference(reference: ResourceReference, context?: LinkContext): LinkTarget;
     fromURL(url: string): LinkTarget;
     list(): LinkTargetType[];
-    toReference(target: LinkTarget): ResourceReference | undefined;
+    toReference(target: LinkTarget, context?: LinkContext): ResourceReference | undefined;
     toURL(target: LinkTarget): string;
 }
 

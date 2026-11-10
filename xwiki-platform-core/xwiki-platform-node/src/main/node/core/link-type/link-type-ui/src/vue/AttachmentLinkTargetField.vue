@@ -18,6 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { entityReferenceQuery } from "../entityReferenceQuery";
 import { suggestLinks } from "../linkSuggestions";
 import { translations } from "../translations";
 import { tryFallible } from "@xwiki/platform-fn-utils";
@@ -31,6 +32,7 @@ import type {
   Link,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { AttachmentLinkTargetConfig } from "@xwiki/platform-link-type-default";
 import type { AttachmentReference } from "@xwiki/platform-model-api";
 import type {
@@ -39,13 +41,18 @@ import type {
 } from "@xwiki/platform-model-reference-api";
 import type { Container } from "inversify";
 
-const { depsContainer, autofocus } = defineProps<{
+const { depsContainer, autofocus, linkContext } = defineProps<{
   depsContainer: Container;
 
   /**
    * Whether the search box is focused when the link modal opens.
    */
   autofocus?: boolean;
+
+  /**
+   * Where the link is: the attachment references are displayed and parsed relative to the document holding it.
+   */
+  linkContext?: LinkContext;
 }>();
 
 const model = defineModel<AttachmentLinkTargetConfig>({
@@ -68,14 +75,34 @@ const linkSuggestService = depsContainer
  */
 function parseReference(reference: string): AttachmentReference | null {
   const ref = tryFallible(() =>
-    modelReferenceParser.parse(reference, { type: EntityType.ATTACHMENT }),
+    modelReferenceParser.parse(reference, {
+      type: EntityType.ATTACHMENT,
+      base: linkContext?.sourceDocument,
+    }),
   );
   return ref?.type === EntityType.ATTACHMENT ? ref : null;
 }
 
+/**
+ * @param ref - an attachment reference
+ * @returns the text of the search box designating the attachment
+ */
+function toQuery(ref: AttachmentReference): string {
+  return entityReferenceQuery(
+    ref,
+    modelReferenceSerializer,
+    "attach:",
+    linkContext,
+  );
+}
+
 const getSuggestions: SearchBoxSource<AttachmentReference, Link> = (query) =>
-  suggestLinks(linkSuggestService, query, LinkType.ATTACHMENT, (link) =>
-    parseReference(link.reference),
+  suggestLinks(
+    linkSuggestService,
+    query,
+    LinkType.ATTACHMENT,
+    (link) => parseReference(link.reference),
+    toQuery,
   );
 
 function select(ref: AttachmentReference | null) {
@@ -89,9 +116,7 @@ const { t } = useI18n({ messages: translations });
   <search-box
     v-bind="{ 'data-test': 'linkAttachmentReference' }"
     :label="t('link-type.target-types.attachment.reference')"
-    :initial-value="
-      model.ref !== null ? modelReferenceSerializer.serialize(model.ref)! : null
-    "
+    :initial-value="model.ref !== null ? toQuery(model.ref) : null"
     :get-suggestions
     :autofocus
     required

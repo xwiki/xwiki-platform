@@ -33,6 +33,7 @@ import { computed, markRaw, ref, useId, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkTargetTypeForm } from "../linkTargetTypeForm";
 import type {
+  LinkContext,
   LinkData,
   LinkTargetType,
   LinkTargetTypeManager,
@@ -58,6 +59,13 @@ const props = defineProps<{
    * @since 18.10.0RC1
    */
   mode?: "createNew" | "editExisting";
+
+  /**
+   * Where the link is (e.g. the document holding it), passed to the target fields so that they display and parse the
+   * references relative to it.
+   * @since 18.10.0RC1
+   */
+  linkContext?: LinkContext;
 }>();
 
 const { t } = useI18n({ messages: translations });
@@ -198,6 +206,7 @@ watch(open, (isOpen) => {
               :is="activeForm.targetField"
               v-model="linkData.target.config"
               :deps-container
+              :link-context
               autofocus
             />
           </div>

@@ -22,6 +22,7 @@ import { useLinkTargetTypeLabels } from "./linkTargetTypeLabels";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
+  LinkContext,
   LinkTargetType,
   PlainTextLinkTargetConfig,
 } from "@xwiki/platform-link-type-api";
@@ -45,6 +46,8 @@ function plainTextFallbackField(targetType: LinkTargetType): Component {
         required: true,
       },
       autofocus: Boolean,
+      // Declared although unused, like the container.
+      linkContext: Object as PropType<LinkContext>,
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {

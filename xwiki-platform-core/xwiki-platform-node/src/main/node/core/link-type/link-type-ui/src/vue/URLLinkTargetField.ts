@@ -21,7 +21,10 @@ import { translations } from "../translations";
 import { PlainTextLinkTargetField } from "@xwiki/platform-link-modal-ui";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
-import type { PlainTextLinkTargetConfig } from "@xwiki/platform-link-type-api";
+import type {
+  LinkContext,
+  PlainTextLinkTargetConfig,
+} from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 import type { PropType } from "vue";
 
@@ -37,6 +40,8 @@ const URLLinkTargetField = defineComponent({
       required: true,
     },
     autofocus: Boolean,
+    // Declared although unused, like the container.
+    linkContext: Object as PropType<LinkContext>,
   },
   emits: ["update:modelValue"],
   setup(props, { emit }) {

@@ -27,6 +27,7 @@
         :editor-content
         :deps-container="container"
         :excluded-link-target-types="excludedLinkTargetTypes"
+        :link-context
         :macros
         :collaboration
         @instant-change="dirty = true"
@@ -106,6 +107,7 @@ import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
+import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
@@ -139,6 +141,8 @@ import type {
   ImageInsertionOverrideFn,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
@@ -295,6 +299,15 @@ const imageEditionHooks: ImageEditionHooks = {
   },
 };
 
+// The link modal resolves the references of the linked pages and attachments against the edited document, and saves them
+// relative to it, like the image references and like the WYSIWYG editors do, so that the links keep working when the
+// edited document is renamed or copied.
+const linkContext: LinkContext = {
+  sourceDocument: toCristalEntityReference(editedDocumentReference) as
+    | DocumentReference
+    | undefined,
+};
+
 // Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new links, to
 // keep the link type selector short. Existing path and UNC path links are still edited with their own link type.
 const excludedLinkTargetTypes = ["path", "unc"];
@@ -339,6 +352,7 @@ const linkEdition: LinkEditionHooks = {
     metadata.xwikiReference = editedLinkResourceReference(
       metadata.xwikiReference as ResourceReference | undefined,
       linkData.reference,
+      editedDocumentReference,
     );
     return { ...linkData, url: injectLinkId(stripLinkId(linkData.url), id) };
   },

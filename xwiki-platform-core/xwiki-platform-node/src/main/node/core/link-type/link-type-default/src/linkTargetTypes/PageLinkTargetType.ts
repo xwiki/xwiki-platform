@@ -29,7 +29,10 @@ import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { inject, injectable } from "inversify";
-import type { LinkTargetType } from "@xwiki/platform-link-type-api";
+import type {
+  LinkContext,
+  LinkTargetType,
+} from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceHandlerProvider,
@@ -136,7 +139,10 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
       : (this.modelReferenceHandlerProvider.get()?.getTitle(ref) ?? "");
   }
 
-  fromReference(reference: ResourceReference): PageLinkTargetConfig | null {
+  fromReference(
+    reference: ResourceReference,
+    context?: LinkContext,
+  ): PageLinkTargetConfig | null {
     if (reference.type !== ResourceType.DOCUMENT) {
       return null;
     }
@@ -145,6 +151,7 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
       reference.reference,
       EntityType.DOCUMENT,
       this.modelReferenceParserProvider,
+      context,
     );
 
     return ref?.type === EntityType.DOCUMENT
@@ -152,16 +159,16 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
       : null;
   }
 
-  toReference({
-    ref,
-    queryString,
-    anchor,
-  }: PageLinkTargetConfig): ResourceReference | undefined {
+  toReference(
+    { ref, queryString, anchor }: PageLinkTargetConfig,
+    context?: LinkContext,
+  ): ResourceReference | undefined {
     return entityResourceReference(
       ResourceType.DOCUMENT,
       ref,
       this.modelReferenceSerializerProvider,
       { queryString, anchor },
+      context,
     );
   }
 }

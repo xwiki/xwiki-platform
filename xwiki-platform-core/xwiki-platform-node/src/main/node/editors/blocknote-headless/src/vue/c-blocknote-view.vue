@@ -47,6 +47,7 @@ import type {
   LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
 import type {
+  LinkContext,
   LinkData,
   LinkTarget,
   LinkTargetTypeManager,
@@ -86,6 +87,12 @@ type Props = {
    * the links they handle. Unknown types are ignored.
    */
   excludedLinkTargetTypes?: string[];
+
+  /**
+   * Where the edited links are, e.g. the document holding the edited content: the references of the linked pages and
+   * attachments are resolved and saved relative to it.
+   */
+  linkContext?: LinkContext;
 };
 
 const {
@@ -95,6 +102,7 @@ const {
   collaboration = undefined,
   depsContainer,
   excludedLinkTargetTypes = undefined,
+  linkContext = undefined,
 } = defineProps<Props>();
 
 const editorRef = shallowRef<EditorType | null>(null);
@@ -181,7 +189,7 @@ const submitEditedLink = ({ displayText, target }: LinkData) => {
     target.type === unsupportedLinkTargetType
       ? (editingLink.value?.current.url ?? "")
       : linkTargetTypeManager.toURL(target);
-  const reference = linkTargetTypeManager.toReference(target);
+  const reference = linkTargetTypeManager.toReference(target, linkContext);
 
   editingLink.value?.onSubmit({
     title: displayText,
@@ -207,7 +215,7 @@ const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
 function currentLinkTarget(current: LinkEditionData): LinkTarget {
   const linkTargetTypeManager = getLinkTargetTypeManager();
   return current.reference
-    ? linkTargetTypeManager.fromReference(current.reference)
+    ? linkTargetTypeManager.fromReference(current.reference, linkContext)
     : linkTargetTypeManager.fromURL(current.url);
 }
 
@@ -255,6 +263,7 @@ onUnmounted(() => {
     :current="currentLinkData"
     :deps-container="depsContainer"
     :excluded-link-target-types="excludedLinkTargetTypes"
+    :link-context
     :mode="editingLink?.mode"
     @submit="submitEditedLink"
     @cancel="editingLink = null"

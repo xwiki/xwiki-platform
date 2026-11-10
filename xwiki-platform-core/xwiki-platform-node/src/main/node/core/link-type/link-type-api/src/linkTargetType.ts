@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { LinkContext } from "./linkContext";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
@@ -121,19 +122,28 @@ interface LinkTargetType<TConfig = unknown> {
    * Optional: the link target types that don't implement it are skipped when converting a reference.
    *
    * @param reference - the reference of a linked resource
+   * @param context - (since 18.10.0RC1) where the link is, e.g. the document that a relative reference is resolved
+   *   against
    * @returns the configuration of the link if `reference` belongs to this link target type, `null` otherwise
    */
-  fromReference?(reference: ResourceReference): TConfig | null;
+  fromReference?(
+    reference: ResourceReference,
+    context?: LinkContext,
+  ): TConfig | null;
 
   /**
    * Convert the configuration of a link of this type into the reference of the linked resource. The reverse of
    * {@link LinkTargetType.fromReference}, optional for the same reason.
    *
    * @param config - the configuration of the link
+   * @param context - (since 18.10.0RC1) where the link is, e.g. the document that the reference is made relative to
    * @returns the reference of the linked resource, or `undefined` (not a placeholder reference) when the
    *   configuration doesn't designate a resource yet (e.g. no page selected, empty URL)
    */
-  toReference?(config: TConfig): ResourceReference | undefined;
+  toReference?(
+    config: TConfig,
+    context?: LinkContext,
+  ): ResourceReference | undefined;
 }
 
 export { linkTargetTypeRole };

@@ -21,7 +21,11 @@ import { AttachmentLinkTargetType } from "../AttachmentLinkTargetType";
 import { EntityType } from "@xwiki/platform-model-api";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mock, mockReset } from "vitest-mock-extended";
-import type { AttachmentReference } from "@xwiki/platform-model-api";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
+import type {
+  AttachmentReference,
+  DocumentReference,
+} from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParser,
   ModelReferenceSerializer,
@@ -180,5 +184,43 @@ describe("AttachmentLinkTargetType", () => {
       }),
     ).toBe("file.png");
     expect(targetType.getDefaultLabel({ ref: null })).toBe("");
+  });
+
+  describe("relative to the source document of the link", () => {
+    const sourceDocument = {
+      type: EntityType.DOCUMENT,
+      name: "Source",
+    } as unknown as DocumentReference;
+    const context: LinkContext = { sourceDocument };
+
+    it("resolves the reference against the source document", () => {
+      modelReferenceParser.parse.mockReturnValue(attachmentRef);
+
+      const config = targetType.fromReference?.(
+        { type: "attach", typed: true, reference: "cat.png", parameters: {} },
+        context,
+      );
+
+      expect(config?.ref).toBe(attachmentRef);
+      expect(modelReferenceParser.parse).toHaveBeenCalledWith("cat.png", {
+        type: EntityType.ATTACHMENT,
+        base: sourceDocument,
+      });
+    });
+
+    it("serializes the reference relative to the source document", () => {
+      modelReferenceSerializer.serialize.mockReturnValue("attach:cat.png");
+
+      const reference = targetType.toReference?.(
+        { ref: attachmentRef },
+        context,
+      );
+
+      expect(reference?.reference).toBe("cat.png");
+      expect(modelReferenceSerializer.serialize).toHaveBeenCalledWith(
+        attachmentRef,
+        sourceDocument,
+      );
+    });
   });
 });

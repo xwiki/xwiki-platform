@@ -17,7 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import {
+  EntityType as XWikiEntityType,
+  Model,
+} from "@xwiki/platform-xwiki-model-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
+import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
 
 /**
  * The parameters of a link resource reference that the link editor edits (the query string and the anchor of a page or
@@ -25,6 +30,35 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
  * means that they were cleared.
  */
 const EDITED_PARAMETERS: readonly string[] = ["queryString", "anchor"];
+
+/**
+ * The types of the resource references that point to an entity (a page or an attachment), mapped to its entity type.
+ */
+const ENTITY_TYPES: Readonly<Record<string, number>> = {
+  doc: XWikiEntityType.DOCUMENT,
+  attach: XWikiEntityType.ATTACHMENT,
+};
+
+/**
+ * @param reference - a resource reference
+ * @param documentReference - the reference of the edited document, which the references of the pages and attachments
+ *   are relative to
+ * @returns a string identifying the referenced resource, whatever the way its reference is written (e.g. absolute or
+ *   relative to the edited document)
+ */
+function resourceKey(
+  reference: ResourceReference,
+  documentReference?: XWikiEntityReference,
+): string {
+  const entityType = ENTITY_TYPES[reference.type];
+  const entityReference =
+    entityType === undefined || !documentReference
+      ? undefined
+      : Model.resolve(reference.reference, entityType, documentReference);
+  return entityReference
+    ? Model.serialize(entityReference)
+    : reference.reference;
+}
 
 /**
  * Picks the resource reference to save for an edited link.
@@ -36,15 +70,20 @@ const EDITED_PARAMETERS: readonly string[] = ["queryString", "anchor"];
  *
  * @param previous - the resource reference of the edited link, if any
  * @param edited - the resource reference produced by the link editor
+ * @param documentReference - the reference of the edited document: the references of the pages and attachments are
+ *   resolved against it, to tell whether the link still points to the same resource even when its reference is written
+ *   differently (e.g. absolute in the edited content, relative to the edited document in the link editor)
  * @returns the resource reference to save
  */
 function editedLinkResourceReference(
   previous: ResourceReference | undefined,
   edited: ResourceReference,
+  documentReference?: XWikiEntityReference,
 ): ResourceReference {
   if (
     previous?.type !== edited.type ||
-    previous.reference !== edited.reference
+    resourceKey(previous, documentReference) !==
+      resourceKey(edited, documentReference)
   ) {
     return edited;
   }

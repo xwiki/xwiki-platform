@@ -13,6 +13,7 @@ import { Container } from 'inversify';
 import { ContextForMacros } from '@xwiki/platform-editors-blocknote-react';
 import { DefineComponent } from 'vue';
 import { EditorType } from '@xwiki/platform-editors-blocknote-react';
+import { LinkContext } from '@xwiki/platform-link-type-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PublicProps } from 'vue';
 
@@ -27,6 +28,7 @@ editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
 excludedLinkTargetTypes?: string[];
+linkContext?: LinkContext;
 }, {
 getContent: () => BlockType[];
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
@@ -43,6 +45,7 @@ editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
 excludedLinkTargetTypes?: string[];
+linkContext?: LinkContext;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: BlockType[]) => any) | undefined;

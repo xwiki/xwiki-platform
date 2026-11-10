@@ -25,7 +25,18 @@ import type { EntityReference } from "@xwiki/platform-model-api";
  * @beta
  */
 interface ModelReferenceSerializer {
-  serialize(reference?: EntityReference): string | undefined;
+  /**
+   * @param reference - the reference to serialize
+   * @param base - (since 18.10.0RC1) the reference to serialize the given reference relative to, omitting the leading
+   *   entities they have in common (e.g. only the page name for a page of the same space as the base document), so
+   *   that parsing the result against the same base gives back the given reference; when not specified, or when the
+   *   implementation doesn't support relative references, the given reference is fully serialized
+   * @returns the serialized reference, or `undefined` when no reference is given
+   */
+  serialize(
+    reference?: EntityReference,
+    base?: EntityReference,
+  ): string | undefined;
 }
 
 export type { ModelReferenceSerializer };

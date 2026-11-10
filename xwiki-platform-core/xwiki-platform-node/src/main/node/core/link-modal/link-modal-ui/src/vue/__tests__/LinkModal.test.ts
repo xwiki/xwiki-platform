@@ -371,28 +371,114 @@ describe("LinkModal", () => {
     expect(wrapper.text()).not.toContain("options-a");
   });
 
-  it("passes its container to the target and option fields, to resolve the services they need", async () => {
-    const targetField = defineComponent({
-      props: ["depsContainer"],
-      template: "<div>fields-a</div>",
-    });
-    const optionFields = defineComponent({
-      props: ["depsContainer"],
-      template: "<div>options-a</div>",
-    });
-    const wrapper = mountLinkModal(
-      { displayText: "", target: { type: "a", config: {} } },
-      [fakeLinkTargetType("a", "A", targetField, optionFields)],
-    );
-    await flushPromises();
+  describe("fields of the selected link target type", () => {
+    it("passes its container to the target and option fields, to resolve the services they need", async () => {
+      const targetField = defineComponent({
+        props: ["depsContainer"],
+        template: "<div>fields-a</div>",
+      });
+      const optionFields = defineComponent({
+        props: ["depsContainer"],
+        template: "<div>options-a</div>",
+      });
+      const wrapper = mountLinkModal(
+        { displayText: "", target: { type: "a", config: {} } },
+        [fakeLinkTargetType("a", "A", targetField, optionFields)],
+      );
+      await flushPromises();
 
-    const depsContainer = wrapper.props("depsContainer");
-    expect(wrapper.getComponent(targetField).props("depsContainer")).toBe(
-      depsContainer,
+      const depsContainer = wrapper.props("depsContainer");
+      expect(wrapper.getComponent(targetField).props("depsContainer")).toBe(
+        depsContainer,
+      );
+      expect(wrapper.getComponent(optionFields).props("depsContainer")).toBe(
+        depsContainer,
+      );
+    });
+
+    it("asks the target field, not the option fields, to focus itself when the dialog opens", async () => {
+      const targetField = defineComponent({
+        props: { autofocus: Boolean },
+        template: "<div>fields-a</div>",
+      });
+      const optionFields = defineComponent({
+        props: { autofocus: Boolean },
+        template: "<div>options-a</div>",
+      });
+      const wrapper = mountLinkModal(
+        { displayText: "", target: { type: "a", config: {} } },
+        [fakeLinkTargetType("a", "A", targetField, optionFields)],
+      );
+      await flushPromises();
+
+      expect(wrapper.getComponent(targetField).props("autofocus")).toBe(true);
+      expect(wrapper.getComponent(optionFields).props("autofocus")).toBe(false);
+    });
+  });
+});
+
+describe("LinkModal display text", () => {
+  /**
+   * @returns a link target type whose links are labelled with their configured name, or that doesn't compute labels
+   *   when the name is `undefined`
+   */
+  function labellingLinkTargetType(
+    getDefaultLabel?: (config: { name?: string }) => string,
+  ): FakeLinkTargetType {
+    return {
+      ...fakeLinkTargetTypeWithForm("a", "A"),
+      toURL: (config) =>
+        `https://example.org/${(config as { name: string }).name}`,
+      getDefaultLabel: getDefaultLabel as LinkTargetType["getDefaultLabel"],
+    };
+  }
+
+  async function submit(wrapper: ReturnType<typeof mountLinkModal>) {
+    await wrapper.find("[data-test='linkSubmit']").trigger("click");
+    return wrapper.emitted("submit")?.[0]?.[0];
+  }
+
+  it("is submitted as typed", async () => {
+    const wrapper = mountLinkModal(
+      {
+        displayText: "Some text",
+        target: { type: "a", config: { name: "Page" } },
+      },
+      [labellingLinkTargetType(({ name }) => name ?? "")],
     );
-    expect(wrapper.getComponent(optionFields).props("depsContainer")).toBe(
-      depsContainer,
+
+    expect(await submit(wrapper)).toMatchObject({ displayText: "Some text" });
+  });
+
+  it("is replaced, when left empty or blank, by the default label of the link target, also used as placeholder", async () => {
+    const wrapper = mountLinkModal(
+      {
+        displayText: "Some text",
+        target: { type: "a", config: { name: "Page" } },
+      },
+      [labellingLinkTargetType(({ name }) => `Label of ${name}`)],
     );
+
+    await wrapper.get("[data-test='linkDisplayText']").setValue("  ");
+
+    expect(
+      wrapper.get("[data-test='linkDisplayText']").attributes("placeholder"),
+    ).toBe("Label of Page");
+    expect(await submit(wrapper)).toEqual({
+      displayText: "Label of Page",
+      target: { type: "a", config: { name: "Page" } },
+    });
+  });
+
+  it("is replaced, when left empty, by the URL of the link for the link target types that don't compute labels", async () => {
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "a", config: { name: "Page" } } },
+      [labellingLinkTargetType()],
+    );
+
+    expect(await submit(wrapper)).toMatchObject({
+      displayText: "https://example.org/Page",
+    });
   });
 });
 
@@ -443,14 +529,22 @@ describe("LinkModal dialog", () => {
 
   it("stays open, without emitting submit, while a required field is empty", async () => {
     const wrapper = mountLinkModal(
-      { displayText: "", target: { type: "a", config: {} } },
-      [fakeLinkTargetTypeWithForm("a", "A")],
+      { displayText: "hello", target: { type: "a", config: {} } },
+      [
+        fakeLinkTargetType(
+          "a",
+          "A",
+          defineComponent({
+            template: `<input data-test="requiredTarget" required />`,
+          }),
+        ),
+      ],
     );
 
     await wrapper.find("[data-test='linkSubmit']").trigger("click");
     expect(wrapper.emitted("submit")).toBeUndefined();
 
-    await wrapper.get("[data-test='linkDisplayText']").setValue("hello");
+    await wrapper.get("[data-test='requiredTarget']").setValue("target");
     await wrapper.find("[data-test='linkSubmit']").trigger("click");
     expect(wrapper.emitted("submit")?.[0]?.[0]).toMatchObject({
       displayText: "hello",

@@ -44,6 +44,7 @@ function plainTextFallbackField(targetType: LinkTargetType): Component {
         type: Object as PropType<PlainTextLinkTargetConfig>,
         required: true,
       },
+      autofocus: Boolean,
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
@@ -54,6 +55,7 @@ function plainTextFallbackField(targetType: LinkTargetType): Component {
           modelValue: props.modelValue,
           "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
             emit("update:modelValue", config),
+          autofocus: props.autofocus,
           fieldLabel: labels.value[targetType.type],
           "data-test": "linkLocation",
         });

@@ -19,10 +19,10 @@
  */
 import { dsComponentStubs } from "./dsStubs";
 import SearchBox from "../SearchBox.vue";
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
-import type { SearchBoxItem } from "../SearchBox.vue";
+import type { SearchBoxItem, SearchBoxSource } from "../SearchBox.vue";
 
 type Value = { name: string };
 
@@ -38,15 +38,22 @@ function item(name: string): SearchBoxItem<Value, string> {
 function mountSearchBox(props: {
   suggestions?: SearchBoxItem<Value, string>[];
   parseQuery?: (query: string) => Value | null;
+  getSuggestions?: SearchBoxSource<Value, string>;
   placeholder?: string;
+  initialValue?: string;
+  autofocus?: boolean;
+  required?: boolean;
 }) {
   return mount(SearchBox<Value, string>, {
     props: {
       label: "Reference",
-      initialValue: null,
-      getSuggestions: async () => props.suggestions ?? [],
+      initialValue: props.initialValue ?? null,
+      getSuggestions:
+        props.getSuggestions ?? (async () => props.suggestions ?? []),
       parseQuery: props.parseQuery,
       placeholder: props.placeholder,
+      autofocus: props.autofocus,
+      required: props.required,
     },
     slots: {
       renderSuggestion: `<template #renderSuggestion="{ renderingData }">{{ renderingData }}</template>`,
@@ -78,56 +85,242 @@ describe("SearchBox", () => {
     expect(wrapper.get("input").attributes("placeholder")).toBe("Page name");
   });
 
-  it("selects the value parsed from the typed text when Enter is pressed without picking a suggestion", async () => {
-    const wrapper = mountSearchBox({
-      parseQuery: (query) =>
-        query.startsWith("ref:") ? { name: query } : null,
+  it("marks the search field with autofocus only when asked to", () => {
+    expect(
+      mountSearchBox({ autofocus: true }).get("input").attributes("autofocus"),
+    ).toBeDefined();
+    expect(
+      mountSearchBox({}).get("input").attributes("autofocus"),
+    ).toBeUndefined();
+  });
+
+  it("marks the search field as required only when asked to", () => {
+    expect(
+      mountSearchBox({ required: true }).get("input").attributes("required"),
+    ).toBeDefined();
+    expect(
+      mountSearchBox({}).get("input").attributes("required"),
+    ).toBeUndefined();
+  });
+
+  describe("Enter key", () => {
+    it("selects the value parsed from the typed text when Enter is pressed without picking a suggestion", async () => {
+      const wrapper = mountSearchBox({
+        parseQuery: (query) =>
+          query.startsWith("ref:") ? { name: query } : null,
+      });
+      const input = wrapper.get("input");
+
+      await input.setValue("ref:Some.Page");
+      await input.trigger("keydown", { key: "Enter" });
+
+      expect(wrapper.emitted("select")).toEqual([[{ name: "ref:Some.Page" }]]);
     });
-    const input = wrapper.get("input");
 
-    await input.setValue("ref:Some.Page");
-    await input.trigger("keydown", { key: "Enter" });
+    it("selects nothing when the typed text doesn't designate a value", async () => {
+      const wrapper = mountSearchBox({ parseQuery: () => null });
+      const input = wrapper.get("input");
 
-    expect(wrapper.emitted("select")).toEqual([[{ name: "ref:Some.Page" }]]);
-  });
+      await input.setValue("not a reference");
+      await input.trigger("keydown", { key: "Enter" });
 
-  it("selects nothing when the typed text doesn't designate a value", async () => {
-    const wrapper = mountSearchBox({ parseQuery: () => null });
-    const input = wrapper.get("input");
-
-    await input.setValue("not a reference");
-    await input.trigger("keydown", { key: "Enter" });
-
-    expect(wrapper.emitted("select")).toBeUndefined();
-  });
-
-  it("selects nothing when Enter is pressed without picking a suggestion and without parseQuery", async () => {
-    const wrapper = mountSearchBox({});
-    const input = wrapper.get("input");
-
-    await input.setValue("ref:Some.Page");
-    await input.trigger("keydown", { key: "Enter" });
-
-    expect(wrapper.emitted("select")).toBeUndefined();
-  });
-
-  it("selects the focused suggestion rather than the typed text", async () => {
-    const parseQuery = vi.fn((query: string) => ({ name: query }));
-    const wrapper = mountSearchBox({
-      suggestions: [item("Suggested.Page")],
-      parseQuery,
+      expect(wrapper.emitted("select")).toBeUndefined();
     });
-    const input = wrapper.get("input");
 
-    await input.setValue("Sugg");
-    await vi.waitFor(() =>
-      expect(wrapper.findAll("li.suggestion")).toHaveLength(1),
-    );
-    await input.trigger("keydown", { key: "ArrowDown" });
-    await input.trigger("keydown", { key: "Enter" });
+    it("selects nothing when Enter is pressed without picking a suggestion and without parseQuery", async () => {
+      const wrapper = mountSearchBox({});
+      const input = wrapper.get("input");
 
-    expect(wrapper.emitted("select")).toEqual([[{ name: "Suggested.Page" }]]);
-    expect(parseQuery).not.toHaveBeenCalled();
+      await input.setValue("ref:Some.Page");
+      await input.trigger("keydown", { key: "Enter" });
+
+      expect(wrapper.emitted("select")).toBeUndefined();
+    });
+
+    it("selects the focused suggestion rather than the typed text", async () => {
+      const parseQuery = vi.fn((query: string) => ({ name: query }));
+      const wrapper = mountSearchBox({
+        suggestions: [item("Suggested.Page")],
+        parseQuery,
+      });
+      const input = wrapper.get("input");
+
+      await input.setValue("Sugg");
+      await vi.waitFor(() =>
+        expect(wrapper.findAll("li.suggestion")).toHaveLength(1),
+      );
+      await input.trigger("keydown", { key: "ArrowDown" });
+      await input.trigger("keydown", { key: "Enter" });
+
+      expect(wrapper.emitted("select")).toEqual([[{ name: "Suggested.Page" }]]);
+      expect(parseQuery).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("leaving the field", () => {
+    it("selects the value parsed from the typed text, e.g. a page that doesn't exist yet", async () => {
+      const wrapper = mountSearchBox({
+        suggestions: [item("Existing.Page")],
+        parseQuery: (query) => ({ name: query }),
+      });
+      const input = wrapper.get("input");
+
+      await input.setValue("New.Page");
+      await vi.waitFor(() =>
+        expect(wrapper.findAll("li.suggestion")).toHaveLength(1),
+      );
+      await input.trigger("blur");
+
+      expect(wrapper.emitted("select")).toEqual([[{ name: "New.Page" }]]);
+    });
+
+    it("selects nothing when the text is unchanged", async () => {
+      const parseQuery = vi.fn((query: string) => ({ name: query }));
+      const wrapper = mountSearchBox({
+        initialValue: "Initial.Page",
+        parseQuery,
+      });
+
+      await wrapper.get("input").trigger("blur");
+
+      expect(wrapper.emitted("select")).toBeUndefined();
+      expect(parseQuery).not.toHaveBeenCalled();
+    });
+
+    it("doesn't select again the text already selected with Enter", async () => {
+      const wrapper = mountSearchBox({
+        parseQuery: (query) => ({ name: query }),
+      });
+      const input = wrapper.get("input");
+
+      await input.setValue("New.Page");
+      await input.trigger("keydown", { key: "Enter" });
+      await input.trigger("blur");
+
+      expect(wrapper.emitted("select")).toEqual([[{ name: "New.Page" }]]);
+    });
+
+    it("doesn't select again the picked suggestion", async () => {
+      const wrapper = mountSearchBox({
+        suggestions: [item("Suggested.Page")],
+        parseQuery: (query) => ({ name: `parsed:${query}` }),
+      });
+      const input = wrapper.get("input");
+
+      await input.setValue("Sugg");
+      await vi.waitFor(() =>
+        expect(wrapper.findAll("li.suggestion")).toHaveLength(1),
+      );
+      await wrapper.get("li.suggestion").trigger("click");
+      await input.trigger("blur");
+
+      expect(wrapper.emitted("select")).toEqual([[{ name: "Suggested.Page" }]]);
+    });
+  });
+
+  describe("emptying the text", () => {
+    it("clears the selection when the field is left, whitespace counting as empty", async () => {
+      const parseQuery = vi.fn((query: string) => ({ name: query }));
+      const wrapper = mountSearchBox({
+        initialValue: "Initial.Page",
+        parseQuery,
+      });
+      const input = wrapper.get("input");
+
+      await input.setValue("  ");
+      await input.trigger("blur");
+
+      expect(wrapper.emitted("select")).toEqual([[null]]);
+      expect(parseQuery).not.toHaveBeenCalled();
+    });
+
+    it("clears nothing when the field is left with the text already empty", async () => {
+      const wrapper = mountSearchBox({});
+
+      await wrapper.get("input").trigger("blur");
+
+      expect(wrapper.emitted("select")).toBeUndefined();
+    });
+
+    it("clears the selection once, when Enter is pressed", async () => {
+      const wrapper = mountSearchBox({
+        initialValue: "Initial.Page",
+        suggestions: [item("Initial.Page")],
+        parseQuery: (query) => ({ name: query }),
+      });
+      const input = wrapper.get("input");
+
+      await input.setValue("");
+      await input.trigger("keydown", { key: "Enter" });
+      await input.trigger("blur");
+
+      expect(wrapper.emitted("select")).toEqual([[null]]);
+    });
+  });
+
+  describe("Escape key", () => {
+    // Presses Escape in the search field and returns whether the event reached the listeners of the ancestors (e.g. the
+    // dialog holding the search box) and whether its default action (e.g. closing a native dialog) was prevented.
+    function pressEscape(wrapper: ReturnType<typeof mountSearchBox>) {
+      const ancestorListener = vi.fn();
+      wrapper.element.addEventListener("keydown", ancestorListener);
+      const event = new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      });
+      wrapper.get("input").element.dispatchEvent(event);
+      wrapper.element.removeEventListener("keydown", ancestorListener);
+      return {
+        propagated: ancestorListener.mock.calls.length > 0,
+        defaultPrevented: event.defaultPrevented,
+      };
+    }
+
+    it("closes the suggestions without closing the dialog holding the search box", async () => {
+      const wrapper = mountSearchBox({ suggestions: [item("Some.Page")] });
+      await wrapper.get("input").setValue("Some");
+      await vi.waitFor(() =>
+        expect(wrapper.findAll("li.suggestion")).toHaveLength(1),
+      );
+
+      expect(pressEscape(wrapper)).toEqual({
+        propagated: false,
+        defaultPrevented: true,
+      });
+      await vi.waitFor(() =>
+        expect(wrapper.find(".suggestions-container").exists()).toBe(false),
+      );
+    });
+
+    it("ignores the results of a search dismissed while loading", async () => {
+      let resolveSearch: (
+        results: SearchBoxItem<Value, string>[],
+      ) => void = () => {};
+      const wrapper = mountSearchBox({
+        getSuggestions: () =>
+          new Promise((resolve) => (resolveSearch = resolve)),
+      });
+      await wrapper.get("input").setValue("Some");
+      await vi.waitFor(() =>
+        expect(wrapper.find(".suggestions-container").exists()).toBe(true),
+      );
+
+      expect(pressEscape(wrapper).propagated).toBe(false);
+      resolveSearch([item("Some.Page")]);
+      await flushPromises();
+
+      expect(wrapper.find(".suggestions-container").exists()).toBe(false);
+    });
+
+    it("is left to the dialog holding the search box when there are no suggestions displayed", () => {
+      const wrapper = mountSearchBox({ suggestions: [item("Some.Page")] });
+
+      expect(pressEscape(wrapper)).toEqual({
+        propagated: true,
+        defaultPrevented: false,
+      });
+    });
   });
 
   describe("suggestion list", () => {

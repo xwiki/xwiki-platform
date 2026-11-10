@@ -83,4 +83,12 @@ describe("URLLinkTargetType", () => {
   it("returns undefined when converting to a reference with an empty URL", () => {
     expect(targetType.toReference?.({ location: "  " })).toBeUndefined();
   });
+
+  it("labels the link with its URL, like XWiki Rendering does for the URL links without a label", () => {
+    expect(
+      targetType.getDefaultLabel({
+        location: " https://www.example.org/docs/guide.pdf ",
+      }),
+    ).toBe("https://www.example.org/docs/guide.pdf");
+  });
 });

@@ -51,6 +51,7 @@ modelValue: PlainTextLinkTargetConfig;
 } & {
 fieldLabel: string;
 inputType?: TextFieldProps["type"];
+autofocus?: boolean;
 }, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "update:modelValue": (value: PlainTextLinkTargetConfig) => any;
 }, string, PublicProps, Readonly<{
@@ -58,6 +59,7 @@ modelValue: PlainTextLinkTargetConfig;
 } & {
 fieldLabel: string;
 inputType?: TextFieldProps["type"];
+autofocus?: boolean;
 }> & Readonly<{
 "onUpdate:modelValue"?: ((value: PlainTextLinkTargetConfig) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
@@ -70,13 +72,15 @@ export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_set
         renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     };
     attrs: any;
-    emit: (evt: "select", value: T) => void;
+    emit: (evt: "select", value: T | null) => void;
 }, __VLS_expose?: NonNullable<Awaited<typeof __VLS_setup>>["expose"], __VLS_setup?: Promise<{
     props: {
-        readonly onSelect?: ((value: T) => any) | undefined;
+        readonly onSelect?: ((value: T | null) => any) | undefined;
         label: string;
         initialValue: string | null;
         placeholder?: string | undefined;
+        autofocus?: boolean | undefined;
+        required?: boolean | undefined;
         getSuggestions: SearchBoxSource<T, U>;
         parseQuery?: ((query: string) => T | null) | undefined;
     } & PublicProps;
@@ -87,7 +91,7 @@ export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_set
     }> & {
         renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
     };
-    emit: (evt: "select", value: T) => void;
+    emit: (evt: "select", value: T | null) => void;
 }>) => VNode & {
     __ctx?: Awaited<typeof __VLS_setup>;
 };

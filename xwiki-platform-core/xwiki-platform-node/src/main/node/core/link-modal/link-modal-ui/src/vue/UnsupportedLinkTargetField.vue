@@ -26,7 +26,8 @@ import type { Container } from "inversify";
 // The fields of the links pointing to a resource that no link target type supports: the reference of the linked
 // resource can only be edited as plain text. The link modal passes the container to every target field (see
 // `LinkTargetTypeForm`): it's declared although unused, so that it doesn't fall through as an attribute of the field.
-defineProps<{ depsContainer: Container }>();
+// The autofocus prop is passed to the reference field.
+defineProps<{ depsContainer: Container; autofocus?: boolean }>();
 
 const model = defineModel<UnsupportedLinkTargetConfig>({
   required: true,
@@ -39,6 +40,7 @@ const { t } = useI18n({ messages: translations });
   <x-text-field
     v-bind="{ 'data-test': 'linkReference' }"
     :label="t('link-modal.unsupported.reference')"
+    :autofocus
     v-model="model.reference.reference"
     required
   />

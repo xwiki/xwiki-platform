@@ -79,6 +79,13 @@ abstract class AbstractPlainTextLinkTargetType
     return location;
   }
 
+  /**
+   * @returns the location as is (e.g. the URL or the path), like XWiki Rendering does for the links without a label
+   */
+  getDefaultLabel({ location }: PlainTextLinkTargetConfig): string {
+    return location.trim();
+  }
+
   fromReference(
     reference: ResourceReference,
   ): PlainTextLinkTargetConfig | null {

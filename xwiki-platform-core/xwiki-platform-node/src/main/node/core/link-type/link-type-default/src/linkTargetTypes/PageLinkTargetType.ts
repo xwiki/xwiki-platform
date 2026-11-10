@@ -20,6 +20,9 @@
 import { translateLabel } from "./labels";
 import {
   entityResourceReference,
+  linkURLPartsFromReference,
+  linkURLPartsFromURL,
+  linkURLSuffix,
   parseEntityReference,
 } from "./referenceHelpers";
 import { tryFallible } from "@xwiki/platform-fn-utils";
@@ -29,6 +32,7 @@ import { inject, injectable } from "inversify";
 import type { LinkTargetType } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type {
+  ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
@@ -46,8 +50,23 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
  */
 type PageLinkTargetConfig = {
   ref: DocumentReference | null;
+
+  /**
+   * The query string of the link, without the "?" URL separator (e.g. "key1=value1&key2=value2")
+   */
   queryString?: string;
+
+  /**
+   * The identifier of the element of the page targeted by the link, without the "#" URL separator
+   */
   anchor?: string;
+
+  /**
+   * The title of the page, when it's known (e.g. from the link suggestion that the user picked), used as the default
+   * label of the link. It's not part of the link itself: it's left out when the link is converted into a URL or a
+   * reference, and unset when the link is read from one.
+   */
+  title?: string;
 };
 
 /**
@@ -67,6 +86,8 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
     @inject("ModelReferenceSerializerProvider")
     private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
+    @inject("ModelReferenceHandlerProvider")
+    private readonly modelReferenceHandlerProvider: ModelReferenceHandlerProvider,
   ) {}
 
   getLabel(locale: string): Promise<string> {
@@ -90,13 +111,7 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
       return null;
     }
 
-    const parsedURL = tryFallible(() => new URL(url));
-
-    return {
-      ref,
-      anchor: parsedURL?.hash,
-      queryString: parsedURL?.search,
-    };
+    return { ref, ...linkURLPartsFromURL(url) };
   }
 
   toURL({ ref, queryString, anchor }: PageLinkTargetConfig): string {
@@ -104,7 +119,21 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
       .get()
       ?.serialize(ref ?? undefined);
 
-    return `${base ?? ""}${queryString ?? ""}${anchor ?? ""}`;
+    return `${base ?? ""}${linkURLSuffix({ queryString, anchor })}`;
+  }
+
+  /**
+   * @returns the title of the page when it's known, its name otherwise, as the backend displays it (e.g. the name of
+   *   the parent space for the home page of a nested page in XWiki, rather than "WebHome")
+   */
+  getDefaultLabel({ ref, title }: PageLinkTargetConfig): string {
+    const knownTitle = title?.trim();
+    if (knownTitle) {
+      return knownTitle;
+    }
+    return ref === null
+      ? ""
+      : (this.modelReferenceHandlerProvider.get()?.getTitle(ref) ?? "");
   }
 
   fromReference(reference: ResourceReference): PageLinkTargetConfig | null {
@@ -118,14 +147,21 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
       this.modelReferenceParserProvider,
     );
 
-    return ref?.type === EntityType.DOCUMENT ? { ref } : null;
+    return ref?.type === EntityType.DOCUMENT
+      ? { ref, ...linkURLPartsFromReference(reference) }
+      : null;
   }
 
-  toReference({ ref }: PageLinkTargetConfig): ResourceReference | undefined {
+  toReference({
+    ref,
+    queryString,
+    anchor,
+  }: PageLinkTargetConfig): ResourceReference | undefined {
     return entityResourceReference(
       ResourceType.DOCUMENT,
       ref,
       this.modelReferenceSerializerProvider,
+      { queryString, anchor },
     );
   }
 }

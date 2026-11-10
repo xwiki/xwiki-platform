@@ -61,77 +61,124 @@ describe("AttachmentLinkTargetType", () => {
     await expect(targetType.getLabel("en")).resolves.toBe("Attachment");
   });
 
-  it("parses an attachment URL, including its query string", () => {
-    remoteURLParser.parse.mockReturnValue(attachmentRef);
+  describe("URL", () => {
+    it("parses the query string of a relative attachment URL", () => {
+      remoteURLParser.parse.mockReturnValue(attachmentRef);
 
-    const config = targetType.fromURL(
-      "https://xwiki.org/xwiki/bin/download/Some/Page/file.png?foo=bar",
-    );
+      const config = targetType.fromURL(
+        "/xwiki/bin/download/Some/Page/file.png?width=100",
+      );
 
-    expect(config).toEqual({ ref: attachmentRef, queryString: "?foo=bar" });
-  });
-
-  it("does not match a non-attachment URL", () => {
-    remoteURLParser.parse.mockReturnValue(undefined);
-
-    expect(targetType.fromURL("https://example.org")).toBeNull();
-  });
-
-  it("serializes an attachment config back into a URL, including its query string", () => {
-    remoteURLSerializer.serialize.mockReturnValue(
-      "https://xwiki.org/xwiki/bin/download/Some/Page/file.png",
-    );
-
-    const url = targetType.toURL({
-      ref: attachmentRef,
-      queryString: "?foo=bar",
+      expect(config).toEqual({ ref: attachmentRef, queryString: "width=100" });
     });
 
-    expect(url).toBe(
-      "https://xwiki.org/xwiki/bin/download/Some/Page/file.png?foo=bar",
-    );
-  });
+    it("parses an attachment URL, including its query string, without its URL separator", () => {
+      remoteURLParser.parse.mockReturnValue(attachmentRef);
 
-  it("parses an attachment reference", () => {
-    modelReferenceParser.parse.mockReturnValue(attachmentRef);
+      const config = targetType.fromURL(
+        "https://xwiki.org/xwiki/bin/download/Some/Page/file.png?foo=bar",
+      );
 
-    const config = targetType.fromReference?.({
-      type: "attach",
-      typed: true,
-      reference: "Some.Page@file.png",
-      parameters: {},
+      expect(config).toEqual({ ref: attachmentRef, queryString: "foo=bar" });
     });
 
-    expect(config).toEqual({ ref: attachmentRef });
+    it("does not match a non-attachment URL", () => {
+      remoteURLParser.parse.mockReturnValue(undefined);
+
+      expect(targetType.fromURL("https://example.org")).toBeNull();
+    });
+
+    it("serializes an attachment config back into a URL, including its query string", () => {
+      remoteURLSerializer.serialize.mockReturnValue(
+        "https://xwiki.org/xwiki/bin/download/Some/Page/file.png",
+      );
+
+      const url = targetType.toURL({
+        ref: attachmentRef,
+        queryString: "foo=bar",
+      });
+
+      expect(url).toBe(
+        "https://xwiki.org/xwiki/bin/download/Some/Page/file.png?foo=bar",
+      );
+    });
+
+    it("serializes an attachment config into a URL without query string when it is empty", () => {
+      remoteURLSerializer.serialize.mockReturnValue(
+        "https://xwiki.org/xwiki/bin/download/Some/Page/file.png",
+      );
+
+      expect(targetType.toURL({ ref: attachmentRef, queryString: " " })).toBe(
+        "https://xwiki.org/xwiki/bin/download/Some/Page/file.png",
+      );
+    });
   });
 
-  it("does not match a non-attachment reference", () => {
-    expect(
-      targetType.fromReference?.({
-        type: "doc",
+  describe("reference", () => {
+    it("parses an attachment reference, including its query string", () => {
+      modelReferenceParser.parse.mockReturnValue(attachmentRef);
+
+      const config = targetType.fromReference?.({
+        type: "attach",
         typed: true,
-        reference: "Some.Page",
+        reference: "Some.Page@file.png",
+        parameters: { queryString: "foo=bar" },
+      });
+
+      expect(config).toEqual({ ref: attachmentRef, queryString: "foo=bar" });
+    });
+
+    it("does not match a non-attachment reference", () => {
+      expect(
+        targetType.fromReference?.({
+          type: "doc",
+          typed: true,
+          reference: "Some.Page",
+          parameters: {},
+        }),
+      ).toBeNull();
+    });
+
+    it("converts an attachment config back into a reference", () => {
+      modelReferenceSerializer.serialize.mockReturnValue(
+        "attach:Some.Page@file.png",
+      );
+
+      const reference = targetType.toReference?.({ ref: attachmentRef });
+
+      expect(reference).toEqual({
+        type: "attach",
+        typed: true,
+        reference: "Some.Page@file.png",
         parameters: {},
-      }),
-    ).toBeNull();
-  });
+      });
+    });
 
-  it("converts an attachment config back into a reference", () => {
-    modelReferenceSerializer.serialize.mockReturnValue(
-      "attach:Some.Page@file.png",
-    );
+    it("keeps the query string in the parameters of the reference, without its URL separator", () => {
+      modelReferenceSerializer.serialize.mockReturnValue(
+        "attach:Some.Page@file.png",
+      );
 
-    const reference = targetType.toReference?.({ ref: attachmentRef });
+      const reference = targetType.toReference?.({
+        ref: attachmentRef,
+        queryString: "?foo=bar",
+      });
 
-    expect(reference).toEqual({
-      type: "attach",
-      typed: true,
-      reference: "Some.Page@file.png",
-      parameters: {},
+      expect(reference?.parameters).toEqual({ queryString: "foo=bar" });
+    });
+
+    it("returns undefined when converting to a reference with no attachment selected", () => {
+      expect(targetType.toReference?.({ ref: null })).toBeUndefined();
     });
   });
 
-  it("returns undefined when converting to a reference with no attachment selected", () => {
-    expect(targetType.toReference?.({ ref: null })).toBeUndefined();
+  it("labels the link with the name of the attached file", () => {
+    expect(
+      targetType.getDefaultLabel({
+        ref: { ...attachmentRef, name: "file.png" } as AttachmentReference,
+        queryString: "foo=bar",
+      }),
+    ).toBe("file.png");
+    expect(targetType.getDefaultLabel({ ref: null })).toBe("");
   });
 });

@@ -43,22 +43,39 @@ public class BlockNoteLinkModal extends BaseElement
     private static final By TARGET_FIELD = By.cssSelector(".link-target input");
 
     /**
+     * The link type selector, which is always displayed.
+     */
+    private static final By TARGET_TYPE_SELECT = By.cssSelector("[data-test='linkTargetType']");
+
+    /**
+     * The collapsible "Options" section, holding the display text field and the options specific to the selected
+     * target type (e.g. the query string and the anchor of a page link, the subject and the body of an e-mail link).
+     */
+    private static final By OPTIONS = By.cssSelector("[data-test='linkOptions']");
+
+    /**
+     * The display text field, which is in the collapsible "Options" section.
+     */
+    private static final By DISPLAY_TEXT_FIELD = By.cssSelector("[data-test='linkDisplayText']");
+
+    /**
      * Create a new instance, waiting for the link modal to be visible.
      */
     public BlockNoteLinkModal()
     {
-        getDriver().waitUntilCondition(
-            ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-test='linkDisplayText']")));
+        getDriver().waitUntilCondition(ExpectedConditions.visibilityOfElementLocated(TARGET_TYPE_SELECT));
     }
 
     /**
-     * Replaces the content of the link display text field with the given title.
+     * Replaces the content of the link display text field with the given title, expanding the "Options" section that
+     * holds it if needed.
      *
      * @param title the new link title
      */
     public void setDisplayText(String title)
     {
-        replaceText(By.cssSelector("[data-test='linkDisplayText']"), title);
+        expandOptions();
+        replaceText(DISPLAY_TEXT_FIELD, title);
     }
 
     /**
@@ -69,7 +86,7 @@ public class BlockNoteLinkModal extends BaseElement
      */
     public void selectTargetType(String targetType)
     {
-        WebElement targetTypeSelect = getDriver().findElement(By.cssSelector("[data-test='linkTargetType']"));
+        WebElement targetTypeSelect = getDriver().findElement(TARGET_TYPE_SELECT);
         new Select(targetTypeSelect).selectByVisibleText(targetType);
     }
 
@@ -213,8 +230,24 @@ public class BlockNoteLinkModal extends BaseElement
         // The dialog covers the whole viewport, with its content inset from its edges: its top left corner is on the
         // backdrop.
         WebElement dialog = getDriver().findElement(
-            By.xpath("//*[@data-test = 'linkDisplayText']/ancestor::*[@role = 'dialog'][last()]"));
+            By.xpath("//*[@data-test = 'linkTargetType']/ancestor::*[@role = 'dialog'][last()]"));
         getDriver().moveToTopLeftCornerOfTargetWithOffset(dialog, 5, 5, null).click().perform();
+    }
+
+    /**
+     * Expands the "Options" section, unless it is already expanded, so that the option fields can be filled in: the
+     * display text and the options specific to the selected target type (e.g. the query string and the anchor of a
+     * page link, the subject and the body of an e-mail link).
+     *
+     * @since 18.10.0RC1
+     */
+    public void expandOptions()
+    {
+        WebElement options = getDriver().findElement(OPTIONS);
+        if (!Boolean.parseBoolean(options.getDomProperty("open"))) {
+            options.findElement(By.tagName("summary")).click();
+            getDriver().waitUntilCondition(driver -> Boolean.parseBoolean(options.getDomProperty("open")));
+        }
     }
 
     /**

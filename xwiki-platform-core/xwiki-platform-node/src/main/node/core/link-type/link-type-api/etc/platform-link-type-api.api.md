@@ -16,6 +16,8 @@ export abstract class AbstractPlainTextLinkTargetType implements LinkTargetType<
     // (undocumented)
     fromURL(url: string): PlainTextLinkTargetConfig | null;
     // (undocumented)
+    getDefaultLabel(input: PlainTextLinkTargetConfig): string;
+    // (undocumented)
     abstract getLabel(locale: string): Promise<string>;
     // (undocumented)
     abstract readonly order: number;
@@ -37,7 +39,6 @@ export class ComponentInit {
 // @beta
 export type LinkData = {
     displayText: string;
-    newTab?: boolean;
     target: LinkTarget;
 };
 
@@ -53,6 +54,7 @@ export interface LinkTargetType<TConfig = unknown> {
     createDefaultConfig(): TConfig;
     fromReference?(reference: ResourceReference): TConfig | null;
     fromURL(url: string): TConfig | null;
+    getDefaultLabel?(config: TConfig): string;
     getLabel(locale: string): Promise<string>;
     readonly order?: number;
     toReference?(config: TConfig): ResourceReference | undefined;

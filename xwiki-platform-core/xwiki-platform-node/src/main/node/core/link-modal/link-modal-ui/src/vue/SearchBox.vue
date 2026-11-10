@@ -71,7 +71,14 @@ export type { SearchBoxItem, SearchBoxSource };
 <script setup lang="ts" generic="T, U">
 import { translations } from "../translations";
 import { debounce } from "lodash-es";
-import { nextTick, ref, shallowRef, useTemplateRef, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  ref,
+  shallowRef,
+  useTemplateRef,
+  watch,
+} from "vue";
 import { useI18n } from "vue-i18n";
 
 const { initialValue, getSuggestions, parseQuery } = defineProps<{
@@ -92,6 +99,16 @@ const { initialValue, getSuggestions, parseQuery } = defineProps<{
   placeholder?: string;
 
   /**
+   * Whether the search field is focused when the dialog holding it opens.
+   */
+  autofocus?: boolean;
+
+  /**
+   * Whether the search field has to be filled for the form holding it to be submitted. Default: false.
+   */
+  required?: boolean;
+
+  /**
    * Perform a search
    *
    * @param query - A user query (text)
@@ -102,7 +119,8 @@ const { initialValue, getSuggestions, parseQuery } = defineProps<{
 
   /**
    * Convert the text typed in the search field into a value, when the user presses Enter without picking a
-   * suggestion (e.g. to select a reference typed by hand). Without it, pressing Enter does nothing in that case.
+   * suggestion or leaves the field after changing its text (e.g. to select a reference typed by hand, possibly to
+   * something that doesn't exist yet). Without it, only the suggestions can be selected.
    *
    * @param query - The text typed in the search field
    *
@@ -121,14 +139,19 @@ defineSlots<{
 const emit = defineEmits<{
   /**
    * Triggered when a value is selected: either a suggestion picked from the list, or the text typed in the search
-   * field, converted by `parseQuery`
+   * field, converted by `parseQuery` (when Enter is pressed, or when the field loses the focus after its text changed).
+   * The value is `null` when the text was emptied, meaning that nothing is selected anymore.
    */
-  select: [value: T];
+  select: [value: T | null];
 }>();
 
 const { t } = useI18n({ messages: translations });
 
 const query = ref(initialValue ?? "");
+
+// The text of the search field matching the selected value (the initial value, until something is selected), to know
+// whether the text left in the field when it loses the focus still has to be selected.
+let selectedQuery = query.value;
 
 // When programmatically updating `query` (e.g. after the user selected a suggestion),
 // this trigger prevents the query watcher from performing a new search (which would be pointless)
@@ -148,6 +171,17 @@ const suggestions = shallowRef<
 
 const loading = ref(false);
 
+// Whether the suggestion list (or the message replacing it, e.g. while loading) is displayed.
+const suggestionsOpen = computed(
+  () =>
+    (suggestions.value.status !== "uninitialized" || loading.value) &&
+    suggestions.value.status !== "closed",
+);
+
+// Identifies the latest search, so that the results of an older one (e.g. a search dismissed with the Escape key while
+// loading) are ignored when they arrive.
+let latestSearchId = 0;
+
 const performSearch = debounce(async (search: string) => {
   // Skip the search when the query is empty (e.g., right after focusing an empty field): searching for
   // everything is wasteful (it fetches unrelated content from the whole wiki) and useless (the caller always
@@ -157,10 +191,14 @@ const performSearch = debounce(async (search: string) => {
     return;
   }
 
+  const searchId = ++latestSearchId;
   loading.value = true;
 
   const results = await getSuggestions(search);
 
+  if (searchId !== latestSearchId) {
+    return;
+  }
   loading.value = false;
   suggestions.value =
     results === false
@@ -171,6 +209,7 @@ const performSearch = debounce(async (search: string) => {
 function selectSuggestion(suggestion: SearchBoxItem<T, U>): void {
   justDynamicallyUpdatedQuery.value = true;
   query.value = suggestion.equivalentQuery;
+  selectedQuery = query.value;
   closeSuggestions();
   emit("select", suggestion.value);
 }
@@ -240,10 +279,28 @@ function onEnterKey(): void {
 }
 
 function selectQuery(): void {
+  if (query.value.trim().length === 0) {
+    selectedQuery = query.value;
+    closeSuggestions();
+    emit("select", null);
+    return;
+  }
   const value = parseQuery?.(query.value) ?? null;
   if (value !== null) {
+    selectedQuery = query.value;
     closeSuggestions();
     emit("select", value);
+  }
+}
+
+// The text typed or pasted in the search field is selected when the field loses the focus (e.g. when the user moves to
+// the next field or clicks the submit button of the form holding the search box), so that it isn't lost when no
+// suggestion is picked, e.g. to designate something that doesn't exist yet. Clicking a suggestion doesn't blur the
+// field (see the mousedown handler of the suggestion list), so that the suggestion is selected instead.
+function onBlur(): void {
+  closeSuggestions();
+  if (query.value !== selectedQuery) {
+    selectQuery();
   }
 }
 
@@ -258,8 +315,24 @@ async function moveFocus(relativeIdx: number): Promise<void> {
     ?.scrollIntoView({ block: "nearest" });
 }
 
+// Escape closes the suggestions without closing the dialog holding the search box: the dialog (e.g. a Bootstrap modal
+// or a native dialog element) is closed by the same key, so the event must neither reach its listeners nor trigger its
+// default action. Once the suggestions are closed, Escape is left to the dialog.
+function onEscapeKey(event: KeyboardEvent): void {
+  if (suggestionsOpen.value) {
+    event.preventDefault();
+    event.stopPropagation();
+    performSearch.cancel();
+    latestSearchId++;
+    loading.value = false;
+    suggestions.value = { status: "closed" };
+  }
+}
+
 function onKeydown(event: KeyboardEvent): void {
-  if (event.key === "Enter") {
+  if (event.key === "Escape") {
+    onEscapeKey(event);
+  } else if (event.key === "Enter") {
     event.preventDefault();
     onEnterKey();
   } else if (event.key === "ArrowUp") {
@@ -293,19 +366,15 @@ watch(suggestions, (suggestions) => {
     <x-text-field
       :label
       :placeholder="placeholder ?? t('link-modal.search-box.placeholder')"
+      :autofocus
+      :required
       v-model="query"
       @keydown="onKeydown"
       @focus="performSearch(query)"
-      @blur="closeSuggestions()"
+      @blur="onBlur()"
     />
 
-    <div
-      class="suggestions-container"
-      v-if="
-        (suggestions.status !== 'uninitialized' || loading) &&
-        suggestions.status !== 'closed'
-      "
-    >
+    <div class="suggestions-container" v-if="suggestionsOpen">
       <h3
         class="status-message"
         v-if="suggestions.status === 'backendSearchUnsupported'"

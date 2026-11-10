@@ -31,6 +31,7 @@ export type PageLinkTargetConfig = {
     ref: DocumentReference | null;
     queryString?: string;
     anchor?: string;
+    title?: string;
 };
 
 // (No @packageDocumentation comment for this package)

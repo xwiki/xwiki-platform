@@ -46,7 +46,6 @@ const urlTargetTypeStub = targetTypeStub("url", async () => "URL", { url: "" });
 function buildLinkData(): LinkData {
   return {
     displayText: "",
-    newTab: false,
     target: { type: "url", config: { url: "" } },
   };
 }
@@ -62,13 +61,19 @@ async function settle(): Promise<void> {
 function mountLinkForm(
   targetTypes: LinkTargetType[] = [urlTargetTypeStub],
   linkData: LinkData = buildLinkData(),
+  defaultDisplayText?: string,
 ) {
   // LinkForm.vue calls useI18n() with its own local `messages`, but vue-i18n still requires a global instance to
   // be installed for that local scope to be created against.
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
 
   return mount(LinkForm, {
-    props: { linkData, linkTargetTypes: targetTypes },
+    props: { linkData, linkTargetTypes: targetTypes, defaultDisplayText },
+    // The target field is provided by the selected link target type, which the link modal asks to mark its main input
+    // with autofocus.
+    slots: {
+      target: `<div><input /><input data-test="target" autofocus /></div>`,
+    },
     attachTo: document.body,
     global: {
       plugins: [i18n],
@@ -82,13 +87,31 @@ describe("LinkForm.vue", () => {
     document.body.innerHTML = "";
   });
 
-  test("focuses the display text field once mounted", async () => {
+  test("focuses the input of the target field marked with autofocus once mounted", async () => {
     const wrapper = mountLinkForm();
 
     await settle();
 
-    const input = wrapper.get('[data-test="linkDisplayText"]').element;
+    const input = wrapper.get('[data-test="target"]').element;
     expect(document.activeElement).toBe(input);
+  });
+
+  test("offers the display text as an option, which hints at the text the link gets when it's left empty", () => {
+    const wrapper = mountLinkForm(undefined, undefined, "Some page");
+
+    const displayText = wrapper.get('[data-test="linkDisplayText"]');
+    expect(displayText.attributes("placeholder")).toBe("Some page");
+    expect(displayText.attributes("required")).toBeUndefined();
+    expect(displayText.element.closest("details.options")).not.toBeNull();
+  });
+
+  test("doesn't mark the link type as required, since it always has a value, but tells assistive technologies", () => {
+    const wrapper = mountLinkForm();
+
+    const select = wrapper.get('[data-test="linkTargetType"]');
+    // The select stub doesn't declare a required prop: the attribute would fall through if the prop was passed.
+    expect(select.attributes("required")).toBeUndefined();
+    expect(select.attributes("aria-required")).toBe("true");
   });
 
   test("steals focus back from an element focused just before it settles", async () => {
@@ -104,7 +127,7 @@ describe("LinkForm.vue", () => {
 
     await settle();
 
-    const input = wrapper.get('[data-test="linkDisplayText"]').element;
+    const input = wrapper.get('[data-test="target"]').element;
     expect(document.activeElement).toBe(input);
   });
 

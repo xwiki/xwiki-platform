@@ -20,6 +20,9 @@
 import { translateLabel } from "./labels";
 import {
   entityResourceReference,
+  linkURLPartsFromReference,
+  linkURLPartsFromURL,
+  linkURLSuffix,
   parseEntityReference,
 } from "./referenceHelpers";
 import { tryFallible } from "@xwiki/platform-fn-utils";
@@ -46,6 +49,10 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
  */
 type AttachmentLinkTargetConfig = {
   ref: AttachmentReference | null;
+
+  /**
+   * The query string of the link, without the "?" URL separator (e.g. "key1=value1&key2=value2")
+   */
   queryString?: string;
 };
 
@@ -87,12 +94,7 @@ class AttachmentLinkTargetType
       return null;
     }
 
-    const parsedURL = tryFallible(() => new URL(url));
-
-    return {
-      ref,
-      queryString: parsedURL?.search,
-    };
+    return { ref, queryString: linkURLPartsFromURL(url).queryString };
   }
 
   toURL({ ref, queryString }: AttachmentLinkTargetConfig): string {
@@ -100,7 +102,14 @@ class AttachmentLinkTargetType
       .get()
       ?.serialize(ref ?? undefined);
 
-    return `${base ?? ""}${queryString ?? ""}`;
+    return `${base ?? ""}${linkURLSuffix({ queryString })}`;
+  }
+
+  /**
+   * @returns the name of the attached file
+   */
+  getDefaultLabel({ ref }: AttachmentLinkTargetConfig): string {
+    return ref?.name ?? "";
   }
 
   fromReference(
@@ -116,16 +125,20 @@ class AttachmentLinkTargetType
       this.modelReferenceParserProvider,
     );
 
-    return ref?.type === EntityType.ATTACHMENT ? { ref } : null;
+    return ref?.type === EntityType.ATTACHMENT
+      ? { ref, queryString: linkURLPartsFromReference(reference).queryString }
+      : null;
   }
 
   toReference({
     ref,
+    queryString,
   }: AttachmentLinkTargetConfig): ResourceReference | undefined {
     return entityResourceReference(
       ResourceType.ATTACHMENT,
       ref,
       this.modelReferenceSerializerProvider,
+      { queryString },
     );
   }
 }

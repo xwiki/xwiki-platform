@@ -50,4 +50,12 @@ describe("UnsupportedLinkTargetType", () => {
     defaultConfig.reference.parameters.anchor = "Features";
     expect(linkTargetType.createDefaultConfig()).toEqual(interwikiConfig());
   });
+
+  it("labels the link with the edited reference, since its URL can't be computed", () => {
+    const linkTargetType = new UnsupportedLinkTargetType(interwikiConfig());
+    const config = linkTargetType.createDefaultConfig();
+    config.reference.reference = " wikipedia:Wiki ";
+
+    expect(linkTargetType.getDefaultLabel(config)).toBe("wikipedia:Wiki");
+  });
 });

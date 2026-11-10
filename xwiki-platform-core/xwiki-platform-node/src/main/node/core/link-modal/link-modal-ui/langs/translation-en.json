@@ -8,8 +8,8 @@
 
   "link-modal.config.target-type": "Link type",
   "link-modal.config.display-text": "Display text",
+  "link-modal.config.display-text.hint": "Generated from the link target when left empty.",
   "link-modal.config.options": "Options",
-  "link-modal.config.open-new-tab": "Open in a new tab",
 
   "link-modal.unsupported.reference": "Reference",
 

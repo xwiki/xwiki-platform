@@ -19,7 +19,7 @@
  */
 import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
-import { pressKeySettled } from "./utils";
+import { fillDisplayText, pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
 import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 
@@ -31,7 +31,6 @@ type Locator = ReturnType<Page["locator"]>;
 test("Editing the title of a link keeps the rest of the line intact", async ({
   mount,
   page,
-  // eslint-disable-next-line max-statements
 }) => {
   const component = await mountBlockNoteHeadless(mount, {
     editorContent: buildParagraphWithLink("https://xwiki.org"),
@@ -47,9 +46,7 @@ test("Editing the title of a link keeps the rest of the line intact", async ({
 
   await openLinkEditor(page, editorEl);
 
-  const titleInputEl = page.locator('[data-test="linkDisplayText"]');
-  await titleInputEl.waitFor({ state: "attached" });
-  await titleInputEl.fill("2nd");
+  await fillDisplayText(page, "2nd");
 
   const submitButtonEl = page.locator('[data-test="linkSubmit"]');
   await submitButtonEl.click();
@@ -97,7 +94,7 @@ test("Editing the title of a link to an unsupported resource keeps its reference
     "wikipedia:XWiki",
   );
 
-  await page.locator('[data-test="linkDisplayText"]').fill("2nd");
+  await fillDisplayText(page, "2nd");
   await page.locator('[data-test="linkSubmit"]').click();
 
   await expect(linkEl).toHaveText("2nd");
@@ -148,7 +145,7 @@ test("Editing the title of a path link keeps its reference, even when path links
     "/xwiki/bin/view/Main/",
   );
 
-  await page.locator('[data-test="linkDisplayText"]').fill("2nd");
+  await fillDisplayText(page, "2nd");
   await page.locator('[data-test="linkSubmit"]').click();
 
   await expect(linkEl).toHaveText("2nd");

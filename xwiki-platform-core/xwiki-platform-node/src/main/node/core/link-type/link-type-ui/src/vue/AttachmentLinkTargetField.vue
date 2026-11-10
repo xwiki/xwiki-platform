@@ -39,7 +39,14 @@ import type {
 } from "@xwiki/platform-model-reference-api";
 import type { Container } from "inversify";
 
-const { depsContainer } = defineProps<{ depsContainer: Container }>();
+const { depsContainer, autofocus } = defineProps<{
+  depsContainer: Container;
+
+  /**
+   * Whether the search box is focused when the link modal opens.
+   */
+  autofocus?: boolean;
+}>();
 
 const model = defineModel<AttachmentLinkTargetConfig>({
   required: true,
@@ -71,7 +78,7 @@ const getSuggestions: SearchBoxSource<AttachmentReference, Link> = (query) =>
     parseReference(link.reference),
   );
 
-function select(ref: AttachmentReference) {
+function select(ref: AttachmentReference | null) {
   model.value = { ref, queryString: undefined };
 }
 
@@ -86,12 +93,14 @@ const { t } = useI18n({ messages: translations });
       model.ref !== null ? modelReferenceSerializer.serialize(model.ref)! : null
     "
     :get-suggestions
+    :autofocus
+    required
     :parse-query="parseReference"
     @select="select"
   >
     <template #renderSuggestion="{ renderingData: { label, hint } }">
       <div class="suggestion-label">
-        <c-icon name="file-earmark" :size="Size.Small" />
+        <c-icon name="paperclip" :size="Size.Small" />
         <span class="suggestion-title">{{ label }}</span>
       </div>
       <div class="suggestion-hint" v-if="hint">{{ hint }}</div>

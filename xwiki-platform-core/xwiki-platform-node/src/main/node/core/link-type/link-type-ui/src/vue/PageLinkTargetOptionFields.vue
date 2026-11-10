@@ -39,12 +39,14 @@ const { t } = useI18n({ messages: translations });
   <x-text-field
     v-bind="{ 'data-test': 'linkPageQueryString' }"
     :label="t('link-type.target-types.page.query-string')"
+    :placeholder="t('link-type.target-types.page.query-string.placeholder')"
     v-model="model.queryString"
   />
 
   <x-text-field
     v-bind="{ 'data-test': 'linkPageAnchor' }"
     :label="t('link-type.target-types.page.anchor')"
+    :placeholder="t('link-type.target-types.page.anchor.placeholder')"
     v-model="model.anchor"
   />
 </template>

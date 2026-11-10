@@ -36,6 +36,7 @@ const URLLinkTargetField = defineComponent({
       type: Object as PropType<PlainTextLinkTargetConfig>,
       required: true,
     },
+    autofocus: Boolean,
   },
   emits: ["update:modelValue"],
   setup(props, { emit }) {
@@ -45,7 +46,10 @@ const URLLinkTargetField = defineComponent({
         modelValue: props.modelValue,
         "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
           emit("update:modelValue", config),
+        autofocus: props.autofocus,
         fieldLabel: t("link-type.target-types.url.url"),
+        // Falls through to the location field: the browser only accepts absolute URLs, i.e. with their scheme.
+        placeholder: t("link-type.target-types.url.url.placeholder"),
         "data-test": "linkUrl",
         inputType: "url",
       });

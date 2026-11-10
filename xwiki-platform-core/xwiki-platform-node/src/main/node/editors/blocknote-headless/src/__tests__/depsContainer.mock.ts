@@ -60,7 +60,12 @@ export function depsContainerMock(): Container {
 
   container.get.calledWith("RemoteURLSerializerProvider").mockReturnValue({
     get: () => ({
-      serialize() {
+      serialize(reference) {
+        // The URL of the page returned by the link suggestion service below, for the tests submitting a page link.
+        if (reference?.type === EntityType.DOCUMENT) {
+          return "https://example.org/some/page";
+        }
+
         throw new Error("Unreachable");
       },
     }),
@@ -164,6 +169,7 @@ function withBuiltInLinkTargetTypes(
     "RemoteURLSerializerProvider",
     "ModelReferenceParserProvider",
     "ModelReferenceSerializerProvider",
+    "ModelReferenceHandlerProvider",
   ]) {
     builtInContainer.bind(provider).toConstantValue(container.get(provider));
   }

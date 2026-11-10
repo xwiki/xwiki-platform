@@ -32,6 +32,7 @@ function containerWithModelServices(): Container {
   for (const provider of [
     "ModelReferenceParserProvider",
     "ModelReferenceSerializerProvider",
+    "ModelReferenceHandlerProvider",
     "RemoteURLParserProvider",
     "RemoteURLSerializerProvider",
   ]) {

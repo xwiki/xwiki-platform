@@ -39,6 +39,9 @@ const { t } = useI18n({ messages: translations });
   <x-text-field
     v-bind="{ 'data-test': 'linkAttachmentQueryString' }"
     :label="t('link-type.target-types.attachment.query-string')"
+    :placeholder="
+      t('link-type.target-types.attachment.query-string.placeholder')
+    "
     v-model="model.queryString"
   />
 </template>

@@ -28,6 +28,11 @@ const props = defineProps<{
   linkData: LinkData;
 
   /**
+   * The text that the link gets when its display text is left empty, computed from its target.
+   */
+  defaultDisplayText?: string;
+
+  /**
    * The link target types offered by the link type selector, in the order they are offered.
    */
   linkTargetTypes: LinkTargetType[];
@@ -79,20 +84,20 @@ const linkTargetTypeItems = computed(() =>
 
 const optionsLabelId = useId();
 
-const displayTextField = useTemplateRef("displayTextField");
+const targetField = useTemplateRef("targetField");
 
 onMounted(() => {
+  // The target field is the one that matters when creating a link, the others being optional or preset. The link modal
+  // asks it to mark its main input with autofocus, for the dialogs that move the focus to the element asking for it
+  // once their opening animation is done. The input can be missing at this point, when the design system loads its
+  // components asynchronously: it's then left to these dialogs.
   // The modal can open while a rich text editor still holds focus (e.g. after picking this action from a slash
   // menu), and that editor may reclaim focus synchronously right after opening it. Deferring past that with a
-  // double rAF (matching the settle delay used in this component's tests) ensures our focus request runs last. The
-  // field is also marked with autofocus, for the dialogs that move the focus once their opening animation is done.
+  // double rAF (matching the settle delay used in this component's tests) ensures our focus request runs last.
   nextTick(() => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        const el = displayTextField.value?.$el as HTMLElement | undefined;
-        const focusable =
-          el?.querySelector<HTMLElement>("input, textarea, select") ?? el;
-        focusable?.focus();
+        targetField.value?.querySelector<HTMLElement>("[autofocus]")?.focus();
       });
     });
   });
@@ -102,34 +107,35 @@ onMounted(() => {
 <template>
   <!-- NOTE: 'v-bind' is used here as it is more flexible
              'data-*' attributes would not be allowed due to not being present in `BtnProps` -->
-  <x-text-field
-    ref="displayTextField"
-    v-bind="{ 'data-test': 'linkDisplayText' }"
-    :label="t('link-modal.config.display-text')"
-    autofocus
-    v-model="linkData.displayText"
-    required
-  />
-
+  <!-- The link type is required, but it's not marked as such since it always has a value: the selector has no empty
+       option. Assistive technologies are still told. -->
   <x-select
-    v-bind="{ 'data-test': 'linkTargetType' }"
+    v-bind="{ 'data-test': 'linkTargetType', 'aria-required': 'true' }"
     :label="t('link-modal.config.target-type')"
     v-model="linkTargetType"
     :items="linkTargetTypeItems"
-    required
   />
 
-  <slot name="target" />
+  <!-- Holds the target field, to focus it: it's provided by the selected link target type. -->
+  <div ref="targetField" class="target-field">
+    <slot name="target" />
+  </div>
 
   <!-- The options are grouped in a box, to make it clear that the summary toggles the fields that follow it. -->
-  <details class="options">
+  <!-- NOTE: 'v-bind' is used because the strict template checks reject the data-* attributes of native elements. -->
+  <details class="options" v-bind="{ 'data-test': 'linkOptions' }">
     <summary :id="optionsLabelId">{{ t("link-modal.config.options") }}</summary>
 
     <!-- The summary names the group of option fields, since a legend can't be shared with it. -->
     <fieldset class="options-fields" :aria-labelledby="optionsLabelId">
-      <x-checkbox
-        :label="t('link-modal.config.open-new-tab')"
-        v-model="linkData.newTab"
+      <!-- NOTE: 'v-bind' is used here as it is more flexible
+                 'data-*' attributes would not be allowed due to not being present in `BtnProps` -->
+      <x-text-field
+        v-bind="{ 'data-test': 'linkDisplayText' }"
+        :label="t('link-modal.config.display-text')"
+        :help="t('link-modal.config.display-text.hint')"
+        :placeholder="defaultDisplayText"
+        v-model="linkData.displayText"
       />
 
       <slot name="options" />
@@ -146,6 +152,11 @@ onMounted(() => {
   border-radius: var(--border-radius-base, var(--cr-border-radius-medium));
   padding: var(--cr-spacing-x-large)
     var(--padding-base-horizontal, var(--cr-spacing-large));
+}
+
+/* The target field is laid out as if it was a direct child of the form. */
+.target-field {
+  display: contents;
 }
 
 .options-fields {

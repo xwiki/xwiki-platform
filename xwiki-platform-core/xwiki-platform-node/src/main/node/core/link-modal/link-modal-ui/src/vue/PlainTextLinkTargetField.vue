@@ -34,6 +34,11 @@ defineProps<{
    * The type of the location field (e.g. "url" to validate it as a URL).
    */
   inputType?: TextFieldProps["type"];
+
+  /**
+   * Whether the location field is focused when the link modal opens.
+   */
+  autofocus?: boolean;
 }>();
 
 const model = defineModel<PlainTextLinkTargetConfig>({
@@ -45,6 +50,7 @@ const model = defineModel<PlainTextLinkTargetConfig>({
   <x-text-field
     :label="fieldLabel"
     :type="inputType ?? 'text'"
+    :autofocus
     v-model="model.location"
     required
   />

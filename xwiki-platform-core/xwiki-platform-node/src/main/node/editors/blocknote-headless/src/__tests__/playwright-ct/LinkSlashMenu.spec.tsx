@@ -22,11 +22,20 @@ import { FULL_SYNTAX } from "./syntax.mock";
 import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
 
-test("Inserting a link from the slash menu focuses the display text field", async ({
-  mount,
-  page,
-  // eslint-disable-next-line max-statements
-}) => {
+// The Playwright page and locator types, taken from the test fixtures since the component testing package doesn't
+// export them.
+type Page = Parameters<Parameters<typeof test>[2]>[0]["page"];
+type Locator = ReturnType<Page["locator"]>;
+
+/**
+ * Open the link modal from the slash menu of an empty editor.
+ *
+ * @returns the editor
+ */
+async function openLinkModalFromSlashMenu(
+  mount: Parameters<typeof mountBlockNoteHeadless>[0],
+  page: Page,
+): Promise<Locator> {
   const component = await mountBlockNoteHeadless(mount, {
     editorContent: [],
     editorProps: {
@@ -48,30 +57,69 @@ test("Inserting a link from the slash menu focuses the display text field", asyn
     slashMenuEl.locator(".bn-suggestion-menu-item p:first-child"),
   ).toHaveText("Link");
 
-  // Select the (only remaining) "Link" item, opening the link modal. The rich text editor still holds focus right
-  // after this (it just handled the Enter keypress), which is exactly the race LinkForm.vue's onMounted guards
-  // against: the display text field must reclaim focus once settled.
+  // Select the (only remaining) "Link" item, opening the link modal.
   await pressKeySettled(page, "Enter");
 
-  const titleInputEl = page.locator('[data-test="linkDisplayText"]');
-  await titleInputEl.waitFor({ state: "attached" });
-  await expect(titleInputEl).toBeFocused();
+  return editorEl;
+}
 
-  await titleInputEl.fill("XWiki");
+test("Inserting a link from the slash menu focuses the link target field, and labels the link with its URL by default", async ({
+  mount,
+  page,
+}) => {
+  const editorEl = await openLinkModalFromSlashMenu(mount, page);
 
-  const targetTypeSelectEl = page.locator('[data-test="linkTargetType"]');
-  await targetTypeSelectEl.waitFor({ state: "attached" });
-  await targetTypeSelectEl.selectOption("URL");
+  // The rich text editor still holds focus right after the modal opens (it just handled the Enter keypress), which is
+  // exactly the race LinkForm.vue's onMounted guards against: the target field must reclaim focus once settled.
+  const targetInputEl = page.locator(".link-target input");
+  await targetInputEl.waitFor({ state: "attached" });
+  await expect(targetInputEl).toBeFocused();
 
-  const urlInputEl = page.locator('[data-test="linkUrl"]');
-  await urlInputEl.waitFor({ state: "attached" });
-  await urlInputEl.fill("https://xwiki.org");
-
-  const submitButtonEl = page.locator('[data-test="linkSubmit"]');
-  await submitButtonEl.click();
+  await page.locator('[data-test="linkTargetType"]').selectOption("URL");
+  await page.locator('[data-test="linkUrl"]').fill("https://xwiki.org");
+  // The display text is left empty.
+  await page.locator('[data-test="linkSubmit"]').click();
 
   // The "/link" trigger text is replaced by the newly created link.
   const linkEl = editorEl.locator('a[href="https://xwiki.org"]');
-  await expect(linkEl).toHaveText("XWiki");
-  await expect(editorEl).toHaveText("XWiki");
+  await expect(linkEl).toHaveText("https://xwiki.org");
+  await expect(editorEl).toHaveText("https://xwiki.org");
+});
+
+test("Inserting a page link from the slash menu labels the link with the title of the picked page by default", async ({
+  mount,
+  page,
+}) => {
+  const editorEl = await openLinkModalFromSlashMenu(mount, page);
+
+  // The link modal defaults to the "Page" target type, whose target field is a search box.
+  await page.locator(".link-target input").fill("some");
+  await page
+    .locator(".link-target li.suggestion", { hasText: "some page label" })
+    .click();
+  // The display text is left empty.
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  const linkEl = editorEl.locator('a[href="https://example.org/some/page"]');
+  await expect(linkEl).toHaveText("some page label");
+});
+
+test("Inserting an attachment link from the slash menu requires an attachment", async ({
+  mount,
+  page,
+}) => {
+  await openLinkModalFromSlashMenu(mount, page);
+
+  await page.locator('[data-test="linkTargetType"]').selectOption("Attachment");
+  const targetInputEl = page.locator(".link-target input");
+  await expect(targetInputEl).toHaveAttribute("required");
+
+  // The browser doesn't submit the form while the attachment reference is empty: the modal stays open.
+  await page.locator('[data-test="linkSubmit"]').click();
+  await expect(targetInputEl).toBeVisible();
+  expect(
+    await targetInputEl.evaluate(
+      (input: HTMLInputElement) => input.validity.valueMissing,
+    ),
+  ).toBe(true);
 });

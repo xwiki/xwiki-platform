@@ -25,7 +25,7 @@ import type { Container } from "inversify";
 
 // The container of the link modal (see `LinkTargetTypeForm`), declared although unused, so that it doesn't fall
 // through as an attribute.
-defineProps<{ depsContainer: Container }>();
+defineProps<{ depsContainer: Container; autofocus?: boolean }>();
 
 const model = defineModel<EmailLinkTargetConfig>({
   required: true,
@@ -38,6 +38,8 @@ const { t } = useI18n({ messages: translations });
   <x-text-field
     v-bind="{ 'data-test': 'linkEmailAddress' }"
     :label="t('link-type.target-types.email.address')"
+    :autofocus
+    :placeholder="t('link-type.target-types.email.address.placeholder')"
     type="email"
     v-model="model.address"
     required

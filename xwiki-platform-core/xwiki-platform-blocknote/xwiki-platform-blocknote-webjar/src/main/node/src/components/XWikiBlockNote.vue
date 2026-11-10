@@ -92,6 +92,7 @@
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { toRelativeAttachmentResourceReference } from "../services/blocknote/attachmentResourceReference";
 import { createFileUploader } from "../services/blocknote/createFileUploader";
+import { editedLinkResourceReference } from "../services/blocknote/editedLinkResourceReference";
 import {
   extractLinkId,
   injectLinkId,
@@ -333,27 +334,15 @@ const linkEdition: LinkEditionHooks = {
     }
     const id = extractLinkId(previous?.url ?? "") ?? uuidv4();
     const metadata = blockNoteDocument!.getMetadata(id, true)!;
-    const previousReference = metadata.xwikiReference as
-      | ResourceReference
-      | undefined;
-    // Preserve the previous reference (with its parameters) when the link still points to the same resource, otherwise
-    // report the new one, so that the edited link points to the newly selected resource.
-    metadata.xwikiReference = isSameResourceReference(
-      previousReference,
+    // Preserve what the link editor doesn't edit when the link still points to the same resource, otherwise report the
+    // new reference, so that the edited link points to the newly selected resource.
+    metadata.xwikiReference = editedLinkResourceReference(
+      metadata.xwikiReference as ResourceReference | undefined,
       linkData.reference,
-    )
-      ? previousReference
-      : linkData.reference;
+    );
     return { ...linkData, url: injectLinkId(stripLinkId(linkData.url), id) };
   },
 };
-
-function isSameResourceReference(
-  alice?: ResourceReference,
-  bob?: ResourceReference,
-): boolean {
-  return alice?.type === bob?.type && alice?.reference === bob?.reference;
-}
 
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
 const temporaryAttachments: Ref<Set<string>> = ref(new Set<string>());

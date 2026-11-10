@@ -74,6 +74,13 @@ class UnsupportedLinkTargetType
   toURL(): string {
     return "";
   }
+
+  /**
+   * @returns the reference of the linked resource, as edited in the link modal
+   */
+  getDefaultLabel({ reference }: UnsupportedLinkTargetConfig): string {
+    return reference.reference.trim();
+  }
 }
 
 /**

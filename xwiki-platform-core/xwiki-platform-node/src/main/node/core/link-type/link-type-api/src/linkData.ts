@@ -41,8 +41,11 @@ type LinkTarget = {
  * @beta
  */
 type LinkData = {
+  /**
+   * The text of the link. When it's empty, the link modal submits the default label of the link target instead (see
+   * `LinkTargetType.getDefaultLabel`).
+   */
   displayText: string;
-  newTab?: boolean;
   target: LinkTarget;
 };
 

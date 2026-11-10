@@ -39,7 +39,14 @@ import type {
 } from "@xwiki/platform-model-reference-api";
 import type { Container } from "inversify";
 
-const { depsContainer } = defineProps<{ depsContainer: Container }>();
+const { depsContainer, autofocus } = defineProps<{
+  depsContainer: Container;
+
+  /**
+   * Whether the search box is focused when the link modal opens.
+   */
+  autofocus?: boolean;
+}>();
 
 const model = defineModel<PageLinkTargetConfig>({
   required: true,
@@ -56,21 +63,32 @@ const linkSuggestService = depsContainer
   .get();
 
 /**
+ * A page selected in the search box: the title of the page is known only when the user picks a link suggestion.
+ */
+type PageSelection = { ref: DocumentReference; title?: string };
+
+/**
  * @param reference - a serialized page reference, typed by the user or held by a link suggestion
  * @returns the parsed page reference, or `null` when it doesn't designate a page
  */
-function parseReference(reference: string): DocumentReference | null {
+function parseReference(reference: string): PageSelection | null {
   const ref = tryFallible(() => modelReferenceParser.parse(reference));
-  return ref?.type === EntityType.DOCUMENT ? ref : null;
+  return ref?.type === EntityType.DOCUMENT ? { ref } : null;
 }
 
-const getSuggestions: SearchBoxSource<DocumentReference, Link> = (query) =>
-  suggestLinks(linkSuggestService, query, LinkType.PAGE, (link) =>
-    parseReference(link.reference),
-  );
+const getSuggestions: SearchBoxSource<PageSelection, Link> = (query) =>
+  suggestLinks(linkSuggestService, query, LinkType.PAGE, (link) => {
+    const selection = parseReference(link.reference);
+    return selection && { ...selection, title: link.label };
+  });
 
-function select(ref: DocumentReference) {
-  model.value = { ref, anchor: undefined, queryString: undefined };
+function select(selection: PageSelection | null) {
+  model.value = {
+    ref: selection?.ref ?? null,
+    title: selection?.title,
+    anchor: undefined,
+    queryString: undefined,
+  };
 }
 
 const { t } = useI18n({ messages: translations });
@@ -84,6 +102,7 @@ const { t } = useI18n({ messages: translations });
       model.ref !== null ? modelReferenceSerializer.serialize(model.ref)! : null
     "
     :get-suggestions
+    :autofocus
     :parse-query="parseReference"
     @select="select"
   >

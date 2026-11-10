@@ -22,8 +22,8 @@ import { defineComponent } from "vue";
 // Minimal stand-ins for the design system components used by the link modal and the link forms. XTextFieldStub mirrors
 // the contract the real component (and the one used by the blocknote-headless Playwright fixtures) must honor: a
 // *single* root element (inheritAttrs: false, so a stray attribute doesn't land twice) wrapping the actual focusable
-// input -- this is exactly the shape LinkForm.vue's onMounted hook relies on via
-// `$el.querySelector("input, textarea, select")`.
+// input, which LinkForm.vue's onMounted hook finds with `querySelector("input, textarea, select")` to focus the target
+// field.
 const XTextFieldStub = defineComponent({
   inheritAttrs: false,
   props: ["modelValue", "label"],

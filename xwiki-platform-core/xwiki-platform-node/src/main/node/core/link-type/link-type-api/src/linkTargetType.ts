@@ -101,6 +101,18 @@ interface LinkTargetType<TConfig = unknown> {
   toURL(config: TConfig): string;
 
   /**
+   * Compute the label of a link of this type, used when the user leaves its display text empty.
+   *
+   * Optional: the link modal uses the URL of the link (see {@link LinkTargetType.toURL}) for the link target types that
+   * don't implement it.
+   *
+   * @param config - the configuration of the link
+   * @returns a short, human-readable name of the link target (e.g. the title of a page, the name of a file, an e-mail
+   *   address), or an empty string when the configuration doesn't designate a target yet
+   */
+  getDefaultLabel?(config: TConfig): string;
+
+  /**
    * Convert the reference of a linked resource into the configuration of a link of this type. Unlike
    * {@link LinkTargetType.fromURL}, implementations must not act as a catch-all here: they must only accept the
    * resource types they represent, so that the reference of a resource that no link target type supports is

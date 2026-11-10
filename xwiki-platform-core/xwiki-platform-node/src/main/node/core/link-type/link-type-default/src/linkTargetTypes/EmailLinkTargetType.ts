@@ -38,6 +38,48 @@ type EmailLinkTargetConfig = {
 };
 
 /**
+ * @param config - an e-mail link configuration
+ * @returns the query string of the `mailto:` URI holding the message subject and body, with its "?" URL separator
+ *   (empty when there are none). The spaces are encoded as "%20" rather than "+", which RFC 6068 doesn't decode as a
+ *   space (some mail clients would display it as is).
+ */
+function mailtoQueryString({
+  messageSubject,
+  messageBody,
+}: EmailLinkTargetConfig): string {
+  const fields: string[] = [];
+  if (messageSubject) {
+    fields.push(`subject=${encodeURIComponent(messageSubject)}`);
+  }
+  if (messageBody) {
+    fields.push(`body=${encodeURIComponent(messageBody)}`);
+  }
+  return fields.length > 0 ? `?${fields.join("&")}` : "";
+}
+
+/**
+ * Parse the part of a `mailto:` URI that follows the scheme, which is also how XWiki Rendering stores an e-mail link
+ * reference: the message subject and body are held by its query string (e.g. `jdoe@example.org?subject=Hello`), not
+ * by the parameters of the resource reference. The CKEditor WYSIWYG editor stores them the same way.
+ *
+ * @param value - the e-mail address, followed by the query string holding the message subject and body, if any
+ * @returns the matching e-mail link configuration
+ */
+function parseMailto(value: string): EmailLinkTargetConfig {
+  const queryStringIndex = value.indexOf("?");
+  if (queryStringIndex < 0) {
+    return { address: value };
+  }
+  // The query string is decoded like the WYSIWYG editor does, i.e. accepting "+" for a space.
+  const fields = new URLSearchParams(value.slice(queryStringIndex + 1));
+  return {
+    address: value.slice(0, queryStringIndex),
+    messageSubject: fields.get("subject") ?? undefined,
+    messageBody: fields.get("body") ?? undefined,
+  };
+}
+
+/**
  * Built-in link target type for `mailto:` links.
  */
 @injectable()
@@ -60,43 +102,33 @@ class EmailLinkTargetType implements LinkTargetType<EmailLinkTargetConfig> {
       return null;
     }
 
-    return {
-      address: parsedURL.pathname,
-      messageSubject: parsedURL.searchParams.get("subject") ?? undefined,
-      messageBody: parsedURL.searchParams.get("body") ?? undefined,
-    };
+    return parseMailto(url.trim().slice(parsedURL.protocol.length));
   }
 
-  toURL({
-    address,
-    messageSubject,
-    messageBody,
-  }: EmailLinkTargetConfig): string {
-    const url = new URL(`mailto:${address}`);
+  toURL(config: EmailLinkTargetConfig): string {
+    return `${new URL(`mailto:${config.address}`)}${mailtoQueryString(config)}`;
+  }
 
-    if (messageSubject) {
-      url.searchParams.set("subject", messageSubject);
-    }
-
-    if (messageBody) {
-      url.searchParams.set("body", messageBody);
-    }
-
-    return url.toString();
+  /**
+   * @returns the e-mail address, without the message subject and body
+   */
+  getDefaultLabel({ address }: EmailLinkTargetConfig): string {
+    return address.trim();
   }
 
   fromReference(reference: ResourceReference): EmailLinkTargetConfig | null {
     return reference.type === ResourceType.MAILTO
-      ? { address: reference.reference }
+      ? parseMailto(reference.reference)
       : null;
   }
 
-  toReference({
-    address,
-  }: EmailLinkTargetConfig): ResourceReference | undefined {
-    return address.trim() === ""
+  toReference(config: EmailLinkTargetConfig): ResourceReference | undefined {
+    return config.address.trim() === ""
       ? undefined
-      : typedResourceReference(ResourceType.MAILTO, address);
+      : typedResourceReference(
+          ResourceType.MAILTO,
+          `${config.address}${mailtoQueryString(config)}`,
+        );
   }
 }
 

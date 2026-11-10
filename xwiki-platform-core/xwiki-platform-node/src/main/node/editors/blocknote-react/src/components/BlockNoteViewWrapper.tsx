@@ -422,6 +422,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
                   lang,
                   t,
                   linkEditionHandler,
+                  linkEditionHooks: overrides?.linkEdition,
                   openMacroInsertionEditor: macros
                     ? macros.ctx.openInsertionEditor
                     : undefined,

@@ -26,7 +26,10 @@ import {
 import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
 import { BlockNoteEditor } from "@blocknote/core";
 import { beforeAll, describe, expect, test, vi } from "vitest";
-import type { LinkEditionHandler } from "../../components/links/linkEdition";
+import type {
+  LinkEditionData,
+  LinkEditionHandler,
+} from "../../components/links/linkEdition";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyEditor = BlockNoteEditor<any, any, any>;
@@ -117,6 +120,54 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
     } finally {
       createLink.mockRestore();
       focus.mockRestore();
+    }
+  });
+
+  test("submitting the link editor lets the integration intercept the link before creating it", () => {
+    const linkEditionHandler: LinkEditionHandler = vi.fn();
+    const beforeUpdate = vi.fn((linkData: LinkEditionData) => ({
+      ...linkData,
+      url: `${linkData.url}?__xwikiLinkId=1`,
+    }));
+    const createLink = vi
+      .spyOn(editor, "createLink")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .mockImplementation((() => {}) as any);
+
+    try {
+      querySuggestionsMenuItems({
+        editor,
+        query: "",
+        macros: [],
+        syntax: FULL_SYNTAX,
+        lang: "en",
+        t,
+        linkEditionHandler,
+        linkEditionHooks: { beforeUpdate },
+        openMacroInsertionEditor: undefined,
+      })
+        .find((item) => item.title === "blocknote.slashMenu.link.title")!
+        .onItemClick?.();
+      const linkData: LinkEditionData = {
+        title: "Page",
+        url: "/xwiki/bin/view/Some/Page",
+        reference: {
+          type: "doc",
+          typed: true,
+          reference: "Some.Page",
+          parameters: {},
+        },
+      };
+      vi.mocked(linkEditionHandler).mock.calls[0][0].onSubmit(linkData);
+
+      // The hook is called as for a new link, i.e. without the previous link data.
+      expect(beforeUpdate).toHaveBeenCalledWith(linkData);
+      expect(createLink).toHaveBeenCalledWith(
+        "/xwiki/bin/view/Some/Page?__xwikiLinkId=1",
+        "Page",
+      );
+    } finally {
+      createLink.mockRestore();
     }
   });
 });

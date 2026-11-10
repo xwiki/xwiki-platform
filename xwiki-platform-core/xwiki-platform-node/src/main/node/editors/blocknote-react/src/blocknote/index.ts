@@ -48,6 +48,7 @@ import { filterMap } from "@xwiki/platform-fn-utils";
 import { createElement } from "react";
 import { RiFileList3Fill, RiLink } from "react-icons/ri";
 import type { LinkEditionHandler } from "../components/links/linkEdition";
+import type { LinkEditionHooks } from "../components/links/linkEditionHooks";
 import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
@@ -164,6 +165,8 @@ type SuggestionMenuItemsParams = {
   t: ReturnType<typeof useTranslation>["t"];
   /** Handler for link editions, same as provided to `BlockNoteViewWrapper` */
   linkEditionHandler: LinkEditionHandler;
+  /** Hooks intercepting the link editions, same as provided to `BlockNoteViewWrapper` */
+  linkEditionHooks?: LinkEditionHooks;
   /** Macro insertion editor, same as provided to `BlockNoteViewWrapper` */
   openMacroInsertionEditor?: ContextForMacros["openInsertionEditor"];
 };
@@ -182,6 +185,7 @@ function querySuggestionsMenuItems({
   lang,
   t,
   linkEditionHandler,
+  linkEditionHooks,
   openMacroInsertionEditor,
 }: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
@@ -211,7 +215,12 @@ function querySuggestionsMenuItems({
             linkEditionHandler({
               mode: "createNew",
               current: { title: "", url: "" },
-              onSubmit({ title, url }) {
+              onSubmit(linkData) {
+                // Let the integration intercept the link (including the reference of the linked resource) before it
+                // is written into the content (e.g. to store that reference aside), as the formatting toolbar does.
+                // Throwing from the hook cancels the insertion.
+                const { title, url } =
+                  linkEditionHooks?.beforeUpdate?.(linkData) ?? linkData;
                 editor.createLink(url, title);
                 editor.focus();
               },

@@ -86,5 +86,11 @@ describe.each([
       });
       expect(targetType.toReference({ location: " " })).toBeUndefined();
     });
+
+    it("labels the link with its location", () => {
+      expect(targetType.getDefaultLabel({ location: ` ${location} ` })).toBe(
+        location,
+      );
+    });
   },
 );

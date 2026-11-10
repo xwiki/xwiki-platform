@@ -127,7 +127,32 @@ const activeForm = computed(() => {
     : undefined;
 });
 
+// The text that the link gets when its display text is left empty. The link target types that don't compute a label
+// get their URL, like XWiki Rendering does for the links without a label.
+const defaultDisplayText = computed(() => {
+  const { type, config } = linkData.value.target;
+  const targetType = linkTargetTypes.find(
+    (candidate) => candidate.type === type,
+  );
+  if (!targetType) {
+    return "";
+  }
+  return targetType.getDefaultLabel
+    ? targetType.getDefaultLabel(config)
+    : targetType.toURL(config);
+});
+
 const emit = defineEmits<{ submit: [LinkData]; cancel: [] }>();
+
+function submit() {
+  emit("submit", {
+    ...linkData.value,
+    displayText:
+      linkData.value.displayText.trim() === ""
+        ? defaultDisplayText.value
+        : linkData.value.displayText,
+  });
+}
 
 // The submit button is displayed in the footer of the dialog, outside of the form, which it designates by its id.
 const formId = useId();
@@ -158,15 +183,12 @@ watch(open, (isOpen) => {
   >
     <!-- The form gives the fields the form style of the design system, and is submitted only once they are valid (e.g.
          the required ones are filled), otherwise the dialog stays open, showing what's invalid. -->
-    <x-form
-      :id="formId"
-      :class="$style.container"
-      @form-submit="emit('submit', linkData)"
-    >
+    <x-form :id="formId" :class="$style.container" @form-submit="submit">
       <!-- The fields shared by all the link target types, with the target and option fields of the selected one. -->
       <LinkForm
         :link-data="linkData"
         :link-target-types="offeredLinkTargetTypes"
+        :default-display-text="defaultDisplayText"
       >
         <template #target>
           <!-- Identifies the target field, whatever the selected link target type. -->
@@ -176,6 +198,7 @@ watch(open, (isOpen) => {
               :is="activeForm.targetField"
               v-model="linkData.target.config"
               :deps-container
+              autofocus
             />
           </div>
         </template>

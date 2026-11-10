@@ -61,13 +61,35 @@ describe("EmailLinkTargetType", () => {
       messageBody: "Hi there",
     });
 
-    expect(url).toBe("mailto:jdoe@example.org?subject=Hello&body=Hi+there");
+    expect(url).toBe("mailto:jdoe@example.org?subject=Hello&body=Hi%20there");
+  });
+
+  it("encodes the subject and body as RFC 6068 requires, e.g. spaces as %20 and not +", () => {
+    const url = targetType.toURL({
+      address: "jdoe@example.org",
+      messageSubject: "1 + 1 = 2?",
+      messageBody: "a&b#c",
+    });
+
+    expect(url).toBe(
+      "mailto:jdoe@example.org?subject=1%20%2B%201%20%3D%202%3F&body=a%26b%23c",
+    );
   });
 
   it("omits subject/body from the URL when unset", () => {
     const url = targetType.toURL({ address: "jdoe@example.org" });
 
     expect(url).toBe("mailto:jdoe@example.org");
+  });
+
+  it("labels the link with the e-mail address, without the message subject and body", () => {
+    expect(
+      targetType.getDefaultLabel({
+        address: " jdoe@example.org ",
+        messageSubject: "Hello",
+        messageBody: "Hi there",
+      }),
+    ).toBe("jdoe@example.org");
   });
 });
 
@@ -83,6 +105,22 @@ describe("EmailLinkTargetType reference conversion", () => {
         parameters: {},
       }),
     ).toEqual({ address: "jdoe@example.org" });
+  });
+
+  it("parses the subject and body held by the query string of a mailto reference, as the WYSIWYG editor saves them", () => {
+    expect(
+      targetType.fromReference?.({
+        type: "mailto",
+        typed: true,
+        reference:
+          "jdoe@example.org?subject=1%20%2B%201%20%3D%202%3F&body=Hi+there",
+        parameters: {},
+      }),
+    ).toEqual({
+      address: "jdoe@example.org",
+      messageSubject: "1 + 1 = 2?",
+      messageBody: "Hi there",
+    });
   });
 
   it("does not match a non-mailto reference", () => {
@@ -101,6 +139,21 @@ describe("EmailLinkTargetType reference conversion", () => {
       type: "mailto",
       typed: true,
       reference: "jdoe@example.org",
+      parameters: {},
+    });
+  });
+
+  it("keeps the subject and body in the query string of the mailto reference", () => {
+    expect(
+      targetType.toReference?.({
+        address: "jdoe@example.org",
+        messageSubject: "Hello",
+        messageBody: "Hi there",
+      }),
+    ).toEqual({
+      type: "mailto",
+      typed: true,
+      reference: "jdoe@example.org?subject=Hello&body=Hi%20there",
       parameters: {},
     });
   });

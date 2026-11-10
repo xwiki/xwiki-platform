@@ -921,7 +921,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.opennlp</groupId>
-        <artifactId>opennlp</artifactId>
+        <artifactId>opennlp-tools</artifactId>
         <version>1.9.5</version>
       </dependency>
       <dependency>

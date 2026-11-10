@@ -63,6 +63,13 @@
       <scope>test</scope>
     </dependency>
     <!-- Runtime dependencies. -->
+    <!-- Needed to verify that the images of the card covers are resized by the server. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-processing-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-macro</artifactId>

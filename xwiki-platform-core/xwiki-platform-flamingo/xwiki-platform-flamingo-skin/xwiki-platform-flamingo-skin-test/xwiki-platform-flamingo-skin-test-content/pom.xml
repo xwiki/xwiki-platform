@@ -46,6 +46,12 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- The Figures page writes its figures in HTML. -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

@@ -40,8 +40,8 @@ catalogs:
       specifier: 7.60.1
       version: 7.60.1
     '@oxc-project/runtime':
-      specifier: 0.156.0
-      version: 0.156.0
+      specifier: 0.157.0
+      version: 0.157.0
     '@playwright/experimental-ct-react':
       specifier: 1.62.1
       version: 1.62.1
@@ -614,7 +614,7 @@ importers:
     devDependencies:
       '@oxc-project/runtime':
         specifier: 'catalog:'
-        version: 0.156.0
+        version: 0.157.0
       '@xwiki/platform-tool-eslintconfig':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
@@ -5172,8 +5172,8 @@ packages:
   '@orchidjs/unicode-variants@1.2.2':
     resolution: {integrity: sha512-Tfdm/fa2NN+75KwtkjpdOvUeaBOgZlyo08Ngb3m6UXe4ACPcKlgnX32vAI5lp39tlLdv2tXiRW0PPdbWyM5ieA==}
 
-  '@oxc-project/runtime@0.156.0':
-    resolution: {integrity: sha512-6C8Bl8OZJJKYJFbo2l9Qjn8WGi0OW1mmiErR0b+n8684ZLXegZZ2Ul4LW5aoapIX0a2ri2nIDz4RpCgRleb04w==}
+  '@oxc-project/runtime@0.157.0':
+    resolution: {integrity: sha512-srnUknwVoji5JdmU664pA4XyjBJXmgxP8rWlnZhFovzw6XQxaICGWAuScZdlLmIHI+ZRc7WgeiC2CURF4tAszQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
   '@oxc-project/types@0.154.0':
@@ -9494,7 +9494,7 @@ snapshots:
 
   '@orchidjs/unicode-variants@1.2.2': {}
 
-  '@oxc-project/runtime@0.156.0': {}
+  '@oxc-project/runtime@0.157.0': {}
 
   '@oxc-project/types@0.154.0': {}
 

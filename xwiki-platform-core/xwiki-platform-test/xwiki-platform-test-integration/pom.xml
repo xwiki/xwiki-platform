@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Integration Tests Framework</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.27</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
@@ -116,6 +116,13 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-resolver-provider</artifactId>
+    </dependency>
+    <!-- Needed by the Maven Resolver to read the artifact descriptors in the unit tests (plexus-utils 4 doesn't contain
+         the XML classes anymore). The tests using this framework get it through xwiki-platform-test-docker. -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

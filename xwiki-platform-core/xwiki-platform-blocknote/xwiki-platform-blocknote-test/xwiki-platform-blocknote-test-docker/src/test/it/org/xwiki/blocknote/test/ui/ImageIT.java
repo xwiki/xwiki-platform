@@ -94,11 +94,8 @@ class ImageIT extends AbstractBlockNoteIT
     // Right after "review", so that the file lands in the middle of the sentence rather than at its end.
     private static final int OFFSET = 13;
 
-    // The sentence with a neighbour on each side, so that a test can tell a block inserted next to it from one
-    // inserted at the start or the end of the page.
     private static final String SURROUNDED_SENTENCE = "Before.\n\n" + SENTENCE + "\n\nAfter.";
 
-    // Long enough to wrap over several lines, so that a drop can land below the vertical middle of its block.
     private static final String LONG_SENTENCE = SENTENCE.repeat(8);
 
     private static final String SENTENCE_WITH_LINK = "Please review[[attach:notes.txt]] before the meeting.";
@@ -236,6 +233,186 @@ class ImageIT extends AbstractBlockNoteIT
 
     @Test
     @Order(2)
+    void dropImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SURROUNDED_SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
+        // A drop goes where the pointer is, so the caret stays at the start of the line to prove it.
+        textArea.clickBlock(1).moveCaretTo(0).dropFiles(OFFSET, "/image.gif");
+        textArea.waitUntilImageIsLoaded(0);
+
+        page.save();
+
+        // Unlike a pasted image, a dropped one keeps the name the user gave it, and it gets a block of its own
+        // above the paragraph it landed in, since the pointer was in that paragraph's upper half.
+        assertEquals("""
+            Before.
+
+            [[image:image.gif]]
+
+            Please review before the meeting.
+
+            After.""", page.editWiki().getContent());
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
+        assertArrayEquals(content, uploaded);
+    }
+
+    @Test
+    @Order(3)
+    void pasteImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "before");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
+        textArea.click().moveCaretTo(2).pasteFiles("/image.gif");
+        // Shown only once uploaded, since that's when the URL is known.
+        textArea.waitUntilImageIsLoaded(0);
+
+        page.save();
+        String savedContent = page.editWiki().getContent();
+
+        // Untyped reference, and renamed: browsers name a pasted file after its media type, so a second paste would
+        // otherwise overwrite this attachment. The caret was in the middle of "before", yet the image goes after the
+        // whole paragraph, since BlockNote inserts the file block after the current block instead of splitting it.
+        assertThat(savedContent, matchesPattern("before\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"));
+
+        String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference(attachmentName, EntityType.ATTACHMENT, testReference));
+        assertArrayEquals(content, uploaded);
+    }
+
+    @Test
+    @Order(4)
+    void dropFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        // A drop goes where the pointer is, so the caret stays at the start of the line to prove it.
+        // Unlike a pasted file, a dropped file keeps the name the user gave it.
+        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
+        // The link replaces the inserted block only once uploaded.
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // A file that is not an image is attached and linked inline where it landed, rather than taking a block of
+        // its own.
+        assertEquals(SENTENCE_WITH_LINK, page.editWiki().getContent());
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertArrayEquals(content, uploaded);
+    }
+
+    @Test
+    @Order(5)
+    void pasteFile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SENTENCE);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        textArea.click().moveCaretTo(OFFSET).pasteFiles("/notes.txt");
+        textArea.waitUntilLinkIsPresent();
+
+        page.save();
+
+        // The link goes where the caret was, splitting the text, rather than after the paragraph that held it.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern("Please review\\[\\[attach:\\d+-\\d+\\.txt\\]\\] before the meeting\\."));
+    }
+
+    @Test
+    @Order(6)
+    void dropFileWithExistingName(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // An attachment the dropped file is going to collide with.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SENTENCE);
+        byte[] before = "before".getBytes(StandardCharsets.UTF_8);
+        setup.rest().attachFile(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference),
+            new ByteArrayInputStream(before), true);
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+
+        byte[] after = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        page.save();
+
+        // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
+        assertEquals(SENTENCE_WITH_LINK, page.editWiki().getContent());
+
+        // A single attachment, so the upload overwrote the existing one rather than adding another.
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(1, attachments.getAttachments().size());
+        Attachment notes = attachments.getAttachments().get(0);
+        assertEquals("notes.txt", notes.getName());
+        assertEquals("1.2", notes.getVersion());
+
+        byte[] uploaded = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
+        assertArrayEquals(after, uploaded);
+    }
+
+    @Test
+    @Order(7)
+    void dropFileWithoutRealtime(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        setup.createPage(testReference, SENTENCE);
+
+        // The editor loads even when it can't reach the collaboration server, which is also what happens for a user
+        // who can't edit the document (e.g. with Change Request).
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage();
+        page.simulateUnreachableCollaborationServer().edit();
+        page.waitForInplaceEditor(false);
+        assertFalse(page.getToolbar().isConnected());
+
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
+        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
+        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
+        textArea.waitUntilLinkIsPresent("notes.txt");
+
+        // Out of a realtime session the file waits in the temporary store, so it isn't attached yet.
+        Attachments beforeSave = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(0, beforeSave.getAttachments().size());
+
+        page.save();
+
+        assertEquals(SENTENCE_WITH_LINK, page.editWiki().getContent());
+
+        // The save is what attaches the file.
+        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
+        assertEquals(1, attachments.getAttachments().size());
+        assertEquals("notes.txt", attachments.getAttachments().get(0).getName());
+        assertArrayEquals(content, setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference)));
+    }
+
+    @Test
+    @Order(8)
     void missingImageShowsItsName(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -255,7 +432,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(3)
+    @Order(9)
     void insertImageFromSuggestions(TestUtils setup, TestReference testReference) throws Exception
     {
         // Start fresh, with a page holding an image, and wait for the image to be indexed, since the image suggestions
@@ -292,7 +469,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(4)
+    @Order(10)
     void insertImageFromImageWizard(TestUtils setup, TestReference testReference) throws Exception
     {
         // Start fresh.
@@ -327,117 +504,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(5)
-    void dropImage(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.deletePage(testReference);
-        setup.createPage(testReference, SURROUNDED_SENTENCE);
-
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-
-        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
-        // A drop goes where the pointer is, so the caret stays at the start of the line to prove it.
-        textArea.clickBlock(1).moveCaretTo(0).dropFiles(OFFSET, "/image.gif");
-        textArea.waitUntilImageIsLoaded(0);
-
-        page.save();
-
-        // Unlike a pasted image, a dropped one keeps the name the user gave it, and it gets a block of its own
-        // above the paragraph it landed in, since the pointer was in that paragraph's upper half.
-        assertEquals("""
-            Before.
-
-            [[image:image.gif]]
-
-            Please review before the meeting.
-
-            After.""", page.editWiki().getContent());
-
-        byte[] uploaded = setup.rest()
-            .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
-        assertArrayEquals(content, uploaded);
-    }
-
-    @Test
-    @Order(6)
-    void pasteImage(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.deletePage(testReference);
-        setup.createPage(testReference, "before");
-
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-
-        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/image.gif"));
-        textArea.click().moveCaretTo(2).pasteFiles("/image.gif");
-        // Shown only once uploaded, since that's when the URL is known.
-        textArea.waitUntilImageIsLoaded(0);
-
-        page.save();
-        String savedContent = page.editWiki().getContent();
-
-        // Untyped reference, and renamed: browsers name a pasted file after its media type, so a second paste would
-        // otherwise overwrite this attachment. The caret was in the middle of "before", yet the image goes after the
-        // whole paragraph, since BlockNote inserts the file block after the current block instead of splitting it.
-        assertThat(savedContent, matchesPattern("before\n\n\\[\\[image:\\d+-\\d+\\.gif\\]\\]"));
-
-        String attachmentName = savedContent.replaceAll("(?s).*\\[\\[image:([^\\]]+)\\]\\].*", "$1");
-        byte[] uploaded = setup.rest()
-            .getAttachmentAsByteArray(new EntityReference(attachmentName, EntityType.ATTACHMENT, testReference));
-        assertArrayEquals(content, uploaded);
-    }
-
-    @Test
-    @Order(7)
-    void dropFile(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.deletePage(testReference);
-        setup.createPage(testReference, SENTENCE);
-
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-
-        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
-        // A drop goes where the pointer is, so the caret stays at the start of the line to prove it.
-        // Unlike a pasted file, a dropped file keeps the name the user gave it.
-        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
-        // The link replaces the inserted block only once uploaded.
-        textArea.waitUntilLinkIsPresent("notes.txt");
-
-        page.save();
-
-        // A file that is not an image is attached and linked inline where it landed, rather than taking a block of
-        // its own.
-        assertEquals(SENTENCE_WITH_LINK, page.editWiki().getContent());
-
-        byte[] uploaded = setup.rest()
-            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
-        assertArrayEquals(content, uploaded);
-    }
-
-    @Test
-    @Order(8)
-    void pasteFile(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.deletePage(testReference);
-        setup.createPage(testReference, SENTENCE);
-
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-
-        textArea.click().moveCaretTo(OFFSET).pasteFiles("/notes.txt");
-        textArea.waitUntilLinkIsPresent();
-
-        page.save();
-
-        // The link goes where the caret was, splitting the text, rather than after the paragraph that held it.
-        assertThat(page.editWiki().getContent(),
-            matchesPattern("Please review\\[\\[attach:\\d+-\\d+\\.txt\\]\\] before the meeting\\."));
-    }
-
-    @Test
-    @Order(9)
+    @Order(11)
     void dropFiles(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -463,7 +530,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(10)
+    @Order(12)
     void pasteFiles(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -485,7 +552,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(11)
+    @Order(13)
     void dropImages(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -514,7 +581,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(12)
+    @Order(14)
     void pasteImages(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -537,7 +604,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(13)
+    @Order(15)
     void dropImageAndFile(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -568,7 +635,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(14)
+    @Order(16)
     void pasteImageAndFile(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -595,7 +662,7 @@ class ImageIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(15)
+    @Order(17)
     void dropImageAndFileBelowTheMiddle(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.deletePage(testReference);
@@ -617,75 +684,5 @@ class ImageIT extends AbstractBlockNoteIT
         // are told when it is fixed: https://github.com/TypeCellOS/BlockNote/issues/3326.
         assertEquals("Before.\n\n" + LONG_SENTENCE + "\n\n[[attach:notes.txt]]\n\n[[image:image.gif]]\n\nAfter.",
             page.editWiki().getContent());
-    }
-
-    @Test
-    @Order(16)
-    void dropFileWithExistingName(TestUtils setup, TestReference testReference) throws Exception
-    {
-        // An attachment the dropped file is going to collide with.
-        setup.deletePage(testReference);
-        setup.createPage(testReference, SENTENCE);
-        byte[] before = "before".getBytes(StandardCharsets.UTF_8);
-        setup.rest().attachFile(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference),
-            new ByteArrayInputStream(before), true);
-
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-
-        byte[] after = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
-        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
-        textArea.waitUntilLinkIsPresent("notes.txt");
-
-        page.save();
-
-        // A taken name overwrites the existing attachment, like CKEditor and the attachment UI do.
-        assertEquals(SENTENCE_WITH_LINK, page.editWiki().getContent());
-
-        // A single attachment, so the upload overwrote the existing one rather than adding another.
-        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
-        assertEquals(1, attachments.getAttachments().size());
-        Attachment notes = attachments.getAttachments().get(0);
-        assertEquals("notes.txt", notes.getName());
-        assertEquals("1.2", notes.getVersion());
-
-        byte[] uploaded = setup.rest()
-            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference));
-        assertArrayEquals(after, uploaded);
-    }
-
-    @Test
-    @Order(17)
-    void dropFileWithoutRealtime(TestUtils setup, TestReference testReference) throws Exception
-    {
-        setup.deletePage(testReference);
-        setup.createPage(testReference, SENTENCE);
-
-        // The editor loads even when it can't reach the collaboration server, which is also what happens for a user
-        // who can't edit the document (e.g. with Change Request).
-        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage();
-        page.simulateUnreachableCollaborationServer().edit();
-        page.waitForInplaceEditor(false);
-        assertFalse(page.getToolbar().isConnected());
-
-        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea();
-        byte[] content = FileUtils.readFileToByteArray(setup.getResourceFile("/notes.txt"));
-        textArea.click().moveCaretTo(0).dropFiles(OFFSET, "/notes.txt");
-        textArea.waitUntilLinkIsPresent("notes.txt");
-
-        // Out of a realtime session the file waits in the temporary store, so it isn't attached yet.
-        Attachments beforeSave = setup.rest().get(AttachmentsResource.class, testReference);
-        assertEquals(0, beforeSave.getAttachments().size());
-
-        page.save();
-
-        assertEquals(SENTENCE_WITH_LINK, page.editWiki().getContent());
-
-        // The save is what attaches the file.
-        Attachments attachments = setup.rest().get(AttachmentsResource.class, testReference);
-        assertEquals(1, attachments.getAttachments().size());
-        assertEquals("notes.txt", attachments.getAttachments().get(0).getName());
-        assertArrayEquals(content, setup.rest()
-            .getAttachmentAsByteArray(new EntityReference("notes.txt", EntityType.ATTACHMENT, testReference)));
     }
 }

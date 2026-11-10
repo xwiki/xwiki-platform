@@ -24,7 +24,9 @@ figure img {
 }
 
 figcaption {
+  --cr-line-height-normal: 1.42857143;
   font-size: var(--figure-caption-font-size);
   color: var(--figure-caption-color);
-  margin-bottom: .625rem;
+  /* Half the line height of the body text, whose font size is the root font size set by the color theme. */
+  margin-bottom: calc(1rem * var(--cr-line-height-normal) / 2);
 }

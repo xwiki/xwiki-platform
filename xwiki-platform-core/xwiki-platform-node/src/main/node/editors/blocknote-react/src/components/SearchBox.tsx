@@ -32,7 +32,7 @@ import {
   useState,
 } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkType } from "../misc/linkEditionCtx";
+import type { LinkType } from "@xwiki/platform-link-suggest-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type {

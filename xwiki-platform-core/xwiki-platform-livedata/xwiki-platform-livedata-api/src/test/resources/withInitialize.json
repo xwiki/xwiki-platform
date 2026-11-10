@@ -22,6 +22,10 @@
       "id" : "cards",
       "name" : "cards",
       "icon" : { }
+    }, {
+      "id" : "list",
+      "name" : "list",
+      "icon" : { }
     } ],
     "defaultLayout" : "table",
     "propertyDescriptors" : [ ],

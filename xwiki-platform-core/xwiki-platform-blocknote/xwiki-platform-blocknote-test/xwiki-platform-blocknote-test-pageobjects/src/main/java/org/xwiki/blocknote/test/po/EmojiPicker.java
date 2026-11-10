@@ -32,13 +32,16 @@ import org.xwiki.test.ui.po.BaseElement;
 @Unstable
 public class EmojiPicker extends BaseElement
 {
-    private static final By SELECTED_EMOJI = By.cssSelector(".bn-grid-suggestion-menu-item[aria-selected=\"true\"]");
+    // The picker filters its grid asynchronously and ignores Enter until the selected emoji is rendered at the first
+    // position of the first row, so we wait for exactly that to avoid submitting against a stale grid.
+    private static final By SELECTED_EMOJI =
+        By.cssSelector("[aria-rowindex=\"0\"] .bn-frimousse-emoji[aria-colindex=\"0\"][aria-selected=\"true\"]");
 
-    private static final By NO_RESULTS = By.className("bn-grid-suggestion-menu-empty-item");
+    private static final By NO_RESULTS = By.className("bn-frimousse-empty");
 
     /**
-     * Waits for the emoji picker to show either its suggestions or the "no results" message. The emoji data is loaded
-     * lazily, so the picker is first displayed empty, with only a loading indicator.
+     * Waits for the emoji picker to show either its first suggestion, selected, or the "no results" message. The emoji
+     * data is loaded lazily, so the picker is first displayed empty, with only a loading indicator.
      */
     public EmojiPicker()
     {

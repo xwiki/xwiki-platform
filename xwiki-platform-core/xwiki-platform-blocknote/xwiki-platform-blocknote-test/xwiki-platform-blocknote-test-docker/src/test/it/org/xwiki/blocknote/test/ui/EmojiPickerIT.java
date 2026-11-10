@@ -104,7 +104,7 @@ class EmojiPickerIT extends AbstractBlockNoteIT
         // the query has to stay short: "xyz" matches no emoji yet is never long enough to close the picker.
         textArea.click().sendKeys(":");
         textArea.sendKeys("xyz");
-        assertEquals("No items found", new EmojiPicker().getNoResultsMessage());
+        assertEquals("No emoji found", new EmojiPicker().getNoResultsMessage());
     }
 
     @Test

@@ -1,0 +1,198 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+define('xwiki-reorder-controls-icons', {
+  icons: ['up', 'down']
+});
+
+/**
+ * Makes a list of items reorderable without dragging, by adding a move up button and a move down button to each item.
+ * Both buttons move the item with a single click or tap, which is the accessible way to reorder the list, including
+ * for screen reader users.
+ *
+ * Once a button is focused, the up and down arrow keys move the item too, as a shortcut for performing a series of
+ * moves without leaving the button. This shortcut is a convenience for keyboard users only: screen readers in browse
+ * mode keep the arrow keys for their own navigation, and nothing advertises it.
+ *
+ * Lists that can also be reordered by dragging and dropping keep their own drag and drop implementation and pass the
+ * same persistence callback to it, so that the two paths stay in sync.
+ *
+ * This widget is internal: it is only used by the class editor for now, and its options may change without notice.
+ * Sharing it with Live Data is tracked by XWIKI-25689.
+ *
+ * @since 18.10.0RC1
+ */
+define('xwiki-reorder-controls', ['jquery', 'xwiki-icon!xwiki-reorder-controls-icons'], function ($, icons) {
+  'use strict';
+
+  const liveRegionId = 'reorder-controls-live-region';
+
+  // How long the live region is left empty before the announcement is set again. Screen readers announce a region
+  // whose content changed, so the same text has to be removed and set back to be announced twice in a row.
+  const liveRegionResetDelay = 100;
+
+  const offsets = {
+    'up': -1,
+    'down': 1
+  };
+
+  // The announcement waiting to be set in the live region, so that a new one can replace it.
+  let pendingAnnouncement;
+
+  /**
+   * @return {jQuery} the region used to announce the moves, created on the first call
+   */
+  function getLiveRegion() {
+    let liveRegion = $('#' + liveRegionId);
+    if (!liveRegion.length) {
+      liveRegion = $('<div></div>').attr({
+        'id': liveRegionId,
+        'aria-live': 'polite'
+      }).addClass('sr-only').appendTo(document.body);
+    }
+    return liveRegion;
+  }
+
+  /**
+   * Announces a text to the screen readers, and does nothing when there is nothing to announce.
+   *
+   * @param {string} [text] the text to announce
+   */
+  function announce(text) {
+    if (!text) {
+      return;
+    }
+    const liveRegion = getLiveRegion();
+    liveRegion.text('');
+    // A move performed while an announcement is still waiting replaces it, so that holding an arrow key down
+    // announces the position the item ended up at instead of every position it went through.
+    clearTimeout(pendingAnnouncement);
+    pendingAnnouncement = setTimeout(function () {
+      liveRegion.text(text);
+    }, liveRegionResetDelay);
+  }
+
+  /**
+   * @param {jQuery} button the button the user is operating
+   * @param {Object} options the options the button was created with
+   * @param {string} direction either up or down
+   */
+  function moveItem(button, options, direction) {
+    const item = button.closest(options.item);
+    // The reordered items are the siblings of the moved item that the caller declared as reorderable. Items that are
+    // not displayed are taken into account, because the drag and drop path moves the item among them too.
+    const items = item.parent().children(options.item);
+    const oldIndex = items.index(item);
+    const offset = offsets[direction];
+    const newIndex = oldIndex + offset;
+    if (oldIndex < 0) {
+      return;
+    }
+    if (newIndex < 0 || newIndex >= items.length) {
+      // The item is already at the end of the list it is moving towards. This is announced, because a keyboard user
+      // has no other way to tell that the button or the key press was taken into account.
+      announce(options.announceBoundary?.(item, direction));
+      return;
+    }
+    // The neighbor is moved rather than the item, so that the focused button never leaves the DOM. This keeps the focus
+    // on it for the next move, and screen readers don't announce the button again on top of the live region.
+    const neighbor = items.eq(newIndex);
+    if (offset < 0) {
+      neighbor.insertAfter(item);
+    } else {
+      neighbor.insertBefore(item);
+    }
+    options.onMove?.(item, oldIndex, newIndex);
+    announce(options.announce?.(item, newIndex, items.length));
+  }
+
+  /**
+   * @param {jQuery} item the item the button moves
+   * @param {Object} options the widget options
+   * @param {string} direction either up or down
+   * @return {jQuery} the button moving the given item in the given direction
+   */
+  function createButton(item, options, direction) {
+    const button = $('<button></button>').attr('type', 'button')
+      .addClass('reorder-control reorder-control-' + direction).addClass(options.buttonClass);
+    $('<span></span>').attr('aria-hidden', 'true').append(icons[direction]?.render()).appendTo(button);
+    $('<span></span>').addClass('sr-only').text(options.label(item, direction)).appendTo(button);
+    button.on('click', function (event) {
+      // The button sits among the other actions of the item, whose container may react to a click of its own.
+      event.stopPropagation();
+      moveItem(button, options, direction);
+    });
+    button.on('keydown', function (event) {
+      // The arrow keys are a shortcut on top of the buttons. Both buttons answer both keys, so that an item moved one
+      // position too far can be moved back without moving the focus to the other button.
+      if (event.key === 'ArrowUp') {
+        moveItem(button, options, 'up');
+      } else if (event.key === 'ArrowDown') {
+        moveItem(button, options, 'down');
+      } else {
+        return;
+      }
+      // Prevent the arrow keys from scrolling the page while the user is reordering the list.
+      event.preventDefault();
+    });
+    return button;
+  }
+
+  /**
+   * Adds a move up button and a move down button to each reorderable item found in the given scope. Items that already
+   * have them are left untouched, so that the widget can be applied again after new items have been added to the list.
+   *
+   * @param {jQuery|Element|string} scope an element that is either a reorderable item itself or an ancestor of the
+   *          reorderable items to enhance
+   * @param {Object} options the widget options:
+   *          <dl>
+   *            <dt>item</dt><dd>the selector matching a reorderable item; the items it matches are expected to be
+   *              siblings, since an item moves among the children of its own parent</dd>
+   *            <dt>buttonContainer</dt><dd>the selector, relative to an item, of the element the buttons are appended
+   *              to</dd>
+   *            <dt>buttonClass</dt><dd>the CSS classes to set on both buttons</dd>
+   *            <dt>label</dt><dd>a callback, called with an item and a direction, returning the accessible name of the
+   *              button</dd>
+   *            <dt>onMove</dt><dd>an optional callback, called with the moved item and its old and new indexes, that
+   *              persists the new order</dd>
+   *            <dt>announce</dt><dd>an optional callback, called with the moved item, its new index and the number of
+   *              items, that returns the text announced to screen readers after a move</dd>
+   *            <dt>announceBoundary</dt><dd>an optional callback, called with the item and the direction, that returns
+   *              the text announced to screen readers when the item is already at the end of the list it is moving
+   *              towards</dd>
+   *          </dl>
+   */
+  function addReorderControls(scope, options) {
+    // The region is created before the first move, because a region that is inserted and filled in the same task is
+    // not announced.
+    getLiveRegion();
+    $(scope).find(options.item).addBack(options.item).each(function () {
+      const item = $(this);
+      // Only the first match is used, so that a nested list does not get the buttons of its ancestor item.
+      const buttonContainer = item.find(options.buttonContainer).first();
+      if (!buttonContainer.length || buttonContainer.find('.reorder-control').length) {
+        return;
+      }
+      buttonContainer.append(createButton(item, options, 'up'), createButton(item, options, 'down'));
+    });
+  }
+
+  return addReorderControls;
+});

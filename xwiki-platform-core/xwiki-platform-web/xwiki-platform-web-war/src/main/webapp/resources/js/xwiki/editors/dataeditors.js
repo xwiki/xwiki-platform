@@ -17,12 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
-#[[*/
-// Start JavaScript-only code.
-
-(function(icons) {
+(function() {
   "use strict";
   define('dataeditors-translations', {
     prefix: 'core.editors.',
@@ -44,11 +39,16 @@
       'object.loadObject.inProgress',
       'object.loadObject.done',
       'object.loadObject.failed',
-      'class.moveProperty.handle.label',
+      'class.moveProperty.up.text',
+      'class.moveProperty.up.boundary',
+      'class.moveProperty.down.text',
+      'class.moveProperty.down.boundary',
+      'class.moveProperty.moved',
       'class.switchClass.confirm'
     ]
   });
-  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-events-bridge','jquery-ui'], function ($, xm, l10n) {
+  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-reorder-controls',
+    'xwiki-events-bridge','jquery-ui'], function ($, xm, l10n, reorderControls) {
     class XDataEditors {
       constructor() {
         let self = this;
@@ -709,9 +709,13 @@
         if(!startExpanded) {
           property.addClass('collapsed');
         }
-        // The click event is caught only on the icon and title to avoid breaking behaviour when using actions, 
-        // especially the move action which is dragAndDrop.
+        // The click event is caught only on the icon and title, so that the tools of the title, such as the delete
+        // and move buttons, don't expand or collapse the property. The title is also where a drag starts, and the
+        // click that ends a drag on it is ignored, so that reordering a property doesn't change its state.
         propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
+          if (property.data('_dragJustEnded')) {
+            return;
+          }
           propertyTitle.parent().toggleClass('collapsed');
         });
       }
@@ -720,7 +724,7 @@
       /* Class editor: xproperty ordering */
       makeSortable(element) {
         if (element.length > 0) {
-          // Hide the property number, as ordering can be done by drag and drop
+          // Hide the property number, as ordering can be done by drag and drop or with the move buttons
           element.find('.xproperty-content').each(function () {
             let item = $(this);
             item.find("input").each(function () {
@@ -734,33 +738,45 @@
               }
             });
           });
-          // Create and insert move button
-          element.find('.xproperty-title .tools').each(function () {
-            let item = $(this);
-            let movebutton = $('<span>', {
-              'class': 'tool move',
-              title: l10n['class.moveProperty.handle.label']
-            }).html(icons['reposition']);
-            item.css('position', 'relative');
-            item.append(movebutton);
-            movebutton.on('click', function (event) {
-              event.stopPropagation();
-            });
-          });
           let self = this;
+          // Create and insert the move up and move down buttons, which reorder the properties both with a single
+          // click and with the arrow keys.
+          reorderControls(element, {
+            item: '.xproperty',
+            buttonContainer: '.xproperty-title .tools',
+            buttonClass: 'tool move',
+            label: function (item, direction) {
+              let propertyName = item.attr('id').substring('xproperty_'.length);
+              return l10n.get('class.moveProperty.' + direction + '.text', propertyName);
+            },
+            onMove: function () {
+              self.updateOrder($('#xclassContent'));
+            },
+            announce: function (item, newIndex, itemCount) {
+              return l10n.get('class.moveProperty.moved', newIndex + 1, itemCount);
+            },
+            announceBoundary: function (item, direction) {
+              return l10n['class.moveProperty.' + direction + '.boundary'];
+            }
+          });
+          // The cancel option is left to its default value on purpose: that value excludes buttons, which is what
+          // keeps a drag from ever starting on a move button. A click or a tap that drifts by a pixel has to stay
+          // a click, otherwise the buttons stop being an alternative to dragging.
           $('#xclassContent').sortable({
-            cursor: 'move',
+            cursor: 'grabbing',
             items: '.xproperty',
             start: self.startDrag,
             stop: self.endDrag,
-            update: self.updateOrder
+            update: function () {
+              self.updateOrder(this);
+            }
           });
         }
       }
 
-      updateOrder() {
+      updateOrder(container) {
         let i = 1;
-        $(this).find(".xproperty-content").each(function () {
+        $(container).find(".xproperty-content").each(function () {
           let item = $(this);
           // the numberProperty data is actually a reference to an input.
           item.data('numberProperty').val(i++);
@@ -776,8 +792,14 @@
         });
       }
 
-      endDrag() {
+      endDrag(event, ui) {
         $(this).removeClass('dragged');
+        // The click that follows the end of the drag is dispatched right after this callback, so the flag only has to
+        // last until the next task.
+        ui.item.data('_dragJustEnded', true);
+        setTimeout(function() {
+          ui.item.removeData('_dragJustEnded');
+        });
         $('#xclassContent').children().each(function() {
           let item = $(this);
           if (item.data('_expandedBeforeDrag')) {
@@ -825,6 +847,4 @@
     }
     $(init);
   });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons]));
+})();

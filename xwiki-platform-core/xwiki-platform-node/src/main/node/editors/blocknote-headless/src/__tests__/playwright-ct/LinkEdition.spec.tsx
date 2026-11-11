@@ -59,6 +59,40 @@ test("Editing the title of a link keeps the rest of the line intact", async ({
   await expect(editorEl).toHaveText("First 2nd third fourth");
 });
 
+for (const close of ["submit", "cancel"] as const) {
+  test(`The edited content is focused back when the link modal is closed (${close})`, async ({
+    mount,
+    page,
+  }) => {
+    const component = await mountBlockNoteHeadless(mount, {
+      editorContent: buildParagraphWithLink("https://xwiki.org"),
+      editorProps: {
+        syntax: FULL_SYNTAX,
+      },
+      macros: false,
+    });
+
+    const editorEl = component.locator(".bn-editor");
+    await editorEl.locator('a[href="https://xwiki.org"]').waitFor({
+      state: "attached",
+    });
+
+    await openLinkEditor(page, editorEl);
+    await expect(editorEl).not.toBeFocused();
+
+    await page
+      .locator(
+        close === "submit"
+          ? '[data-test="linkSubmit"]'
+          : '[data-test="linkCancel"]',
+      )
+      .click();
+
+    // Keyboard users can keep typing right away.
+    await expect(editorEl).toBeFocused();
+  });
+}
+
 test("Editing the title of a link to an unsupported resource keeps its reference", async ({
   mount,
   page,

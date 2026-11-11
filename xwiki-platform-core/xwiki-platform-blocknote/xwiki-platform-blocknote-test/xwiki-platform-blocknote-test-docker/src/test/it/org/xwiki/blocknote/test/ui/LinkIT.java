@@ -116,6 +116,8 @@ class LinkIT extends AbstractBlockNoteIT
 
         // The link title must be updated without touching the rest of the line.
         textArea.waitUntilTextIs("first 2nd third");
+        // The edited content is focused back, so that keyboard users can keep typing.
+        textArea.waitUntilFocused();
 
         // Save and check the source.
         page.save();
@@ -183,6 +185,8 @@ class LinkIT extends AbstractBlockNoteIT
 
         // The link title must be left untouched.
         textArea.waitUntilTextIs("first second third");
+        // The edited content is focused back, so that keyboard users can keep typing.
+        textArea.waitUntilFocused();
 
         // Save and check the source: since nothing was actually changed in the editor, the page content is left
         // untouched (i.e. it is not even round-tripped through the editor, hence the lack of style annotation that a

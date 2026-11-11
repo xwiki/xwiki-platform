@@ -29,6 +29,7 @@ import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
   computed,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   onUnmounted,
@@ -197,8 +198,19 @@ const submitEditedLink = ({ displayText, target }: LinkData) => {
     reference,
   });
 
-  editingLink.value = null;
+  closeLinkModal();
 };
+
+/**
+ * Close the link modal and focus back the edited content, so that keyboard users can keep typing where they were.
+ * The content is focused only once the modal is removed: a modal dialog keeps the focus while it's shown (e.g. the
+ * Bootstrap one moves it back inside as soon as it leaves).
+ */
+async function closeLinkModal(): Promise<void> {
+  editingLink.value = null;
+  await nextTick();
+  editorRef.value?.focus();
+}
 
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
 
@@ -266,7 +278,7 @@ onUnmounted(() => {
     :link-context
     :mode="editingLink?.mode"
     @submit="submitEditedLink"
-    @cancel="editingLink = null"
+    @cancel="closeLinkModal"
   />
 </template>
 

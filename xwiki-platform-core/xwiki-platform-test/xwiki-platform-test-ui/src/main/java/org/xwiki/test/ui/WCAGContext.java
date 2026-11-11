@@ -109,7 +109,11 @@ public class WCAGContext
             entry("input-image-alt", true),
             // Set to true once the build doesn't fail this rule anymore
             entry("label", false),
-            entry("link-in-text-block", true),
+            // axe-core 4.14.0 counts the text of elements hidden with display: none as text surrounding a link,
+            // which reports false positives on the breadcrumb links followed by a hidden tree description.
+            // Set back to true once axe-core is upgraded to a version including
+            // https://github.com/dequelabs/axe-core/pull/5444 .
+            entry("link-in-text-block", false),
             entry("link-name", true),
             entry("list", true),
             entry("listitem", true),

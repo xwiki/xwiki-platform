@@ -23,7 +23,7 @@ import type { MentionableUser } from "@xwiki/platform-editors-blocknote-react";
 import type { Container } from "inversify";
 
 // As many suggestions as the CKEditor mentions show.
-const SUGGESTION_LIMIT = "6";
+const SUGGESTION_LIMIT = 6;
 
 /**
  * A user suggestion as returned by the user suggestion template.
@@ -36,7 +36,8 @@ type UserSuggestion = {
 };
 
 /**
- * Suggests the users of the current wiki, using the same user suggestion template as the CKEditor mentions.
+ * Suggests the users the wiki's user scope allows mentioning, using the same user suggestion template as the CKEditor
+ * mentions.
  *
  * @since 18.10.0RC1
  * @beta
@@ -47,14 +48,45 @@ class DefaultUserSuggest implements UserSuggest {
     container.bind("UserSuggest").to(DefaultUserSuggest).inSingletonScope();
   }
 
-  public async getUsers(query: string): Promise<MentionableUser[]> {
+  public async getUsers(
+    query: string,
+    userScope?: string,
+  ): Promise<MentionableUser[]> {
+    if (userScope === "GLOBAL_ONLY") {
+      return this.fetchUsers(query, true);
+    }
+
+    const localUsers = await this.fetchUsers(query, false);
+    if (
+      userScope !== "LOCAL_AND_GLOBAL" ||
+      localUsers.length >= SUGGESTION_LIMIT
+    ) {
+      return localUsers;
+    }
+
+    // Same as the CKEditor mentions: complete the local users with global ones, then sort the lot by name, so that
+    // the suggestions don't look split in two lists.
+    const globalUsers = await this.fetchUsers(query, true);
+    return [
+      ...localUsers,
+      ...globalUsers.slice(0, SUGGESTION_LIMIT - localUsers.length),
+    ].sort((alice, bob) => alice.label.localeCompare(bob.label));
+  }
+
+  private async fetchUsers(
+    query: string,
+    global: boolean,
+  ): Promise<MentionableUser[]> {
     const parameters = new URLSearchParams({
       xpage: "uorgsuggest",
       media: "json",
       uorg: "user",
       input: query,
-      limit: SUGGESTION_LIMIT,
+      limit: `${SUGGESTION_LIMIT}`,
     });
+    if (global) {
+      parameters.set("wiki", "global");
+    }
     const response = await fetch(
       XWiki.currentDocument.getURL("get", parameters),
     );

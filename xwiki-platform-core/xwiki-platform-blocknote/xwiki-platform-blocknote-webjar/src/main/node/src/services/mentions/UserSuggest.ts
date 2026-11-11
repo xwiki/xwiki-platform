@@ -28,9 +28,11 @@ import type { MentionableUser } from "@xwiki/platform-editors-blocknote-react";
 interface UserSuggest {
   /**
    * @param query - the text the suggested users have to match
+   * @param userScope - the user scope of the wiki, which says whether its local users, the global ones, or both can
+   *     be mentioned
    * @returns the users matching the given query
    */
-  getUsers(query: string): Promise<MentionableUser[]>;
+  getUsers(query: string, userScope?: string): Promise<MentionableUser[]>;
 }
 
 export type { UserSuggest };

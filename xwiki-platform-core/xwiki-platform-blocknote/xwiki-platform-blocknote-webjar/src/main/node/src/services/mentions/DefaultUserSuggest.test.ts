@@ -20,6 +20,28 @@
 import { DefaultUserSuggest } from "./DefaultUserSuggest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+function user(name: string) {
+  return { value: `XWiki.${name}`, label: name };
+}
+
+/**
+ * Serves the given suggestions to the successive requests, so that the local and the global users can differ.
+ */
+function mockSuggestionsPerCall(...suggestions: unknown[][]): void {
+  mockSuggestions([]);
+  suggestions.forEach((result) =>
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      json: async () => result,
+    }),
+  );
+}
+
+function fetchedWikis(): (string | null)[] {
+  return (fetch as ReturnType<typeof vi.fn>).mock.calls.map((call) =>
+    new URLSearchParams(String(call[0]).split("?")[1]).get("wiki"),
+  );
+}
+
 function mockSuggestions(suggestions: unknown[]): void {
   vi.stubGlobal("XWiki", {
     currentDocument: {
@@ -67,6 +89,42 @@ describe("DefaultUserSuggest", () => {
     expect(fetch).toHaveBeenCalledWith(
       "/bin/get/Space/Page?xpage=uorgsuggest&media=json&uorg=user&input=admin&limit=6",
     );
+  });
+
+  it("queries only the local users when the wiki has its own users", async () => {
+    mockSuggestions([user("John")]);
+
+    await new DefaultUserSuggest().getUsers("joh", "LOCAL_ONLY");
+
+    expect(fetchedWikis()).toEqual([null]);
+  });
+
+  it("queries only the global users when the wiki has no users of its own", async () => {
+    mockSuggestions([user("John")]);
+
+    await new DefaultUserSuggest().getUsers("joh", "GLOBAL_ONLY");
+
+    expect(fetchedWikis()).toEqual(["global"]);
+  });
+
+  it("completes the local users with the global ones, sorted by name", async () => {
+    mockSuggestionsPerCall([user("Carol"), user("Alice")], [user("Bob")]);
+
+    const users = await new DefaultUserSuggest().getUsers(
+      "",
+      "LOCAL_AND_GLOBAL",
+    );
+
+    expect(fetchedWikis()).toEqual([null, "global"]);
+    expect(users.map((it) => it.label)).toEqual(["Alice", "Bob", "Carol"]);
+  });
+
+  it("doesn't query the global users when the local ones already fill the menu", async () => {
+    mockSuggestions(["Al", "Bo", "Cy", "Di", "Ed", "Fay"].map(user));
+
+    await new DefaultUserSuggest().getUsers("", "LOCAL_AND_GLOBAL");
+
+    expect(fetchedWikis()).toEqual([null]);
   });
 
   it("drops the hint of a user that has none", async () => {

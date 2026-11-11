@@ -168,6 +168,7 @@ const {
   inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
+  userScope = undefined,
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
   startupFocus = undefined,
@@ -196,6 +197,9 @@ const {
 
   // The URL of the collaboration server used for real-time editing. If not specified, real-time editing is disabled.
   collaborationURL?: string;
+
+  // The user scope of the wiki, which says whether its local users, the global ones, or both can be mentioned.
+  userScope?: string;
 
   // The reference of the XWiki document whose field is being edited using BlockNote. This is required for real-time
   // collaboration in order to join the corresponding collaboration session. It is also used to contextualize some of
@@ -359,7 +363,7 @@ function newFileUploader(eventTarget: EventTarget): FileUploader {
 
 const userSuggest: UserSuggestFn = (query) => {
   const userSuggestService: UserSuggest = container.get("UserSuggest");
-  return userSuggestService.getUsers(query);
+  return userSuggestService.getUsers(query, userScope);
 };
 
 const syntaxes = container.getAll<SyntaxConfig>(

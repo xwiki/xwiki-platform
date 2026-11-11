@@ -17,21 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { moveCaretTo } from "@xwiki/platform-editors-blocknote-headless";
 import type { FileTransfer } from "../attachments/pasteTracker";
+import type {
+  EditorPartialLink,
+  EditorType,
+} from "@xwiki/platform-editors-blocknote-react";
 
-type InlineLink = {
-  type: "link";
-  href: string;
-  content: string;
-};
-
-type LinkFor = (file: File, paste: boolean) => Promise<InlineLink | undefined>;
-
-type InsertInlineContent = (content: (InlineLink | string)[]) => void;
-
-// Puts the caret where the insertion belongs, under the pointer for a drop and wherever it already is for a
-// paste, and returns false when the transfer didn't land on the content and so has no caret to go to.
-type PlaceCaret = (coordinates?: { left: number; top: number }) => boolean;
+type LinkFor = (
+  file: File,
+  paste: boolean,
+) => Promise<EditorPartialLink | undefined>;
 
 function isImage(file: File): boolean {
   return file.type.startsWith("image/");
@@ -42,7 +38,7 @@ function isImage(file: File): boolean {
  * them a block of its own and would leave the link alone in a paragraph.
  */
 async function insertFilesInline(
-  insertInlineContent: InsertInlineContent,
+  editor: EditorType,
   { files, paste }: FileTransfer,
   linkFor: LinkFor,
 ): Promise<void> {
@@ -53,9 +49,11 @@ async function insertFilesInline(
       // made of the current timestamp and a small random number.
       const link = await linkFor(file, paste);
       if (link) {
-        // Each insertion leaves the caret where the next file belongs, separated by a space so that the links
-        // don't run into each other.
-        insertInlineContent(first ? [link] : [" ", link]);
+        // updateSelection leaves the caret after the link, so the next file lines up behind it, separated by a
+        // space so that the links don't run into each other.
+        editor.insertInlineContent(first ? [link] : [" ", link], {
+          updateSelection: true,
+        });
         first = false;
       }
     }
@@ -69,36 +67,43 @@ async function insertFilesInline(
 }
 
 /**
+ * Puts the caret where the links of a transfer belong: under the pointer for a drop, since a drop doesn't move the
+ * caret itself, and wherever it already is for a paste. Called from the event handler rather than after the
+ * uploads, because a drop's coordinates are viewport pixels and point at different text once the page has
+ * scrolled.
+ *
+ * @returns false when the transfer didn't land on the content, so there is no caret to insert at
+ */
+function placeCaret(editor: EditorType, transfer: FileTransfer): boolean {
+  return transfer.coordinates
+    ? moveCaretTo(editor, transfer.coordinates)
+    : editor.isFocused();
+}
+
+/**
  * Decides which transfers to insert rather than leave to BlockNote. A transfer that mixes images with other files
  * is left to BlockNote as a whole, rather than being split over two code paths.
  *
- * @param insertInlineContent - inserts the links in the editor
- * @param placeCaret - puts the caret where the links belong, telling whether the transfer landed on the content
+ * @param getEditor - the editor to insert in, or nothing before it is mounted
  * @param linkFor - attaches a file and returns the link to it, or nothing if that failed
  * @returns the handler the paste tracker calls to offer a transfer, true meaning that the transfer is ours now
  */
 function takeOverFileTransfers(
-  insertInlineContent: InsertInlineContent,
-  placeCaret: PlaceCaret,
+  getEditor: () => EditorType | undefined,
   linkFor: LinkFor,
 ): (transfer: FileTransfer) => boolean {
   return function takeOver(transfer) {
-    if (transfer.files.some(isImage)) {
+    const editor = getEditor();
+    if (!editor || transfer.files.some(isImage)) {
       return false;
     }
-    // Before the uploads, while a drop's viewport coordinates still point at the text it landed on.
-    if (!placeCaret(transfer.coordinates)) {
+    if (!placeCaret(editor, transfer)) {
       return false;
     }
     // Not awaited: the handler has to answer while the event is still live, the uploads take far longer.
-    void insertFilesInline(insertInlineContent, transfer, linkFor);
+    void insertFilesInline(editor, transfer, linkFor);
     return true;
   };
 }
 
-export {
-  type InlineLink,
-  type InsertInlineContent,
-  type PlaceCaret,
-  takeOverFileTransfers,
-};
+export { takeOverFileTransfers };

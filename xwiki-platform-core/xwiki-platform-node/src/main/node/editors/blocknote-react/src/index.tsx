@@ -64,6 +64,7 @@ export type {
   EditorInlineContentSchema,
   EditorLanguage,
   EditorLink,
+  EditorPartialLink,
   EditorSchema,
   EditorStyleSchema,
   EditorStyledText,

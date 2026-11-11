@@ -19,7 +19,6 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import { moveCaretTo as moveEditorCaretTo } from "./caret";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import { LinkModal } from "@xwiki/platform-link-modal-ui";
 import {
@@ -133,42 +132,16 @@ function getContent(): BlockType[] {
 }
 
 /**
- * Inserts inline content at the caret, for the integrations that insert content of their own rather than through
- * BlockNote.
- *
- * @param content - what to insert
+ * @returns the editor instance, for the integrations that act on the edited content themselves, or nothing before
+ *   the editor is mounted
  */
-function insertInlineContent(
-  content: Parameters<EditorType["insertInlineContent"]>[0],
-): void {
-  // updateSelection leaves the caret after the content, so a second insertion lines up behind the first.
-  editorRef.value?.insertInlineContent(content, { updateSelection: true });
-}
-
-/**
- * Puts the caret where an insertion that follows a paste or a drop belongs: under the pointer for a drop, since a
- * drop doesn't move the caret itself, and wherever it already is for a paste. Call it from the event handler
- * rather than after the upload: the coordinates are viewport pixels, so they point at different text once the
- * page has scrolled.
- *
- * @param coordinates - where the pointer is, in viewport coordinates, for a drop; nothing for a paste
- * @returns false when there is no caret to insert at, because the pointer is not over the editor content or,
- *   for a paste, because the editor doesn't hold the focus
- */
-function placeCaret(coordinates?: { left: number; top: number }): boolean {
-  const editor = editorRef.value;
-  if (!editor) {
-    return false;
-  }
-  return coordinates
-    ? moveEditorCaretTo(editor, coordinates)
-    : editor.isFocused();
+function getEditor(): EditorType | undefined {
+  return editorRef.value ?? undefined;
 }
 
 defineExpose({
   getContent,
-  insertInlineContent,
-  placeCaret,
+  getEditor,
 });
 
 /**

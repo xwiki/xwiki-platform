@@ -50,7 +50,13 @@ import { RiFileList3Fill, RiLink } from "react-icons/ri";
 import type { LinkEditionHandler } from "../components/links/linkEdition";
 import type { LinkEditionHooks } from "../components/links/linkEditionHooks";
 import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
-import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
+import type {
+  Block,
+  InlineContent,
+  Link,
+  PartialLink,
+  StyledText,
+} from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { useTranslation } from "react-i18next";
@@ -465,6 +471,14 @@ type EditorStyledText = StyledText<EditorStyleSchema>;
  */
 type EditorLink = Link<EditorStyleSchema>;
 
+/**
+ * Typesafe BlockNote link to insert, whose content is the label rather than styled text
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type EditorPartialLink = PartialLink<EditorStyleSchema>;
+
 export type {
   BlockOfType,
   BlockType,
@@ -472,6 +486,7 @@ export type {
   EditorInlineContentSchema,
   EditorLanguage,
   EditorLink,
+  EditorPartialLink,
   EditorSchema,
   EditorStyleSchema,
   EditorStyledText,

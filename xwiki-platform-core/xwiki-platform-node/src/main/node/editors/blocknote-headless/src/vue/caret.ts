@@ -38,6 +38,8 @@ function caretAt(left: number, top: number): [Node, number] | undefined {
  * @param coordinates - where the pointer is, in viewport coordinates
  * @returns false when there is no place for the caret under the pointer, e.g. because it is over the chrome around
  *   the content rather than over the content itself, which leaves the caret where it was
+ * @since 18.10.0RC1
+ * @beta
  */
 function moveCaretTo(
   editor: EditorType,

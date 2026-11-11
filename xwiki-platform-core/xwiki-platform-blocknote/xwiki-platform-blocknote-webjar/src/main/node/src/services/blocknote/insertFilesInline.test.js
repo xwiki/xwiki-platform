@@ -18,7 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { takeOverFileTransfers } from "./insertFilesInline";
+import { moveCaretTo } from "@xwiki/platform-editors-blocknote-headless";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@xwiki/platform-editors-blocknote-headless", () => ({
+  moveCaretTo: vi.fn(),
+}));
 
 function file(name, type) {
   return new File(["content"], name, { type });
@@ -29,7 +34,7 @@ function link(label) {
 }
 
 describe("takeOverFileTransfers", () => {
-  let insertInlineContent, placeCaret, linkFor, takeOver;
+  let editor, linkFor, takeOver;
 
   function transfer(files, coordinates) {
     return { paste: !coordinates, files, coordinates };
@@ -42,10 +47,13 @@ describe("takeOverFileTransfers", () => {
   }
 
   beforeEach(() => {
-    insertInlineContent = vi.fn();
-    placeCaret = vi.fn(() => true);
+    // Only what inserting the links touches.
+    editor = { insertInlineContent: vi.fn(), isFocused: vi.fn(() => true) };
+    // The module mock is shared by the whole file, so the calls of the previous test have to go.
+    moveCaretTo.mockReset();
+    moveCaretTo.mockReturnValue(true);
     linkFor = vi.fn(async (f) => link(f.name));
-    takeOver = takeOverFileTransfers(insertInlineContent, placeCaret, linkFor);
+    takeOver = takeOverFileTransfers(() => editor, linkFor);
   });
 
   describe("the files it takes over", () => {
@@ -59,26 +67,35 @@ describe("takeOverFileTransfers", () => {
         transfer([file("report.pdf", "application/pdf")], { left: 5, top: 9 }),
       );
 
-      expect(placeCaret).toHaveBeenCalledWith({ left: 5, top: 9 });
+      expect(moveCaretTo).toHaveBeenCalledWith(editor, { left: 5, top: 9 });
     });
 
-    it("places the caret for a paste too, which has no pointer to go by", () => {
+    it("inserts a paste at the caret the editor already holds, since there is no pointer to go by", () => {
       takeOver(transfer([file("report.pdf", "application/pdf")]));
 
-      expect(placeCaret).toHaveBeenCalledWith(undefined);
+      expect(moveCaretTo).not.toHaveBeenCalled();
+      expect(editor.isFocused).toHaveBeenCalled();
     });
 
     it("links a dropped file at the caret it moved under the pointer", async () => {
       await take(file("report.pdf", "application/pdf"));
 
-      expect(insertInlineContent).toHaveBeenCalledWith([link("report.pdf")]);
+      expect(editor.insertInlineContent).toHaveBeenCalledWith(
+        [link("report.pdf")],
+        { updateSelection: true },
+      );
     });
 
     it("links a pasted file at the caret", async () => {
       takeOver(transfer([file("report.pdf", "application/pdf")]));
-      await vi.waitFor(() => expect(insertInlineContent).toHaveBeenCalled());
+      await vi.waitFor(() =>
+        expect(editor.insertInlineContent).toHaveBeenCalled(),
+      );
 
-      expect(insertInlineContent).toHaveBeenCalledWith([link("report.pdf")]);
+      expect(editor.insertInlineContent).toHaveBeenCalledWith(
+        [link("report.pdf")],
+        { updateSelection: true },
+      );
     });
 
     it("links the files of one transfer in order, after the first one", async () => {
@@ -89,9 +106,9 @@ describe("takeOverFileTransfers", () => {
 
       // The caret follows the first link, so later files go after it rather than back at the drop point, each
       // preceded by a space.
-      expect(insertInlineContent.mock.calls).toEqual([
-        [[link("first.pdf")]],
-        [[" ", link("second.pdf")]],
+      expect(editor.insertInlineContent.mock.calls).toEqual([
+        [[link("first.pdf")], { updateSelection: true }],
+        [[" ", link("second.pdf")], { updateSelection: true }],
       ]);
     });
 
@@ -106,7 +123,7 @@ describe("takeOverFileTransfers", () => {
 
       await take(file("report.pdf", "application/pdf"));
 
-      expect(insertInlineContent).not.toHaveBeenCalled();
+      expect(editor.insertInlineContent).not.toHaveBeenCalled();
     });
   });
 
@@ -120,7 +137,7 @@ describe("takeOverFileTransfers", () => {
     // A transfer with nowhere to put the caret never landed on the content: a drop on a dialog over the editor,
     // or a paste into one of its fields.
     it("leaves a drop alone when the caret can't follow the pointer", () => {
-      placeCaret.mockReturnValue(false);
+      moveCaretTo.mockReturnValue(false);
 
       expect(
         takeOver(
@@ -134,7 +151,7 @@ describe("takeOverFileTransfers", () => {
     });
 
     it("leaves a paste alone when the editor doesn't hold the caret", () => {
-      placeCaret.mockReturnValue(false);
+      editor.isFocused.mockReturnValue(false);
 
       expect(takeOver(transfer([file("report.pdf", "application/pdf")]))).toBe(
         false,

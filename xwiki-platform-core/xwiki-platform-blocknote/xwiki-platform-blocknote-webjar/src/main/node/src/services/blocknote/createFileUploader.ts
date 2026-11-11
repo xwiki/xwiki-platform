@@ -28,13 +28,12 @@ import {
 } from "@xwiki/platform-xwiki-model-api";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteDocument } from "./BlockNoteProcessor";
-import type {
-  InlineLink,
-  InsertInlineContent,
-  PlaceCaret,
-} from "./insertFilesInline";
 import type { PageAttachment } from "@xwiki/platform-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
+import type {
+  EditorPartialLink,
+  EditorType,
+} from "@xwiki/platform-editors-blocknote-react";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
 
@@ -46,13 +45,10 @@ type FileUploaderDependencies = {
   // see each other's.
   eventTarget: EventTarget;
 
-  // Functions because neither is known yet when the editor is created.
+  // Functions because none of them is known yet when the editor is created.
   getDocumentReference: () => string;
   getBlockNoteDocument: () => BlockNoteDocument | undefined;
-
-  insertInlineContent: InsertInlineContent;
-
-  placeCaret: PlaceCaret;
+  getEditor: () => EditorType | undefined;
 
   // Whether the files are uploaded to the temporary store of the user session, from where the save request attaches
   // them to the document, rather than being attached right away.
@@ -96,8 +92,7 @@ function createFileUploader(
     eventTarget,
     getDocumentReference,
     getBlockNoteDocument,
-    insertInlineContent,
-    placeCaret,
+    getEditor,
     isTemporaryUpload,
     registerTemporaryAttachment,
     notifyUploadFailed,
@@ -108,20 +103,16 @@ function createFileUploader(
   // Pasted files are renamed, so we need to know how the file reached the editor.
   const pasteTracker = trackPaste(
     eventTarget,
-    takeOverFileTransfers(
-      insertInlineContent,
-      placeCaret,
-      async (file, paste) => {
-        const toUpload = toAttach(file, paste);
-        // Only the upload is caught here: a link that can't be built is a bug rather than something to report as
-        // a failed upload, and insertFilesInline logs it as one.
-        const attachment = await attach(toUpload).catch((error) => {
-          notifyUploadFailed(toUpload.name, error);
-          return undefined;
-        });
-        return attachment && linkTo(attachment, toUpload.name);
-      },
-    ),
+    takeOverFileTransfers(getEditor, async (file, paste) => {
+      const toUpload = toAttach(file, paste);
+      // Only the upload is caught here: a link that can't be built is a bug rather than something to report as a
+      // failed upload, and insertFilesInline logs it as one.
+      const attachment = await attach(toUpload).catch((error) => {
+        notifyUploadFailed(toUpload.name, error);
+        return undefined;
+      });
+      return attachment && linkTo(attachment, toUpload.name);
+    }),
   );
 
   // The file is attached to the edited document, so its reference is serialized relative to that document, as the
@@ -177,7 +168,10 @@ function createFileUploader(
   // The file, video and audio blocks are saved as macro calls, but those macros don't exist yet, so such a file
   // becomes a link to the attachment instead. The link metadata hangs off a synthetic id carried in the href,
   // because links have no id of their own.
-  function linkTo(attachment: PageAttachment, label: string): InlineLink {
+  function linkTo(
+    attachment: PageAttachment,
+    label: string,
+  ): EditorPartialLink {
     const linkId = uuidv4();
     const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;
     metadata.xwikiReference = attachmentReference(attachment.reference, true);

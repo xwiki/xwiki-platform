@@ -31,11 +31,7 @@ excludedLinkTargetTypes?: string[];
 linkContext?: LinkContext;
 }, {
 getContent: () => BlockType[];
-insertInlineContent: (content: Parameters<EditorType["insertInlineContent"]>[0]) => void;
-placeCaret: (coordinates?: {
-left: number;
-top: number;
-}) => boolean;
+getEditor: () => EditorType | undefined;
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
 "debounced-change": (content: BlockType[]) => any;
@@ -62,6 +58,12 @@ linkContext?: LinkContext;
 export { ContextForMacros }
 
 export { EditorType }
+
+// @beta
+export function moveCaretTo(editor: EditorType, coordinates: {
+    left: number;
+    top: number;
+}): boolean;
 
 // (No @packageDocumentation comment for this package)
 

@@ -32,11 +32,22 @@ import org.xwiki.test.ui.TestUtils;
  */
 public class ExtensionTestUtils extends AbstractExtensionTestUtils
 {
+    /**
+     * Creates a new instance.
+     *
+     * @param utils the generic test utility methods
+     */
     public ExtensionTestUtils(TestUtils utils)
     {
         super(utils);
     }
 
+    /**
+     * Creates a new instance.
+     *
+     * @param utils the generic test utility methods
+     * @param adminCredentials the admin credentials to use
+     */
     public ExtensionTestUtils(TestUtils utils, XWikiCredentials adminCredentials)
     {
         super(utils, adminCredentials);

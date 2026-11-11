@@ -35,6 +35,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class MacroDialogSelectModal extends BaseElement
 {
+    private static final By MACRO_NAME = By.cssSelector(".macro-name");
+
     private final Consumer<Runnable> submitHandler;
 
     /**
@@ -94,7 +96,7 @@ public class MacroDialogSelectModal extends BaseElement
      */
     public Optional<WebElement> getFirstMacro()
     {
-        return getDriver().findElements(By.cssSelector(".macro-name"))
+        return getDriver().findElements(MACRO_NAME)
             .stream()
             .filter(WebElement::isDisplayed)
             .findFirst();
@@ -113,7 +115,7 @@ public class MacroDialogSelectModal extends BaseElement
 
     private long countDisplayedMacros()
     {
-        return getDriver().findElements(By.cssSelector(".macro-name"))
+        return getDriver().findElements(MACRO_NAME)
             .stream()
             .filter(WebElement::isDisplayed)
             .count();

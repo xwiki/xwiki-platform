@@ -41,6 +41,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class RealtimeRichTextAreaElement extends RichTextAreaElement
 {
+    private static final String COEDITOR_ID_PREFIX = "rt-user-";
+
     /**
      * Represents the position of a coeditor in the rich text area (displayed on the left side).
      */
@@ -48,11 +50,18 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     {
         private String id;
 
+        /**
+         * @param id the id of the element marking the coeditor position
+         */
         public CoeditorPosition(String id)
         {
             this(id, false);
         }
 
+        /**
+         * @param id the id of the element marking the coeditor position
+         * @param wait {@code true} to wait for the coeditor position to be available in the edited content
+         */
         public CoeditorPosition(String id, boolean wait)
         {
             this.id = id;
@@ -63,26 +72,44 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
             }
         }
 
+        /**
+         * @return the id of the coeditor whose position this is
+         */
         public String getCoeditorId()
         {
-            return Strings.CS.removeStart(id, "rt-user-");
+            return Strings.CS.removeStart(id, COEDITOR_ID_PREFIX);
         }
 
+        /**
+         * @return the URL of the avatar displayed for the coeditor
+         */
         public String getAvatarURL()
         {
             return getFromEditedContent(() -> getContainer().getDomAttribute("src"));
         }
 
+        /**
+         * @return the hint (tooltip) of the avatar displayed for the coeditor
+         */
         public String getAvatarHint()
         {
             return getFromEditedContent(() -> getContainer().getDomAttribute("title"));
         }
 
+        /**
+         * @return the location of the coeditor position, relative to the edited content
+         */
         public Point getLocation()
         {
             return getFromEditedContent(() -> getContainer().getLocation());
         }
 
+        /**
+         * Waits for the coeditor position to be at the given location.
+         *
+         * @param point the expected location, relative to the edited content
+         * @return this coeditor position
+         */
         public CoeditorPosition waitForLocation(Point point)
         {
             getDriver().waitUntilCondition(driver -> getFromEditedContent(() -> {
@@ -108,9 +135,10 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
                 int viewportWidth = Integer.parseInt(root.getDomProperty("clientWidth"));
                 Map<String, Long> position = (Map<String, Long>) getDriver()
                     .executeScript("return arguments[0].getBoundingClientRect()", getContainer());
-                return position.get("y") >= 0 && position.get("x") >= 0
-                    && (position.get("y") + position.get("height")) <= viewportHeight
-                    && (position.get("x") + position.get("width")) <= viewportWidth;
+                long y = position.get("y");
+                long x = position.get("x");
+                return y >= 0 && x >= 0 && (y + position.get("height")) <= viewportHeight
+                    && (x + position.get("width")) <= viewportWidth;
             });
         }
 
@@ -147,7 +175,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public CoeditorPosition getCoeditorPosition(String coeditorId)
     {
-        return new CoeditorPosition("rt-user-" + coeditorId, true);
+        return new CoeditorPosition(COEDITOR_ID_PREFIX + coeditorId, true);
     }
 
     @Override

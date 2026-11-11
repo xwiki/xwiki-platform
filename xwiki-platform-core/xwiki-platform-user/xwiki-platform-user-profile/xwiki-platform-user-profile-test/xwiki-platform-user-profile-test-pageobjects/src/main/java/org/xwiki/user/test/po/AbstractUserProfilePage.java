@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -60,7 +59,6 @@ public class AbstractUserProfilePage extends ViewPage
      * @return the list of menu items available.
      * @since 13.2RC1
      */
-    @Unstable
     public List<String> getAvailableCategories()
     {
         return getDriver().findElementsWithoutWaiting(By.className("category-tab"))

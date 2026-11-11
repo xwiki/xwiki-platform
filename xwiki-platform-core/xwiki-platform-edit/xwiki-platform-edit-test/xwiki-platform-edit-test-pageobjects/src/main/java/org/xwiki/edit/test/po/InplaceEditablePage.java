@@ -43,6 +43,8 @@ public class InplaceEditablePage extends ViewPage
 
     private static final String ARIA_DESCRIBEDBY = "aria-describedby";
 
+    private static final String SAVED_MESSAGE = "Saved";
+
     @FindBy(id = "commentinput")
     private WebElement versionSummaryInput;
 
@@ -302,7 +304,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage save(boolean wait)
     {
-        return save(wait ? "Saved" : null);
+        return save(wait ? SAVED_MESSAGE : null);
     }
 
     /**
@@ -340,7 +342,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage saveAndView(boolean wait)
     {
-        return saveAndView(wait ? "Saved" : null);
+        return saveAndView(wait ? SAVED_MESSAGE : null);
     }
 
     /**

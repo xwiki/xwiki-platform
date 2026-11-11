@@ -46,6 +46,8 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNest
  */
 public class BlockNoteRichTextArea extends BaseElement
 {
+    private static final By IMAGE = By.tagName("img");
+
     @NonNull
     private WebElement container;
 
@@ -217,7 +219,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public WebElement getImage(int index)
     {
-        return this.container.findElements(By.tagName("img")).get(index);
+        return this.container.findElements(IMAGE).get(index);
     }
 
     /**
@@ -252,7 +254,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea waitUntilImagesAreLoaded()
     {
-        int imageCount = this.container.findElements(By.tagName("img")).size();
+        int imageCount = this.container.findElements(IMAGE).size();
         for (int i = 0; i < imageCount; i++) {
             waitUntilImageIsLoaded(i);
         }

@@ -26,7 +26,6 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -35,9 +34,12 @@ import org.xwiki.test.ui.po.BaseElement;
  * @version $Id$
  * @since 18.6.0
  */
-@Unstable
 public class SlashMenu extends BaseElement
 {
+    private static final By MENU = By.className("bn-suggestion-menu");
+
+    private static final By SELECTED_ITEM = By.cssSelector(".bn-suggestion-menu-item[aria-selected=\"true\"]");
+
     /**
      * We keep a reference to the previously selected item in order to detect when the items are updated.
      */
@@ -59,11 +61,10 @@ public class SlashMenu extends BaseElement
     public SlashMenu(boolean wait)
     {
         if (wait) {
-            getDriver().waitUntilElementIsVisible(By.className("bn-suggestion-menu"));
+            getDriver().waitUntilElementIsVisible(MENU);
         }
 
-        List<WebElement> selectedItems =
-            getDriver().findElementsWithoutWaiting(By.cssSelector(".bn-suggestion-menu-item[aria-selected=\"true\"]"));
+        List<WebElement> selectedItems = getDriver().findElementsWithoutWaiting(SELECTED_ITEM);
         if (!selectedItems.isEmpty()) {
             this.selectedItem = selectedItems.get(0);
         }
@@ -73,6 +74,7 @@ public class SlashMenu extends BaseElement
      * Waits for the given menu item to be selected.
      * 
      * @param title the menu item title
+     * @return this menu
      */
     public SlashMenu waitForItemSelected(String title)
     {
@@ -135,9 +137,8 @@ public class SlashMenu extends BaseElement
         try {
             getDriver().waitUntilCondition(driver -> {
                 try {
-                    Rectangle menu = getDriver().findElement(By.className("bn-suggestion-menu")).getRect();
-                    Rectangle item = getDriver()
-                        .findElement(By.cssSelector(".bn-suggestion-menu-item[aria-selected=\"true\"]")).getRect();
+                    Rectangle menu = getDriver().findElement(MENU).getRect();
+                    Rectangle item = getDriver().findElement(SELECTED_ITEM).getRect();
                     return item.getY() >= menu.getY()
                         && item.getY() + item.getHeight() <= menu.getY() + menu.getHeight();
                 } catch (StaleElementReferenceException e) {

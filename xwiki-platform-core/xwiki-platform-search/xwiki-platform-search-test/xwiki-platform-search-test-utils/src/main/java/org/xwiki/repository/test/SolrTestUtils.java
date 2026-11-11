@@ -41,6 +41,12 @@ public class SolrTestUtils
 
     private final String url;
 
+    /**
+     * Creates a new instance, creating the wiki page used to query the Solr indexing queue if it doesn't exist.
+     *
+     * @param testUtils the generic test utility methods
+     * @throws Exception if the creation of the wiki page fails
+     */
     public SolrTestUtils(TestUtils testUtils) throws Exception
     {
         this.testUtils = testUtils;
@@ -69,6 +75,10 @@ public class SolrTestUtils
         }
     }
 
+    /**
+     * @return the number of entries waiting to be indexed by Solr
+     * @throws Exception if the queue size cannot be retrieved
+     */
     public long getSolrQueueSize() throws Exception
     {
         String value;

@@ -19,8 +19,10 @@
  */
 package org.xwiki.user.internal.group;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -349,6 +351,78 @@ public class DefaultGroupManager implements GroupManager
 
         // Check if the reference is part of those groups
         return wikiGroup.contains(reference);
+    }
+
+    @Override
+    public boolean isMember(DocumentReference member, DocumentReference group, boolean recurse) throws GroupException
+    {
+        if (member == null || group == null) {
+            return false;
+        }
+
+        DocumentReference memberReference = member.withoutLocale();
+        DocumentReference groupReference = group.withoutLocale();
+
+        // Like the default implementation: a group is never a member of itself, even when it lists itself as a member
+        // or in case of cross references between groups.
+        if (memberReference.equals(groupReference)) {
+            return false;
+        }
+
+        // Same wikis as the default implementation: a direct membership is stored in the group's document, while the
+        // intermediate groups of a recursive membership are usually located in the member's wiki.
+        Collection<String> searchWikis = new TreeSet<>();
+        searchWikis.add(groupReference.getWikiReference().getName());
+        if (recurse) {
+            searchWikis.add(memberReference.getWikiReference().getName());
+        }
+
+        // The entry getGroups uses for the member's groups (the walk below would create it anyway), taken before
+        // resolving anything, like getGroups does.
+        GroupCacheEntry entry = this.memberGroupsCache.getCacheEntry(memberReference, searchWikis, true);
+
+        // Answer from the groups of the member when they are already known. The members of the group are not used
+        // since they are not resolved the same way (e.g. no implicit membership).
+        Collection<DocumentReference> cachedGroups = get(entry, recurse);
+        if (cachedGroups != null) {
+            return cachedGroups.contains(groupReference);
+        }
+
+        if (!recurse) {
+            return getGroups(memberReference, searchWikis, false).contains(groupReference);
+        }
+
+        return isMemberRecursive(memberReference, groupReference, searchWikis, entry);
+    }
+
+    private boolean isMemberRecursive(DocumentReference memberReference, DocumentReference groupReference,
+        Collection<String> searchWikis, GroupCacheEntry entry) throws GroupException
+    {
+        // Walk up the direct groups (which are cached) and stop as soon as the group is found, instead of resolving
+        // all the groups of the member.
+        Set<DocumentReference> visited = new LinkedHashSet<>();
+        visited.add(memberReference);
+        Deque<DocumentReference> toVisit = new ArrayDeque<>();
+        toVisit.add(memberReference);
+        while (!toVisit.isEmpty()) {
+            for (DocumentReference directGroup : getGroups(toVisit.poll(), searchWikis, false)) {
+                if (directGroup.equals(groupReference)) {
+                    return true;
+                }
+                // Protect against cross references between groups
+                if (visited.add(directGroup)) {
+                    toVisit.add(directGroup);
+                }
+            }
+        }
+
+        // The walk visited all the groups of the member: cache them so that the next check is a single lookup, like
+        // after getGroups. No lock is needed (and none is taken, to not slow down concurrent checks): concurrent walks
+        // all compute the same complete set, and the entry publishes it safely through an unmodifiable wrapper.
+        visited.remove(memberReference);
+        entry.setAll(visited);
+
+        return false;
     }
 
     @Override

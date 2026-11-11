@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.group.WikiTarget;
@@ -143,6 +144,34 @@ public class GroupScriptService implements ScriptService
     public Collection<DocumentReference> getMembers(DocumentReference group) throws GroupException
     {
         return getMembers(group, true);
+    }
+
+    /**
+     * Indicate if the passed member (user or group) is a member of the passed group.
+     * <p>
+     * The membership is resolved from the groups of the member, which differs from
+     * {@code getMembers(group, recurse).contains(member)} in two ways:
+     * <ul>
+     * <li>when {@code recurse} is true, the intermediate groups are only searched in the wiki of the member and in the
+     * wiki of the group (which covers a global user or group added to a subwiki group): a membership going through a
+     * group located in any other wiki is not taken into account</li>
+     * <li>implicit memberships are taken into account, for example every user except the guest user being a member of
+     * {@code XWikiAllGroup} when {@code xwiki.authentication.group.allgroupimplicit} is enabled</li>
+     * </ul>
+     * The locale of the passed references, if any, is ignored, and a group is never a member of itself.
+     *
+     * @param member the group member (user or group); {@code null} (the guest user) is never a member
+     * @param group the group to check; {@code null} has no members
+     * @param recurse false to only check direct membership, true to also take into account groups of groups
+     * @return {@code true} if the passed member is a member of the passed group
+     * @throws GroupException when failing to get the groups of the member
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public boolean isMember(DocumentReference member, DocumentReference group, boolean recurse)
+        throws GroupException
+    {
+        return this.groupManager.isMember(member, group, recurse);
     }
 
     /**

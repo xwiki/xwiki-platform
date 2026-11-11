@@ -68,6 +68,15 @@ class GroupScriptServiceTest
     private GroupManager groupManager;
 
     @Test
+    void isMember() throws Exception
+    {
+        when(this.groupManager.isMember(CANDIDATE_GROUP, TARGET_GROUP, true)).thenReturn(true);
+
+        assertTrue(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP, true));
+        assertFalse(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP, false));
+    }
+
+    @Test
     void canAddGroupAsMember() throws Exception
     {
         when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenReturn(emptyList());

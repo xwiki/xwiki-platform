@@ -242,6 +242,9 @@ public class ClassSheetPage extends ViewPage
         return new ViewPage();
     }
 
+    /**
+     * @return the picker used to choose the location of a new document based on the class template
+     */
     public DocumentPicker getNewPagePicker()
     {
         if (this.documentPicker == null) {

@@ -41,17 +41,30 @@ public class ShareDialog extends BaseElement
     @FindBy(xpath = "//input[@type = 'submit' and @class = 'button']")
     private WebElement sendButton;
 
+    /**
+     * Types the given email address in the recipient field and selects it from the suggestions.
+     *
+     * @param email the email address of the recipient
+     */
     public void setEmailField(String email)
     {
         new SuggestInputElement(this.emailField).sendKeys(email).waitForSuggestions().selectTypedText();
     }
 
+    /**
+     * @param message the message to send along with the shared page link
+     */
     public void setMessage(String message)
     {
         this.emailMessage.clear();
         this.emailMessage.sendKeys(message);
     }
 
+    /**
+     * Sends the email.
+     *
+     * @return the dialog displaying the result of sending the email
+     */
     public ShareResultDialog sendMail()
     {
         this.sendButton.click();

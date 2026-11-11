@@ -20,7 +20,6 @@
 package org.xwiki.blocknote.test.po;
 
 import org.openqa.selenium.By;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -29,7 +28,6 @@ import org.xwiki.test.ui.po.BaseElement;
  * @version $Id$
  * @since 18.10.0RC1
  */
-@Unstable
 public class EmojiPicker extends BaseElement
 {
     // The picker filters its grid asynchronously and ignores Enter until the selected emoji is rendered at the first

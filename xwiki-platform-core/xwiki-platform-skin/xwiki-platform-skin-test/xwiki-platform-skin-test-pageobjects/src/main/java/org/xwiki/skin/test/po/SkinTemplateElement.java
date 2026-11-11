@@ -34,6 +34,9 @@ public class SkinTemplateElement extends BaseElement
 {
     private final WebElement rootElement;
 
+    /**
+     * @param rootElement the container of the properties
+     */
     public SkinTemplateElement(WebElement rootElement)
     {
         this(rootElement, false);
@@ -53,6 +56,9 @@ public class SkinTemplateElement extends BaseElement
         }
     }
 
+    /**
+     * @param content the new content of the template override
+     */
     public void setContent(String content)
     {
         WebElement contentElement = getDriver().findElementWithoutWaiting(this.rootElement, By.tagName("textarea"));

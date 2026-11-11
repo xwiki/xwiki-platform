@@ -31,6 +31,10 @@
   <name>XWiki Platform - Share Page - Tests - Page Objects</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Share Page - Tests - Page Objects</description>
+  <properties>
+    <!-- Unlike other test modules, check the code style since this module is reused by other tests -->
+    <xwiki.checkstyle.skip>false</xwiki.checkstyle.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

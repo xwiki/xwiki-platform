@@ -39,11 +39,19 @@ public class DocumentPickerModal extends BaseElement
 
     private DocumentTreeElement tree;
 
+    /**
+     * Creates a page object for the default location picker modal.
+     */
     public DocumentPickerModal()
     {
         this(By.cssSelector(".location-picker .modal"));
     }
 
+    /**
+     * Creates a page object for the modal matched by the given selector, waiting for it to be displayed.
+     *
+     * @param selector the selector used to locate the modal
+     */
     public DocumentPickerModal(By selector)
     {
         this.container = getDriver().findElementWithoutWaiting(selector);
@@ -51,6 +59,9 @@ public class DocumentPickerModal extends BaseElement
         this.waitForIt();
     }
 
+    /**
+     * @return the document tree displayed in the modal
+     */
     public DocumentTreeElement getTree()
     {
         if (this.tree == null) {
@@ -59,24 +70,40 @@ public class DocumentPickerModal extends BaseElement
         return this.tree;
     }
 
+    /**
+     * Closes the modal without selecting anything.
+     */
     public void cancel()
     {
         this.container.findElement(By.className("btn-default")).click();
         waitToClose();
     }
 
+    /**
+     * Confirms the current selection and waits for the modal to close.
+     */
     public void select()
     {
         this.container.findElement(By.className("btn-primary")).click();
         waitToClose();
     }
 
+    /**
+     * Selects the specified document in the tree and confirms the selection.
+     *
+     * @param path the path used to locate the document to select
+     */
     public void selectDocument(String... path)
     {
         getTree().clearSelection().openToDocument(path);
         select();
     }
 
+    /**
+     * Waits for the modal to be displayed.
+     *
+     * @return this modal
+     */
     public DocumentPickerModal waitForIt()
     {
         // Wait for the modal fade animation.

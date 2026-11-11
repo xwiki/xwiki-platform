@@ -25,7 +25,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
@@ -1217,7 +1216,6 @@ public class TestConfiguration
      * @since 18.10.0RC1
      * @since 18.4.8
      */
-    @Unstable
     public boolean isSharedFileSystemBlobStore()
     {
         return isCluster() && getBlobStore() == BlobStore.FILESYSTEM;

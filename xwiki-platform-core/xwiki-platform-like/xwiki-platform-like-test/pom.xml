@@ -30,6 +30,11 @@
   <artifactId>xwiki-platform-like-test</artifactId>
   <name>XWiki Platform - Like - Test - Parent POM</name>
   <packaging>pom</packaging>
+  <properties>
+    <!-- Test code and page objects are not public APIs, so don't run backward-compatibility checks on them.
+         See https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HCodeThatIsNotAPI -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <modules>
     <module>xwiki-platform-like-test-pageobjects</module>
   </modules>

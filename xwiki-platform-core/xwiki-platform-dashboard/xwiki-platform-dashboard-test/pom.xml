@@ -31,6 +31,11 @@
   <name>XWiki Platform - Dashboard - Test - Parent POM</name>
   <description>XWiki Platform - Dashboard - Test - Parent POM</description>
   <packaging>pom</packaging>
+  <properties>
+    <!-- Test code and page objects are not public APIs, so don't run backward-compatibility checks on them.
+         See https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HCodeThatIsNotAPI -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <modules>
     <module>xwiki-platform-dashboard-test-pageobjects</module>
   </modules>

@@ -29,6 +29,11 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class SkinViewPage extends ViewPage
 {
+    /**
+     * Edits the skin.
+     *
+     * @return the page used to edit the skin
+     */
     public SkinInlinePage editSkin()
     {
         super.edit();

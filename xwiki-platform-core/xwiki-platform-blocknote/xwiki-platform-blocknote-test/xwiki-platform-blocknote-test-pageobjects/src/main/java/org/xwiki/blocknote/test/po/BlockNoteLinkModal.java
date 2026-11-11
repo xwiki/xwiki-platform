@@ -37,6 +37,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class BlockNoteLinkModal extends BaseElement
 {
+    private static final String OPEN = "open";
+
     /**
      * The field designating the link target, whatever the selected target type.
      */
@@ -244,9 +246,9 @@ public class BlockNoteLinkModal extends BaseElement
     public void expandOptions()
     {
         WebElement options = getDriver().findElement(OPTIONS);
-        if (!Boolean.parseBoolean(options.getDomProperty("open"))) {
+        if (!Boolean.parseBoolean(options.getDomProperty(OPEN))) {
             options.findElement(By.tagName("summary")).click();
-            getDriver().waitUntilCondition(driver -> Boolean.parseBoolean(options.getDomProperty("open")));
+            getDriver().waitUntilCondition(driver -> Boolean.parseBoolean(options.getDomProperty(OPEN)));
         }
     }
 

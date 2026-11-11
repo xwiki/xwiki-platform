@@ -3144,9 +3144,6 @@ importers:
       '@xwiki/platform-model-xwiki':
         specifier: workspace:*
         version: link:../../model-xwiki
-      '@xwiki/platform-rendering-api':
-        specifier: workspace:*
-        version: link:../../../rendering/rendering-api
       '@xwiki/platform-xwiki-model-api':
         specifier: workspace:*
         version: link:../../../xwiki/xwiki-model-api

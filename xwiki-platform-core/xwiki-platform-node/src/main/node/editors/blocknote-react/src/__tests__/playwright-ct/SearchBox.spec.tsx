@@ -111,6 +111,36 @@ test("Options should be selectable", async ({ mount }) => {
   expect(submitted).toBe("https://perdu.com");
 });
 
+test("A typed entity reference is submitted with the entity type of the search box", async ({
+  mount,
+}) => {
+  let submitted = null;
+
+  const component = await mount(
+    <SearchBoxForTest
+      onSubmit={(url, reference) => {
+        submitted = { url, reference };
+      }}
+    />,
+  );
+
+  // The entity reference doesn't say it designates an attachment: the search box does (see SearchBoxForTest).
+  await component.locator("input").fill("some attachment reference");
+  await component.locator("input").press("Enter");
+
+  await expect
+    .poll(() => submitted)
+    .toEqual({
+      url: "some attachment url",
+      reference: {
+        type: "attach",
+        typed: true,
+        reference: "some attachment reference",
+        parameters: {},
+      },
+    });
+});
+
 // eslint-disable-next-line max-statements
 test("Options should be navigable", async ({ mount }) => {
   let selected = null;

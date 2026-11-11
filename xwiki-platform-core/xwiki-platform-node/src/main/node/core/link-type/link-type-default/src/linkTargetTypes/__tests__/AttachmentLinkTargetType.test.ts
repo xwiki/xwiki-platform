@@ -144,9 +144,7 @@ describe("AttachmentLinkTargetType", () => {
     });
 
     it("converts an attachment config back into a reference", () => {
-      modelReferenceSerializer.serialize.mockReturnValue(
-        "attach:Some.Page@file.png",
-      );
+      modelReferenceSerializer.serialize.mockReturnValue("Some.Page@file.png");
 
       const reference = targetType.toReference?.({ ref: attachmentRef });
 
@@ -159,9 +157,7 @@ describe("AttachmentLinkTargetType", () => {
     });
 
     it("keeps the query string in the parameters of the reference, without its URL separator", () => {
-      modelReferenceSerializer.serialize.mockReturnValue(
-        "attach:Some.Page@file.png",
-      );
+      modelReferenceSerializer.serialize.mockReturnValue("Some.Page@file.png");
 
       const reference = targetType.toReference?.({
         ref: attachmentRef,
@@ -209,7 +205,7 @@ describe("AttachmentLinkTargetType", () => {
     });
 
     it("serializes the reference relative to the source document", () => {
-      modelReferenceSerializer.serialize.mockReturnValue("attach:cat.png");
+      modelReferenceSerializer.serialize.mockReturnValue("cat.png");
 
       const reference = targetType.toReference?.(
         { ref: attachmentRef },

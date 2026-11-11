@@ -21,6 +21,7 @@ import { DepsContainerContext } from "../contexts";
 import { toResourceReference } from "../misc/resourceReference";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
 import { debounceAsync } from "@xwiki/platform-fn-utils";
+import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
 import {
@@ -51,6 +52,12 @@ type SearchBoxProps = {
    * The search box's placeholder (when empty)
    */
   placeholder: string;
+
+  /**
+   * The type of the entities designated by the search box (e.g. attachments for an image), used to parse the entity
+   * reference typed by the user: an entity reference doesn't hold the type of the entity.
+   */
+  entityType: EntityType.DOCUMENT | EntityType.ATTACHMENT;
 
   /**
    * Perform a search
@@ -115,6 +122,7 @@ type LinkSuggestion = {
 export const SearchBox: React.FC<SearchBoxProps> = ({
   initialValue,
   placeholder,
+  entityType,
   getSuggestions,
   renderSuggestion,
   onSelect,
@@ -197,7 +205,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
       }
 
       const reference = await modelReferenceParser
-        .parseAsync(value)
+        .parseAsync(value, { type: entityType })
         .catch(() => null);
 
       if (!reference) {
@@ -212,17 +220,17 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       // Build the resource reference directly from the typed entity reference, rather than parsing it
       // back from the URL we just serialized.
-      onSubmit(
-        url,
-        resourceReferenceParser.parse(value, { type: ResourceType.DOCUMENT }),
-      );
+      onSubmit(url, {
+        type:
+          reference.type === EntityType.ATTACHMENT
+            ? ResourceType.ATTACHMENT
+            : ResourceType.DOCUMENT,
+        typed: true,
+        reference: value,
+        parameters: {},
+      });
     },
-    [
-      onSubmit,
-      modelReferenceParser,
-      remoteURLSerializer,
-      resourceReferenceParser,
-    ],
+    [entityType, onSubmit, modelReferenceParser, remoteURLSerializer],
   );
 
   const isFirstSearch = useRef(true);

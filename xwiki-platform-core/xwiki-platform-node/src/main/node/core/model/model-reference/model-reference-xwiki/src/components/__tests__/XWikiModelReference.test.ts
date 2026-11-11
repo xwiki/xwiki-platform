@@ -27,22 +27,8 @@ import {
   WikiReference,
 } from "@xwiki/platform-model-api";
 import { describe, expect, it } from "vitest";
-import type { ResourceReferenceParser } from "@xwiki/platform-rendering-api";
 
-// Reads the resource type prefix (e.g. "doc:"), like the XWiki resource reference parser does for the entity types.
-const resourceReferenceParser = {
-  parse(reference: string, { type }: { type: string }) {
-    const match = /^(doc|attach|space):(.*)$/.exec(reference);
-    return {
-      type: match?.[1] ?? type,
-      typed: !!match,
-      reference: match?.[2] ?? reference,
-      parameters: {},
-    };
-  },
-} as unknown as ResourceReferenceParser;
-
-const parser = new XWikiModelReferenceParser(resourceReferenceParser);
+const parser = new XWikiModelReferenceParser();
 const serializer = new XWikiModelReferenceSerializer();
 
 const page = new DocumentReference(
@@ -57,6 +43,33 @@ const otherPage = new DocumentReference(
 );
 
 describe("XWikiModelReferenceParser", () => {
+  it("parses a document reference unless another entity type is specified", () => {
+    expect(parser.parse("xwiki:Space.Other")).toEqual(otherPage);
+    expect(
+      parser.parse("dev:A.B@cat.png", { type: EntityType.ATTACHMENT }),
+    ).toEqual(
+      new AttachmentReference(
+        "cat.png",
+        new DocumentReference(
+          "B",
+          new SpaceReference(new WikiReference("dev"), "A"),
+          true,
+        ),
+      ),
+    );
+  });
+
+  it("parses an entity reference, not a resource reference", () => {
+    // Like the server-side entity reference resolver, "doc" is the wiki name here, not the resource type.
+    expect(parser.parse("doc:Space.Other")).toEqual(
+      new DocumentReference(
+        "Other",
+        new SpaceReference(new WikiReference("doc"), "Space"),
+        true,
+      ),
+    );
+  });
+
   it("resolves a relative reference against the base reference", () => {
     expect(parser.parse("Other", { base: page })).toEqual(otherPage);
     expect(
@@ -77,14 +90,26 @@ describe("XWikiModelReferenceParser", () => {
 
 describe("XWikiModelReferenceSerializer", () => {
   it("serializes a reference fully without a base reference", () => {
-    expect(serializer.serialize(otherPage)).toBe("doc:xwiki:Space.Other");
+    expect(serializer.serialize(otherPage)).toBe("xwiki:Space.Other");
+    expect(serializer.serialize(new AttachmentReference("cat.png", page))).toBe(
+      "xwiki:Space.Page@cat.png",
+    );
   });
 
   it("serializes a reference relative to the base reference", () => {
-    expect(serializer.serialize(otherPage, page)).toBe("doc:Other");
+    expect(serializer.serialize(otherPage, page)).toBe("Other");
     expect(
       serializer.serialize(new AttachmentReference("cat.png", page), page),
-    ).toBe("attach:cat.png");
+    ).toBe("cat.png");
+  });
+
+  it("serializes an attachment reference that parses back to itself given its type", () => {
+    const attachment = new AttachmentReference("cat.png", otherPage);
+    expect(
+      parser.parse(serializer.serialize(attachment)!, {
+        type: EntityType.ATTACHMENT,
+      }),
+    ).toEqual(attachment);
   });
 
   it("serializes a reference that parses back to itself against the same base", () => {

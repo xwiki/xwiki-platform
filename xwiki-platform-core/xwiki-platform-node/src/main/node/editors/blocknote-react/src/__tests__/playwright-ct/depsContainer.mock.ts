@@ -53,7 +53,11 @@ export function depsContainerMock(): Container {
 
   container.get.calledWith("RemoteURLSerializerProvider").mockReturnValue({
     get: () => ({
-      serialize() {
+      serialize(reference) {
+        if (reference?.type === EntityType.ATTACHMENT) {
+          return "some attachment url";
+        }
+
         throw new Error("Unreachable");
       },
     }),
@@ -156,7 +160,8 @@ const parseModelReference: ModelReferenceParser["parse"] = (
 
   if (
     reference === "some attachment reference" &&
-    (!opts?.type || opts?.type === EntityType.ATTACHMENT)
+    // Like an actual entity reference, it doesn't hold the type of the entity.
+    opts?.type === EntityType.ATTACHMENT
   ) {
     return new AttachmentReference(
       "some attachment",

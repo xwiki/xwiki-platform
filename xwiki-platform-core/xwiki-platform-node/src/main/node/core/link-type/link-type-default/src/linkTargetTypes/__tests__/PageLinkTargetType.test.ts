@@ -184,8 +184,8 @@ describe("PageLinkTargetType", () => {
       ).toBeNull();
     });
 
-    it("converts a page config back into a reference, dropping the type prefix added by the serializer", () => {
-      modelReferenceSerializer.serialize.mockReturnValue("doc:Some.Page");
+    it("converts a page config back into a reference", () => {
+      modelReferenceSerializer.serialize.mockReturnValue("Some.Page");
 
       const reference = targetType.toReference?.({ ref: documentRef });
 
@@ -198,7 +198,7 @@ describe("PageLinkTargetType", () => {
     });
 
     it("keeps the query string and the anchor in the parameters of the reference, without their URL separators", () => {
-      modelReferenceSerializer.serialize.mockReturnValue("doc:Some.Page");
+      modelReferenceSerializer.serialize.mockReturnValue("Some.Page");
 
       const reference = targetType.toReference?.({
         ref: documentRef,
@@ -215,7 +215,7 @@ describe("PageLinkTargetType", () => {
     });
 
     it("leaves the empty query string and anchor out of the parameters of the reference", () => {
-      modelReferenceSerializer.serialize.mockReturnValue("doc:Some.Page");
+      modelReferenceSerializer.serialize.mockReturnValue("Some.Page");
 
       const reference = targetType.toReference?.({
         ref: documentRef,
@@ -231,7 +231,7 @@ describe("PageLinkTargetType", () => {
     });
 
     it("leaves the title of the page out of the reference", () => {
-      modelReferenceSerializer.serialize.mockReturnValue("doc:Some.Page");
+      modelReferenceSerializer.serialize.mockReturnValue("Some.Page");
 
       expect(
         targetType.toReference?.({ ref: documentRef, title: "Some title" }),
@@ -321,7 +321,7 @@ describe("PageLinkTargetType without the services of the current wiki", () => {
     });
 
     it("serializes the reference relative to the source document", () => {
-      modelReferenceSerializer.serialize.mockReturnValue("doc:Other");
+      modelReferenceSerializer.serialize.mockReturnValue("Other");
 
       const reference = targetType.toReference?.({ ref: documentRef }, context);
 

@@ -119,11 +119,8 @@ function linkReferenceParameters(parts: LinkURLParts): Record<string, string> {
 }
 
 /**
- * Build the reference of a linked page or attachment.
- *
- * The model reference serializer produces a typed reference (e.g. "doc:Space.Page") while a resource
- * reference holds the type and the entity reference separately, so the type prefix is stripped. Not
- * all serializers add it though, so its presence is not assumed.
+ * Build the reference of a linked page or attachment: a resource reference holds the type of the linked entity and its
+ * serialized entity reference separately.
  *
  * @param parts - the query string and the anchor of the link, held by the parameters of the reference
  * @param context - where the link is: the entity reference is serialized relative to the document holding the link,
@@ -145,14 +142,8 @@ function entityResourceReference(
   if (!serialized) {
     return undefined;
   }
-  const prefix = `${type}:`;
   return {
-    ...typedResourceReference(
-      type,
-      serialized.startsWith(prefix)
-        ? serialized.slice(prefix.length)
-        : serialized,
-    ),
+    ...typedResourceReference(type, serialized),
     parameters: linkReferenceParameters(parts),
   };
 }

@@ -17,13 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EntityType } from "@xwiki/platform-model-api";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
 import { Model } from "@xwiki/platform-xwiki-model-api";
 import { injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
 
+/**
+ * Serializes entity references in the format of the default server-side entity reference serializer (e.g.
+ * `wiki:Space.Page@file.png`), without any type prefix: the type of the entity is not part of its reference, so it
+ * must be passed to the parser when it's not a document (see `ModelReferenceParserOptions.type`).
+ */
 @injectable()
 class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
   public serialize(
@@ -33,26 +37,10 @@ class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
     if (!reference) {
       return undefined;
     }
-    return (
-      this.getPrefix(reference.type) +
-      Model.serialize(
-        toXWikiEntityReference(reference),
-        base && toXWikiEntityReference(base),
-      )
+    return Model.serialize(
+      toXWikiEntityReference(reference),
+      base && toXWikiEntityReference(base),
     );
-  }
-
-  private getPrefix(type: EntityType): string {
-    switch (type) {
-      case EntityType.SPACE:
-        return "space:";
-      case EntityType.DOCUMENT:
-        return "doc:";
-      case EntityType.ATTACHMENT:
-        return "attach:";
-      default:
-        return "";
-    }
   }
 }
 

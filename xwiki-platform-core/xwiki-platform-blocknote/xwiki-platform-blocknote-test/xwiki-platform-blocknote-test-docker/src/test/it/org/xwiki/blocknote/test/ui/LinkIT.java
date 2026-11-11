@@ -225,8 +225,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>doc:%s]] third".formatted(setup.serializeReference(targetPage)),
-            wikiEditor.getContent());
+        assertEquals("first [[second>>doc:PageLinkTarget]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -267,8 +266,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>attach:%s@%s]] third".formatted(setup.serializeReference(targetPage),
-            attachmentName), wikiEditor.getContent());
+        assertEquals("first [[second>>attach:AttachmentLinkTarget@image.gif]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -392,8 +390,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>doc:%s]] third".formatted(setup.serializeReference(newTargetPage)),
-            wikiEditor.getContent());
+        assertEquals("first [[second>>doc:NewPageLinkTarget]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -436,8 +433,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>attach:%s@%s]] third".formatted(setup.serializeReference(newTargetPage),
-            attachmentName), wikiEditor.getContent());
+        assertEquals("first [[second>>attach:NewAttachmentLinkTarget@image.gif]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -524,7 +520,6 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>doc:%s||class=\"foo\"]] third".formatted(setup.serializeReference(newTargetPage)),
-            wikiEditor.getContent());
+        assertEquals("first [[second>>doc:NewLinkTarget||class=\"foo\"]] third", wikiEditor.getContent());
     }
 }

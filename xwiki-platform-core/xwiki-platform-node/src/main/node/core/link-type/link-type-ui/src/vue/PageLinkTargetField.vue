@@ -18,7 +18,6 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { entityReferenceQuery } from "../entityReferenceQuery";
 import { suggestLinks } from "../linkSuggestions";
 import { translations } from "../translations";
 import { tryFallible } from "@xwiki/platform-fn-utils";
@@ -89,14 +88,11 @@ function parseReference(reference: string): PageSelection | null {
 
 /**
  * @param ref - a page reference
- * @returns the text of the search box designating the page
+ * @returns the text of the search box designating the page, relative to the document holding the link
  */
 function toQuery(ref: DocumentReference): string {
-  return entityReferenceQuery(
-    ref,
-    modelReferenceSerializer,
-    "doc:",
-    linkContext,
+  return (
+    modelReferenceSerializer.serialize(ref, linkContext?.sourceDocument) ?? ""
   );
 }
 

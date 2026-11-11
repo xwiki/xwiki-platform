@@ -104,7 +104,7 @@ function mockReferenceServices(
     get: () => ({
       serialize: (reference: AttachmentReference) =>
         serializeReferences
-          ? `attach:${reference.document.name}@${reference.name}`
+          ? `${reference.document.name}@${reference.name}`
           : undefined,
     }),
   } as unknown as ModelReferenceSerializerProvider);
@@ -224,12 +224,13 @@ describe("triggerUserImageUpload", () => {
     selectFile(input);
 
     // The reference of the uploaded image is built from the page it was uploaded to and the name of the uploaded
-    // attachment.
+    // attachment. It's untyped, like the references of the image suggestions, since an image designates an attachment
+    // by default.
     await expect(promise).resolves.toEqual({
       url: "https://example.org/attachments/uploaded.png",
       reference: {
         type: "attach",
-        typed: true,
+        typed: false,
         reference: "Edited.Page@uploaded.png",
         parameters: {},
       },

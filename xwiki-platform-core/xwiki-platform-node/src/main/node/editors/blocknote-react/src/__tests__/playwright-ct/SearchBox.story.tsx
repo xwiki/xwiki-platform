@@ -21,11 +21,13 @@ import { depsContainerMock } from "./depsContainer.mock";
 import { SearchBox } from "../../components/SearchBox";
 import { DepsContainerContext } from "../../contexts";
 import { MantineProvider } from "@mantine/core";
+import { EntityType } from "@xwiki/platform-model-api";
 import { useCallback, useMemo, useState } from "react";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type SearchBoxForTestProps = {
   onSelect?: (url: string) => void;
-  onSubmit?: (url: string) => void;
+  onSubmit?: (url: string, reference: ResourceReference) => void;
 };
 
 export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
@@ -66,12 +68,13 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
         <SearchBox
           initialValue="Some great initial value"
           placeholder="Some super placeholder"
+          entityType={EntityType.ATTACHMENT}
           getSuggestions={getSuggestions}
           renderSuggestion={(suggestion) => (
             <span>Suggestion title: {suggestion.title}</span>
           )}
           onSelect={(url) => onSelect?.(url)}
-          onSubmit={(url) => onSubmit?.(url)}
+          onSubmit={(url, reference) => onSubmit?.(url, reference)}
         />
         <output data-test="searchedQueries">
           {JSON.stringify(searchedQueries)}

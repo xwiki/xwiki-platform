@@ -148,6 +148,7 @@ export function ImageSelector({
 
       <SearchBox
         placeholder={t("blocknote.imageSelector.placeholder")}
+        entityType={EntityType.ATTACHMENT}
         initialValue={initialQuery}
         getSuggestions={searchAttachments}
         renderSuggestion={(suggestion) => (

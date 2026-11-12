@@ -80,6 +80,36 @@ describe("URLLinkTargetType", () => {
     });
   });
 
+  describe("completing the URL typed by the user", () => {
+    it("completes a URL starting with a host name with the https scheme", () => {
+      expect(targetType.toURL({ location: "www.example.org" })).toBe(
+        "https://www.example.org",
+      );
+      expect(
+        targetType.toReference?.({ location: " www.example.org " }),
+      ).toEqual({
+        type: "url",
+        typed: false,
+        reference: "https://www.example.org",
+        parameters: {},
+      });
+    });
+
+    it("converts a relative URL into a typed path reference, which isn't parsed back as a document reference", () => {
+      expect(targetType.toURL({ location: "/xwiki/bin/view/Main/" })).toBe(
+        "/xwiki/bin/view/Main/",
+      );
+      expect(
+        targetType.toReference?.({ location: "/xwiki/bin/view/Main/" }),
+      ).toEqual({
+        type: "path",
+        typed: true,
+        reference: "/xwiki/bin/view/Main/",
+        parameters: {},
+      });
+    });
+  });
+
   it("returns undefined when converting to a reference with an empty URL", () => {
     expect(targetType.toReference?.({ location: "  " })).toBeUndefined();
   });

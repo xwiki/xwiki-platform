@@ -19,6 +19,7 @@
  */
 import { translations } from "../translations";
 import { PlainTextLinkTargetField } from "@xwiki/platform-link-modal-ui";
+import { completeURL } from "@xwiki/platform-link-type-default";
 import { defineComponent, h } from "vue";
 import { useI18n } from "vue-i18n";
 import type {
@@ -53,10 +54,20 @@ const URLLinkTargetField = defineComponent({
           emit("update:modelValue", config),
         autofocus: props.autofocus,
         fieldLabel: t("link-type.target-types.url.url"),
-        // Falls through to the location field: the browser only accepts absolute URLs, i.e. with their scheme.
+        // The attributes and listeners below fall through to the location field.
         placeholder: t("link-type.target-types.url.url.placeholder"),
         "data-test": "linkUrl",
-        inputType: "url",
+        // A text field rather than a URL one, which would only accept absolute URLs, i.e. with their scheme, while the
+        // URL can be completed (e.g. "www.example.org") or relative (e.g. "/xwiki/bin/view/Main/"). The input mode
+        // still offers a keyboard suited to URLs.
+        inputmode: "url",
+        // Show the completed URL once the user leaves the field, so that they see what is inserted.
+        onChange: () => {
+          const location = completeURL(props.modelValue.location);
+          if (location !== props.modelValue.location) {
+            emit("update:modelValue", { ...props.modelValue, location });
+          }
+        },
       });
   },
 });

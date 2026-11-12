@@ -15,6 +15,9 @@ export type AttachmentLinkTargetConfig = {
 };
 
 // @beta
+export function completeURL(url: string): string;
+
+// @beta
 export class ComponentInit {
     constructor(container: Container);
 }
@@ -25,6 +28,9 @@ export type EmailLinkTargetConfig = {
     messageSubject?: string;
     messageBody?: string;
 };
+
+// @beta (undocumented)
+export function hasURLScheme(url: string): boolean;
 
 // @beta
 export type PageLinkTargetConfig = {

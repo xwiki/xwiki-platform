@@ -93,6 +93,17 @@ public class BlockNoteLinkModal extends BaseElement
     }
 
     /**
+     * @return the label of the selected type of target (e.g. {@code Page}, {@code URL}, {@code Attachment} or
+     *         {@code E-mail})
+     * @since 18.10.0RC1
+     */
+    public String getTargetType()
+    {
+        WebElement targetTypeSelect = getDriver().findElement(TARGET_TYPE_SELECT);
+        return new Select(targetTypeSelect).getFirstSelectedOption().getText();
+    }
+
+    /**
      * Replaces the content of the field designating the link target with the given text, whatever the selected target
      * type: e.g. the URL or the e-mail address. For the target types designated through a search box (page and
      * attachment), this only types the search query: use {@link #setPageReference(String, String)} or

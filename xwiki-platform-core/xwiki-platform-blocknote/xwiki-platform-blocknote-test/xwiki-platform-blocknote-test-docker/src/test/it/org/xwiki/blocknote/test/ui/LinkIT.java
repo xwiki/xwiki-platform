@@ -87,10 +87,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Create a link targeting a URL from the selection.
         editor.getToolBar().createLink().setTargetAndSubmit("https://xwiki.org");
 
-        // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link is inserted on the selected word, without touching the rest of the line.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>https://xwiki.org]] third", wikiEditor.getContent());
@@ -223,10 +220,7 @@ class LinkIT extends AbstractBlockNoteIT
         // rendered) using the page title, not its reference.
         editor.getToolBar().createLink().setPageTargetAndSubmit("Page Link Target", "Page Link Target");
 
-        // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link is inserted on the selected word, without touching the rest of the line.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>doc:PageLinkTarget]] third", wikiEditor.getContent());
@@ -264,10 +258,7 @@ class LinkIT extends AbstractBlockNoteIT
         editor.getToolBar().createLink().setAttachmentTargetAndSubmit(attachmentName, attachmentName,
             testReference.getLastSpaceReference().getName());
 
-        // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link is inserted on the selected word, without touching the rest of the line.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>attach:AttachmentLinkTarget@image.gif]] third", wikiEditor.getContent());
@@ -292,10 +283,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Create a link targeting an e-mail address from the selection.
         editor.getToolBar().createLink().setEmailTargetAndSubmit("second@xwiki.org");
 
-        // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link is inserted on the selected word, without touching the rest of the line.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>mailto:second@xwiki.org]] third", wikiEditor.getContent());
@@ -319,10 +307,7 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setEmailTargetAndSubmit("second@xwiki.org");
 
-        // The link text must be left untouched.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link text is left untouched.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>mailto:second@xwiki.org]] third", wikiEditor.getContent());
@@ -330,7 +315,7 @@ class LinkIT extends AbstractBlockNoteIT
 
     @Test
     @Order(10)
-    void editUrlLink(TestUtils setup, TestReference testReference)
+    void editURLLink(TestUtils setup, TestReference testReference)
     {
         // Start fresh.
         setup.deletePage(testReference);
@@ -342,17 +327,31 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
-        // and change the target URL.
+        // and change the target to a relative URL.
         textArea.click().moveCaretTo(8);
-        editor.getToolBar().editLink().setTargetAndSubmit("https://example.org");
+        editor.getToolBar().editLink().setTargetAndSubmit("/xwiki/bin/view/Main/");
 
-        // The link text must be left untouched.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source (which also shows that the link label is left untouched): the relative URL is kept
+        // as typed, as a path reference, since a URL reference needs a scheme.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>https://example.org]] third", wikiEditor.getContent());
+        assertEquals("first [[second>>path:/xwiki/bin/view/Main/]] third", wikiEditor.getContent());
+
+        // Edit the link again: it's now a path link.
+        page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        editor = page.getContentEditor();
+        textArea = editor.getRichTextArea();
+        textArea.click().moveCaretTo(8);
+        BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+        assertEquals("Path", linkModal.getTargetType());
+        assertEquals("/xwiki/bin/view/Main/", linkModal.getTarget());
+
+        // Change it to a link to a URL without a scheme: the URL is completed, as in the address bar of a browser.
+        linkModal.setTargetAndSubmit("www.xwiki.org");
+
+        page.save();
+        wikiEditor = page.editWiki();
+        assertEquals("first [[second>>https://www.xwiki.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -388,10 +387,7 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setPageTargetAndSubmit("New Page Link Target", "New Page Link Target");
 
-        // The link text must be left untouched.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link text is left untouched.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>doc:NewPageLinkTarget]] third", wikiEditor.getContent());
@@ -431,10 +427,7 @@ class LinkIT extends AbstractBlockNoteIT
         editor.getToolBar().editLink().setAttachmentTargetAndSubmit(attachmentName, attachmentName,
             testReference.getLastSpaceReference().getName());
 
-        // The link text must be left untouched.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link text is left untouched.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>attach:NewAttachmentLinkTarget@image.gif]] third", wikiEditor.getContent());
@@ -458,10 +451,7 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setEmailTargetAndSubmit("other@xwiki.org");
 
-        // The link text must be left untouched.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link text is left untouched.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>mailto:other@xwiki.org]] third", wikiEditor.getContent());
@@ -518,10 +508,7 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.click().moveCaretTo(8);
         editor.getToolBar().editLink().setPageTargetAndSubmit("New Link Target", "New Link Target");
 
-        // The link text must be left untouched.
-        textArea.waitUntilTextIs("first second third");
-
-        // Save and check the source.
+        // Save and check the source: the link text is left untouched.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>doc:NewLinkTarget||class=\"foo\"]] third", wikiEditor.getContent());

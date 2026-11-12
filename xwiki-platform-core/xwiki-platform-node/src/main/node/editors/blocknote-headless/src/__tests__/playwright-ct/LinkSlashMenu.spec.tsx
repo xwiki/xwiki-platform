@@ -86,6 +86,61 @@ test("Inserting a link from the slash menu focuses the link target field, and la
   await expect(editorEl).toHaveText("https://xwiki.org");
 });
 
+test("Inserting a URL link without a scheme completes the URL when leaving the URL field", async ({
+  mount,
+  page,
+}) => {
+  const editorEl = await openLinkModalFromSlashMenu(mount, page);
+
+  await page.locator('[data-test="linkTargetType"]').selectOption("URL");
+  const urlInputEl = page.locator('[data-test="linkUrl"]');
+  await urlInputEl.fill("www.xwiki.org/download");
+  await urlInputEl.press("Tab");
+  await expect(urlInputEl).toHaveValue("https://www.xwiki.org/download");
+
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  await expect(
+    editorEl.locator('a[href="https://www.xwiki.org/download"]'),
+  ).toHaveText("https://www.xwiki.org/download");
+  await expect(page.locator('[data-test="submittedLinkReference"]')).toHaveText(
+    JSON.stringify({
+      type: "url",
+      typed: false,
+      reference: "https://www.xwiki.org/download",
+      parameters: {},
+    }),
+  );
+});
+
+test("Inserting a relative URL link keeps the URL as typed, with a typed path reference", async ({
+  mount,
+  page,
+}) => {
+  const editorEl = await openLinkModalFromSlashMenu(mount, page);
+
+  await page.locator('[data-test="linkTargetType"]').selectOption("URL");
+  const urlInputEl = page.locator('[data-test="linkUrl"]');
+  await urlInputEl.fill("/xwiki/bin/view/Main/");
+  await urlInputEl.press("Tab");
+  await expect(urlInputEl).toHaveValue("/xwiki/bin/view/Main/");
+
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  await expect(editorEl.locator('a[href="/xwiki/bin/view/Main/"]')).toHaveText(
+    "/xwiki/bin/view/Main/",
+  );
+  // XWiki Rendering parses a URL reference without a scheme back as a document reference, even when typed.
+  await expect(page.locator('[data-test="submittedLinkReference"]')).toHaveText(
+    JSON.stringify({
+      type: "path",
+      typed: true,
+      reference: "/xwiki/bin/view/Main/",
+      parameters: {},
+    }),
+  );
+});
+
 test("Inserting a page link from the slash menu labels the link with the title of the picked page by default", async ({
   mount,
   page,

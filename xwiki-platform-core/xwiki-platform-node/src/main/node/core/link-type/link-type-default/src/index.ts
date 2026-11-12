@@ -19,6 +19,7 @@
  */
 
 export { ComponentInit } from "./componentInit";
+export { completeURL, hasURLScheme } from "./linkTargetTypes/urlCompletion";
 
 export type { AttachmentLinkTargetConfig } from "./linkTargetTypes/AttachmentLinkTargetType";
 export type { EmailLinkTargetConfig } from "./linkTargetTypes/EmailLinkTargetType";

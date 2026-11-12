@@ -23,6 +23,7 @@ import type { TextFieldProps } from "@xwiki/platform-dsapi";
 
 const {
   label,
+  help,
   type = "text",
   autofocus,
   required,
@@ -40,6 +41,7 @@ defineOptions({
 <template>
   <div>
     <label :for="textFieldId">{{ label }}</label>
+    <span v-if="help" class="xHint">{{ help }}</span>
     <input
       :id="textFieldId"
       :type="type"

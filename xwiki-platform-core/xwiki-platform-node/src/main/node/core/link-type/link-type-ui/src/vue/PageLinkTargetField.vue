@@ -124,6 +124,7 @@ const { t } = useI18n({ messages: translations });
   <search-box
     v-bind="{ 'data-test': 'linkPageReference' }"
     :label="t('link-type.target-types.page.reference')"
+    :help="t('link-type.target-types.page.reference.hint')"
     :initial-value="model.ref !== null ? toQuery(model.ref) : null"
     :get-suggestions
     :autofocus

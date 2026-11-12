@@ -193,7 +193,7 @@ const submitEditedLink = ({
   const url =
     target.type === unsupportedLinkTargetType
       ? (editingLink.value?.current.url ?? "")
-      : linkTargetTypeManager.toURL(target);
+      : linkTargetTypeManager.toURL(target, linkContext);
   const reference = linkTargetTypeManager.toReference(target, linkContext);
 
   editingLink.value?.onSubmit({

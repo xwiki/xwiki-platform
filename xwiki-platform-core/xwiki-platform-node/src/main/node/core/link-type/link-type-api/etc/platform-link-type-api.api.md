@@ -61,11 +61,11 @@ export interface LinkTargetType<TConfig = unknown> {
     createDefaultConfig(): TConfig;
     fromReference?(reference: ResourceReference, context?: LinkContext): TConfig | null;
     fromURL(url: string): TConfig | null;
-    getDefaultLabel?(config: TConfig): string;
+    getDefaultLabel?(config: TConfig, context?: LinkContext): string;
     getLabel(locale: string): Promise<string>;
     readonly order?: number;
     toReference?(config: TConfig, context?: LinkContext): ResourceReference | undefined;
-    toURL(config: TConfig): string;
+    toURL(config: TConfig, context?: LinkContext): string;
     readonly type: string;
 }
 
@@ -75,7 +75,7 @@ export interface LinkTargetTypeManager {
     fromURL(url: string): LinkTarget;
     list(): LinkTargetType[];
     toReference(target: LinkTarget, context?: LinkContext): ResourceReference | undefined;
-    toURL(target: LinkTarget): string;
+    toURL(target: LinkTarget, context?: LinkContext): string;
 }
 
 // @beta

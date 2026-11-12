@@ -20,6 +20,7 @@
 import { translateLabel } from "./labels";
 import {
   entityResourceReference,
+  linkReferenceParameters,
   linkURLPartsFromReference,
   linkURLPartsFromURL,
   linkURLSuffix,
@@ -117,26 +118,39 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
     return { ref, ...linkURLPartsFromURL(url) };
   }
 
-  toURL({ ref, queryString, anchor }: PageLinkTargetConfig): string {
+  /**
+   * @returns the URL of the page, or of the document holding the link when no page is set (i.e. a link to that
+   *   document, or to one of its sections), followed by the query string and the anchor
+   */
+  toURL(
+    { ref, queryString, anchor }: PageLinkTargetConfig,
+    context?: LinkContext,
+  ): string {
     const base = this.remoteURLSerializerProvider
       .get()
-      ?.serialize(ref ?? undefined);
+      ?.serialize(ref ?? context?.sourceDocument);
 
     return `${base ?? ""}${linkURLSuffix({ queryString, anchor })}`;
   }
 
   /**
    * @returns the title of the page when it's known, its name otherwise, as the backend displays it (e.g. the name of
-   *   the parent space for the home page of a nested page in XWiki, rather than "WebHome")
+   *   the parent space for the home page of a nested page in XWiki, rather than "WebHome"); the label of the document
+   *   holding the link when no page is set, like the backend generates it for a link to that document (whatever its
+   *   anchor)
    */
-  getDefaultLabel({ ref, title }: PageLinkTargetConfig): string {
+  getDefaultLabel(
+    { ref, title }: PageLinkTargetConfig,
+    context?: LinkContext,
+  ): string {
     const knownTitle = title?.trim();
     if (knownTitle) {
       return knownTitle;
     }
-    return ref === null
-      ? ""
-      : (this.modelReferenceHandlerProvider.get()?.getTitle(ref) ?? "");
+    const page = ref ?? context?.sourceDocument;
+    return page
+      ? (this.modelReferenceHandlerProvider.get()?.getTitle(page) ?? "")
+      : "";
   }
 
   fromReference(
@@ -145,6 +159,13 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
   ): PageLinkTargetConfig | null {
     if (reference.type !== ResourceType.DOCUMENT) {
       return null;
+    }
+
+    // An empty reference designates the document holding the link (e.g. `[[label>>||anchor="HSection"]]`, a link to one
+    // of its sections): it's edited without a page, rather than as a link to that document by name, so that it's saved
+    // back as is.
+    if (reference.reference.trim() === "") {
+      return { ref: null, ...linkURLPartsFromReference(reference) };
     }
 
     const ref = parseEntityReference(
@@ -159,10 +180,24 @@ class PageLinkTargetType implements LinkTargetType<PageLinkTargetConfig> {
       : null;
   }
 
+  /**
+   * @returns the reference of the page, relative to the document holding the link, or an empty (untyped) reference
+   *   when no page is set, which designates the document holding the link (e.g. `[[label>>||anchor="HSection"]]`, or
+   *   `[[label>>]]`)
+   */
   toReference(
     { ref, queryString, anchor }: PageLinkTargetConfig,
     context?: LinkContext,
   ): ResourceReference | undefined {
+    if (ref === null) {
+      // Untyped, since a typed empty reference would be saved as "doc:".
+      return {
+        type: ResourceType.DOCUMENT,
+        typed: false,
+        reference: "",
+        parameters: linkReferenceParameters({ queryString, anchor }),
+      };
+    }
     return entityResourceReference(
       ResourceType.DOCUMENT,
       ref,

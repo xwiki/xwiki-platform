@@ -152,8 +152,8 @@ const defaultDisplayText = computed(() => {
     return "";
   }
   return targetType.getDefaultLabel
-    ? targetType.getDefaultLabel(config)
-    : targetType.toURL(config);
+    ? targetType.getDefaultLabel(config, props.linkContext)
+    : targetType.toURL(config, props.linkContext);
 });
 
 const emit = defineEmits<{ submit: [LinkData]; cancel: [] }>();

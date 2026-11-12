@@ -65,13 +65,13 @@ class DefaultLinkTargetTypeManager implements LinkTargetTypeManager {
     throw new Error(`No link target type accepts the URL [${url}]`);
   }
 
-  toURL(target: LinkTarget): string {
+  toURL(target: LinkTarget, context?: LinkContext): string {
     const linkTargetType = this.get(target.type);
     if (!linkTargetType) {
       throw new Error(`No link target type of type [${target.type}]`);
     }
 
-    return linkTargetType.toURL(target.config);
+    return linkTargetType.toURL(target.config, context);
   }
 
   fromReference(

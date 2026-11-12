@@ -97,9 +97,11 @@ interface LinkTargetType<TConfig = unknown> {
    * Convert the configuration of a link of this type into a URL. The reverse of {@link LinkTargetType.fromURL}.
    *
    * @param config - the configuration of the link
+   * @param context - where the link is, e.g. the document that a link without target (i.e. to the document itself) is
+   *   relative to
    * @returns the URL of the link
    */
-  toURL(config: TConfig): string;
+  toURL(config: TConfig, context?: LinkContext): string;
 
   /**
    * Compute the label of a link of this type, used when the user leaves its display text empty.
@@ -108,10 +110,12 @@ interface LinkTargetType<TConfig = unknown> {
    * don't implement it.
    *
    * @param config - the configuration of the link
+   * @param context - where the link is, e.g. the document that a link without target (i.e. to the document itself) is
+   *   relative to
    * @returns a short, human-readable name of the link target (e.g. the title of a page, the name of a file, an e-mail
    *   address), or an empty string when the configuration doesn't designate a target yet
    */
-  getDefaultLabel?(config: TConfig): string;
+  getDefaultLabel?(config: TConfig, context?: LinkContext): string;
 
   /**
    * Convert the reference of a linked resource into the configuration of a link of this type. Unlike

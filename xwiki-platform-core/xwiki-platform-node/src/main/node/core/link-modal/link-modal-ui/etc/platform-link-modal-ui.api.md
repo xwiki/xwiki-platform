@@ -82,6 +82,7 @@ export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_set
         label: string;
         initialValue: string | null;
         placeholder?: string | undefined;
+        help?: string | undefined;
         autofocus?: boolean | undefined;
         required?: boolean | undefined;
         getSuggestions: SearchBoxSource<T, U>;

@@ -664,12 +664,12 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.click().select(6, 6);
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
         linkModal.selectTargetType("Attachment");
-        linkModal.submit();
+        linkModal.trySubmit();
         assertFalse(linkModal.getTargetValidationMessage().isEmpty());
 
         // The same goes for a link to a URL.
         linkModal.selectTargetType("URL");
-        linkModal.submit();
+        linkModal.trySubmit();
         assertFalse(linkModal.getTargetValidationMessage().isEmpty());
 
         // Once a target is set, the link modal can be submitted.
@@ -739,9 +739,9 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
-        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal. The
-        // page search box is focused, which lists the pages matching the current reference: close these suggestions,
-        // which cover the link options, then type the display text, the same as the generated label.
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal.
+        // The page search box is focused, which lists the pages matching the current reference: close these
+        // suggestions, which cover the link options, then type the display text, the same as the generated label.
         textArea.click().moveCaretTo(8);
         BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
         linkModal.closeSuggestions();
@@ -777,5 +777,98 @@ class LinkIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[https://xwiki.org]] third", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(24)
+    void createLinkToSectionOfCurrentPage(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first second third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard, then create a link from the selection, leaving the page
+        // reference empty and setting only the anchor.
+        textArea.click().select(6, 6);
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.setAnchor("HSection");
+        linkModal.submit();
+
+        // Save and check the source: the link has an empty reference, which designates the current page.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>||anchor=\"HSection\"]] third", wikiEditor.getContent());
+
+        // Edit the link again: the page reference is still empty.
+        page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        editor = page.getContentEditor();
+        textArea = editor.getRichTextArea();
+        textArea.click().moveCaretTo(8);
+        linkModal = editor.getToolBar().editLink();
+        assertEquals("Page", linkModal.getTargetType());
+        assertEquals("", linkModal.getTarget());
+        linkModal.expandOptions();
+        assertEquals("HSection", linkModal.getAnchor());
+
+        // Change the anchor, add a query string and clear the display text: the reference is kept empty, and the link
+        // label is generated from the current page.
+        linkModal.setAnchor("HOther");
+        linkModal.setQueryString("a=b");
+        linkModal.setDisplayText("");
+        linkModal.submit();
+        textArea.waitUntilTextIs("first createLinkToSectionOfCurrentPage third");
+
+        // Save and check the source: the link is saved without its generated label.
+        page.save();
+        wikiEditor = page.editWiki();
+        assertEquals("first [[||queryString=\"a=b\" anchor=\"HOther\"]] third", wikiEditor.getContent());
+
+        // The link is still there when editing the page again, with its generated label.
+        page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        page.getContentEditor().getRichTextArea().waitUntilLinkIsPresent("createLinkToSectionOfCurrentPage");
+    }
+
+    @Test
+    @Order(25)
+    void createLinkToCurrentPage(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first second third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Insert, from the slash menu in a new paragraph, a link to the current page, leaving all the fields of the
+        // link modal empty: the link label is generated from the current page.
+        textArea.appendParagraph("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("link");
+        slashMenu.waitForItemSelected("Link");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+        new BlockNoteLinkModal().submit();
+        textArea.waitUntilLinkIsPresent("createLinkToCurrentPage");
+
+        // Select the word "second" of the first paragraph using the keyboard, then create another link to the current
+        // page from the selection, leaving the page reference, the query string and the anchor empty.
+        textArea.clickBlock(0).select(6, 6);
+        editor.getToolBar().createLink().submit();
+        textArea.waitUntilLinkIsPresent("second");
+
+        // Save and check the source: both links have an empty reference, which designates the current page, and the
+        // one in the new paragraph has no label either.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>]] third\n\n[[]]", wikiEditor.getContent());
+
+        // The link is still there when editing the page again, with its generated label.
+        page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        page.getContentEditor().getRichTextArea().waitUntilLinkIsPresent("createLinkToCurrentPage");
     }
 }

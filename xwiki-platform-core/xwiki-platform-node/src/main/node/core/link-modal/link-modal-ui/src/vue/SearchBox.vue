@@ -99,6 +99,11 @@ const { initialValue, getSuggestions, parseQuery } = defineProps<{
   placeholder?: string;
 
   /**
+   * Help text displayed with the search field, e.g. to explain what an empty value means.
+   */
+  help?: string;
+
+  /**
    * Whether the search field is focused when the dialog holding it opens.
    */
   autofocus?: boolean;
@@ -365,6 +370,7 @@ watch(suggestions, (suggestions) => {
   <div class="search-box">
     <x-text-field
       :label
+      :help
       :placeholder="placeholder ?? t('link-modal.search-box.placeholder')"
       :autofocus
       :required

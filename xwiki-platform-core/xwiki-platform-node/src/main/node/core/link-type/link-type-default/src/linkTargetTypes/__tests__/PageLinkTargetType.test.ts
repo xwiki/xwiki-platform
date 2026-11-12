@@ -226,8 +226,38 @@ describe("PageLinkTargetType", () => {
       expect(reference?.parameters).toEqual({});
     });
 
-    it("returns undefined when converting to a reference with no page selected", () => {
-      expect(targetType.toReference?.({ ref: null })).toBeUndefined();
+    it("converts a config without page into an empty untyped reference, which designates the document holding the link", () => {
+      expect(
+        targetType.toReference?.({ ref: null, anchor: "HSection" }),
+      ).toEqual({
+        type: "doc",
+        typed: false,
+        reference: "",
+        parameters: { anchor: "HSection" },
+      });
+      expect(targetType.toReference?.({ ref: null })).toEqual({
+        type: "doc",
+        typed: false,
+        reference: "",
+        parameters: {},
+      });
+      expect(modelReferenceSerializer.serialize).not.toHaveBeenCalled();
+    });
+
+    it("parses an empty document reference as a link without page, keeping its query string and anchor", () => {
+      const config = targetType.fromReference?.({
+        type: "doc",
+        typed: false,
+        reference: "",
+        parameters: { queryString: "foo=bar", anchor: "HSection" },
+      });
+
+      expect(config).toEqual({
+        ref: null,
+        queryString: "foo=bar",
+        anchor: "HSection",
+      });
+      expect(modelReferenceParser.parse).not.toHaveBeenCalled();
     });
 
     it("leaves the title of the page out of the reference", () => {
@@ -262,7 +292,7 @@ describe("PageLinkTargetType", () => {
       expect(modelReferenceHandler.getTitle).toHaveBeenCalledWith(documentRef);
     });
 
-    it("is empty when no page is selected", () => {
+    it("is empty when no page is selected and the document holding the link is unknown", () => {
       expect(targetType.getDefaultLabel({ ref: null })).toBe("");
     });
   });
@@ -318,6 +348,33 @@ describe("PageLinkTargetType without the services of the current wiki", () => {
         type: EntityType.DOCUMENT,
         base: sourceDocument,
       });
+    });
+
+    it("labels a link without page with the name of the source document, whatever its anchor", () => {
+      modelReferenceHandler.getTitle.mockReturnValue("Source");
+
+      expect(
+        targetType.getDefaultLabel({ ref: null, anchor: "HSection" }, context),
+      ).toBe("Source");
+      expect(modelReferenceHandler.getTitle).toHaveBeenCalledWith(
+        sourceDocument,
+      );
+    });
+
+    it("gives a link without page the URL of the source document", () => {
+      remoteURLSerializer.serialize.mockReturnValue(
+        "https://xwiki.org/xwiki/bin/view/Source",
+      );
+
+      expect(
+        targetType.toURL(
+          { ref: null, queryString: "a=b", anchor: "HSection" },
+          context,
+        ),
+      ).toBe("https://xwiki.org/xwiki/bin/view/Source?a=b#HSection");
+      expect(remoteURLSerializer.serialize).toHaveBeenCalledWith(
+        sourceDocument,
+      );
     });
 
     it("serializes the reference relative to the source document", () => {

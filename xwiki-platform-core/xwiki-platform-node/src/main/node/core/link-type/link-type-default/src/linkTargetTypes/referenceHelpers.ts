@@ -180,6 +180,7 @@ function parseEntityReference(
 
 export {
   entityResourceReference,
+  linkReferenceParameters,
   linkURLPartsFromReference,
   linkURLPartsFromURL,
   linkURLSuffix,

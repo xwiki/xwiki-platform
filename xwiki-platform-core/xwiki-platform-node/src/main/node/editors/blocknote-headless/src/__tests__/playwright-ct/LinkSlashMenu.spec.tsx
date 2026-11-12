@@ -21,6 +21,9 @@ import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
+import { EntityType } from "@xwiki/platform-model-api";
+import type { LinkContext } from "@xwiki/platform-link-type-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 
 // The Playwright page and locator types, taken from the test fixtures since the component testing package doesn't
 // export them.
@@ -35,6 +38,7 @@ type Locator = ReturnType<Page["locator"]>;
 async function openLinkModalFromSlashMenu(
   mount: Parameters<typeof mountBlockNoteHeadless>[0],
   page: Page,
+  linkContext?: LinkContext,
 ): Promise<Locator> {
   const component = await mountBlockNoteHeadless(mount, {
     editorContent: [],
@@ -42,6 +46,7 @@ async function openLinkModalFromSlashMenu(
       syntax: FULL_SYNTAX,
     },
     macros: false,
+    linkContext,
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -181,4 +186,39 @@ test("Inserting an attachment link from the slash menu requires an attachment", 
       (input: HTMLInputElement) => input.validity.valueMissing,
     ),
   ).toBe(true);
+});
+
+test("Inserting a link to a section of the current page, leaving the page reference empty", async ({
+  mount,
+  page,
+}) => {
+  // Plain data, since the props are serialized to reach the browser.
+  const editorEl = await openLinkModalFromSlashMenu(mount, page, {
+    sourceDocument: {
+      type: EntityType.DOCUMENT,
+      name: "Current",
+    } as unknown as DocumentReference,
+  });
+
+  // The page reference is left empty, as the hint of the field suggests, and only the anchor is set.
+  await expect(page.locator(".link-target")).toContainText(
+    "Leave empty to link to the current page.",
+  );
+  await page.locator("[data-test='linkOptions'] > summary").click();
+  await page.locator('[data-test="linkPageAnchor"]').fill("HSection");
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  // The link points to the section of the current page and is labelled with the name of the current page.
+  await expect(
+    editorEl.locator('a[href="https://example.org/some/page#HSection"]'),
+  ).toHaveText("Current");
+  // An empty untyped reference designates the current page.
+  await expect(page.locator('[data-test="submittedLinkReference"]')).toHaveText(
+    JSON.stringify({
+      type: "doc",
+      typed: false,
+      reference: "",
+      parameters: { anchor: "HSection" },
+    }),
+  );
 });

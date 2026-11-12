@@ -61,12 +61,13 @@ interface LinkTargetTypeManager {
    * {@link LinkTargetTypeManager.fromURL}.
    *
    * @param target - the target of a link
+   * @param context - where the link is (see {@link LinkTargetType.toURL})
    * @returns the URL of the link
    * @throws {@link Error} when no registered link target type matches the type of the target, which is also the case
    *   for a target of the {@link unsupportedLinkTargetType} type: the URL of a resource that no link target type
    *   supports can't be computed client-side
    */
-  toURL(target: LinkTarget): string;
+  toURL(target: LinkTarget, context?: LinkContext): string;
 
   /**
    * Convert the reference of a linked resource into a link target, using the first link target type, in ascending

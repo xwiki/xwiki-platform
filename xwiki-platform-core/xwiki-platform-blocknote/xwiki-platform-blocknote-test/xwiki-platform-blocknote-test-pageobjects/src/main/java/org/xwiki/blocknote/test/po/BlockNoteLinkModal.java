@@ -338,19 +338,40 @@ public class BlockNoteLinkModal extends BaseElement
     }
 
     /**
-     * Submits the link modal, applying the changes.
+     * Submits the link modal, applying the changes, and waits for it to close.
      */
     public void submit()
+    {
+        trySubmit();
+        waitUntilClosed();
+    }
+
+    /**
+     * Tries to submit the link modal, without waiting for it to close: the browser blocks the submit when a required
+     * field is empty, and the link modal then stays open.
+     *
+     * @since 18.10.0RC1
+     */
+    public void trySubmit()
     {
         getDriver().findElement(By.cssSelector("[data-test='linkSubmit']")).click();
     }
 
     /**
-     * Cancels the link modal, discarding any change.
+     * Cancels the link modal, discarding any change, and waits for it to close.
      */
     public void cancel()
     {
         getDriver().findElement(By.cssSelector("[data-test='linkCancel']")).click();
+        waitUntilClosed();
+    }
+
+    private void waitUntilClosed()
+    {
+        getDriver().waitUntilElementDisappears(TARGET_TYPE_SELECT);
+        // The backdrop of the link modal fades out once the link modal is closed, and it covers the edited content
+        // until then.
+        getDriver().waitUntilElementDisappears(By.cssSelector(".modal-backdrop"));
     }
 
     /**

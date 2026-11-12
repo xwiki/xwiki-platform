@@ -298,8 +298,9 @@
   CKEDITOR.plugins.add('xwiki-selection', {
     requires: 'notification',
     onLoad: function() {
-      require(['textSelection'], function(TextSelection) {
+      require(['textSelection', 'scrollUtils'], function(TextSelection, scrollUtils) {
         CKEDITOR.plugins.xwikiSelection.TextSelection = TextSelection;
+        CKEDITOR.plugins.xwikiSelection.scrollUtils = scrollUtils;
       });
 
       // Make sure the ContextManager used by the balloon toolbar doesn't shrink the selection when it's fake.

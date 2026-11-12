@@ -92,7 +92,12 @@ define('xwiki-ckeditor-realtime-adapter', [
       // Don't push local changes when saving the snapshot. Wait until the content has been updated (see below),
       // otherwise we risk reverting the received remote changes.
       this._isRemoteChange = true;
-      delete this._contentRefreshed;
+      delete this._keepCaretVisible;
+      // Check if the caret is visible before updating the content, because the edited content is detached while it is
+      // updated (see #_protectWidgets()), which moves the DOM selection outside of it. We need this only if the content
+      // has to be refreshed (see #_refreshContent()).
+      const caret = this._getCaret();
+      this._caretWasVisible = !!caret && this._isVisible(caret);
       // Save the editor state before updating the content in order to be able to undo the remote changes.
       this._ckeditor.fire('saveSnapshot');
       // Prevent the editor from recording Undo/Redo history entries while the edited content is being refreshed:
@@ -125,6 +130,7 @@ define('xwiki-ckeditor-realtime-adapter', [
         // empty line placeholders).
         this._ckeditor.fire('saveSnapshot');
         delete this._isRemoteChange;
+        delete this._caretWasVisible;
       }
     }
 
@@ -148,13 +154,20 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    restoreSelection(ranges) {
-      // The content refresh triggered by a remote change overwrites the edited content, which normally scrolls the
-      // restored selection into view. But the local user didn't ask for this refresh, and may be reading a different
-      // part of the content, so we keep their scroll position (see #_refreshContent()).
-      const preventScroll = this._contentRefreshed;
-      delete this._contentRefreshed;
+    restoreSelection(ranges, options) {
+      const preventScroll = options?.preventScroll;
+      // See #_refreshContent() for when we keep the caret visible.
+      const keepCaretVisible = preventScroll && this._keepCaretVisible;
+      delete this._keepCaretVisible;
+      // The selection is restored synchronously (async: false).
       this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges, async: false, preventScroll});
+      const caret = keepCaretVisible && this._getCaret();
+      if (caret) {
+        // This scrolls only if the caret is not already in the middle of the visible area, and only the scroll
+        // container of the edited content (not the page holding the iframe-based editing area).
+        this._CKEDITOR.plugins.xwikiSelection.scrollUtils.scrollSelectionIntoView(this.getContentWrapper(),
+          caret.range);
+      }
 
       // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
       // selection is restored.
@@ -532,23 +545,63 @@ define('xwiki-ckeditor-realtime-adapter', [
     async _refreshContent() {
       console.debug('Refreshing the content to re-render the macros.');
       // Refreshing the content overwrites it, which loses the scroll position (e.g. the iframe-based editing area is
-      // reloaded) so we have to restore it afterwards.
-      const restoreScrollPosition = this._saveScrollPosition();
-      // Refresh the content to re-render the macros. Don't preserve the selection because this is done by the realtime
-      // framework when applying remove changes.
-      this._ckeditor.execCommand('xwiki-refresh', {preserveSelection: false});
-
-      await new Promise(resolve => {
-        const macroPlugin = this._ckeditor.plugins['xwiki-macro'];
-        if (macroPlugin) {
-          macroPlugin.onceAfterRefresh(this._ckeditor, resolve);
-        } else {
-          resolve();
-        }
+      // reloaded) so we have to restore it afterwards. We save the scroll position right before the content is
+      // overwritten, and not before the refresh starts, because the content is first rendered on the server, and the
+      // user can scroll in the mean time.
+      let restoreScrollPosition = () => {};
+      const setDataListener = this._ckeditor.on('setData', () => {
+        restoreScrollPosition = this._saveScrollPosition();
       });
+      try {
+        // Refresh the content to re-render the macros. Don't preserve the selection because this is done by the
+        // realtime framework when applying remove changes.
+        this._ckeditor.execCommand('xwiki-refresh', {preserveSelection: false});
+
+        await new Promise(resolve => {
+          const macroPlugin = this._ckeditor.plugins['xwiki-macro'];
+          if (macroPlugin) {
+            macroPlugin.onceAfterRefresh(this._ckeditor, resolve);
+          } else {
+            resolve();
+          }
+        });
+      } finally {
+        setDataListener.removeListener();
+      }
 
       restoreScrollPosition();
-      this._contentRefreshed = true;
+      // The content above the visible area may have changed height (e.g. a macro was inserted), in which case restoring
+      // the scroll position doesn't show the same content. If the caret was visible then scroll it back into view, if
+      // needed, after the selection is restored (see #restoreSelection()).
+      this._keepCaretVisible = this._caretWasVisible;
+    }
+
+    /**
+     * @returns {Object} the caret (or the start of the selection) as a collapsed range, its client rectangle and the
+     *   element holding it, or {@code undefined} if the edited content doesn't have the selection
+     */
+    _getCaret() {
+      const contentWrapper = this.getContentWrapper();
+      const selection = contentWrapper?.ownerDocument.getSelection();
+      if (!selection?.rangeCount || !contentWrapper.contains(selection.getRangeAt(0).startContainer)) {
+        return undefined;
+      }
+      const range = selection.getRangeAt(0).cloneRange();
+      range.collapse(true);
+      const node = range.startContainer;
+      const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+      // A collapsed range has no client rectangle when it's not inside a text node.
+      const rect = range.getClientRects()[0] || element.getBoundingClientRect();
+      return {range, rect, element};
+    }
+
+    /**
+     * @param {Object} caret the caret, as returned by {@link #_getCaret()}
+     * @returns {boolean} whether the caret is inside the visible area of the window holding the editing area
+     */
+    _isVisible(caret) {
+      const view = caret.element.ownerDocument.defaultView;
+      return caret.rect.top >= 0 && caret.rect.bottom <= view.innerHeight;
     }
 
     /**

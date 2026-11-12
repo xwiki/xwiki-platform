@@ -54,7 +54,10 @@ type Updater = (content: HTMLElement) => unknown;
 
 type CKEditorAdapter = {
   updateContent(updater: Updater, isLocalChange: boolean): Promise<void>;
-  restoreSelection(ranges: Range[] | null): void;
+  restoreSelection(
+    ranges: Range[] | null,
+    options?: { preventScroll?: boolean },
+  ): void;
 };
 
 let requirejs: RequireJSMock;
@@ -63,6 +66,7 @@ let customData: Map<string, unknown>;
 let adapter: CKEditorAdapter;
 let restoreSelection: ReturnType<typeof vi.fn>;
 let execCommand: ReturnType<typeof vi.fn>;
+let scrollSelectionIntoView: ReturnType<typeof vi.fn>;
 
 function loadAdapter(): new (
   ckeditor: unknown,
@@ -121,39 +125,64 @@ function setFillingChar(text: Text): void {
   customData.set("cke-fillingChar", { $: text, getText: () => text.data });
 }
 
+/**
+ * @returns a fake CKEditor instance, whose editable area is the content element
+ */
+function createCKEditor(): unknown {
+  const editable = {
+    $: content,
+    getCustomData: (key: string) => customData.get(key) ?? null,
+    removeCustomData: (key: string) => customData.delete(key),
+  };
+  const listeners = new Map<string, Set<() => void>>();
+  // Refreshing the content overwrites it.
+  execCommand = vi.fn(() =>
+    listeners.get("setData")?.forEach((listener) => listener()),
+  );
+  return {
+    mode: "wysiwyg",
+    on: (event: string, listener: () => void) => {
+      if (!listeners.has(event)) {
+        listeners.set(event, new Set());
+      }
+      listeners.get(event)?.add(listener);
+      return {
+        removeListener: () => listeners.get(event)?.delete(listener),
+      };
+    },
+    fire: () => {},
+    editable: () => editable,
+    execCommand,
+    plugins: {
+      "xwiki-macro": {
+        onceAfterRefresh: (_editor: unknown, callback: () => void) =>
+          callback(),
+      },
+    },
+    widgets: {
+      instances: {},
+      checkWidgets: () => {},
+      checkSelection: () => {},
+    },
+  };
+}
+
 describe("CKEditorAdapter", () => {
   beforeEach(() => {
     content = document.createElement("div");
     document.body.append(content);
     customData = new Map();
-    const editable = {
-      $: content,
-      getCustomData: (key: string) => customData.get(key) ?? null,
-      removeCustomData: (key: string) => customData.delete(key),
-    };
-    execCommand = vi.fn();
-    const ckeditor = {
-      mode: "wysiwyg",
-      on: () => {},
-      fire: () => {},
-      editable: () => editable,
-      execCommand,
-      plugins: {
-        "xwiki-macro": {
-          onceAfterRefresh: (_editor: unknown, callback: () => void) =>
-            callback(),
-        },
-      },
-      widgets: {
-        instances: {},
-        checkWidgets: () => {},
-        checkSelection: () => {},
-      },
-    };
+    const ckeditor = createCKEditor();
     restoreSelection = vi.fn();
+    scrollSelectionIntoView = vi.fn();
     const CKEDITOR = {
       dom: { selection: { FILLING_CHAR_SEQUENCE } },
-      plugins: { xwikiSelection: { restoreSelection } },
+      plugins: {
+        xwikiSelection: {
+          restoreSelection,
+          scrollUtils: { scrollSelectionIntoView },
+        },
+      },
     };
     const CKEditorAdapter = loadAdapter();
     adapter = new CKEditorAdapter(ckeditor, CKEDITOR);
@@ -162,6 +191,7 @@ describe("CKEditorAdapter", () => {
   afterEach(() => {
     requirejs.restore();
     content.remove();
+    vi.restoreAllMocks();
   });
 
   describe("updateContent", () => {
@@ -264,45 +294,97 @@ describe("CKEditorAdapter", () => {
     });
   });
   describe("restoreSelection", () => {
-    it("scrolls the restored selection into view, if needed, after a remote change", async () => {
+    let caretTop: number;
+
+    /**
+     * Places the caret in the given text node. jsdom doesn't compute the layout so the caret is shown at the position
+     * given by {@link caretTop}, in a window that is 500 pixels high.
+     *
+     * @param text - the text node holding the caret
+     */
+    function placeCaret(text: Text): void {
+      document.getSelection()?.collapse(text, 1);
+    }
+
+    beforeEach(() => {
+      vi.spyOn(window, "innerHeight", "get").mockReturnValue(500);
+      Range.prototype.getClientRects = () =>
+        [{ top: caretTop, bottom: caretTop + 20 }] as unknown as DOMRectList;
+      // The content is detached while it's updated, which loses the DOM selection, so restore it in the first
+      // paragraph.
+      restoreSelection.mockImplementation(() =>
+        placeCaret(content.firstChild?.firstChild as Text),
+      );
+    });
+
+    afterEach(() => {
+      delete (Range.prototype as Partial<Range>).getClientRects;
+    });
+
+    it("forwards the preventScroll option", async () => {
       content.innerHTML = "<p>one</p>";
 
       await adapter.updateContent(patchTo("<p>one</p><p>two</p>"), false);
+      adapter.restoreSelection(null, { preventScroll: true });
       adapter.restoreSelection(null);
 
       expect(execCommand).not.toHaveBeenCalled();
-      expect(restoreSelection).toHaveBeenCalledWith(expect.anything(), {
-        ranges: null,
-        async: false,
-        preventScroll: undefined,
-      });
-    });
-
-    it("doesn't scroll the restored selection into view after a remote change that refreshes the content", async () => {
-      // A remote user inserted a macro, which has to be rendered.
-      content.innerHTML =
-        "<xwiki-widget-xwiki-macro></xwiki-widget-xwiki-macro>";
-
-      await adapter.updateContent(() => [content.firstChild], false);
-      adapter.restoreSelection(null);
-
-      expect(execCommand).toHaveBeenCalledWith("xwiki-refresh", {
-        preserveSelection: false,
-      });
-      expect(restoreSelection).toHaveBeenCalledWith(expect.anything(), {
+      expect(restoreSelection).toHaveBeenNthCalledWith(1, expect.anything(), {
         ranges: null,
         async: false,
         preventScroll: true,
       });
-
-      // The next remote change doesn't refresh the content.
-      await adapter.updateContent(patchTo("<p>one</p>"), false);
-      adapter.restoreSelection(null);
-
-      expect(restoreSelection).toHaveBeenLastCalledWith(expect.anything(), {
+      expect(restoreSelection).toHaveBeenNthCalledWith(2, expect.anything(), {
         ranges: null,
         async: false,
         preventScroll: undefined,
+      });
+      expect(scrollSelectionIntoView).not.toHaveBeenCalled();
+    });
+
+    describe("after a content refresh", () => {
+      beforeEach(() => {
+        // A remote user inserted a macro, which has to be rendered.
+        content.innerHTML =
+          "<p>one</p><xwiki-widget-xwiki-macro></xwiki-widget-xwiki-macro>";
+        placeCaret(content.firstChild?.firstChild as Text);
+      });
+
+      it("keeps the scroll position if the caret wasn't visible before", async () => {
+        caretTop = 1000;
+
+        await adapter.updateContent(() => [content.lastChild], false);
+        adapter.restoreSelection(null, { preventScroll: true });
+
+        expect(execCommand).toHaveBeenCalledWith("xwiki-refresh", {
+          preserveSelection: false,
+        });
+        expect(restoreSelection).toHaveBeenCalledWith(expect.anything(), {
+          ranges: null,
+          async: false,
+          preventScroll: true,
+        });
+        expect(scrollSelectionIntoView).not.toHaveBeenCalled();
+      });
+
+      it("keeps the caret visible if it was visible before", async () => {
+        caretTop = 100;
+
+        await adapter.updateContent(() => [content.lastChild], false);
+        adapter.restoreSelection(null, { preventScroll: true });
+
+        expect(scrollSelectionIntoView).toHaveBeenCalledWith(
+          content,
+          expect.objectContaining({
+            startContainer: content.firstChild?.firstChild,
+          }),
+        );
+
+        // The next remote change doesn't refresh the content.
+        await adapter.updateContent(patchTo("<p>one</p>"), false);
+        adapter.restoreSelection(null, { preventScroll: true });
+
+        expect(scrollSelectionIntoView).toHaveBeenCalledTimes(1);
       });
     });
   });

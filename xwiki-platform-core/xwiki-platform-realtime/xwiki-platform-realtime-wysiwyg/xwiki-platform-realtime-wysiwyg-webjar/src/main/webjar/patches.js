@@ -577,7 +577,9 @@ define('xwiki-realtime-wysiwyg-patches', [
         ranges = null;
         console.debug('Restoring the text-based selection.');
       }
-      this._editor.restoreSelection(ranges);
+      // The local user didn't make this change, and may be reading a different part of the content than the one holding
+      // the selection, so we don't want to scroll the restored selection into view.
+      this._editor.restoreSelection(ranges, {preventScroll: true});
     }
 
     _restoreRange(savedRange) {

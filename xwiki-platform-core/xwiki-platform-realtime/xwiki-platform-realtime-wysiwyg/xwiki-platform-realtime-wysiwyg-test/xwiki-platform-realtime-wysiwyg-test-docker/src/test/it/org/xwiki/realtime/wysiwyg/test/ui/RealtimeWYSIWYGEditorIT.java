@@ -3011,10 +3011,15 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
         RealtimeRichTextAreaElement secondTextArea = editPage.get();
-        // Place the caret before the caret of the first user, in the same paragraph.
-        moveCaretToEndOfParagraph(secondTextArea, 40);
+        // Place the caret before the caret of the first user, in the same paragraph. Move the caret up from a paragraph
+        // further down, so that it's not at the edge of the visible area, where any content added above (like the empty
+        // paragraph added by the third user) would push it out of view.
+        moveCaretToEndOfParagraph(secondTextArea, 48);
+        secondTextArea.sendKeys(Collections.nCopies(8, Keys.ARROW_UP).toArray(CharSequence[]::new));
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME));
+        assertEquals("Paragraph 40", secondTextArea.getSelectedText());
         secondTextArea.sendKeys(Keys.HOME);
-        int secondScrollTop = secondTextArea.getScrollTop();
+        assertTrue(secondTextArea.isCaretVisible());
 
         //
         // Third Tab
@@ -3046,8 +3051,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(secondTabHandle);
         secondTextArea.waitUntilTextContains("Information");
         secondTextArea.waitForContentRefresh();
-        // Check the scroll position before typing, because typing scrolls to the caret.
-        assertScrollTop(secondScrollTop, secondTextArea,
+        // Check the caret before typing, because typing scrolls to the caret. The scroll position can change, because
+        // the inserted macro changes the height of the content above the caret.
+        assertTrue(secondTextArea.isCaretVisible(),
             "The content refresh triggered by a remote change didn't keep the caret visible.");
         // Type before the caret of the first user, in the same text node, which forces the first editor to restore the
         // caret based on the text.

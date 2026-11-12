@@ -62,4 +62,12 @@ export default {
 .draggable-item .handle .fa {
   vertical-align: middle;
 }
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .draggable-item .handle {
+    /* Always show the drag handle on small screens because we can't rely on hover. */
+    opacity: 1;
+  }
+}
 </style>

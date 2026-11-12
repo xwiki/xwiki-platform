@@ -435,4 +435,25 @@ export default {
 .draggable-container.column-header-names .draggable-item {
   position: relative;
 }
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .layout-table th.draggable-item {
+    /* Overwrite the draggable-item display in order to show the property names, which form the table header, as a
+      column. */
+    display: flex;
+  }
+
+  /* Trim long property names. */
+  .xwiki-livedata .layout-table th.draggable-item .property-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .xwiki-livedata .layout-table .resize-handle {
+    /* The columns cannot be resized in responsive mode. */
+    display: none;
+  }
+}
 </style>

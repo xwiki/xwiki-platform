@@ -45,6 +45,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -119,6 +121,12 @@ public class DefaultIOService implements IOService
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
     /**
+     * Used to resolve the user performing the annotation operation.
+     */
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
+
+    /**
      * {@inheritDoc}
      * <p>
      * This implementation saves the added annotation in the document where the target of the annotation is.
@@ -181,11 +189,9 @@ public class DefaultIOService implements IOService
             } else {
                 object.set(Annotation.TARGET_FIELD, target, deprecatedContext);
             }
-            // set the author of the document to the current user
-            document.setAuthor(deprecatedContext.getUser());
             // Note: We make sure to only provide a few characters of contextual information in order to control the
             // size of the comment (we display the first 30 characters).
-            deprecatedContext.getWiki().saveDocument(document, "Added annotation on \""
+            saveAnnotatedDocument(document, "Added annotation on \""
                 + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", deprecatedContext);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
@@ -329,9 +335,7 @@ public class DefaultIOService implements IOService
             // if object exists and its target matches the requested target, delete it
             if (annotationObject != null && matchesTarget(annotationObject, localTargetId, isDocumentType)) {
                 document.removeObject(annotationObject);
-                document.setAuthor(deprecatedContext.getUser());
-                deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
-                    deprecatedContext);
+                saveAnnotatedDocument(document, "Deleted annotation " + annotationID, deprecatedContext);
             }
         } catch (NumberFormatException e) {
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
@@ -388,13 +392,27 @@ public class DefaultIOService implements IOService
                 updateNotifs.add(annotation.getId());
             }
             if (updated) {
-                // set the author of the document to the current user
-                document.setAuthor(deprecatedContext.getUser());
-                deprecatedContext.getWiki().saveDocument(document, "Updated annotations", deprecatedContext);
+                saveAnnotatedDocument(document, "Updated annotations", deprecatedContext);
             }
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
         }
+    }
+
+    /**
+     * Saves a document whose annotations have been modified.
+     *
+     * @param document the annotated document to save
+     * @param comment the comment to associate to the new version of the document
+     * @param context the XWikiContext to save with
+     */
+    private void saveAnnotatedDocument(XWikiDocument document, String comment, XWikiContext context)
+        throws XWikiException
+    {
+        // Same as when saving a comment.
+        document.getAuthors()
+            .setOriginalMetadataAuthor(this.currentUserResolver.resolve(CurrentUserReference.INSTANCE));
+        context.getWiki().saveDocument(document, comment, false, true, context);
     }
 
     /**

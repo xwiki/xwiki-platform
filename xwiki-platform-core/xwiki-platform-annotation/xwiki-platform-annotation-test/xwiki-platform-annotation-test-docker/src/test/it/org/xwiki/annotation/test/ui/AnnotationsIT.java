@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -77,6 +78,8 @@ class AnnotationsIT
 
     private static final String USER_PASS = "pass";
 
+    private static final String SUPERADMIN = "XWiki.superadmin";
+
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
     {
@@ -89,7 +92,7 @@ class AnnotationsIT
 
     // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
-    @Order(5)
+    @Order(6)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
@@ -267,5 +270,30 @@ class AnnotationsIT
         annotatableViewPage.showAnnotationsPane().clickShowAnnotations();
         annotatableViewPage.waitForAnnotationsDisplayed();
         assertEquals(1, annotatableViewPage.getAnnotationCount());
+    }
+
+    @Test
+    @Order(5)
+    void annotationsKeepTheAuthorsOfTheAnnotatedPage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        setup.rest().savePage(testReference, CONTENT, null);
+        assertAnnotatedPageAuthors(setup, testReference, SUPERADMIN);
+
+        // Add an annotation as a user who is not the author of the page.
+        setup.login(USER_NAME, USER_PASS);
+        AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(setup.gotoPage(testReference));
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+        assertAnnotatedPageAuthors(setup, testReference, "xwiki:XWiki." + USER_NAME);
+    }
+
+    private void assertAnnotatedPageAuthors(TestUtils setup, TestReference testReference,
+        String originalMetadataAuthor) throws Exception
+    {
+        Page page = setup.rest().get(testReference);
+        // The REST author is the effective metadata author, and the modifier the content author.
+        assertEquals(SUPERADMIN, page.getAuthor());
+        assertEquals(SUPERADMIN, page.getModifier());
+        assertEquals(originalMetadataAuthor, page.getOriginalMetadataAuthor());
     }
 }

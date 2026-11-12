@@ -28,9 +28,11 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
@@ -38,9 +40,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.group.WikiTarget;
+import org.xwiki.user.internal.document.DocumentUserReference;
 import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -79,6 +84,10 @@ public class DefaultGroupManager implements GroupManager
 
     @Inject
     private DocumentReferenceResolver<String> resolver;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<String> userResolver;
 
     @Inject
     private EntityReferenceFactory referenceFactory;
@@ -459,7 +468,14 @@ public class DefaultGroupManager implements GroupManager
         Set<DocumentReference> members = new LinkedHashSet<>();
 
         for (String memberString : memberStrings) {
-            members.add(this.referenceFactory.getReference(this.resolver.resolve(memberString, reference)));
+            // Only members stored as documents are actual members: guest and superadmin cannot be members of a
+            // group, and an empty member value would otherwise resolve to the current user.
+            if (StringUtils.isNotEmpty(memberString)) {
+                UserReference member = this.userResolver.resolve(memberString, reference.getWikiReference());
+                if (member instanceof DocumentUserReference documentMember) {
+                    members.add(this.referenceFactory.getReference(documentMember.getReference()));
+                }
+            }
         }
 
         return members;

@@ -50,14 +50,14 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
         reference: "",
         hint: "",
         title: "Some great suggestion title starting with " + query,
-        url: "https://picsum.photos/150",
+        url: "https://example.com/images/150",
       },
       {
         type: 1,
         reference: "",
         hint: "",
         title: "Another great suggestion title starting with " + query,
-        url: "https://picsum.photos/300",
+        url: "https://example.com/images/300",
       },
     ];
   }, []);

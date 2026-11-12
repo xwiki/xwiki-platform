@@ -100,14 +100,14 @@ test("Options should be selectable", async ({ mount }) => {
   await component.locator("input").press("ArrowDown");
   await component.locator("input").press("Enter");
 
-  expect(selected).toBe("https://picsum.photos/150");
+  expect(selected).toBe("https://example.com/images/150");
   expect(submitted).toBeNull();
 
   await component.locator("input").clear();
   await component.locator("input").fill("https://perdu.com");
   await component.locator("input").press("Enter");
 
-  expect(selected).toBe("https://picsum.photos/150");
+  expect(selected).toBe("https://example.com/images/150");
   expect(submitted).toBe("https://perdu.com");
 });
 
@@ -168,6 +168,6 @@ test("Options should be navigable", async ({ mount }) => {
   await component.locator("input").press("ArrowDown");
   await component.locator("input").press("Enter");
 
-  expect(selected).toBe("https://picsum.photos/300");
+  expect(selected).toBe("https://example.com/images/300");
   expect(submitted).toBeNull();
 });

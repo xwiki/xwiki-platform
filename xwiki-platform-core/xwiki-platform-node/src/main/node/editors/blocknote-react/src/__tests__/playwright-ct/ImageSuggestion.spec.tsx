@@ -74,6 +74,17 @@ function attachmentResourceReference(reference: string, typed = false) {
   return { type: "attach", typed, reference, parameters: {} };
 }
 
+// The images are designated by URLs on a domain reserved for examples, so that the tests never depend on a remote
+// server: they are served locally, with a size, since some tests click on them.
+test.beforeEach(async ({ page }) => {
+  await page.route("https://example.com/images/**", (route) =>
+    route.fulfill({
+      contentType: "image/svg+xml",
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"/>',
+    }),
+  );
+});
+
 test("The image quick action shows the browse and upload actions, then the matching images", async ({
   mount,
   page,
@@ -84,17 +95,17 @@ test("The image quick action shows the browse and upload actions, then the match
       images={[
         {
           label: "Cat picture",
-          url: "https://picsum.photos/150",
+          url: "https://example.com/images/150",
           hint: "Animals / Cats",
         },
         {
           label: "Dog picture",
-          url: "https://picsum.photos/300",
+          url: "https://example.com/images/300",
           hint: "Animals / Cat",
         },
         {
           label: "Bird picture",
-          url: "https://picsum.photos/450",
+          url: "https://example.com/images/450",
         },
       ]}
     />,
@@ -127,7 +138,7 @@ test("The image quick action shows the browse and upload actions, then the match
   // the page holding the image under it.
   await expect(items.nth(2).locator("img")).toHaveAttribute(
     "src",
-    "https://picsum.photos/150",
+    "https://example.com/images/150",
   );
   await expect(items.nth(2).locator("img")).toHaveAttribute("alt", "");
   await expect(items.nth(2)).toContainText("Cat picture");
@@ -137,7 +148,7 @@ test("The image quick action shows the browse and upload actions, then the match
 
   await expect(items.nth(3).locator("img")).toHaveAttribute(
     "src",
-    "https://picsum.photos/300",
+    "https://example.com/images/300",
   );
   await expect(items.nth(3)).toContainText("Dog picture");
   await expect(
@@ -157,7 +168,7 @@ test("Only the first 5 image suggestions are shown, in addition to the browse an
 }) => {
   const images = Array.from({ length: 8 }, (_, i) => ({
     label: `Image ${i}`,
-    url: `https://picsum.photos/${100 + i}`,
+    url: `https://example.com/images/${100 + i}`,
   }));
 
   const component = await mount(<ImageSuggestionForTest images={images} />);
@@ -181,7 +192,7 @@ test("Clicking an image suggestion inserts an image block with its URL and refer
       images={[
         {
           label: "Cat picture",
-          url: "https://picsum.photos/150",
+          url: "https://example.com/images/150",
           reference: "wiki:Animals.Cats@cat.png",
         },
       ]}
@@ -198,7 +209,7 @@ test("Clicking an image suggestion inserts an image block with its URL and refer
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/150",
+    "https://example.com/images/150",
   );
   // The reference of the suggested image is passed on, so that the image can be saved with it rather
   // than with its URL.
@@ -221,8 +232,8 @@ test("Keyboard navigation can select an image suggestion", async ({
   const component = await mount(
     <ImageSuggestionForTest
       images={[
-        { label: "Cat picture", url: "https://picsum.photos/150" },
-        { label: "Dog picture", url: "https://picsum.photos/300" },
+        { label: "Cat picture", url: "https://example.com/images/150" },
+        { label: "Dog picture", url: "https://example.com/images/300" },
       ]}
     />,
   );
@@ -245,7 +256,7 @@ test("Keyboard navigation can select an image suggestion", async ({
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/150",
+    "https://example.com/images/150",
   );
 });
 
@@ -315,7 +326,7 @@ test("Uploading an image from the upload action inserts it with its reference", 
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      uploadedImageURL="https://picsum.photos/600"
+      uploadedImageURL="https://example.com/images/600"
       uploadedImageName="uploaded.png"
     />,
   );
@@ -337,7 +348,7 @@ test("Uploading an image from the upload action inserts it with its reference", 
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/600",
+    "https://example.com/images/600",
   );
   // The reference of the uploaded attachment is passed on.
   await expectSelectedImage(
@@ -353,7 +364,7 @@ test("Uploading an image attaches it to the edited document, when specified", as
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      uploadedImageURL="https://picsum.photos/600"
+      uploadedImageURL="https://example.com/images/600"
       uploadedImageName="uploaded.png"
       documentReference="Other.Page"
     />,
@@ -423,7 +434,7 @@ test("Clicking the browse action opens the full image selector where the suggest
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
     />,
   );
 
@@ -452,7 +463,7 @@ test("The browse action uses the image insertion override, when specified, to in
     <ImageSuggestionForTest
       imageInsertionResult={{
         type: "insert",
-        props: { url: "https://picsum.photos/700", previewWidth: 120 },
+        props: { url: "https://example.com/images/700", previewWidth: 120 },
         reference,
       }}
     />,
@@ -464,7 +475,7 @@ test("The browse action uses the image insertion override, when specified, to in
 
   // The image returned by the override is inserted, with all its properties, instead of opening the image selector.
   const image = editorEl.locator("img.bn-visual-media");
-  await expect(image).toHaveAttribute("src", "https://picsum.photos/700");
+  await expect(image).toHaveAttribute("src", "https://example.com/images/700");
   await expect(image).toHaveCSS("width", "120px");
   await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
   await expectSelectedImage(page, editorEl, reference);
@@ -515,7 +526,7 @@ test("Uploading an image from the opened image selector inserts it and closes th
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      uploadedImageURL="https://picsum.photos/600"
+      uploadedImageURL="https://example.com/images/600"
       uploadedImageName="uploaded.png"
     />,
   );
@@ -538,7 +549,7 @@ test("Uploading an image from the opened image selector inserts it and closes th
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/600",
+    "https://example.com/images/600",
   );
   await expectSelectedImage(
     page,
@@ -555,13 +566,13 @@ test("Uploading an image from the edit panel of an image replaces that image", a
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      uploadedImageURL="https://picsum.photos/600"
+      uploadedImageURL="https://example.com/images/600"
       content={[
         {
           id: "some-image",
           type: "image",
           props: {
-            url: "https://picsum.photos/150",
+            url: "https://example.com/images/150",
           },
           content: undefined,
           children: [],
@@ -587,7 +598,7 @@ test("Uploading an image from the edit panel of an image replaces that image", a
   await expect(editorEl.locator("img.bn-visual-media")).toHaveCount(1);
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/600",
+    "https://example.com/images/600",
   );
   await expectSelectedImage(
     page,
@@ -607,7 +618,7 @@ test("Entering an image URL in the edit panel of an image replaces that image, k
           id: "some-image",
           type: "image",
           props: {
-            url: "https://picsum.photos/150",
+            url: "https://example.com/images/150",
           },
           content: undefined,
           children: [],
@@ -621,12 +632,12 @@ test("Entering an image URL in the edit panel of an image replaces that image, k
   await page.getByLabel("blocknote.imageToolbar.buttons.edit").click();
 
   const searchInput = page.locator('[data-test="searchBoxInput"]');
-  await searchInput.fill("https://picsum.photos/600");
+  await searchInput.fill("https://example.com/images/600");
   await searchInput.press("Enter");
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/600",
+    "https://example.com/images/600",
   );
   // Without a reference, the integration knows the image must be saved with its URL, rather than
   // with the reference of the replaced image.
@@ -639,7 +650,7 @@ test("Selecting the browse action with the keyboard also opens the full image se
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
     />,
   );
 
@@ -663,7 +674,7 @@ test("Selecting a search result in the opened image selector inserts the image b
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
     />,
   );
 
@@ -683,7 +694,7 @@ test("Selecting a search result in the opened image selector inserts the image b
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/150",
+    "https://example.com/images/150",
   );
   await expectSelectedImage(
     page,
@@ -702,10 +713,10 @@ test("The opened image selector shows the location of the found images", async (
       images={[
         {
           label: "Cat picture",
-          url: "https://picsum.photos/150",
+          url: "https://example.com/images/150",
           hint: "Animals / Cats",
         },
-        { label: "Bird picture", url: "https://picsum.photos/450" },
+        { label: "Bird picture", url: "https://example.com/images/450" },
       ]}
     />,
   );
@@ -732,7 +743,7 @@ test("Keyboard navigation can select a search result in the opened image selecto
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
     />,
   );
 
@@ -754,7 +765,7 @@ test("Keyboard navigation can select a search result in the opened image selecto
 
   await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
     "src",
-    "https://picsum.photos/150",
+    "https://example.com/images/150",
   );
 });
 
@@ -765,7 +776,7 @@ test("Pressing Escape closes the opened image selector without inserting anythin
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
     />,
   );
 
@@ -792,7 +803,7 @@ test("Opening the full image selector clears the typed trigger text from the edi
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
     />,
   );
 
@@ -819,7 +830,7 @@ test("Typing the trigger shows the image suggestions only once followed by a que
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
     />,
   );
 
@@ -846,7 +857,7 @@ test("The image suggestions aren't available when the syntax doesn't support ima
 }) => {
   const component = await mount(
     <ImageSuggestionForTest
-      images={[{ label: "Cat picture", url: "https://picsum.photos/150" }]}
+      images={[{ label: "Cat picture", url: "https://example.com/images/150" }]}
       syntax={{
         ...FULL_SYNTAX,
         features: {

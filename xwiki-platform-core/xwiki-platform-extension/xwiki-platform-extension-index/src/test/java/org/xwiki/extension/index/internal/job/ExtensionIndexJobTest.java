@@ -134,6 +134,69 @@ class ExtensionIndexJobTest
     }
 
     @Test
+    void incompleteRemotePageIsNotTheLastOne() throws Exception
+    {
+        // The repository announces 250 extensions but the first page contains less than requested
+        when(this.repository1.search("", 0, 100)).thenReturn(
+            new CollectionIterableResult<Extension>(250, 0, Arrays.asList(this.extension11)));
+        when(this.repository1.search("", 100, 100)).thenReturn(
+            new CollectionIterableResult<Extension>(250, 100, Arrays.asList(this.extension12)));
+        Extension extension13 = new TestExtension(new ExtensionId("id13", "version"), null);
+        when(this.repository1.search("", 200, 100)).thenReturn(
+            new CollectionIterableResult<Extension>(250, 200, Arrays.asList(extension13)));
+
+        this.job.initialize(new ExtensionIndexRequest(false, true, Collections.emptyList()));
+        this.job.run();
+
+        verify(this.indexStore).add(this.extension11, true);
+        verify(this.indexStore).add(this.extension12, true);
+        verify(this.indexStore).add(extension13, true);
+        verify(this.repository1, never()).search("", 300, 100);
+        verify(this.indexStore).add(this.extension21, true);
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void failingRemotePage() throws Exception
+    {
+        when(this.repository1.search("", 0, 100)).thenReturn(
+            new CollectionIterableResult<Extension>(250, 0, Arrays.asList(this.extension11)));
+        when(this.repository1.search("", 100, 100)).thenThrow(new SearchException("page failure"));
+        when(this.repository1.search("", 200, 100)).thenReturn(
+            new CollectionIterableResult<Extension>(250, 200, Arrays.asList(this.extension12)));
+
+        this.job.initialize(new ExtensionIndexRequest(false, true, Collections.emptyList()));
+        this.job.run();
+
+        // The failing page does not prevent indexing the following ones
+        verify(this.indexStore).add(this.extension11, true);
+        verify(this.indexStore).add(this.extension12, true);
+        verify(this.repository1, never()).search("", 300, 100);
+        verify(this.indexStore).add(this.extension21, true);
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Failed to get remote extensions from offset [100] in repository [null]:"
+            + " [SearchException: page failure]", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void failingLastRemotePage() throws Exception
+    {
+        when(this.repository1.search("", 0, 100)).thenReturn(
+            new CollectionIterableResult<Extension>(150, 0, Arrays.asList(this.extension11)));
+        when(this.repository1.search("", 100, 100)).thenThrow(new SearchException("page failure"));
+
+        this.job.initialize(new ExtensionIndexRequest(false, true, Collections.emptyList()));
+        this.job.run();
+
+        verify(this.indexStore).add(this.extension11, true);
+        verify(this.repository1, never()).search("", 200, 100);
+        verify(this.indexStore).add(this.extension21, true);
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Failed to get remote extensions from offset [100] in repository [null]:"
+            + " [SearchException: page failure]", this.logCapture.getMessage(0));
+    }
+
+    @Test
     void storeDisposedWhileAddingRemoteExtensions() throws Exception
     {
         // The store is disposed (e.g. XWiki is stopping) while the remote extensions are being added.

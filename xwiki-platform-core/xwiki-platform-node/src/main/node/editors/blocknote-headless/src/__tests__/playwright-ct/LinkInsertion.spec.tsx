@@ -87,8 +87,10 @@ async function openLinkModalOnSelection(
   url: string,
 ): Promise<void> {
   // Each key press is awaited until it is painted (see pressKeySettled) so that sending them in quick succession
-  // doesn't outrun the editor's selection update.
-  await paragraph.click();
+  // doesn't outrun the editor's selection update. The paragraph is clicked at its start, where Home moves the caret:
+  // the editor can apply the caret position of the click after a key press that follows it closely (e.g. on a loaded
+  // machine), which would undo a Home pressed after a click elsewhere in the paragraph.
+  await paragraph.click({ position: { x: 1, y: 1 } });
   await pressKeySettled(page, "Home");
   for (let i = 0; i < offset; i++) {
     await pressKeySettled(page, "ArrowRight");

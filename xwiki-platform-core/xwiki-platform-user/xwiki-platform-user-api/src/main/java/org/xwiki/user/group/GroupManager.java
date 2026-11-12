@@ -121,7 +121,8 @@ public interface GroupManager
     default boolean isMember(DocumentReference member, DocumentReference group, boolean recurse)
         throws GroupException
     {
-        // A group is never a member of itself, even when it lists itself as a member.
+        // The guest user (null member) is never a member of any group, a null group has no members, and a group is
+        // never a member of itself, even when it lists itself as a member.
         if (member == null || group == null || member.withoutLocale().equals(group.withoutLocale())) {
             return false;
         }
@@ -130,8 +131,9 @@ public interface GroupManager
         // while a group can have thousands of members. A direct membership is stored in the group's document, so only
         // the group's wiki holds it, while a recursive check also needs the member's wiki, where the intermediate
         // groups of the member are usually located.
-        Object wikiTarget =
-            recurse ? List.of(member.getWikiReference(), group.getWikiReference()) : group.getWikiReference();
+        WikiReference groupWiki = group.getWikiReference();
+        Object wikiTarget = recurse && !member.getWikiReference().equals(groupWiki)
+            ? List.of(member.getWikiReference(), groupWiki) : groupWiki;
 
         return getGroups(member.withoutLocale(), wikiTarget, recurse).contains(group.withoutLocale());
     }

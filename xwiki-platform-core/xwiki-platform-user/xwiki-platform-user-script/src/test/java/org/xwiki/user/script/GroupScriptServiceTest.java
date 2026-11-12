@@ -74,6 +74,8 @@ class GroupScriptServiceTest
 
         assertTrue(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP, true));
         assertFalse(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP, false));
+        // Recursive by default
+        assertTrue(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP));
     }
 
     @Test

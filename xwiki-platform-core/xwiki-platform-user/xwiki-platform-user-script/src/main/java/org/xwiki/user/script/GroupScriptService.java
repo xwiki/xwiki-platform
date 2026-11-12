@@ -175,6 +175,23 @@ public class GroupScriptService implements ScriptService
     }
 
     /**
+     * Indicate if the passed member (user or group) is a member of the passed group, directly or through groups of
+     * groups. Same as {@link #isMember(DocumentReference, DocumentReference, boolean)} with {@code recurse} set to
+     * {@code true}.
+     *
+     * @param member the group member (user or group); {@code null} (the guest user) is never a member
+     * @param group the group to check; {@code null} has no members
+     * @return {@code true} if the passed member is a member of the passed group
+     * @throws GroupException when failing to get the groups of the member
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public boolean isMember(DocumentReference member, DocumentReference group) throws GroupException
+    {
+        return isMember(member, group, true);
+    }
+
+    /**
      * Checks if a group (candidate) can be added to the members of another group (target).
      * <ul>
      * <li>A group (candidate) can be added to the members of another group (target) if the target is not, transitively,

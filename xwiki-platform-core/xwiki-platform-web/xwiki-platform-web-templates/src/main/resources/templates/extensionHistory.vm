@@ -37,7 +37,7 @@
   #elseif ($request.data == 'sources')
     #displayExtensionHistorySourcesList
   #elseif ($request.data == 'records')
-    #getExtensionHistoryRecords
+    #getExtensionHistoryRecords(false)
     #if ($records && $records.size() > 0)
       #displayExtensionHistoryRecords($records)
     #end
@@ -226,7 +226,7 @@
 #end
 
 #macro (maybeDisplayExtensionHistoryRecordsForm)
-  #getExtensionHistoryRecords
+  #getExtensionHistoryRecords(false)
   #if ($records && $records.size() > 0)
     #displayExtensionHistoryRecordsForm($records)
   #else
@@ -266,7 +266,12 @@
   </form>
 #end
 
-#macro (getExtensionHistoryRecords)
+## Gets the history records of the selected source (local history or history file).
+##
+## @param $all whether to get all the records (needed e.g. to look for the selected records, which may come from
+##   several pages) or only one page of records, starting from the "offsetRecordId" request parameter. History files
+##   are always read entirely.
+#macro (getExtensionHistoryRecords $all)
   #if ("$!request.source" != '')
     ## History File
     #set ($sourceFile = $xwiki.getDocument('XWiki.ExtensionHistoryUploads').getAttachment($request.source))
@@ -281,9 +286,15 @@
     ## Local History
     ## Show by default only the jobs that affect the wiki.
     #set ($jobTypes = ['install', 'uninstall', 'repairxar'])
+    ## The page size, used to display the records and to decide if there are more records to load.
     #set ($limit = 10)
+    ## A negative limit means no limit.
+    #set ($fetchLimit = $limit)
+    #if ($all)
+      #set ($fetchLimit = -1)
+    #end
     #set ($recordsFilter = $services.extension.history.records)
-    #set ($records = $recordsFilter.fromThisWiki().ofType($jobTypes).list($request.offsetRecordId, $limit))
+    #set ($records = $recordsFilter.fromThisWiki().ofType($jobTypes).list($request.offsetRecordId, $fetchLimit))
   #end
 #end
 
@@ -292,7 +303,9 @@
   #if ($selectedRecordIds && $selectedRecordIds.size() > 0)
     #set ($selectedRecordIdsSet = $collectiontool.set)
     #set ($discard = $selectedRecordIdsSet.addAll($selectedRecordIds.subList(0, $selectedRecordIds.size())))
-    #getExtensionHistoryRecords
+    ## The selected records may come from several pages of records (the user can load more records before selecting
+    ## them) so we have to look for them in the entire history, not only in the first page.
+    #getExtensionHistoryRecords(true)
     #set ($selectedRecords = [])
     #foreach ($record in $records)
       #if ($selectedRecordIdsSet.contains($record.id))

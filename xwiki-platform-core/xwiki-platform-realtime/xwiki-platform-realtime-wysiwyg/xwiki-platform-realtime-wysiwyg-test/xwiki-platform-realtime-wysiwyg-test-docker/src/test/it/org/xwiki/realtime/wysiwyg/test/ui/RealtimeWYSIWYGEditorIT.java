@@ -424,7 +424,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         secondTextArea.waitUntilTextContains("one");
-        secondTextArea.insertMacro("/info", "Info Box");
+        secondTextArea.insertMacro("/info", "Info Message");
 
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -791,7 +791,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 
-        firstTextArea.insertMacro("/info", "Info Box");
+        firstTextArea.insertMacro("/info", "Info Message");
 
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -1060,7 +1060,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Type some text and insert an information box.
         firstTextArea.sendKeys("before", Keys.ENTER);
-        firstTextArea.insertMacro("/info", "Info Box");
+        firstTextArea.insertMacro("/info", "Info Message");
 
         // Select the default information message and delete it.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));

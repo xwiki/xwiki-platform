@@ -714,12 +714,16 @@
 
 
           macros.forEach(function (macro) {
-            // Do not add macros that are already registered.
-            if (editor.quickActions.getAction('macro-' + macro.id.id) ||
-              // Do not add macros that cannot be installed
-              (macro.categories.some(function (cat) {
+            // Do not add macros that are already registered, but use the macro name for their quick action so that it
+            // matches the macro dialogs.
+            if (editor.quickActions.getAction('macro-' + macro.id.id)) {
+              editor.quickActions.updateAction('macro-' + macro.id.id, {name: macro.name});
+              return;
+            }
+            // Do not add macros that cannot be installed
+            if (macro.categories.some(function (cat) {
                 return cat.id === "_notinstalled";
-              }) && macro.extensionVersion && !macro.extensionInstallAllowed)) {
+              }) && macro.extensionVersion && !macro.extensionInstallAllowed) {
               return;
             }
 
@@ -737,6 +741,17 @@
             };
 
             editor.quickActions.addAction(item);
+          });
+
+          // Use the macro name for the tool bar menu items that insert a macro, so that it matches the macro dialogs.
+          // The xwiki-toolbar plugin registers these menu items with the toolbar_ prefix.
+          const macroNames = Object.fromEntries(macros.map(macro => [macro.id.id, macro.name]));
+          Object.keys(editor.config.toolbarMenuItems || {}).forEach(function (itemId) {
+            const menuItem = editor.getMenuItem?.('toolbar_' + itemId);
+            if (['xwiki-macro', 'xwiki-macro-insert'].includes(menuItem?.command) &&
+                Object.hasOwn(macroNames, menuItem.data?.name)) {
+              menuItem.label = macroNames[menuItem.data.name];
+            }
           });
         });
       });

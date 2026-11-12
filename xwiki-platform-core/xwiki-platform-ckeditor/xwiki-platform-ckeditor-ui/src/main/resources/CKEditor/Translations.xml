@@ -106,6 +106,13 @@ ckeditor.plugin.toolbar.numberedlist=Numbered List
 ckeditor.plugin.toolbar.insert=Insert
 ckeditor.plugin.toolbar.horizontalrule=Divider
 ckeditor.plugin.toolbar.specialchar=Special Character
+ckeditor.plugin.toolbar.infoBox=Info Box
+ckeditor.plugin.toolbar.successBox=Success Box
+ckeditor.plugin.toolbar.warningBox=Warning Box
+ckeditor.plugin.toolbar.errorBox=Error Box
+ckeditor.plugin.toolbar.toc=Table of Contents
+ckeditor.plugin.toolbar.include=Include Page
+ckeditor.plugin.toolbar.code=Code Snippet
 ckeditor.plugin.toolbar.otherMacros=Other Macros
 
 ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
@@ -289,16 +296,6 @@ ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 ckeditor.upload.error.csrf=The CSRF token is missing.
 ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
 
-## Deprecated since 18.10.0RC1
-## Use rendering.macro.&lt;macroId&gt;.name instead, exposed to the plugins as xwiki-macro.name.&lt;macroId&gt;.
-ckeditor.plugin.toolbar.infoBox=Info Box
-ckeditor.plugin.toolbar.successBox=Success Box
-ckeditor.plugin.toolbar.warningBox=Warning Box
-ckeditor.plugin.toolbar.errorBox=Error Box
-ckeditor.plugin.toolbar.toc=Table of Contents
-ckeditor.plugin.toolbar.include=Include Page
-ckeditor.plugin.toolbar.code=Code Snippet
-
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>
@@ -410,14 +407,6 @@ ckeditor.plugin.toolbar.code=Code Snippet
     #else
       #set ($discard = $pluginTranslations.put($relativeKey, $relativeKey))
     #end
-  #end
-#end
-## Expose the macro names used by the toolbar and the Quick Actions, so that they match the macro dialogs.
-#set ($macroTranslations = $translations.get('xwiki-macro'))
-#foreach ($macroId in ['info', 'success', 'warning', 'error', 'toc', 'include', 'code'])
-  #set ($translation = $services.localization.get("rendering.macro.${macroId}.name"))
-  #if ($translation)
-    #set ($discard = $macroTranslations.put("name.$macroId", $translation.rawSource))
   #end
 #end
 */

@@ -122,6 +122,29 @@
     }
 
     /**
+     * Updates an existing quick action and re-indexes it for the search.
+     *
+     * @param {String} id - the id of the quick action to update
+     * @param {Object} changes - the quick action fields to change, e.g. the name
+     * @return {Promise} a promise that resolves when the quick action is updated
+     */
+    updateAction(id, changes) {
+      // Wait for the search to be ready, because the quick actions are added only once it is.
+      return this.searchReady.then(fuse => {
+        const action = this.getAction(id);
+        if (action) {
+          Object.assign(action, changes);
+          action.nameTokens = action.name.split(/\s+/);
+          action.descriptionTokens = action.description.split(/\s+/);
+          fuse.remove(indexedAction => indexedAction === action);
+          fuse.add(action);
+        }
+      }).catch(error => {
+        console.error('Failed to update the quick action because: ' + error);
+      });
+    }
+
+    /**
       * Get an action definition based on its id
       * @param {String} The action id
       * @return {Object} The action if it exists
@@ -745,7 +768,7 @@
         }, {
           group: 'Layout',
           id: 'macro-info',
-          name: editor.localization.get('xwiki-macro.name.info'),
+          name: editor.localization.get('xwiki-toolbar.infoBox'),
           iconClass: 'fa fa-info-circle',
           description: editor.localization.get('xwiki-slash.action.info.hint'),
           command: {
@@ -760,7 +783,7 @@
         }, {
           group: 'Layout',
           id: 'macro-success',
-          name: editor.localization.get('xwiki-macro.name.success'),
+          name: editor.localization.get('xwiki-toolbar.successBox'),
           iconClass: 'fa fa-check-circle',
           description: editor.localization.get('xwiki-slash.action.success.hint'),
           command: {
@@ -775,7 +798,7 @@
         }, {
           group: 'Layout',
           id: 'macro-warning',
-          name: editor.localization.get('xwiki-macro.name.warning'),
+          name: editor.localization.get('xwiki-toolbar.warningBox'),
           iconClass: 'fa fa-exclamation-triangle',
           description: editor.localization.get('xwiki-slash.action.warning.hint'),
           command: {
@@ -790,7 +813,7 @@
         }, {
           group: 'Layout',
           id: 'macro-error',
-          name: editor.localization.get('xwiki-macro.name.error'),
+          name: editor.localization.get('xwiki-toolbar.errorBox'),
           iconClass: 'fa fa-exclamation-circle',
           description: editor.localization.get('xwiki-slash.action.error.hint'),
           command: {
@@ -855,7 +878,7 @@
         }, {
           group: 'Content',
           id: 'macro-include',
-          name: editor.localization.get('xwiki-macro.name.include'),
+          name: editor.localization.get('xwiki-toolbar.include'),
           iconClass: 'fa fa-file-text-o',
           description: editor.localization.get('xwiki-slash.action.include.hint'),
           command: {
@@ -872,7 +895,7 @@
         {
           group: 'Formatting',
           id: 'macro-code',
-          name: editor.localization.get('xwiki-macro.name.code'),
+          name: editor.localization.get('xwiki-toolbar.code'),
           iconClass: 'fa fa-code',
           description: editor.localization.get('xwiki-slash.action.code.hint'),
           command: {
@@ -889,7 +912,7 @@
         {
           group: 'Navigation',
           id: 'macro-toc',
-          name: editor.localization.get('xwiki-macro.name.toc'),
+          name: editor.localization.get('xwiki-toolbar.toc'),
           iconClass: 'fa fa-list',
           description: editor.localization.get('xwiki-slash.action.toc.hint'),
           command: {

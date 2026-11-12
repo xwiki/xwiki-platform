@@ -19,10 +19,14 @@
  */
 package org.xwiki.bridge.event;
 
+import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered after a wiki is deleted.
+ * <p>
+ * This event ends the fold started by the {@link WikiDeletingEvent}.
+ * </p>
  * <p>
  * The event also send the following parameters:
  * </p>
@@ -34,7 +38,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * @version $Id$
  * @since 3.0M1
  */
-public class WikiDeletedEvent extends AbstractWikiEvent
+public class WikiDeletedEvent extends AbstractWikiEvent implements EndFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

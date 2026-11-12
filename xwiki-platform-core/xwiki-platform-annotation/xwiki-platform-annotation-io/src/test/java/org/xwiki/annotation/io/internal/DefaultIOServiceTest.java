@@ -24,12 +24,15 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.annotation.reference.internal.DefaultTypedStringEntityReferenceResolver;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
@@ -37,6 +40,9 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -69,6 +75,9 @@ class DefaultIOServiceTest
 {
     private static final String TARGET = "xwiki:Space.Page";
 
+    /** The user performing the annotation operation, as resolved from the context. */
+    private static final UserReference ANNOTATOR = mock(UserReference.class, "annotator");
+
     @InjectMockComponents
     private DefaultIOService ioService;
 
@@ -81,11 +90,16 @@ class DefaultIOServiceTest
     @MockComponent
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
+
     private XWiki xwiki;
 
     private XWikiContext xcontext;
 
     private XWikiDocument clonedDocument;
+
+    private DocumentAuthors clonedDocumentAuthors;
 
     private BaseObject annotationObject;
 
@@ -105,6 +119,9 @@ class DefaultIOServiceTest
         this.clonedDocument = mock(XWikiDocument.class);
         when(cachedDocument.clone()).thenReturn(this.clonedDocument);
         when(this.xwiki.getDocument(anyString(), eq(this.xcontext))).thenReturn(cachedDocument);
+        this.clonedDocumentAuthors = mock(DocumentAuthors.class);
+        when(this.clonedDocument.getAuthors()).thenReturn(this.clonedDocumentAuthors);
+        when(this.currentUserResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(ANNOTATOR);
 
         DocumentReference annotationClassReference = new DocumentReference("xwiki", "XWiki", "AnnotationClass");
         when(this.configuration.getAnnotationClassReference()).thenReturn(annotationClassReference);
@@ -112,6 +129,7 @@ class DefaultIOServiceTest
         this.annotationObject = mock(BaseObject.class);
         when(this.clonedDocument.createXObject(any(EntityReference.class), eq(this.xcontext))).thenReturn(0);
         when(this.clonedDocument.getXObject(annotationClassReference, 0)).thenReturn(this.annotationObject);
+        when(this.annotationObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn("Space.Page");
     }
 
     @Test
@@ -128,7 +146,8 @@ class DefaultIOServiceTest
         InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, this.xwiki);
         inOrder.verify(this.temporaryAttachmentSessionsManager)
             .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image1.png", "image2.png"));
-        inOrder.verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
+        inOrder.verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(false), eq(true),
+            eq(this.xcontext));
         // The uploaded files list must not be written as a (bogus) annotation object property.
         verify(this.annotationObject, never()).set(eq("uploadedFiles"), any(), any());
     }
@@ -143,7 +162,8 @@ class DefaultIOServiceTest
 
         verify(this.temporaryAttachmentSessionsManager, never())
             .attachTemporaryAttachmentsInDocument(any(), any());
-        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(false), eq(true),
+            eq(this.xcontext));
     }
 
     @Test
@@ -159,6 +179,33 @@ class DefaultIOServiceTest
         InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, this.xwiki);
         inOrder.verify(this.temporaryAttachmentSessionsManager)
             .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image.png"));
-        inOrder.verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
+        inOrder.verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(false), eq(true),
+            eq(this.xcontext));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "add", "update", "remove" })
+    void annotationOperationOnlyUpdatesTheOriginalMetadataAuthor(String operation) throws Exception
+    {
+        switch (operation) {
+            case "add" -> {
+                Annotation annotation = new Annotation("selection", "left", "right");
+                annotation.setAuthor("xwiki:XWiki.Annotator");
+                this.ioService.addAnnotation(TARGET, annotation);
+            }
+            case "update" -> {
+                Annotation annotation = new Annotation("0");
+                annotation.setSelection("new selection");
+                this.ioService.updateAnnotations(TARGET, List.of(annotation));
+            }
+            default -> this.ioService.removeAnnotation(TARGET, "0");
+        }
+
+        verify(this.clonedDocumentAuthors).setOriginalMetadataAuthor(ANNOTATOR);
+        verify(this.clonedDocumentAuthors, never()).setEffectiveMetadataAuthor(any());
+        verify(this.clonedDocumentAuthors, never()).setContentAuthor(any());
+        verify(this.clonedDocument, never()).setAuthor(anyString());
+        verify(this.clonedDocument, never()).setAuthorReference(any());
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(false), eq(true), eq(this.xcontext));
     }
 }

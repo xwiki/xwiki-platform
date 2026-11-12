@@ -21,11 +21,11 @@ package org.xwiki.security.authorization;
 
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.SuperAdminUserReference;
 
 /**
  * This API is for checking the access rights of any users on any XWiki entities. It replaces
@@ -48,7 +48,7 @@ public interface AuthorizationManager
     /**
      * The Superadmin username.
      */
-    String SUPERADMIN_USER = "superadmin";
+    String SUPERADMIN_USER = SuperAdminUserReference.SUPERADMIN_USER_NAME;
 
     /**
      * Check if the user is the super admin.
@@ -65,7 +65,7 @@ public interface AuthorizationManager
     @Unstable
     default boolean isSuperAdmin(DocumentReference user)
     {
-        return user != null && StringUtils.equalsIgnoreCase(user.getName(), SUPERADMIN_USER);
+        return SuperAdminUserReference.isSuperAdminReference(user);
     }
 
     /**

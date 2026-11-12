@@ -43,8 +43,6 @@ import org.xwiki.user.UserReferenceSerializer;
 @Singleton
 public class DocumentStringUserReferenceSerializer implements UserReferenceSerializer<String>
 {
-    private static final String SUPERADMIN_REFERENCE_STRING = "XWiki.superadmin";
-
     private static final String GUEST_REFERENCE_STRING = "XWiki.XWikiGuest";
 
     @Inject
@@ -73,8 +71,8 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
                 resolvedReference = userReference;
             }
 
-            if (SuperAdminUserReference.INSTANCE == resolvedReference) {
-                result = SUPERADMIN_REFERENCE_STRING;
+            if (SuperAdminUserReference.isSuperAdmin(resolvedReference)) {
+                result = SuperAdminUserReference.SUPERADMIN_LOCAL_REFERENCE_STRING;
             } else if (GuestUserReference.INSTANCE == resolvedReference) {
                 result = GUEST_REFERENCE_STRING;
             } else {

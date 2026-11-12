@@ -22,12 +22,11 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.security.Principal;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.user.SuperAdminUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.PasswordClass;
@@ -64,17 +63,9 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
      */
     protected boolean isSuperAdmin(String username)
     {
-        // FIXME: this method should probably use a XWikiRightService#isSuperadmin(String) method, see
-        // XWikiRightServiceImpl#isSuperadmin(String)
-
-        // Note 1: we use the default document reference resolver here but it doesn't matter since we only care about
-        // the resolved page name.
-        // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
-        // to retrieve only the page name
-        DocumentReference documentReference =
-            Utils.<DocumentReferenceResolver<String>>getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
-                username);
-        return StringUtils.equalsIgnoreCase(documentReference.getName(), XWikiRightService.SUPERADMIN_USER);
+        // We use a resolver since the passed username could contain the wiki and/or the space too.
+        return SuperAdminUserReference.isSuperAdmin(
+            Utils.<UserReferenceResolver<String>>getComponent(UserReferenceResolver.TYPE_STRING).resolve(username));
     }
 
     /**

@@ -43,5 +43,16 @@
   sourceParameters="translationPrefix=&amp;resultPage=SkinVisualIT.LiveDataResults"
   sort="name"
   filters="name=a"
-/}}</content>
+}}
+{
+  "meta": {
+    "propertyDescriptors": [
+      {
+        "id": "description",
+        "name": "Description of the entry, long enough to be trimmed on a small screen"
+      }
+    ]
+  }
+}
+{{/liveData}}</content>
 </xwikidoc>

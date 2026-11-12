@@ -37,6 +37,10 @@
          By setting this property, we make sure this application would be automatically uninstalled if the administrator
          installs the old Activity Stream Application. -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream-ui</xwiki.extension.features>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/activity
+    </xwiki.extension.components>
   </properties>
   <description>Provide a macro implemented with the Notifications Application to keep a backward compatibility with Activity Stream.</description>
   <dependencies>

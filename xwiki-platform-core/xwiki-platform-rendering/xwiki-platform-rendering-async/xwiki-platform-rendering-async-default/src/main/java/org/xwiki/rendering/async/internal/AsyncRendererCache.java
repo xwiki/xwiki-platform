@@ -273,6 +273,20 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
                 cleanCache(reference);
             }
         }
+
+        // Also clean entries associated with a right check of a user or an entity of the wiki
+        for (Map.Entry<RightEntry, Set<String>> entry : this.rightMapping.entrySet()) {
+            RightEntry right = entry.getKey();
+
+            if (isInWiki(right.getUserReference(), wiki) || isInWiki(right.getEntityReference(), wiki)) {
+                clean(entry.getValue());
+            }
+        }
+    }
+
+    private boolean isInWiki(EntityReference reference, String wiki)
+    {
+        return reference != null && reference.getRoot().getName().equals(wiki);
     }
 
     /**

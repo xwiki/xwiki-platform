@@ -983,7 +983,7 @@ Generates:
       <name>location</name>
     </property>
     <property>
-      <type/>
+      <type>org.xwiki.model.reference.SpaceReference</type>
     </property>
   </object>
   <object>

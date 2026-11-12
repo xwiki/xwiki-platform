@@ -43,7 +43,8 @@
 ## @param tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 ##
 #if($tagCloudSpace &amp;&amp; "$!tagCloudSpace" != "")
-  {{tagcloud space="$tagCloudSpace"/}}
+  #set ($quotedTagCloudSpace = $services.rendering.escape($tagCloudSpace.replace("'", "''"), 'xwiki/2.1'))
+  {{tagcloud spaces="'$quotedTagCloudSpace'"/}}
 #else
   {{tagcloud/}}
 #end
@@ -469,7 +470,9 @@ ol.tagCloud .ultraPopular {
 ##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 #set ($tagCloudSpace = $wikimacro.parameters.get('space'))
-#set ($tagCloudSpaces = $wikimacro.parameters.get('spaces'))
+## The value of spaces is read as typed through the deprecated $xcontext.macro binding on purpose: $wikimacro only gives
+## its conversion to a list, which also splits the names on whitespace, and has no macro context in async rendering.
+#set ($tagCloudSpaces = $xcontext.macro.params.spaces)
 #set ($limit = $wikimacro.parameters.get('limit'))
 #if ("$!limit" != '' &amp;&amp; $limit &lt; 0)
   #set ($limit = 0)
@@ -489,13 +492,49 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #break
 #end
 
-##If multiple spaces with "spaces" parameter
-#if( $tagCloudSpaces )
-  #set ($tagCount = $xwiki.tag.getTagCountForSpaces($tagCloudSpaces))
+## The locations are separated by commas. Each one is given either as typed, like the location picker outputs it, or in
+## single quotes with the quotes inside its name doubled, which a name containing a comma or starting with a quote needs.
+#set ($locationPattern = "\s*(?:'((?:[^']|'')+)'|([^,'\s](?:[^,]*[^,\s])?))\s*")
+#set ($tagCloudLocations = [])
+#if ($stringtool.isNotBlank($tagCloudSpaces))
+  #if (!$regextool.compile("(?:$locationPattern,)*$locationPattern").matcher($tagCloudSpaces).matches())
+    #set ($escapedSpaces = $services.rendering.escape($tagCloudSpaces, 'xwiki/2.1'))
+    {{error}}$services.localization.render('tag.cloud.invalidLocations', [$escapedSpaces]){{/error}}
+    #break
+  #end
+  #foreach ($match in $regextool.findAll($tagCloudSpaces, "(?:^|,)$locationPattern"))
+    #if ($match.get(1).group)
+      #set ($discard = $tagCloudLocations.add($match.get(1).group.replace("''", "'")))
+    #else
+      #set ($discard = $tagCloudLocations.add($match.get(2).group))
+    #end
+  #end
+#end
+## Get tag count map. Key: tag, value: number of occurrences.
+#if (!$tagCloudLocations.isEmpty())
+  ## The tag plugin expects the quoted syntax.
+  #set ($quote = "'")
+  #set ($quotedLocations = [])
+  #foreach ($location in $tagCloudLocations)
+    #set ($escapedLocation = $location.replace($quote, "$quote$quote"))
+    #set ($discard = $quotedLocations.add("$quote$escapedLocation$quote"))
+  #end
+  #set ($tagCount = $xwiki.tag.getTagCountForSpaces($stringtool.join($quotedLocations, ',')))
 #else
-  ##If only one space
-  ## Get tag count map. Key: tag, value: number of occurrences.
   #set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
+  #if ("$!tagCloudSpace" != '')
+    #set ($discard = $tagCloudLocations.add($tagCloudSpace))
+  #end
+#end
+## Without a warning, a location that doesn't exist would only show that no tag has been found.
+#foreach ($location in $tagCloudLocations)
+  #set ($spaceQuery = $services.query.hql('select space.reference from XWikiSpace space where space.reference = :space'))
+  #if ($spaceQuery.bindValue('space', $location).setLimit(1).execute().isEmpty())
+    #set ($wikiLocation = $services.rendering.escape($location, 'xwiki/2.1'))
+    ## The empty line keeps the warning apart from the tag cloud, which is a block of HTML that can't be inline.
+    {{warning}}$services.localization.render('tag.cloud.locationNotFound', [$wikiLocation]){{/warning}}
+
+  #end
 #end
 ## Organize tags as a list of {name, count} object so that it is easier to handle (sorting, limiting, ...)
 #set ($tagCountList = [])
@@ -568,10 +607,10 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   &lt;/ol&gt;
 #else
   &lt;p class="noitems"&gt;
-  #if("$!tagCloudSpace" == "")
-    $services.localization.render('xe.tag.notags')
+  #if ($tagCloudLocations.isEmpty())
+    $escapetool.xml($services.localization.render('xe.tag.notags'))
   #else
-    $services.localization.render('xe.tag.notagsforspace', ["$tagCloudSpace"])
+    $escapetool.xml($services.localization.render('xe.tag.notagsforspace'))
   #end
   &lt;/p&gt;
 #end
@@ -634,6 +673,16 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -678,7 +727,10 @@ $xwiki.ssx.use('XWiki.TagCloud')##
       <defaultValue/>
     </property>
     <property>
-      <description>The space to display the tag cloud for. If missing, the tags in the whole wiki will be displayed.</description>
+      <deprecated>1</deprecated>
+    </property>
+    <property>
+      <description>Deprecated, use spaces instead. The location to display the tags of, with its child pages. If missing, the tags of the whole wiki are displayed.</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -757,8 +809,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
       <defaultValue/>
     </property>
     <property>
-      <description>Spaces to display the tag cloud for. Spaces name must be separate by "," character and "'".
-(i.e. spaces="'My Space','Space2'")</description>
+      <description>The locations to display the tags of, with their child pages, separated by commas. For example, spaces="Sandbox,My Space". To use a location with a comma in its name, put each location in single quotes and double the quotes inside a name. For example, spaces="'My, Space','Space2'". If missing, the tags of the whole wiki are displayed.</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -767,7 +818,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
       <name>spaces</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.model.reference.SpaceReference&gt;</type>
     </property>
   </object>
   <object>

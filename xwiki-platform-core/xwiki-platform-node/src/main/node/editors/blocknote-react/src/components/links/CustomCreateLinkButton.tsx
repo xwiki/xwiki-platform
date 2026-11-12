@@ -40,22 +40,22 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
   const dict = useDictionary();
 
   const insertLink = useCallback(
-    (linkData: LinkEditionData) => {
+    (linkData: LinkEditionData, selectedText: string) => {
       // Let the integration intercept the link (including the reference of the linked resource)
       // before it is written into the content (e.g. to store that reference aside). Throwing from
       // the hook cancels the insertion.
-      const updatedLinkData =
+      const { url, title } =
         linkEditionHooks?.beforeUpdate?.(linkData) ?? linkData;
-      // Don't pass the title as text: we want to link the current selection in place, without
-      // replacing it (which would strip its inline formatting).
-      editor.createLink(updatedLinkData.url);
+      // Link the selection in place, without replacing it (which would strip the inline formatting
+      // it doesn't share), unless the link label differs from the selected text, i.e. the user
+      // changed the display text (or emptied it, to have the label generated from the target): the
+      // selection is then replaced with the new label, keeping the formatting shared by the whole
+      // selection, like typing over it does.
+      editor.createLink(url, title === selectedText ? undefined : title);
       editor.focus();
     },
     [editor, linkEditionHooks],
   );
-
-  // TODO: check if we need to update in realtime when the selection change?
-  const selected = editor.getSelectedText();
 
   // Links are inline content, so they can only wrap editable inline content. Hide the button when the
   // selection has no such content (e.g. a block-level macro or other content-less block is selected),
@@ -75,13 +75,16 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
         dict.generic.ctrl_shortcut,
       )}
       icon={<RiLink />}
-      onClick={() =>
+      onClick={() => {
+        // The display text is pre-filled with the text selected when the link modal is opened, which
+        // also tells, on submit, whether the user changed it.
+        const selectedText = editor.getSelectedText();
         linkEditionHandler({
           mode: "createNew",
-          current: { title: selected, url: "" },
-          onSubmit: insertLink,
-        })
-      }
+          current: { title: selectedText, url: "" },
+          onSubmit: (linkData) => insertLink(linkData, selectedText),
+        });
+      }}
     />
   );
 };

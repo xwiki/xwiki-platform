@@ -674,4 +674,51 @@ class LinkIT extends AbstractBlockNoteIT
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>https://xwiki.org]] third", wikiEditor.getContent());
     }
+
+    @Test
+    @Order(20)
+    void createLinkWithDisplayTextOnFormattedSelection(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a bold word.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first **second** third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the bold word using the keyboard, then create a link from the selection, changing its display text.
+        textArea.click().select(6, 6);
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.setDisplayText("2nd");
+        linkModal.setTargetAndSubmit("https://xwiki.org");
+
+        // Save and check the source: the selected word is replaced with the display text, which keeps its formatting.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[**2nd**>>https://xwiki.org]] third", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(21)
+    void editTargetOfLinkWithFormattedText(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a link whose text is partly bold.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[se**con**d>>https://xwiki.org]] third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
+        // and change only the link target.
+        textArea.click().moveCaretTo(8);
+        editor.getToolBar().editLink().setTargetAndSubmit("https://www.xwiki.org");
+
+        // Save and check the source: the link text keeps its formatting.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[se**con**d>>https://www.xwiki.org]] third", wikiEditor.getContent());
+    }
 }

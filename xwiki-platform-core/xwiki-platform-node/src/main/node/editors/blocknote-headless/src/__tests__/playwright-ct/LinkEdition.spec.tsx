@@ -59,6 +59,44 @@ test("Editing the title of a link keeps the rest of the line intact", async ({
   await expect(editorEl).toHaveText("First 2nd third fourth");
 });
 
+test("Editing the target of a link keeps the inline formatting of its text when the display text is left unchanged", async ({
+  mount,
+  page,
+}) => {
+  const component = await mountBlockNoteHeadless(mount, {
+    editorContent: buildParagraphWithLink("https://xwiki.org", [
+      { text: "se", styles: {} },
+      { text: "con", styles: { bold: true } },
+      { text: "d", styles: {} },
+    ]),
+    editorProps: {
+      syntax: FULL_SYNTAX,
+    },
+    macros: false,
+  });
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl
+    .locator('a[href="https://xwiki.org"]')
+    .first()
+    .waitFor({ state: "attached" });
+
+  // Change only the target of the link.
+  await openLinkEditor(page, editorEl);
+  await page.locator('[data-test="linkUrl"]').fill("https://www.xwiki.org");
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  // The link points to the new target and its text keeps its bold part (the link is rendered as one element per
+  // formatting run).
+  await expect(editorEl.locator('a[href="https://www.xwiki.org"]')).toHaveText([
+    "se",
+    "con",
+    "d",
+  ]);
+  await expect(editorEl.locator("strong")).toHaveText("con");
+  await expect(editorEl).toHaveText("First second third fourth");
+});
+
 for (const close of ["submit", "cancel"] as const) {
   test(`The edited content is focused back when the link modal is closed (${close})`, async ({
     mount,
@@ -265,7 +303,17 @@ async function openLinkEditor(page: Page, editorEl: Locator): Promise<void> {
   await editLinkButtonEl.click();
 }
 
-function buildParagraphWithLink(url: string): BlockType[] {
+/**
+ * @param url - the URL of the link
+ * @param linkContent - the text runs of the link, "second" by default
+ * @returns a paragraph holding the text "First second third fourth", where "second" is a link
+ */
+function buildParagraphWithLink(
+  url: string,
+  linkContent: { text: string; styles: { bold?: true } }[] = [
+    { text: "second", styles: {} },
+  ],
+): BlockType[] {
   return [
     {
       id: Math.random().toString(),
@@ -280,7 +328,7 @@ function buildParagraphWithLink(url: string): BlockType[] {
         {
           type: "link",
           href: url,
-          content: [{ type: "text", text: "second", styles: {} }],
+          content: linkContent.map((run) => ({ type: "text", ...run })),
         },
         { type: "text", text: " third fourth", styles: {} },
       ],

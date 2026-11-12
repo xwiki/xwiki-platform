@@ -43,7 +43,8 @@
 ## @param tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 ##
 #if($tagCloudSpace &amp;&amp; "$!tagCloudSpace" != "")
-  {{tagcloud space="$tagCloudSpace"/}}
+  ## Escape the characters that would end the quoted macro parameter value.
+  {{tagcloud space="$tagCloudSpace.replaceAll('([~"])', '~$1')"/}}
 #else
   {{tagcloud/}}
 #end
@@ -567,7 +568,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #if("$!tagCloudSpace" == "")
     $services.localization.render('xe.tag.notags')
   #else
-    $services.localization.render('xe.tag.notagsforspace', ["$tagCloudSpace"])
+    $escapetool.xml($services.localization.render('xe.tag.notagsforspace', ["$tagCloudSpace"]))
   #end
   &lt;/p&gt;
 #end

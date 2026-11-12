@@ -64,10 +64,14 @@ import { stub } from "sinon";
  * @param logic - a mock of `Logic.js`
  * @param editBus - a mock of the editBus Vue component
  * @param mocks - additional mocks such as the `$t` translation operation.
+ * @param mixins - global mixins applied to every mounted component, for instance to count their updates
  * @returns an initialized Vue component
  */
 // eslint-disable-next-line max-statements
-export function initWrapper(displayer, { props, logic, editBus, mocks }) {
+export function initWrapper(
+  displayer,
+  { props, logic, editBus, mocks, mixins },
+) {
   global.xcontext = { locale: "en" };
   global.XWiki = {
     EntityType: {},
@@ -188,6 +192,7 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
         },
       },
       mocks: { $t: (key) => key, ...mocks },
+      mixins,
     },
   });
 }

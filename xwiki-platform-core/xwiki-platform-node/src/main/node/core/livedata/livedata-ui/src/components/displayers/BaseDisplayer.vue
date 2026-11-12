@@ -30,28 +30,14 @@
 -->
 <template>
   <!--
-  Deactivate the popover on non editable entries by setting the trigger configuration to manual.
-  Since we don't do anything manually, that make the popover disabled.
+  The actions popover of the cell is a tippy.js instance attached to this element. It is created the first time the
+  user hovers or focuses an editable cell, so that displaying many cells does not create one tooltip per cell.
   -->
-  <!-- We explicitly disable expanded in the aria prop as otherwise a aria-expanded attribute is
-  produced on a non-iteractive div element. -->
-  <tippy
+  <div
     class="displayer-actions-popover"
-    :interactive="true"
-    :trigger="
-      isEditable && !duringEditing && !isEditMode
-        ? 'mouseenter focus manual'
-        : 'manual'
-    "
-    theme="light-border"
-    follow-cursor="horizontal"
-    :arrow="true"
-    ref="tippy"
-    :ignore-attributes="true"
-    :z-index="99999"
+    ref="popoverTarget"
     :tabindex="isView ? 0 : -1"
-    :aria="{ expanded: false }"
-    tag="div"
+    @mouseenter="onPopoverTriggered"
     @focusin="onDisplayerFocus"
     @focusout="onDisplayerBlur"
   >
@@ -117,25 +103,28 @@
         <XWikiLoader></XWikiLoader>
       </slot>
     </div>
-    <template #content>
-      <div class="displayer-action-list">
-        <ActionEdit
-          v-if="isEditable"
-          :displayer="{
-            setEdit: () => {
-              setEdit();
-            },
-          }"
-          :close-popover="closePopover"
-        />
-        <ActionFollowLink
-          :displayer="{ href: sanitizeUrl(href) }"
-          v-if="href"
-          :close-popover="closePopover"
-        />
-      </div>
-    </template>
-  </tippy>
+    <!-- tippy.js moves this element into its popper as soon as the popover is created. -->
+    <div
+      v-if="popoverContentRendered"
+      class="displayer-action-list"
+      ref="popoverContent"
+    >
+      <ActionEdit
+        v-if="isEditable"
+        :displayer="{
+          setEdit: () => {
+            setEdit();
+          },
+        }"
+        :close-popover="closePopover"
+      />
+      <ActionFollowLink
+        :displayer="{ href: sanitizeUrl(href) }"
+        v-if="href"
+        :close-popover="closePopover"
+      />
+    </div>
+  </div>
 </template>
 
 <script lang="js">
@@ -145,7 +134,7 @@ import ActionEdit from "./actions/ActionEdit.vue";
 import ActionFollowLink from "./actions/ActionFollowLink.vue";
 import displayerMixin from "./displayerMixin.js";
 import XWikiLoader from "../utilities/XWikiLoader.vue";
-import { Tippy } from "vue-tippy";
+import { tippy } from "vue-tippy";
 
 // @ts-expect-error expected as this is not a typescript implementation
 export default {
@@ -157,7 +146,6 @@ export default {
   components: {
     ActionEdit,
     ActionFollowLink,
-    Tippy,
     XWikiLoader,
   },
 
@@ -166,7 +154,17 @@ export default {
       duringEditing: false,
       editorFocused: false,
       href: undefined,
+      // Whether the content of the actions popover is rendered, which is only needed once the popover is created.
+      popoverContentRendered: false,
     };
+  },
+
+  created() {
+    // The tippy.js instance of the actions popover, created on the first interaction with the cell. It is kept out
+    // of the reactive data since Vue must not proxy it.
+    this.popover = undefined;
+    // The creation of the popover, while it waits for its content to be rendered.
+    this.popoverCreation = undefined;
   },
 
   props: {
@@ -210,6 +208,13 @@ export default {
     },
     isEditorShown() {
       return !this.isView && !this.isLoading;
+    },
+    // The popover only shows on hover and focus for an editable cell, outside of edit mode, when no other cell is
+    // being edited. Otherwise, the manual trigger disables it since nothing shows it manually.
+    popoverTrigger() {
+      return this.isEditable && !this.duringEditing && !this.isEditMode
+        ? "mouseenter focus manual"
+        : "manual";
     },
   },
 
@@ -256,7 +261,75 @@ export default {
       }
     },
     closePopover() {
-      this.$refs.tippy.tippy.hide();
+      this.popover?.hide();
+    },
+    // Creates the actions popover once, after rendering its content.
+    createPopover() {
+      this.popoverCreation ??= this.initPopover();
+      return this.popoverCreation;
+    },
+    async initPopover() {
+      this.popoverContentRendered = true;
+      await this.$nextTick();
+      if (this.$.isUnmounted) {
+        return undefined;
+      }
+      const popover = tippy(this.$refs.popoverTarget, {
+        content: this.$refs.popoverContent,
+        interactive: true,
+        trigger: this.popoverTrigger,
+        theme: "light-border",
+        followCursor: "horizontal",
+        arrow: true,
+        ignoreAttributes: true,
+        zIndex: 99999,
+        // The popover target is not an interactive element, so it must not get an aria-expanded attribute.
+        aria: { expanded: false },
+      });
+      this.watchPopoverState(popover);
+      this.popover = popover;
+      return popover;
+    },
+    // Keeps the popover in sync with the cell, from its creation on.
+    watchPopoverState(popover) {
+      // The disable option behaves weirdly, so the popover is disabled manually in edit mode.
+      if (this.isEditMode) {
+        popover.disable();
+      }
+      this.$watch("popoverTrigger", (trigger) => popover.setProps({ trigger }));
+      this.$watch("isEditMode", (editMode) =>
+        editMode ? popover.disable() : popover.enable(),
+      );
+    },
+    // Creates the popover on the first hover or focus of the cell, when it can be shown, and replays the event that
+    // happened before the popover existed so that it shows right away.
+    async onPopoverTriggered(event) {
+      // The focus trigger of tippy.js only applies to the focus of the popover target itself.
+      const target = this.$refs.popoverTarget;
+      const ignored = event.type === "focusin" && event.target !== target;
+      if (this.popover || this.popoverTrigger === "manual" || ignored) {
+        return;
+      }
+      if (await this.createPopover()) {
+        this.replayPopoverTrigger(event, target);
+      }
+    },
+    replayPopoverTrigger(event, target) {
+      if (event.type === "mouseenter") {
+        target.dispatchEvent(
+          new MouseEvent("mouseenter", {
+            clientX: event.clientX,
+            clientY: event.clientY,
+          }),
+        );
+      } else if (document.activeElement === target) {
+        target.dispatchEvent(new FocusEvent("focus"));
+      }
+    },
+    async showPopover() {
+      const popover = await this.createPopover();
+      popover?.hide();
+      popover?.show();
     },
     touchHandler(e) {
       // Active only when intercepting touch event is allowed, the displayer is in view mode, and no other
@@ -275,12 +348,12 @@ export default {
           e.preventDefault();
         }
         if (this.isEditable) {
-          this.$refs.tippy.tippy.hide();
-          this.$refs.tippy.tippy.show();
+          this.showPopover();
         }
       }
     },
-    onDisplayerFocus() {
+    onDisplayerFocus(event) {
+      this.onPopoverTriggered(event);
       // In edit mode, focusing an editable cell should make it editable.
       if (this.logic.isEditMode()) {
         this.setEdit();
@@ -349,6 +422,9 @@ export default {
       this.duringEditing = !this.logic.getEditBus().isEditable();
     });
   },
+  beforeUnmount() {
+    this.popover?.destroy();
+  },
   watch: {
     isEditorShown: {
       // A displayer can start in edit mode.
@@ -360,14 +436,6 @@ export default {
           this.markMandatoryFields();
         }
       },
-    },
-    // The disable prop behaves weirdly, so we handle that manually instead.
-    isEditMode(newValue) {
-      if (newValue) {
-        this.$refs.tippy.tippy.disable();
-      } else {
-        this.$refs.tippy.tippy.enable();
-      }
     },
   },
 };

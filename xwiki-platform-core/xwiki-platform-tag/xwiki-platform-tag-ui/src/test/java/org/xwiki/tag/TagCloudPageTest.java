@@ -47,12 +47,14 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.user.internal.DefaultUserPropertiesResolver;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.tag.TagPlugin;
 import com.xpn.xwiki.plugin.tag.TagQueryUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -245,5 +247,38 @@ class TagCloudPageTest extends PageTest
 
         assertEquals("xe.tag.paramerror", document.selectFirst(".errormessage").text());
         verify(this.query, never()).execute();
+    }
+
+    @Test
+    void withSpaceContainingMarkup() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Page"), this.context);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        xwikiDocument.setContent(
+            "{{tagcloud space=\"A~{~{/html~}~}~{~{error~}~}injected~{~{/error~}~}\"/}}");
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        assertNull(document.selectFirst(".errormessage"));
+        assertEquals("xe.tag.notagsforspace [A{{/html}}{{error}}injected{{/error}}]",
+            document.selectFirst("p.noitems").text());
+    }
+
+    @Test
+    void pageContentWithSpaceContainingQuote() throws Exception
+    {
+        when(this.query.execute()).thenReturn(List.of());
+        String space = "A\"/}}{{error}}injected{{/error}}{{tagcloud space=\"B";
+        this.componentManager.<VelocityManager>getInstance(VelocityManager.class).getVelocityContext()
+            .put("tagCloudSpace", space);
+
+        Document document = renderHTMLPage(new DocumentReference("xwiki", "XWiki", "TagCloud"));
+
+        assertNull(document.selectFirst(".errormessage"));
+        assertEquals(String.format("xe.tag.notagsforspace [%s]", space), document.selectFirst("p.noitems").text());
+        verify(this.query).bindValues(List.of(space, "A\"/}}{{error}}injected{{/error}}{{tagcloud space=\"B.%"));
     }
 }

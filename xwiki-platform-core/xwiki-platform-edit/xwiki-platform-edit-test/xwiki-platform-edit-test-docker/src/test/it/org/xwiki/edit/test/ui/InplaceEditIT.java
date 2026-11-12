@@ -180,7 +180,7 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert a macro that is editable in-line.
-        richTextArea.insertMacro("/inf", "Info Box");
+        richTextArea.insertMacro("/inf", "Info Message");
 
         // Switch to Source mode and save without making any change.
         ckeditor.getToolBar().toggleSourceMode();

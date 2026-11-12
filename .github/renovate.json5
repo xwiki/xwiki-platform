@@ -29,12 +29,6 @@
       "registryUrls": ["https://repo1.maven.org/maven2/", "https://nexus.xwiki.org/nexus/content/repositories/public/"]
     },
 
-    // There is no point trying to find updates for the old XWiki Enterprise dependencies
-    {
-      "matchPackagePrefixes": ["org.xwiki.enterprise:"],
-      "enabled": false
-    },
-
     // Automatically assign webjars packages to @mflorea
     {
       "matchDatasources": ["maven"],

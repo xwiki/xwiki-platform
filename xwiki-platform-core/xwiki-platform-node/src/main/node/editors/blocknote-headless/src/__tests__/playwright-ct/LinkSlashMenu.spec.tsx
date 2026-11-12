@@ -57,12 +57,21 @@ async function openLinkModalFromSlashMenu(
   const slashMenuEl = page.locator(
     "[data-floating-ui-portal] .bn-suggestion-menu",
   );
-  await slashMenuEl.waitFor({ state: "attached" });
   await expect(
     slashMenuEl.locator(".bn-suggestion-menu-item p:first-child"),
   ).toHaveText("Link");
 
-  // Select the (only remaining) "Link" item, opening the link modal.
+  // Select the (only remaining) "Link" item, opening the link suggestion menu.
+  await pressKeySettled(page, "Enter");
+
+  // Select its initially selected "Link to..." item, opening the link modal. The slash menu stays attached for a moment
+  // while it closes, hence waiting for the item of the link suggestion menu rather than for a single menu.
+  await expect(
+    page.locator(
+      '[data-floating-ui-portal] .bn-suggestion-menu-item[aria-selected="true"]',
+      { hasText: "Link to..." },
+    ),
+  ).toBeVisible();
   await pressKeySettled(page, "Enter");
 
   return editorEl;

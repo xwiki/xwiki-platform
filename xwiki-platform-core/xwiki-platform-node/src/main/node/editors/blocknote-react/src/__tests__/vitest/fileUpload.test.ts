@@ -20,6 +20,7 @@
 // @vitest-environment jsdom
 
 import {
+  triggerUserAttachmentUpload,
   triggerUserFileUpload,
   triggerUserImageUpload,
 } from "../../misc/fileUpload";
@@ -228,6 +229,7 @@ describe("triggerUserImageUpload", () => {
     // by default.
     await expect(promise).resolves.toEqual({
       url: "https://example.org/attachments/uploaded.png",
+      name: "uploaded.png",
       reference: {
         type: "attach",
         typed: false,
@@ -261,6 +263,7 @@ describe("triggerUserImageUpload", () => {
 
     await expect(promise).resolves.toEqual({
       url: "https://example.org/attachments/uploaded.png",
+      name: "uploaded.png",
       reference: undefined,
     });
   });
@@ -290,6 +293,53 @@ describe("triggerUserImageUpload", () => {
     await expect(promise).resolves.toBeUndefined();
     expect(consoleError).toHaveBeenCalledWith(
       "Failed to upload the selected image.",
+      expect.objectContaining({ message: "Upload failed" }),
+    );
+  });
+});
+
+describe("triggerUserAttachmentUpload", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("offers all file types and resolves with the uploaded attachment's URL, name and resource reference", async () => {
+    const { container, attachmentsService } = buildContainer();
+    const promise = triggerUserAttachmentUpload(container, EDITED_PAGE);
+
+    const input = getHiddenFileInput();
+    expect(input.accept).toBe("");
+    const file = selectFile(input);
+
+    // The name is the one of the uploaded attachment, rather than the one of the selected file, since it's the one
+    // that a link to the attachment gets as generated label.
+    await expect(promise).resolves.toEqual({
+      url: "https://example.org/attachments/uploaded.png",
+      name: "uploaded.png",
+      reference: {
+        type: "attach",
+        typed: false,
+        reference: "Edited.Page@uploaded.png",
+        parameters: {},
+      },
+    });
+    expect(attachmentsService.upload).toHaveBeenCalledWith(EDITED_PAGE, [file]);
+  });
+
+  test("logs the error and resolves with undefined when the upload fails", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const promise = triggerUserAttachmentUpload(
+      buildContainer({ failUpload: true }).container,
+      EDITED_PAGE,
+    );
+
+    selectFile(getHiddenFileInput());
+
+    await expect(promise).resolves.toBeUndefined();
+    expect(consoleError).toHaveBeenCalledWith(
+      "Failed to upload the selected file.",
       expect.objectContaining({ message: "Upload failed" }),
     );
   });

@@ -19,6 +19,9 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
@@ -520,12 +523,16 @@ class LinkIT extends AbstractBlockNoteIT
     @Order(16)
     void insertLinkFromSlashMenu(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Create the page to link to and wait for it to be indexed, since the page link suggestions are based on
-        // Solr indexation.
+        // Create the page to link to, with an attachment, and wait for them to be indexed, since the link suggestions
+        // are based on Solr indexation.
         DocumentReference targetPage =
             new DocumentReference("SlashMenuLinkTarget", testReference.getLastSpaceReference());
         setup.deletePage(targetPage);
         setup.createPage(targetPage, "", "Slash Menu Link Target");
+        // The file name is searched by its words, which are indexed only when shorter than 14 characters.
+        String attachmentName = "slashmenu-file.txt";
+        setup.attachFile(targetPage, attachmentName,
+            new ByteArrayInputStream("content".getBytes(StandardCharsets.UTF_8)), false);
         new SolrTestUtils(setup).waitEmptyQueue();
 
         // Start fresh, with a page that already has a link, edited in a realtime session.
@@ -536,11 +543,14 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
-        // Open the link modal from the slash menu, in a new paragraph.
+        // Open the link modal from the link suggestions of the slash menu, in a new paragraph.
         textArea.appendParagraph("/");
         SlashMenu slashMenu = new SlashMenu();
         textArea.sendKeys("link");
         slashMenu.waitForItemSelected("Link");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+        slashMenu = new SlashMenu().waitForItemSelected("Link to...");
         textArea.sendKeys(Keys.ENTER);
         slashMenu.waitForItemSubmitted();
 
@@ -556,11 +566,31 @@ class LinkIT extends AbstractBlockNoteIT
         linkModal.submit();
         textArea.waitUntilLinkIsPresent("Slash Menu Link Target");
 
-        // Save and check the source: the link is saved with the reference of the page, relative to the edited page,
-        // rather than with its URL, and without its generated label, while the existing link is left untouched.
+        // Typing the start of a link in XWiki syntax suggests the pages to link to: search the page by its title (as a
+        // real user would), but pick the suggestion using its location, since other tests running in the same wiki
+        // may also create a page with the same title. The link label is generated from the page.
+        // The trigger is sent on its own: the editor recognizes it only when typed, not when inserted along with other
+        // text in one go (as Firefox inserts the keys sent at once by WebDriver).
+        String location = testReference.getLastSpaceReference().getName();
+        textArea.sendKeys(" ");
+        textArea.sendKeys("[[");
+        textArea.sendKeys("Slash");
+        new SlashMenu().clickItem("Slash Menu Link Target", location);
+
+        // The attachments to link to are suggested as well, and the link label is generated from the attachment.
+        textArea.sendKeys(" ");
+        textArea.sendKeys("[[");
+        textArea.sendKeys("slashmenu");
+        new SlashMenu().clickItem(attachmentName, location);
+        textArea.waitUntilLinkIsPresent(attachmentName);
+
+        // Save and check the source: the links are saved with the reference of the linked page or attachment, relative
+        // to the edited page, rather than with its URL, and without their generated label, while the existing link is
+        // left untouched.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>doc:Users.Alice]] third\n\n[[doc:SlashMenuLinkTarget]]",
+        assertEquals("first [[second>>doc:Users.Alice]] third\n\n[[doc:SlashMenuLinkTarget]] "
+            + "[[doc:SlashMenuLinkTarget]] [[attach:SlashMenuLinkTarget@%s]]".formatted(attachmentName),
             wikiEditor.getContent());
     }
 
@@ -850,6 +880,9 @@ class LinkIT extends AbstractBlockNoteIT
         SlashMenu slashMenu = new SlashMenu();
         textArea.sendKeys("link");
         slashMenu.waitForItemSelected("Link");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+        slashMenu = new SlashMenu().waitForItemSelected("Link to...");
         textArea.sendKeys(Keys.ENTER);
         slashMenu.waitForItemSubmitted();
         new BlockNoteLinkModal().submit();

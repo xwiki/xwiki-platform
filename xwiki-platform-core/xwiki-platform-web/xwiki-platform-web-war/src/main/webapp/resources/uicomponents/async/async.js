@@ -92,28 +92,39 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
     update(element, url);
   };
 
-  var onMutations = function(mutations)
+  /**
+   * Find the placeholders held by an added node: the node itself and its descendants, in document order.
+   * The placeholders are selected by their class only, because checking the visibility of an element reads its
+   * layout, which forces a layout of the page.
+   */
+  const findPlaceholders = function(node)
   {
-    for (var i = 0; i < mutations.length; i++) {
-      var mutation = mutations[i];
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return [];
+    }
+    const placeholders = Array.from(node.getElementsByClassName('xwiki-async'));
+    if (node.classList.contains('xwiki-async')) {
+      placeholders.unshift(node);
+    }
+    return placeholders;
+  };
 
-      for (var j = 0; j < mutation.addedNodes.length; j++) {
-        var element = mutation.addedNodes[j];
-        // we activate placeholder because they contain class xwiki-async and they are visible
-        var selector = ".xwiki-async:visible";
-
-        // placeholder can be in the subtree of the added/mutated element, so we use find()
-        // but it can also be the currently added/mutated element, so we use addBack()
-        $(element).find(selector).addBack(selector).each(function() {
+  const onMutations = function(mutations)
+  {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        // Only the visible placeholders are activated.
+        $(findPlaceholders(node)).filter(':visible').each(function() {
           activateAsyncPlaceHolder(this);
         });
       }
     }
   };
 
-  // Register a callback for when inserting an async placeholder in the DOM
-  var observer = new MutationObserver(onMutations);
-  observer.observe(document, { childList: true, subtree : true, attributes : true});
+  // Register a callback for when inserting an async placeholder in the DOM. Only the added nodes matter, so attribute
+  // changes are not observed.
+  const observer = new MutationObserver(onMutations);
+  observer.observe(document, {childList: true, subtree: true});
 
   // Activate all the place holders already in the DOM
   $(".xwiki-async").each(function(index, element) {

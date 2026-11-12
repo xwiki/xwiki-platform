@@ -50,7 +50,7 @@ public class BlockNoteRichTextArea extends BaseElement
 {
     private static final By IMAGE = By.tagName("img");
 
-    private static final By LINK = By.xpath(".//a");
+    private static final By LINK = By.tagName("a");
 
     @NonNull
     private WebElement container;

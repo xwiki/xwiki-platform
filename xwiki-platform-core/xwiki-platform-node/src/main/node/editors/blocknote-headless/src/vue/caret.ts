@@ -32,7 +32,8 @@ function caretAt(left: number, top: number): [Node, number] | undefined {
 /**
  * Moves the caret under the pointer. A drop leaves the caret where it was, which is rarely where the file landed.
  * The selection is set in the DOM because BlockNote's setTextCursorPosition only takes a block and "start" or
- * "end", so it cannot put the caret inside the text the pointer is over.
+ * "end", so it cannot put the caret inside the text the pointer is over. See
+ * https://github.com/TypeCellOS/BlockNote/issues/3323#issuecomment-6800538598 for the API that would remove this.
  *
  * @param editor - the editor to move the caret in
  * @param coordinates - where the pointer is, in viewport coordinates

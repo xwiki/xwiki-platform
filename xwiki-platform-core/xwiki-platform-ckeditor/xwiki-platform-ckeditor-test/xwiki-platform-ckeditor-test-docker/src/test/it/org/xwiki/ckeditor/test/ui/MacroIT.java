@@ -406,4 +406,64 @@ class MacroIT extends AbstractCKEditorIT
         assertSourceContains(String.format("tags=\"%s\"", targetTag));
         assertSourceContains(String.format("users=\"XWiki.alice,XWiki.%s\"", targetUser));
     }
+
+    @Test
+    @Order(9)
+    void collectionParameterWithSeparators(TestUtils setup, TestReference testReference)
+    {
+        // A wiki macro listing the locations it gets from a parameter converted into a list.
+        setup.loginAsSuperAdmin();
+        LocalDocumentReference macroReference =
+            new LocalDocumentReference("LocationsMacro", testReference.getLastSpaceReference());
+        setup.deletePage(macroReference);
+        setup.createPage(macroReference, "");
+        setup.addObject(macroReference, "XWiki.WikiMacroClass",
+            "id", "locations",
+            "contentType", "No content",
+            "visibility", "Current Wiki",
+            "code", """
+                {{velocity}}
+                #foreach ($location in $wikimacro.parameters.locations)
+                * $services.rendering.escape($services.model.serialize($location, 'local'), 'xwiki/2.1')
+                #end
+                {{/velocity}}""");
+        setup.addObject(macroReference, "XWiki.WikiMacroParameterClass",
+            "name", "locations",
+            "type", "java.util.List<org.xwiki.model.reference.SpaceReference>");
+        loginStandardUser(setup);
+
+        // The test page isn't deleted because the macro page is one of its children.
+        WYSIWYGEditPage editPage = edit(setup, testReference, false);
+        setSource("before\n\n{{locations/}}\n\nafter");
+
+        // A single location wrapped in braces, which the macro removes from the whole value unless it is quoted.
+        this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
+        MacroDialogEditModal macroEditModal = this.textArea.editSelectedMacro();
+        macroEditModal.getMacroParameterSuggestInput("locations").sendKeys("{Draft}").selectTypedText();
+        macroEditModal.clickSubmit();
+
+        // The double quotes are escaped with a tilde by the wiki syntax.
+        String draftMacroCall = "{{locations locations=\"~\"{Draft}~\"\"/}}";
+        assertSourceEquals("before\n\n" + draftMacroCall + "\n\nafter");
+
+        // A location quoted because it holds a comma, followed by a location holding a whitespace, typed without the
+        // quotes.
+        setSource(
+            "before\n\n" + draftMacroCall + "\n\n{{locations locations=\"'Space.My, Page',My Space\"/}}\n\nafter");
+
+        this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
+        macroEditModal = this.textArea.editSelectedMacro();
+        SuggestInputElement locationPicker = macroEditModal.getMacroParameterSuggestInput("locations");
+        assertEquals(List.of("Space.My, Page", "My Space"), locationPicker.getValues());
+
+        // A location holding double quotes, which are escaped with a backslash inside the quoted value.
+        locationPicker.sendKeys("Say \"Hi\"").selectTypedText();
+        macroEditModal.clickSubmit();
+
+        assertSourceEquals("before\n\n" + draftMacroCall
+            + "\n\n{{locations locations=\"~\"Space.My, Page~\",~\"My Space~\",~\"Say \\~\"Hi\\~\"~\"\"/}}\n\nafter");
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertEquals("before\n{Draft}\nSpace.My, Page\nMy Space\nSay \"Hi\"\nafter", viewPage.getContent());
+    }
 }

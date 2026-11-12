@@ -91,6 +91,8 @@ class LiveDataIT
 
     private static final String NAME_ESTHER = "Esther";
 
+    private static final String NAME_FROM_TEMPLATE = "Grace";
+
     private static final String NAME_CHARLY = "Charly";
 
     private static final String NAME_NIKOLAY = "Nikolay";
@@ -1112,6 +1114,48 @@ class LiveDataIT
             .exists(new DocumentReference(ENTRY_TITLE + "-1", testReference.getLastSpaceReference())));
     }
 
+    @Test
+    @Order(15)
+    void addEntryFromTemplateProvider(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // The template is named after the class, so that the live table doesn't list it as an entry.
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        DocumentReference templateReference = new DocumentReference(testReference.getName() + "Template", testSpace);
+        DocumentReference providerReference = new DocumentReference("TemplateProvider", testSpace);
+        SpaceReference dataSpace = new SpaceReference("Data", testSpace);
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        String sourceParameters = "&newRowTemplateProvider=" + testUtils.serializeReference(providerReference);
+        createLiveDataPage(testUtils, testReference, "templateProvider", DOC_TITLE_COLUMN + "," + NAME_COLUMN, "",
+            sourceParameters, List.of(NAME_LYNDA));
+        testUtils.addObject(templateReference, className, singletonMap(NAME_COLUMN, NAME_FROM_TEMPLATE));
+        testUtils.addObject(providerReference, "XWiki.TemplateProviderClass",
+            Map.of("template", testUtils.serializeReference(templateReference), "creationRestrictions",
+                testUtils.serializeReference(dataSpace), "terminal", "0"));
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+
+        liveData.toggleEditMode();
+
+        // The new row starts with the values of the template.
+        tableLayout.startNewEntry();
+        tableLayout.waitUntilCellText(NAME_COLUMN, 2, NAME_FROM_TEMPLATE);
+
+        // The entry is created from the template, as a nested page in the space the template provider restricts
+        // creation to. The values of the template are not edits, so this is the only entry created.
+        tableLayout.createNewEntryFromDocumentProperty(DOC_TITLE_COLUMN, ENTRY_TITLE);
+        assertEquals(2, tableLayout.getTotalEntries());
+        tableLayout.assertRow(NAME_COLUMN, NAME_FROM_TEMPLATE);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, ENTRY_TITLE);
+        assertTrue(testUtils.rest().exists(new DocumentReference("WebHome", new SpaceReference(ENTRY_TITLE,
+            dataSpace))));
+    }
+
     /**
      * Creates a Live Data page on an XClass, with a source supporting the edit mode and the "uuid" row naming
      * strategy, which generates a new page named after a random UUID.
@@ -1136,15 +1180,30 @@ class LiveDataIT
     private void createLiveDataPage(TestUtils testUtils, DocumentReference testReference, String namingStrategy,
         String properties, String macroParameters, String... names)
     {
+        createLiveDataPage(testUtils, testReference, namingStrategy, properties, macroParameters, "", List.of(names));
+    }
+
+    /**
+     * Creates a Live Data page on an XClass, with a source supporting the edit mode.
+     *
+     * @param namingStrategy the row naming strategy, which names the pages of the new entries
+     * @param properties the properties displayed by the Live Data, as a comma separated list
+     * @param macroParameters additional parameters of the Live Data macro, for instance its limit or its sort
+     * @param sourceParameters additional source parameters, each starting with {@code &}
+     * @param names the names of the entries to create, each entry being saved in a page of the same name
+     */
+    private void createLiveDataPage(TestUtils testUtils, DocumentReference testReference, String namingStrategy,
+        String properties, String macroParameters, String sourceParameters, List<String> names)
+    {
         // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
         String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
         String newRowLocation = testUtils.serializeReference(testReference.getLocalDocumentReference().getParent());
 
-        // New entries are created in the "newRowLocation" space.
+        // New entries are created in the "newRowLocation" space, unless a template provider says otherwise.
         // "hasEditMode=true" exposes the edit mode button in the top bar.
-        String sourceParameters = String.format(
-            "translationPrefix=&className=%s&hasEditMode=true&newRowNamingStrategy=%s&newRowLocation=%s",
-            className, namingStrategy, newRowLocation);
+        String allSourceParameters = String.format(
+            "translationPrefix=&className=%s&hasEditMode=true&newRowNamingStrategy=%s&newRowLocation=%s%s",
+            className, namingStrategy, newRowLocation, sourceParameters);
         String content = """
             {{liveData
               id="test"
@@ -1153,7 +1212,7 @@ class LiveDataIT
               source="liveTable"
               sourceParameters="%s"
             /}}
-            """.formatted(properties, macroParameters, sourceParameters);
+            """.formatted(properties, macroParameters, allSourceParameters);
         testUtils.createPage(testReference, content, "Live Data with an edit mode");
 
         // Define the XClass on the test page, and add the entries.

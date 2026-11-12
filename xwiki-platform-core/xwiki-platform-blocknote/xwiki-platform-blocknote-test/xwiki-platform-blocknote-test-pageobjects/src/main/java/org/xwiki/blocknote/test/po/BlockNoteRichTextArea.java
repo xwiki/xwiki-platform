@@ -50,6 +50,8 @@ public class BlockNoteRichTextArea extends BaseElement
 {
     private static final By IMAGE = By.tagName("img");
 
+    private static final By LINK = By.xpath(".//a");
+
     @NonNull
     private WebElement container;
 
@@ -606,7 +608,7 @@ public class BlockNoteRichTextArea extends BaseElement
     public BlockNoteRichTextArea waitUntilLinkCountIs(int count)
     {
         getDriver().waitUntilCondition(
-            driver -> this.container.findElements(By.xpath(".//a")).size() == count);
+            driver -> this.container.findElements(LINK).size() == count);
         return this;
     }
 
@@ -619,7 +621,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public WebElement waitUntilLinkIsPresent()
     {
-        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, By.xpath(".//a")));
+        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, LINK));
     }
 
 }

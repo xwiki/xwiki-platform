@@ -93,12 +93,7 @@
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { toRelativeAttachmentResourceReference } from "../services/blocknote/attachmentResourceReference";
 import { createFileUploader } from "../services/blocknote/createFileUploader";
-import { editedLinkResourceReference } from "../services/blocknote/editedLinkResourceReference";
-import {
-  extractLinkId,
-  injectLinkId,
-  stripLinkId,
-} from "../services/blocknote/linkId";
+import { createLinkEditionHooks } from "../services/blocknote/linkEditionHooks";
 import {
   ConnectionStatus,
   collaborationManagerProviderName,
@@ -111,7 +106,6 @@ import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
-import { uuidv4 } from "lib0/random";
 import {
   inject,
   onBeforeMount,
@@ -139,7 +133,6 @@ import type {
   ImageEditionHooks,
   ImageEditionOverrideFn,
   ImageInsertionOverrideFn,
-  LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
@@ -312,51 +305,10 @@ const linkContext: LinkContext = {
 // keep the link type selector short. Existing path and UNC path links are still edited with their own link type.
 const excludedLinkTargetTypes = ["path", "unc"];
 
-const linkEdition: LinkEditionHooks = {
-  // Runs before the link editor is opened on an existing link. The reference of the linked resource is kept as link
-  // metadata (outside the BlockNote schema), mapped to a synthetic id stored in the link url, so we resolve it here
-  // and inject it into the link data to pre-fill the link editor. The synthetic id is stripped from the url passed to
-  // the link editor; beforeUpdate recovers it from the previous link data.
-  beforeEdit: (linkData) => {
-    const id = extractLinkId(linkData.url);
-    if (!id) {
-      // The link doesn't have associated metadata (e.g. a resource reference) so we return the link data as-is. Calling
-      // stripLinkId when the ID is missing is safe but the URL gets normalized by the URL constructor (e.g. a trailing
-      // slash is added). We prefer to avoid that in order to keep the link URL exactly as the user entered it.
-      return linkData;
-    }
-    return {
-      ...linkData,
-      url: stripLinkId(linkData.url),
-      reference: blockNoteDocument?.getMetadata(id)?.xwikiReference as
-        | ResourceReference
-        | undefined,
-    };
-  },
-
-  // Runs right before the link is written into the content (i.e. before createLink / editLink). We store the (possibly
-  // updated) resource reference as link metadata, mapped to a synthetic id that we carry in the link url. When editing,
-  // we reuse the id of the edited link (taken from the previous link data) so that the other link metadata (parameters,
-  // freestanding flag) is preserved even when the target changes; when creating, we mint a new id.
-  beforeUpdate: (linkData, previous) => {
-    if (!linkData.reference) {
-      // Without a reference the link is saved from its url, so leave that url exactly as the link editor produced it:
-      // storing a synthetic id in it would round-trip it through the URL constructor, normalizing it (e.g. adding a
-      // trailing slash).
-      return linkData;
-    }
-    const id = extractLinkId(previous?.url ?? "") ?? uuidv4();
-    const metadata = blockNoteDocument!.getMetadata(id, true)!;
-    // Preserve what the link editor doesn't edit when the link still points to the same resource, otherwise report the
-    // new reference, so that the edited link points to the newly selected resource.
-    metadata.xwikiReference = editedLinkResourceReference(
-      metadata.xwikiReference as ResourceReference | undefined,
-      linkData.reference,
-      editedDocumentReference,
-    );
-    return { ...linkData, url: injectLinkId(stripLinkId(linkData.url), id) };
-  },
-};
+const linkEdition = createLinkEditionHooks(
+  () => blockNoteDocument,
+  editedDocumentReference,
+);
 
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
 const temporaryAttachments: Ref<Set<string>> = ref(new Set<string>());

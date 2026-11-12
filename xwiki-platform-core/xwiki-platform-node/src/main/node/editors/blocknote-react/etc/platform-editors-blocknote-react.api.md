@@ -172,6 +172,7 @@ export type InlineMacroInvocation = Omit<InlineMacroInvocation_2, "body"> & {
 // @beta
 export type LinkEditionData = {
     title: string;
+    generatedTitle?: boolean;
     url: string;
     reference?: ResourceReference;
 };

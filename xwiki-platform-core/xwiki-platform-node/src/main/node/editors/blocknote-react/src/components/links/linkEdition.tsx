@@ -33,6 +33,17 @@ type LinkEditionData = {
   title: string;
 
   /**
+   * Whether the link label is generated from the link target rather than chosen by the user, i.e. the link has no
+   * label of its own (e.g. in XWiki syntax, `[[doc:Space.Page]]` rather than `[[label>>doc:Space.Page]]`). The link
+   * editor doesn't show a generated label as the text of the link, so that the label follows the link target, and it
+   * sets this when the user leaves the link text empty. It's up to the integration to tell which labels are generated
+   * (see `LinkEditionHooks`).
+   *
+   * @since 18.10.0RC1
+   */
+  generatedTitle?: boolean;
+
+  /**
    * The link URL, as written into the edited content.
    */
   url: string;

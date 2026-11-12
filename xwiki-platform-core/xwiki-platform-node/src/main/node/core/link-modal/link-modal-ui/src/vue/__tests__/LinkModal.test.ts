@@ -235,7 +235,9 @@ describe("LinkModal", () => {
 
     await wrapper.find("[data-test='linkSubmit']").trigger("click");
 
-    expect(wrapper.emitted("submit")).toEqual([[current]]);
+    expect(wrapper.emitted("submit")).toEqual([
+      [{ ...current, generatedDisplayText: false }],
+    ]);
   });
 
   it("edits the reference of a link to an unsupported resource as plain text, keeping its type", async () => {
@@ -253,6 +255,7 @@ describe("LinkModal", () => {
     expect(wrapper.text()).not.toContain("component-a");
     expect(wrapper.emitted("submit")?.[0]?.[0]).toEqual({
       displayText: "XWiki",
+      generatedDisplayText: false,
       target: {
         type: unsupportedLinkTargetType,
         config: {
@@ -471,7 +474,10 @@ describe("LinkModal display text", () => {
       [labellingLinkTargetType(({ name }) => name ?? "")],
     );
 
-    expect(await submit(wrapper)).toMatchObject({ displayText: "Some text" });
+    expect(await submit(wrapper)).toMatchObject({
+      displayText: "Some text",
+      generatedDisplayText: false,
+    });
   });
 
   it("is replaced, when left empty or blank, by the default label of the link target, also used as placeholder", async () => {
@@ -490,7 +496,49 @@ describe("LinkModal display text", () => {
     ).toBe("Label of Page");
     expect(await submit(wrapper)).toEqual({
       displayText: "Label of Page",
+      generatedDisplayText: true,
       target: { type: "a", config: { name: "Page" } },
+    });
+  });
+
+  it("is left empty for a link whose text is generated from its target, so that the text follows the target", async () => {
+    const wrapper = mountLinkModal(
+      {
+        displayText: "Label of Page",
+        generatedDisplayText: true,
+        target: { type: "a", config: { name: "Page" } },
+      },
+      [labellingLinkTargetType(({ name }) => `Label of ${name}`)],
+    );
+
+    const displayText = wrapper.get<HTMLInputElement>(
+      "[data-test='linkDisplayText']",
+    );
+    expect(displayText.element.value).toBe("");
+    expect(displayText.attributes("placeholder")).toBe("Label of Page");
+    expect(await submit(wrapper)).toMatchObject({
+      displayText: "Label of Page",
+      generatedDisplayText: true,
+    });
+  });
+
+  it("is no longer generated once the user types it, even when it's the same as the generated one", async () => {
+    const wrapper = mountLinkModal(
+      {
+        displayText: "Label of Page",
+        generatedDisplayText: true,
+        target: { type: "a", config: { name: "Page" } },
+      },
+      [labellingLinkTargetType(({ name }) => `Label of ${name}`)],
+    );
+
+    await wrapper
+      .get("[data-test='linkDisplayText']")
+      .setValue("Label of Page");
+
+    expect(await submit(wrapper)).toMatchObject({
+      displayText: "Label of Page",
+      generatedDisplayText: false,
     });
   });
 

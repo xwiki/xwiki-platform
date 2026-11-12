@@ -46,6 +46,15 @@ type LinkData = {
    * `LinkTargetType.getDefaultLabel`).
    */
   displayText: string;
+
+  /**
+   * Whether the text of the link is generated from its target rather than chosen by the user, i.e. the link has no
+   * label of its own (e.g. in XWiki syntax, `[[doc:Space.Page]]` rather than `[[label>>doc:Space.Page]]`). For the
+   * edited link, the link modal then leaves the display text field empty, so that the text follows the link target. On
+   * submit, the link modal sets it when the display text is left empty, so that the link is saved without a label.
+   */
+  generatedDisplayText?: boolean;
+
   target: LinkTarget;
 };
 

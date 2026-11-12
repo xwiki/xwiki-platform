@@ -182,7 +182,11 @@ function getLinkTargetTypeManager(): LinkTargetTypeManager {
   return depsContainer.get<LinkTargetTypeManager>(linkTargetTypeManagerRole);
 }
 
-const submitEditedLink = ({ displayText, target }: LinkData) => {
+const submitEditedLink = ({
+  displayText,
+  generatedDisplayText,
+  target,
+}: LinkData) => {
   const linkTargetTypeManager = getLinkTargetTypeManager();
   // The URL of a resource that no link target type supports can't be computed client-side, so keep the URL of the
   // edited link. It's only a preview anyway: the link is saved from its reference.
@@ -194,6 +198,7 @@ const submitEditedLink = ({ displayText, target }: LinkData) => {
 
   editingLink.value?.onSubmit({
     title: displayText,
+    generatedTitle: generatedDisplayText,
     url,
     reference,
   });
@@ -238,6 +243,7 @@ const currentLinkData = computed<LinkData | null>(() => {
 
   return {
     displayText: editingLink.value.current.title,
+    generatedDisplayText: editingLink.value.current.generatedTitle,
     target: currentLinkTarget(editingLink.value.current),
   };
 });

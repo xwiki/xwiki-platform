@@ -157,6 +157,10 @@ test("Inserting a page link from the slash menu labels the link with the title o
 
   const linkEl = editorEl.locator('a[href="https://example.org/some/page"]');
   await expect(linkEl).toHaveText("some page label");
+  // The label is reported as generated, so that the integration doesn't save it.
+  await expect(
+    page.locator('[data-test="submittedLinkGeneratedTitle"]'),
+  ).toHaveText("true");
 });
 
 test("Inserting an attachment link from the slash menu requires an attachment", async ({

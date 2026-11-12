@@ -391,8 +391,16 @@ public class BlockNoteLinkModal extends BaseElement
     private void replaceText(By locator, String text)
     {
         WebElement input = getDriver().findElement(locator);
-        input.clear();
-        input.sendKeys(text);
+        if (text.isEmpty()) {
+            // Empty the field as a user does, because WebElement#clear() doesn't fire the input event that the field
+            // listens to. The select all shortcut and the deletion are sent separately because Firefox keeps the
+            // modifier key pressed for the rest of the keys sent along with a chord.
+            input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+            input.sendKeys(Keys.BACK_SPACE);
+        } else {
+            input.clear();
+            input.sendKeys(text);
+        }
     }
 
     /**

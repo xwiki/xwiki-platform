@@ -61,6 +61,12 @@ const props = defineProps<{
    */
   linkReferences?: Record<string, ResourceReference>;
 
+  /**
+   * The URLs of the links whose label is generated from their target. The editor tells the link modal when editing the
+   * corresponding links, like the XWiki integration does from the link metadata.
+   */
+  linksWithGeneratedLabel?: string[];
+
   excludedLinkTargetTypes?: string[];
 
   linkContext?: LinkContext;
@@ -77,16 +83,23 @@ defineEmits<{
 // passed as a prop would lose all its behavior once it reaches the browser.
 const depsContainer = depsContainerMock();
 
-// The reference of the last submitted link, rendered so that the tests can check it.
+// The reference of the last submitted link, and whether its label is generated, rendered so that the tests can check
+// them.
 const lastSubmittedLinkReference = ref<ResourceReference>();
+const lastSubmittedLinkGeneratedTitle = ref<boolean>();
 
 const linkEdition: LinkEditionHooks = {
   beforeEdit: (linkData) => {
     const reference = props.linkReferences?.[linkData.url];
-    return reference ? { ...linkData, reference } : linkData;
+    return {
+      ...linkData,
+      ...(reference ? { reference } : {}),
+      generatedTitle: props.linksWithGeneratedLabel?.includes(linkData.url),
+    };
   },
   beforeUpdate: (linkData) => {
     lastSubmittedLinkReference.value = linkData.reference;
+    lastSubmittedLinkGeneratedTitle.value = !!linkData.generatedTitle;
     return linkData;
   },
 };
@@ -123,6 +136,11 @@ defineExpose({
       v-if="lastSubmittedLinkReference"
       data-test="submittedLinkReference"
       >{{ JSON.stringify(lastSubmittedLinkReference) }}</output
+    >
+    <output
+      v-if="lastSubmittedLinkGeneratedTitle !== undefined"
+      data-test="submittedLinkGeneratedTitle"
+      >{{ lastSubmittedLinkGeneratedTitle }}</output
     >
   </div>
 </template>

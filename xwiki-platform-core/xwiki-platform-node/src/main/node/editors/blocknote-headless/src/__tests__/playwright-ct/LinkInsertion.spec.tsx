@@ -186,3 +186,26 @@ test("Creating a link on a selection uses the display text typed in the link mod
   await expect(editorEl.locator("strong")).toHaveText("2nd");
   await expect(editorEl).toHaveText("First 2nd third");
 });
+
+test("Creating a link on a selection with an empty display text replaces the selection with the generated label", async ({
+  mount,
+  page,
+}) => {
+  const { editorEl, paragraph } = await mountParagraph(
+    mount,
+    buildParagraphs(["First second third"]),
+  );
+
+  // Select "second", empty the display text and link it to a URL.
+  await openLinkModalOnSelection(page, paragraph, 6, 6, "https://xwiki.org");
+  await fillDisplayText(page, "");
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  // The selection is replaced with the label generated from the link target.
+  const linkEl = editorEl.locator('a[href="https://xwiki.org"]');
+  await expect(linkEl).toHaveText("https://xwiki.org");
+  await expect(editorEl).toHaveText("First https://xwiki.org third");
+  await expect(
+    page.locator('[data-test="submittedLinkGeneratedTitle"]'),
+  ).toHaveText("true");
+});

@@ -557,10 +557,10 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.waitUntilLinkIsPresent("Slash Menu Link Target");
 
         // Save and check the source: the link is saved with the reference of the page, relative to the edited page,
-        // rather than with its URL, and the existing link is left untouched.
+        // rather than with its URL, and without its generated label, while the existing link is left untouched.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("first [[second>>doc:Users.Alice]] third\n\n[[Slash Menu Link Target>>doc:SlashMenuLinkTarget]]",
+        assertEquals("first [[second>>doc:Users.Alice]] third\n\n[[doc:SlashMenuLinkTarget]]",
             wikiEditor.getContent());
     }
 
@@ -625,9 +625,11 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
-        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal.
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal:
+        // the display text is empty, since the link label is generated.
         textArea.click().moveCaretTo(8);
         BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+        assertEquals("", linkModal.getDisplayText());
 
         // Type the reference of the new target page, rather than picking a suggestion, then close the suggestions with
         // the Escape key: this must not close the link modal.
@@ -636,7 +638,10 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("Users.Bob", linkModal.getTarget());
         linkModal.submit();
 
-        // Save and check the source.
+        // The link label is generated from the new target.
+        textArea.waitUntilTextIs("first Bob third");
+
+        // Save and check the source: the link is still saved without its generated label.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[doc:Users.Bob]] third", wikiEditor.getContent());
@@ -720,5 +725,57 @@ class LinkIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[se**con**d>>https://www.xwiki.org]] third", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(22)
+    void typeDisplayTextOfLinkWithGeneratedLabel(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a link whose label is generated from its target.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[Users.Alice]] third");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal. The
+        // page search box is focused, which lists the pages matching the current reference: close these suggestions,
+        // which cover the link options, then type the display text, the same as the generated label.
+        textArea.click().moveCaretTo(8);
+        BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+        linkModal.closeSuggestions();
+        linkModal.setTitleAndSubmit("Alice");
+
+        // Save and check the source: the link label chosen by the user is saved.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[Alice>>Users.Alice]] third", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(23)
+    void createLinkWithEmptyDisplayTextOnSelection(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first second third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard, then create a link from the selection, emptying its display
+        // text: the selection is replaced with the label generated from the link target.
+        textArea.click().select(6, 6);
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.setDisplayText("");
+        linkModal.setTargetAndSubmit("https://xwiki.org");
+        textArea.waitUntilTextIs("first https://xwiki.org third");
+
+        // Save and check the source: the link is saved without its generated label.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[https://xwiki.org]] third", wikiEditor.getContent());
     }
 }

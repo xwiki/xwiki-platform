@@ -45,6 +45,7 @@ export type LinkContext = {
 // @beta
 export type LinkData = {
     displayText: string;
+    generatedDisplayText?: boolean;
     target: LinkTarget;
 };
 

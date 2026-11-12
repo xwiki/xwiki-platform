@@ -97,6 +97,50 @@ test("Editing the target of a link keeps the inline formatting of its text when 
   await expect(editorEl).toHaveText("First second third fourth");
 });
 
+test("Editing a link with a generated label leaves the display text empty, so that the label follows the new target", async ({
+  mount,
+  page,
+}) => {
+  const editorEl = await mountLinkWithGeneratedLabel(mount);
+
+  // The display text field is empty, showing the generated label as placeholder.
+  await openLinkEditor(page, editorEl);
+  await page.locator("[data-test='linkOptions'] > summary").click();
+  const displayTextEl = page.locator("[data-test='linkDisplayText']");
+  await expect(displayTextEl).toHaveValue("");
+  await expect(displayTextEl).toHaveAttribute(
+    "placeholder",
+    "https://xwiki.org",
+  );
+
+  // Change only the target: the label is generated from the new target, and still reported as generated.
+  await page.locator('[data-test="linkUrl"]').fill("https://www.xwiki.org");
+  await page.locator('[data-test="linkSubmit"]').click();
+  await expect(editorEl.locator('a[href="https://www.xwiki.org"]')).toHaveText(
+    "https://www.xwiki.org",
+  );
+  await expect(
+    page.locator('[data-test="submittedLinkGeneratedTitle"]'),
+  ).toHaveText("true");
+});
+
+test("Typing the display text of a link with a generated label gives the link a label of its own", async ({
+  mount,
+  page,
+}) => {
+  const editorEl = await mountLinkWithGeneratedLabel(mount);
+  const linkEl = editorEl.locator('a[href="https://xwiki.org"]');
+
+  await openLinkEditor(page, editorEl);
+  await fillDisplayText(page, "XWiki");
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  await expect(linkEl).toHaveText("XWiki");
+  await expect(
+    page.locator('[data-test="submittedLinkGeneratedTitle"]'),
+  ).toHaveText("false");
+});
+
 for (const close of ["submit", "cancel"] as const) {
   test(`The edited content is focused back when the link modal is closed (${close})`, async ({
     mount,
@@ -283,6 +327,29 @@ test("Editing the title of a path link keeps its reference, even when path links
 /**
  * Open the link modal on the link of the paragraph built by {@link buildParagraphWithLink}.
  */
+/**
+ * Mounts the editor with a link to "https://xwiki.org" whose label is generated from its target.
+ *
+ * @returns the editor
+ */
+async function mountLinkWithGeneratedLabel(
+  mount: Parameters<typeof mountBlockNoteHeadless>[0],
+): Promise<Locator> {
+  const component = await mountBlockNoteHeadless(mount, {
+    editorContent: buildParagraphWithLink("https://xwiki.org", [
+      { text: "https://xwiki.org", styles: {} },
+    ]),
+    editorProps: { syntax: FULL_SYNTAX },
+    macros: false,
+    linksWithGeneratedLabel: ["https://xwiki.org"],
+  });
+  const editorEl = component.locator(".bn-editor");
+  await editorEl
+    .locator('a[href="https://xwiki.org"]')
+    .waitFor({ state: "attached" });
+  return editorEl;
+}
+
 async function openLinkEditor(page: Page, editorEl: Locator): Promise<void> {
   // Move the caret inside the link, with the keyboard, to trigger the link toolbar. The toolbar also opens when the
   // link is hovered, but not with a single synthetic mouse move: the editor only records the hovered link when the

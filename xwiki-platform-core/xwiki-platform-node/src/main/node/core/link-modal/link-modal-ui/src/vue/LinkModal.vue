@@ -70,7 +70,13 @@ const props = defineProps<{
 
 const { t } = useI18n({ messages: translations });
 
-const linkData = typedRef(props.current);
+// The display text field is left empty for a link whose text is generated from its target, so that the text follows
+// the target (the field shows the generated text as placeholder).
+const linkData = typedRef(
+  props.current.generatedDisplayText
+    ? { ...props.current, displayText: "" }
+    : props.current,
+);
 
 // When the edited link points to a resource that no registered link target type supports, its own link target type is
 // offered first, so that the user can keep editing the reference as plain text, or switch back to it (restoring the
@@ -153,12 +159,14 @@ const defaultDisplayText = computed(() => {
 const emit = defineEmits<{ submit: [LinkData]; cancel: [] }>();
 
 function submit() {
+  // An empty display text means that the text of the link is generated from its target.
+  const generatedDisplayText = linkData.value.displayText.trim() === "";
   emit("submit", {
     ...linkData.value,
-    displayText:
-      linkData.value.displayText.trim() === ""
-        ? defaultDisplayText.value
-        : linkData.value.displayText,
+    displayText: generatedDisplayText
+      ? defaultDisplayText.value
+      : linkData.value.displayText,
+    generatedDisplayText,
   });
 }
 

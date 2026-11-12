@@ -56,6 +56,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.resolver.DocumentExistenceCheckRecorder;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
@@ -252,9 +253,16 @@ class DocumentSolrMetadataExtractorTest
         String comment = "1.1 comment";
         when(this.document.getComment()).thenReturn(comment);
 
-        // Links
-        when(this.document.getUniqueLinkedEntities(any(XWikiContext.class))).thenReturn(Set.of(
-            new DocumentReference("wiki", "space", "document1"), new DocumentReference("wiki", "space", "document2")));
+        // Links, the second one being an untyped link to a missing terminal document, resolved to the space home page
+        when(this.document.getUniqueLinkedEntities(any(XWikiContext.class), any(DocumentExistenceCheckRecorder.class)))
+            .then(invocation -> {
+                DocumentExistenceCheckRecorder recorder = invocation.getArgument(1);
+                recorder.add(new DocumentReference("wiki", "space", "document2"));
+                recorder.add(new DocumentReference("wiki", List.of("space", "document2"), "WebHome"));
+
+                return Set.of(new DocumentReference("wiki", "space", "document1"),
+                    new DocumentReference("wiki", List.of("space", "document2"), "WebHome"));
+            });
 
         // XObjects.
         when(this.document.getXObjects()).thenReturn(Map.of());
@@ -324,12 +332,16 @@ class DocumentSolrMetadataExtractorTest
 
         assertEquals("document:wiki:Path.To.Page.WebHome", solrDocument.getFieldValue(FieldUtils.REFERENCE));
 
-        assertEquals(Set.of("entity:document:wiki:space.document2", "entity:document:wiki:space.document1"),
+        assertEquals(
+            Set.of("entity:document:wiki:space.document2.WebHome", "entity:document:wiki:space.document1"),
             new HashSet<>(solrDocument.getFieldValues(FieldUtils.LINKS)));
         assertEquals(
-            Set.of("entity:wiki:wiki", "entity:space:wiki:space", "entity:document:wiki:space.document2",
-                "entity:document:wiki:space.document1"),
+            Set.of("entity:wiki:wiki", "entity:space:wiki:space", "entity:space:wiki:space.document2",
+                "entity:document:wiki:space.document2.WebHome", "entity:document:wiki:space.document1"),
             new HashSet<>(solrDocument.getFieldValues(FieldUtils.LINKS_EXTENDED)));
+        assertEquals(
+            Set.of("entity:document:wiki:space.document2", "entity:document:wiki:space.document2.WebHome"),
+            new HashSet<>(solrDocument.getFieldValues(FieldUtils.LINKS_EXISTENCE)));
     }
 
     @Test

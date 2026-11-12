@@ -92,6 +92,7 @@
         18.10.0 (181000000):
           * upgraded to the Solr 9.11 default configuration, including schema version 1.7 (docValues enabled by default, uninverting disabled by default), which is not compatible with data indexed with the previous configuration
           * at startup, the index is deleted (and filled again by the synchronization with the database) when it contains fields which are not compliant with their definition in the schema
+          * added field "links_existence"
     -->
     <!-- XWIKI: the versions of the schema from XWiki point of view.
     
@@ -225,6 +226,8 @@
     <field name="links" type="string" indexed="true" stored="true" multiValued="true" />
     <!-- Contains links plus all the references parents to make easier to search for links from any entity level (per wiki, per space, per document, etc.) -->
     <field name="links_extended" type="string" indexed="true" stored="false" multiValued="true" />
+    <!-- The documents whose existence the target of the links depends on (e.g. the untyped link [[Space.Page]] targets Space.Page when it exists and Space.Page.WebHome otherwise), to know which documents to index again when one of them is created or deleted -->
+    <field name="links_existence" type="string" indexed="true" stored="false" multiValued="true" />
 
     <!-- Document static fields -->
 

@@ -19,7 +19,9 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +30,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditorConfigurationPane;
+import org.xwiki.flamingo.skin.test.po.CompactLocationPickerElement;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -305,5 +311,99 @@ class MacroIT extends AbstractCKEditorIT
 
         ViewPage viewPage = editPage.clickSaveAndView();
         assertEquals("Displayed page content", viewPage.getContent());
+    }
+
+    /**
+     * Verify that a macro parameter whose type has a dedicated picker (e.g. a list of space references) is edited with
+     * that picker rather than with a plain text input, and that its value is properly loaded and saved. See
+     * XWIKI-23834: Add pickers for the notification macro.
+     */
+    @Test
+    @Order(8)
+    void editTypedParametersWithPickers(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // One parameter per type that has a picker, in order to check that each type selects the expected displayer
+        // template.
+        Map<String, String> parameterTypes = new LinkedHashMap<>();
+        parameterTypes.put("wikis", "java.util.List<org.xwiki.model.reference.WikiReference>");
+        parameterTypes.put("spaces", "java.util.List<org.xwiki.model.reference.SpaceReference>");
+        parameterTypes.put("pages", "java.util.List<org.xwiki.model.reference.DocumentReference>");
+        parameterTypes.put("users", "java.util.List<org.xwiki.user.UserReference>");
+        parameterTypes.put("tags", "java.util.List<org.xwiki.tag.Tag>");
+
+        // Only a user with script rights can define a wiki macro.
+        setup.loginAsSuperAdmin();
+        String macroId = "typedParameters";
+        DocumentReference macroReference =
+            new DocumentReference("TypedParametersMacro", testReference.getLastSpaceReference());
+        setup.deletePage(macroReference);
+        setup.createPage(macroReference, "", "Typed Parameters Macro");
+        setup.addObject(macroReference, "XWiki.WikiMacroClass",
+            "id", macroId,
+            "name", "Typed Parameters",
+            "description", "One parameter per type that has a picker.",
+            "contentType", "No content",
+            "visibility", "Current Wiki",
+            "code", "{{velocity}}ok{{/velocity}}");
+        for (Map.Entry<String, String> parameterType : parameterTypes.entrySet()) {
+            setup.addObject(macroReference, "XWiki.WikiMacroParameterClass",
+                "name", parameterType.getKey(),
+                "type", parameterType.getValue());
+        }
+        // The space, page, tag and user we're going to select with the pickers.
+        SpaceReference targetSpace = new SpaceReference("Target", testReference.getLastSpaceReference());
+        String targetSpaceValue = setup.serializeLocalReference(targetSpace);
+        setup.createPage(new DocumentReference("WebHome", targetSpace), "", "Target Space");
+        DocumentReference targetPage = new DocumentReference("TargetPage", testReference.getLastSpaceReference());
+        String targetPageValue = setup.serializeLocalReference(targetPage);
+        setup.createPage(targetPage, "", "Target Page");
+        String targetTag = "MacroITPickerTag";
+        setup.addObject(targetPage, "XWiki.TagClass", "tags", targetTag);
+        String targetUser = "MacroITPickerUser";
+        setup.deletePage(new DocumentReference("xwiki", "XWiki", targetUser));
+        setup.rest().createUser(new XWikiCredentials(targetUser, targetUser));
+
+        loginStandardUser(setup);
+        edit(setup, testReference, true);
+        setSource(String.format(
+            "before\n\n{{%s spaces=\"Main\" pages=\"Main.WebHome\" users=\"XWiki.alice\"/}}\n\nafter", macroId));
+
+        this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
+        MacroDialogEditModal macroEditModal = this.textArea.editSelectedMacro();
+
+        // Every typed parameter is edited with a picker. Note that looking up the picker already asserts that the
+        // suggestion widget has been applied to the parameter field.
+        for (String parameterName : parameterTypes.keySet()) {
+            macroEditModal.getMacroParameterSuggestInput(parameterName);
+        }
+        // The spaces are edited with the compact location picker, which also allows browsing for them in a tree.
+        assertEquals("Browse for locations", CompactLocationPickerElement.get("spaces").getBrowseLabel());
+
+        // The values of the macro call are loaded in the pickers.
+        assertEquals(List.of("Main"), macroEditModal.getMacroParameterSuggestInput("spaces").getValues());
+        assertEquals(List.of("Main.WebHome"), macroEditModal.getMacroParameterSuggestInput("pages").getValues());
+        assertEquals(List.of("XWiki.alice"), macroEditModal.getMacroParameterSuggestInput("users").getValues());
+        assertEquals(List.of(), macroEditModal.getMacroParameterSuggestInput("tags").getValues());
+
+        // Select a wiki, an additional space, an additional page, a tag and an additional user with their pickers and
+        // check that they end up in the macro call, so that the save round-trip is verified for every picker.
+        macroEditModal.getMacroParameterSuggestInput("wikis").sendKeys("xwiki").waitForNonTypedSuggestions()
+            .selectByValue("xwiki");
+        macroEditModal.getMacroParameterSuggestInput("spaces").sendKeys("Target Space").waitForNonTypedSuggestions()
+            .selectByValue(targetSpaceValue);
+        macroEditModal.getMacroParameterSuggestInput("pages").sendKeys("Target Page").waitForNonTypedSuggestions()
+            .selectByValue(targetPageValue);
+        // The tags are suggested from part of their name.
+        macroEditModal.getMacroParameterSuggestInput("tags").sendKeys("PickerT").waitForNonTypedSuggestions()
+            .selectByValue(targetTag);
+        macroEditModal.getMacroParameterSuggestInput("users").sendKeys(targetUser).waitForNonTypedSuggestions()
+            .selectByValue("XWiki." + targetUser);
+        macroEditModal.clickSubmit();
+
+        assertSourceContains("wikis=\"xwiki\"");
+        assertSourceContains(String.format("spaces=\"Main,%s\"", targetSpaceValue));
+        assertSourceContains(String.format("pages=\"Main.WebHome,%s\"", targetPageValue));
+        assertSourceContains(String.format("tags=\"%s\"", targetTag));
+        assertSourceContains(String.format("users=\"XWiki.alice,XWiki.%s\"", targetUser));
     }
 }

@@ -241,7 +241,8 @@ public class RecordsMacroParameters
      * @param allowEditMode whether readers can switch the table to its edit mode
      */
     @PropertyName("Allow edit mode")
-    @PropertyDescription("Lets readers who can edit the entries switch the table to its edit mode.")
+    @PropertyDescription("Lets readers switch the table to its edit mode; only the entries they can edit become "
+        + "editable.")
     @PropertyGroup("editing")
     @PropertyOrder(7)
     public void setAllowEditMode(boolean allowEditMode)

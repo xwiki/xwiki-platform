@@ -96,22 +96,24 @@ async function warnIfDataTypeMissing(
   dataTypeInput: HTMLInputElement | HTMLSelectElement,
 ): Promise<void> {
   const dataType = dataTypeInput.value;
-  let descriptors;
-  try {
-    descriptors = await loadDescriptors(picker, XWiki.contextPath, fetchJson);
-  } catch {
-    // The pickers make the same request and report its failure themselves.
-    return;
+  if (dataType !== "") {
+    let descriptors;
+    try {
+      descriptors = await loadDescriptors(picker, XWiki.contextPath, fetchJson);
+    } catch {
+      // The pickers make the same request and report its failure themselves.
+      return;
+    }
+    // The author may have picked another data type while the request was running.
+    if (hasDataTypeFields(descriptors) || dataTypeInput.value !== dataType) {
+      return;
+    }
+    showMessage(
+      dataTypeInput.selectize?.wrapper ?? dataTypeInput,
+      "warning",
+      translate("picker.dataTypeMissing", findDataTypeLabel(dataTypeInput)),
+    );
   }
-  // The author may have picked another data type while the request was running.
-  if (hasDataTypeFields(descriptors) || dataTypeInput.value !== dataType) {
-    return;
-  }
-  showMessage(
-    dataTypeInput.selectize?.wrapper ?? dataTypeInput,
-    "warning",
-    translate("picker.dataTypeMissing", findDataTypeLabel(dataTypeInput)),
-  );
 }
 
 /**
@@ -158,7 +160,6 @@ function enhancePickers(
  * @param $ - the page's jQuery instance
  * @param picker - the columns picker element
  */
-// eslint-disable-next-line max-statements
 function wire($: JQueryStatic, picker: Element): void {
   const scope = findScope(picker);
   const dataTypeInput = findDataTypeInput(scope);
@@ -174,12 +175,9 @@ function wire($: JQueryStatic, picker: Element): void {
     return;
   }
 
-  if (dataTypeInput.value !== "") {
-    void warnIfDataTypeMissing(picker, dataTypeInput);
-  }
+  void warnIfDataTypeMissing(picker, dataTypeInput);
 
   let previous = dataTypeInput.value;
-  // eslint-disable-next-line max-statements
   $(dataTypeInput).on("change", () => {
     const current = dataTypeInput.value;
     if (current === previous) {
@@ -190,13 +188,23 @@ function wire($: JQueryStatic, picker: Element): void {
       revert(dataTypeInput, previous);
       return;
     }
-    resetDerivedParameters(scope);
-    clearMessages(scope);
-    // The columns were reset silently, which the creation fields have to follow.
-    updateCreationFields(scope, true);
-    setTabsVisible(scope, current !== "");
+    applyDataType(scope, current);
     previous = current;
   });
+}
+
+/**
+ * Brings a dialog in line with the data type the author just picked.
+ *
+ * @param scope - the dialog's form
+ * @param dataType - the data type picked, empty when the author cleared it
+ */
+function applyDataType(scope: ParentNode, dataType: string): void {
+  resetDerivedParameters(scope);
+  clearMessages(scope);
+  // The columns were reset silently, which the creation fields have to follow.
+  updateCreationFields(scope, true);
+  setTabsVisible(scope, dataType !== "");
 }
 
 /**

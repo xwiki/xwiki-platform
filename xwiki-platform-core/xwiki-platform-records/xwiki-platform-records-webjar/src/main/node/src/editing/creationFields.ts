@@ -19,6 +19,7 @@
  */
 
 import { clearMessage, findMessage, showMessage } from "../common/dialog";
+import { METADATA_PREFIX } from "../common/fields";
 import { metadataLabels, translate } from "../common/translations";
 
 /**
@@ -37,6 +38,11 @@ const STRATEGY_PARAMETER = "creationStrategy";
 const LOCATION_PARAMETER = "newEntriesLocation";
 
 const COLUMNS_PARAMETER = "properties";
+
+/**
+ * The column holding the page title.
+ */
+const TITLE_COLUMN = "doc.title";
 
 /**
  * Registers a change listener. The suggest widget notifies its changes through jQuery, which a native listener
@@ -105,7 +111,7 @@ function getMissingColumns(
  * @returns whether the table displays the column when the author picked none: the title and every field do
  */
 function isDisplayedByDefault(column: string): boolean {
-  return column === "doc.title" || !column.startsWith("doc.");
+  return column === TITLE_COLUMN || !column.startsWith(METADATA_PREFIX);
 }
 
 /**

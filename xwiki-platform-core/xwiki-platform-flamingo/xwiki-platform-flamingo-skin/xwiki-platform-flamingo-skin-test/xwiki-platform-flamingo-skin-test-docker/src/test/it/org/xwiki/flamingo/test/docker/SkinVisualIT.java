@@ -111,9 +111,9 @@ class SkinVisualIT
             liveData.openPropertiesPanel();
             liveData.openSortPanel();
             liveData.openFiltersPanel();
-            // Only the part of an element inside the viewport is captured, so capture the panels alone, scrolled into
-            // view, rather than the whole content, which no longer fits in the viewport once they are open.
-            screenshots.assertMatches("liveDataPanels", setup.getDriver().scrollTo(liveData.getAdvancedPanels()));
+            // Capture the panels alone rather than the whole content, which no longer fits in the viewport once they
+            // are open.
+            screenshots.assertMatches("liveDataPanels", liveData.getAdvancedPanels());
         } finally {
             setup.maximizeBrowserWindow();
         }

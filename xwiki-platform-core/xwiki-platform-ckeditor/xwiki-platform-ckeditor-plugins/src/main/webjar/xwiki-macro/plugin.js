@@ -638,8 +638,12 @@
         cssSelector: 'div.macro div.xwiki-metadata-container.cke_widget_editable'
       });
 
-      // Register Quick Actions
-
+      // Register Quick Actions. The quick action search waits for them, so that it finds the macros by their name.
+      let quickActionsRegistered, quickActionsFailed;
+      editor.quickActions?.waitFor(new Promise((resolve, reject) => {
+        quickActionsRegistered = resolve;
+        quickActionsFailed = reject;
+      }));
       require([
         'xwiki-wysiwyg-macro-service',
         'xwiki-l10n!xwiki-wysiwyg-macro-selector-translation-keys'
@@ -662,6 +666,7 @@
 
           // Keep track of how many groups we created
           var macroGroupsCount = 0;
+          const quickActionTasks = [];
 
           // List the category in order and provide the related attributes for the given macro
           var getCategoryAttributes = function (macro) {
@@ -717,7 +722,7 @@
             // Do not add macros that are already registered, but use the macro name for their quick action so that it
             // matches the macro dialogs.
             if (editor.quickActions.getAction('macro-' + macro.id.id)) {
-              editor.quickActions.updateAction('macro-' + macro.id.id, {name: macro.name});
+              quickActionTasks.push(editor.quickActions.updateAction('macro-' + macro.id.id, {name: macro.name}));
               return;
             }
             // Do not add macros that cannot be installed
@@ -740,8 +745,9 @@
               }
             };
 
-            editor.quickActions.addAction(item);
+            quickActionTasks.push(editor.quickActions.addAction(item));
           });
+          quickActionsRegistered(Promise.all(quickActionTasks));
 
           // Use the macro name for the tool bar menu items that insert a macro, so that it matches the macro dialogs.
           // The xwiki-toolbar plugin registers these menu items with the toolbar_ prefix.
@@ -753,8 +759,8 @@
               menuItem.label = macroNames[menuItem.data.name];
             }
           });
-        });
-      });
+        }).fail(quickActionsFailed);
+      }, quickActionsFailed);
       // Ensure that widgets are always properly initialized after a paste.
       // Fix XWIKI-22391
       editor.on('afterPaste', function () {

@@ -76,6 +76,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <!-- We need this to test the table of contents Quick Action. -->
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-toc</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
       <!-- We need this to test that uninstalled macros are listed in the Quick Actions. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-index</artifactId>

@@ -69,6 +69,8 @@
       // Start with an empty list of quick actions and no groups;
       this.actions = [];
       this.groups = {};
+      // The tasks that must end before searching, e.g. adding or updating quick actions asynchronously.
+      this.pendingTasks = [];
 
       // Initialize the quick action search asynchronously.
       this.searchReady = new Promise((resolve, reject) => {
@@ -202,14 +204,28 @@
      * @return {Promise} a promise that resolves with the array of quick actions that match the given text
      */
     search(text) {
-      if (text.length) {
-        return this.searchReady.then(function(fuse) {
-          return fuse.search(text);
-        });
-      } else {
-        // Return a shallow copy of the actions array in order to be able to modify it safely (e.g. add groups).
-        return Promise.resolve(this.actions.slice());
-      }
+      return Promise.all(this.pendingTasks).then(() => {
+        if (text.length) {
+          return this.searchReady.then(function(fuse) {
+            return fuse.search(text);
+          });
+        } else {
+          // Return a shallow copy of the actions array in order to be able to modify it safely (e.g. add groups).
+          return this.actions.slice();
+        }
+      });
+    }
+
+    /**
+     * Delays the search until the given task ends, so that the search takes into account the quick actions that the
+     * task adds or updates. A failed task doesn't prevent the search.
+     *
+     * @param {Promise} task - the task to wait for
+     */
+    waitFor(task) {
+      this.pendingTasks.push(task.catch(error => {
+        console.error('Failed to wait for a quick action task because: ' + error);
+      }));
     }
 
     /**

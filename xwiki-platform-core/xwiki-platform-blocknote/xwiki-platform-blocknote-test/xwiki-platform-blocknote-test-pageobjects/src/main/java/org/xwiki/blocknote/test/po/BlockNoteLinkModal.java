@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.po;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -59,6 +60,29 @@ public class BlockNoteLinkModal extends BaseElement
      * The display text field, which is in the collapsible "Options" section.
      */
     private static final By DISPLAY_TEXT_FIELD = By.cssSelector("[data-test='linkDisplayText']");
+
+    /**
+     * The query string field of a page or an attachment link, which is in the collapsible "Options" section.
+     */
+    private static final By QUERY_STRING_FIELD =
+        By.cssSelector("[data-test='linkPageQueryString'], [data-test='linkAttachmentQueryString']");
+
+    /**
+     * The anchor field of a page link, which is in the collapsible "Options" section.
+     */
+    private static final By ANCHOR_FIELD = By.cssSelector("[data-test='linkPageAnchor']");
+
+    /**
+     * The suggestions listed below the page and attachment search boxes, or the message replacing them (e.g. while
+     * searching, or when nothing matches).
+     */
+    private static final By SUGGESTIONS = By.cssSelector(".link-target .suggestions-container");
+
+    /**
+     * The link modal itself, i.e. the outermost dialog holding the link type selector.
+     */
+    private static final By DIALOG =
+        By.xpath("//*[@data-test = 'linkTargetType']/ancestor::*[@role = 'dialog'][last()]");
 
     /**
      * Create a new instance, waiting for the link modal to be visible.
@@ -124,7 +148,103 @@ public class BlockNoteLinkModal extends BaseElement
      */
     public String getTarget()
     {
-        return getDriver().findElement(TARGET_FIELD).getDomProperty("value");
+        return getDriver().findElement(TARGET_FIELD).getDomProperty(ATTRIBUTE_VALUE);
+    }
+
+    /**
+     * @return the message the browser shows when the link modal is submitted while the field designating the link
+     *         target is not valid (e.g. it's required but empty), or the empty string when this field is valid
+     * @since 18.10.0RC1
+     */
+    public String getTargetValidationMessage()
+    {
+        return getDriver().findElement(TARGET_FIELD).getDomProperty("validationMessage");
+    }
+
+    /**
+     * Types the given text where the focus is, without clicking anything first, as a keyboard user does right after the
+     * link modal opens. Waits for the focus to be inside the link modal first, since the link modal moves it there
+     * once it's shown.
+     *
+     * @param keysToSend the keys to type
+     * @since 18.10.0RC1
+     */
+    public void typeInFocusedField(CharSequence... keysToSend)
+    {
+        WebElement dialog = getDriver().findElement(DIALOG);
+        getDriver().waitUntilCondition(driver -> {
+            WebElement activeElement = driver.switchTo().activeElement();
+            return "input".equals(activeElement.getTagName())
+                && (boolean) getDriver().executeScript("return arguments[0].contains(arguments[1])", dialog,
+                    activeElement);
+        });
+        getDriver().switchTo().activeElement().sendKeys(keysToSend);
+    }
+
+    /**
+     * Closes, with the Escape key, the suggestions listed below the page or attachment search box, once they are
+     * shown (i.e. after typing in the search box), and waits for them to be hidden. The link modal is expected to
+     * stay open.
+     *
+     * @since 18.10.0RC1
+     */
+    public void closeSuggestions()
+    {
+        getDriver().waitUntilElementIsVisible(SUGGESTIONS);
+        getDriver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
+        getDriver().waitUntilElementDisappears(SUGGESTIONS);
+    }
+
+    /**
+     * Replaces the query string of a page or an attachment link, expanding the "Options" section that holds it if
+     * needed.
+     *
+     * @param queryString the new query string
+     * @since 18.10.0RC1
+     */
+    public void setQueryString(String queryString)
+    {
+        expandOptions();
+        replaceText(QUERY_STRING_FIELD, queryString);
+    }
+
+    /**
+     * @return the query string of a page or an attachment link
+     * @since 18.10.0RC1
+     */
+    public String getQueryString()
+    {
+        return getDriver().findElement(QUERY_STRING_FIELD).getDomProperty(ATTRIBUTE_VALUE);
+    }
+
+    /**
+     * Replaces the anchor of a page link, expanding the "Options" section that holds it if needed.
+     *
+     * @param anchor the new anchor
+     * @since 18.10.0RC1
+     */
+    public void setAnchor(String anchor)
+    {
+        expandOptions();
+        replaceText(ANCHOR_FIELD, anchor);
+    }
+
+    /**
+     * @return the anchor of a page link
+     * @since 18.10.0RC1
+     */
+    public String getAnchor()
+    {
+        return getDriver().findElement(ANCHOR_FIELD).getDomProperty(ATTRIBUTE_VALUE);
+    }
+
+    /**
+     * @return the content of the display text field, which is in the collapsible "Options" section
+     * @since 18.10.0RC1
+     */
+    public String getDisplayText()
+    {
+        return getDriver().findElement(DISPLAY_TEXT_FIELD).getDomProperty(ATTRIBUTE_VALUE);
     }
 
     /**
@@ -242,8 +362,7 @@ public class BlockNoteLinkModal extends BaseElement
     {
         // The dialog covers the whole viewport, with its content inset from its edges: its top left corner is on the
         // backdrop.
-        WebElement dialog = getDriver().findElement(
-            By.xpath("//*[@data-test = 'linkTargetType']/ancestor::*[@role = 'dialog'][last()]"));
+        WebElement dialog = getDriver().findElement(DIALOG);
         getDriver().moveToTopLeftCornerOfTargetWithOffset(dialog, 5, 5, null).click().perform();
     }
 

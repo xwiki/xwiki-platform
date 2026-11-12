@@ -26,6 +26,7 @@ import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteLinkModal;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -34,6 +35,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Verify link related features of the BlockNote editor integration.
@@ -512,5 +514,164 @@ class LinkIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("first [[second>>doc:NewLinkTarget||class=\"foo\"]] third", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(16)
+    void insertLinkFromSlashMenu(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create the page to link to and wait for it to be indexed, since the page link suggestions are based on
+        // Solr indexation.
+        DocumentReference targetPage =
+            new DocumentReference("SlashMenuLinkTarget", testReference.getLastSpaceReference());
+        setup.deletePage(targetPage);
+        setup.createPage(targetPage, "", "Slash Menu Link Target");
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Start fresh, with a page that already has a link, edited in a realtime session.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[second>>doc:Users.Alice]] third");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Open the link modal from the slash menu, in a new paragraph.
+        textArea.appendParagraph("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("link");
+        slashMenu.waitForItemSelected("Link");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        // The link modal shows the link type and the link target, which is focused, so that keyboard users can type
+        // the target right away.
+        BlockNoteLinkModal linkModal = new BlockNoteLinkModal();
+        assertEquals("Page", linkModal.getTargetType());
+        linkModal.typeInFocusedField("Slash");
+        assertEquals("Slash", linkModal.getTarget());
+
+        // Pick the page to link to, leaving the display text empty: the link label is generated from the target.
+        linkModal.setPageReference("Slash Menu Link Target", "Slash Menu Link Target");
+        linkModal.submit();
+        textArea.waitUntilLinkIsPresent("Slash Menu Link Target");
+
+        // Save and check the source: the link is saved with the reference of the page, relative to the edited page,
+        // rather than with its URL, and the existing link is left untouched.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>doc:Users.Alice]] third\n\n[[Slash Menu Link Target>>doc:SlashMenuLinkTarget]]",
+            wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(17)
+    void editLinkQueryStringAndAnchor(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a page link that has an anchor and a custom parameter.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[second>>doc:QueryStringTarget||anchor=\"HOld\" class=\"foo\"]] third");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal.
+        // The page search box is focused, which lists the pages matching the current reference: close these
+        // suggestions, which cover the link options.
+        textArea.click().moveCaretTo(8);
+        BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+        linkModal.closeSuggestions();
+
+        // The link modal shows the anchor of the link.
+        linkModal.expandOptions();
+        assertEquals("HOld", linkModal.getAnchor());
+        assertEquals("", linkModal.getQueryString());
+
+        // Change the anchor and add a query string, without changing the target page.
+        linkModal.setAnchor("HNew");
+        linkModal.setQueryString("a=b");
+        linkModal.submit();
+
+        // Save and check the source: the anchor is updated, the query string is added and the custom parameter is
+        // preserved.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>doc:QueryStringTarget||queryString=\"a=b\" anchor=\"HNew\" class=\"foo\"]] third",
+            wikiEditor.getContent());
+
+        // Edit the link again: the link modal shows the new anchor and query string.
+        page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        editor = page.getContentEditor();
+        textArea = editor.getRichTextArea();
+        textArea.click().moveCaretTo(8);
+        linkModal = editor.getToolBar().editLink();
+        linkModal.closeSuggestions();
+        linkModal.expandOptions();
+        assertEquals("HNew", linkModal.getAnchor());
+        assertEquals("a=b", linkModal.getQueryString());
+        linkModal.cancel();
+    }
+
+    @Test
+    @Order(18)
+    void changeTargetOfLinkWithGeneratedLabel(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a link whose label is generated from its target.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[Users.Alice]] third");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal.
+        textArea.click().moveCaretTo(8);
+        BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+
+        // Type the reference of the new target page, rather than picking a suggestion, then close the suggestions with
+        // the Escape key: this must not close the link modal.
+        linkModal.setTarget("Users.Bob");
+        linkModal.closeSuggestions();
+        assertEquals("Users.Bob", linkModal.getTarget());
+        linkModal.submit();
+
+        // Save and check the source.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[doc:Users.Bob]] third", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(19)
+    void submitLinkWithoutTarget(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first second third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard, then open the link modal and submit it without a target
+        // attachment: the browser reports the missing target and the link modal stays open.
+        textArea.click().select(6, 6);
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.selectTargetType("Attachment");
+        linkModal.submit();
+        assertFalse(linkModal.getTargetValidationMessage().isEmpty());
+
+        // The same goes for a link to a URL.
+        linkModal.selectTargetType("URL");
+        linkModal.submit();
+        assertFalse(linkModal.getTargetValidationMessage().isEmpty());
+
+        // Once a target is set, the link modal can be submitted.
+        linkModal.setTargetAndSubmit("https://xwiki.org");
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>https://xwiki.org]] third", wikiEditor.getContent());
     }
 }

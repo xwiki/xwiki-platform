@@ -21,6 +21,8 @@ package org.xwiki.blocknote.test.po;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
@@ -47,6 +49,8 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNest
 public class BlockNoteRichTextArea extends BaseElement
 {
     private static final By IMAGE = By.tagName("img");
+
+    private static final By LINK = By.tagName("a");
 
     @NonNull
     private WebElement container;
@@ -474,60 +478,82 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * Pastes a file over the rich text area.
+     * Pastes several files at once into the rich text area, as one transfer, at the caret.
      *
-     * @param filePath the path of the file to paste, relative to the test resources
+     * @param filePaths the paths of the files to paste, relative to the test resources
      * @return this rich text area instance
-     * @throws URISyntaxException if the given file can't be located
+     * @throws URISyntaxException if one of the given files can't be located
      * @since 18.10.0RC1
      */
-    public BlockNoteRichTextArea pasteFile(String filePath) throws URISyntaxException
+    public BlockNoteRichTextArea pasteFiles(String... filePaths) throws URISyntaxException
     {
-        return insertFile("paste", filePath);
+        return insertFiles("paste", 0, filePaths);
     }
 
     /**
-     * Drops a file over the rich text area.
+     * Drops several files at once over the rich text area, as one transfer, at the given offset of the line holding
+     * the caret.
      *
-     * @param filePath the path of the file to drop, relative to the test resources
+     * @param offset how far from the start of that line the files land
+     * @param filePaths the paths of the files to drop, relative to the test resources
      * @return this rich text area instance
-     * @throws URISyntaxException if the given file can't be located
+     * @throws URISyntaxException if one of the given files can't be located
      * @since 18.10.0RC1
      */
-    public BlockNoteRichTextArea dropFile(String filePath) throws URISyntaxException
+    public BlockNoteRichTextArea dropFiles(int offset, String... filePaths) throws URISyntaxException
     {
-        return insertFile("drop", filePath);
+        return insertFiles("drop", offset, filePaths);
     }
 
     /**
-     * Inserts a file using a synthetic event, because WebDriver can drag and drop DOM elements but not files, and
+     * Inserts files using a synthetic event, because WebDriver can drag and drop DOM elements but not files, and
      * can't put one on the clipboard at all.
      *
      * @param eventType either {@code paste} or {@code drop}
-     * @param filePath the path of the file to insert, relative to the test resources
+     * @param offset where a drop lands, as an offset of the line holding the caret; ignored for a paste
+     * @param filePaths the paths of the files to insert, relative to the test resources
      * @return this rich text area instance
-     * @throws URISyntaxException if the given file can't be located
+     * @throws URISyntaxException if one of the given files can't be located
      */
-    private BlockNoteRichTextArea insertFile(String eventType, String filePath) throws URISyntaxException
+    private BlockNoteRichTextArea insertFiles(String eventType, int offset, String... filePaths)
+        throws URISyntaxException
     {
-        WebElement fileInput = loadFile(filePath);
+        List<WebElement> fileInputs = new ArrayList<>();
+        for (String filePath : filePaths) {
+            fileInputs.add(loadFile(filePath));
+        }
         String script = """
-            const [editor, fileInput, eventType] = arguments;
+            const [editor, eventType, offset, fileInputs] = arguments;
             const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(fileInput.files[0]);
-            const {left, top, width, height} = editor.getBoundingClientRect();
-            const eventInit = {bubbles: true, cancelable: true, clientX: left + width / 2, clientY: top + height / 2};
+            fileInputs.forEach((fileInput) => dataTransfer.items.add(fileInput.files[0]));
+            const eventInit = {bubbles: true, cancelable: true};
             if (eventType === 'paste') {
                 const paste = new ClipboardEvent('paste', eventInit);
                 // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
                 Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
                 editor.dispatchEvent(paste);
             } else {
-                editor.dispatchEvent(new DragEvent('drop', {...eventInit, dataTransfer}));
+                // Only a DOM range can turn the offset into the pixels the drop event needs.
+                // An empty one has no rectangle, so measure a neighbouring character and take the edge at it.
+                // Measure the paragraph holding the caret, since that's the line the offset refers to.
+                const anchor = editor.ownerDocument.getSelection().anchorNode;
+                const paragraph = (anchor.nodeType === Node.ELEMENT_NODE ? anchor : anchor.parentElement)
+                    .closest('p');
+                const text = paragraph.firstChild;
+                const range = document.createRange();
+                range.setStart(text, Math.max(offset - 1, 0));
+                range.setEnd(text, Math.max(offset, 1));
+                const {left, right, top, height} = range.getBoundingClientRect();
+                editor.dispatchEvent(new DragEvent('drop', {...eventInit, clientX: offset > 0 ? right : left,
+                    clientY: top + height / 2, dataTransfer}));
             }
-            fileInput.remove();
+            // The browser empties a real transfer once the event has been dispatched, so code that reads its items
+            // after awaiting an upload gets nothing. Do the same, otherwise the test passes against a transfer no
+            // browser ever hands the editor.
+            dataTransfer.items.clear();
+            fileInputs.forEach((fileInput) => fileInput.remove());
             """;
-        getDriver().executeScript(script, this.container, fileInput, eventType);
+        getDriver().executeScript(script, this.container, eventType, offset, fileInputs);
         return this;
     }
 
@@ -572,6 +598,21 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * Waits until the given number of links are present, whatever their labels. Needed when the labels can't be
+     * predicted, e.g. the generated names several pasted files are attached under.
+     *
+     * @param count the number of links to wait for
+     * @return this rich text area instance
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilLinkCountIs(int count)
+    {
+        getDriver().waitUntilCondition(
+            driver -> this.container.findElements(LINK).size() == count);
+        return this;
+    }
+
+    /**
      * Waits for a link, whatever its label. Needed when the label can't be predicted, e.g. the generated name a
      * pasted file is attached under.
      *
@@ -580,7 +621,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public WebElement waitUntilLinkIsPresent()
     {
-        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, By.xpath(".//a")));
+        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, LINK));
     }
 
 }

@@ -34,10 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Message Stream Application</xwiki.extension.name>
-    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
-    <xwiki.extension.components>
-      org.xwiki.rendering.macro.Macro/messageSender
-    </xwiki.extension.components>
+    <!-- Legacy macro, not declared in xwiki.extension.components so that the editor doesn't suggest installing it -->
+    <xwiki.extension.components.macros.check.excluded>messageSender</xwiki.extension.components.macros.check.excluded>
   </properties>
   <dependencies>
     <dependency>

@@ -875,6 +875,8 @@ public class RichTextAreaElement extends BaseElement
      * @return the vertical scroll position of the edited content, in pixels; this is the scroll position of the
      *         rich text area itself when it is implemented using an iframe, or the scroll position of its closest
      *         scrollable ancestor (usually the page) otherwise
+     * @since 17.10.16
+     * @since 18.4.9
      * @since 18.10.0RC1
      */
     public int getScrollTop()
@@ -888,6 +890,8 @@ public class RichTextAreaElement extends BaseElement
      *
      * @param scrollTop the new vertical scroll position of the edited content, in pixels
      * @see #getScrollTop()
+     * @since 17.10.16
+     * @since 18.4.9
      * @since 18.10.0RC1
      */
     public void scrollTo(int scrollTop)

@@ -46,6 +46,24 @@ import type { ComposerTranslation } from "vue-i18n";
 const HTML_CONVERSION_KEY = "RequiresHTMLConversion";
 
 /**
+ * A resolved displayer descriptor: its id and the free form configuration of the displayer.
+ */
+type Descriptor = { id: string; [key: string]: unknown };
+
+/**
+ * Freeze an object and, recursively, the objects and arrays it contains.
+ * @param value - the value to freeze
+ * @returns the same value, frozen
+ */
+function deepFreeze<T>(value: T): T {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.values(value).forEach(deepFreeze);
+    Object.freeze(value);
+  }
+  return value;
+}
+
+/**
  * @param descriptors - the descriptors to index
  * @returns the descriptors by id, the first one winning when several share an id
  */
@@ -100,7 +118,7 @@ export class LiveDataLogic implements Logic {
     Map<string, PropertyDescriptor>
   > = computed(() => indexById(this.data.meta.propertyTypes));
   private readonly displayerDescriptorsByPropertyId: ComputedRef<
-    Map<string, unknown>
+    Map<string, Readonly<Descriptor>>
   > = computed(
     () =>
       new Map(
@@ -454,18 +472,18 @@ export class LiveDataLogic implements Logic {
   /**
    * Get the displayer descriptor associated to a property id.
    * The descriptor is resolved once per property and cached until the meta data changes. The returned object is
-   * shared by all the callers and must not be modified.
+   * shared by all the callers, so it is deeply frozen: a write throws in strict mode code and is ignored otherwise.
    * @param propertyId - a property id
    * @returns the displayer descriptor
    */
-  getDisplayerDescriptor(propertyId: string) {
+  getDisplayerDescriptor(propertyId: string): Readonly<Descriptor> {
     const displayerDescriptor =
       this.displayerDescriptorsByPropertyId.value.get(propertyId);
     // A property without descriptor is not cached, it falls back on the default displayer.
     return displayerDescriptor ?? this.resolveDisplayerDescriptor(propertyId);
   }
 
-  private resolveDisplayerDescriptor(propertyId: string) {
+  private resolveDisplayerDescriptor(propertyId: string): Readonly<Descriptor> {
     // Property descriptor config
     const propertyDescriptor = this.getPropertyDescriptor(propertyId);
     // Property type descriptor config
@@ -483,8 +501,10 @@ export class LiveDataLogic implements Logic {
     const defaultDisplayerDescriptor = this.data.meta.displayers.find(
       (displayer) => displayer.id === displayerId,
     );
-    // Merge displayer descriptors.
-    return jsonMerge({}, defaultDisplayerDescriptor, customDisplayerDescriptor);
+    // Merge displayer descriptors. The merge produces copies, so freezing does not touch the meta data.
+    return deepFreeze(
+      jsonMerge({}, defaultDisplayerDescriptor, customDisplayerDescriptor),
+    ) as Readonly<Descriptor>;
   }
 
   /**
@@ -597,9 +617,7 @@ export class LiveDataLogic implements Logic {
     const displayerIds = new Set(
       this.getPropertyDescriptors()
         .filter((it) => it != undefined && this.isPropertyVisible(it.id))
-        .map(
-          (it) => (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
-        ),
+        .map((it) => this.getDisplayerDescriptor(it!.id).id),
     );
     await Promise.all(
       [...displayerIds]

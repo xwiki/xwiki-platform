@@ -30,7 +30,7 @@ vi.mock("vue-i18n", () => ({
 vi.mock("@xwiki/platform-livedata-componentstore", () => ({
   componentStore: {
     load: vi.fn().mockResolvedValue({}),
-    isRegistered: () => true,
+    isRegistered: vi.fn(() => true),
   },
 }));
 
@@ -940,6 +940,57 @@ describe("Resolving the descriptors of the properties", () => {
   });
 });
 
+describe("Freezing the displayer descriptors", () => {
+  let logic;
+
+  beforeEach(() => {
+    ({ logic } = initLogic([]));
+    logic.data.meta.propertyDescriptors[0].displayer = {
+      id: "text",
+      actions: [{ id: "view" }],
+      nested: { key: "value" },
+    };
+  });
+
+  it("freezes the shared displayer descriptor and its nested values", () => {
+    const descriptor = logic.getDisplayerDescriptor("name");
+
+    expect(Object.isFrozen(descriptor)).toBe(true);
+    expect(Object.isFrozen(descriptor.actions)).toBe(true);
+    expect(Object.isFrozen(descriptor.actions[0])).toBe(true);
+    expect(Object.isFrozen(descriptor.nested)).toBe(true);
+  });
+
+  it("rejects writes in strict mode code and keeps the descriptor shared", () => {
+    const descriptor = logic.getDisplayerDescriptor("name");
+
+    expect(() => {
+      descriptor.id = "html";
+    }).toThrow(TypeError);
+    expect(() => descriptor.actions.push({ id: "edit" })).toThrow(TypeError);
+    expect(logic.getDisplayerDescriptor("name")).toBe(descriptor);
+    expect(descriptor.id).toBe("text");
+  });
+
+  it("does not freeze the meta data the descriptor is merged from", () => {
+    logic.getDisplayerDescriptor("name");
+
+    const { displayer } = logic.data.meta.propertyDescriptors[0];
+    expect(Object.isFrozen(displayer)).toBe(false);
+    expect(Object.isFrozen(displayer.actions)).toBe(false);
+  });
+
+  it("freezes the descriptor resolved again after a change of the meta data", () => {
+    logic.getDisplayerDescriptor("name");
+    logic.data.meta.propertyDescriptors[0].displayer = { id: "html" };
+
+    const descriptor = logic.getDisplayerDescriptor("name");
+
+    expect(descriptor).toStrictEqual({ id: "html" });
+    expect(Object.isFrozen(descriptor)).toBe(true);
+  });
+});
+
 describe("Loading the displayers of the fetched entries", () => {
   let logic;
   let liveDataSource;
@@ -972,6 +1023,40 @@ describe("Loading the displayers of the fetched entries", () => {
 
     expect(triggerEvent).toHaveBeenCalledWith("afterEntryFetch");
     expect(displayedIds(logic)).toStrictEqual(["1"]);
+  });
+
+  it("starts loading the displayers while the entries are being fetched", async () => {
+    const { promise: entries, resolve: resolveEntries } =
+      Promise.withResolvers();
+    liveDataSource.getEntries.mockReturnValue(entries);
+    componentStore.load.mockClear();
+
+    const updated = logic.updateEntries();
+    await flushPromises();
+
+    expect(componentStore.load).toHaveBeenCalledWith("displayer", "text");
+    expect(displayedIds(logic)).toStrictEqual([]);
+
+    resolveEntries({ count: 1, entries: [{ id: "1", name: "one" }] });
+    await updated;
+
+    expect(displayedIds(logic)).toStrictEqual(["1"]);
+  });
+
+  it("ends the fetch without waiting for an unregistered displayer", async () => {
+    componentStore.isRegistered.mockReturnValue(false);
+    componentStore.load.mockReturnValue(new Promise(() => {}));
+    onTestFinished(() => {
+      componentStore.isRegistered.mockReturnValue(true);
+      componentStore.load.mockResolvedValue({});
+    });
+
+    // The update itself never ends, since entriesUpdated waits on every visible displayer. The fetch does.
+    logic.updateEntries();
+    await flushPromises();
+
+    expect(displayedIds(logic)).toStrictEqual(["1"]);
+    expect(triggerEvent).toHaveBeenCalledWith("afterEntryFetch");
   });
 
   it("displays the entries when a displayer fails to load", async () => {

@@ -412,10 +412,10 @@ class LiveDataIT
 
         PropertiesPanelElement propertiesPanel = liveDataElement.openPropertiesPanel();
         propertiesPanel.setPropertyDisplayed(CHOICE_COLUMN, false);
-        assertFalse(tableLayout.isColumnDisplayed(CHOICE_COLUMN));
-        assertTrue(tableLayout.isColumnDisplayed(NAME_COLUMN));
+        tableLayout.waitUntilColumnDisplayed(CHOICE_COLUMN, false);
+        tableLayout.waitUntilColumnDisplayed(NAME_COLUMN, true);
         propertiesPanel.setPropertyDisplayed(CHOICE_COLUMN, true);
-        assertTrue(tableLayout.isColumnDisplayed(CHOICE_COLUMN));
+        tableLayout.waitUntilColumnDisplayed(CHOICE_COLUMN, true);
         assertEquals(List.of(CHOICE_C, CHOICE_D), tableLayout.getColumnValues(CHOICE_COLUMN));
         propertiesPanel.closePanel();
 

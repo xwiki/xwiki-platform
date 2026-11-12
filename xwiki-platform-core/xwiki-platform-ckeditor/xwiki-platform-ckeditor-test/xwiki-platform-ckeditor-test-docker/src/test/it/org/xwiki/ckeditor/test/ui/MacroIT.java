@@ -447,9 +447,9 @@ class MacroIT extends AbstractCKEditorIT
         assertSourceEquals("before\n\n" + draftMacroCall + "\n\nafter");
 
         // A location quoted because it holds a comma, followed by a location holding a whitespace, typed without the
-        // quotes.
+        // quotes. The braces wrapping the whole value are removed by the macro.
         setSource(
-            "before\n\n" + draftMacroCall + "\n\n{{locations locations=\"'Space.My, Page',My Space\"/}}\n\nafter");
+            "before\n\n" + draftMacroCall + "\n\n{{locations locations=\"{'Space.My, Page',My Space}\"/}}\n\nafter");
 
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
         macroEditModal = this.textArea.editSelectedMacro();
@@ -460,8 +460,18 @@ class MacroIT extends AbstractCKEditorIT
         locationPicker.sendKeys("Say \"Hi\"").selectTypedText();
         macroEditModal.clickSubmit();
 
-        assertSourceEquals("before\n\n" + draftMacroCall
-            + "\n\n{{locations locations=\"~\"Space.My, Page~\",~\"My Space~\",~\"Say \\~\"Hi\\~\"~\"\"/}}\n\nafter");
+        String source = "before\n\n" + draftMacroCall
+            + "\n\n{{locations locations=\"~\"Space.My, Page~\",~\"My Space~\",~\"Say \\~\"Hi\\~\"~\"\"/}}\n\nafter";
+        assertSourceEquals(source);
+
+        // The values written by the dialog are read back as they were selected. The source is set again to place the
+        // caret like before.
+        setSource(source);
+        this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
+        macroEditModal = this.textArea.editSelectedMacro();
+        assertEquals(List.of("Space.My, Page", "My Space", "Say \"Hi\""),
+            macroEditModal.getMacroParameterSuggestInput("locations").getValues());
+        macroEditModal.clickSubmit();
 
         ViewPage viewPage = editPage.clickSaveAndView();
         assertEquals("before\n{Draft}\nSpace.My, Page\nMy Space\nSay \"Hi\"\nafter", viewPage.getContent());

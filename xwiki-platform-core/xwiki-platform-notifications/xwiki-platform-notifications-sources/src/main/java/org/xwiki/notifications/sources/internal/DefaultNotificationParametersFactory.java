@@ -484,11 +484,8 @@ public class DefaultNotificationParametersFactory
 
     private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
     {
-        if (StringUtils.isNotBlank(tags)) {
-            String[] tagArray = tags.split(",");
-            for (int i = 0; i < tagArray.length; ++i) {
-                parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
-            }
+        for (String tag : ListParameterSplitter.split(tags)) {
+            parameters.filterPreferences.add(new TagNotificationFilterPreference(tag, currentWiki));
         }
     }
 
@@ -538,8 +535,8 @@ public class DefaultNotificationParametersFactory
             Set<NotificationFormat> formats = new HashSet<>();
             formats.add(parameters.format);
 
-            String[] locationArray = locations.split(FIELD_SEPARATOR);
-            for (int i = 0; i < locationArray.length; ++i) {
+            List<String> locationList = ListParameterSplitter.split(locations);
+            for (int i = 0; i < locationList.size(); ++i) {
                 DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
                 pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));
                 pref.setEnabled(true);
@@ -548,13 +545,13 @@ public class DefaultNotificationParametersFactory
                 pref.setNotificationFormats(formats);
                 switch (property) {
                     case WIKI:
-                        pref.setWiki(locationArray[i]);
+                        pref.setWiki(locationList.get(i));
                         break;
                     case SPACE:
-                        pref.setPage(makeReferenceAbsolute(locationArray[i], EntityType.SPACE, currentWiki));
+                        pref.setPage(makeReferenceAbsolute(locationList.get(i), EntityType.SPACE, currentWiki));
                         break;
                     case PAGE:
-                        pref.setPageOnly(makeReferenceAbsolute(locationArray[i], EntityType.PAGE, currentWiki));
+                        pref.setPageOnly(makeReferenceAbsolute(locationList.get(i), EntityType.PAGE, currentWiki));
                         break;
                     default:
                         break;

@@ -103,24 +103,39 @@ define('xwiki-wysiwyg-macro-collection-parameter', [], function() {
   };
 
   /**
-   * Reads the value that starts at the given index, up to the next comma.
-   *
-   * @param text the text to read from
-   * @param start the index where the value starts, whitespaces included
-   * @return the value, and the index of the comma that ends it or -1 when it is the last value
+   * @return the index of the first character that isn't a whitespace, starting from the given index
    */
-  const readValue = function(text, start) {
+  const skipWhitespaces = function(text, start) {
     let index = start;
     while (index < text.length && isWhitespace(text[index])) {
       index++;
     }
+    return index;
+  };
+
+  /**
+   * Reads the value that starts at the given index. A value without quotes ends at the next comma. A value put in
+   * quotes ends at its closing quote, and the text that follows it before the next comma is read as another value.
+   *
+   * @param text the text to read from
+   * @param start the index where the value starts, whitespaces included
+   * @return the value, and the index where the next value starts or -1 when it is the last value
+   */
+  const readValue = function(text, start) {
+    const index = skipWhitespaces(text, start);
     if (isQuote(text[index])) {
       const quotedValue = readQuotedValue(text, index);
-      // The characters between the closing quote and the next comma are ignored.
-      return {value: quotedValue.value, comma: text.indexOf(',', quotedValue.end)};
+      const next = skipWhitespaces(text, quotedValue.end);
+      if (next >= text.length) {
+        return {value: quotedValue.value, next: -1};
+      }
+      return {value: quotedValue.value, next: text[next] === ',' ? next + 1 : next};
     }
     const comma = text.indexOf(',', index);
-    return {value: text.substring(index, comma < 0 ? text.length : comma).trim(), comma};
+    return {
+      value: text.substring(index, comma < 0 ? text.length : comma).trim(),
+      next: comma < 0 ? -1 : comma + 1
+    };
   };
 
   /**
@@ -141,14 +156,14 @@ define('xwiki-wysiwyg-macro-collection-parameter', [], function() {
   const splitCollectionValue = function(collectionValue) {
     const text = removeWrappingBraces(collectionValue);
     const values = [];
-    let comma = -1;
+    let start = 0;
     do {
-      const next = readValue(text, comma + 1);
-      if (next.value !== '') {
-        values.push(next.value);
+      const value = readValue(text, start);
+      if (value.value !== '') {
+        values.push(value.value);
       }
-      comma = next.comma;
-    } while (comma >= 0);
+      start = value.next;
+    } while (start >= 0);
     return values;
   };
 

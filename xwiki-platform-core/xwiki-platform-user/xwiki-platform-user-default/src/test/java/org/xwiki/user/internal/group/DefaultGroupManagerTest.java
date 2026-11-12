@@ -43,6 +43,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.WikiTarget;
+import org.xwiki.user.internal.document.DefaultDocumentStringUserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -72,7 +73,8 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-@ComponentList(value = { MemberGroupsCache.class, GroupMembersCache.class, WikiGroupCache.class })
+@ComponentList(value = { MemberGroupsCache.class, GroupMembersCache.class, WikiGroupCache.class,
+    DefaultDocumentStringUserReferenceResolver.class })
 @ReferenceComponentList
 class DefaultGroupManagerTest
 {
@@ -188,9 +190,14 @@ class DefaultGroupManagerTest
 
     private void mockMembers(DocumentReference group, List<DocumentReference> groups)
     {
+        mockMemberNames(group, groups.stream().map(DocumentReference::toString).toList());
+    }
+
+    private void mockMemberNames(DocumentReference group, List<String> memberNames)
+    {
         try {
             when(this.groupService.getAllMembersNamesForGroup(eq(group.toString()), anyInt(), anyInt(), any()))
-                .thenReturn(groups.stream().map(DocumentReference::toString).toList());
+                .thenReturn(memberNames);
         } catch (XWikiException e) {
             // Cannot happen
         }
@@ -376,6 +383,25 @@ class DefaultGroupManagerTest
         assertGetMembers(GLOBAL_GROUP_2, GLOBAL_GROUP_1, false);
         assertGetMembers(GLOBAL_GROUP_1, GLOBAL_GROUP_2, true);
         assertGetMembers(GLOBAL_GROUP_2, GLOBAL_GROUP_1, true);
+    }
+
+    @Test
+    void getMembersIgnoresNonDocumentMembers() throws GroupException
+    {
+        mockMemberNames(GLOBAL_GROUP_1,
+            List.of("XWiki.user1", "XWiki.XWikiGuest", "xwiki:XWiki.XWikiGuest", "XWiki.superadmin", ""));
+
+        assertGetMembers(GLOBAL_USER_1, GLOBAL_GROUP_1, false);
+        assertGetMembers(GLOBAL_USER_1, GLOBAL_GROUP_1, true);
+    }
+
+    @Test
+    void getMembersResolvesRelativeMembersInTheGroupWiki() throws GroupException
+    {
+        mockMemberNames(WIKI_GROUP_1, List.of("user1", "XWiki.user2", "xwiki:XWiki.user1"));
+
+        assertGetMembers(List.of(new DocumentReference("wiki", "XWiki", "user1"),
+            new DocumentReference("wiki", "XWiki", "user2"), GLOBAL_USER_1), WIKI_GROUP_1, false);
     }
 
     /**

@@ -28,7 +28,6 @@ import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.blocknote.test.po.BlockNoteToolBar;
 import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.test.docker.junit5.TestReference;
-import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
@@ -46,31 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 18.3.0RC1
  */
-@UITest(
-    properties = {
-        // The Image Wizard needs this to be able to upload images.
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
-
-        // The page, attachment and image suggestions execute a Solr query from XWiki.SuggestSolrService /
-        // XWiki.SuggestSolrMacros, which requires programming right. These pages are authored by a user that has
-        // programming right in a normal wiki, but the test wiki blocks programming right by default, so we need to
-        // explicitly exclude them.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
-    },
-    extraJARs = {
-        // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
-        "org.xwiki.platform:xwiki-platform-websocket",
-
-        // The macro service uses the extension index script service to get the list of uninstalled macros (from
-        // extensions) which expects an implementation of the extension index. The extension index script service is a
-        // core extension so we need to make the extension index also core.
-        "org.xwiki.platform:xwiki-platform-extension-index",
-
-        // Solr search is used to get suggestions for the link and image quick actions.
-        "org.xwiki.platform:xwiki-platform-search-solr-query"
-    },
-    servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
-)
 class MacroIT extends AbstractBlockNoteIT
 {
     @Test

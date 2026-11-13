@@ -35,6 +35,8 @@
     <!-- Put the name of the distribution which will be displayed in the footer -->
     <xwiki.extension.name>XWiki</xwiki.extension.name>
     <xwiki.extension.features>${platform.distribution.features}</xwiki.extension.features>
+    <!-- The WAR is meant to be run as-is, its SBOM (generated at release time) describes an application. -->
+    <xwiki.cyclonedx.projectType>application</xwiki.cyclonedx.projectType>
   </properties>
   <dependencies>
     <dependency>
@@ -185,6 +187,52 @@
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Verify the SBOM of the WAR, so that a regression in its generation (which runs in the release builds
+               only) is caught by the CI job building with the release profile. The expected components are npm
+               packages bundled in XWiki webjars (listed by the SBOM embedded in them) and npm packages repackaged in
+               third-party webjars (some mapped by the SBOM plugin, e.g. font-awesome). The forbidden ones are provided
+               by the servlet container, so their vulnerabilities don't affect XWiki. -->
+          <plugin>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-tool-sbom-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>check-sbom</id>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+                <configuration>
+                  <expectedComponents>
+                    <!-- Live Data webjar -->
+                    <expectedComponent>pkg:npm/dompurify</expectedComponent>
+                    <expectedComponent>pkg:npm/vuedraggable</expectedComponent>
+                    <!-- Localization webjar -->
+                    <expectedComponent>pkg:npm/%40xwiki/platform-localization-default</expectedComponent>
+                    <!-- Third-party webjars -->
+                    <expectedComponent>pkg:npm/jquery</expectedComponent>
+                    <expectedComponent>pkg:npm/requirejs</expectedComponent>
+                    <expectedComponent>pkg:npm/%40fortawesome/fontawesome-free</expectedComponent>
+                  </expectedComponents>
+                  <forbiddenComponents>
+                    <forbiddenComponent>pkg:maven/jakarta.servlet/jakarta.servlet-api</forbiddenComponent>
+                  </forbiddenComponents>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>clover</id>
       <!-- Add the Clover JAR to the WAR so that it's available at runtime. It's needed because instrumented jars in

@@ -49,6 +49,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Update the owner of the wikis owned by a user or group which is renamed or deleted.
  *
  * @version $Id$
+ * @since 16.10.20
  * @since 17.10.16
  * @since 18.4.9
  * @since 18.10.0RC1

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.pdf;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,17 +32,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.avalon.framework.configuration.Configuration;
-import org.apache.avalon.framework.configuration.ConfigurationException;
-import org.apache.avalon.framework.configuration.DefaultConfiguration;
-import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -52,8 +54,14 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.PageSequenceResults;
+import org.apache.fop.configuration.Configuration;
+import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.fop.fonts.FontManager;
 import org.slf4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -85,6 +93,8 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
     private static final String RENDERERS = "renderers";
 
     private static final String MIME_TYPE_PDF = "application/pdf";
+
+    private static final String RENDERER = "renderer";
 
     private static final String MIME = "mime";
 
@@ -175,40 +185,57 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
         Configuration configuration = null;
         try (InputStream fopConfigurationFile = FOPXSLFORenderer.class.getResourceAsStream("/fop-config.xml")) {
             if (fopConfigurationFile != null) {
-                configuration = new DefaultConfigurationBuilder().build(fopConfigurationFile);
+                configuration = loadConfiguration(fopConfigurationFile);
             }
         } catch (Exception e) {
             this.logger.warn("Wrong FOP configuration: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
 
-        configuration = maybeExtendConfiguration(configuration);
-
         return configuration;
     }
 
-    private Configuration maybeExtendConfiguration(Configuration configuration)
+    /**
+     * @param fopConfigurationFile the content of the FOP configuration file
+     * @return the FOP configuration, extended with the XWiki fonts folder
+     * @throws Exception when failing to parse the configuration
+     */
+    Configuration loadConfiguration(InputStream fopConfigurationFile) throws Exception
     {
-        Configuration writableConfiguration = configuration;
-        if (writableConfiguration != null) {
-            // Get a writable configuration instance.
-            if (!(writableConfiguration instanceof DefaultConfiguration)) {
-                try {
-                    writableConfiguration = new DefaultConfiguration(configuration, true);
-                } catch (ConfigurationException e) {
-                    // Should never happen.
-                    this.logger.error("Failed to copy configuration.", e);
-                }
-            }
+        Document configurationDocument = parseConfiguration(fopConfigurationFile);
 
-            if (writableConfiguration instanceof DefaultConfiguration defaultConfiguration) {
-                extendConfiguration(defaultConfiguration);
-            }
-        }
+        extendConfiguration(configurationDocument.getDocumentElement());
 
-        return writableConfiguration;
+        return buildConfiguration(configurationDocument);
     }
 
-    private void extendConfiguration(DefaultConfiguration writableConfiguration)
+    private Document parseConfiguration(InputStream fopConfigurationFile) throws Exception
+    {
+        // Parse the configuration with the same settings as FOP's own configuration builder, so that the configuration
+        // file is understood the same way as when FOP reads it directly. The FOP configuration API is read-only, hence
+        // the DOM, which can be extended with the XWiki fonts folder.
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(false);
+        documentBuilderFactory.setValidating(false);
+        documentBuilderFactory.setIgnoringComments(true);
+        documentBuilderFactory.setIgnoringElementContentWhitespace(true);
+        documentBuilderFactory.setExpandEntityReferences(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        // Fail on fatal errors without printing them in the console, they are logged by the caller.
+        documentBuilder.setErrorHandler(new DefaultHandler());
+
+        return documentBuilder.parse(fopConfigurationFile);
+    }
+
+    private Configuration buildConfiguration(Document configurationDocument) throws Exception
+    {
+        ByteArrayOutputStream configurationBytes = new ByteArrayOutputStream();
+        this.transformerFactory.newTransformer()
+            .transform(new DOMSource(configurationDocument), new StreamResult(configurationBytes));
+
+        return new DefaultConfigurationBuilder().build(new ByteArrayInputStream(configurationBytes.toByteArray()));
+    }
+
+    private void extendConfiguration(Element configuration)
     {
         // Add XWiki fonts folder to the configuration.
         try {
@@ -222,38 +249,27 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
             }
 
             // <renderers>
-            DefaultConfiguration renderersConfiguration =
-                (DefaultConfiguration) writableConfiguration.getChild(RENDERERS, false);
-            if (renderersConfiguration == null) {
-                renderersConfiguration = new DefaultConfiguration(RENDERERS);
-                writableConfiguration.addChild(renderersConfiguration);
-            }
+            Element renderersConfiguration = getOrAddChild(configuration, RENDERERS);
 
             // Ensure we have support for PDF rendering.
             // <renderer mime="application/pdf">
-            DefaultConfiguration pdfRenderer = null;
-            for (Configuration renderer : renderersConfiguration.getChildren()) {
-                if (MIME_TYPE_PDF.equals(renderer.getAttribute(MIME))) {
-                    pdfRenderer = (DefaultConfiguration) renderer;
+            Element pdfRenderer = null;
+            for (Node child = renderersConfiguration.getFirstChild(); child != null; child = child.getNextSibling()) {
+                if (child instanceof Element renderer && RENDERER.equals(renderer.getTagName())
+                    && MIME_TYPE_PDF.equals(renderer.getAttribute(MIME))) {
+                    pdfRenderer = renderer;
                 }
             }
             if (pdfRenderer == null) {
-                pdfRenderer = new DefaultConfiguration("renderer");
+                pdfRenderer = addChild(renderersConfiguration, RENDERER);
                 pdfRenderer.setAttribute(MIME, MIME_TYPE_PDF);
-                renderersConfiguration.addChild(pdfRenderer);
             }
 
             // <fonts>
-            DefaultConfiguration fontsConfiguration = (DefaultConfiguration) pdfRenderer.getChild(FONTS, false);
-            if (fontsConfiguration == null) {
-                fontsConfiguration = new DefaultConfiguration(FONTS);
-                pdfRenderer.addChild(fontsConfiguration);
-            }
+            Element fontsConfiguration = getOrAddChild(pdfRenderer, FONTS);
 
             // <directory>fontdirectory</directory>
-            DefaultConfiguration directoryConfiguration = new DefaultConfiguration("directory");
-            directoryConfiguration.setValue(fontsPath);
-            fontsConfiguration.addChild(directoryConfiguration);
+            addChild(fontsConfiguration, "directory").setTextContent(fontsPath);
         } catch (Exception e) {
             this.logger.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
@@ -261,6 +277,26 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
                 + "make sure you also copy the WEB-INF/fonts directory from the new distribution package. "
                 + "Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
+    }
+
+    private Element getOrAddChild(Element parent, String name)
+    {
+        // Same as FOP's configuration API, which only considers the first child with the requested name.
+        for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof Element element && name.equals(element.getTagName())) {
+                return element;
+            }
+        }
+
+        return addChild(parent, name);
+    }
+
+    private Element addChild(Element parent, String name)
+    {
+        Element child = parent.getOwnerDocument().createElement(name);
+        parent.appendChild(child);
+
+        return child;
     }
 
     private void setCacheFile(FontManager fontManager) throws InitializationException

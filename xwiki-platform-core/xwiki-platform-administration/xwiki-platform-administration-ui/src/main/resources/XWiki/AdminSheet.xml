@@ -158,6 +158,9 @@
         #set ($section.name = $sectionDoc.getDisplayTitle())
         #if ($sectionDoc.getAttachment('icon.svg'))
           #set ($section.iconReference = "${sectionDoc}@icon.svg")
+        #elseif ($sectionDoc.getAttachment('icon.png'))
+          ## Backward compatibility with the sections that still provide a PNG icon.
+          #set ($section.iconReference = "${sectionDoc}@icon.png")
         #else
           #set ($section.iconReference = 'XWiki.ConfigurableClass@DefaultAdminSectionIcon.svg')
         #end

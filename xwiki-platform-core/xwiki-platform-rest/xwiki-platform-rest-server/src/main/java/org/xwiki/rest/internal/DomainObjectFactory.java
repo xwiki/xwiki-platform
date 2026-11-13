@@ -145,6 +145,8 @@ public final class DomainObjectFactory
         return getModelFactory().toRestPage(baseUri, self, doc, useVersion, withPrettyNames, false, false, false);
     }
 
+    // Published static factory of the REST module: one parameter per field of the returned HistorySummary.
+    @SuppressWarnings("java:S107")
     public static HistorySummary createHistorySummary(ObjectFactory objectFactory, URI baseUri, String wikiName,
         List<String> spaces, String pageName, String language, Version version, String modifier, Date modified,
         String comment, XWiki xwikiApi, Boolean withPrettyNames)

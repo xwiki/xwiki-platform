@@ -1135,8 +1135,25 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
     </property>
     <property>
       <code>{{velocity}}
+## The list parameters are read once converted, and passed on as the notification sources expect them.
+#set ($listParameters = {'wikis': [], 'spaces': [], 'pages': [], 'users': [], 'tags': []})
+#foreach ($wikiReference in $wikimacro.parameters.wikis)
+  #set ($discard = $listParameters.wikis.add($wikiReference.name))
+#end
+#foreach ($spaceReference in $wikimacro.parameters.spaces)
+  #set ($discard = $listParameters.spaces.add($services.model.serialize($spaceReference, 'default')))
+#end
+#foreach ($documentReference in $wikimacro.parameters.pages)
+  #set ($discard = $listParameters.pages.add($services.model.serialize($documentReference, 'default')))
+#end
+#foreach ($userReference in $wikimacro.parameters.users)
+  #set ($discard = $listParameters.users.add($services.user.serialize($userReference)))
+#end
+#foreach ($tag in $wikimacro.parameters.tags)
+  #set ($discard = $listParameters.tags.add($tag.name))
+#end
+#set ($discard = $listParameters.put('displayedUsers', $listParameters.users))
 #set ($displayMacro = true)
-#set ($users = $xcontext.macro.params.users)
 #if ("$!xcontext.macro.params.displayWatchedUsersOnly" == 'true')
   #set ($watchedUsers = $services.notification.watch.watchedUsers)
   #if ($watchedUsers.isEmpty())
@@ -1147,8 +1164,19 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 
     #set ($displayMacro = false)
   #else
-    #set ($users = $stringtool.join($services.notification.watch.watchedUsers, ','))
+    #set ($discard = $listParameters.put('displayedUsers', $watchedUsers))
   #end
+#end
+## Each value is put in double quotes, doubling the double quotes it holds, so that a value holding a comma is read as
+## one value.
+#set ($quote = '"')
+#set ($escapedQuote = "$quote$quote")
+#foreach ($listParameter in $listParameters.entrySet())
+  #set ($quotedValues = [])
+  #foreach ($value in $listParameter.value)
+    #set ($discard = $quotedValues.add("$quote$value.replace($quote, $escapedQuote)$quote"))
+  #end
+  #set ($discard = $listParameter.setValue($stringtool.join($quotedValues, ',')))
 #end
 #if ($displayMacro)
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
@@ -1163,12 +1191,12 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   "displayMinorEvents": "$!xcontext.macro.params.displayMinorEvents",
   "displaySystemEvents": "$!xcontext.macro.params.displaySystemEvents",
   "displayReadEvents": "$!xcontext.macro.params.displayReadEvents",
-  "wikis": "$!xcontext.macro.params.wikis",
-  "spaces": "$!xcontext.macro.params.spaces",
-  "pages": "$!xcontext.macro.params.pages",
-  "users": "$!users",
+  "wikis": "$!listParameters.wikis",
+  "spaces": "$!listParameters.spaces",
+  "pages": "$!listParameters.pages",
+  "users": "$!listParameters.displayedUsers",
   "currentWiki": "$!services.wiki.currentWikiId",
-  "tags": "$!xcontext.macro.params.tags"
+  "tags": "$!listParameters.tags"
 })
 #set ($dataParameters = [])
 #foreach($key in $parameters.keySet())
@@ -1189,12 +1217,12 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   #set ($rssURL = "${rssURL}&amp;displayMinorEvents=$!escapetool.url($xcontext.macro.params.displayMinorEvents)")
   #set ($rssURL = "${rssURL}&amp;displaySystemEvents=$!escapetool.url($xcontext.macro.params.displaySystemEvents)")
   #set ($rssURL = "${rssURL}&amp;displayReadEvents=$!escapetool.url($xcontext.macro.params.displayReadEvents)")
-  #set ($rssURL = "${rssURL}&amp;wikis=$!escapetool.url($xcontext.macro.params.wikis)")
-  #set ($rssURL = "${rssURL}&amp;spaces=$!escapetool.url($xcontext.macro.params.spaces)")
-  #set ($rssURL = "${rssURL}&amp;pages=$!escapetool.url($xcontext.macro.params.pages)")
-  #set ($rssURL = "${rssURL}&amp;users=$!escapetool.url($xcontext.macro.params.users)")
+  #set ($rssURL = "${rssURL}&amp;wikis=$!escapetool.url($listParameters.wikis)")
+  #set ($rssURL = "${rssURL}&amp;spaces=$!escapetool.url($listParameters.spaces)")
+  #set ($rssURL = "${rssURL}&amp;pages=$!escapetool.url($listParameters.pages)")
+  #set ($rssURL = "${rssURL}&amp;users=$!escapetool.url($listParameters.users)")
   #set ($rssURL = "${rssURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
-  #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($xcontext.macro.params.tags)")
+  #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($listParameters.tags)")
   #set ($rssURL = "${rssURL}&amp;currentWiki=$!escapetool.url($services.wiki.currentWikiId)")
   &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" rel="nofollow external"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
 #end

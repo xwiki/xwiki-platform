@@ -19,6 +19,7 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
@@ -26,6 +27,7 @@ import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
@@ -39,13 +41,34 @@ import static org.hamcrest.Matchers.matchesPattern;
  * @since 18.10.0RC1
  */
 @UITest(
+    properties = {
+        // Registering a user copies its notification filter preferences, which are stored through a Hibernate
+        // mapping that has to be added to hibernate.cfg.xml.
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
     extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an extension, so it
+        // has to be in WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
         "org.xwiki.platform:xwiki-platform-websocket"
     }
 )
 class MentionIT extends AbstractBlockNoteIT
 {
+    @AfterAll
+    void ignoreTheErrorsOfTheMentionsBackendThisInstanceDoesNotInstall(
+        LogCaptureConfiguration logCaptureConfiguration)
+    {
+        // Only the mention macro is installed, so the mention event produced when saving has no converter. Both
+        // shapes are logged, depending on which component manager reports the missing converter first.
+        logCaptureConfiguration.registerExcludes("Failed to send event [targets = ",
+            "Failed to lookup component with type [interface org.xwiki.eventstream.RecordableEventConverter]");
+        // The page is saved while the instance is being torn down, after the notification caches are gone.
+        logCaptureConfiguration.registerExcludes(
+            "Cache 'notification.rest.longCache.events' is in 'TERMINATED' state");
+    }
+
     @Test
     void insertMentionUsingMentionMenu(TestUtils setup, TestReference testReference)
     {

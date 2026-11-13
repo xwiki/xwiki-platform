@@ -595,7 +595,8 @@ define('xwiki-wysiwyg-macro-editor', [
       value = isBooleanType(parameterDescriptor.displayType) ? value[0] : value.join();
     }
     let defaultValue = parameterDescriptor.defaultValue;
-    if (value !== '' && !isValueSameAsDefaultValue(value, defaultValue)) {
+    // A parameter is missing from the form data when its field is disabled.
+    if (value !== undefined && value !== '' && !isValueSameAsDefaultValue(value, defaultValue)) {
       macroCall.parameters[parameterDescriptor.id] = value;
     }
   },

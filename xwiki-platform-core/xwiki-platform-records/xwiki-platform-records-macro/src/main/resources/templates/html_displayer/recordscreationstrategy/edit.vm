@@ -1,0 +1,52 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the creation strategy picker of a Records table: a dropdown listing the installed row naming strategies,
+## after a choice that turns creation off.
+##
+## Each option names the columns its strategy needs in data-required-columns, which the dialog script reads to
+## disable the strategies the table cannot use.
+#set ($strategies = $services.liveData.liveTable.newRowNamingStrategies)
+#set ($translationPrefix = 'rendering.macro.records.parameter.creationStrategy.')
+## Loads the dialog styles and script, as the columns picker does.
+#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-records-webjar',
+  'index.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+<script type="module" src="$escapetool.xml($services.webjars.url(
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
+<select
+  #foreach ($parameter in $displayer.parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
+>
+  <option value="">$escapetool.xml($services.localization.render("${translationPrefix}disabled"))</option>
+  #foreach ($strategy in $strategies.entrySet())
+    ## A strategy installed without a label of ours is named by its hint.
+    #set ($label = $strategy.key)
+    #if ($services.localization.get("$translationPrefix$strategy.key"))
+      #set ($label = $services.localization.render("$translationPrefix$strategy.key"))
+    #end
+    <option value="$escapetool.xml($strategy.key)"
+      data-required-columns="$escapetool.xml($stringtool.join($strategy.value, ','))"
+      #if ($strategy.key == "$!displayer.value")selected#end>$escapetool.xml($label)</option>
+  #end
+  ## A strategy that is no longer installed stays selected, so that reopening the dialog does not drop it.
+  #if ("$!displayer.value" != '' && !$strategies.containsKey($displayer.value))
+    <option value="$escapetool.xml($displayer.value)" selected>$escapetool.xml($displayer.value)</option>
+  #end
+</select>

@@ -281,7 +281,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(11)
     void infoBox()
     {
-        textArea.insertMacro("/inf", "Info Box");
+        assertQuickActionSelected("/info message", "Info Message");
+        textArea.insertMacro("/inf", "Info Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -294,7 +295,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(12)
     void successBox()
     {
-        textArea.insertMacro("/suc", "Success Box");
+        assertQuickActionSelected("/success message", "Success Message");
+        textArea.insertMacro("/suc", "Success Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -307,7 +309,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(13)
     void warningBox()
     {
-        textArea.insertMacro("/war", "Warning Box");
+        assertQuickActionSelected("/warning message", "Warning Message");
+        textArea.insertMacro("/war", "Warning Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -320,7 +323,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(14)
     void errorBox()
     {
-        textArea.insertMacro("/err", "Error Box");
+        assertQuickActionSelected("/error message", "Error Message");
+        textArea.insertMacro("/err", "Error Message");
 
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -404,7 +408,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         testUtils.rest().savePage(new DocumentReference("xwiki", "QuickActionsIT", "TestInclude"), "Test include",
             "Test include");
-        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/inc", "Include Page");
+        assertQuickActionSelected("/include", "Include");
+        MacroDialogEditModal macroDialogEditModal = textArea.insertMacroWithRequiredParameters("/inc", "Include");
         SuggestInputElement reference =
             new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
         reference.sendKeys("TestInclude")
@@ -419,7 +424,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     void code()
     {
         // Empty form
-        textArea.insertMacroWithRequiredParameters("/cod", "Code Snippet").clickSubmit();
+        assertQuickActionSelected("/code", "Code");
+        textArea.insertMacroWithRequiredParameters("/cod", "Code").clickSubmit();
 
         assertSourceEquals("{{code}}{{/code}}");
     }
@@ -428,7 +434,8 @@ class QuickActionsIT extends AbstractCKEditorIT
     @Order(22)
     void toc()
     {
-        textArea.insertMacro("/toc", "Table of Contents");
+        assertQuickActionSelected("/table of contents", "Table of contents");
+        textArea.insertMacro("/toc", "Table of contents");
 
         assertSourceEquals("{{toc/}}\n\n ");
     }
@@ -498,7 +505,8 @@ class QuickActionsIT extends AbstractCKEditorIT
         // Remove the 4 characters we just typed
         textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE,  Keys.BACK_SPACE, Keys.BACK_SPACE);
         textArea.sendKeys(" ");
-        textArea.insertMacro("/inf", "Info Box");
+        assertQuickActionSelected("/info message", "Info Message");
+        textArea.insertMacro("/inf", "Info Message");
 
         // Note that we didn't modify the default info message because inline macros are not editable in-place.
         assertSourceEquals("before {{info}}Type your information message here.{{/info}} after");
@@ -519,5 +527,18 @@ class QuickActionsIT extends AbstractCKEditorIT
         macroEditModal.clickSubmit();
 
         assertSourceEquals("one {{velocity}}test{{/velocity}} two");
+    }
+
+    /**
+     * Types the given query, checks that it selects the quick action with the given label, then removes the query.
+     *
+     * @param query the quick action query, starting with {@code /}
+     * @param label the label of the quick action that the query is expected to select
+     */
+    private void assertQuickActionSelected(String query, String label)
+    {
+        textArea.sendKeys(query);
+        new AutocompleteDropdown().waitForItemSelected(query, label);
+        textArea.sendKeys(Keys.BACK_SPACE.toString().repeat(query.length()));
     }
 }

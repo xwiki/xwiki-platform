@@ -69,6 +69,8 @@
       // Start with an empty list of quick actions and no groups;
       this.actions = [];
       this.groups = {};
+      // The tasks that must end before searching, e.g. adding or updating quick actions asynchronously.
+      this.pendingTasks = [];
 
       // Initialize the quick action search asynchronously.
       this.searchReady = new Promise((resolve, reject) => {
@@ -98,7 +100,7 @@
      *
      * @param {Object} action - the action to add
      */
-    addAction(action) {
+    async addAction(action) {
       action = Object.assign({}, this.config.defaultAction, action);
       action.nameTokens = action.name.split(/\s+/);
       action.descriptionTokens = action.description.split(/\s+/);
@@ -113,12 +115,37 @@
         group = this.groups[action.group];
       }
       action.group = group;
-      return this.searchReady.then(function(fuse) {
+      try {
+        const fuse = await this.searchReady;
         fuse.add(action);
-      }).catch(function (error) {
+      } catch (error) {
         console.error('Failed to initialize quick action search because: ' + error);
         this.actions.push(action);
-      }.bind(this));
+      }
+    }
+
+    /**
+     * Updates an existing quick action and re-indexes it for the search.
+     *
+     * @param {String} id - the id of the quick action to update
+     * @param {Object} changes - the quick action fields to change, e.g. the name
+     * @return {Promise} a promise that resolves when the quick action is updated
+     */
+    async updateAction(id, changes) {
+      try {
+        // Wait for the search to be ready, because the quick actions are added only once it is.
+        const fuse = await this.searchReady;
+        const action = this.getAction(id);
+        if (action) {
+          Object.assign(action, changes);
+          action.nameTokens = action.name.split(/\s+/);
+          action.descriptionTokens = action.description.split(/\s+/);
+          fuse.remove(indexedAction => indexedAction === action);
+          fuse.add(action);
+        }
+      } catch (error) {
+        console.error('Failed to update the quick action because: ' + error);
+      }
     }
 
     /**
@@ -178,15 +205,31 @@
      * @param {String} text - the text to match
      * @return {Promise} a promise that resolves with the array of quick actions that match the given text
      */
-    search(text) {
+    async search(text) {
+      await Promise.all(this.pendingTasks);
       if (text.length) {
-        return this.searchReady.then(function(fuse) {
-          return fuse.search(text);
-        });
+        const fuse = await this.searchReady;
+        return fuse.search(text);
       } else {
         // Return a shallow copy of the actions array in order to be able to modify it safely (e.g. add groups).
-        return Promise.resolve(this.actions.slice());
+        return this.actions.slice();
       }
+    }
+
+    /**
+     * Delays the search until the given task ends, so that the search takes into account the quick actions that the
+     * task adds or updates. A failed task doesn't prevent the search.
+     *
+     * @param {Promise} task - the task to wait for
+     */
+    waitFor(task) {
+      this.pendingTasks.push((async () => {
+        try {
+          await task;
+        } catch (error) {
+          console.error('Failed to wait for a quick action task because: ' + error);
+        }
+      })());
     }
 
     /**

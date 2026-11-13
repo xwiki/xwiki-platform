@@ -24,6 +24,7 @@ import { FilePanel } from "./files/FilePanel";
 import { ImageSuggestionController } from "./images/ImageSuggestionController";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import { LinkSuggestionController } from "./links/LinkSuggestionController";
+import { MentionSuggestionController } from "./mentions/MentionSuggestionController";
 import {
   createBlockNoteSchema,
   createDictionary,
@@ -72,6 +73,7 @@ import type { ImageEditionHooks } from "./images/imageEditionHooks";
 import type { ImageInsertionOverrideFn } from "./images/imageInsertionOverride";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type { LinkEditionHooks } from "./links/linkEditionHooks";
+import type { UserSuggestFn } from "./mentions/mentionMenu";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
@@ -198,6 +200,14 @@ type BlockNoteViewWrapperProps = {
   linkEditionHandler: LinkEditionHandler;
 
   /**
+   * Source of the suggestions of the user mention menu. The mention menu is disabled when it is not provided.
+   *
+   * @since 18.10.0RC1
+   * @beta
+   */
+  userSuggest?: UserSuggestFn;
+
+  /**
    * Overrides for default behavior
    *
    * @since 0.26
@@ -283,6 +293,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   lang,
   depsContainer,
   linkEditionHandler,
+  userSuggest,
   overrides,
   label,
   syntax,
@@ -444,6 +455,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
                 maxSuggestions={8}
                 pageSuggestionsShare={5}
               />
+            )}
+
+            {/* The mention macro is a server-rendered inline macro, so mentions need the syntax to support those. */}
+            {userSuggest && syntax.features.inlineContents.macros && (
+              <MentionSuggestionController userSuggest={userSuggest} />
             )}
 
             {/* TODO: suggestions menu for inline macros */}

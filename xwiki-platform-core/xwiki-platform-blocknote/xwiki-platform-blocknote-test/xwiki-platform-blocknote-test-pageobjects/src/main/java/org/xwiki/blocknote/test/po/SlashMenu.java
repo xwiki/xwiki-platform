@@ -40,6 +40,8 @@ public class SlashMenu extends BaseElement
 
     private static final By SELECTED_ITEM = By.cssSelector(".bn-suggestion-menu-item[aria-selected=\"true\"]");
 
+    private static final By ITEM_TITLE = By.cssSelector(".bn-suggestion-menu-item .bn-mt-suggestion-menu-item-title");
+
     /**
      * We keep a reference to the previously selected item in order to detect when the items are updated.
      */
@@ -82,6 +84,36 @@ public class SlashMenu extends BaseElement
             .findElement(By.xpath("//div[contains(@class, 'bn-suggestion-menu-item') and @aria-selected='true' and "
                 + " .//p[contains(@class, 'bn-mt-suggestion-menu-item-title') and text()='" + title + "']]"));
         return this;
+    }
+
+    /**
+     * Waits for the menu to show exactly the given items, which is also how you wait for the suggestions of a query
+     * to have replaced those of the previous one.
+     *
+     * @param titles the expected menu item titles, in the order they are displayed
+     * @return this menu
+     * @since 18.10.0RC1
+     */
+    public SlashMenu waitForItemTitles(List<String> titles)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return titles.equals(getItemTitles());
+            } catch (StaleElementReferenceException e) {
+                // The menu items are being updated.
+                return false;
+            }
+        });
+        return this;
+    }
+
+    /**
+     * @return the titles of the menu items, in the order they are displayed
+     * @since 18.10.0RC1
+     */
+    public List<String> getItemTitles()
+    {
+        return getDriver().findElementsWithoutWaiting(ITEM_TITLE).stream().map(WebElement::getText).toList();
     }
 
     /**

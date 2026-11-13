@@ -3,7 +3,9 @@
 {{html clean="false"}}
 ## Base configuration for all BlockNote editor instances created on this web page.
 #set ($config = {
-  'collaborationURL': $services.websocket.url('yjs')
+  'collaborationURL': $services.websocket.url('yjs'),
+  ## Empty when the wiki module isn't available, which leaves the mentions suggesting the local users only.
+  'userScope': "$!services.wiki.user.userScope"
 })
 <script id="blocknote-config" type="application/json">$jsontool.serialize($config).replace('<', '\u003C')</script>
 {{/html}}

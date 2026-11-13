@@ -1,11 +1,9 @@
-#template('colorThemeInit.vm')
-
 /**
  * Collapsible Job Log
  */
 
 .collapse-toggle {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   cursor: pointer;
   font-size: smaller;
 }
@@ -37,7 +35,7 @@
 .ui-progress-bar {
   background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
   background-repeat: repeat;
-  background-color: $theme.notificationSuccessColor !important;
+  background-color: var(--brand-success) !important;
   background-position: left;
   -moz-animation-duration: 0.2s;
   -moz-animation-iteration-count: infinite;
@@ -53,14 +51,14 @@
 .ui-progress-background {
   background-color: transparent;
   border-radius: 10px 10px 10px 10px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) inset, 0 1px 0 0 $theme.pageContentBackgroundColor;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) inset, 0 1px 0 0 var(--xwiki-page-content-bg);
   height: 8px;
   /* Avoid that the progress bar is behind floating elements, like the rating of an extension. */
   display: flow-root;
 }
 
 .ui-progress-bar {
-  background-color: $theme.backgroundSecondaryColor;
+  background-color: var(--xwiki-background-secondary-color);
   border-radius: 10px 10px 10px 10px;
   height: 8px;
 }
@@ -92,7 +90,7 @@
 }
 
 .ui-progress-message {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: .85em;
   line-height: inherit;
   margin: 0;

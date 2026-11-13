@@ -405,13 +405,13 @@ class RegisterIT
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
             // TODO: looks like a pretty strange behavior, there might be a message box title missing somewhere
             String messagePrefix = "Information ";
-            messagePrefix = !closedWiki&&withRegistrationConfig ? "Welcome ": messagePrefix;
+            messagePrefix = !closedWiki && withRegistrationConfig ? "Welcome, " : messagePrefix;
             // TODO: clean up this test with a better final assertion. 
             //  As of now, the string retrieved changes a lot depending on the test parameters
             // The assertion should be less strong so that we can clearly show these differences.
             assertEquals(String.format("%s%s %s (%s)%s", messagePrefix, firstName, lastName,
                     AbstractRegistrationPage.JOHN_SMITH_USERNAME, 
-                    !closedWiki&&withRegistrationConfig ? "" : ": Registration successful."),
+                    !closedWiki && withRegistrationConfig ? "!" : ": Registration successful."),
                 ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
         }
     }

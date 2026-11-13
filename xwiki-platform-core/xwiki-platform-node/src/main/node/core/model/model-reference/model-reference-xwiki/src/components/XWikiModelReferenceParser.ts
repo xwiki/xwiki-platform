@@ -18,44 +18,47 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { EntityType } from "@xwiki/platform-model-api";
-import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
+import {
+  toCristalEntityReference,
+  toXWikiEntityReference,
+} from "@xwiki/platform-model-xwiki";
 import {
   EntityType as XWikiEntityType,
   Model,
 } from "@xwiki/platform-xwiki-model-api";
-import { inject, injectable } from "inversify";
+import { injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParser,
   ModelReferenceParserOptions,
 } from "@xwiki/platform-model-reference-api";
-import type {
-  ResourceReference,
-  ResourceReferenceParser,
-} from "@xwiki/platform-rendering-api";
 
+const XWIKI_ENTITY_TYPES: Record<EntityType, number> = {
+  [EntityType.WIKI]: XWikiEntityType.WIKI,
+  [EntityType.SPACE]: XWikiEntityType.SPACE,
+  [EntityType.DOCUMENT]: XWikiEntityType.DOCUMENT,
+  [EntityType.ATTACHMENT]: XWikiEntityType.ATTACHMENT,
+};
+
+/**
+ * Parses entity references in the format of the default server-side entity reference resolver (e.g.
+ * `wiki:Space.Page@file.png`), the format produced by the XWiki model reference serializer. The reference holds no
+ * entity type, so it's parsed as a document reference unless another type is specified.
+ */
 @injectable()
 class XWikiModelReferenceParser implements ModelReferenceParser {
-  constructor(
-    @inject("ResourceReferenceParser")
-    private readonly resourceReferenceParser: ResourceReferenceParser,
-  ) {}
-
   public parse(
     reference: string,
     options?: ModelReferenceParserOptions,
   ): EntityReference {
-    const defaultType =
-      options?.type === EntityType.ATTACHMENT ? "attach" : "doc";
-    const resourceReference = this.resourceReferenceParser.parse(reference, {
-      type: defaultType,
-    });
-    const entityType = this.getEntityType(resourceReference);
-    if (entityType) {
-      return this.parseEntityReference(resourceReference.reference, entityType);
-    } else {
-      throw new Error(`[${reference}] is not an entity reference.`);
-    }
+    const base = options?.base && toXWikiEntityReference(options.base);
+    return toCristalEntityReference(
+      Model.resolve(
+        reference,
+        XWIKI_ENTITY_TYPES[options?.type ?? EntityType.DOCUMENT],
+        base,
+      ),
+    )!;
   }
 
   public async parseAsync(
@@ -63,28 +66,6 @@ class XWikiModelReferenceParser implements ModelReferenceParser {
     options?: ModelReferenceParserOptions,
   ): Promise<EntityReference> {
     return this.parse(reference, options);
-  }
-
-  private getEntityType(
-    resourceReference: ResourceReference,
-  ): number | undefined {
-    switch (resourceReference.type) {
-      case "space":
-        return XWikiEntityType.SPACE;
-      case "doc":
-        return XWikiEntityType.DOCUMENT;
-      case "attach":
-        return XWikiEntityType.ATTACHMENT;
-      default:
-        return undefined;
-    }
-  }
-
-  private parseEntityReference(
-    reference: string,
-    type: number,
-  ): EntityReference {
-    return toCristalEntityReference(Model.resolve(reference, type))!;
   }
 }
 

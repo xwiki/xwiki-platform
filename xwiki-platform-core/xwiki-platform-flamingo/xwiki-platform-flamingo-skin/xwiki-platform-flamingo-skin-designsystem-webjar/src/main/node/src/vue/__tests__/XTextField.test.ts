@@ -36,7 +36,9 @@ describe("XTextField", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
     <!--v-if-->
   </dt>
   <dd>
@@ -58,13 +60,39 @@ describe("XTextField", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
     <!--v-if-->
   </dt>
   <dd>
     <!-- Optional default slot to display some content before the input field -->Some Text before the field<input id="v-0" type="text">
   </dd>
 </dl>`);
+    },
+  );
+
+  runTest(
+    "render the input attributes declared as props on the input field",
+    accessibilityMount({
+      props: {
+        label: "Select Label",
+        name: "address",
+        type: "email",
+        required: true,
+        autofocus: true,
+        readonly: true,
+      } satisfies TextFieldProps,
+    }),
+    (wrapper) => {
+      const input = wrapper.get("input");
+      expect(input.attributes()).toMatchObject({
+        name: "address",
+        type: "email",
+        required: "",
+        autofocus: "",
+        readonly: "",
+      });
     },
   );
 });

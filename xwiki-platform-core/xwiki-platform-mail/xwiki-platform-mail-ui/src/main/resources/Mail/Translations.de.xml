@@ -79,5 +79,6 @@ mailSender.admin.resendSuccess=Die Mail wurde erfolgreich erneut gesendet
 mailSender.admin.resendFailure=Mail kann nicht erneut gesendet werden. Für weitere Details klicken.
 mailSender.admin.deleteSuccess=Die E-Mail wurde erfolgreich gelöscht
 mailSender.admin.deleteFailure=Löschen der E-Mail ist fehlgeschlagen. Für weitere Details klicken.
+mailSender.admin.invalidCSRF=Ungültiger CSRF-Token. Bitte aktualisiere die Seite und versuche es erneut.
 </content>
 </xwikidoc>

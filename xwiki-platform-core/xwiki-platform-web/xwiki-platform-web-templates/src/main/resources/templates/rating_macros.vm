@@ -32,10 +32,11 @@
  *#
 #macro(ratingstars $id $cssclass $ratinglabel $rating $nbVotes $locked)
 #set($width = $rating * 20)
-<div class="rating-container $cssclass" id="$id">
-    <div class="rating-header $cssclass">$ratinglabel</div>
+#set ($escapedCssClass = $escapetool.xml($cssclass))
+<div class="rating-container $escapedCssClass" id="$escapetool.xml($id)">
+    <div class="rating-header $escapedCssClass">$ratinglabel</div>
     <div class="rating-stars">
-        <ul class="star-rating ${cssclass}-star #if($locked) locked #end">
+        <ul class="star-rating ${escapedCssClass}-star #if($locked) locked #end">
             <li class="current-rating">
                 <meter class="average-rating" min="0" max="5" value="$rating">$rating</meter>
             </li>

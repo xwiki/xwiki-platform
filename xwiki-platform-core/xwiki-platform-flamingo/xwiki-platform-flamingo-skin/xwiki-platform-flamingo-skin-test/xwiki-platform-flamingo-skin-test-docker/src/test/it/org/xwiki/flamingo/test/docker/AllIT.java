@@ -246,4 +246,9 @@ public class AllIT
     class NestedViewPageIT extends ViewPageIT
     {
     }
+
+    @Nested
+    class NestedHibernateStoreAPIIT extends HibernateStoreAPIIT
+    {
+    }
 }

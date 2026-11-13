@@ -37,12 +37,12 @@
     <xwiki.extension.name>Chart Macro</xwiki.extension.name>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/chart
+    </xwiki.extension.components>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-chart-renderer</artifactId>
@@ -63,6 +63,11 @@
       <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-temporary</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -74,6 +79,12 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-standard</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed by the servlet components of the temporary resource API, loaded by the rendering integration tests. -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

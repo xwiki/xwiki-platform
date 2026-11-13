@@ -50,4 +50,9 @@ public class AllIT
     class NestedExtensionSecurityScanIT extends ExtensionSecurityScanIT
     {
     }
+
+    @Nested
+    class NestedBlacklistedMenuIT extends BlacklistedMenuIT
+    {
+    }
 }

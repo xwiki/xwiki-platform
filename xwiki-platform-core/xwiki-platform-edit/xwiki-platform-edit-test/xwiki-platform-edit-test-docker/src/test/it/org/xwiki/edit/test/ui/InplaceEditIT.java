@@ -73,7 +73,9 @@ class InplaceEditIT
     @BeforeAll
     static void beforeAll(TestUtils setup)
     {
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg");
+        // Alice is an advanced user in order to see the restricted mode warning displayed when viewing an old revision
+        // without rendering errors.
+        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
     }
 
     @BeforeEach
@@ -636,5 +638,30 @@ class InplaceEditIT
         assertEquals("gamma", richTextArea.getSelectedText());
 
         viewPage.cancel();
+    }
+
+    @Test
+    @Order(13)
+    void editInplaceFromOldRevision(TestUtils setup, TestReference testReference)
+    {
+        // Start from a fresh page in order to know its revisions.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "old content", "old title");
+        setup.createPage(testReference, "latest content", "latest title");
+
+        setup.gotoPage(testReference, "view", "rev=1.1");
+        InplaceEditablePage viewPage = new InplaceEditablePage();
+        assertEquals("old title", viewPage.getDocumentTitle());
+        assertTrue(viewPage.hasRestrictedModeWarning());
+
+        // The in-place editor edits the latest version so the restricted mode warning doesn't apply anymore.
+        viewPage.editInplace();
+        assertEquals("latest title", viewPage.getDocumentTitle());
+        assertFalse(viewPage.hasRestrictedModeWarning());
+
+        viewPage.setDocumentTitle("updated title");
+        viewPage.saveAndView();
+        assertEquals("updated title", viewPage.getDocumentTitle());
+        assertFalse(viewPage.hasRestrictedModeWarning());
     }
 }

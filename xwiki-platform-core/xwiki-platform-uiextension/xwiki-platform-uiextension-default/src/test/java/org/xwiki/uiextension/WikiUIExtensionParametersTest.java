@@ -19,10 +19,11 @@
  */
 package org.xwiki.uiextension;
 
+import java.io.Reader;
 import java.io.StringWriter;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
@@ -39,6 +41,7 @@ import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -46,18 +49,26 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.uiextension.internal.WikiUIExtensionParameters;
+import org.xwiki.uiextension.internal.parameters.UIXParameterValueFactory;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -65,17 +76,28 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link WikiUIExtensionParametersTest}.
+ * Unit tests for {@link WikiUIExtensionParameters}.
  *
  * @version $Id$
  * @since 5.0M1
  */
 @ComponentTest
+@ComponentList({ UIXParameterValueFactory.class, VelocityDetector.class })
 class WikiUIExtensionParametersTest
 {
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "XWikiAdmin");
 
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Space", "UIX");
+
+    private static final String VELOCITY_VALUE = "$value";
+
+    private static final String LOCALIZATION_VALUE = "$services.localization.render('my.key')";
+
+    private static final String TRANSLATION = "My translation";
+
+    private static final String KEY = "key";
+
+    private static final String NAMESPACE = "id:key";
 
     @Mock
     private VelocityEngine velocityEngine;
@@ -98,6 +120,9 @@ class WikiUIExtensionParametersTest
     @MockComponent
     private DocumentAuthorizationManager authorizationManager;
 
+    @MockComponent
+    private ContextualLocalizationManager localizationManager;
+
     @RegisterExtension
     private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
@@ -113,6 +138,13 @@ class WikiUIExtensionParametersTest
         when(this.execution.getContext()).thenReturn(executionContext);
         when(this.velocityManager.getVelocityContext()).thenReturn(velocityContext);
         when(this.velocityManager.getVelocityEngine()).thenReturn(this.velocityEngine);
+        when(this.velocityManager.compile(anyString(), any(Reader.class)))
+            .thenAnswer(invocation -> mock(VelocityTemplate.class));
+        // Output the namespace of the evaluated template to identify the value.
+        doAnswer(invocation -> {
+            invocation.<StringWriter>getArgument(1).write("evaluated " + invocation.getArgument(2));
+            return null;
+        }).when(this.velocityEngine).evaluate(any(), any(), anyString(), any(VelocityTemplate.class));
 
         when(this.authorExecutor.call(any(), any(), any())).thenAnswer(invocation -> {
             Callable<?> callable = invocation.getArgument(0);
@@ -123,27 +155,24 @@ class WikiUIExtensionParametersTest
             DOCUMENT_REFERENCE)).thenReturn(true);
 
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
+
+        when(this.localizationManager.getTranslationPlain("my.key")).thenReturn(TRANSLATION);
     }
 
     @Test
     void getParametersWithAnEmptyParametersProperty() throws Exception
     {
-        BaseObject mockUIX = constructMockUIXObject("");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
-        assertEquals(MapUtils.EMPTY_MAP, parameters.get());
+        WikiUIExtensionParameters parameters = createParameters("");
+
+        assertEquals(Map.of(), parameters.get());
     }
 
     @Test
     void getParametersWithAnEqualSignInAValue() throws Exception
     {
-        when(this.velocityEngine
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
-            .thenReturn(true);
-        BaseObject mockUIX = constructMockUIXObject("key=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        WikiUIExtensionParameters parameters = createParameters("key=value=foo");
 
-        // Since the StringWriter is created within the method, the value is "" and not "value".
-        assertEquals("", parameters.get().get("key"));
+        assertEquals("value=foo", parameters.get().get(KEY));
     }
 
     @Test
@@ -155,13 +184,9 @@ class WikiUIExtensionParametersTest
             y=2
             # ...
             z=3""";
-        BaseObject mockUIX = constructMockUIXObject(paramsStr);
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
-        parameters.get();
+        WikiUIExtensionParameters parameters = createParameters(paramsStr);
 
-        verify(this.velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1"));
-        verify(this.velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2"));
-        verify(this.velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3"));
+        assertEquals(Map.of("x", "1", "y", "2", "z", "3"), parameters.get());
     }
 
     @Test
@@ -172,46 +197,120 @@ class WikiUIExtensionParametersTest
             y=2####x
             z=3 ## xyz
             """;
-        BaseObject mockUIX = constructMockUIXObject(paramsStr);
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
-        parameters.get();
+        WikiUIExtensionParameters parameters = createParameters(paramsStr);
 
-        verify(this.velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1##b"));
-        verify(this.velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2####x"));
-        verify(this.velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3 ## xyz"));
+        assertEquals(Map.of("x", "evaluated id:x", "y", "evaluated id:y", "z", "evaluated id:z"), parameters.get());
+        verify(this.velocityManager).compile(eq("id:x"), any(Reader.class));
+        verify(this.velocityManager).compile(eq("id:y"), any(Reader.class));
+        verify(this.velocityManager).compile(eq("id:z"), any(Reader.class));
+    }
+
+    @Test
+    void getParametersWithoutVelocity() throws Exception
+    {
+        WikiUIExtensionParameters parameters = createParameters("key=value\nother=other value");
+
+        Map<String, String> result = parameters.get();
+        assertEquals(Map.of(KEY, "value", "other", "other value"), result);
+        assertSame(result, parameters.get());
+
+        // Nothing is evaluated, so there is no need to check rights, to set up Velocity or to cache anything.
+        verifyNoInteractions(this.authorizationManager, this.authorExecutor, this.velocityManager, this.execution,
+            this.modelContext);
+    }
+
+    @Test
+    void getParametersWithShortcutOnly() throws Exception
+    {
+        WikiUIExtensionParameters parameters = createParameters("key=" + LOCALIZATION_VALUE + "\nother=value");
+
+        assertEquals(Map.of(KEY, TRANSLATION, "other", "value"), parameters.get());
+
+        verify(this.authorizationManager).hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
+            DOCUMENT_REFERENCE);
+        verifyNoInteractions(this.authorExecutor, this.velocityManager);
+    }
+
+    @Test
+    void getParametersWithShortcutAndVelocity() throws Exception
+    {
+        WikiUIExtensionParameters parameters =
+            createParameters("key=" + VELOCITY_VALUE + "\nlabel=" + LOCALIZATION_VALUE + "\nother=value");
+
+        assertEquals(Map.of(KEY, "evaluated id:key", "label", TRANSLATION, "other", "value"), parameters.get());
+
+        verify(this.authorExecutor).call(any(), eq(AUTHOR_REFERENCE), eq(DOCUMENT_REFERENCE));
+        verify(this.velocityManager).getVelocityContext();
+        verify(this.velocityManager).compile(eq(NAMESPACE), any(Reader.class));
+        verify(this.velocityManager).getVelocityEngine();
+    }
+
+    @Test
+    void getParametersReturnsUnmodifiableMap() throws Exception
+    {
+        Map<String, String> staticParameters = createParameters("key=value").get();
+        Map<String, String> evaluatedParameters = createParameters("key=" + VELOCITY_VALUE).get();
+
+        assertThrows(UnsupportedOperationException.class, () -> staticParameters.put(KEY, "other"));
+        assertThrows(UnsupportedOperationException.class, () -> evaluatedParameters.put(KEY, "other"));
     }
 
     @Test
     void getParametersWhenVelocityFails() throws Exception
     {
-        when(this.velocityEngine
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
-            .thenThrow(new XWikiVelocityException("evaluation failure"));
-        BaseObject mockUIX = constructMockUIXObject("key=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        doThrow(new XWikiVelocityException("evaluation failure")).when(this.velocityEngine)
+            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq(NAMESPACE), any(VelocityTemplate.class));
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
 
         // It put a warning in the logs and return the not-evaluated value.
-        assertEquals("value", parameters.get().get("key"));
-        assertEquals("Failed to evaluate UI extension data value, key [key], value [value]. Reason: "
+        assertEquals(VELOCITY_VALUE, parameters.get().get(KEY));
+        assertEquals("Failed to evaluate UI extension data value, key [key], value [$value]. Reason: "
             + "[XWikiVelocityException: evaluation failure]", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void getParametersWhenVelocityCompilationFails() throws Exception
+    {
+        when(this.velocityManager.compile(eq(NAMESPACE), any(Reader.class)))
+            .thenThrow(new XWikiVelocityException("compilation failure"));
+        ExecutionContext ec1 = mock(ExecutionContext.class, "ec1");
+        ExecutionContext ec2 = mock(ExecutionContext.class, "ec2");
+        when(this.execution.getContext()).thenReturn(ec1, ec2);
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
+
+        assertEquals(VELOCITY_VALUE, parameters.get().get(KEY));
+        assertEquals(VELOCITY_VALUE, parameters.get().get(KEY));
+
+        assertEquals("Failed to evaluate UI extension data value, key [key], value [$value]. Reason: "
+            + "[XWikiVelocityException: compilation failure]", this.logCapture.getMessage(0));
+        assertEquals("Failed to evaluate UI extension data value, key [key], value [$value]. Reason: "
+            + "[XWikiVelocityException: compilation failure]", this.logCapture.getMessage(1));
+        // The value isn't compiled again for the second request.
+        verify(this.velocityManager).compile(eq(NAMESPACE), any(Reader.class));
+        verifyNoInteractions(this.velocityEngine);
+    }
+
+    @Test
+    void getParametersWhenVelocityEngineFails() throws Exception
+    {
+        when(this.velocityManager.getVelocityEngine()).thenThrow(new XWikiVelocityException("engine failure"));
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE + "\nlabel=" + LOCALIZATION_VALUE);
+
+        assertEquals(Map.of(KEY, VELOCITY_VALUE, "label", LOCALIZATION_VALUE), parameters.get());
+        assertEquals("Failed to get velocity engine. Reason: [XWikiVelocityException: engine failure]",
+            this.logCapture.getMessage(0));
     }
 
     @Test
     void getParametersFromTheSameRequestAndForTheSameWiki() throws Exception
     {
-        when(this.velocityEngine
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
-            .thenReturn(true);
-        BaseObject mockUIX = constructMockUIXObject("key=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
 
-        // It should fail silently
-        assertEquals("", parameters.get().get("key"));
-        assertEquals("", parameters.get().get("key"));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
 
         // Verify the evaluate is done only once
-        verify(this.velocityEngine)
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value"));
+        verify(this.velocityEngine).evaluate(any(), any(), eq(NAMESPACE), any(VelocityTemplate.class));
     }
 
     @Test
@@ -219,41 +318,49 @@ class WikiUIExtensionParametersTest
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki1"))
             .thenReturn(new WikiReference("wiki2"));
-        when(this.velocityEngine
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
-            .thenReturn(true);
-        BaseObject mockUIX = constructMockUIXObject("key=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
 
-        // It should fail silently
-        assertEquals("", parameters.get().get("key"));
-        assertEquals("", parameters.get().get("key"));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
 
-        // Verify the velocity evaluation has been done for both wikis.
-        verify(this.velocityEngine, times(2))
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value"));
+        // Verify the velocity evaluation has been done for both wikis, but the value compiled only once.
+        verify(this.velocityEngine, times(2)).evaluate(any(), any(), eq(NAMESPACE), any(VelocityTemplate.class));
+        verify(this.velocityManager).compile(eq(NAMESPACE), any(Reader.class));
+    }
+
+    @Test
+    void getParametersWithoutCurrentWiki() throws Exception
+    {
+        // No current wiki, e.g. when no XWiki context is initialized for the current thread, then the second call is
+        // made once a wiki has been set.
+        when(this.modelContext.getCurrentEntityReference()).thenReturn(null, null, new WikiReference("wiki"));
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
+
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+
+        // Evaluated once without a wiki (and cached for the second call), then again once a wiki is set.
+        verify(this.velocityEngine, times(2)).evaluate(any(), any(), eq(NAMESPACE), any(VelocityTemplate.class));
     }
 
     @Test
     void getParametersFromDifferentRequests() throws Exception
     {
-        when(this.velocityEngine
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
-            .thenReturn(true);
-        BaseObject mockUIX = constructMockUIXObject("key=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
 
         ExecutionContext ec1 = mock(ExecutionContext.class, "ec1");
         ExecutionContext ec2 = mock(ExecutionContext.class, "ec2");
-        when(this.execution.getContext()).thenReturn(ec1).thenReturn(ec2);
+        when(this.execution.getContext()).thenReturn(ec1, ec2, ec1);
 
-        // It should fail silently
-        assertEquals("", parameters.get().get("key"));
-        assertEquals("", parameters.get().get("key"));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
+        // Only the parameters of the last request are cached.
+        assertEquals("evaluated id:key", parameters.get().get(KEY));
 
-        // Verify the velocity evaluation has been done for both wikis.
-        verify(this.velocityEngine, times(2))
-            .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value"));
+        // Verify the velocity evaluation has been done for each request change, but the value compiled only once.
+        verify(this.velocityEngine, times(3)).evaluate(any(), any(), eq(NAMESPACE), any(VelocityTemplate.class));
+        verify(this.velocityManager).compile(eq(NAMESPACE), any(Reader.class));
     }
 
     @Test
@@ -261,11 +368,13 @@ class WikiUIExtensionParametersTest
     {
         when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
             DOCUMENT_REFERENCE)).thenReturn(false);
-        BaseObject mockUIX = constructMockUIXObject("key=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        WikiUIExtensionParameters parameters =
+            createParameters("key=" + VELOCITY_VALUE + "\nlabel=" + LOCALIZATION_VALUE + "\nother=value");
 
-        assertEquals("value", parameters.get().get("key"));
-        verifyNoInteractions(this.velocityEngine);
+        // Without script right, not even the calls that are executed without Velocity are executed.
+        assertEquals(Map.of(KEY, VELOCITY_VALUE, "label", LOCALIZATION_VALUE, "other", "value"), parameters.get());
+        verifyNoInteractions(this.velocityEngine, this.velocityManager, this.localizationManager,
+            this.authorExecutor);
     }
 
     @Test
@@ -274,10 +383,9 @@ class WikiUIExtensionParametersTest
         // Do not call the callable to check that the call to the Velocity engine is inside the author executor.
         doReturn(null).when(this.authorExecutor).call(any(), any(), any());
 
-        BaseObject mockUIX = constructMockUIXObject("key=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        WikiUIExtensionParameters parameters = createParameters("key=" + VELOCITY_VALUE);
 
-        assertEquals("value", parameters.get().get("key"));
+        assertEquals(VELOCITY_VALUE, parameters.get().get(KEY));
         verify(this.authorExecutor).call(any(), eq(AUTHOR_REFERENCE), eq(DOCUMENT_REFERENCE));
         verifyNoInteractions(this.velocityEngine);
     }
@@ -285,10 +393,14 @@ class WikiUIExtensionParametersTest
     @Test
     void getParametersWithEmptyKey() throws Exception
     {
-        BaseObject mockUIX = constructMockUIXObject("=value");
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
+        WikiUIExtensionParameters parameters = createParameters("=" + VELOCITY_VALUE);
 
         assertTrue(parameters.get().isEmpty());
+    }
+
+    private WikiUIExtensionParameters createParameters(String parameters) throws Exception
+    {
+        return new WikiUIExtensionParameters(constructMockUIXObject(parameters), this.componentManager);
     }
 
     private BaseObject constructMockUIXObject(String parameters)

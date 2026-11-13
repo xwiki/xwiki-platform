@@ -88,8 +88,8 @@ viewers.Comments = Class.create({
             this.addSubmitListener(this.form);
             this.addCancelListener();
             this.addPreview(this.form);
-            if(typeof CKEDITOR === 'undefined') {
-              // Focus on the textarea.
+            // Handle focus for plain text editor (WYSIWYG editors do it on their own).
+            if (this.isPlainTextEditor(this.form)) {
               this.form["XWiki.XWikiComments_comment"].focus();
             }
           }.bind(this)
@@ -105,6 +105,12 @@ viewers.Comments = Class.create({
     } else {
       this.form = undefined;
     }
+  },
+  /**
+   * @return whether the comment is edited with the plain text editor (a textarea), as opposed to a WYSIWYG editor
+   */
+  isPlainTextEditor: function (form) {
+    return form.down("input[name='defaultEditorId']").value === 'text';
   },
   // load the form only once, when it is first needed
   // the next calls to this method does nothing but calling the callback
@@ -289,8 +295,10 @@ viewers.Comments = Class.create({
           this.addPreview(this.form);
           // Set the replyto field to the replied comment's number
           this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
-          // Focus on the textarea.
-          this.form["XWiki.XWikiComments_comment"].focus();
+          // Handle focus for plain text editor (WYSIWYG editors do it on their own).
+          if (this.isPlainTextEditor(this.form)) {
+            this.form["XWiki.XWikiComments_comment"].focus();
+          }
           // Hide the reply button
           item.hide();
         }.bind(this)
@@ -310,7 +318,13 @@ viewers.Comments = Class.create({
         event.stop();
         // triggers the copy of the content of the rich editor to hidden fields
         document.fire('xwiki:actions:beforeSave');
-        if (form.down('textarea').value != "") {
+        const comment = form.down('.xwikicomment');
+        let name = "XWiki.XWikiComments_comment";
+        if (comment !== undefined && this.hasCommentNumber(comment)) {
+          name = "XWiki.XWikiComments_" + this.extractCommentNumber(comment) + "_comment";
+        }
+        // The comment field is missing until the editor has loaded.
+        if (form[name]?.value) {
           var formData = new Hash(form.serialize(true));
           formData.set('xredirect',
               window.docgeturl + '?xpage=xpart&vm=commentsinline.vm&skin=' + encodeURIComponent(XWiki.skin));
@@ -351,14 +365,6 @@ viewers.Comments = Class.create({
               // form input fields and the user will get disabled fields when (soft) reloading the page.
               form.enable();
 
-              var comment = form.down('.xwikicomment');
-              var name = "XWiki.XWikiComments_comment";
-              if (comment !== undefined) {
-                if (this.hasCommentNumber(comment)) {
-                  const commentNbr = this.extractCommentNumber(comment);
-                  name = "XWiki.XWikiComments_" + commentNbr + "_comment";
-                }
-              }
               this.destroyEditor("[name='" + name + "']");
 
               if (this.requestSucceeded) {
@@ -437,7 +443,7 @@ viewers.Comments = Class.create({
    */
   addPreview : function(form) {
     // We only allow to preview comment if the user is using text editor.
-    if (!form || !XWiki.hasEdit || form.down("input[name='defaultEditorId']").value !== "text") {
+    if (!form || !XWiki.hasEdit || !this.isPlainTextEditor(form)) {
       return;
     }
 

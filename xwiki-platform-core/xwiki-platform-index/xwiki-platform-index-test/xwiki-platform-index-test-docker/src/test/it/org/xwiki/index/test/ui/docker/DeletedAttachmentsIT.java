@@ -124,10 +124,13 @@ public class DeletedAttachmentsIT
         setup.createPageWithAttachment(terminalPage, "", "Terminal Attachments", TERMINAL_FILE_1,
             new ByteArrayInputStream("terminal1".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
         setup.attachFile(terminalPage, TERMINAL_FILE_2, new ByteArrayInputStream("terminal2".getBytes()), true);
-        setup.deleteAttachement(new AttachmentReference(NESTED_FILE, testReference));
-        setup.deleteAttachement(new AttachmentReference(TERMINAL_FILE_1, terminalPage));
-        setup.rest().runAs(deleter,
-            rest -> rest.deleteAttachement(new AttachmentReference(TERMINAL_FILE_2, terminalPage)));
+
+        AttachmentReference nestedFile = new AttachmentReference(NESTED_FILE, testReference);
+        AttachmentReference terminalFile1 = new AttachmentReference(TERMINAL_FILE_1, terminalPage);
+        AttachmentReference terminalFile2 = new AttachmentReference(TERMINAL_FILE_2, terminalPage);
+        setup.deleteAttachement(nestedFile);
+        setup.deleteAttachement(terminalFile1);
+        setup.rest().runAs(deleter, rest -> rest.deleteAttachement(terminalFile2));
 
         DeletedAttachmentsPage deletedAttachmentsPage = DeletedAttachmentsPage.gotoPage();
         LiveTableElement livetable = deletedAttachmentsPage.getDeletedAttachmentsLiveTable();

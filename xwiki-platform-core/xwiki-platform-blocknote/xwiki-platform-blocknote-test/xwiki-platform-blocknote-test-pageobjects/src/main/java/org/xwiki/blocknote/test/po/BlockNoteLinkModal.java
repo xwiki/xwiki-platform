@@ -38,29 +38,70 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class BlockNoteLinkModal extends BaseElement
 {
+    private static final String OPEN = "open";
+
+    /**
+     * The field designating the link target, whatever the selected target type.
+     */
+    private static final By TARGET_FIELD = By.cssSelector(".link-target input");
+
+    /**
+     * The link type selector, which is always displayed.
+     */
+    private static final By TARGET_TYPE_SELECT = By.cssSelector("[data-test='linkTargetType']");
+
+    /**
+     * The collapsible "Options" section, holding the display text field and the options specific to the selected
+     * target type (e.g. the query string and the anchor of a page link, the subject and the body of an e-mail link).
+     */
+    private static final By OPTIONS = By.cssSelector("[data-test='linkOptions']");
+
+    /**
+     * The display text field, which is in the collapsible "Options" section.
+     */
+    private static final By DISPLAY_TEXT_FIELD = By.cssSelector("[data-test='linkDisplayText']");
+
+    /**
+     * The query string field of a page or an attachment link, which is in the collapsible "Options" section.
+     */
+    private static final By QUERY_STRING_FIELD =
+        By.cssSelector("[data-test='linkPageQueryString'], [data-test='linkAttachmentQueryString']");
+
+    /**
+     * The anchor field of a page link, which is in the collapsible "Options" section.
+     */
+    private static final By ANCHOR_FIELD = By.cssSelector("[data-test='linkPageAnchor']");
+
+    /**
+     * The suggestions listed below the page and attachment search boxes, or the message replacing them (e.g. while
+     * searching, or when nothing matches).
+     */
+    private static final By SUGGESTIONS = By.cssSelector(".link-target .suggestions-container");
+
+    /**
+     * The link modal itself, i.e. the outermost dialog holding the link type selector.
+     */
+    private static final By DIALOG =
+        By.xpath("//*[@data-test = 'linkTargetType']/ancestor::*[@role = 'dialog'][last()]");
+
     /**
      * Create a new instance, waiting for the link modal to be visible.
      */
     public BlockNoteLinkModal()
     {
-        getDriver().waitUntilCondition(
-            ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-test='linkDisplayText']")));
+        getDriver().waitUntilCondition(ExpectedConditions.visibilityOfElementLocated(TARGET_TYPE_SELECT));
     }
 
     /**
-     * Replaces the content of the link display text field with the given title.
+     * Replaces the content of the link display text field with the given title, expanding the "Options" section that
+     * holds it if needed.
      *
      * @param title the new link title
      */
     public void setDisplayText(String title)
     {
-        WebElement displayTextInput = getDriver().findElement(By.cssSelector("[data-test='linkDisplayText']"));
-        // Focus the field explicitly by clicking it: the focus performed implicitly when sending keys doesn't always
-        // deliver the keys to the field. Send the selection, the field content and the submission key separately:
-        // the field is a Vue controlled input which can miss keys that are sent in a single burst.
-        displayTextInput.click();
-        displayTextInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        displayTextInput.sendKeys(title);
+        expandOptions();
+        replaceText(DISPLAY_TEXT_FIELD, title);
     }
 
     /**
@@ -71,22 +112,139 @@ public class BlockNoteLinkModal extends BaseElement
      */
     public void selectTargetType(String targetType)
     {
-        WebElement targetTypeSelect = getDriver().findElement(By.cssSelector("[data-test='linkTargetType']"));
+        WebElement targetTypeSelect = getDriver().findElement(TARGET_TYPE_SELECT);
         new Select(targetTypeSelect).selectByVisibleText(targetType);
     }
 
     /**
-     * Types the given URL in the URL field. The URL field is only available when the target type is set to
-     * {@code URL}.
-     *
-     * @param url the URL to type
+     * @return the label of the selected type of target (e.g. {@code Page}, {@code URL}, {@code Attachment} or
+     *         {@code E-mail})
+     * @since 18.10.0RC1
      */
-    public void setUrl(String url)
+    public String getTargetType()
     {
-        WebElement urlInput = getDriver().findElement(By.cssSelector("[data-test='linkUrl']"));
-        urlInput.click();
-        urlInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        urlInput.sendKeys(url);
+        WebElement targetTypeSelect = getDriver().findElement(TARGET_TYPE_SELECT);
+        return new Select(targetTypeSelect).getFirstSelectedOption().getText();
+    }
+
+    /**
+     * Replaces the content of the field designating the link target with the given text, whatever the selected target
+     * type: e.g. the URL or the e-mail address. For the target types designated through a search box (page and
+     * attachment), this only types the search query: use {@link #setPageReference(String, String)} or
+     * {@link #setAttachmentReference(String, String, String)} to select the target.
+     *
+     * @param target the text to type
+     * @since 18.10.0RC1
+     */
+    public void setTarget(String target)
+    {
+        replaceText(TARGET_FIELD, target);
+    }
+
+    /**
+     * @return the content of the field designating the link target, whatever the selected target type: e.g. the URL,
+     *         the page or attachment reference, or the e-mail address
+     * @since 18.10.0RC1
+     */
+    public String getTarget()
+    {
+        return getDriver().findElement(TARGET_FIELD).getDomProperty(ATTRIBUTE_VALUE);
+    }
+
+    /**
+     * @return the message the browser shows when the link modal is submitted while the field designating the link
+     *         target is not valid (e.g. it's required but empty), or the empty string when this field is valid
+     * @since 18.10.0RC1
+     */
+    public String getTargetValidationMessage()
+    {
+        return getDriver().findElement(TARGET_FIELD).getDomProperty("validationMessage");
+    }
+
+    /**
+     * Types the given text where the focus is, without clicking anything first, as a keyboard user does right after the
+     * link modal opens. Waits for the focus to be inside the link modal first, since the link modal moves it there
+     * once it's shown.
+     *
+     * @param keysToSend the keys to type
+     * @since 18.10.0RC1
+     */
+    public void typeInFocusedField(CharSequence... keysToSend)
+    {
+        WebElement dialog = getDriver().findElement(DIALOG);
+        getDriver().waitUntilCondition(driver -> {
+            WebElement activeElement = driver.switchTo().activeElement();
+            return "input".equals(activeElement.getTagName())
+                && (boolean) getDriver().executeScript("return arguments[0].contains(arguments[1])", dialog,
+                    activeElement);
+        });
+        getDriver().switchTo().activeElement().sendKeys(keysToSend);
+    }
+
+    /**
+     * Closes, with the Escape key, the suggestions listed below the page or attachment search box, once they are
+     * shown (i.e. after typing in the search box), and waits for them to be hidden. The link modal is expected to
+     * stay open.
+     *
+     * @since 18.10.0RC1
+     */
+    public void closeSuggestions()
+    {
+        getDriver().waitUntilElementIsVisible(SUGGESTIONS);
+        getDriver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
+        getDriver().waitUntilElementDisappears(SUGGESTIONS);
+    }
+
+    /**
+     * Replaces the query string of a page or an attachment link, expanding the "Options" section that holds it if
+     * needed.
+     *
+     * @param queryString the new query string
+     * @since 18.10.0RC1
+     */
+    public void setQueryString(String queryString)
+    {
+        expandOptions();
+        replaceText(QUERY_STRING_FIELD, queryString);
+    }
+
+    /**
+     * @return the query string of a page or an attachment link
+     * @since 18.10.0RC1
+     */
+    public String getQueryString()
+    {
+        return getDriver().findElement(QUERY_STRING_FIELD).getDomProperty(ATTRIBUTE_VALUE);
+    }
+
+    /**
+     * Replaces the anchor of a page link, expanding the "Options" section that holds it if needed.
+     *
+     * @param anchor the new anchor
+     * @since 18.10.0RC1
+     */
+    public void setAnchor(String anchor)
+    {
+        expandOptions();
+        replaceText(ANCHOR_FIELD, anchor);
+    }
+
+    /**
+     * @return the anchor of a page link
+     * @since 18.10.0RC1
+     */
+    public String getAnchor()
+    {
+        return getDriver().findElement(ANCHOR_FIELD).getDomProperty(ATTRIBUTE_VALUE);
+    }
+
+    /**
+     * @return the content of the display text field, which is in the collapsible "Options" section
+     * @since 18.10.0RC1
+     */
+    public String getDisplayText()
+    {
+        return getDriver().findElement(DISPLAY_TEXT_FIELD).getDomProperty(ATTRIBUTE_VALUE);
     }
 
     /**
@@ -97,7 +255,7 @@ public class BlockNoteLinkModal extends BaseElement
     public void setTargetAndSubmit(String target)
     {
         selectTargetType("URL");
-        setUrl(target);
+        setTarget(target);
         submit();
     }
 
@@ -157,20 +315,6 @@ public class BlockNoteLinkModal extends BaseElement
     }
 
     /**
-     * Types the given address in the e-mail address field. The e-mail address field is only available when the
-     * target type is set to {@code E-mail}.
-     *
-     * @param address the e-mail address to type
-     */
-    public void setEmailAddress(String address)
-    {
-        WebElement addressInput = getDriver().findElement(By.cssSelector("[data-test='linkEmailAddress']"));
-        addressInput.click();
-        addressInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        addressInput.sendKeys(address);
-    }
-
-    /**
      * Selects the {@code E-mail} target type, types the given e-mail address and submits the modal.
      *
      * @param address the e-mail address to set as the link target
@@ -178,7 +322,7 @@ public class BlockNoteLinkModal extends BaseElement
     public void setEmailTargetAndSubmit(String address)
     {
         selectTargetType("E-mail");
-        setEmailAddress(address);
+        setTarget(address);
         submit();
     }
 
@@ -194,19 +338,90 @@ public class BlockNoteLinkModal extends BaseElement
     }
 
     /**
-     * Submits the link modal, applying the changes.
+     * Submits the link modal, applying the changes, and waits for it to close.
      */
     public void submit()
+    {
+        trySubmit();
+        waitUntilClosed();
+    }
+
+    /**
+     * Tries to submit the link modal, without waiting for it to close: the browser blocks the submit when a required
+     * field is empty, and the link modal then stays open.
+     *
+     * @since 18.10.0RC1
+     */
+    public void trySubmit()
     {
         getDriver().findElement(By.cssSelector("[data-test='linkSubmit']")).click();
     }
 
     /**
-     * Cancels the link modal, discarding any change.
+     * Cancels the link modal, discarding any change, and waits for it to close.
      */
     public void cancel()
     {
         getDriver().findElement(By.cssSelector("[data-test='linkCancel']")).click();
+        waitUntilClosed();
+    }
+
+    private void waitUntilClosed()
+    {
+        getDriver().waitUntilElementDisappears(TARGET_TYPE_SELECT);
+        // The backdrop of the link modal fades out once the link modal is closed, and it covers the edited content
+        // until then.
+        getDriver().waitUntilElementDisappears(By.cssSelector(".modal-backdrop"));
+    }
+
+    /**
+     * Clicks outside the link modal, on the backdrop that covers the rest of the page (e.g. the edited content).
+     *
+     * @since 18.10.0RC1
+     */
+    public void clickOutside()
+    {
+        // The dialog covers the whole viewport, with its content inset from its edges: its top left corner is on the
+        // backdrop.
+        WebElement dialog = getDriver().findElement(DIALOG);
+        getDriver().moveToTopLeftCornerOfTargetWithOffset(dialog, 5, 5, null).click().perform();
+    }
+
+    /**
+     * Expands the "Options" section, unless it is already expanded, so that the option fields can be filled in: the
+     * display text and the options specific to the selected target type (e.g. the query string and the anchor of a
+     * page link, the subject and the body of an e-mail link).
+     *
+     * @since 18.10.0RC1
+     */
+    public void expandOptions()
+    {
+        WebElement options = getDriver().findElement(OPTIONS);
+        if (!Boolean.parseBoolean(options.getDomProperty(OPEN))) {
+            options.findElement(By.tagName("summary")).click();
+            getDriver().waitUntilCondition(driver -> Boolean.parseBoolean(options.getDomProperty(OPEN)));
+        }
+    }
+
+    /**
+     * Replaces the content of the text field matching the given locator with the given text.
+     *
+     * @param locator the locator of the text field
+     * @param text the text to type
+     */
+    private void replaceText(By locator, String text)
+    {
+        WebElement input = getDriver().findElement(locator);
+        if (text.isEmpty()) {
+            // Empty the field as a user does, because WebElement#clear() doesn't fire the input event that the field
+            // listens to. The select all shortcut and the deletion are sent separately because Firefox keeps the
+            // modifier key pressed for the rest of the keys sent along with a chord.
+            input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+            input.sendKeys(Keys.BACK_SPACE);
+        } else {
+            input.clear();
+            input.sendKeys(text);
+        }
     }
 
     /**
@@ -240,7 +455,7 @@ public class BlockNoteLinkModal extends BaseElement
             + "[.//span[contains(@class, 'suggestion-title') and . = '%s']]", dataTest, suggestionTitle);
         if (suggestionHint != null) {
             suggestionXPath +=
-                String.format("[.//span[contains(@class, 'segment') and contains(., '%s')]]", suggestionHint);
+                String.format("[.//*[contains(@class, 'suggestion-hint') and contains(., '%s')]]", suggestionHint);
         }
         By suggestionLocator = By.xpath(suggestionXPath);
         // There's a race between the target page/attachment being saved and its indexing actually being queued, so
@@ -274,8 +489,8 @@ public class BlockNoteLinkModal extends BaseElement
         // The search box starts a new search for each character typed in the query input and renders the results of
         // each of them as they come back, so the suggestion list can still be re-rendered after the expected
         // suggestion showed up. Clicking during such a re-render either loses the suggestion (stale element
-        // reference) or sends the click where the suggestion no longer is, which is outside the link modal and thus
-        // closes it. Wait for the suggestion element to be the same across two consecutive checks before clicking it.
+        // reference) or sends the click where the suggestion no longer is. Wait for the suggestion element to be the
+        // same across two consecutive checks before clicking it.
         AtomicReference<WebElement> previousSuggestion = new AtomicReference<>();
         WebElement suggestion = getDriver().waitUntilCondition(driver -> {
             WebElement currentSuggestion =

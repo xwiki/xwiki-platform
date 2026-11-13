@@ -59,7 +59,7 @@ class TestCollaborationManager extends AbstractCollaborationManager {
       } as unknown as AuthenticationManagerProvider,
       {} as DocumentService,
       {
-        serialize: () => "doc:Space.Page",
+        serialize: () => "xwiki:Space.Page",
       } as unknown as ModelReferenceSerializer,
     );
   }

@@ -22,12 +22,16 @@ package org.xwiki.export.pdf.internal.docker;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.async.ResultCallback.Adapter;
 import com.github.dockerjava.api.command.InspectContainerCmd;
 import com.github.dockerjava.api.command.InspectContainerResponse;
@@ -37,14 +41,20 @@ import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.StartContainerCmd;
+import com.github.dockerjava.api.command.StopContainerCmd;
 import com.github.dockerjava.api.command.UnpauseContainerCmd;
+import com.github.dockerjava.api.command.WaitContainerCmd;
+import com.github.dockerjava.api.exception.DockerException;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.PullResponseItem;
+import com.github.dockerjava.api.model.WaitResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -60,6 +70,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class ContainerManagerTest
 {
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @InjectMockComponents
     private ContainerManager containerManager;
 
@@ -165,5 +178,45 @@ class ContainerManagerTest
         when(state.getDead()).thenReturn(true);
         assertNull(this.containerManager.maybeReuseContainerByName("container-name"));
         verify(removeCmd).exec();
+    }
+
+    @Test
+    void stopContainerWhenRemovedBeforeWaiting()
+    {
+        StopContainerCmd stopCommand = mock(StopContainerCmd.class);
+        when(this.dockerClient.stopContainerCmd("containerId")).thenReturn(stopCommand);
+        WaitContainerCmd waitCommand = mock(WaitContainerCmd.class);
+        when(this.dockerClient.waitContainerCmd("containerId")).thenReturn(waitCommand);
+        // Docker removes the stopped container (automatic removal) before the wait request reaches it.
+        when(waitCommand.exec(any())).thenAnswer(invocation -> {
+            ResultCallback<WaitResponse> callback = invocation.getArgument(0);
+            callback.onError(new NotFoundException("No such container: containerId"));
+            return callback;
+        });
+
+        this.containerManager.stopContainer("containerId");
+
+        verify(stopCommand).exec();
+        verify(waitCommand).exec(any());
+    }
+
+    @Test
+    void stopContainerWhenWaitingFails()
+    {
+        StopContainerCmd stopCommand = mock(StopContainerCmd.class);
+        when(this.dockerClient.stopContainerCmd("containerId")).thenReturn(stopCommand);
+        WaitContainerCmd waitCommand = mock(WaitContainerCmd.class);
+        when(this.dockerClient.waitContainerCmd("containerId")).thenReturn(waitCommand);
+        DockerException failure = new DockerException("Server error", 500);
+        when(waitCommand.exec(any())).thenAnswer(invocation -> {
+            ResultCallback<WaitResponse> callback = invocation.getArgument(0);
+            callback.onError(failure);
+            return callback;
+        });
+
+        // Other failures are still reported.
+        assertSame(failure,
+            assertThrows(DockerException.class, () -> this.containerManager.stopContainer("containerId")));
+        assertEquals("Error during callback", this.logCapture.getMessage(0));
     }
 }

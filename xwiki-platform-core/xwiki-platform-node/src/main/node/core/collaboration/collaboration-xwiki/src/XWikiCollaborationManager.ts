@@ -79,9 +79,7 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
       "./xwikiProviderWebSocket"
     );
 
-    const room = this.modelReferenceSerializer
-      .serialize(documentReference)
-      ?.substring("doc:".length);
+    const room = this.modelReferenceSerializer.serialize(documentReference);
     const locale = documentReference.locale ?? "";
     console.debug(
       `Connecting the the collaboration WebSocket endpoint for document [${room}(${locale})].`,

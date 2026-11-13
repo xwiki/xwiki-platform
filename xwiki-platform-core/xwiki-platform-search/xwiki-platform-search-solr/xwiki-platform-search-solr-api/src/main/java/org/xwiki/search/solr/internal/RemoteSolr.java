@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -154,6 +155,34 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         }
     }
 
+    @Override
+    protected String getCoreLoadFailure(String xwikiCoreName, int solrMajorVersion) throws SolrException
+    {
+        String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
+
+        // The cores which failed to be loaded are not part of the status of the cores, but listed separately
+        Object failures;
+        try {
+            CoreAdminRequest request = new CoreAdminRequest();
+            request.setAction(CoreAdminAction.STATUS);
+            failures = request.process(this.rootClient).getResponse().get("initFailures");
+        } catch (Exception e) {
+            throw new SolrException("Failed to get the status of the cores", e);
+        }
+
+        Object failure = failures instanceof Map<?, ?> failureMap ? failureMap.get(solrCoreName) : null;
+
+        return failure != null ? failure.toString() : null;
+    }
+
+    @Override
+    protected String getImpossibleMigrationHint(int intermediateVersion)
+    {
+        return String.format("To keep the data, migrate it first with a Solr %d server: start XWiki with a Solr %d"
+            + " server containing both cores, then move the migrated core to the current Solr server.",
+            intermediateVersion, intermediateVersion);
+    }
+
     private Set<String> getCores() throws SolrServerException, IOException
     {
         CoreAdminRequest request = new CoreAdminRequest();
@@ -177,6 +206,16 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     public int getSolrMajorVersion()
     {
         return this.solrMajorVersion;
+    }
+
+    @Override
+    protected void reloadCore(XWikiSolrCore core) throws SolrException
+    {
+        try {
+            CoreAdminRequest.reloadCore(core.getSolrName(), this.rootClient);
+        } catch (Exception e) {
+            throw new SolrException("Failed to reload the Solr core [" + core.getSolrName() + "]", e);
+        }
     }
 
     @Override

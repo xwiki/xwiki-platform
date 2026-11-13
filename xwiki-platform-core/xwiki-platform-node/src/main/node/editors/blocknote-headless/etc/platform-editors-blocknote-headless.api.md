@@ -13,6 +13,7 @@ import { Container } from 'inversify';
 import { ContextForMacros } from '@xwiki/platform-editors-blocknote-react';
 import { DefineComponent } from 'vue';
 import { EditorType } from '@xwiki/platform-editors-blocknote-react';
+import { LinkContext } from '@xwiki/platform-link-type-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PublicProps } from 'vue';
 
@@ -26,8 +27,11 @@ ctx: ContextForMacros;
 editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
+linkContext?: LinkContext;
 }, {
 getContent: () => BlockType[];
+getEditor: () => EditorType | undefined;
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
 "debounced-change": (content: BlockType[]) => any;
@@ -41,18 +45,25 @@ ctx: ContextForMacros;
 editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
+linkContext?: LinkContext;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: BlockType[]) => any) | undefined;
 "onLocal-instant-change"?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
-'link-modal-container': HTMLDivElement;
 }, any>;
 
 export { ContextForMacros }
 
 export { EditorType }
+
+// @beta
+export function moveCaretTo(editor: EditorType, coordinates: {
+    left: number;
+    top: number;
+}): boolean;
 
 // (No @packageDocumentation comment for this package)
 

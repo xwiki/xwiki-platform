@@ -8,4 +8,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><span class="wikiexternallink"><a class="wikimodel-freestanding" href="temppath/chart/${{{regex:.*}}}"><img src="temppath/chart/${{{regex:.*}}}" class="wikimodel-freestanding"/></a></span></p>
+<p><span class="wikiexternallink"><a class="wikimodel-freestanding" href="tmp/chart/currentwiki:currentspace.currentpage/${{{regex:.*}}}"><img src="tmp/chart/currentwiki:currentspace.currentpage/${{{regex:.*}}}" class="wikimodel-freestanding"/></a></span></p>

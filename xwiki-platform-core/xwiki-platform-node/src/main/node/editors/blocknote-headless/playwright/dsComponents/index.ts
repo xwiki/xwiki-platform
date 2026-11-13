@@ -25,6 +25,8 @@
 
 import XBtn from "./XBtn.vue";
 import XCheckbox from "./XCheckbox.vue";
+import XDialog from "./XDialog.vue";
+import XForm from "./XForm.vue";
 import XSelect from "./XSelect.vue";
 import XTextField from "./XTextField.vue";
 import type { App } from "vue";
@@ -34,4 +36,6 @@ export function registerDsComponents(app: App): void {
   app.component("XSelect", XSelect);
   app.component("XBtn", XBtn);
   app.component("XCheckbox", XCheckbox);
+  app.component("XDialog", XDialog);
+  app.component("XForm", XForm);
 }

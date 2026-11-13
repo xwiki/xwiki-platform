@@ -34,6 +34,10 @@ describe("linkId", () => {
     "url with existing query": "/xwiki/bin/view/Space/Page?a=1&b=2",
     "url with fragment": "/xwiki/bin/view/Space/Page#section",
     "url with query and fragment": "/xwiki/bin/view/Space/Page?a=1#section",
+    "fragment only": "#section",
+    "query string only": "?a=1",
+    "query string and fragment only": "?a=1#section",
+    "document-relative path": "Page?a=1#section",
     mailto: "mailto:john@example.com",
   };
 

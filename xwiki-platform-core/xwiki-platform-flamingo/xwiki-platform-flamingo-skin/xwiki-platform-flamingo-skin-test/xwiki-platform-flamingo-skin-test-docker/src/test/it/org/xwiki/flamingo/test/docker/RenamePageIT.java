@@ -319,12 +319,17 @@ class RenamePageIT
     void renamePageUsedInMacroContentAndParameters(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
-        // FIXME: Using WebHome locations and not terminal page, since it's not properly supported yet.
-        // Improve the test whenever XWIKI-18634 is fixed
+        // The image and the untyped link target a terminal page, to check that their references are updated even
+        // though the renamed terminal page doesn't exist anymore when the backlinks are updated. The sibling link is
+        // an untyped link resolved to the sibling space home page of the test page, which the resolver only does when
+        // that space home page exists, so it has to be updated even though the renamed page doesn't exist anymore.
         // Fixture: we're creating 5 different pages to ensure that the backlinks, rename are working properly
         // and independently in different situations.
         String sourcePageName = "WebHome";
-        String sourcePageLocation1 = RenamePageIT.class.getSimpleName() + ".StandardLink";
+        String siblingLink = "StandardLink";
+        // The sibling space is computed from the test reference and not from the test class name, since the test page
+        // is in a space named after the running class, which is NestedRenamePageIT when running through AllIT.
+        String sourcePageLocation1 = testReference.getLastSpaceReference().getParent().getName() + "." + siblingLink;
         String sourcePage1 = sourcePageLocation1 + "." + sourcePageName;
 
         String sourcePageLocation2 = RenamePageIT.class.getSimpleName() + ".StandardMacroLink";
@@ -333,8 +338,7 @@ class RenamePageIT
         String sourcePageLocation3 = RenamePageIT.class.getSimpleName() + ".NestedMacroLink";
         String sourcePage3 = sourcePageLocation3 + "." + sourcePageName;
 
-        String sourcePageLocation4 = RenamePageIT.class.getSimpleName() + ".ImageLink";
-        String sourcePage4 = sourcePageLocation4 + "." + sourcePageName;
+        String sourcePage4 = RenamePageIT.class.getSimpleName() + ".ImageLink";
 
         String sourcePageLocation5 = RenamePageIT.class.getSimpleName() + ".IncludeLink";
         String sourcePage5 = sourcePageLocation5 + "." + sourcePageName;
@@ -349,8 +353,8 @@ class RenamePageIT
         String targetPageLastSpace3 = "TargetNestedMacroLink";
         String targetPage3 = targetPageSubSpace + "." + targetPageLastSpace3 + ".WebHome";
 
-        String targetPageLastSpace4 = "TargetImageLink";
-        String targetPage4 = targetPageSubSpace + "." + targetPageLastSpace4 + ".WebHome";
+        String targetPageName4 = "TargetImageLink";
+        String targetPage4 = targetPageSubSpace + "." + targetPageName4;
 
         String targetPageLastSpace5 = "TargetIncludeLink";
         String targetPage5 = targetPageSubSpace + "." + targetPageLastSpace5 + ".WebHome";
@@ -395,16 +399,19 @@ class RenamePageIT
         String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]%n" + "%n" + "{{warning}}%n"
             + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]%n" + "%n" + "{{error}}%n"
             + "And in nested macro: Check out this page: [[type the link label>>doc:%3$s]]%n" + "{{/error}}%n" + "%n"
-            + " %n" + "{{/warning}}%n" + "%n" + "Picture: [[image:%4$s@image.gif]]%n" + "Include macro:%n" + "%n"
+            + " %n" + "{{/warning}}%n" + "%n" + "Picture: [[image:%4$s@image.gif]]%n" + "Untyped link: [[%4$s]]%n"
+            + "Include macro:%n" + "%n"
             + "{{include reference=\"%5$s\"/}}%n%n"
             + "== A section ==%n%n"
             + "First link again: [[type the link label>>doc:%1$s]]%n%n"
             + "{{warning}}%n"
             + "Withing a macro: Check out this page: [[type the link label>>doc:%1$s]]%n"
             + "{{/warning}}%n%n"
+            + "Sibling link: [[%6$s]]%n%n"
             + "Final line.";
         setup.rest().savePage(testReference,
-            String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5),
+            String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5,
+                siblingLink),
             "testPage");
 
         // Wait for the solr indexing to be completed before doing any rename
@@ -416,13 +423,13 @@ class RenamePageIT
         DocumentPicker documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace1);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
         WikiEditPage wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup).waitEmptyQueue();
@@ -433,13 +440,13 @@ class RenamePageIT
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace2);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, sourcePage3, sourcePage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, sourcePage3, sourcePage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup).waitEmptyQueue();
@@ -450,13 +457,13 @@ class RenamePageIT
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace3);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, sourcePage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, sourcePage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup).waitEmptyQueue();
@@ -466,14 +473,14 @@ class RenamePageIT
         rename = viewPage.rename();
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
-        documentPicker.setName(targetPageLastSpace4);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        documentPicker.setName(targetPageName4);
+        rename.setTerminal(true);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, sourcePage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, sourcePage5,
+            targetPage1), wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup).waitEmptyQueue();
@@ -484,13 +491,13 @@ class RenamePageIT
         documentPicker = rename.getDocumentPicker();
         documentPicker.setParent(targetPageSubSpace);
         documentPicker.setName(targetPageLastSpace5);
-        rename.setTerminal(false); // to be changed too when XWIKI-18634 is fixed.
+        rename.setTerminal(false);
         rename.clickRenameButton().waitUntilFinished();
 
         viewPage = setup.gotoPage(testReference);
         wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, targetPage5),
-            wikiEditPage.getContent());
+        assertEquals(String.format(testPageContent, targetPage1, targetPage2, targetPage3, targetPage4, targetPage5,
+            targetPage1), wikiEditPage.getContent());
     }
 
     /**

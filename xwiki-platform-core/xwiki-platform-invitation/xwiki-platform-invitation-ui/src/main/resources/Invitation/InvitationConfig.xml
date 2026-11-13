@@ -393,7 +393,8 @@ $services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoi
 {{html clean=false}}
 #if("$!messageBody" != "")
   &lt;p style="$bigText"&gt;
-  $!escapetool.xml($!messageBody)
+  ## Escape first, then turn the line breaks typed by the user into HTML ones.
+  $!escapetool.xml($!messageBody).replaceAll('\r?\n', '&lt;br/&gt;')
   &lt;/p&gt;
 #end
 &lt;p style="margin-top:30px"&gt;

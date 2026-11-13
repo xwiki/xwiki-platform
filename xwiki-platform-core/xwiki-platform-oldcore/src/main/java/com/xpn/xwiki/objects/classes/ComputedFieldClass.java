@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import javax.script.ScriptContext;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
@@ -122,10 +123,36 @@ public class ComputedFieldClass extends PropertyClass
         scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
                 ScriptContext.ENGINE_SCOPE);
 
-        XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
+        XWikiDocument classDocument = getClassDocument(object, context);
+        DocumentReference authorReference = classDocument.getAuthorReference();
+        if (authorReference == null && classDocument.isNew()) {
+            // If the class document has not been saved yet (e.g. we could be previewing a class property in the class
+            // editor) then use the context user as author (e.g. the user that is in the process of creating the class).
+            authorReference = context.getUserReference();
+        }
 
-        return renderContentInContext(script, classDocument.getSyntax().toIdString(),
-                classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
+        // Make sure we execute the script with the rights of the user who wrote it (i.e. class document author).
+        return renderContentInContext(script, classDocument.getSyntax().toIdString(), authorReference,
+                classDocument.getDocumentReference(), classDocument.isRestricted(), context);
+    }
+
+    /**
+     * The script is part of the definition of this property, so it has to be executed with the rights of the author of
+     * the class holding this property, which can be an in-memory version of the class (e.g. a class being edited)
+     * different from the stored class that the object resolves.
+     *
+     * @param object the object for which the property value is computed
+     * @param context the current context
+     * @return the document of the class holding this property
+     */
+    private XWikiDocument getClassDocument(BaseCollection object, XWikiContext context)
+    {
+        BaseCollection xclass = getObject();
+        if (xclass != null && xclass.getOwnerDocument() != null) {
+            return xclass.getOwnerDocument();
+        }
+
+        return object.getXClass(context).getOwnerDocument();
     }
 
     @Override

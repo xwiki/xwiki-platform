@@ -32,12 +32,16 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailResender;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
+import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.MemoryMailListener;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -46,10 +50,17 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWikiContext;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,6 +75,9 @@ import static org.mockito.Mockito.when;
 })
 class DeprecatedMailStorageScriptServiceTest
 {
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Author");
+
+    private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "User");
     @InjectMockComponents
     private DeprecatedMailStorageScriptService service;
 
@@ -79,7 +93,20 @@ class DeprecatedMailStorageScriptServiceTest
     private MailResender resender;
 
     @MockComponent
-    private ContextualAuthorizationManager authorizationManager;
+    private AuthorizationManager authorizationManager;
+
+    @MockComponent
+    private Provider<XWikiContext> xwikiContextProvider;
+
+    @MockComponent
+    @Named("database")
+    private MailStatusStore statusStore;
+
+    @MockComponent
+    @Named("filesystem")
+    private MailContentStore contentStore;
+
+    private XWikiContext xcontext;
 
     @BeforeComponent
     void beforeComponent(MockitoComponentManager cm)
@@ -92,6 +119,23 @@ class DeprecatedMailStorageScriptServiceTest
     {
         ExecutionContext executionContext = new ExecutionContext();
         when(this.execution.getContext()).thenReturn(executionContext);
+
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontext.isMainWiki()).thenReturn(true);
+        when(this.xcontext.getWikiId()).thenReturn("xwiki");
+        when(this.xcontext.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
+        when(this.xcontext.getUserReference()).thenReturn(USER_REFERENCE);
+        when(this.xwikiContextProvider.get()).thenReturn(this.xcontext);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki")))
+            .thenReturn(true);
+    }
+
+    private void setSubWiki()
+    {
+        when(this.xcontext.isMainWiki()).thenReturn(false);
+        when(this.xcontext.getWikiId()).thenReturn("wiki");
+        when(this.authorizationManager.hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("wiki")))
+            .thenReturn(true);
     }
 
     @Test
@@ -168,12 +212,99 @@ class DeprecatedMailStorageScriptServiceTest
     @Test
     void loadWhenNotAuthorized()
     {
-        when(this.authorizationManager.hasAccess(Right.ADMIN)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki")))
+            .thenReturn(false);
 
         List<MailStatus> result = this.service.load(Map.of(), 0, 0, null, false);
 
         assertNull(result);
-        assertEquals("You need Admin rights to load mail statuses",
+        assertEquals("The author of the script needs Admin rights on the wiki to load mail statuses",
             this.service.getLastError().getMessage());
+    }
+
+    @Test
+    void resendWhenNotAuthorized()
+    {
+        when(this.authorizationManager.hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki")))
+            .thenReturn(false);
+        // A script written by a non-admin and viewed by an admin is not allowed: only the script author is checked.
+        when(this.authorizationManager.hasAccess(Right.ADMIN, USER_REFERENCE, new WikiReference("xwiki")))
+            .thenReturn(true);
+
+        assertNull(this.service.resend("batchId", "messageId"));
+        assertNull(this.service.resendAsynchronously(Map.of(), 0, 0));
+        assertEquals("The author of the script needs Admin rights on the wiki to resend mails",
+            this.service.getLastError().getMessage());
+        verifyNoInteractions(this.resender);
+    }
+
+    @Test
+    void deleteWhenNotAuthorized()
+    {
+        when(this.authorizationManager.hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki")))
+            .thenReturn(false);
+
+        this.service.delete("batchId", "messageId");
+
+        assertEquals("The author of the script needs Admin rights on the wiki to delete mails",
+
+            this.service.getLastError().getMessage());
+        verifyNoInteractions(this.statusStore);
+        verifyNoInteractions(this.contentStore);
+    }
+
+    @Test
+    void loadByIdWhenNotAuthorized()
+    {
+        when(this.authorizationManager.hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki")))
+            .thenReturn(false);
+
+        assertNull(this.service.load("messageId"));
+        assertEquals("The author of the script needs Admin rights on the wiki to load mail statuses",
+            this.service.getLastError().getMessage());
+        verifyNoInteractions(this.statusStore);
+    }
+
+    @Test
+    void deleteWhenInSubWikiAndMailFromOtherWiki() throws Exception
+    {
+        setSubWiki();
+        MailStatus status = new MailStatus();
+        status.setBatchId("batchId");
+        status.setWiki("otherwiki");
+        when(this.statusStore.load("messageId")).thenReturn(status);
+
+        this.service.delete("batchId", "messageId");
+
+        assertEquals("The mail [messageId] of the batch [batchId] was not sent from the current wiki",
+            this.service.getLastError().getMessage());
+        verify(this.statusStore, never()).delete(anyString(), anyMap());
+        verifyNoInteractions(this.contentStore);
+    }
+
+    @Test
+    void resendWhenInSubWikiAndMailFromOtherBatch() throws Exception
+    {
+        setSubWiki();
+        MailStatus status = new MailStatus();
+        status.setBatchId("batchId");
+        status.setWiki("wiki");
+        when(this.statusStore.load("messageId")).thenReturn(status);
+
+        assertNull(this.service.resend("otherBatchId", "messageId"));
+        assertEquals("The mail [messageId] of the batch [otherBatchId] was not sent from the current wiki",
+            this.service.getLastError().getMessage());
+        verifyNoInteractions(this.resender);
+    }
+
+    @Test
+    void resendAsynchronouslySeveralMessagesWhenInSubWiki() throws Exception
+    {
+        setSubWiki();
+
+        this.service.resendAsynchronously(Map.of("state", "prepare_%"), 5, 10);
+
+        // The mails of the other wikis are filtered out.
+        verify(this.resender).resendAsynchronously(Map.of("state", "prepare_%", "wiki", "wiki"), 5, 10);
     }
 }

@@ -21,6 +21,7 @@
 import { XWikiCodeBlock } from "./codeBlock";
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
+import { XWikiImageBlock } from "./imageBlock";
 import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
 import { XWikiRawBlock } from "./raw";
 import {
@@ -30,6 +31,8 @@ import {
   XWikiParametersStyle,
 } from "./styles";
 import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
+import { openImageSuggestionMenu } from "../components/images/imageSuggestionMenu";
+import { openLinkSuggestionMenu } from "../components/links/linkSuggestionMenu";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -46,8 +49,13 @@ import { filterMap } from "@xwiki/platform-fn-utils";
 import { createElement } from "react";
 import { RiFileList3Fill, RiLink } from "react-icons/ri";
 import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
-import type { LinkEditionHandler } from "../components/links/linkEdition";
-import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
+import type {
+  Block,
+  InlineContent,
+  Link,
+  PartialLink,
+  StyledText,
+} from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { useTranslation } from "react-i18next";
@@ -73,6 +81,7 @@ function createBlockNoteSchema(
     blockSpecs: {
       ...defaultBlockSpecs,
       codeBlock: XWikiCodeBlock({ className: options?.codeBlockClassName }),
+      image: XWikiImageBlock(),
       xwikiDefinitionListItem: DefinitionListItemBlock(),
       xwikiGroup: XWikiGroupBlock(),
       xwikiMacroBlock: XWikiMacroBlock(),
@@ -159,8 +168,6 @@ type SuggestionMenuItemsParams = {
   lang: EditorLanguage;
   /** `t` property from `react-i18n`'s useTranslation() return value */
   t: ReturnType<typeof useTranslation>["t"];
-  /** Handler for link editions, same as provided to `BlockNoteViewWrapper` */
-  linkEditionHandler: LinkEditionHandler;
   /** Macro insertion editor, same as provided to `BlockNoteViewWrapper` */
   openMacroInsertionEditor?: ContextForMacros["openInsertionEditor"];
 };
@@ -178,14 +185,22 @@ function querySuggestionsMenuItems({
   syntax,
   lang,
   t,
-  linkEditionHandler,
   openMacroInsertionEditor,
 }: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
 
-  // A single generic "Link" entry that opens the link wizard.
-  // Only enabled if the syntax supports it
+  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
+  // eslint-disable-next-line import-x/namespace
+  const locale = locales[lang].slash_menu;
+
+  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
+    candidates.some(
+      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
+    );
+
+  // A single generic "Link" entry that opens the link suggestion menu, which suggests pages and attachments to link to,
+  // in addition to uploading a file to link to and opening the link editor. Only enabled if the syntax supports it
   const genericLinkItem: DefaultReactSuggestionItem[] = inlineSupport.links
     .basicLinks
     ? [
@@ -195,16 +210,7 @@ function querySuggestionsMenuItems({
           aliases: ["link"],
           group: t("blocknote.slashMenu.link.group"),
           icon: createElement(RiLink),
-          onItemClick() {
-            linkEditionHandler({
-              mode: "createNew",
-              current: { title: "", url: "" },
-              onSubmit({ title, url }) {
-                editor.createLink(url, title);
-                editor.focus();
-              },
-            });
-          },
+          onItemClick: () => openLinkSuggestionMenu(editor),
         },
       ]
     : [];
@@ -236,7 +242,13 @@ function querySuggestionsMenuItems({
 
   let items = filterSuggestionItems(
     combineByGroup(
-      getDefaultReactSlashMenuItems(editor),
+      getDefaultReactSlashMenuItems(editor).map((item) =>
+        // The image quick action suggests images to insert, in addition to uploading or browsing
+        // images, instead of inserting an empty image block.
+        isLocale(item.title, ["image"])
+          ? { ...item, onItemClick: () => openImageSuggestionMenu(editor) }
+          : item,
+      ),
 
       // Block macros
       blocksSupport.macros
@@ -262,15 +274,6 @@ function querySuggestionsMenuItems({
     ),
     query,
   );
-
-  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
-  // eslint-disable-next-line import-x/namespace
-  const locale = locales[lang].slash_menu;
-
-  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
-    candidates.some(
-      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
-    );
 
   if (!blocksSupport.headings.levels1To3) {
     items = items.filter(
@@ -447,6 +450,14 @@ type EditorStyledText = StyledText<EditorStyleSchema>;
  */
 type EditorLink = Link<EditorStyleSchema>;
 
+/**
+ * Typesafe BlockNote link to insert, whose content is the label rather than styled text
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type EditorPartialLink = PartialLink<EditorStyleSchema>;
+
 export type {
   BlockOfType,
   BlockType,
@@ -454,6 +465,7 @@ export type {
   EditorInlineContentSchema,
   EditorLanguage,
   EditorLink,
+  EditorPartialLink,
   EditorSchema,
   EditorStyleSchema,
   EditorStyledText,

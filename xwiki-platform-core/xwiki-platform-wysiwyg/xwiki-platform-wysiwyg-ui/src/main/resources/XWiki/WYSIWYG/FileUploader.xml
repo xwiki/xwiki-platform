@@ -89,7 +89,7 @@
     #end
   #end
   #if ($uploaded)
-    #sendSuccess($document $fileName)
+    #sendSuccess($document $document.getAttachment($fileName))
   #elseif ($forbidden)
     #sendError(403 'You are not allowed to perform this action.')
   #else
@@ -144,7 +144,7 @@
       #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload', $fileName))
     #end
     #if ($attachment)
-      #sendSuccess($document, $attachment.filename)
+      #sendSuccess($document, $attachment)
     #elseif ("$!uploadTemporaryAttachmentException" != '')
       ## The exception is wrapped in an org.apache.velocity.exception.MethodInvocationException
       #set ($validationException = $uploadTemporaryAttachmentException.cause)
@@ -161,12 +161,23 @@
   #end
 #end
 
-#macro (sendSuccess $document $fileName)
+#macro (sendSuccess $document $attachment)
+  #set ($fileName = $attachment.filename)
   #set ($url = $document.getAttachmentURL($fileName))
   #set ($attachmentReference = $services.model.createAttachmentReference($document.documentReference, $fileName))
   #set ($resourceReference = {
     'type': 'attach',
     'reference': $services.model.serialize($attachmentReference, $document.documentReference)
+  })
+  ## The uploaded attachment, described like the REST API describes attachments, so that the caller doesn't need an
+  ## additional request to get it (which wouldn't find a temporary attachment anyway).
+  #set ($uploadedAttachment = {
+    'id': $services.model.serialize($attachmentReference, 'default'),
+    'name': $fileName,
+    'size': $attachment.longSize,
+    'mimeType': $attachment.mimeType,
+    'date': $attachment.date.time,
+    'author': $services.model.serialize($attachment.authorReference, 'default')
   })
   #set ($discard = $response.setContentType('application/json'))
   #if ($request.initiator == 'filetools')
@@ -174,7 +185,8 @@
       'uploaded': 1,
       'fileName': $fileName,
       'url': $url,
-      'resourceReference': $resourceReference
+      'resourceReference': $resourceReference,
+      'attachment': $uploadedAttachment
     })
   #else
     ## JSON expected by the filebrowser plugin.
@@ -184,7 +196,8 @@
       'fileName': $fileName,
       'message': {
         'resourceReference': $resourceReference
-      }
+      },
+      'attachment': $uploadedAttachment
     })
   #end
 #end

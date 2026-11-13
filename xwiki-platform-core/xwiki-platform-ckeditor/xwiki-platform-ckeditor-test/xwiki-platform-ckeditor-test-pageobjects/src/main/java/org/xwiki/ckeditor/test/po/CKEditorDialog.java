@@ -21,7 +21,6 @@ package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
 import static org.openqa.selenium.By.cssSelector;
@@ -33,7 +32,6 @@ import static org.openqa.selenium.By.cssSelector;
  * @since 15.5.1
  * @since 15.6RC1
  */
-@Unstable
 public class CKEditorDialog extends BaseElement
 {
     private static final By DIALOG_CONTENTS = By.className("cke_dialog_contents");

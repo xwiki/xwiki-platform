@@ -19,6 +19,7 @@
  */
 package org.xwiki.wysiwyg;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -37,6 +38,7 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeManager;
@@ -51,10 +53,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
 import com.xpn.xwiki.render.ScriptXWikiServletRequest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,6 +85,7 @@ import static org.mockito.Mockito.when;
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
+@ReferenceComponentList
 @ComponentList({
     DocumentReferenceConverter.class,
     EntityReferenceConverter.class,
@@ -131,12 +136,59 @@ class FileUploaderPageTest extends PageTest
             "test.txt")).thenReturn(attachment);
 
         when(attachment.getFilename()).thenReturn("test.txt");
+        when(attachment.getLongSize()).thenReturn(42L);
+        when(attachment.getMimeType()).thenReturn("text/plain");
+        when(attachment.getDate()).thenReturn(new Date(1000));
+        when(attachment.getAuthorReference()).thenReturn(new DocumentReference("xwiki", "XWiki", "Alice"));
 
         JsonNode json = renderJSONPage(documentReference);
 
         assertEquals(1, json.get("uploaded").asInt());
         assertEquals("/xwiki/bin/download/XWiki/WYSIWYG/FileUploader/test.txt", json.get("url").asText());
         assertEquals("test.txt", json.get("fileName").asText());
+
+        // The uploaded attachment is described like the REST API describes attachments.
+        JsonNode uploadedAttachment = json.get("attachment");
+        assertEquals("xwiki:XWiki.WYSIWYG.FileUploader@test.txt", uploadedAttachment.get("id").asText());
+        assertEquals("test.txt", uploadedAttachment.get("name").asText());
+        assertEquals(42, uploadedAttachment.get("size").asLong());
+        assertEquals("text/plain", uploadedAttachment.get("mimeType").asText());
+        assertEquals(1000, uploadedAttachment.get("date").asLong());
+        assertEquals("xwiki:XWiki.Alice", uploadedAttachment.get("author").asText());
+    }
+
+    @Test
+    void renderUploadSuccessWithoutTemporaryAttachmentSupport() throws Exception
+    {
+        this.context.setAction("get");
+        this.context.setUserReference(new DocumentReference("xwiki", "XWiki", "Alice"));
+        // The current user is allowed to upload, and the page author to save the document holding the attachment.
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.EDIT,
+            new DocumentReference("xwiki", "XWiki", "Admin"), documentReference)).thenReturn(true);
+        setAttachmentSupportStatus(false);
+
+        FileUploadPluginApi fileUploadPluginApi = mock();
+        when(this.oldcore.getSpyXWiki().getPluginApi("fileupload", this.context)).thenReturn(fileUploadPluginApi);
+        when(fileUploadPluginApi.getFileName("upload")).thenReturn("test.txt");
+        when(fileUploadPluginApi.getFileItemData("upload")).thenReturn("content".getBytes());
+
+        JsonNode json = renderJSONPage(documentReference);
+
+        assertEquals(1, json.get("uploaded").asInt());
+        assertEquals("/xwiki/bin/download/XWiki/WYSIWYG/FileUploader/test.txt", json.get("url").asText());
+        assertEquals("test.txt", json.get("fileName").asText());
+
+        // The attachment is saved right away, and described like the REST API describes attachments.
+        XWikiAttachment savedAttachment =
+            this.xwiki.getDocument(documentReference, this.context).getAttachment("test.txt");
+        JsonNode uploadedAttachment = json.get("attachment");
+        assertEquals("xwiki:XWiki.WYSIWYG.FileUploader@test.txt", uploadedAttachment.get("id").asText());
+        assertEquals("test.txt", uploadedAttachment.get("name").asText());
+        assertEquals(7, uploadedAttachment.get("size").asLong());
+        assertEquals("text/plain", uploadedAttachment.get("mimeType").asText());
+        assertEquals(savedAttachment.getDate().getTime(), uploadedAttachment.get("date").asLong());
+        assertEquals("xwiki:XWiki.Alice", uploadedAttachment.get("author").asText());
     }
 
     @Test

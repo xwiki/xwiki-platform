@@ -31,15 +31,24 @@
   <name>XWiki Platform - Rendering - Macro - Cache</name>
   <description>Cache the content of the macro for some time</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.96</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Cache Macro</xwiki.extension.name>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/cache
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-cache-api</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bridge</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

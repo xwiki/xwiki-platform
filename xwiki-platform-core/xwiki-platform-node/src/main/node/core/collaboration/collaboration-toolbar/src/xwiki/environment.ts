@@ -20,7 +20,7 @@
 
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
-import type { ToolbarEnvironment } from "../ui/types";
+import type { ToolbarEnvironment } from "../vue/types";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 
 type Define = (id: string, definition: unknown) => void;

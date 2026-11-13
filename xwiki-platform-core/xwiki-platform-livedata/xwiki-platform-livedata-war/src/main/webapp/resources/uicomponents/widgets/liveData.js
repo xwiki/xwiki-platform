@@ -27,8 +27,6 @@
     'xwiki-livedata': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'main.es.js')
   },
   'css': {
-    'liveDataLessReactive': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'reactive.less', {'evaluate': true}),
     'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css')
   },
   'liveDataBasePath': $stringtool.removeEnd($liveDataPath, $liveDataEntry),
@@ -89,7 +87,6 @@
   });
 
   loadModule(paths.module["xwiki-livedata"]);
-  loadCSS(paths.css.liveDataLessReactive);
 
 // End JavaScript-only code.
 }).apply("]]#", $jsontool.serialize([$paths]));

@@ -22,14 +22,28 @@ package org.xwiki.user.directory.test.po;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
+/**
+ * Represents the User Directory page ({@code Main.UserDirectory}).
+ *
+ * @version $Id$
+ * @since 4.2M3
+ */
 public class UserDirectoryPage extends ViewPage
 {
+    /**
+     * Go to the User Directory page.
+     *
+     * @return the page object for the User Directory page
+     */
     public static UserDirectoryPage gotoPage()
     {
         getUtil().gotoPage("Main", "UserDirectory");
         return new UserDirectoryPage();
     }
 
+    /**
+     * @return the live table listing the users, once it's ready
+     */
     public LiveTableElement getUserDirectoryLiveTable()
     {
         LiveTableElement lt = new LiveTableElement("userdirectory");

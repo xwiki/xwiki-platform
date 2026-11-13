@@ -26,6 +26,8 @@ import { createI18n } from "vue-i18n";
 // @ts-expect-error xwiki-platform-localization does not export types
 import { resolver } from "xwiki-platform-localization-webjar";
 
+// Counts the live data applications created in the page, to give each its own identifier prefix.
+let liveDataCount = 0;
 
 /**
  * The init function of the logic script
@@ -49,18 +51,12 @@ function init(element, $) {
   const locale = document.documentElement.getAttribute("lang");
   const i18n = createI18n({ legacy: false, locale });
 
-  let contentTrusted = false;
-  try {
-    const scriptEl = element.querySelector(':scope > script[type="application/json"]');
-    if(!scriptEl) {
-      console.error("Missing live data configuration for element", element, "The HTML content is" +
-        " considered unsafe.");
-    }
-    contentTrusted = scriptEl?.getAttribute('data-config-content-trusted') === 'true';
-  } catch (e) {
-    console.error("Failed to access the live data configuration for element", element, "The HTML content is" +
-      " considered unsafe.", e);
-  }
+  // The content is trusted only if the Live Data macro says so, using a script element that the HTML sanitizer would
+  // strip from untrusted markup. The script element is legitimately missing when the live data markup is not produced
+  // by the Live Data macro (e.g. by the livetable Velocity macro), or when the macro output is displayed in the WYSIWYG
+  // editor (which replaces script elements with comments). The content is considered untrusted in this case.
+  const trustScript = element.querySelector(':scope > script[type="application/json"]');
+  const contentTrusted = trustScript?.getAttribute("data-config-content-trusted") === "true";
 
   // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
   const placeholderElement = document.createElement("div");
@@ -82,12 +78,16 @@ function init(element, $) {
     }, {once: true});
   });
 
-  createApp(XWikiLivedata, {
+  const app = createApp(XWikiLivedata, {
     data,
     liveDataSource: new XWikiLiveDataSource($),
     contentTrusted,
     resolveTranslations: buildTranslations(locale, i18n),
-  })
+  });
+  // The identifiers generated with useId are only unique in their application, and there is one application per live
+  // data.
+  app.config.idPrefix = `xwiki-livedata-${++liveDataCount}`;
+  app
     .mixin({
       mounted() {
         element.classList.remove("loading");

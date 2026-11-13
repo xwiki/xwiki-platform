@@ -320,8 +320,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         throws XWikiException
     {
         BaseObject extensionObject = getExtensionObject(extensionDocument);
-        XWikiDocument versionDocument =
-            this.extensionStore.getExtensionVersionDocument(extensionDocument, version, getXWikiContext());
         DocumentReference extensionDocumentReference = extensionDocument.getDocumentReference();
 
         if (extensionObject == null) {
@@ -433,6 +431,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             extensionVersion.withRepositories(toExtensionRepositories(repositories));
 
             // Dependencies
+            XWikiDocument versionDocument =
+                this.extensionStore.getExtensionVersionDocument(extensionDocument, version, getXWikiContext());
             List<BaseObject> dependencies =
                 versionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
             if (dependencies != null) {

@@ -1,0 +1,20 @@
+{
+  "link-type.target-types.url.url": "URL",
+  "link-type.target-types.url.url.placeholder": "https://www.example.org",
+
+  "link-type.target-types.email.address": "E-mail address",
+  "link-type.target-types.email.address.placeholder": "name{'@'}example.org",
+  "link-type.target-types.email.subject": "Message subject",
+  "link-type.target-types.email.body": "Message body",
+
+  "link-type.target-types.page.reference": "Page reference",
+  "link-type.target-types.page.reference.hint": "Leave empty to link to the current page.",
+  "link-type.target-types.page.query-string": "Query string",
+  "link-type.target-types.page.query-string.placeholder": "key1=value1&key2=value2",
+  "link-type.target-types.page.anchor": "Anchor",
+  "link-type.target-types.page.anchor.placeholder": "HSectionTitle",
+
+  "link-type.target-types.attachment.reference": "Attachment reference",
+  "link-type.target-types.attachment.query-string": "Query string",
+  "link-type.target-types.attachment.query-string.placeholder": "key1=value1&key2=value2"
+}

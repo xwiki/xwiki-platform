@@ -66,6 +66,14 @@ public class LoggingAdministrationSectionPage extends AdministrationSectionPage
     private static final By SET_BUTTON = By.cssSelector("input[name='loggeraction_set']");
 
     /**
+     * Creates a page object for the Logging administration section, which must be the current page.
+     */
+    public LoggingAdministrationSectionPage()
+    {
+        super(SECTION_ID);
+    }
+
+    /**
      * Open the Logging administration section.
      *
      * @return the Logging administration section
@@ -74,11 +82,6 @@ public class LoggingAdministrationSectionPage extends AdministrationSectionPage
     {
         AdministrationSectionPage.gotoPage(SECTION_ID);
         return new LoggingAdministrationSectionPage();
-    }
-
-    public LoggingAdministrationSectionPage()
-    {
-        super(SECTION_ID);
     }
 
     /**

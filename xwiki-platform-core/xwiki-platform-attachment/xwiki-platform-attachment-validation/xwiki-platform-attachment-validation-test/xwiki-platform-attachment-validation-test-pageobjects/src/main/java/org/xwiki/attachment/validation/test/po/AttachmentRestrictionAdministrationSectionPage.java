@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 14.10
  */
-public class AttachmentRestrictionAdministrationSectionPage extends ViewPage
+public final class AttachmentRestrictionAdministrationSectionPage extends ViewPage
 {
     private AdministrationSectionPage attachmentsrestriction;
 

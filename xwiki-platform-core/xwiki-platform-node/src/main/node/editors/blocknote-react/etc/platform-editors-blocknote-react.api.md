@@ -17,16 +17,21 @@ import { Container } from 'inversify';
 import { CustomInlineContentConfig } from '@blocknote/core';
 import { DefaultInlineContentSchema } from '@blocknote/core';
 import { DefaultStyleSchema } from '@blocknote/core';
+import { Extension } from '@blocknote/core';
+import { ExtensionFactoryInstance } from '@blocknote/core';
 import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
+import { InlineMacroInvocation as InlineMacroInvocation_2 } from '@xwiki/platform-uniast-api';
 import { Link } from '@blocknote/core';
 import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
+import { MacroBlockInvocation as MacroBlockInvocation_2 } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
+import { PartialLink } from '@blocknote/core';
 import { PropSchema } from '@blocknote/core';
 import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactInlineContentImplementation } from '@blocknote/react';
@@ -46,6 +51,7 @@ export type BlockNoteViewWrapperProps = {
     theme?: "light" | "dark";
     lang: EditorLanguage;
     label: string;
+    documentReference?: string;
     content: BlockType[];
     macros: {
         list?: MacroWithUnknownParamsType[];
@@ -57,6 +63,8 @@ export type BlockNoteViewWrapperProps = {
     linkEditionHandler: LinkEditionHandler;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
+        imageEditionHooks?: ImageEditionHooks;
+        imageInsertion?: ImageInsertionOverrideFn;
         linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
@@ -81,6 +89,7 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 export type ContextForMacros = {
     openParamsEditor?(invocation: MacroBlockInvocation | InlineMacroInvocation, update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void): void;
     openInsertionEditor?(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
+    getMacroOutput?(id: string, call: string): unknown[] | undefined;
 };
 
 // @beta
@@ -100,6 +109,9 @@ export type EditorLanguage = keyof typeof locales & keyof typeof _default;
 // @beta
 export type EditorLink = Link<EditorStyleSchema>;
 
+// @beta
+export type EditorPartialLink = PartialLink<EditorStyleSchema>;
+
 // Warning: (ae-forgotten-export) The symbol "createBlockNoteSchema" needs to be exported by the entry point index.d.ts
 //
 // @beta
@@ -118,7 +130,24 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
+export type ImageEditionHooks = {
+    afterUpdate?: (block: BlockOfType<"image">, reference?: ResourceReference) => void;
+};
+
+// @beta
 export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;
+
+// @beta
+export type ImageInsertionOverrideFn = (insert: (insertionResult: ImageInsertionResult) => void) => void;
+
+// @beta
+export type ImageInsertionResult = {
+    type: "insert";
+    props: Partial<BlockOfType<"image">["props"]>;
+    reference?: ResourceReference;
+} | {
+    type: "aborted";
+};
 
 // @beta
 export type ImageUpdateResult = {
@@ -132,10 +161,7 @@ export type ImageUpdateResult = {
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta
-export type InlineMacroInvocation = {
-    kind: "inline";
-    id: string;
-    params: MacroCallParams;
+export type InlineMacroInvocation = Omit<InlineMacroInvocation_2, "body"> & {
     body: {
         type: "inlineContent";
         content: InlineContentType;
@@ -150,6 +176,7 @@ export type InlineMacroInvocation = {
 // @beta
 export type LinkEditionData = {
     title: string;
+    generatedTitle?: boolean;
     url: string;
     reference?: ResourceReference;
 };
@@ -174,10 +201,7 @@ export type LinkEditionHooks = {
 export const MACRO_NAME_PREFIX = "Macro_";
 
 // @beta
-export type MacroBlockInvocation = {
-    kind: "block";
-    id: string;
-    params: MacroCallParams;
+export type MacroBlockInvocation = Omit<MacroBlockInvocation_2, "body"> & {
     body: {
         type: "inlineContents";
         content: InlineContentType[];

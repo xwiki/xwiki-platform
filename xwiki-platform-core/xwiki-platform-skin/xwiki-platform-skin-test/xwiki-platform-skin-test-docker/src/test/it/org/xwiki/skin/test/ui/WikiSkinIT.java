@@ -43,7 +43,6 @@ import org.xwiki.skin.test.po.SkinInlinePage;
 import org.xwiki.skin.test.po.SkinTemplateElement;
 import org.xwiki.skin.test.po.SkinViewPage;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -144,15 +143,8 @@ class WikiSkinIT
      */
     @Test
     @Order(2)
-    void overrideFaviconWithSkinAttachment(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
-        throws Exception
+    void overrideFaviconWithSkinAttachment(TestUtils setup) throws Exception
     {
-        // The attachments are deleted one after the other at the end of the test: the Solr indexer can index the skin
-        // while an attachment is being deleted, when its content is already removed but the skin document still has
-        // it. Nothing is lost since the deletion indexes the skin document again.
-        logCaptureConfiguration.registerExcludes("Failed to retrieve the content of attachment "
-            + "[Attachment xwiki:XWiki.DefaultSkin@icons.xwiki.");
-
         setup.loginAsSuperAdmin();
 
         byte[] svg = SVG_CONTENT.getBytes(StandardCharsets.UTF_8);

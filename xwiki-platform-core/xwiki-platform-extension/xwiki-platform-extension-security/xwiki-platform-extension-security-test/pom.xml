@@ -30,6 +30,11 @@
   <name>XWiki Platform - Extension - Security - Test - Root POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Extension - Security - Test - Root POM</description>
+  <properties>
+    <!-- Test code and page objects are not public APIs, so don't run backward-compatibility checks on them.
+         See https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HCodeThatIsNotAPI -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <modules>
     <module>xwiki-platform-extension-security-test-pageobjects</module>
   </modules>

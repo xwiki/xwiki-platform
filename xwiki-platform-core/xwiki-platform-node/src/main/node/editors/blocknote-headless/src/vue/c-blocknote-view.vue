@@ -20,15 +20,16 @@
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
+import { LinkModal } from "@xwiki/platform-link-modal-ui";
 import {
-  LinkModal,
-  linkTargetToResourceReference,
-  parseLinkTarget,
-  resourceReferenceToLinkTarget,
-} from "@xwiki/platform-link-modal-ui";
+  linkTargetTypeManagerRole,
+  unsupportedLinkTargetType,
+} from "@xwiki/platform-link-type-api";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
+  computed,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   onUnmounted,
@@ -46,16 +47,13 @@ import type {
   LinkEditionData,
   LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkData, LinkTarget } from "@xwiki/platform-link-modal-ui";
+import type {
+  LinkContext,
+  LinkData,
+  LinkTarget,
+  LinkTargetTypeManager,
+} from "@xwiki/platform-link-type-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type {
-  ModelReferenceParserProvider,
-  ModelReferenceSerializerProvider,
-} from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
 
 type Props = {
   /** Main properties for the BlockNote editor */
@@ -84,6 +82,18 @@ type Props = {
 
   /** Container to inject dependencies from */
   depsContainer: Container;
+
+  /**
+   * The link target types (by type) that the link modal doesn't offer for new links, while still using them to edit
+   * the links they handle. Unknown types are ignored.
+   */
+  excludedLinkTargetTypes?: string[];
+
+  /**
+   * Where the edited links are, e.g. the document holding the edited content: the references of the linked pages and
+   * attachments are resolved and saved relative to it.
+   */
+  linkContext?: LinkContext;
 };
 
 const {
@@ -92,6 +102,8 @@ const {
   macros,
   collaboration = undefined,
   depsContainer,
+  excludedLinkTargetTypes = undefined,
+  linkContext = undefined,
 } = defineProps<Props>();
 
 const editorRef = shallowRef<EditorType | null>(null);
@@ -115,28 +127,21 @@ const emit = defineEmits<{
   "local-instant-change": [];
 }>();
 
-const remoteURLParser = depsContainer
-  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
-  .get()!;
-
-const remoteURLSerializer = depsContainer
-  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-  .get()!;
-
-const modelReferenceParser = depsContainer
-  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-  .get()!;
-
-const modelReferenceSerializer = depsContainer
-  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
-  .get()!;
-
 function getContent(): BlockType[] {
   return editorRef.value!.document;
 }
 
+/**
+ * @returns the editor instance, for the integrations that act on the edited content themselves, or nothing before
+ *   the editor is mounted
+ */
+function getEditor(): EditorType | undefined {
+  return editorRef.value ?? undefined;
+}
+
 defineExpose({
   getContent,
+  getEditor,
 });
 
 /**
@@ -179,55 +184,78 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
 };
 
 /**
- * The reference of the linked resource is the authoritative link target (the URL is only a rendering
- * of it), so build the target to configure in the link modal from that reference when the
- * integration provides one, and fall back on reverse-engineering the URL otherwise.
+ * @returns the link target type manager, resolved each time it's needed, so that it uses the link target types
+ *   registered at that time
  */
-function currentLinkTarget(current: LinkEditionData): LinkTarget {
-  return (
-    (current.reference &&
-      resourceReferenceToLinkTarget(current.reference, modelReferenceParser)) ??
-    parseLinkTarget(current.url, remoteURLParser)
-  );
+function getLinkTargetTypeManager(): LinkTargetTypeManager {
+  return depsContainer.get<LinkTargetTypeManager>(linkTargetTypeManagerRole);
 }
 
-const submitEditedLink = ({ displayText, target }: LinkData) => {
-  const { type, config } = target;
-
-  // TODO: support
-
+const submitEditedLink = ({
+  displayText,
+  generatedDisplayText,
+  target,
+}: LinkData) => {
+  const linkTargetTypeManager = getLinkTargetTypeManager();
+  // The URL of a resource that no link target type supports can't be computed client-side, so keep the URL of the
+  // edited link. It's only a preview anyway: the link is saved from its reference.
   const url =
-    type === "url"
-      ? config.url
-      : type === "email"
-        ? `mailto:${config.address}`
-        : remoteURLSerializer.serialize(config.ref!)!;
+    target.type === unsupportedLinkTargetType
+      ? (editingLink.value?.current.url ?? "")
+      : linkTargetTypeManager.toURL(target, linkContext);
+  const reference = linkTargetTypeManager.toReference(target, linkContext);
 
   editingLink.value?.onSubmit({
     title: displayText,
+    generatedTitle: generatedDisplayText,
     url,
-    reference: linkTargetToResourceReference(target, modelReferenceSerializer),
+    reference,
   });
 
-  editingLink.value = null;
+  closeLinkModal();
 };
 
+/**
+ * Close the link modal and focus back the edited content, so that keyboard users can keep typing where they were.
+ * The content is focused only once the modal is removed: a modal dialog keeps the focus while it's shown (e.g. the
+ * Bootstrap one moves it back inside as soon as it leaves).
+ */
+async function closeLinkModal(): Promise<void> {
+  editingLink.value = null;
+  await nextTick();
+  editorRef.value?.focus();
+}
+
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
-const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
 const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
 
-function handleLinkEditorOutsideClick(e: MouseEvent) {
-  if (!editingLink.value || !linkModalContainer.value) {
-    return;
+/**
+ * The reference of the linked resource is the authoritative link target (the URL is only a rendering
+ * of it), so build the target to configure in the link modal from that reference when the
+ * integration provides one, even when no link target type supports it (the reference is then edited as
+ * is), and fall back on reverse-engineering the URL otherwise.
+ */
+function currentLinkTarget(current: LinkEditionData): LinkTarget {
+  const linkTargetTypeManager = getLinkTargetTypeManager();
+  return current.reference
+    ? linkTargetTypeManager.fromReference(current.reference, linkContext)
+    : linkTargetTypeManager.fromURL(current.url);
+}
+
+const currentLinkData = computed<LinkData | null>(() => {
+  if (!editingLink.value) {
+    return null;
   }
 
-  if (!e.composedPath().includes(linkModalContainer.value)) {
-    editingLink.value = null;
-  }
-}
+  return {
+    displayText: editingLink.value.current.title,
+    generatedDisplayText: editingLink.value.current.generatedTitle,
+    target: currentLinkTarget(editingLink.value.current),
+  };
+});
 
 onMounted(() => {
   if (!blockNoteContainer.value) {
@@ -238,8 +266,6 @@ onMounted(() => {
     ...initializedEditorProps,
     content: editorContent,
   });
-
-  window.addEventListener("mousedown", handleLinkEditorOutsideClick);
 });
 
 onBeforeUnmount(() => {
@@ -251,7 +277,6 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener("mousedown", handleLinkEditorOutsideClick);
   unsubscribeFromLocalChanges?.();
   unsubscribeFromLocalChanges = undefined;
 });
@@ -260,17 +285,16 @@ onUnmounted(() => {
 <template>
   <div ref="blocknote-container" />
 
-  <div ref="link-modal-container" v-if="editingLink">
-    <LinkModal
-      :current="{
-        displayText: editingLink.current.title,
-        target: currentLinkTarget(editingLink.current),
-      }"
-      :deps-container="depsContainer"
-      @submit="submitEditedLink"
-      @cancel="editingLink = null"
-    />
-  </div>
+  <LinkModal
+    v-if="currentLinkData"
+    :current="currentLinkData"
+    :deps-container="depsContainer"
+    :excluded-link-target-types="excludedLinkTargetTypes"
+    :link-context
+    :mode="editingLink?.mode"
+    @submit="submitEditedLink"
+    @cancel="closeLinkModal"
+  />
 </template>
 
 <style scoped>

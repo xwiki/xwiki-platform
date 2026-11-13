@@ -35,6 +35,10 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Records Macro</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/records
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

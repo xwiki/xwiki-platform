@@ -1,0 +1,2 @@
+org.xwiki.pagetemplate.internal.DefaultTemplateProviderManager
+org.xwiki.pagetemplate.internal.TemplateProviderClassDocumentInitializer

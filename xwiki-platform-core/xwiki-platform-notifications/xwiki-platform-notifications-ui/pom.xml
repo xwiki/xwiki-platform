@@ -34,6 +34,16 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications Application</xwiki.extension.name>
+    <!-- Internal macros of the notification preferences, not declared in xwiki.extension.components so that the editor
+         doesn't suggest installing them -->
+    <xwiki.extension.components.macros.check.excluded>
+      notificationsApplicationsPreferences
+      notificationsAutoWatchPreferences
+      notificationsCustomFiltersPreferences
+      notificationsEmailPreferences
+      notificationsFiltersPreferences
+      notificationsSystemFiltersPreferences
+    </xwiki.extension.components.macros.check.excluded>
   </properties>
   <dependencies>
     <!-- We should keep notifications-preferences-default as first dependency since it declares DefaultModelBridge

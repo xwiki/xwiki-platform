@@ -996,10 +996,6 @@
 /* Input-color-placeholder is hardcoded in bootstrap, we need to override it. */
 @input-color-placeholder: @gray-light;
 
-/* Drawer */
-@xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;
-@xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
-
 /* Headings */
 @headings-font-weight: 500;
 

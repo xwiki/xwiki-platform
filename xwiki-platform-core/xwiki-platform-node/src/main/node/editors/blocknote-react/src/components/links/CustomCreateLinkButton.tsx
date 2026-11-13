@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { insertLink } from "./insertLink";
 import { useEditor } from "../../hooks";
 import { selectionHasInlineContent } from "../../selection";
 import { formatKeyboardShortcut } from "@blocknote/core";
@@ -39,23 +40,13 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
   const Components = useComponentsContext()!;
   const dict = useDictionary();
 
-  const insertLink = useCallback(
-    (linkData: LinkEditionData) => {
-      // Let the integration intercept the link (including the reference of the linked resource)
-      // before it is written into the content (e.g. to store that reference aside). Throwing from
-      // the hook cancels the insertion.
-      const updatedLinkData =
-        linkEditionHooks?.beforeUpdate?.(linkData) ?? linkData;
-      // Don't pass the title as text: we want to link the current selection in place, without
-      // replacing it (which would strip its inline formatting).
-      editor.createLink(updatedLinkData.url);
-      editor.focus();
-    },
+  const insertSelectionLink = useCallback(
+    // When the link label differs from the selected text, the selection is replaced with the new label, keeping the
+    // formatting shared by the whole selection, like typing over it does.
+    (linkData: LinkEditionData, selectedText: string) =>
+      insertLink(editor, linkData, linkEditionHooks, selectedText),
     [editor, linkEditionHooks],
   );
-
-  // TODO: check if we need to update in realtime when the selection change?
-  const selected = editor.getSelectedText();
 
   // Links are inline content, so they can only wrap editable inline content. Hide the button when the
   // selection has no such content (e.g. a block-level macro or other content-less block is selected),
@@ -75,13 +66,16 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
         dict.generic.ctrl_shortcut,
       )}
       icon={<RiLink />}
-      onClick={() =>
+      onClick={() => {
+        // The display text is pre-filled with the text selected when the link modal is opened, which
+        // also tells, on submit, whether the user changed it.
+        const selectedText = editor.getSelectedText();
         linkEditionHandler({
           mode: "createNew",
-          current: { title: selected, url: "" },
-          onSubmit: insertLink,
-        })
-      }
+          current: { title: selectedText, url: "" },
+          onSubmit: (linkData) => insertSelectionLink(linkData, selectedText),
+        });
+      }}
     />
   );
 };

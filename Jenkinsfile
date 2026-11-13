@@ -78,16 +78,10 @@ def builds = [
       ))
     }
   },
-  'Flavor Test - UI' : {
+  'Flavor Test - Data' : {
     buildFunctionalTest(
-      name: 'Flavor Test - UI',
-      pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml',
-    )
-  },
-  'Flavor Test - Storage': {
-    buildFunctionalTest(
-      name: 'Flavor Test - Storage',
-      pom: 'xwiki-platform-distribution-flavor-test-storage/pom.xml'
+      name: 'Flavor Test - Data',
+      pom: 'xwiki-platform-distribution-flavor-test-data/pom.xml',
     )
   },
   'Flavor Test - Escaping' : {
@@ -190,13 +184,9 @@ private void buildStandardAll(builds)
 
           // Now run all functional tests in parallel, each on its own node.
           parallel(
-            'flavor-test-ui': {
-              // Run the Flavor UI tests
-              builds['Flavor Test - UI'].call()
-            },
-            'flavor-test-storage': {
-              // Run the Flavor Storage tests
-              builds['Flavor Test - Storage'].call()
+            'flavor-test-data': {
+              // Run the Flavor Data tests
+              builds['Flavor Test - Data'].call()
             },
             'flavor-test-escaping': {
               // Run the Flavor Escaping tests

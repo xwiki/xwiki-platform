@@ -44,7 +44,9 @@ public class ApplicationFilterHomePage extends ViewPage
     private WebElement convertButton;
 
     /**
-     * Go to the home page of the Application Index application.
+     * Go to the home page of the Filter application.
+     *
+     * @return the page object for the Filter application home page
      */
     public static ApplicationFilterHomePage gotoPage()
     {
@@ -53,48 +55,79 @@ public class ApplicationFilterHomePage extends ViewPage
         return new ApplicationFilterHomePage();
     }
 
+    /**
+     * @param typeId the identifier of the input filter type to select
+     */
     public void setInputFilter(String typeId)
     {
         new Select(this.inputType).selectByValue(typeId);
     }
 
+    /**
+     * @param typeId the identifier of the output filter type to select
+     */
     public void setOutputFilter(String typeId)
     {
         new Select(this.outType).selectByValue(typeId);
     }
 
+    /**
+     * @param propertyName the name of the input filter property
+     * @return the form field used to set the value of the given input filter property
+     */
     public WebElement getInputField(String propertyName)
     {
         return getDriver().findElement(By.id("filter_input_properties_descriptor_" + propertyName));
     }
 
+    /**
+     * @param propertyName the name of the output filter property
+     * @return the form field used to set the value of the given output filter property
+     */
     public WebElement getOutputField(String propertyName)
     {
         return getDriver().findElement(By.id("filter_output_properties_descriptor_" + propertyName));
     }
 
+    /**
+     * @param propertyName the name of the input filter property to set
+     * @param value the value to type in the input filter property field
+     */
     public void setInputProperty(String propertyName, String value)
     {
         WebElement inputElement = getInputField(propertyName);
         inputElement.sendKeys(value);
     }
 
+    /**
+     * @param propertyName the name of the output filter property to set
+     * @param value the value to type in the output filter property field
+     */
     public void setOutputProperty(String propertyName, String value)
     {
         WebElement outputElement = getOutputField(propertyName);
         outputElement.sendKeys(value);
     }
 
+    /**
+     * @param source the value of the {@code source} input filter property
+     */
     public void setSource(String source)
     {
         setInputProperty("source", source);
     }
 
+    /**
+     * @param target the value of the {@code target} output filter property
+     */
     public void setTarget(String target)
     {
         setOutputProperty("target", target);
     }
 
+    /**
+     * Starts the conversion and waits for it to finish.
+     */
     public void convert()
     {
         // Click convert

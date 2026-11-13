@@ -24,10 +24,12 @@ import java.io.IOException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.DrawerMenu;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -74,5 +76,46 @@ class SkinVisualIT
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Headings"));
         screenshots.assertMatches("headings", viewPage.getContentContainer());
+    }
+
+    /**
+     * Verify the layout of the drawer menu: the brand with the current user, the category headers, the menu items and
+     * the separators.
+     */
+    @Test
+    @Order(2)
+    void drawer(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Headings"));
+        DrawerMenu drawerMenu = viewPage.getDrawerMenu();
+        drawerMenu.show();
+        screenshots.assertMatches("drawer", drawerMenu.getContainer());
+    }
+
+    /**
+     * Verify the layout of a Live Data on a small screen: the property names and the filters are displayed as two
+     * columns, the page size selector is hidden, and the actions that are otherwise only displayed on hover, in the
+     * table and in the advanced panels, are always displayed.
+     */
+    @Test
+    @Order(3)
+    void liveDataSmallScreen(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "LiveData"));
+        LiveDataElement liveData = new LiveDataElement("skinVisual");
+        liveData.getTableLayout().waitUntilRowCountEqualsTo(2);
+        setup.setBrowserWindowWidth(700);
+        try {
+            screenshots.assertMatches("liveData", viewPage.getContentContainer());
+
+            liveData.openPropertiesPanel();
+            liveData.openSortPanel();
+            liveData.openFiltersPanel();
+            // Capture the panels alone rather than the whole content, which no longer fits in the viewport once they
+            // are open.
+            screenshots.assertMatches("liveDataPanels", liveData.getAdvancedPanels());
+        } finally {
+            setup.maximizeBrowserWindow();
+        }
     }
 }

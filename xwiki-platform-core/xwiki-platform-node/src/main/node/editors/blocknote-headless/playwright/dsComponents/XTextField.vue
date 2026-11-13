@@ -21,7 +21,13 @@
 import { useId } from "vue";
 import type { TextFieldProps } from "@xwiki/platform-dsapi";
 
-const { label, type = "text" } = defineProps<TextFieldProps>();
+const {
+  label,
+  help,
+  type = "text",
+  autofocus,
+  required,
+} = defineProps<TextFieldProps>();
 
 const model = defineModel<string>();
 
@@ -35,6 +41,14 @@ defineOptions({
 <template>
   <div>
     <label :for="textFieldId">{{ label }}</label>
-    <input :id="textFieldId" :type="type" v-model="model" v-bind="$attrs" />
+    <span v-if="help" class="xHint">{{ help }}</span>
+    <input
+      :id="textFieldId"
+      :type="type"
+      :autofocus
+      :required
+      v-model="model"
+      v-bind="$attrs"
+    />
   </div>
 </template>

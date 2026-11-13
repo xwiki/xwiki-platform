@@ -694,8 +694,9 @@ define('paged-polyfill-patched', [
     }
 
     beforeTreeParse(text, sheet) {
-      sheet.text = text.replace(/\(\s*(width|height)\s*([&lt;&gt;])=\s*([^()]+?)\s*\)/g,
-        (match, feature, operator, value) =&gt; `(${operator === '&lt;' ? 'max' : 'min'}-${feature}: ${value})`);
+      sheet.text = text
+        .replace(/\(\s*(width|height)\s*&lt;=\s*/g, '(max-$1: ')
+        .replace(/\(\s*(width|height)\s*&gt;=\s*/g, '(min-$1: ');
     }
   }
 

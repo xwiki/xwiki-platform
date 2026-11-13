@@ -19,6 +19,10 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,8 +41,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.CaseUtils;
-import org.apache.commons.text.StringTokenizer;
-import org.apache.commons.text.matcher.StringMatcherFactory;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
@@ -485,17 +487,35 @@ public class DefaultNotificationParametersFactory
     }
 
     /**
-     * Splits the value of a parameter holding a list on the commas that are not inside double quotes. A double quote
-     * inside a quoted value is doubled.
+     * Splits the value of a parameter holding a list on the commas that are not inside double quotes, the way the macro
+     * editor writes it. A backslash escapes the next character inside double quotes. Unlike the conversion of a
+     * collection macro parameter, the values aren't split on whitespaces, so that a value holding a whitespace can be
+     * given without quotes.
      *
      * @param value the value of the parameter
      * @return the values it holds, trimmed, empty values excluded
      */
     static List<String> splitListParameter(String value)
     {
-        StringTokenizer tokenizer = new StringTokenizer(value, ',', '"');
-        tokenizer.setTrimmerMatcher(StringMatcherFactory.INSTANCE.trimMatcher());
-        return tokenizer.getTokenList();
+        List<String> values = new ArrayList<>();
+        if (StringUtils.isNotBlank(value)) {
+            StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(value));
+            tokenizer.resetSyntax();
+            tokenizer.wordChars(0, 255);
+            tokenizer.whitespaceChars(',', ',');
+            tokenizer.quoteChar('"');
+            try {
+                while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+                    String token = StringUtils.trim(tokenizer.sval);
+                    if (StringUtils.isNotEmpty(token)) {
+                        values.add(token);
+                    }
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+        return values;
     }
 
     private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)

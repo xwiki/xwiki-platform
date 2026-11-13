@@ -432,11 +432,11 @@ class DefaultNotificationParametersFactoryTest
             new TagNotificationFilterPreference("say \"hi\"", "mywiki")
         );
 
-        // The values are put in double quotes, doubling the double quotes they hold.
+        // The values are quoted the way the macro editor writes them, except for the last space, which holds no comma.
         assertEquals(expectedNotificationParameters, this.parametersFactory.createNotificationParameters(Map.of(
             ParametersKey.USE_USER_PREFERENCES, "false",
-            ParametersKey.SPACES, "\"My, Space\",\"Other Space\"",
-            ParametersKey.TAGS, "\"my tag\",\"say \"\"hi\"\"\""
+            ParametersKey.SPACES, "\"My, Space\", Other Space",
+            ParametersKey.TAGS, "\"my tag\",\"say \\\"hi\\\"\""
         )));
     }
 

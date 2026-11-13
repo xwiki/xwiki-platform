@@ -123,7 +123,7 @@ catalog:
   # entry below provides the TypeScript 6 API that typescript-eslint, vue-tsc, Volar and the dts tooling require.
   "@typescript/native": npm:typescript@7.0.2
   "@vitejs/plugin-react": 6.1.2
-  "@vitejs/plugin-vue": 6.0.10
+  "@vitejs/plugin-vue": 6.0.11
   "@vitest/eslint-plugin": 1.6.28
   "@vue/compiler-dom": 3.5.45
   "@vue/eslint-config-prettier": 10.2.0

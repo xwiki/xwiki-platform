@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -152,15 +151,20 @@ class PasswordClassTest
     }
 
     @Test
-    void arePasswordsMatchingWithUnknownHashFormat()
+    void arePasswordsMatchingWithUnsupportedHashFormat()
     {
-        // A hash whose algorithm is not supported must not be compared in clear, otherwise knowing the stored hash
-        // would be enough to authenticate.
-        String unknownHash = "{SSHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=";
+        // A value which is not a supported hash is handled as a password stored in clear text, as in
+        // BaseCollection#isPasswordValueMatching for passwords stored in a StringProperty.
+        String unsupportedHash = "{SSHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=";
 
-        assertThrows(IllegalArgumentException.class,
-            () -> this.passwordClass.arePasswordsMatching(unknownHash, unknownHash));
-        assertThrows(IllegalArgumentException.class, () -> this.passwordClass.getAlgorithmFromPassword(unknownHash));
+        assertTrue(this.passwordClass.arePasswordsMatching(unsupportedHash, unsupportedHash));
+        assertFalse(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, unsupportedHash));
+        assertNull(this.passwordClass.getAlgorithmFromPassword(unsupportedHash));
+
+        assertEquals(2, this.logCapture.size());
+        assertEquals("A password stored in clear text is checked with a PasswordClass property expecting hashed values "
+            + "and not yet attached to an object: it should be hashed or reset.", this.logCapture.getMessage(0));
+        assertEquals(this.logCapture.getMessage(0), this.logCapture.getMessage(1));
     }
 
     @Test

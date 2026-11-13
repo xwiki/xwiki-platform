@@ -172,14 +172,6 @@ public class PasswordClass extends StringClass
             PASSWORD_HASH_PATTERN_GROUP
         ));
 
-    /**
-     * Matches any value starting like a hash encoded password, i.e. with the legacy {@code hash:} prefix or with an
-     * algorithm identifier between braces, whether that algorithm is supported or not. Contrarily to
-     * {@link #isPasswordHashed(String)}, which tells if a value is a hash this class can verify, it tells if a value
-     * can be compared in clear without accepting a stored hash as the password.
-     */
-    private static final Pattern HASH_LIKE_PATTERN = Pattern.compile("hash:|\\{[^{}]+}");
-
     // "password" is used for both the field type and the xclass name:
     // we use a single constant to comply with checkstyle here.
     private static final String PASSWORD_FIELD_TYPE = "password";
@@ -255,7 +247,8 @@ public class PasswordClass extends StringClass
     @Unstable
     public static boolean isPasswordHashed(String value)
     {
-        return value != null && value.startsWith(HASH_IDENTIFIER + SEPARATOR) || HASH_PATTERN.matcher(value).matches();
+        return value != null
+            && (value.startsWith(HASH_IDENTIFIER + SEPARATOR) || HASH_PATTERN.matcher(value).matches());
     }
 
     @Override
@@ -398,7 +391,7 @@ public class PasswordClass extends StringClass
      */
     public String getAlgorithmFromPassword(String password)
     {
-        if (PasswordMetaClass.CLEAR.equals(getStorageType()) || isStoredInClear(password)) {
+        if (PasswordMetaClass.CLEAR.equals(getStorageType()) || !isPasswordHashed(password)) {
             return null;
         } else if (password.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             String legacyAlgorithm = LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(password);
@@ -449,11 +442,9 @@ public class PasswordClass extends StringClass
      * passwords (using the format {@code hash:<algorithmName>:<salt>:<hash>}) but it will warn to reencode them.
      * In a similar way, if the provided encode passwords uses a deprecated algorithm a warning will be issued.
      * <p>
-     * A value which doesn't look like a hash at all, while the storage type is hash, was stored in clear text (e.g.
-     * while the storage type of the property was clear): it's compared in clear, with a warning since it should be
-     * hashed.
-     * A value which looks like a hash but whose format is unknown (e.g. an unsupported algorithm) is never compared in
-     * clear, otherwise the stored hash itself would be accepted as the password.
+     * A value which is not a supported hash (see {@link #isPasswordHashed(String)}), while the storage type is hash,
+     * was stored in clear text (e.g. while the storage type of the property was clear): it's compared in clear, with a
+     * warning since it should be hashed.
      * An empty (or {@code null}) encoded password, while the storage type is hash, means that no password is set: it
      * never matches, since the hash of any password, even an empty one, is never empty.
      *
@@ -470,7 +461,7 @@ public class PasswordClass extends StringClass
             return Strings.CS.equals(rawPassword, encodedPassword);
         } else if (StringUtils.isEmpty(encodedPassword)) {
             return false;
-        } else if (isStoredInClear(encodedPassword)) {
+        } else if (!isPasswordHashed(encodedPassword)) {
             warnAboutClearPassword();
             return Strings.CS.equals(rawPassword, encodedPassword);
         } else if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
@@ -492,11 +483,6 @@ public class PasswordClass extends StringClass
                 throw new IllegalArgumentException(ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG);
             }
         }
-    }
-
-    private static boolean isStoredInClear(String password)
-    {
-        return !HASH_LIKE_PATTERN.matcher(password).lookingAt();
     }
 
     private void warnAboutClearPassword()

@@ -21,6 +21,9 @@ package com.xpn.xwiki.objects.classes;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 
@@ -132,6 +135,23 @@ class PasswordClassTest
     }
 
     @Test
+    void arePasswordsMatchingWithClearValueAndHashStorageAttachedToClass()
+    {
+        BaseClass xclass = new BaseClass();
+        xclass.setDocumentReference(new DocumentReference("xwiki", "XWiki", "XWikiUsers"));
+        xclass.addPasswordField("password", "Password", 10);
+        PasswordClass attachedPasswordClass = (PasswordClass) xclass.get("password");
+
+        assertTrue(attachedPasswordClass.arePasswordsMatching(PLAIN_PASSWORD, PLAIN_PASSWORD));
+
+        assertEquals(1, this.logCapture.size());
+        // The warning must name the property expecting hashed values.
+        assertEquals("A password of the property [Class_property xwiki:XWiki.XWikiUsers^password] is stored in clear "
+            + "text while the property expects hashed values: it should be hashed or reset.",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
     void arePasswordsMatchingWithUnknownHashFormat()
     {
         // A hash whose algorithm is not supported must not be compared in clear, otherwise knowing the stored hash
@@ -141,5 +161,45 @@ class PasswordClassTest
         assertThrows(IllegalArgumentException.class,
             () -> this.passwordClass.arePasswordsMatching(unknownHash, unknownHash));
         assertThrows(IllegalArgumentException.class, () -> this.passwordClass.getAlgorithmFromPassword(unknownHash));
+    }
+
+    @Test
+    void arePasswordsMatchingWithEmptyStoredValueAndHashStorage()
+    {
+        // An empty stored value means that no password is set: nothing must match it.
+        assertFalse(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, ""));
+        assertFalse(this.passwordClass.arePasswordsMatching("", ""));
+        assertFalse(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, null));
+        assertFalse(this.passwordClass.arePasswordsMatching(null, null));
+
+        // Callers of the deprecated API check a match by comparing the returned value with the stored one.
+        assertNotEquals("", this.passwordClass.getEquivalentPassword("", PLAIN_PASSWORD));
+        assertNotEquals("", this.passwordClass.getEquivalentPassword("", ""));
+
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void arePasswordsMatchingWithEmptyStoredValueAndClearStorage()
+    {
+        this.passwordClass.setStorageType(PasswordMetaClass.CLEAR);
+
+        assertTrue(this.passwordClass.arePasswordsMatching("", ""));
+        assertFalse(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, ""));
+
+        // Callers of the deprecated API check a match by comparing the returned value with the stored one.
+        assertEquals("", this.passwordClass.getEquivalentPassword("", ""));
+        assertNotEquals("", this.passwordClass.getEquivalentPassword("", PLAIN_PASSWORD));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { PasswordMetaClass.HASH, PasswordMetaClass.CLEAR })
+    void getEquivalentPassword(String storageType)
+    {
+        this.passwordClass.setStorageType(storageType);
+        String storedPassword = this.passwordClass.getProcessedPassword(PLAIN_PASSWORD);
+
+        assertEquals(storedPassword, this.passwordClass.getEquivalentPassword(storedPassword, PLAIN_PASSWORD));
+        assertNotEquals(storedPassword, this.passwordClass.getEquivalentPassword(storedPassword, "SECRET"));
     }
 }

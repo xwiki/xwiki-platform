@@ -174,9 +174,11 @@ public class PasswordClass extends StringClass
 
     /**
      * Matches any value starting like a hash encoded password, i.e. with the legacy {@code hash:} prefix or with an
-     * algorithm identifier between braces, whether that algorithm is supported or not.
+     * algorithm identifier between braces, whether that algorithm is supported or not. Contrarily to
+     * {@link #isPasswordHashed(String)}, which tells if a value is a hash this class can verify, it tells if a value
+     * can be compared in clear without accepting a stored hash as the password.
      */
-    private static final Pattern HASH_LIKE_PATTERN = Pattern.compile("^((hash:)|(\\{[^{}]+}))");
+    private static final Pattern HASH_LIKE_PATTERN = Pattern.compile("hash:|\\{[^{}]+}");
 
     // "password" is used for both the field type and the xclass name:
     // we use a single constant to comply with checkstyle here.
@@ -196,6 +198,12 @@ public class PasswordClass extends StringClass
         new org.springframework.security.crypto.password.MessageDigestPasswordEncoder(SHA_512_ALGORITHM),
         XWikiLegacyPasswordEncoder.ALGORITHM_ID, LEGACY_PASSWORD_ENCODER
     );
+
+    /**
+     * Value returned by {@link #getEquivalentPassword(String, String)} on a mismatch when the stored password is empty:
+     * it must differ from the stored password since callers compare the returned value with it.
+     */
+    private static final String NON_MATCHING_EQUIVALENT_PASSWORD = "-";
 
     private static final String ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG = "The provided encoded password "
         + "doesn't match any known hash encoded password format.";
@@ -324,13 +332,23 @@ public class PasswordClass extends StringClass
      * @param plainPassword The plain text password to be encrypted.
      * @return The input password, encrypted with the same mechanism as the stored password.
      * @deprecated Contrarily to what the original doc says this method only returns the stored password value, if
-     * there's a match between both values, else it returns an empty string. It shouldn't be used at all anymore and
-     * instead {@link #arePasswordsMatching(String, String)} should be used.
+     * there's a match between both values, else it returns a value different from the stored password (an empty string
+     * unless the stored password is empty). It shouldn't be used at all anymore and instead
+     * {@link #arePasswordsMatching(String, String)} should be used.
      */
     @Deprecated(since = "18.8.0RC1, 18.4.5")
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
-        return (arePasswordsMatching(plainPassword, storedPassword)) ? storedPassword : "";
+        String result;
+        if (arePasswordsMatching(plainPassword, storedPassword)) {
+            result = storedPassword;
+        } else if (StringUtils.isEmpty(storedPassword)) {
+            // Callers check a match by comparing the returned value with the stored password.
+            result = NON_MATCHING_EQUIVALENT_PASSWORD;
+        } else {
+            result = "";
+        }
+        return result;
     }
 
     /**
@@ -436,6 +454,8 @@ public class PasswordClass extends StringClass
      * hashed.
      * A value which looks like a hash but whose format is unknown (e.g. an unsupported algorithm) is never compared in
      * clear, otherwise the stored hash itself would be accepted as the password.
+     * An empty (or {@code null}) encoded password, while the storage type is hash, means that no password is set: it
+     * never matches, since the hash of any password, even an empty one, is never empty.
      *
      * @param rawPassword the raw password to test for a match
      * @param encodedPassword the encoded (or not if the storage type is clear) password to match with
@@ -448,6 +468,8 @@ public class PasswordClass extends StringClass
     {
         if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
             return Strings.CS.equals(rawPassword, encodedPassword);
+        } else if (StringUtils.isEmpty(encodedPassword)) {
+            return false;
         } else if (isStoredInClear(encodedPassword)) {
             warnAboutClearPassword();
             return Strings.CS.equals(rawPassword, encodedPassword);
@@ -474,7 +496,7 @@ public class PasswordClass extends StringClass
 
     private static boolean isStoredInClear(String password)
     {
-        return !HASH_LIKE_PATTERN.matcher(password).find();
+        return !HASH_LIKE_PATTERN.matcher(password).lookingAt();
     }
 
     private void warnAboutClearPassword()

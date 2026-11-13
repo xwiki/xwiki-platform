@@ -176,10 +176,6 @@ class PasswordClassTest
         assertFalse(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, null));
         assertFalse(this.passwordClass.arePasswordsMatching(null, null));
 
-        // Callers of the deprecated API check a match by comparing the returned value with the stored one.
-        assertNotEquals("", this.passwordClass.getEquivalentPassword("", PLAIN_PASSWORD));
-        assertNotEquals("", this.passwordClass.getEquivalentPassword("", ""));
-
         assertEquals(0, this.logCapture.size());
     }
 
@@ -191,19 +187,35 @@ class PasswordClassTest
         assertTrue(this.passwordClass.arePasswordsMatching("", ""));
         assertFalse(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, ""));
 
-        // Callers of the deprecated API check a match by comparing the returned value with the stored one.
-        assertEquals("", this.passwordClass.getEquivalentPassword("", ""));
-        assertNotEquals("", this.passwordClass.getEquivalentPassword("", PLAIN_PASSWORD));
     }
 
     @ParameterizedTest
     @ValueSource(strings = { PasswordMetaClass.HASH, PasswordMetaClass.CLEAR })
-    void getEquivalentPassword(String storageType)
+    void getEquivalentPasswordWithHashedStoredValue(String storageType)
+    {
+        String storedPassword = this.passwordClass.getPasswordHash(PLAIN_PASSWORD);
+        this.passwordClass.setStorageType(storageType);
+
+        // Callers of the deprecated API check a match by comparing the returned value with the stored one.
+        assertEquals(storedPassword, this.passwordClass.getEquivalentPassword(storedPassword, PLAIN_PASSWORD));
+        assertEquals("", this.passwordClass.getEquivalentPassword(storedPassword, "SECRET"));
+        // The stored hash is never accepted as the password.
+        assertEquals("", this.passwordClass.getEquivalentPassword(storedPassword, storedPassword));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { PasswordMetaClass.HASH, PasswordMetaClass.CLEAR })
+    void getEquivalentPasswordWithClearStoredValue(String storageType)
     {
         this.passwordClass.setStorageType(storageType);
-        String storedPassword = this.passwordClass.getProcessedPassword(PLAIN_PASSWORD);
 
-        assertEquals(storedPassword, this.passwordClass.getEquivalentPassword(storedPassword, PLAIN_PASSWORD));
-        assertNotEquals(storedPassword, this.passwordClass.getEquivalentPassword(storedPassword, "SECRET"));
+        // A value stored in clear text is compared with the plain text password, which is returned unchanged.
+        assertEquals("SECRET", this.passwordClass.getEquivalentPassword(PLAIN_PASSWORD, "SECRET"));
+        assertEquals(PLAIN_PASSWORD, this.passwordClass.getEquivalentPassword(PLAIN_PASSWORD, PLAIN_PASSWORD));
+        assertEquals("", this.passwordClass.getEquivalentPassword("", ""));
+        assertEquals(PLAIN_PASSWORD, this.passwordClass.getEquivalentPassword("", PLAIN_PASSWORD));
+        assertNull(this.passwordClass.getEquivalentPassword(null, null));
+
+        assertEquals(0, this.logCapture.size());
     }
 }

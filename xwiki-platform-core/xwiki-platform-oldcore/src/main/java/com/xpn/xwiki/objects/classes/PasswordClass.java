@@ -191,12 +191,6 @@ public class PasswordClass extends StringClass
         XWikiLegacyPasswordEncoder.ALGORITHM_ID, LEGACY_PASSWORD_ENCODER
     );
 
-    /**
-     * Value returned by {@link #getEquivalentPassword(String, String)} on a mismatch when the stored password is empty:
-     * it must differ from the stored password since callers compare the returned value with it.
-     */
-    private static final String NON_MATCHING_EQUIVALENT_PASSWORD = "-";
-
     private static final String ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG = "The provided encoded password "
         + "doesn't match any known hash encoded password format.";
 
@@ -324,22 +318,17 @@ public class PasswordClass extends StringClass
      * @param storedPassword The stored password, which gives the storage type and algorithm.
      * @param plainPassword The plain text password to be encrypted.
      * @return The input password, encrypted with the same mechanism as the stored password.
-     * @deprecated Contrarily to what the original doc says this method only returns the stored password value, if
-     * there's a match between both values, else it returns a value different from the stored password (an empty string
-     * unless the stored password is empty). It shouldn't be used at all anymore and instead
-     * {@link #arePasswordsMatching(String, String)} should be used.
+     * @deprecated Contrarily to what the original doc says, when the stored password is a hash this method only
+     * returns the stored password value if there's a match between both values, else it returns an empty string. When
+     * the stored password is in clear text, the plain text password is returned unchanged. It shouldn't be used at all
+     * anymore and instead {@link #arePasswordsMatching(String, String)} should be used.
      */
     @Deprecated(since = "18.8.0RC1, 18.4.5")
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
-        String result;
-        if (arePasswordsMatching(plainPassword, storedPassword)) {
-            result = storedPassword;
-        } else if (StringUtils.isEmpty(storedPassword)) {
-            // Callers check a match by comparing the returned value with the stored password.
-            result = NON_MATCHING_EQUIVALENT_PASSWORD;
-        } else {
-            result = "";
+        String result = plainPassword;
+        if (plainPassword != null && isPasswordHashed(storedPassword)) {
+            result = arePasswordHashesMatching(plainPassword, storedPassword) ? storedPassword : "";
         }
         return result;
     }
@@ -464,7 +453,14 @@ public class PasswordClass extends StringClass
         } else if (!isPasswordHashed(encodedPassword)) {
             warnAboutClearPassword();
             return Strings.CS.equals(rawPassword, encodedPassword);
-        } else if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+        } else {
+            return arePasswordHashesMatching(rawPassword, encodedPassword);
+        }
+    }
+
+    private boolean arePasswordHashesMatching(String rawPassword, String encodedPassword)
+    {
+        if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             // The password has not been re-encoded with XWikiLegacyPasswordEncoder: it's only protected by the
             // legacy message digest algorithm it contains, which is the one to report.
             warnAboutOutdatedAlgorithm(LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(encodedPassword));

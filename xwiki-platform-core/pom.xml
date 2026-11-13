@@ -239,6 +239,20 @@
               </differences>
             </revapi.differences>
             <revapi.differences>
+              <justification>No retro compatibility impact, only marks the cssClass parameter inherited from the box
+                macro as advanced in the macro parameter descriptor (XRENDERING-824).</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.box.BoxMacroParameters::setCssClass(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters</old>
+                  <new>method void org.xwiki.rendering.macro.box.BoxMacroParameters::setCssClass(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyAdvanced</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
               <justification>
                 It's very unlikely for the Solr role to be implemented outside of XWiki Platform, and there is no way to
                 provide an accurate default implementation of deleting the whole index of a core.

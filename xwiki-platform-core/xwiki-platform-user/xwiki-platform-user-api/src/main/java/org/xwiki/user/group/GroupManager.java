@@ -20,11 +20,13 @@
 package org.xwiki.user.group;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Fast access to group membership.
@@ -90,5 +92,49 @@ public interface GroupManager
     {
         // Not always true, but a reasonable default implementation from API point of view
         return !getMembers(reference, false).isEmpty();
+    }
+
+    /**
+     * Indicate if the passed member (user or group) is a member of the passed group.
+     * <p>
+     * The membership is resolved from the groups of the member (see
+     * {@link #getGroups(DocumentReference, Object, boolean)}), which differs from
+     * {@code getMembers(group, recurse).contains(member)} in two ways:
+     * <ul>
+     * <li>when {@code recurse} is true, the intermediate groups are only searched in the wiki of the member and in the
+     * wiki of the group (which covers a global user or group added to a subwiki group): a membership going through a
+     * group located in any other wiki is not taken into account</li>
+     * <li>the implicit memberships known by the implementation are taken into account, for example every user except
+     * the guest user being a member of {@code XWikiAllGroup} when {@code xwiki.authentication.group.allgroupimplicit}
+     * is enabled</li>
+     * </ul>
+     * The locale of the passed references, if any, is ignored, and a group is never a member of itself.
+     *
+     * @param member the group member (user or group); {@code null} (the guest user) is never a member
+     * @param group the group to check; {@code null} has no members
+     * @param recurse false to only check direct membership, true to also take into account groups of groups
+     * @return {@code true} if the passed member is a member of the passed group
+     * @throws GroupException when failing to get the groups of the member
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    default boolean isMember(DocumentReference member, DocumentReference group, boolean recurse)
+        throws GroupException
+    {
+        // The guest user (null member) is never a member of any group, a null group has no members, and a group is
+        // never a member of itself, even when it lists itself as a member.
+        if (member == null || group == null || member.withoutLocale().equals(group.withoutLocale())) {
+            return false;
+        }
+
+        // Start from the member's groups rather than the group's members: a user usually belongs to a few groups
+        // while a group can have thousands of members. A direct membership is stored in the group's document, so only
+        // the group's wiki holds it, while a recursive check also needs the member's wiki, where the intermediate
+        // groups of the member are usually located.
+        WikiReference groupWiki = group.getWikiReference();
+        Object wikiTarget = recurse && !member.getWikiReference().equals(groupWiki)
+            ? List.of(member.getWikiReference(), groupWiki) : groupWiki;
+
+        return getGroups(member.withoutLocale(), wikiTarget, recurse).contains(group.withoutLocale());
     }
 }

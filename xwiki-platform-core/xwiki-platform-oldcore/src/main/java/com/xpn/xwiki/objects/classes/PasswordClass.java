@@ -191,9 +191,8 @@ public class PasswordClass extends StringClass
         XWikiLegacyPasswordEncoder.ALGORITHM_ID, LEGACY_PASSWORD_ENCODER
     );
 
-    private static final IllegalArgumentException ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT =
-        new IllegalArgumentException("The provided encoded password doesn't match any known hash "
-            + "encoded password format.");
+    private static final String ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG = "The provided encoded password "
+        + "doesn't match any known hash encoded password format.";
 
     /**
      * Default constructor with a metaclass.
@@ -385,7 +384,7 @@ public class PasswordClass extends StringClass
             if (hashMatcher.matches()) {
                 return hashMatcher.group(ALGORITHM_ID_PATTERN_GROUP);
             } else {
-                throw ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT;
+                throw new IllegalArgumentException(ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG);
             }
         }
     }
@@ -452,7 +451,7 @@ public class PasswordClass extends StringClass
                 }
                 return passwordEncoder.matches(rawPassword, passwordHash);
             } else {
-                throw ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT;
+                throw new IllegalArgumentException(ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG);
             }
         }
     }

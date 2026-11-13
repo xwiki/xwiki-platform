@@ -86,8 +86,8 @@ public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerial
         try {
             reader.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         } catch (SAXException e) {
-            // Old parsers may not support this feature. However, we use Xerces and it's supported. Thus this
-            // exception should not be raised.
+            // Old parsers may not support this feature. However, all JAXP implementations, including the one of the
+            // JDK, are required to support it. Thus this exception should not be raised.
             throw new IOException("Failure to set secure XML processing", e);
         }
 

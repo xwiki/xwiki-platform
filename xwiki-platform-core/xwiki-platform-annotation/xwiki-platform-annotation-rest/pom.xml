@@ -38,25 +38,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${project.version}</version>
-      <exclusions>
-        <!-- Xerces is causing problems with the jaxb plugin -->
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-annotation-core</artifactId>
       <version>${project.version}</version>
-      <exclusions>
-        <!-- Xerces is causing problems with the jaxb plugin -->
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -71,13 +57,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-api</artifactId>
       <version>${project.version}</version>
-      <exclusions>
-        <!-- Xerces is causing problems with the jaxb plugin -->
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
   <build>

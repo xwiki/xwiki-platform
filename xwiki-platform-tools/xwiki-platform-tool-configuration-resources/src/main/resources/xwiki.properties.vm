@@ -725,6 +725,8 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xalan:serializer
 # extension.ignoredDependencies=xml-apis:xml-apis
 # extension.ignoredDependencies=xerces:xmlParserAPIs
+# extension.ignoredDependencies=xerces:xercesImpl
+# extension.ignoredDependencies=xerces:xerces-impl
 
 #-------------------------------------------------------------------------------------
 # Repository

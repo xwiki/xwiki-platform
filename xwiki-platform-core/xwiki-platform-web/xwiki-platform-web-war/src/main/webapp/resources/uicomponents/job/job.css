@@ -35,7 +35,7 @@
 .ui-progress-bar {
   background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
   background-repeat: repeat;
-  background-color: var(--brand-success) !important;
+  background-color: var(--brand-success);
   background-position: left;
   -moz-animation-duration: 0.2s;
   -moz-animation-iteration-count: infinite;
@@ -58,7 +58,6 @@
 }
 
 .ui-progress-bar {
-  background-color: var(--xwiki-background-secondary-color);
   border-radius: 10px 10px 10px 10px;
   height: 8px;
 }

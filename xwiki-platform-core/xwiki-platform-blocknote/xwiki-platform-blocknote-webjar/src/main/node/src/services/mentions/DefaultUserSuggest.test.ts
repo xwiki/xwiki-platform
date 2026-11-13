@@ -31,6 +31,7 @@ function mockSuggestionsPerCall(...suggestions: unknown[][]): void {
   mockSuggestions([]);
   suggestions.forEach((result) =>
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
       json: async () => result,
     }),
   );
@@ -51,13 +52,15 @@ function mockSuggestions(suggestions: unknown[]): void {
   });
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue({ json: async () => suggestions }),
+    vi.fn().mockResolvedValue({ ok: true, json: async () => suggestions }),
   );
 }
 
 describe("DefaultUserSuggest", () => {
   beforeEach(() => {
     vi.unstubAllGlobals();
+    // The tests below trigger the failures they assert on, so their logs are expected.
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   it("maps the suggestions of the user suggestion template", async () => {
@@ -125,6 +128,30 @@ describe("DefaultUserSuggest", () => {
     await new DefaultUserSuggest().getUsers("", "LOCAL_AND_GLOBAL");
 
     expect(fetchedWikis()).toEqual([null]);
+  });
+
+  it("keeps the local users when the global ones can't be fetched", async () => {
+    mockSuggestionsPerCall([user("Carol")]);
+    (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error("Connection reset"),
+    );
+
+    const users = await new DefaultUserSuggest().getUsers(
+      "",
+      "LOCAL_AND_GLOBAL",
+    );
+
+    expect(users.map((it) => it.label)).toEqual(["Carol"]);
+  });
+
+  it("suggests no user when the request is rejected", async () => {
+    mockSuggestions([]);
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: false,
+      status: 401,
+    });
+
+    expect(await new DefaultUserSuggest().getUsers("admin")).toEqual([]);
   });
 
   it("drops the hint of a user that has none", async () => {

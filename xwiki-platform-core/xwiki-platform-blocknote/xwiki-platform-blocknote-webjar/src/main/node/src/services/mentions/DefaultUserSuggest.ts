@@ -77,6 +77,23 @@ class DefaultUserSuggest implements UserSuggest {
     query: string,
     global: boolean,
   ): Promise<MentionableUser[]> {
+    try {
+      return await this.requestUsers(query, global);
+    } catch (e) {
+      // Same as the CKEditor mentions: a request that fails contributes no suggestion, rather than emptying the menu
+      // of the suggestions the other request returned.
+      console.error(
+        `Failed to suggest the ${global ? "global" : "local"} users matching [${query}].`,
+        e,
+      );
+      return [];
+    }
+  }
+
+  private async requestUsers(
+    query: string,
+    global: boolean,
+  ): Promise<MentionableUser[]> {
     const parameters = new URLSearchParams({
       xpage: "uorgsuggest",
       media: "json",
@@ -90,6 +107,9 @@ class DefaultUserSuggest implements UserSuggest {
     const response = await fetch(
       XWiki.currentDocument.getURL("get", parameters),
     );
+    if (!response.ok) {
+      throw new Error(`Unexpected response status [${response.status}].`);
+    }
     const suggestions: UserSuggestion[] = await response.json();
 
     return suggestions.map((suggestion) => ({

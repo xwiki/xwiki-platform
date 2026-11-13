@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { injectable } from "inversify";
-import type { UserSuggest } from "./UserSuggest";
+import type { UserScope, UserSuggest } from "./UserSuggest";
 import type { MentionableUser } from "@xwiki/platform-editors-blocknote-react";
 import type { Container } from "inversify";
 
@@ -50,7 +50,7 @@ class DefaultUserSuggest implements UserSuggest {
 
   public async getUsers(
     query: string,
-    userScope?: string,
+    userScope?: UserScope,
   ): Promise<MentionableUser[]> {
     if (userScope === "GLOBAL_ONLY") {
       return this.fetchUsers(query, true);
@@ -67,9 +67,14 @@ class DefaultUserSuggest implements UserSuggest {
     // Same as the CKEditor mentions: complete the local users with global ones, then sort the lot by name, so that
     // the suggestions don't look split in two lists.
     const globalUsers = await this.fetchUsers(query, true);
+    // The local and the global wiki are one and the same on the main wiki, where both requests then return the same
+    // users.
+    const localReferences = new Set(localUsers.map((user) => user.reference));
     return [
       ...localUsers,
-      ...globalUsers.slice(0, SUGGESTION_LIMIT - localUsers.length),
+      ...globalUsers
+        .filter((user) => !localReferences.has(user.reference))
+        .slice(0, SUGGESTION_LIMIT - localUsers.length),
     ].sort((alice, bob) => alice.label.localeCompare(bob.label));
   }
 

@@ -94,40 +94,57 @@ describe("DefaultUserSuggest", () => {
     );
   });
 
-  it("queries only the local users when the wiki has its own users", async () => {
-    mockSuggestions([user("John")]);
+  describe("the user scope of the wiki", () => {
+    it("queries only the local users when the wiki has its own users", async () => {
+      mockSuggestions([user("John")]);
 
-    await new DefaultUserSuggest().getUsers("joh", "LOCAL_ONLY");
+      await new DefaultUserSuggest().getUsers("joh", "LOCAL_ONLY");
 
-    expect(fetchedWikis()).toEqual([null]);
-  });
+      expect(fetchedWikis()).toEqual([null]);
+    });
 
-  it("queries only the global users when the wiki has no users of its own", async () => {
-    mockSuggestions([user("John")]);
+    it("queries only the global users when the wiki has no users of its own", async () => {
+      mockSuggestions([user("John")]);
 
-    await new DefaultUserSuggest().getUsers("joh", "GLOBAL_ONLY");
+      await new DefaultUserSuggest().getUsers("joh", "GLOBAL_ONLY");
 
-    expect(fetchedWikis()).toEqual(["global"]);
-  });
+      expect(fetchedWikis()).toEqual(["global"]);
+    });
 
-  it("completes the local users with the global ones, sorted by name", async () => {
-    mockSuggestionsPerCall([user("Carol"), user("Alice")], [user("Bob")]);
+    it("completes the local users with the global ones, sorted by name", async () => {
+      mockSuggestionsPerCall([user("Carol"), user("Alice")], [user("Bob")]);
 
-    const users = await new DefaultUserSuggest().getUsers(
-      "",
-      "LOCAL_AND_GLOBAL",
-    );
+      const users = await new DefaultUserSuggest().getUsers(
+        "",
+        "LOCAL_AND_GLOBAL",
+      );
 
-    expect(fetchedWikis()).toEqual([null, "global"]);
-    expect(users.map((it) => it.label)).toEqual(["Alice", "Bob", "Carol"]);
-  });
+      expect(fetchedWikis()).toEqual([null, "global"]);
+      expect(users.map((it) => it.label)).toEqual(["Alice", "Bob", "Carol"]);
+    });
 
-  it("doesn't query the global users when the local ones already fill the menu", async () => {
-    mockSuggestions(["Al", "Bo", "Cy", "Di", "Ed", "Fay"].map(user));
+    it("suggests a user once when the local and the global wiki are the same", async () => {
+      // What the main wiki returns when its scope is LOCAL_AND_GLOBAL: both requests hit the same wiki.
+      mockSuggestionsPerCall(
+        [user("Alice"), user("Bob")],
+        [user("Alice"), user("Bob")],
+      );
 
-    await new DefaultUserSuggest().getUsers("", "LOCAL_AND_GLOBAL");
+      const users = await new DefaultUserSuggest().getUsers(
+        "",
+        "LOCAL_AND_GLOBAL",
+      );
 
-    expect(fetchedWikis()).toEqual([null]);
+      expect(users.map((it) => it.label)).toEqual(["Alice", "Bob"]);
+    });
+
+    it("doesn't query the global users when the local ones already fill the menu", async () => {
+      mockSuggestions(["Al", "Bo", "Cy", "Di", "Ed", "Fay"].map(user));
+
+      await new DefaultUserSuggest().getUsers("", "LOCAL_AND_GLOBAL");
+
+      expect(fetchedWikis()).toEqual([null]);
+    });
   });
 
   it("keeps the local users when the global ones can't be fetched", async () => {

@@ -20,6 +20,15 @@
 import type { MentionableUser } from "@xwiki/platform-editors-blocknote-react";
 
 /**
+ * Which users a wiki can use: its own, those of the main wiki, or both. Matches the values of the `UserScope`
+ * enumeration of the wiki module.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type UserScope = "LOCAL_ONLY" | "GLOBAL_ONLY" | "LOCAL_AND_GLOBAL";
+
+/**
  * The component suggesting the users that can be mentioned in the editor.
  *
  * @since 18.10.0RC1
@@ -32,7 +41,7 @@ interface UserSuggest {
    *     be mentioned
    * @returns the users matching the given query
    */
-  getUsers(query: string, userScope?: string): Promise<MentionableUser[]>;
+  getUsers(query: string, userScope?: UserScope): Promise<MentionableUser[]>;
 }
 
-export type { UserSuggest };
+export type { UserScope, UserSuggest };

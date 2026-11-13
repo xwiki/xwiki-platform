@@ -120,7 +120,7 @@ import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcesso
 import type { FileUploader } from "../services/blocknote/createFileUploader";
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
-import type { UserSuggest } from "../services/mentions/UserSuggest";
+import type { UserScope, UserSuggest } from "../services/mentions/UserSuggest";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -199,7 +199,7 @@ const {
   collaborationURL?: string;
 
   // The user scope of the wiki, which says whether its local users, the global ones, or both can be mentioned.
-  userScope?: string;
+  userScope?: UserScope;
 
   // The reference of the XWiki document whose field is being edited using BlockNote. This is required for real-time
   // collaboration in order to join the corresponding collaboration session. It is also used to contextualize some of

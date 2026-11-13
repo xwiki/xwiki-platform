@@ -1,11 +1,10 @@
-#template('colorThemeInit.vm')
 .fullScreenEditButton {
   cursor: ne-resize !important;
 }
 .fullScreenEditLinkContainer {
   text-transform: lowercase;
   font-size: 80%;
-  color: $theme.linkColor;
+  color: var(--link-color);
   cursor: pointer;
   display: block;
   margin-top: -1.4em;
@@ -47,7 +46,7 @@
   height: 100%;
   padding: 0 !important;
   margin: 0 !important;
-  background-color: $theme.pageContentBackgroundColor;
+  background-color: var(--xwiki-page-content-bg);
 }
 
 /* This overrides the pre behavior when the buttons end up as children of such a field */
@@ -63,7 +62,7 @@
   float: right;
 }
 #xwikiobjects .fullScreenWrapper textarea:focus, #xwikiclassproperties .fullScreenWrapper textarea:focus {
-  background-color: $theme.pageContentBackgroundColor;
+  background-color: var(--xwiki-page-content-bg);
 }
 .fullScreenWrapper textarea {
   margin: 0 !important;
@@ -71,7 +70,7 @@
   border: 0 none !important;
 }
 .fullScreenWrapper .bottombuttons {
-  background-color: $theme.backgroundSecondaryColor;
-  border-top: 1px solid $theme.borderColor;
+  background-color: var(--xwiki-background-secondary-color);
+  border-top: 1px solid var(--xwiki-border-color);
   padding: .5em;
 }

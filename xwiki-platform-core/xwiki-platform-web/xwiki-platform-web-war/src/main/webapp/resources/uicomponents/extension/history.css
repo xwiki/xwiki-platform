@@ -1,5 +1,3 @@
-#template('colorThemeInit.vm')
-
 /**
  * Extension History Sources
  */
@@ -53,17 +51,17 @@ ul.extension-history-sources {
 }
 
 .extension-history-source.selected {
-  background-color: $theme.backgroundSecondaryColor;
+  background-color: var(--xwiki-background-secondary-color);
 }
 .extension-history-source.selected .extension-history-source-name {
-  color: $theme.textColor;
+  color: var(--text-color);
   cursor: text;
   outline: 0;
   text-decoration: none;
 }
 
 .extension-history-source .deleteLink {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   min-height: 16px;
   min-width: 16px;
   outline: 0;
@@ -74,7 +72,7 @@ ul.extension-history-sources {
 .extension-history-source .deleteLink:hover,
 .extension-history-source .deleteLink:active,
 .extension-history-source .deleteLink:focus {
-  color: $theme.notificationErrorColor;
+  color: var(--brand-danger);
 }
 
 /**
@@ -82,8 +80,8 @@ ul.extension-history-sources {
  */
 
 ul.extension-history-records {
-  border-bottom: 1px dotted $theme.borderColor;
-  border-top: 1px dotted $theme.borderColor;
+  border-bottom: 1px dotted var(--xwiki-border-color);
+  border-top: 1px dotted var(--xwiki-border-color);
   list-style-type: none;
   padding: 0;
 }
@@ -98,7 +96,7 @@ li.extension-history-record.loading {
 
 .extension-history-source:hover,
 li.extension-history-record:hover {
-  background-color: $theme.highlightColor;
+  background-color: var(--nav-link-hover-bg);
 }
 
 li.extension-history-record input[type="checkbox"] {
@@ -113,7 +111,7 @@ li.extension-history-record input[type="checkbox"] {
 .extension-history-record-version,
 .extension-history-record-namespaces,
 .extension-history-record-user {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: 80%;
 }
 

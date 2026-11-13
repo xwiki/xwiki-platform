@@ -1,7 +1,6 @@
 /**
  * CSS for the location picker.
  */
-#template('colorThemeInit.vm')
 
 .location-picker .breadcrumb {
   /* Remove the margin so that the validation message is displayed right below the breadcrumb, for simple users.

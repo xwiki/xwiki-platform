@@ -1,11 +1,9 @@
-#template('colorThemeInit.vm')
-
 /**
  * Raw (Wiki Syntax) Diff
  */
 
 .diff-container {
-  border: 1px solid $theme.borderColor;
+  border: 1px solid var(--xwiki-border-color);
   font-family: Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
   overflow: auto;
@@ -25,8 +23,8 @@
 }
 
 td.diff-line-number {
-  border-right: 1px solid $theme.borderColor;
-  color: $theme.textSecondaryColor;
+  border-right: 1px solid var(--xwiki-border-color);
+  color: var(--text-muted);
   text-align: center;
   vertical-align: middle;
 }
@@ -64,8 +62,8 @@ td.diff-line.diff-line-decision span.diff-decision {
 }
 
 td.diff-line-meta {
-  background-color: $theme.backgroundSecondaryColor;
-  color: $theme.textSecondaryColor;
+  background-color: var(--xwiki-background-secondary-color);
+  color: var(--text-muted);
   padding: .8em .5em;
 }
 
@@ -111,9 +109,9 @@ textarea.diff-decision {
 }
 
 dt.diff-header {
-  border-left: 5px solid $theme.borderColor;
-  border-right: 1px solid $theme.borderColor;
-  color: $theme.textSecondaryColor;
+  border-left: 5px solid var(--xwiki-border-color);
+  border-right: 1px solid var(--xwiki-border-color);
+  color: var(--text-muted);
   font-weight: normal;
   margin: 0;
   padding: .5em .2em;
@@ -121,11 +119,11 @@ dt.diff-header {
 
 dt.diff-header:first-child,
 dt.diff-header + dt.diff-header {
-  border-top: 1px solid $theme.borderColor;
+  border-top: 1px solid var(--xwiki-border-color);
 }
 
 dt.diff-header:last-child {
-  border-bottom: 1px solid $theme.borderColor;
+  border-bottom: 1px solid var(--xwiki-border-color);
 }
 
 dl.diff-group {
@@ -137,7 +135,7 @@ dl.diff-group > dt {
 }
 
 dl.diff-group > dt .hint {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-weight: normal;
 }
 
@@ -159,7 +157,7 @@ dl.diff-group > dd > dl {
 }
 
 .diff-item-locale, .diff-item-hint {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: 65%;
 }
 
@@ -185,7 +183,7 @@ ul.diff-summary, .diff-summary ul {
 }
 
 .diff-summary-item-hint {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   font-size: 85%;
 }
 
@@ -226,12 +224,12 @@ ul.diff-summary, .diff-summary ul {
   visibility: hidden;
 }
 .html-diff [data-xwiki-html-diff-hidden="ellipsis"]:before {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
   content: '...';
   cursor: pointer;
   position: absolute;
   visibility: visible;
 }
 .html-diff [data-xwiki-html-diff-hidden="ellipsis"]:hover:before {
-  color: $theme.linkColor;
+  color: var(--link-color);
 }

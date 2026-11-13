@@ -20,10 +20,15 @@
 package org.xwiki.realtime.wysiwyg.test.ui;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -115,6 +120,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 {
     public static final String XWIKI_ALIAS = "xwiki-alias";
+
+    private static final int PARAGRAPH_COUNT = 100;
 
     /**
      * Whether the wiki was made multilingual by the current test, in which case the localization settings have to be
@@ -2955,6 +2962,136 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.maybeLeaveEditMode();
         loginAsJohn(setup);
+    }
+
+    @Test
+    @Order(30)
+    void keepScrollPositionOnRemoteChangesStandalone(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        // The standalone edit mode uses an iframe for the rich text area.
+        keepScrollPositionOnRemoteChanges(setup, testReference, multiUserSetup,
+            () -> RealtimeWYSIWYGEditPage.gotoPage(testReference).getContenEditor().getRichTextArea());
+    }
+
+    @Test
+    @Order(31)
+    void keepScrollPositionOnRemoteChangesInplace(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        // The in-place edit mode doesn't use an iframe for the rich text area.
+        keepScrollPositionOnRemoteChanges(setup, testReference, multiUserSetup, () -> {
+            RealtimeInplaceEditablePage.gotoPage(testReference).editInplace();
+            return new RealtimeCKEditor().getRichTextArea();
+        });
+    }
+
+    private void keepScrollPositionOnRemoteChanges(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup, Supplier<RealtimeRichTextAreaElement> editPage)
+    {
+        // Start fresh, with content that is long enough to be scrolled.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, IntStream.rangeClosed(1, PARAGRAPH_COUNT).mapToObj(i -> "Paragraph " + i)
+            .collect(Collectors.joining("\n\n")), "");
+
+        //
+        // First Tab
+        //
+
+        RealtimeRichTextAreaElement firstTextArea = editPage.get();
+        // Place the caret in the middle of the content, then scroll to the end to look at something else, without
+        // moving the caret.
+        moveCaretToEndOfParagraph(firstTextArea, 40);
+        firstTextArea.scrollTo(Integer.MAX_VALUE);
+        int scrollTop = firstTextArea.getScrollTop();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+        RealtimeRichTextAreaElement secondTextArea = editPage.get();
+        // Place the caret before the caret of the first user, in the same paragraph. Move the caret up from a paragraph
+        // further down, so that it's not at the edge of the visible area, where any content added above (like the empty
+        // paragraph added by the third user) would push it out of view.
+        moveCaretToEndOfParagraph(secondTextArea, 48);
+        secondTextArea.sendKeys(Collections.nCopies(8, Keys.ARROW_UP).toArray(CharSequence[]::new));
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME));
+        assertEquals("Paragraph 40", secondTextArea.getSelectedText());
+        secondTextArea.sendKeys(Keys.HOME);
+        assertTrue(secondTextArea.isCaretVisible());
+
+        //
+        // Third Tab
+        //
+
+        setup.getDriver().switchTo().newWindow(WindowType.TAB);
+        RealtimeRichTextAreaElement thirdTextArea = editPage.get();
+        // Insert a macro, which has to be rendered so all users refresh their content. We insert it at the start of the
+        // content because inserting a paragraph further down, among many similar paragraphs, can move the caret of the
+        // other users to a different paragraph (XWIKI-25613: Adding a paragraph in the realtime WYSIWYG editor can move
+        // the caret of the other users to another paragraph).
+        moveCaretToEndOfParagraph(thirdTextArea, 1);
+        thirdTextArea.sendKeys(Keys.HOME, Keys.ENTER, Keys.ARROW_UP);
+        thirdTextArea.insertMacro("/info", "Info Box");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("Information");
+        firstTextArea.waitForContentRefresh();
+        assertScrollTop(scrollTop, firstTextArea, "The content refresh triggered by a remote change scrolled.");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilTextContains("Information");
+        secondTextArea.waitForContentRefresh();
+        // Check the caret before typing, because typing scrolls to the caret. The scroll position can change, because
+        // the inserted macro changes the height of the content above the caret.
+        assertTrue(secondTextArea.isCaretVisible(),
+            "The content refresh triggered by a remote change didn't keep the caret visible.");
+        // Type before the caret of the first user, in the same text node, which forces the first editor to restore the
+        // caret based on the text.
+        secondTextArea.sendKeys("X");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("XParagraph 40");
+        assertScrollTop(scrollTop, firstTextArea, "Restoring the caret after a remote change scrolled.");
+
+        // Verify that the caret was preserved.
+        firstTextArea.sendKeys("Y");
+        firstTextArea.waitUntilTextContains("XParagraph 40Y");
+    }
+
+    private void assertScrollTop(int expectedScrollTop, RealtimeRichTextAreaElement textArea, String message)
+    {
+        // The scroll position can change slightly when the height of the content above the visible area changes (e.g.
+        // when the inserted macro is rendered). What we verify is that the content isn't scrolled to the caret, which
+        // is far from the visible area.
+        assertEquals(expectedScrollTop, textArea.getScrollTop(), 100, message);
+    }
+
+    private void moveCaretToEndOfParagraph(RealtimeRichTextAreaElement textArea, int paragraphNumber)
+    {
+        // Send the key chord separately, otherwise the modifier key may remain pressed for the following keys.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.HOME));
+        List<CharSequence> keys = new ArrayList<>(Collections.nCopies(paragraphNumber - 1, Keys.ARROW_DOWN));
+        keys.add(Keys.END);
+        textArea.sendKeys(keys.toArray(CharSequence[]::new));
+
+        // Verify the caret position by selecting the paragraph text.
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME));
+        assertEquals("Paragraph " + paragraphNumber, textArea.getSelectedText());
+        textArea.sendKeys(Keys.END);
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.fop.configuration.Configuration;
+import org.apache.fop.configuration.ConfigurationException;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -208,8 +210,35 @@ class FOPXSLFORendererTest
     }
 
     @Test
+    void loadConfigurationWithExternalDTD() throws Exception
+    {
+        // The external DTD is not loaded, which doesn't prevent loading the configuration.
+        Configuration configuration = loadConfiguration(
+            "<!DOCTYPE fop SYSTEM \"" + this.tmpDir.toURI() + "missing.dtd\"><fop version=\"1.0\"/>");
+
+        assertEquals("1.0", configuration.getAttribute("version"));
+    }
+
+    @Test
+    void loadConfigurationWithExternalEntity() throws Exception
+    {
+        File secret = new File(this.tmpDir, "secret.txt");
+        Files.writeString(secret.toPath(), "secret");
+
+        Configuration configuration =
+            loadConfiguration("<!DOCTYPE fop [<!ENTITY secret SYSTEM \"" + secret.toURI() + "\">]>"
+                + "<fop version=\"1.0\"><base>before&secret;after</base></fop>");
+
+        // The external entity is not resolved.
+        assertEquals("beforeafter", configuration.getChild("base").getValue());
+    }
+
+    @Test
     void loadInvalidConfiguration()
     {
-        assertThrows(Exception.class, () -> loadConfiguration("<fop>"));
+        ConfigurationException exception =
+            assertThrows(ConfigurationException.class, () -> loadConfiguration("<fop>"));
+
+        assertEquals("Failed to parse the FOP configuration", exception.getMessage());
     }
 }

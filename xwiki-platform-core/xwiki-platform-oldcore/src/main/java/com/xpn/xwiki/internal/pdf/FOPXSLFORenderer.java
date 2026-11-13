@@ -32,11 +32,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
@@ -55,12 +58,14 @@ import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.PageSequenceResults;
 import org.apache.fop.configuration.Configuration;
+import org.apache.fop.configuration.ConfigurationException;
 import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.fop.fonts.FontManager;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -95,6 +100,15 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
     private static final String MIME_TYPE_PDF = "application/pdf";
 
     private static final String RENDERER = "renderer";
+
+    private static final String LOAD_EXTERNAL_DTD_FEATURE =
+        "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+
+    private static final String EXTERNAL_GENERAL_ENTITIES_FEATURE =
+        "http://xml.org/sax/features/external-general-entities";
+
+    private static final String EXTERNAL_PARAMETER_ENTITIES_FEATURE =
+        "http://xml.org/sax/features/external-parameter-entities";
 
     private static final String MIME = "mime";
 
@@ -197,9 +211,9 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
     /**
      * @param fopConfigurationFile the content of the FOP configuration file
      * @return the FOP configuration, extended with the XWiki fonts folder
-     * @throws Exception when failing to parse the configuration
+     * @throws ConfigurationException when failing to parse the configuration
      */
-    Configuration loadConfiguration(InputStream fopConfigurationFile) throws Exception
+    Configuration loadConfiguration(InputStream fopConfigurationFile) throws ConfigurationException
     {
         Document configurationDocument = parseConfiguration(fopConfigurationFile);
 
@@ -208,7 +222,7 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
         return buildConfiguration(configurationDocument);
     }
 
-    private Document parseConfiguration(InputStream fopConfigurationFile) throws Exception
+    private Document parseConfiguration(InputStream fopConfigurationFile) throws ConfigurationException
     {
         // Parse the configuration with the same settings as FOP's own configuration builder, so that the configuration
         // file is understood the same way as when FOP reads it directly. The FOP configuration API is read-only, hence
@@ -219,18 +233,33 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
         documentBuilderFactory.setIgnoringComments(true);
         documentBuilderFactory.setIgnoringElementContentWhitespace(true);
         documentBuilderFactory.setExpandEntityReferences(true);
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        // Fail on fatal errors without printing them in the console, they are logged by the caller.
-        documentBuilder.setErrorHandler(new DefaultHandler());
+        try {
+            // Don't access any external resource while parsing the configuration: the external DTD is ignored (a non
+            // validating parser doesn't need it) and the external entities are not resolved.
+            documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            documentBuilderFactory.setFeature(LOAD_EXTERNAL_DTD_FEATURE, false);
+            documentBuilderFactory.setFeature(EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+            documentBuilderFactory.setFeature(EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
 
-        return documentBuilder.parse(fopConfigurationFile);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            // Fail on fatal errors without printing them in the console, they are logged by the caller.
+            documentBuilder.setErrorHandler(new DefaultHandler());
+
+            return documentBuilder.parse(fopConfigurationFile);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new ConfigurationException("Failed to parse the FOP configuration", e);
+        }
     }
 
-    private Configuration buildConfiguration(Document configurationDocument) throws Exception
+    private Configuration buildConfiguration(Document configurationDocument) throws ConfigurationException
     {
         ByteArrayOutputStream configurationBytes = new ByteArrayOutputStream();
-        this.transformerFactory.newTransformer()
-            .transform(new DOMSource(configurationDocument), new StreamResult(configurationBytes));
+        try {
+            this.transformerFactory.newTransformer()
+                .transform(new DOMSource(configurationDocument), new StreamResult(configurationBytes));
+        } catch (TransformerException e) {
+            throw new ConfigurationException("Failed to serialize the FOP configuration", e);
+        }
 
         return new DefaultConfigurationBuilder().build(new ByteArrayInputStream(configurationBytes.toByteArray()));
     }

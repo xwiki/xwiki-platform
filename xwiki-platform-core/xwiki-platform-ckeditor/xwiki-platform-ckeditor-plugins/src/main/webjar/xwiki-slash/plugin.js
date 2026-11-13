@@ -100,7 +100,7 @@
      *
      * @param {Object} action - the action to add
      */
-    addAction(action) {
+    async addAction(action) {
       action = Object.assign({}, this.config.defaultAction, action);
       action.nameTokens = action.name.split(/\s+/);
       action.descriptionTokens = action.description.split(/\s+/);
@@ -115,12 +115,13 @@
         group = this.groups[action.group];
       }
       action.group = group;
-      return this.searchReady.then(function(fuse) {
+      try {
+        const fuse = await this.searchReady;
         fuse.add(action);
-      }).catch(function (error) {
+      } catch (error) {
         console.error('Failed to initialize quick action search because: ' + error);
         this.actions.push(action);
-      }.bind(this));
+      }
     }
 
     /**

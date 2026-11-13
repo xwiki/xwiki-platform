@@ -75,7 +75,7 @@ public class UsersParameterHandler
     {
         if (StringUtils.isNotBlank(users)) {
             List<String> userList = new ArrayList<>();
-            for (String userValue : ListParameterSplitter.split(users)) {
+            for (String userValue : DefaultNotificationParametersFactory.splitListParameter(users)) {
                 String user = Util.getStandardUsername(userValue, true);
                 DocumentReference userReference = currentDocumentReferenceResolver.resolve(user);
                 if (documentAccessBridge.exists(userReference)) {

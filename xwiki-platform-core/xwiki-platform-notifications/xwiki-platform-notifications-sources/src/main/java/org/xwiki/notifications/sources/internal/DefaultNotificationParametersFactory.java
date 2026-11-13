@@ -37,6 +37,8 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.CaseUtils;
+import org.apache.commons.text.StringTokenizer;
+import org.apache.commons.text.matcher.StringMatcherFactory;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
@@ -482,9 +484,23 @@ public class DefaultNotificationParametersFactory
         handleTagsParameter(notificationParameters, parameters.get(ParametersKey.TAGS), currentWiki);
     }
 
+    /**
+     * Splits the value of a parameter holding a list on the commas that are not inside double quotes. A double quote
+     * inside a quoted value is doubled.
+     *
+     * @param value the value of the parameter
+     * @return the values it holds, trimmed, empty values excluded
+     */
+    static List<String> splitListParameter(String value)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(value, ',', '"');
+        tokenizer.setTrimmerMatcher(StringMatcherFactory.INSTANCE.trimMatcher());
+        return tokenizer.getTokenList();
+    }
+
     private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
     {
-        for (String tag : ListParameterSplitter.split(tags)) {
+        for (String tag : splitListParameter(tags)) {
             parameters.filterPreferences.add(new TagNotificationFilterPreference(tag, currentWiki));
         }
     }
@@ -535,7 +551,7 @@ public class DefaultNotificationParametersFactory
             Set<NotificationFormat> formats = new HashSet<>();
             formats.add(parameters.format);
 
-            List<String> locationList = ListParameterSplitter.split(locations);
+            List<String> locationList = splitListParameter(locations);
             for (int i = 0; i < locationList.size(); ++i) {
                 DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
                 pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));

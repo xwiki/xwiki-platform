@@ -683,6 +683,24 @@ define('paged-polyfill-patched', [
   }
 
   /**
+   * The CSS parser used by Paged.js doesn't support the range syntax of media queries, such as "(width &lt;= 767px)",
+   * and Paged.js fails to generate the print layout when a style sheet uses it. As a workaround, we rewrite the width
+   * and height comparisons to the legacy syntax, such as "(max-width: 767px)", before the style sheet is parsed.
+   * TODO: Remove this code when https://github.com/pagedjs/pagedjs/issues/344 is fixed.
+   */
+  class FixMediaQueryRangeSyntax extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforeTreeParse(text, sheet) {
+      sheet.text = text
+        .replace(/\(\s*(width|height)\s*&lt;=\s*/g, '(max-$1: ')
+        .replace(/\(\s*(width|height)\s*&gt;=\s*/g, '(min-$1: ');
+    }
+  }
+
+  /**
    * Logs the time spent to layout each print page, useful for debugging PDF export timeouts.
    */
   class LoggingHandler extends Paged.Handler {
@@ -704,6 +722,7 @@ define('paged-polyfill-patched', [
     FixFloatingImages,
     FixTableLayout,
     FixMaxChars,
+    FixMediaQueryRangeSyntax,
     LoggingHandler
   ];
   // The following handlers are more opionated, so we provide a way to disable them.

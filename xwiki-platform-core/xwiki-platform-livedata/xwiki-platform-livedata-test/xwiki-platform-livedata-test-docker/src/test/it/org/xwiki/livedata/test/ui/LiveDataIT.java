@@ -39,7 +39,9 @@ import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingExcept
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ObjectNode;
+import org.xwiki.livedata.test.po.CardLayoutElement;
 import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.PropertiesPanelElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -99,6 +101,8 @@ class LiveDataIT
 
     private static final String NAME_ABBY = "Abby";
 
+    private static final String NAME_YANN = "Yann";
+
     private static final String CHOICE_A = "value1";
 
     private static final String CHOICE_B = "value2";
@@ -151,7 +155,8 @@ class LiveDataIT
 
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
-     * and two XObjects, then edit the XObjects properties from the live data.
+     * and two XObjects, then edit the XObjects properties from the live data. Then adds XObjects to display a second
+     * page of entries, hides and shows a column, and displays the entries as cards.
      */
     @ParameterizedTest
     @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-livetable-ui")
@@ -366,6 +371,62 @@ class LiveDataIT
             testUtils.loginAsSuperAdmin();
             testUtils.setWikiPreference("default_language", "en");
         }
+
+        browseEntries(testUtils, testReference);
+    }
+
+    /**
+     * Adds XObjects to the three created by {@link #createXObjects(TestUtils, DocumentReference)} so that the entries
+     * do not fit in one page, then checks the entries of the second page, in the table layout and as cards.
+     */
+    private void browseEntries(TestUtils testUtils, DocumentReference testReference)
+    {
+        String className = testUtils.serializeReference(testReference);
+        SpaceReference space = (SpaceReference) testReference.getParent();
+        DocumentReference o4 = new DocumentReference("O4", space);
+        testUtils.createPage(o4, "", "O4");
+        addXObject(testUtils, o4, className, NAME_ABBY, CHOICE_A, null, true);
+        DocumentReference o5 = new DocumentReference("O5", space);
+        testUtils.createPage(o5, "", "O5");
+        addXObject(testUtils, o5, className, NAME_ESTHER, CHOICE_B, null, true);
+        DocumentReference o6 = new DocumentReference("O6", space);
+        testUtils.createPage(o6, "", "O6");
+        addXObject(testUtils, o6, className, NAME_YANN, CHOICE_C, null, false);
+        DocumentReference o7 = new DocumentReference("O7", space);
+        testUtils.createPage(o7, "", "O7");
+        addXObject(testUtils, o7, className, NAME_ZOE, CHOICE_D, null, true);
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveDataElement = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+        tableLayout.waitUntilReady();
+        // The seven entries are sorted by name and displayed five per page.
+        assertEquals(List.of(NAME_ABBY, NAME_CHARLY, NAME_ESTHER, NAME_LYNDA, NAME_NIKOLAY),
+            tableLayout.getColumnValues(NAME_COLUMN));
+
+        liveDataElement.goToPage(2);
+        assertEquals(List.of(NAME_YANN, NAME_ZOE), tableLayout.getColumnValues(NAME_COLUMN));
+        assertEquals(List.of(CHOICE_C, CHOICE_D), tableLayout.getColumnValues(CHOICE_COLUMN));
+        assertEquals(List.of(NO, YES), tableLayout.getColumnValues(IS_ACTIVE_COLUMN));
+        assertEquals(List.of("O6", "O7"), tableLayout.getColumnValues(DOC_TITLE_COLUMN));
+
+        PropertiesPanelElement propertiesPanel = liveDataElement.openPropertiesPanel();
+        propertiesPanel.setPropertyDisplayed(CHOICE_COLUMN, false);
+        tableLayout.waitUntilColumnDisplayed(CHOICE_COLUMN, false);
+        tableLayout.waitUntilColumnDisplayed(NAME_COLUMN, true);
+        propertiesPanel.setPropertyDisplayed(CHOICE_COLUMN, true);
+        tableLayout.waitUntilColumnDisplayed(CHOICE_COLUMN, true);
+        assertEquals(List.of(CHOICE_C, CHOICE_D), tableLayout.getColumnValues(CHOICE_COLUMN));
+        propertiesPanel.closePanel();
+
+        // The cards display the entries of the current page.
+        CardLayoutElement cardLayout = liveDataElement.switchToCardLayout();
+        assertEquals(2, cardLayout.countCards());
+        assertEquals(NAME_YANN, cardLayout.getPropertyValue(1, NAME_COLUMN));
+        assertEquals(CHOICE_C, cardLayout.getPropertyValue(1, CHOICE_COLUMN));
+        assertEquals(NO, cardLayout.getPropertyValue(1, IS_ACTIVE_COLUMN));
+        assertEquals("O6", cardLayout.getPropertyValue(1, DOC_TITLE_COLUMN));
+        assertEquals(NAME_ZOE, cardLayout.getPropertyValue(2, NAME_COLUMN));
     }
 
     private void createXObjects(TestUtils testUtils, DocumentReference testReference)

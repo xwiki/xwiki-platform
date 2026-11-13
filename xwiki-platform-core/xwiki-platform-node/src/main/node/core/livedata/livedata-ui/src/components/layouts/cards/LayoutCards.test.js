@@ -71,6 +71,7 @@ function initWrapper({ options, afterEntryFetchWrapper } = {}) {
                   afterEntryFetchWrapper.callback = callback;
                 }
               },
+              getPropertyDescriptors: () => [],
               data: {
                 data: {
                   entries: [],
@@ -130,6 +131,7 @@ describe("LayoutCards.vue", () => {
     expect(cards.at(0).props()).toStrictEqual({
       entry: { id: 1 },
       entryIdx: 0,
+      propertyDescriptors: [],
     });
     expect(wrapper.find(".noentries-card").exists()).toBe(false);
   });

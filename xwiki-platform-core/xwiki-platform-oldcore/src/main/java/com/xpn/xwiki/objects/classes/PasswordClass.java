@@ -172,6 +172,12 @@ public class PasswordClass extends StringClass
             PASSWORD_HASH_PATTERN_GROUP
         ));
 
+    /**
+     * Matches any value starting like a hash encoded password, i.e. with the legacy {@code hash:} prefix or with an
+     * algorithm identifier between braces, whether that algorithm is supported or not.
+     */
+    private static final Pattern HASH_LIKE_PATTERN = Pattern.compile("^((hash:)|(\\{[^{}]+}))");
+
     // "password" is used for both the field type and the xclass name:
     // we use a single constant to comply with checkstyle here.
     private static final String PASSWORD_FIELD_TYPE = "password";
@@ -369,11 +375,12 @@ public class PasswordClass extends StringClass
 
     /**
      * @param password the encoded password
-     * @return The algorithm used for the given password or {@code null} if the storage type is clear.
+     * @return The algorithm used for the given password or {@code null} if the storage type is clear or if the password
+     *     is stored in clear text (see {@link #arePasswordsMatching(String, String)})
      */
     public String getAlgorithmFromPassword(String password)
     {
-        if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
+        if (PasswordMetaClass.CLEAR.equals(getStorageType()) || isStoredInClear(password)) {
             return null;
         } else if (password.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             String legacyAlgorithm = LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(password);
@@ -423,6 +430,12 @@ public class PasswordClass extends StringClass
      * Otherwise, the method will check a match with a password hash: the method still supports legacy encoded
      * passwords (using the format {@code hash:<algorithmName>:<salt>:<hash>}) but it will warn to reencode them.
      * In a similar way, if the provided encode passwords uses a deprecated algorithm a warning will be issued.
+     * <p>
+     * A value which doesn't look like a hash at all, while the storage type is hash, was stored in clear text (e.g.
+     * while the storage type of the property was clear): it's compared in clear, with a warning since it should be
+     * hashed.
+     * A value which looks like a hash but whose format is unknown (e.g. an unsupported algorithm) is never compared in
+     * clear, otherwise the stored hash itself would be accepted as the password.
      *
      * @param rawPassword the raw password to test for a match
      * @param encodedPassword the encoded (or not if the storage type is clear) password to match with
@@ -434,6 +447,9 @@ public class PasswordClass extends StringClass
     public boolean arePasswordsMatching(String rawPassword, String encodedPassword)
     {
         if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
+            return Strings.CS.equals(rawPassword, encodedPassword);
+        } else if (isStoredInClear(encodedPassword)) {
+            warnAboutClearPassword();
             return Strings.CS.equals(rawPassword, encodedPassword);
         } else if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             // The password has not been re-encoded with XWikiLegacyPasswordEncoder: it's only protected by the
@@ -453,6 +469,22 @@ public class PasswordClass extends StringClass
             } else {
                 throw new IllegalArgumentException(ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG);
             }
+        }
+    }
+
+    private static boolean isStoredInClear(String password)
+    {
+        return !HASH_LIKE_PATTERN.matcher(password).find();
+    }
+
+    private void warnAboutClearPassword()
+    {
+        if (getObject() != null) {
+            LOGGER.warn("A password of the property [{}] is stored in clear text while the property expects hashed "
+                + "values: it should be hashed or reset.", getReference());
+        } else {
+            LOGGER.warn("A password stored in clear text is checked with a PasswordClass property expecting hashed "
+                + "values and not yet attached to an object: it should be hashed or reset.");
         }
     }
 

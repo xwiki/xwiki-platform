@@ -28,8 +28,10 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -113,5 +115,31 @@ class PasswordClassTest
         assertEquals("An outdated algorithm [SHA-256] (or an outdated version of it) is used in a PasswordClass "
             + "property not yet attached to an object", this.logCapture.getMessage(0));
         assertEquals(this.logCapture.getMessage(0), this.logCapture.getMessage(1));
+    }
+
+    @Test
+    void arePasswordsMatchingWithClearValueAndHashStorage()
+    {
+        // A value stored while the property was configured with the clear storage type.
+        assertTrue(this.passwordClass.arePasswordsMatching(PLAIN_PASSWORD, PLAIN_PASSWORD));
+        assertFalse(this.passwordClass.arePasswordsMatching("SECRET", PLAIN_PASSWORD));
+        assertNull(this.passwordClass.getAlgorithmFromPassword(PLAIN_PASSWORD));
+
+        assertEquals(2, this.logCapture.size());
+        assertEquals("A password stored in clear text is checked with a PasswordClass property expecting hashed values "
+            + "and not yet attached to an object: it should be hashed or reset.", this.logCapture.getMessage(0));
+        assertEquals(this.logCapture.getMessage(0), this.logCapture.getMessage(1));
+    }
+
+    @Test
+    void arePasswordsMatchingWithUnknownHashFormat()
+    {
+        // A hash whose algorithm is not supported must not be compared in clear, otherwise knowing the stored hash
+        // would be enough to authenticate.
+        String unknownHash = "{SSHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=";
+
+        assertThrows(IllegalArgumentException.class,
+            () -> this.passwordClass.arePasswordsMatching(unknownHash, unknownHash));
+        assertThrows(IllegalArgumentException.class, () -> this.passwordClass.getAlgorithmFromPassword(unknownHash));
     }
 }

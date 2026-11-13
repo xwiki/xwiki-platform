@@ -130,9 +130,10 @@
      * @param {Object} changes - the quick action fields to change, e.g. the name
      * @return {Promise} a promise that resolves when the quick action is updated
      */
-    updateAction(id, changes) {
-      // Wait for the search to be ready, because the quick actions are added only once it is.
-      return this.searchReady.then(fuse => {
+    async updateAction(id, changes) {
+      try {
+        // Wait for the search to be ready, because the quick actions are added only once it is.
+        const fuse = await this.searchReady;
         const action = this.getAction(id);
         if (action) {
           Object.assign(action, changes);
@@ -141,9 +142,9 @@
           fuse.remove(indexedAction => indexedAction === action);
           fuse.add(action);
         }
-      }).catch(error => {
+      } catch (error) {
         console.error('Failed to update the quick action because: ' + error);
-      });
+      }
     }
 
     /**
@@ -203,17 +204,15 @@
      * @param {String} text - the text to match
      * @return {Promise} a promise that resolves with the array of quick actions that match the given text
      */
-    search(text) {
-      return Promise.all(this.pendingTasks).then(() => {
-        if (text.length) {
-          return this.searchReady.then(function(fuse) {
-            return fuse.search(text);
-          });
-        } else {
-          // Return a shallow copy of the actions array in order to be able to modify it safely (e.g. add groups).
-          return this.actions.slice();
-        }
-      });
+    async search(text) {
+      await Promise.all(this.pendingTasks);
+      if (text.length) {
+        const fuse = await this.searchReady;
+        return fuse.search(text);
+      } else {
+        // Return a shallow copy of the actions array in order to be able to modify it safely (e.g. add groups).
+        return this.actions.slice();
+      }
     }
 
     /**
@@ -223,9 +222,13 @@
      * @param {Promise} task - the task to wait for
      */
     waitFor(task) {
-      this.pendingTasks.push(task.catch(error => {
-        console.error('Failed to wait for a quick action task because: ' + error);
-      }));
+      this.pendingTasks.push((async () => {
+        try {
+          await task;
+        } catch (error) {
+          console.error('Failed to wait for a quick action task because: ' + error);
+        }
+      })());
     }
 
     /**

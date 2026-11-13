@@ -639,15 +639,13 @@
       });
 
       // Register Quick Actions. The quick action search waits for them, so that it finds the macros by their name.
-      let quickActionsRegistered, quickActionsFailed;
-      editor.quickActions?.waitFor(new Promise((resolve, reject) => {
-        quickActionsRegistered = resolve;
-        quickActionsFailed = reject;
-      }));
-      require([
-        'xwiki-wysiwyg-macro-service',
-        'xwiki-l10n!xwiki-wysiwyg-macro-selector-translation-keys'
-      ], function (macroService, translations) {
+      const registerQuickActions = async () => {
+        const [macroService, translations] = await new Promise((resolve, reject) => {
+          require([
+            'xwiki-wysiwyg-macro-service',
+            'xwiki-l10n!xwiki-wysiwyg-macro-selector-translation-keys'
+          ], (...modules) => resolve(modules), reject);
+        });
 
         // Icons used for Quick Actions
         var categoriesIcons = {
@@ -662,105 +660,106 @@
         };
 
         // Register macros in Quick Actions plugin
-        macroService.getMacros(editor.config.sourceSyntax).done(function (macros) {
+        const macros = await macroService.getMacros(editor.config.sourceSyntax);
 
-          // Keep track of how many groups we created
-          var macroGroupsCount = 0;
-          const quickActionTasks = [];
+        // Keep track of how many groups we created
+        var macroGroupsCount = 0;
+        const quickActionTasks = [];
 
-          // List the category in order and provide the related attributes for the given macro
-          var getCategoryAttributes = function (macro) {
-            var attributes = {};
+        // List the category in order and provide the related attributes for the given macro
+        var getCategoryAttributes = function (macro) {
+          var attributes = {};
 
-            // Same macro should always appear in the same group and default category should be first.
-            var categories = macro.categories.sort((left, right) => {
-              if (macro.defaultCategory && left.id !== right.id) {
-                // Check against id and label because any of the two might be used.
-                 if ([left.id, left.label].includes(macro.defaultCategory)) {
-                   return -1;
-                 } else if ([right.id, right.label].includes(macro.defaultCategory)) {
-                   return 1;
-                 }
+          // Same macro should always appear in the same group and default category should be first.
+          var categories = macro.categories.sort((left, right) => {
+            if (macro.defaultCategory && left.id !== right.id) {
+              // Check against id and label because any of the two might be used.
+               if ([left.id, left.label].includes(macro.defaultCategory)) {
+                 return -1;
+               } else if ([right.id, right.label].includes(macro.defaultCategory)) {
+                 return 1;
+               }
+            }
+            return left.id.localeCompare(right.id);
+          });
+
+          // Add relevant group
+          attributes.group = (categories[0] && categories[0].id) || 'Macro';
+
+          // Create the group if it doesn't already exist
+          if (!editor.quickActions.getGroup(attributes.group)) {
+            editor.quickActions.addGroup({
+              id: attributes.group,
+              name: categories[0].label || attributes.group,
+              order: 9000 + macroGroupsCount * 10
+            });
+            macroGroupsCount++;
+          }
+
+          // Add relevant iconClass
+          attributes.iconClass = categoriesIcons[(categories[0] && categories[0].id)] ||
+              categoriesIcons._fallback;
+
+          // Add badge for each category, the first one will not be rendered
+          // because the templating index starts at 1. All categories exceeding
+          // the maximum number of badges will not be rendered either.
+          categories.forEach(function (category, i) {
+            attributes["badge" + i] = category.label;
+          });
+
+          // Add recommended badge
+          if (macro.extensionRecommended) {
+            attributes["badge" + editor.quickActions.config.maxBadges] = translations.get('recommended');
+          }
+
+          return attributes;
+        };
+
+
+        macros.forEach(function (macro) {
+          // Do not add macros that are already registered, but use the macro name for their quick action so that it
+          // matches the macro dialogs.
+          if (editor.quickActions.getAction('macro-' + macro.id.id)) {
+            quickActionTasks.push(editor.quickActions.updateAction('macro-' + macro.id.id, {name: macro.name}));
+            return;
+          }
+          // Do not add macros that cannot be installed
+          if (macro.categories.some(function (cat) {
+              return cat.id === "_notinstalled";
+            }) && macro.extensionVersion && !macro.extensionInstallAllowed) {
+            return;
+          }
+
+          var item = {
+            id: 'macro-' + macro.id.id,
+            name: macro.name,
+            description: macro.description,
+            ...getCategoryAttributes(macro),
+            command: {
+              name: 'xwiki-macro-maybe-install-insert',
+              data: {
+                id: macro.id.id
               }
-              return left.id.localeCompare(right.id);
-            });
-
-            // Add relevant group
-            attributes.group = (categories[0] && categories[0].id) || 'Macro';
-
-            // Create the group if it doesn't already exist
-            if (!editor.quickActions.getGroup(attributes.group)) {
-              editor.quickActions.addGroup({
-                id: attributes.group,
-                name: categories[0].label || attributes.group,
-                order: 9000 + macroGroupsCount * 10
-              });
-              macroGroupsCount++;
             }
-
-            // Add relevant iconClass
-            attributes.iconClass = categoriesIcons[(categories[0] && categories[0].id)] ||
-                categoriesIcons._fallback;
-
-            // Add badge for each category, the first one will not be rendered
-            // because the templating index starts at 1. All categories exceeding
-            // the maximum number of badges will not be rendered either.
-            categories.forEach(function (category, i) {
-              attributes["badge" + i] = category.label;
-            });
-
-            // Add recommended badge
-            if (macro.extensionRecommended) {
-              attributes["badge" + editor.quickActions.config.maxBadges] = translations.get('recommended');
-            }
-
-            return attributes;
           };
 
+          quickActionTasks.push(editor.quickActions.addAction(item));
+        });
 
-          macros.forEach(function (macro) {
-            // Do not add macros that are already registered, but use the macro name for their quick action so that it
-            // matches the macro dialogs.
-            if (editor.quickActions.getAction('macro-' + macro.id.id)) {
-              quickActionTasks.push(editor.quickActions.updateAction('macro-' + macro.id.id, {name: macro.name}));
-              return;
-            }
-            // Do not add macros that cannot be installed
-            if (macro.categories.some(function (cat) {
-                return cat.id === "_notinstalled";
-              }) && macro.extensionVersion && !macro.extensionInstallAllowed) {
-              return;
-            }
+        // Use the macro name for the tool bar menu items that insert a macro, so that it matches the macro dialogs.
+        // The xwiki-toolbar plugin registers these menu items with the toolbar_ prefix.
+        const macroNames = Object.fromEntries(macros.map(macro => [macro.id.id, macro.name]));
+        Object.keys(editor.config.toolbarMenuItems || {}).forEach(function (itemId) {
+          const menuItem = editor.getMenuItem?.('toolbar_' + itemId);
+          if (['xwiki-macro', 'xwiki-macro-insert'].includes(menuItem?.command) &&
+              Object.hasOwn(macroNames, menuItem.data?.name)) {
+            menuItem.label = macroNames[menuItem.data.name];
+          }
+        });
 
-            var item = {
-              id: 'macro-' + macro.id.id,
-              name: macro.name,
-              description: macro.description,
-              ...getCategoryAttributes(macro),
-              command: {
-                name: 'xwiki-macro-maybe-install-insert',
-                data: {
-                  id: macro.id.id
-                }
-              }
-            };
-
-            quickActionTasks.push(editor.quickActions.addAction(item));
-          });
-          quickActionsRegistered(Promise.all(quickActionTasks));
-
-          // Use the macro name for the tool bar menu items that insert a macro, so that it matches the macro dialogs.
-          // The xwiki-toolbar plugin registers these menu items with the toolbar_ prefix.
-          const macroNames = Object.fromEntries(macros.map(macro => [macro.id.id, macro.name]));
-          Object.keys(editor.config.toolbarMenuItems || {}).forEach(function (itemId) {
-            const menuItem = editor.getMenuItem?.('toolbar_' + itemId);
-            if (['xwiki-macro', 'xwiki-macro-insert'].includes(menuItem?.command) &&
-                Object.hasOwn(macroNames, menuItem.data?.name)) {
-              menuItem.label = macroNames[menuItem.data.name];
-            }
-          });
-        }).fail(quickActionsFailed);
-      }, quickActionsFailed);
+        await Promise.all(quickActionTasks);
+      };
+      editor.quickActions?.waitFor(registerQuickActions());
       // Ensure that widgets are always properly initialized after a paste.
       // Fix XWIKI-22391
       editor.on('afterPaste', function () {

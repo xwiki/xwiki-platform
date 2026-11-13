@@ -1069,6 +1069,13 @@ require(['jquery'], function($) {
   border: 1px solid var(--xwiki-border-color);
 }
 
+/* Section icons provided by extensions can have any size (e.g. the old 125x85 PNG icons). */
+.admin-category-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
 .admin-category-name {
   font-size: var(--font-size-h3);
   font-weight: var(--font-weight-semibold);

@@ -36,6 +36,145 @@ define('xwiki-wysiwyg-macro-editor-translation-keys', {
 });
 
 /**
+ * Joins and splits the values of the macro parameters converted into a collection, like List<SpaceReference>. It
+ * follows the syntax read by org.xwiki.properties.converter.collection.AbstractCollectionConverter on the server.
+ */
+define('xwiki-wysiwyg-macro-collection-parameter', [], function() {
+  'use strict';
+
+  const collectionTypePrefixes = ['java.util.List<', 'java.util.Set<', 'java.util.Collection<'];
+
+  /**
+   * @return whether the macro converts the value of a parameter with the given type into a collection, which splits the
+   *   value on commas and whitespaces, except inside quotes
+   */
+  const isCollectionType = function(type) {
+    return typeof type === 'string' &&
+      (collectionTypePrefixes.some(prefix => type.startsWith(prefix)) || type.endsWith('[]'));
+  };
+
+  const isQuote = function(character) {
+    return character === '"' || character === "'";
+  };
+
+  const isWhitespace = function(character) {
+    return character.trim() === '';
+  };
+
+  // The braces are listed because the macro removes the braces wrapping the whole value.
+  const charactersToQuote = [',', '\\', '"', "'", '{', '}'];
+
+  /**
+   * @return whether the macro would split the given value, or read it wrongly, unless it is put in quotes
+   */
+  const needsQuotes = function(value) {
+    return [...value].some(character => charactersToQuote.includes(character) || isWhitespace(character));
+  };
+
+  /**
+   * Joins the values of a collection parameter with commas. A value containing a comma, a whitespace, a quote, a
+   * backslash or a brace is put in double quotes, escaping the backslashes and the double quotes it contains, so that
+   * the macro gets it as one value. The other values are left as they are.
+   */
+  const joinCollectionValues = function(values) {
+    return values.map(value => needsQuotes(value) ?
+      '"' + value.replaceAll('\\', '\\\\').replaceAll('"', '\\"') + '"' : value).join(',');
+  };
+
+  /**
+   * Reads the value put in quotes that starts at the given index, a backslash escaping the next character.
+   *
+   * @param text the text to read from
+   * @param start the index of the opening quote
+   * @return the value without its quotes and escaping, and the index following the closing quote
+   */
+  const readQuotedValue = function(text, start) {
+    const quote = text[start];
+    let value = '';
+    let index = start + 1;
+    while (index < text.length && text[index] !== quote) {
+      if (text[index] === '\\' && index + 1 < text.length) {
+        index++;
+      }
+      value += text[index];
+      index++;
+    }
+    return {value, end: index + 1};
+  };
+
+  /**
+   * @return the index of the first character that isn't a whitespace, starting from the given index
+   */
+  const skipWhitespaces = function(text, start) {
+    let index = start;
+    while (index < text.length && isWhitespace(text[index])) {
+      index++;
+    }
+    return index;
+  };
+
+  /**
+   * Reads the value that starts at the given index. A value without quotes ends at the next comma. A value put in
+   * quotes ends at its closing quote, and the text that follows it before the next comma is read as another value.
+   *
+   * @param text the text to read from
+   * @param start the index where the value starts, whitespaces included
+   * @return the value, and the index where the next value starts or -1 when it is the last value
+   */
+  const readValue = function(text, start) {
+    const index = skipWhitespaces(text, start);
+    if (isQuote(text[index])) {
+      const quotedValue = readQuotedValue(text, index);
+      const next = skipWhitespaces(text, quotedValue.end);
+      if (next >= text.length) {
+        return {value: quotedValue.value, next: -1};
+      }
+      return {value: quotedValue.value, next: text[next] === ',' ? next + 1 : next};
+    }
+    const comma = text.indexOf(',', index);
+    return {
+      value: text.substring(index, comma < 0 ? text.length : comma).trim(),
+      next: comma < 0 ? -1 : comma + 1
+    };
+  };
+
+  /**
+   * @return the given text trimmed, without the braces wrapping it, like the macro reads it
+   */
+  const removeWrappingBraces = function(text) {
+    const trimmedText = text.trim();
+    return trimmedText.startsWith('{') && trimmedText.endsWith('}') ?
+      trimmedText.substring(1, trimmedText.length - 1) : trimmedText;
+  };
+
+  /**
+   * Splits the value of a collection parameter on the commas that are not inside quotes, after removing the braces
+   * wrapping it. A value can be put in double or single quotes, a backslash escaping the next character inside them.
+   * Unlike the conversion done by the macro, the value isn't split on whitespaces, so that a value typed by hand with
+   * whitespaces and without quotes is kept whole.
+   */
+  const splitCollectionValue = function(collectionValue) {
+    const text = removeWrappingBraces(collectionValue);
+    const values = [];
+    let start = 0;
+    do {
+      const value = readValue(text, start);
+      if (value.value !== '') {
+        values.push(value.value);
+      }
+      start = value.next;
+    } while (start >= 0);
+    return values;
+  };
+
+  return {
+    isCollectionType,
+    joinCollectionValues,
+    splitCollectionValue
+  };
+});
+
+/**
  * Macro Parameter Tree Sorter
  */
 define('xwiki-wysiwyg-macro-parameter-enhancer', [], function() {
@@ -135,8 +274,9 @@ define('xwiki-wysiwyg-macro-parameter-enhancer', [], function() {
  */
 define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
   'jquery',
-  'xwiki-l10n!xwiki-wysiwyg-macro-editor-translation-keys'
-], function($, translations) {
+  'xwiki-l10n!xwiki-wysiwyg-macro-editor-translation-keys',
+  'xwiki-wysiwyg-macro-collection-parameter'
+], function($, translations, collectionParameter) {
   'use strict';
 
   let displayMacroParameterTree = function(macroParameterTree) {
@@ -364,19 +504,20 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     return output;
   },
 
-  normalizeSelectValue = function (value, valueInputs) {
+  normalizeSelectValue = function (value, valueInputs, type) {
     if (Array.isArray(value)) {
       return value;
     }
 
     const isMultiSelect = valueInputs.prop('type') === 'select-multiple';
     if (isMultiSelect) {
-      return value.split(',');
+      return collectionParameter.isCollectionType(type) ? collectionParameter.splitCollectionValue(value) :
+        value.split(',');
     }
     return [value];
   },
 
-  getParameterValue = function (valueInputs, originalValue, isCaseInsensitive) {
+  getParameterValue = function (valueInputs, originalValue, isCaseInsensitive, type) {
     let matchesParameterValue = function(value) {
       return function() {
         if (isCaseInsensitive) {
@@ -402,7 +543,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       valueInputs = valueInputs.first();
       // For select inputs we should add the value to the list of options if it's missing.
       if (value && valueInputs.is('select')) {
-        value = normalizeSelectValue(value, valueInputs);
+        value = normalizeSelectValue(value, valueInputs, type);
         value.forEach(function (val, index) {
           let matchedOption = valueInputs.find('option').filter(matchesParameterValue(val));
           if (matchedOption.length > 0) {
@@ -435,7 +576,8 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       }
     }
 
-    [value, valueInputs] = getParameterValue(valueInputs, value, parameter.caseInsensitive);
+    [value, valueInputs] = getParameterValue(valueInputs, value, parameter.caseInsensitive,
+      parameter.displayType);
 
     // We pass the value as an array in order to properly handle radio inputs and checkboxes
     // and in case it's an object we properly serialize the value.
@@ -479,9 +621,11 @@ define('xwiki-wysiwyg-macro-editor', [
   'xwiki-wysiwyg-macro-service',
   'xwiki-wysiwyg-macro-parameter-enhancer',
   'xwiki-wysiwyg-macro-parameter-tree-displayer',
+  'xwiki-wysiwyg-macro-collection-parameter',
   'bootstrap'
   // jshint maxparams:false
-], function($, $modal, translations, macroService, macroParameterEnhancer, macroParameterTreeDisplayer) {
+], function($, $modal, translations, macroService, macroParameterEnhancer, macroParameterTreeDisplayer,
+    collectionParameter) {
   'use strict';
 
   const macroEditorTemplate =
@@ -534,6 +678,13 @@ define('xwiki-wysiwyg-macro-editor', [
 
   extractFormData = function(container) {
     let data = {};
+    // A multiple select gives a list of values even when a single value is selected, so that a collection parameter
+    // with a single value is joined like one with several values.
+    container.find('select[multiple]').each(function() {
+      if (this.name) {
+        data[this.name] = [];
+      }
+    });
     container.find(':input').serializeArray().forEach(function(parameter) {
       let value = data[parameter.name];
       if (value === undefined) {
@@ -592,7 +743,13 @@ define('xwiki-wysiwyg-macro-editor', [
   addParameterValueToMacroCall = function(macroCall, formData, parameterDescriptor) {
     let value = formData[parameterDescriptor.id];
     if (Array.isArray(value)) {
-      value = isBooleanType(parameterDescriptor.displayType) ? value[0] : value.join();
+      if (isBooleanType(parameterDescriptor.displayType)) {
+        value = value[0];
+      } else if (collectionParameter.isCollectionType(parameterDescriptor.displayType)) {
+        value = collectionParameter.joinCollectionValues(value);
+      } else {
+        value = value.join();
+      }
     }
     let defaultValue = parameterDescriptor.defaultValue;
     if (value !== '' && !isValueSameAsDefaultValue(value, defaultValue)) {

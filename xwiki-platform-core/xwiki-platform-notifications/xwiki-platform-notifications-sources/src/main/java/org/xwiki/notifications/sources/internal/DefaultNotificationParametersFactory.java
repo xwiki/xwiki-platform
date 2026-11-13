@@ -19,6 +19,10 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -482,13 +486,42 @@ public class DefaultNotificationParametersFactory
         handleTagsParameter(notificationParameters, parameters.get(ParametersKey.TAGS), currentWiki);
     }
 
+    /**
+     * Splits the value of a parameter holding a list on the commas that are not inside double quotes, the way the macro
+     * editor writes it. A backslash escapes the next character inside double quotes. Unlike the conversion of a
+     * collection macro parameter, the values aren't split on whitespaces, so that a value holding a whitespace can be
+     * given without quotes.
+     *
+     * @param value the value of the parameter
+     * @return the values it holds, trimmed, empty values excluded
+     */
+    static List<String> splitListParameter(String value)
+    {
+        List<String> values = new ArrayList<>();
+        if (StringUtils.isNotBlank(value)) {
+            StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(value));
+            tokenizer.resetSyntax();
+            tokenizer.wordChars(0, 255);
+            tokenizer.whitespaceChars(',', ',');
+            tokenizer.quoteChar('"');
+            try {
+                while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+                    String token = StringUtils.trim(tokenizer.sval);
+                    if (StringUtils.isNotEmpty(token)) {
+                        values.add(token);
+                    }
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+        return values;
+    }
+
     private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
     {
-        if (StringUtils.isNotBlank(tags)) {
-            String[] tagArray = tags.split(",");
-            for (int i = 0; i < tagArray.length; ++i) {
-                parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
-            }
+        for (String tag : splitListParameter(tags)) {
+            parameters.filterPreferences.add(new TagNotificationFilterPreference(tag, currentWiki));
         }
     }
 
@@ -538,8 +571,8 @@ public class DefaultNotificationParametersFactory
             Set<NotificationFormat> formats = new HashSet<>();
             formats.add(parameters.format);
 
-            String[] locationArray = locations.split(FIELD_SEPARATOR);
-            for (int i = 0; i < locationArray.length; ++i) {
+            List<String> locationList = splitListParameter(locations);
+            for (int i = 0; i < locationList.size(); ++i) {
                 DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
                 pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));
                 pref.setEnabled(true);
@@ -548,13 +581,13 @@ public class DefaultNotificationParametersFactory
                 pref.setNotificationFormats(formats);
                 switch (property) {
                     case WIKI:
-                        pref.setWiki(locationArray[i]);
+                        pref.setWiki(locationList.get(i));
                         break;
                     case SPACE:
-                        pref.setPage(makeReferenceAbsolute(locationArray[i], EntityType.SPACE, currentWiki));
+                        pref.setPage(makeReferenceAbsolute(locationList.get(i), EntityType.SPACE, currentWiki));
                         break;
                     case PAGE:
-                        pref.setPageOnly(makeReferenceAbsolute(locationArray[i], EntityType.PAGE, currentWiki));
+                        pref.setPageOnly(makeReferenceAbsolute(locationList.get(i), EntityType.PAGE, currentWiki));
                         break;
                     default:
                         break;

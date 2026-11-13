@@ -255,7 +255,8 @@ public class PasswordClass extends StringClass
     @Unstable
     public static boolean isPasswordHashed(String value)
     {
-        return value != null && value.startsWith(HASH_IDENTIFIER + SEPARATOR) || HASH_PATTERN.matcher(value).matches();
+        return value != null
+            && (value.startsWith(HASH_IDENTIFIER + SEPARATOR) || HASH_PATTERN.matcher(value).matches());
     }
 
     @Override
@@ -343,14 +344,19 @@ public class PasswordClass extends StringClass
      * @param storedPassword The stored password, which gives the storage type and algorithm.
      * @param plainPassword The plain text password to be encrypted.
      * @return The input password, encrypted with the same mechanism as the stored password.
-     * @deprecated Contrarily to what the original doc says this method only returns the stored password value, if
-     * there's a match between both values, else it returns an empty string. It shouldn't be used at all anymore and
-     * instead {@link #arePasswordsMatching(String, String)} should be used.
+     * @deprecated Contrarily to what the original doc says, when the stored password is a hash this method only
+     * returns the stored password value if there's a match between both values, else it returns an empty string. When
+     * the stored password is in clear text, the plain text password is returned unchanged. It shouldn't be used at all
+     * anymore and instead {@link #arePasswordsMatching(String, String)} should be used.
      */
     @Deprecated(since = "18.8.0RC1, 18.4.5, 17.10.14")
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
-        return (arePasswordsMatching(plainPassword, storedPassword)) ? storedPassword : "";
+        String result = plainPassword;
+        if (plainPassword != null && isPasswordHashed(storedPassword)) {
+            result = arePasswordHashesMatching(plainPassword, storedPassword) ? storedPassword : "";
+        }
+        return result;
     }
 
     /**
@@ -410,11 +416,12 @@ public class PasswordClass extends StringClass
 
     /**
      * @param password the encoded password
-     * @return The algorithm used for the given password or {@code null} if the storage type is clear.
+     * @return The algorithm used for the given password or {@code null} if the storage type is clear or if the password
+     *     is stored in clear text (see {@link #arePasswordsMatching(String, String)})
      */
     public String getAlgorithmFromPassword(String password)
     {
-        if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
+        if (PasswordMetaClass.CLEAR.equals(getStorageType()) || !isPasswordHashed(password)) {
             return null;
         } else if (password.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             String legacyAlgorithm = LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(password);
@@ -464,6 +471,12 @@ public class PasswordClass extends StringClass
      * Otherwise, the method will check a match with a password hash: the method still supports legacy encoded
      * passwords (using the format {@code hash:<algorithmName>:<salt>:<hash>}) but it will warn to reencode them.
      * In a similar way, if the provided encode passwords uses a deprecated algorithm a warning will be issued.
+     * <p>
+     * A value which is not a supported hash (see {@link #isPasswordHashed(String)}), while the storage type is hash,
+     * was stored in clear text (e.g. while the storage type of the property was clear): it's compared in clear, with a
+     * warning since it should be hashed.
+     * An empty (or {@code null}) encoded password, while the storage type is hash, means that no password is set: it
+     * never matches, since the hash of any password, even an empty one, is never empty.
      *
      * @param rawPassword the raw password to test for a match
      * @param encodedPassword the encoded (or not if the storage type is clear) password to match with
@@ -477,7 +490,19 @@ public class PasswordClass extends StringClass
     {
         if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
             return Strings.CS.equals(rawPassword, encodedPassword);
-        } else if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+        } else if (StringUtils.isEmpty(encodedPassword)) {
+            return false;
+        } else if (!isPasswordHashed(encodedPassword)) {
+            warnAboutClearPassword();
+            return Strings.CS.equals(rawPassword, encodedPassword);
+        } else {
+            return arePasswordHashesMatching(rawPassword, encodedPassword);
+        }
+    }
+
+    private boolean arePasswordHashesMatching(String rawPassword, String encodedPassword)
+    {
+        if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
             // The password has not been re-encoded with XWikiLegacyPasswordEncoder: it's only protected by the
             // legacy message digest algorithm it contains, which is the one to report.
             warnAboutOutdatedAlgorithm(LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(encodedPassword));
@@ -495,6 +520,17 @@ public class PasswordClass extends StringClass
             } else {
                 throw new IllegalArgumentException(ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT_MSG);
             }
+        }
+    }
+
+    private void warnAboutClearPassword()
+    {
+        if (getObject() != null) {
+            LOGGER.warn("A password of the property [{}] is stored in clear text while the property expects hashed "
+                + "values: it should be hashed or reset.", getReference());
+        } else {
+            LOGGER.warn("A password stored in clear text is checked with a PasswordClass property expecting hashed "
+                + "values and not yet attached to an object: it should be hashed or reset.");
         }
     }
 

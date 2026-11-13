@@ -240,11 +240,10 @@
  *        name or description are specified
  *#
 #macro(admin_displayCategory $sections $translationPrefix)
-(% class="admin-category" %)
 #set ($sortedSections = [])
-## XWIKI-24518 Without the ((())) the following line was outputing a paragraph filled with empty spaces
-(((#sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections))))
-(% class="admin-categories-container" %)
+## Discard the output of the sort macro, otherwise it generates a paragraph filled with white spaces.
+#set ($discard = "#sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections)")
+(% class="admin-category admin-categories-container" %)
 #foreach ($section in $sortedSections)
       ## Icon Container
       * (% class="admin-category-icon" %)
@@ -292,7 +291,7 @@
  *        name or description are specified
  *#
 #macro(admin_displayCategories $adminMenu $translationPrefix)
-(% class="admin-categories-container" %)
+(% class="admin-category admin-categories-container" %)
 #foreach ($category in $adminMenu)
     * (% class="admin-category-icon" %)
       (((
@@ -439,8 +438,7 @@
 
   ----
 )))
-(% class="admin-container" %)
-(((
+
   #verticalNavigation($adminMenu {
     'id': 'administration-menu',
     'translationPrefix': 'admin.',
@@ -472,7 +470,6 @@
       ))) ## admin-page-content
     #end
 #end
-)))
 {{/velocity}}</content>
   <attachment>
     <filename>applications.svg</filename>
@@ -1039,7 +1036,6 @@ require(['jquery'], function($) {
   margin: 0;
 }
 .admin-categories-container {
-    float: left;
     display: flex;
     gap: var(--spacing-medium);
     flex-flow: column;

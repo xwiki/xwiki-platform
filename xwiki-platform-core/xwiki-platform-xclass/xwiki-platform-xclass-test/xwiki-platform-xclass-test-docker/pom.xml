@@ -44,8 +44,16 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Required so that the class UI can create a template provider: it defines XWiki.TemplateProviderClass and the
-         template provider sheet, which xwiki-platform-xclass-ui does not depend on. -->
+    <!-- Required so that the class UI can create a template provider: it provides XWiki.TemplateProviderClass, the
+         template provider sheet and the Page Templates administration section, which xwiki-platform-xclass-ui does not
+         depend on. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-pagetemplate-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- Displays the Page Templates administration section, where the created template provider must be listed. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>
@@ -93,7 +101,7 @@
          the Page Templates administration section. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-pagetemplate-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

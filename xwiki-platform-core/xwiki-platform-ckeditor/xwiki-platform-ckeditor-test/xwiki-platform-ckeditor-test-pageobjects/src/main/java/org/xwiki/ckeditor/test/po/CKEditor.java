@@ -25,7 +25,6 @@ import java.util.Objects;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -35,7 +34,6 @@ import org.xwiki.test.ui.po.BaseElement;
  * @version $Id$
  * @since 1.13
  */
-@Unstable
 public class CKEditor extends BaseElement
 {
     /**

@@ -709,7 +709,8 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       #end
 {{/html}}
 
-{{notifications useUserPreferences="false" displayOwnEvents="true" users="${doc.prefixedFullName}" displayRSSLink="false" /}}
+#set ($userReference = $services.rendering.escape($doc.prefixedFullName, 'xwiki/2.1'))
+{{notifications useUserPreferences="false" displayOwnEvents="true" users="$userReference" displayRSSLink="false" /}}
 
 {{html clean='false'}}
       &lt;/div&gt;

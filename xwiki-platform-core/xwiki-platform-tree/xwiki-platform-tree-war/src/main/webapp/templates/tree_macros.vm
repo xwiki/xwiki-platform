@@ -38,6 +38,16 @@
 
 #macro (tree $options)
   <div #treeAttributes($options)></div>
+  #set ($macro.description = $options.description)
+  #if ("$!macro.description" == '')
+    #set ($macro.description = $services.localization.render('tree.macro.description'))
+  #end
+  ## The description is linked to the tree on the client side, where the tree id is generated when missing. Generating
+  ## the id here would give the same id to every copy of a cached tree output.
+  ## The description is hidden on purpose. Assistive technologies still announce it through the aria-describedby of
+  ## the tree, because a description is computed even from a hidden element, but it is never read on its own,
+  ## out of the context of the tree, and it stays out of the visible text of the page.
+  <p class="xtree-description" hidden>$escapetool.xml($macro.description)</p>
 #end
 
 #macro (treeAttributes $options $isWikiSyntax)

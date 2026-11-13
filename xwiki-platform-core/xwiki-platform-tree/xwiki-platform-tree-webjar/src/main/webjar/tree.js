@@ -793,7 +793,14 @@ define([
       }), 'tree:ready');
       // The rendered id of the node anchors is derived from the tree id, and the nodes can be drawn synchronously
       // (when the tree data comes from the HTML inside the tree element), so the tree needs an id before it is created.
-      getOrGenerateTreeId($(this));
+      const treeId = getOrGenerateTreeId($(this));
+      // The tree description is rendered right after the tree element, without an id because the tree id may only be
+      // generated here.
+      const description = $(this).next('.xtree-description');
+      if (description.length) {
+        description.attr('id', treeId + '-description');
+        $(this).attr('aria-describedby', description.attr('id'));
+      }
       var treeParams = $.extend(true, getDefaultParams($(this)), params || {});
       // Add our plugin after the merge because $.extend() merges the arrays by index, so a plugin list passed by the
       // caller could otherwise overwrite it.

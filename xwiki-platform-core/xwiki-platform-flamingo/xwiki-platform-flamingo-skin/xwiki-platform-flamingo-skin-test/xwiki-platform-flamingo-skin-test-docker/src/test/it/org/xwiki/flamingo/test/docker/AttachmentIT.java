@@ -330,7 +330,7 @@ class AttachmentIT
         setup.gotoPage(testReference);
 
         DeletePageOutcomePage deletePageOutcomePage = new DeletePageOutcomePage();
-        deletePageOutcomePage.clickRestore();
+        deletePageOutcomePage.getDeletedPagesEntries().get(0).clickRestore();
 
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("toto.txt"));

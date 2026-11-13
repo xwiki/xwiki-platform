@@ -1538,6 +1538,44 @@ describe("MarkdownToUniAstConverter", () => {
       },
     });
   });
+
+  test.each<{ name: string; blocks: UniAst["blocks"]; error: string }>([
+    {
+      name: "a raw HTML block",
+      blocks: [{ type: "rawHtml", html: "<div>raw</div>" }],
+      error: "Raw HTML is not representable in Markdown",
+    },
+    {
+      name: "a macro editable area block",
+      blocks: [{ type: "macroBlockEditableArea", styles: {} }],
+      error: "Macro editable-area blocks are not representable in Markdown",
+    },
+    {
+      name: "raw HTML inline content",
+      blocks: [
+        {
+          type: "paragraph",
+          styles: {},
+          content: [{ type: "rawHtml", html: "<span>raw</span>" }],
+        },
+      ],
+      error: "Raw HTML is not representable in Markdown",
+    },
+    {
+      name: "a macro editable area inline content",
+      blocks: [
+        {
+          type: "paragraph",
+          styles: {},
+          content: [{ type: "inlineMacroEditableArea" }],
+        },
+      ],
+      error:
+        "Macro editable-area inline content is not representable in Markdown",
+    },
+  ])("refuse to serialize $name", async ({ blocks, error }) => {
+    await expect(uniAstToMd.toMarkdown({ blocks })).rejects.toThrow(error);
+  });
 });
 
 const TEST_MACROS: Record<string, ReturnType<MacrosService["get"]>> = {

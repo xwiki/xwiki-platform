@@ -36,6 +36,14 @@ public class RealtimeWikiEditPage extends WikiEditPage
     private RealtimeEditToolbar toolbar;
 
     /**
+     * Default constructor.
+     */
+    public RealtimeWikiEditPage()
+    {
+        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
+    }
+
+    /**
      * Opens the specified wiki page in real-time wiki edit mode.
      *
      * @param pageReference the wiki page to edit in real-time wiki edit mode
@@ -45,14 +53,6 @@ public class RealtimeWikiEditPage extends WikiEditPage
     {
         WikiEditPage.gotoPage(pageReference);
         return new RealtimeWikiEditPage();
-    }
-
-    /**
-     * Default constructor.
-     */
-    public RealtimeWikiEditPage()
-    {
-        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
     }
 
     /**

@@ -21,18 +21,12 @@
   // The settings the XWiki repositories share. See https://github.com/xwiki/.github
   "extends": ["github>xwiki/.github//renovate/default.json5"],
 
-  // Added to the rules of the preset, which already disables the commons dependencies.
+  // Added to the rules of the preset, which already disables the commons, rendering and platform dependencies.
   "packageRules": [
     // Add the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
     {
       "matchDatasources": ["maven"],
       "registryUrls": ["https://repo1.maven.org/maven2/", "https://nexus.xwiki.org/nexus/content/repositories/public/"]
-    },
-
-    // There is no point trying to find updates for commons, rendering and platform dependencies
-    {
-      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
-      "enabled": false
     },
 
     // Automatically assign webjars packages to @mflorea

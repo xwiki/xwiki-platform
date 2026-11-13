@@ -1,0 +1,241 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxLinks" locale="da">
+  <web>XWiki</web>
+  <name>XWikiSyntaxLinks</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWiki-syntaks: Links</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Redigering =
+
+== Links ==
+
+=== 1.0 Links ===
+
+|=(% style="width:20%" %)Funktion|=XWiki Syntax 1.0|=(% style="width:20%" %)Resultat
+|Link til en side i det aktuelle område|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
+|Link med en etiket|{{{[etiket&gt;WebHome]}}}|[[etiket&gt;&gt;WebHome]]
+|Link med XWiki-syntaks i etiketten|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;fed etiket&lt;/strong&gt;&lt;/a&gt;}}}|[[**fed etiket**&gt;&gt;WebHome]]
+|Link til en side med angivet område|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
+|Link til en underwiki|{{{[subwiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
+|Link, der åbnes i et nyt vindue|{{{[etiket&gt;WebHome&gt;_blank]}}}|[[etiket&gt;&gt;WebHome||target="_blank"]]
+|Link til en URL direkte i teksten|{{{Dette er en URL: https://xwiki.org}}}|Dette er en URL: https://xwiki.org
+|Link til en URL|{{{[https://xwiki.org]}}}|[[https://xwiki.org]]
+|Link til en URL med en etiket|{{{[XWiki&gt;https://xwiki.org]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Link til en e-mailadresse|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Billedlink|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Billedlink med billedparametre|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Link til et bilag på den aktuelle side|(((
+{{info}}Se [[Attach-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] for detaljer{{/info}}
+{{{{attach:tekst|file=img.png}}}}
+)))|[[tekst&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Link til et bilag på en anden side|(((
+{{info}}Se [[Attach-makroen&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] for detaljer{{/info}}
+{{{{attach:tekst|document=Space.Page|file=img.png}}}}
+)))|[[tekst&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Link til et anker på en side|{{{[etiket&gt;Space.Page#anchor]}}}|[[etiket&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
+|Link til en overskrift på en side|(((
+{{{[etiket&gt;Space.Page#HMyheading]}}}
+)))|[[etiket&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+
+{{info}}Når du tilføjer en overskrift, oprettes der et anker med navnet "H" efterfulgt af overskriftens titel med kun bogstaver. For en overskrift med navnet "My heading" bliver ankeret fx "HMyheading".{{/info}}
+
+{{velocity}}$subHeading Specifikation af links i XWiki Syntax 1.0 $subHeading{{/velocity}}
+
+{{info}}
+Delen i ##( )## er obligatorisk, delene i ##[ ]## er valgfrie, og et af de to tegn i ##{ }## skal tilføjes, hvis der bruges valgfrie dele.
+{{/info}}
+
+Det fulde format for et link er **##[label {&gt; or |}] (resource) [@interWikiAlias] [{&gt; or |} target]##**
+
+* **##label##**: En valgfri streng, der vises for brugeren som linkets navn. Eksempel: ##My Page##
+* **##resource##**: Den fulde linkhenvisning med følgende syntaks: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: Linkhenvisningen. Den kan være enten
+*** **En URI** i formen **##protocol:path##** (eksempler: ##http:~/~/xwiki.org##, ##mailto~:john@smith.com##), eller
+*** **En wikiside**-henvisning i formen **##~[~[wikiName:] spaceNameList.] (pageName)##**. Eksempler: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: En valgfri streng med navnet på en wiki. Linket peger på en side i den wiki. Eksempel: ##mywiki##
+**** **##spaceNameList##**: En valgfri punktumadskilt liste over navne på områder i wikien. Hvis der ikke er angivet et område, bruges det aktuelle. Eksempler: ##Main##, ##A.B##, ##A.B.C##
+**** **##pageName##**: En obligatorisk streng med navnet på den wikiside, der linkes til. Eksempel: ##WebHome##
+** **##queryString##**: En valgfri forespørgselsstreng med parametre, der bruges i den gengivne URL. Eksempel: ##mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: Et valgfrit ankernavn, der peger på et anker i det link, der henvises til. Bemærk, at XWiki automatisk opretter ankre for overskrifter. Eksempel: ##HTableOfContents##
+* **##interWikiAlias##**: Et valgfrit [[Inter Wiki&gt;&gt;en.wikipedia.org/wiki/InterWiki]]-alias som defineret i InterWiki-kortet (se [[administratorvejledningen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Det gælder kun navne på wikisider. Eksempel: ##wikipedia##
+* **##target##**: En valgfri streng, der svarer til HTML-attributten ##target## for et HTML-linkelement ##A##. Elementet bruges, når linket gengives. Som standard åbnes linket i det aktuelle vindue. Eksempler: ##_self##, ##_blank##
+
+=== 2.0 Links ===
+
+|=(% style="width:20%" %)Funktion|=XWiki Syntax 2.0|=(% style="width:20%" %)Resultat
+|Link til en side i det aktuelle område|{{{[[WebHome]]}}}|[[WebHome]]
+|Link med en etiket|(((
+{{{[[etiket&gt;&gt;WebHome]]}}}
+{{info}}XWiki-syntaks understøttes i linkets etiket.{{/info}}
+)))|[[etiket&gt;&gt;WebHome]]
+|Link med XWiki-syntaks i etiketten|{{{[[**fed etiket**&gt;&gt;WebHome]]}}}|[[**fed etiket**&gt;&gt;WebHome]]
+|Link til en side med angivet område|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|Link til en underwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|Link, der åbnes i et nyt vindue|{{{[[etiket&gt;&gt;WebHome||target="_blank"]]}}}|[[etiket&gt;&gt;WebHome||target="_blank"]]
+|Link til en URL direkte i teksten|{{{Dette er en URL: https://xwiki.org}}}|Dette er en URL: https://xwiki.org
+|Link til en URL|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Link til en URL med en etiket|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Link til en e-mailadresse|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Billedlink|{{{[[image:Space2.Page2@img.png&gt;&gt;Space1.Page1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Billedlink med billedparametre|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Link til et bilag på den aktuelle side|{{{[[tekst&gt;&gt;attach:img.png]]}}}|[[tekst&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Link til et bilag på en anden side|{{{[[tekst&gt;&gt;attach:Space.Page@img.png]]}}}|[[tekst&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Link til et anker på en side|{{{[[etiket&gt;&gt;Space.Page#anchor]]}}}|[[etiket&gt;&gt;XWiki.XWikiSyntax||anchor="anchor"]]
+|Link til en overskrift på en side|{{{[[etiket&gt;&gt;Space.Page#HMyheading]]}}}|[[etiket&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]
+|Link til et anker på den aktuelle side|{{{[[etiket&gt;&gt;#anchor]]}}}|[[etiket&gt;&gt;||anchor="anchor"]]
+
+{{info}}Når du tilføjer en overskrift, oprettes der et anker med navnet "H" efterfulgt af overskriftens titel med kun bogstaver. For en overskrift med navnet "My heading" bliver ankeret fx "HMyheading".{{/info}}
+
+{{velocity}}$subHeading Specifikation af links i XWiki Syntax 2.0 $subHeading{{/velocity}}
+
+{{info}}
+Delen i ##( )## er obligatorisk, mens delene i ##[ ]## er valgfrie.
+{{/info}}
+
+Det fulde format for et link er **##[label&gt;&gt;] (resource) [@interWikiAlias] [||parameters]##**
+
+* **##label##**: En valgfri streng, der vises for brugeren som linkets navn. Etiketten kan indeholde XWiki-syntaks. Hvis der ikke er angivet en etiket, dannes der en standardetiket. Mønstret kan ændres, se [[administratorvejledningen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Eksempel: ##My Page##
+* **##resource##**: Den fulde linkhenvisning med følgende syntaks: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: Linkhenvisningen i en af følgende former:
+*** **URL**: En hvilken som helst URL i formen **##protocol:~/~/path##**. Eksempler: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
+*** **Wikiside**-henvisning i formen **##~[~[wikiName:] spaceNameList.] (pageName)##**. Eksempler: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: En valgfri streng med navnet på en wiki. Linket peger på en side i den wiki. Eksempel: ##mywiki##
+**** **##spaceNameList##**: En valgfri punktumadskilt liste over navne på områder i wikien. Hvis der ikke er angivet et område, bruges det aktuelle. Eksempler: ##Main##, ##A.B##, ##A.B.C##
+**** **##pageName##**: En obligatorisk streng med navnet på den wikiside, der linkes til. Eksempel: ##WebHome##
+*** **Bilag**-henvisning i formen **##attach~: [wikiPageName@] (attachmentName)##**. Eksempler: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
+**** **##attach~:##** En obligatorisk streng, der angiver, at ressourcen er et bilag.
+**** **##wikiPageName##**: En valgfri streng, der henviser til den side, bilaget ligger på, se "Wikiside" ovenfor.
+**** **##attachmentName##**: Bilagets navn, som det er gemt i wikien.
+*** **E-mailadresse** i formen **##mailto~: (emailAddress)##** (###anchor## er ikke gyldig). Eksempel: ##mailto~:john@smith.com##
+**** **##mailto~:##** En obligatorisk streng, der angiver, at ressourcen er en e-mail.
+**** **##emailAddress##**: Den e-mailadresse, der skal bruges. Eksempel: "##john@smith.com##"
+** **##queryString##**: En valgfri forespørgselsstreng med parametre, der bruges i den gengivne URL. Eksempel: ##mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: Et valgfrit ankernavn, der peger på et anker i det link, der henvises til. Bemærk, at XWiki automatisk opretter ankre for overskrifter og billeder. Eksempel: ##HTableOfContents##
+* **##interWikiAlias##**: Et valgfrit [[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]]-alias som defineret i InterWiki-kortet (se [[administratorvejledningen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Det gælder kun navne på wikisider. Eksempel: ##wikipedia##
+* **##parameters##**: En valgfri liste over parametre, der sendes til linket. Eksempel: ##target="~_blank"## (åbn i nyt vindue)
+
+=== 2.1 Links ===
+
+|=Funktion|=XWiki Syntax 2.1|=Resultat
+|Absolut link til siden ##PageB## i ##PageA##|{{{[[PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Relativt link til siden ##PageA## fra den aktuelle side|{{{[[PageA]]}}} or {{{[[.PageA]]}}}|[[PageA&gt;&gt;]]
+|Relativt link til siden ##PageB## i ##PageA## fra den aktuelle side|{{{[[.PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Link med en etiket|(((
+{{{[[etiket&gt;&gt;PageA]]}}}
+
+{{info}}XWiki-syntaks understøttes i linkets etiket.{{/info}}
+)))|[[etiket&gt;&gt;]]
+|Link med wikisyntaks i etiketten|{{{[[**fed etiket**&gt;&gt;PageA]]}}}|[[**fed etiket**&gt;&gt;]]
+|Link på et billede|{{{[[image:PageA@img.png&gt;&gt;PageA]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;]]
+|Absolut link til siden ##PageB## i ##PageA## i wikien ##WikiA##|{{{[[WikiA:PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Link, der åbnes i et nyt vindue|{{{[[PageA||target="_blank"]]}}}|[[PageA&gt;&gt;]]
+|Implicit link til en URL|{{{Dette er en URL: https://xwiki.org}}}|Dette er en URL: https://xwiki.org
+|Eksplicit link til en URL|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Eksplicit link til en URL med en etiket|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Link til en e-mailadresse|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Link til et bilag på den aktuelle side|{{{[[attach:img.png]]}}}|[[img.png&gt;&gt;]]
+|Link til et bilag på en anden side|{{{[[attach:PageA.PageB@img.png]]}}}|[[img.png&gt;&gt;]]
+|Link til et anker på en side|{{{[[PageA.PageB||anchor="anchor"]]}}}|[[PageB&gt;&gt;]]
+|Link til en overskrift på en side|(((
+{{{[[PageA.PageB||anchor="HMyheading"]]}}}
+
+{{info}}Når du tilføjer en overskrift, oprettes der et anker med navnet "H" efterfulgt af overskriftens titel med kun bogstaver. For en overskrift med navnet "My heading" bliver ankeret fx "HMyheading".{{/info}}
+)))|[[PageB&gt;&gt;]]
+|Link til et anker på den aktuelle side|{{{[[etiket&gt;&gt;||anchor="anchor"]]}}}|[[etiket&gt;&gt;]]
+|Link til en side med en forespørgselsstreng|{{{[[PageA.PageB||queryString="param1=value1&amp;param2=value2"]]}}}|[[PageB&gt;&gt;]]
+|Link til den aktuelle side med en forespørgselsstreng|{{{[[etiket&gt;&gt;||queryString="param1=value1&amp;param2=value2"]]}}}|[[etiket&gt;&gt;]]
+
+{{velocity}}$subHeading Specifikation af links i XWiki Syntax 2.1 $subHeading{{/velocity}}
+
+{{info}}
+Forklaring: Delene i ##()## er obligatoriske, mens delene i ##[]## er valgfrie.
+{{/info}}
+
+Det fulde format for et link er **##[label&gt;&gt;] (resource) [||parameters]##**
+
+* **##label##**: En valgfri streng, der vises for brugeren som linkets navn. Etiketten kan indeholde XWiki-syntaks. Hvis der ikke er angivet en etiket, dannes der en standardetiket. Mønstret kan ændres, se [[administratorvejledningen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Eksempel: ##My Page##
+* **##resource##**: En obligatorisk streng med linkhenvisningen i en af følgende former
+** **URL**: En hvilken som helst URL i formen **##[url:](protocol:~/~/path)##**. Eksempler: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
+*** **##url:##** En valgfri streng, der angiver, at ressourcen er en URL.
+*** **##protocol:~/~/path##**: Selve URL'en
+** **Wikiside**: En henvisning i formen **##page:[(wikiName):](pageNameList)##**. Eksempler: ##page:Page##, ##page:myxwiki:Page##, ##page:ParentPage.ChildPage.SubChildPage##, ##page:../SiblingPage##, ##page:./ChildPage##
+*** **##page:##** En obligatorisk streng, der angiver, at ressourcen er en XWiki-side. Samme henvisning kan bruges til både en slutside og en almindelig side; hvis begge findes, fører den til den almindelige side.
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Linket peger på en side i den wiki. Hvis der ikke er angivet en wiki, bruges den aktuelle. Eksempel: ##mywiki##
+*** **##pageNameList##**: En obligatorisk liste over navne på wikisider adskilt af skråstreger, der peger på den wikiside, der linkes til. Du kan også bruge ##.## og ##..## til at angive den aktuelle eller den overordnede side/wiki. Eksempler: ##Main##, ##A/B##, ##A/B/C##, ##../Sibling##, ##./Child##
+** **Wikidokument**: En henvisning i formen **##[doc:]~[~[(wikiName):](spaceNameList).](documentName)##**. Eksempler: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##, ##Welcome##
+*** **##doc:##** En valgfri streng, der angiver, at ressourcen er en XWiki-slutside. En almindelig side kan også henvises til på denne måde, men så skal delen ##.WebHome## tilføjes (fx ##doc:Sandbox.WebHome##).
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Linket peger på en side i den wiki. Hvis der ikke er angivet en wiki, bruges den aktuelle. Eksempel: ##mywiki##.
+*** **##spaceNameList##**: En valgfri punktumadskilt liste over navne på områder i wikien. Hvis der ikke er angivet et område, bruges det aktuelle. Eksempler: ##Main##, ##A.B##, ##A.B.C##
+*** **##documentName##**: En obligatorisk streng med navnet på den wikiside, der linkes til. Eksempel: ##Welcome##
+** **Wikiområde**: En henvisning i formen **##space:[(wikiName):](spaceNameList)##**. Eksempler: ##space:Main##, ##space:mywiki:Main##, ##space:A.B.C##
+*** **##space:##** En obligatorisk streng, der angiver, at ressourcen er en almindelig XWiki-side (dvs. et område).
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Linket peger på en side i den wiki. Hvis der ikke er angivet en wiki, bruges den aktuelle. Eksempel: ##mywiki##
+*** **##spaceNameList##**: En obligatorisk punktumadskilt liste over navne på områder i wikien, der peger på det område (eller den almindelige side), der linkes til. Eksempler: ##Main##, ##A.B##, ##A.B.C##
+** **InterWiki-side**: En henvisning i formen **##interwiki:[(interWikiAlias):](pageName)##**. Eksempel: ##interwiki:wikipedia:XWiki##
+*** **##interwiki:##** En obligatorisk streng, der angiver, at ressourcen er et InterWiki-link.
+*** **##interWikiAlias##**: Et valgfrit [[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]]-alias som defineret i InterWiki-kortet (se [[administratorvejledningen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Eksempel: ##wikipedia##
+*** **##pageName##**: En obligatorisk streng med navnet på den side, der linkes til. Eksempel: ##XWiki##
+** **Bilag**: En henvisning i formen **##attach~:~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##**
+*** **##attach~:##** En obligatorisk streng, der angiver, at henvisningen er et bilag til et XWiki-dokument.
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Billedhenvisningen peger på et billede, der er vedhæftet en side i den wiki. Hvis der ikke er angivet en wiki, bruges den aktuelle. Eksempel: ##mywiki##.
+*** **##spaceNameList##**: En valgfri punktumadskilt liste over navne på områder i wikien. Hvis der ikke er angivet et område, bruges det aktuelle. Eksempler: ##Main##, ##A.B##, ##A.B.C##
+*** **##pageName##**: En valgfri streng med navnet på den wikiside, som billedet er vedhæftet. Eksempel: ##Welcome##
+*** **##attachmentName##**: Bilagets navn, som det er gemt i wikien. Eksempel: ##photo.png##
+** **Sidebilag**: En henvisning i formen **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##**
+*** **##pageAttach~:##** En obligatorisk streng, der angiver, at henvisningen er et bilag til en XWiki-side.
+*** **##wikiName##**: En valgfri streng med navnet på en wiki. Billedhenvisningen peger på et billede, der er vedhæftet en side i den wiki. Hvis der ikke er angivet en wiki, bruges den aktuelle. Eksempel: ##mywiki##.
+*** **##pageNameList##**: En valgfri punktumadskilt liste over navne på wikisider. Hvis der ikke er angivet en side, bruges den aktuelle. Eksempler: ##Main##, ##A/B##, ##A/B/C##
+*** **##attachmentName##**: Bilagets navn, som det er gemt i wikien. Eksempel: ##photo.png##
+** **E-mailadresse**: En henvisning i formen **##mailto{{{:(}}}emailAddress)##** (###anchor## er ikke gyldig). Eksempel: ##mailto~:john@smith.com##
+*** **##mailto~:##** En obligatorisk streng, der angiver, at ressourcen er en e-mail.
+*** **##emailAddress##**: Den e-mailadresse, der skal bruges. Eksempel: ##john@smith.com##
+** **Relativ sti**: En henvisning på serveren i formen **##path{{{:(}}}relPath)##**. Eksempel: ##path:$doc.getURL('reset')## giver måladressen ##http:~/~/server.domain.com/xwiki/bin/reset/Space/Page##, hvor ##/xwiki/bin/reset/Space/Page## dannes af ##$doc.getURL('reset')##.
+*** **##path:##** En obligatorisk streng, der angiver, at ressourcen er en relativ sti.
+*** **##relPath##**: En obligatorisk streng med den relative sti til den ressource på serveren, der skal linkes til.
+** **UNC (Stifinder i Windows)**: En henvisning i formen **##unc{{{:(}}}path)##**. Linket gengives som et ##file:~/~/##-link. Eksempler: ##unc:C:Windows##, ##unc:~~myserverpathimg.png##, ##unc:home/user/somefile##
+*** **##unc:##** En obligatorisk streng, der angiver, at ressourcen er en UNC-sti (Stifinder i Windows).
+*** **##path##**: En obligatorisk streng med den lokale sti til en ressource, som brugeren har adgang til. Eksempler: ##C:Windows##, ##~~myserverpathimg.png##, ##home/user/somefile##
+** **Uden type**: Hvis ingen af de ovennævnte ressourcetyper er angivet (dvs. der er ikke angivet et ressourcepræfiks ##type:## i linket), behandles linket som et link til en XWiki-slutside eller en almindelig side efter følgende algoritme:
+*** **##Slutside##** i det aktuelle område, //kun// hvis den findes. Eksempel: ##~[~[A]]## fortolkes som ##~[~[doc:currentSpace.A]]##
+*** **##Almindelig side##**  i det aktuelle område. Eksempel: ##~[~[A]]## fortolkes som ##~[~[space:currentSpace.A]]##, hvilket svarer til ##~[~[doc:currentSpace.A.WebHome]]##
+*** Hvis den aktuelle side er en almindelig side, og de 2 kontroller ovenfor ikke fandt en eksisterende side, foretages der 2 ekstra kontroller:
+**** **##Slutside##** på samme niveau i det overordnede område, //kun// hvis den findes. Eksempel: Linket ##~[~[B]]## på den almindelige side ##A.C## fortolkes som ##~[~[doc:A.B]]##
+**** **##Almindelig side##** på samme niveau i det overordnede område, uanset om den findes eller ej. Eksempel: Linket ##~[~[B]]## på den almindelige side ##A.C## fortolkes som ##~[~[space:A.B]]##, hvilket svarer til ##~[~[doc:A.B.WebHome]]##
+*** //Note 1 - absolutte links//: Hvis linket uden type har 2 eller flere punktumadskilte dele (dvs. det ligner et områdenavn og et sidenavn), fortolker algoritmen ovenfor siden i forhold til den aktuelle wiki og ikke det aktuelle område. Eksempel: ##~[~[A.B]]## kan fortolkes som enten ##~[~[doc:currentWiki:A.B]]## (hvis den findes) eller ##~[~[space:currentWiki:A.B]##] (svarer til ##~[~[doc:currentWiki:A.B.WebHome]]##) og ikke som ##~[~[doc:currentWiki:currentSpace.A.B]]## eller ##~[~[doc:currentWiki:currentSpace.A.B.WebHome]]##.
+*** //Note 2 - særlig håndtering af ##.WebHome##//: Hvis linket uden type ender på ##.WebHome##, behandles det //altid// som en slutside. Eksempel: ##~[~[A.WebHome]]## fortolkes altid som ##~[~[doc:A.WebHome]]## og ikke som ##~[~[doc:A.WebHome.WebHome]]##.
+* **##parameters##**: En valgfri liste over mellemrumsadskilte parametre, der sendes til linket. Eksempel: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" target="~_blank"##
+** **##queryString##**: En valgfri forespørgselsstreng med parametre, der føjes til linkets måladresse og bruges i den gengivne URL. Eksempel: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## giver måladressen ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: Et valgfrit ankernavn, der peger på et anker i det link, der henvises til. Bemærk, at XWiki automatisk opretter ankre for overskrifter og billeder. Eksempel: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## giver måladressen ##http:~/~/domain.com/path#HTableOfContents##
+** **##target##**: En valgfri parameter, der gør det muligt at åbne linkets mål i et nyt vindue. Eksempel: ##target="~_blank"##</content>
+  </xwikidoc>

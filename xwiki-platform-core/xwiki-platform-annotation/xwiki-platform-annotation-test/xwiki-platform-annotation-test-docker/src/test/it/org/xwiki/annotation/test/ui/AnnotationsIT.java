@@ -19,6 +19,8 @@
  */
 package org.xwiki.annotation.test.ui;
 
+import java.awt.Insets;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,8 +29,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
+import org.xwiki.annotation.test.po.AnnotationsPane;
 import org.xwiki.annotation.test.po.AnnotationsWindow;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -80,6 +85,14 @@ class AnnotationsIT
     private static final String USER_NAME = "UserAnnotation";
 
     private static final String USER_PASS = "pass";
+
+    private static final String SUPERADMIN = "XWiki.superadmin";
+
+    /**
+     * Shows the space between the annotation settings and the page content. The space above the settings is left out
+     * because it shows the date of the last modification of the page.
+     */
+    private static final Insets PANE_MARGIN = new Insets(0, 0, 30, 0);
 
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
@@ -229,7 +242,8 @@ class AnnotationsIT
      */
     @Test
     @Order(4)
-    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference)
+    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference, ScreenshotComparator screenshots)
+        throws IOException
     {
         AnnotatableViewPage annotatableViewPage =
             new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
@@ -246,14 +260,49 @@ class AnnotationsIT
         assertEquals("Done.", renameStatusPage.getInfoMessage());
         renameStatusPage.gotoNewPage();
 
-        annotatableViewPage.showAnnotationsPane().clickShowAnnotations();
+        AnnotationsPane annotationsPane = annotatableViewPage.showAnnotationsPane();
+        // Check the layout of the annotation settings, which differs on small screens.
+        screenshots.assertMatches("annotationsPane", annotationsPane.getContainer(), PANE_MARGIN);
+        setup.setBrowserWindowWidth(700);
+        try {
+            screenshots.assertMatches("annotationsPaneSmallScreen", annotationsPane.getContainer(), PANE_MARGIN);
+        } finally {
+            setup.maximizeBrowserWindow();
+        }
+
+        annotationsPane.clickShowAnnotations();
         annotatableViewPage.waitForAnnotationsDisplayed();
         assertEquals(1, annotatableViewPage.getAnnotationCount());
     }
 
-    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
     @Order(5)
+    void annotationsKeepTheAuthorsOfTheAnnotatedPage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        setup.rest().savePage(testReference, CONTENT, null);
+        assertAnnotatedPageAuthors(setup, testReference, SUPERADMIN);
+
+        // Add an annotation as a user who is not the author of the page.
+        setup.login(USER_NAME, USER_PASS);
+        AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(setup.gotoPage(testReference));
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+        assertAnnotatedPageAuthors(setup, testReference, "xwiki:XWiki." + USER_NAME);
+    }
+
+    private void assertAnnotatedPageAuthors(TestUtils setup, TestReference testReference,
+        String originalMetadataAuthor) throws Exception
+    {
+        Page page = setup.rest().get(testReference);
+        // The REST author is the effective metadata author, and the modifier the content author.
+        assertEquals(SUPERADMIN, page.getAuthor());
+        assertEquals(SUPERADMIN, page.getModifier());
+        assertEquals(originalMetadataAuthor, page.getOriginalMetadataAuthor());
+    }
+
+    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
+    @Test
+    @Order(6)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {

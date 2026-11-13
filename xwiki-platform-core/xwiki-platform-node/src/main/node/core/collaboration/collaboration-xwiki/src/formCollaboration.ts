@@ -247,7 +247,8 @@ function leave(
  *
  * @param options - the edited document, the edit form and the collaboration manager
  * @returns the joined collaboration session, once the connection is established and the initial synchronization is
- *   done
+ *   done, or once the collaboration manager gives up waiting for the connection (see
+ *   {@link CollaborationManager.join})
  * @since 18.9.0RC1
  * @beta
  */

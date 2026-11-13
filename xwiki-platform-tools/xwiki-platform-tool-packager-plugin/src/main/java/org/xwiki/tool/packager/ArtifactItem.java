@@ -19,7 +19,7 @@
  */
 package org.xwiki.tool.packager;
 
-import org.codehaus.plexus.util.StringUtils;
+import java.util.Objects;
 
 /**
  * Represents an Artifact Item in the plugin configuration.
@@ -162,7 +162,7 @@ public class ArtifactItem
             builder.append(':');
         }
 
-        builder.append(StringUtils.defaultString(this.version, "?"));
+        builder.append(Objects.toString(this.version, "?"));
         builder.append(':');
         builder.append(this.type);
 

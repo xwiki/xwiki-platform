@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import BlocknoteEditor from "./vue/c-blocknote-view.vue";
+import { moveCaretTo } from "./vue/caret";
 export type {
   ContextForMacros,
   EditorType,
@@ -29,4 +30,4 @@ export type {
  */
 const BlocknoteEditorAnnotated = BlocknoteEditor;
 
-export { BlocknoteEditorAnnotated as BlocknoteEditor };
+export { BlocknoteEditorAnnotated as BlocknoteEditor, moveCaretTo };

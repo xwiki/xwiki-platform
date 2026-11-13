@@ -30,20 +30,30 @@ import org.xwiki.livedata.test.po.LiveDataElement;
  */
 public class MenuHomePage extends ApplicationHomePage
 {
+    private static final String SPACE = "Menu";
+
     /**
      * Go to the home page of the Menu application.
+     *
+     * @return the page object for the Menu application home page
      */
     public static MenuHomePage gotoPage()
     {
-        ApplicationHomePage.gotoPage("Menu");
+        ApplicationHomePage.gotoPage(SPACE);
         return new MenuHomePage();
     }
 
+    /**
+     * @return the name of the space holding the Menu application home page
+     */
     public static String getSpace()
     {
-        return "Menu";
+        return SPACE;
     }
 
+    /**
+     * @return the name of the Menu application home page
+     */
     public static String getPage()
     {
         return "WebHome";

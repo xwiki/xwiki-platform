@@ -61,6 +61,8 @@ const TRANSLATION_KEYS = [
   "realtime.saveStatus.saved",
   "realtime.saveStatus.saving",
   "realtime.saveStatus.unsaved",
+  "realtime.sessionReplacedWarning",
+  "realtime.sessionReplacedWarning.message",
   "realtime.summarize",
   "realtime.summarize.hint",
   "realtime.summarizeAndDone",

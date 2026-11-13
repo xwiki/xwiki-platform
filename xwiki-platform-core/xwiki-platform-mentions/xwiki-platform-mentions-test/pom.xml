@@ -29,6 +29,11 @@
   <name>XWiki Platform - Mentions - Test - POM</name>
   <packaging>pom</packaging>
   <description>Tests for the Mentions Application.</description>
+  <properties>
+    <!-- Test code and page objects are not public APIs, so don't run backward-compatibility checks on them.
+         See https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HCodeThatIsNotAPI -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <modules>
     <module>xwiki-platform-mentions-test-pageobjects</module>
   </modules>

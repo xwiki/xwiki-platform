@@ -67,7 +67,6 @@ function resolveMacroEdit(
         editor.updateBlock(macroBlock.id, {
           props: {
             call: JSON.stringify(invocationToMacroCall(updated)),
-            output: "[]",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         }),

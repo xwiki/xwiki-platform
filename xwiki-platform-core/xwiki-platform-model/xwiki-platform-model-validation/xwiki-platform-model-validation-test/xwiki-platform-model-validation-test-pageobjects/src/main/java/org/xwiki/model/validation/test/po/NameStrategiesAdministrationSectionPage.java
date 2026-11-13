@@ -64,6 +64,14 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
         By.id("XWiki.EntityNameValidation.ConfigurationClass_0_slug.forbiddenWords");
 
     /**
+     * Creates a page object for the Name Strategies administration section, which must be the current page.
+     */
+    public NameStrategiesAdministrationSectionPage()
+    {
+        super(SECTION_ID);
+    }
+
+    /**
      * Open the Name Strategies administration section.
      *
      * @return the Name Strategies administration section
@@ -72,11 +80,6 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     {
         AdministrationSectionPage.gotoPage(SECTION_ID);
         return new NameStrategiesAdministrationSectionPage();
-    }
-
-    public NameStrategiesAdministrationSectionPage()
-    {
-        super(SECTION_ID);
     }
 
     /**
@@ -189,13 +192,13 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     }
 
     /**
-     * Enter a name in the "test selected strategy" field, then wait until the asynchronously computed result matches the
-     * expected transformed name and verify the validity.
+     * Enter a name in the "test selected strategy" field, then wait until the asynchronously computed result matches
+     * the expected transformed name and verify the validity.
      * <p>
-     * The name is set and an {@code input} event is dispatched on every polling iteration, which makes the method robust
-     * against (a) the asynchronous loading of the section's JavaScript (the {@code input} handler that triggers the test
-     * might not be bound yet on the first attempt) and (b) out-of-order responses (all the requests carry the same name,
-     * so the displayed result converges to the expected one).
+     * The name is set and an {@code input} event is dispatched on every polling iteration, which makes the method
+     * robust against (a) the asynchronous loading of the section's JavaScript (the {@code input} handler that triggers
+     * the test might not be bound yet on the first attempt) and (b) out-of-order responses (all the requests carry the
+     * same name, so the displayed result converges to the expected one).
      *
      * @param name the name to test against the selected strategy
      * @param expectedValid the expected validity of the tested name
@@ -209,12 +212,17 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
                 "arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input'));", input, name);
             return expectedTransformedName.equals(getTransformedName());
         });
-        if (isTestedNameValid() != expectedValid) {
+        boolean valid = isTestedNameValid();
+        if (valid != expectedValid) {
             throw new AssertionError(String.format(
                 "The name [%s] was expected to be [%s] but was [%s] (transformed name [%s])", name,
-                expectedValid ? "valid" : "invalid", isTestedNameValid() ? "valid" : "invalid",
-                expectedTransformedName));
+                toValidityLabel(expectedValid), toValidityLabel(valid), expectedTransformedName));
         }
+    }
+
+    private static String toValidityLabel(boolean valid)
+    {
+        return valid ? "valid" : "invalid";
     }
 
     /**

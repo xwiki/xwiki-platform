@@ -25,6 +25,7 @@ from pygments.styles import get_style_by_name
 from pygments.util import ClassNotFound
 from pygments.formatters.xdom import XDOMFormatter
 from pygments.styles.xwiki_default import XWikiStyle
+import pygments.xwiki_lexer
 
 if language:
   try:

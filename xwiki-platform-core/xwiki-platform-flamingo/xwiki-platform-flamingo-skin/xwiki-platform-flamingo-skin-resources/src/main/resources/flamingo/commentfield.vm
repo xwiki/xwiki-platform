@@ -49,7 +49,7 @@
   $escapetool.xml($services.localization.render('core.viewers.comments.edit.comment.label'))
 </label>
 #initRequiredSkinExtensions()
-## This startupFocus parameter is used by the CKEditor WYSIWYG editor.
+## This startupFocus parameter is used by the WYSIWYG editors.
 #set ($wysiwygEditorConfig = {
   'startupFocus': true
 })

@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.ui;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -47,7 +48,12 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ForceEditLockModal;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -62,7 +68,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(
     properties = {
         // The Image Wizard needs this to be able to upload images.
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+
+        // The page, attachment and image suggestions execute a Solr query from XWiki.SuggestSolrService /
+        // XWiki.SuggestSolrMacros, which requires programming right. These pages are authored by a user that has
+        // programming right in a normal wiki, but the test wiki blocks programming right by default, so we need to
+        // explicitly exclude them.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
     },
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
@@ -73,7 +85,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // core extension so we need to make the extension index also core.
         "org.xwiki.platform:xwiki-platform-extension-index",
 
-        // Solr search is used to get suggestions for the link quick action.
+        // Solr search is used to get suggestions for the link and image quick actions.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
     },
     servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
@@ -581,6 +593,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
         setup.loginAsSuperAdmin();
         setup.gotoPage(testReferenceEn).editWYSIWYG();
+        // John, the content author, doesn't have script right, so superadmin is warned that editing the page would
+        // allow the velocity macro to be executed.
+        new ForceEditLockPage().clickForceEdit();
         BlockNoteStandaloneEditPage secondEditPage = new BlockNoteStandaloneEditPage();
         BlockNoteEditor secondEditor = secondEditPage.getContentEditor();
         BlockNoteRichTextArea secondTextArea = secondEditor.getRichTextArea();
@@ -654,8 +669,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        // Re-join the collaboration session.
-        joinSession(firstEditPage, setup);
+        // Re-join the collaboration session. Superadmin's save made them the content author, so John is warned that
+        // editing the page may break the velocity macro because he doesn't have script right.
+        joinSessionConfirmingRequiredRightsWarning(firstEditPage);
         firstEditor = firstEditPage.getContentEditor();
         firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.waitUntilTextContains("five");
@@ -1002,6 +1018,169 @@ class CollaborationIT extends AbstractBlockNoteIT
         }
     }
 
+    @Test
+    @Order(12)
+    void editWhileCollaborationServerIsUnreachable(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "one", "");
+
+        // The editor is loaded even if it can't connect to the collaboration server.
+        BlockNoteInplaceEditPage firstEditPage = new BlockNoteInplaceEditPage();
+        firstEditPage.simulateUnreachableCollaborationServer().edit();
+        firstEditPage.waitForInplaceEditor(false);
+        RealtimeEditToolbar firstToolbar = firstEditPage.getToolbar();
+        assertFalse(firstToolbar.isConnected());
+        // The auto-save is started even if we're disconnected.
+        firstToolbar.waitForSaveStatus(SaveStatus.SAVED);
+        // We're identified in the realtime editing session even before we connect to it.
+        String firstCoeditorId = firstToolbar.getUserId();
+
+        // The user can edit and save while disconnected.
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.appendParagraph("two").waitUntilTextContains("two");
+        firstToolbar.waitForSaveStatus(SaveStatus.UNSAVED);
+        firstEditPage.save();
+        assertEquals(SaveStatus.SAVED, firstToolbar.getSaveStatus());
+        assertFalse(firstToolbar.isConnected());
+
+        // The created version is listed in the history dropdown.
+        List<VersionElement> versions =
+            firstToolbar.getHistoryDropdown().waitForVersion("1.2").open().getVersions();
+        assertEquals(2, versions.size());
+        assertEquals("1.2", versions.get(1).getNumber());
+        firstToolbar.getHistoryDropdown().close();
+
+        // The editor connects to the realtime editing session as soon as the collaboration server is reachable, and
+        // the changes made while disconnected are shared.
+        firstEditPage.restoreCollaborationServer();
+        firstToolbar.waitUntilEditingAlone();
+        firstTextArea.appendParagraph("three").waitUntilTextContains("three");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsAlice(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSession(secondEditPage, setup);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        secondTextArea.waitUntilTextContains("three");
+        RealtimeEditToolbar secondToolbar = secondEditPage.getToolbar();
+        String secondCoeditorId = secondToolbar.getUserId();
+        // The user who edited while disconnected is listed among the coeditors.
+        secondToolbar.waitForCoeditor(firstCoeditorId);
+        assertEquals(2, secondToolbar.getVisibleCoeditorCount());
+        secondTextArea.appendParagraph("four").waitUntilTextContains("four");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("four");
+        firstToolbar.waitForCoeditor(secondCoeditorId);
+        assertEquals(2, firstToolbar.getVisibleCoeditorCount());
+        assertEquals("one\ntwo\nthree\nfour", firstEditPage.done().getContent());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondToolbar.waitUntilEditingAlone();
+        assertEquals("one\ntwo\nthree\nfour", secondEditPage.done().getContent());
+    }
+
+    @Test
+    @Order(13)
+    void macroOutputIsNotShared(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh. The macro output depends on the current user, and it's not supposed to be shared with the other
+        // users editing the page.
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            Hello {{velocity}}$xcontext.userReference.name{{/velocity}}!
+
+            {{velocity}}
+            Welcome $xcontext.userReference.name
+            {{/velocity}}
+            """, "");
+
+        // Edit the page as superadmin, who starts the collaboration session. We use the standalone editor because
+        // superadmin doesn't have a preferred editor (i.e. in-place editing would use the wiki editor).
+        BlockNoteStandaloneEditPage firstEditPage = BlockNoteStandaloneEditPage.gotoPage(testReference);
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.waitUntilTextContains("Welcome superadmin");
+        assertThat(firstTextArea.getText(), containsString("Hello superadmin!"));
+
+        //
+        // Second Tab
+        //
+
+        // Join the collaboration session as John. The superadmin content author has script right, but John doesn't.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsJohn(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSessionConfirmingRequiredRightsWarning(secondEditPage);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        // John gets the macro calls but not their output (which was rendered for superadmin).
+        secondTextArea.waitUntilTextContains("Hello macro:velocity!");
+        String secondText = secondTextArea.getText();
+        assertMacroOutputNotShared(secondText);
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Superadmin keeps seeing the macro output while editing.
+        firstTextArea.appendParagraph("end").waitUntilTextContains("end");
+        String firstText = firstTextArea.getText();
+        assertThat(firstText, containsString("Hello superadmin!"));
+        assertThat(firstText, containsString("Welcome superadmin"));
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilTextContains("end");
+        assertMacroOutputNotShared(secondTextArea.getText());
+        // Leave without making changes, so that superadmin remains the effective author of the collaboration session.
+        secondEditPage.cancel();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstEditPage.getToolbar().waitUntilEditingAlone();
+        // The macro calls are saved even though the macro output is not part of the edited content.
+        assertEquals("Hello superadmin!\nWelcome superadmin\nend", firstEditPage.clickDone().getContent());
+    }
+
+    private void assertMacroOutputNotShared(String text)
+    {
+        // We can't simply check that the text doesn't contain "superadmin" because the text includes the labels of the
+        // coeditor carets.
+        assertEquals(2, StringUtils.countMatches(text, "macro:velocity"), "Unexpected content: " + text);
+        assertThat(text, not(containsString("Hello superadmin")));
+        assertThat(text, not(containsString("Welcome superadmin")));
+    }
+
     /**
      * Joins an existing collaboration session, checking that the user is not asked to confirm that they want to take
      * over the edit lock held by the users that are already in the session.
@@ -1017,6 +1196,25 @@ class CollaborationIT extends AbstractBlockNoteIT
         inplaceEditablePage.waitForInplaceEditor();
         assertTrue(setup.getDriver().findElementsWithoutWaiting(By.className("force-edit-lock-modal")).isEmpty(),
             "The user was asked to force the edit lock instead of joining the collaboration session.");
+    }
+
+    /**
+     * Joins the collaboration session after confirming the required rights warning that is displayed when the current
+     * user doesn't have a right that the content author of the edited page has.
+     *
+     * @param inplaceEditablePage the page to edit in-place
+     */
+    private void joinSessionConfirmingRequiredRightsWarning(BlockNoteInplaceEditPage inplaceEditablePage)
+    {
+        inplaceEditablePage.edit();
+        ForceEditLockModal requiredRightsWarning = new ForceEditLockModal();
+        String message = requiredRightsWarning.getMessage();
+        // Being asked to take over the edit lock would mean that the user doesn't join the collaboration session, so
+        // the warning must only be about the missing rights.
+        assertTrue(message.contains("you are missing the following rights"), "Unexpected warning: " + message);
+        assertFalse(message.contains("locked"), "Unexpected warning: " + message);
+        requiredRightsWarning.clickOk();
+        inplaceEditablePage.waitForInplaceEditor();
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

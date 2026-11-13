@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Search - Tests - Utils</description>
   <properties>
-    <!-- None of the classes is valid -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Unlike other test modules, check the code style since this module is reused by other tests -->
+    <xwiki.checkstyle.skip>false</xwiki.checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>

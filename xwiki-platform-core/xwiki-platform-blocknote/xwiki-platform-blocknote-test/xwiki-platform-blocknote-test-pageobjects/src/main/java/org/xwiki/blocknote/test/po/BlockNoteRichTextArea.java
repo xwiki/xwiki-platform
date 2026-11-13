@@ -19,17 +19,25 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfNestedElementLocatedBy;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNestedElementsLocatedBy;
 
 /**
@@ -40,6 +48,10 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNest
  */
 public class BlockNoteRichTextArea extends BaseElement
 {
+    private static final By IMAGE = By.tagName("img");
+
+    private static final By LINK = By.tagName("a");
+
     @NonNull
     private WebElement container;
 
@@ -211,7 +223,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public WebElement getImage(int index)
     {
-        return this.container.findElements(By.tagName("img")).get(index);
+        return this.container.findElements(IMAGE).get(index);
     }
 
     /**
@@ -246,7 +258,7 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea waitUntilImagesAreLoaded()
     {
-        int imageCount = this.container.findElements(By.tagName("img")).size();
+        int imageCount = this.container.findElements(IMAGE).size();
         for (int i = 0; i < imageCount; i++) {
             waitUntilImageIsLoaded(i);
         }
@@ -464,4 +476,152 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         return this.container.findElements(By.className("bn-block-content")).get(index);
     }
+
+    /**
+     * Pastes several files at once into the rich text area, as one transfer, at the caret.
+     *
+     * @param filePaths the paths of the files to paste, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if one of the given files can't be located
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea pasteFiles(String... filePaths) throws URISyntaxException
+    {
+        return insertFiles("paste", 0, filePaths);
+    }
+
+    /**
+     * Drops several files at once over the rich text area, as one transfer, at the given offset of the line holding
+     * the caret.
+     *
+     * @param offset how far from the start of that line the files land
+     * @param filePaths the paths of the files to drop, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if one of the given files can't be located
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea dropFiles(int offset, String... filePaths) throws URISyntaxException
+    {
+        return insertFiles("drop", offset, filePaths);
+    }
+
+    /**
+     * Inserts files using a synthetic event, because WebDriver can drag and drop DOM elements but not files, and
+     * can't put one on the clipboard at all.
+     *
+     * @param eventType either {@code paste} or {@code drop}
+     * @param offset where a drop lands, as an offset of the line holding the caret; ignored for a paste
+     * @param filePaths the paths of the files to insert, relative to the test resources
+     * @return this rich text area instance
+     * @throws URISyntaxException if one of the given files can't be located
+     */
+    private BlockNoteRichTextArea insertFiles(String eventType, int offset, String... filePaths)
+        throws URISyntaxException
+    {
+        List<WebElement> fileInputs = new ArrayList<>();
+        for (String filePath : filePaths) {
+            fileInputs.add(loadFile(filePath));
+        }
+        String script = """
+            const [editor, eventType, offset, fileInputs] = arguments;
+            const dataTransfer = new DataTransfer();
+            fileInputs.forEach((fileInput) => dataTransfer.items.add(fileInput.files[0]));
+            const eventInit = {bubbles: true, cancelable: true};
+            if (eventType === 'paste') {
+                const paste = new ClipboardEvent('paste', eventInit);
+                // Firefox ignores clipboardData passed to the constructor, so define it as an own property instead.
+                Object.defineProperty(paste, 'clipboardData', {value: dataTransfer, configurable: true});
+                editor.dispatchEvent(paste);
+            } else {
+                // Only a DOM range can turn the offset into the pixels the drop event needs.
+                // An empty one has no rectangle, so measure a neighbouring character and take the edge at it.
+                // Measure the paragraph holding the caret, since that's the line the offset refers to.
+                const anchor = editor.ownerDocument.getSelection().anchorNode;
+                const paragraph = (anchor.nodeType === Node.ELEMENT_NODE ? anchor : anchor.parentElement)
+                    .closest('p');
+                const text = paragraph.firstChild;
+                const range = document.createRange();
+                range.setStart(text, Math.max(offset - 1, 0));
+                range.setEnd(text, Math.max(offset, 1));
+                const {left, right, top, height} = range.getBoundingClientRect();
+                editor.dispatchEvent(new DragEvent('drop', {...eventInit, clientX: offset > 0 ? right : left,
+                    clientY: top + height / 2, dataTransfer}));
+            }
+            // The browser empties a real transfer once the event has been dispatched, so code that reads its items
+            // after awaiting an upload gets nothing. Do the same, otherwise the test passes against a transfer no
+            // browser ever hands the editor.
+            dataTransfer.items.clear();
+            fileInputs.forEach((fileInput) => fileInput.remove());
+            """;
+        getDriver().executeScript(script, this.container, eventType, offset, fileInputs);
+        return this;
+    }
+
+    /**
+     * Gets the file into the browser, which runs in a different container than the test, through a throwaway file
+     * input. Same approach as the CKEditor page objects.
+     *
+     * @param filePath the path of the file to load, relative to the test resources
+     * @return the file input holding the loaded file
+     * @throws URISyntaxException if the given file can't be located
+     */
+    private WebElement loadFile(String filePath) throws URISyntaxException
+    {
+        FileDetector originalFileDetector = getDriver().getFileDetector();
+        try {
+            getDriver().setFileDetector(new LocalFileDetector());
+            WebElement fileInput = (WebElement) getDriver().executeScript("""
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                document.body.append(fileInput);
+                return fileInput;
+                """);
+            fileInput.sendKeys(Paths.get(getClass().getResource(filePath).toURI()).toFile().getAbsolutePath());
+            return fileInput;
+        } finally {
+            getDriver().setFileDetector(originalFileDetector);
+        }
+    }
+
+    /**
+     * Waits for a link with the given label. Waiting for the text alone wouldn't do: the block BlockNote inserts
+     * while uploading already shows the file name.
+     *
+     * @param label the expected link label
+     * @return the link element
+     * @since 18.10.0RC1
+     */
+    public WebElement waitUntilLinkIsPresent(String label)
+    {
+        By locator = By.xpath(".//a[normalize-space(.) = " + getUtil().escapeXPath(label) + "]");
+        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, locator));
+    }
+
+    /**
+     * Waits until the given number of links are present, whatever their labels. Needed when the labels can't be
+     * predicted, e.g. the generated names several pasted files are attached under.
+     *
+     * @param count the number of links to wait for
+     * @return this rich text area instance
+     * @since 18.10.0RC1
+     */
+    public BlockNoteRichTextArea waitUntilLinkCountIs(int count)
+    {
+        getDriver().waitUntilCondition(
+            driver -> this.container.findElements(LINK).size() == count);
+        return this;
+    }
+
+    /**
+     * Waits for a link, whatever its label. Needed when the label can't be predicted, e.g. the generated name a
+     * pasted file is attached under.
+     *
+     * @return the link element
+     * @since 18.10.0RC1
+     */
+    public WebElement waitUntilLinkIsPresent()
+    {
+        return getDriver().waitUntilCondition(presenceOfNestedElementLocatedBy(this.container, LINK));
+    }
+
 }

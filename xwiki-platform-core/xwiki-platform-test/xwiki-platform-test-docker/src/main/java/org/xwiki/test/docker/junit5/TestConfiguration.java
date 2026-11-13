@@ -1211,6 +1211,17 @@ public class TestConfiguration
     }
 
     /**
+     * @return {@code true} if the XWiki instances of the test share a filesystem blob store, i.e. when they form a
+     *     cluster using the filesystem blob store, {@code false} otherwise
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     */
+    public boolean isSharedFileSystemBlobStore()
+    {
+        return isCluster() && getBlobStore() == BlobStore.FILESYSTEM;
+    }
+
+    /**
      * @return true if the database is embedded in the XWiki instance, false if it runs in its own Docker container.
      *         Only HSQLDB can be embedded and only when there's a single XWiki instance since an embedded database
      *         cannot be shared: in a cluster it runs in server mode instead.

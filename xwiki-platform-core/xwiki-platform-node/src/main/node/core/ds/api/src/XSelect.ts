@@ -19,6 +19,15 @@
  */
 
 /**
+ * An item of the select component: either a string, used both as the value and as the label of the item, or an
+ * object with a distinct value and label, for when the displayed label is not a suitable value (e.g. when it is
+ * localized, or when several items can have the same label).
+ * @since 18.10.0RC1
+ * @beta
+ */
+type SelectItem = string | { value: string; label: string };
+
+/**
  * Props of the select component.
  * @since 18.0.0RC1
  * @beta
@@ -31,7 +40,7 @@ type SelectProps = {
   /**
    * List of items to select from.
    */
-  items: Array<string>;
+  items: Array<SelectItem>;
   /**
    * Help message.
    */
@@ -42,9 +51,9 @@ type SelectProps = {
    */
   required?: boolean;
   /**
-   * The v-model value of the currently selected item.
+   * The v-model value of the currently selected item (its value, not its label).
    */
   modelValue?: string;
 };
 
-export type { SelectProps };
+export type { SelectItem, SelectProps };

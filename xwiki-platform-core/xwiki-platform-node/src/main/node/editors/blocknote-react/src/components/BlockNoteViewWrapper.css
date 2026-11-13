@@ -1,0 +1,52 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ * Overrides for the BlockNote stylesheet imported by BlockNoteViewWrapper.
+ */
+
+/*
+ * BlockNote marks the placeholder it shows while a file uploads but ships no rule for it, so the block looks stalled
+ * rather than busy. The spinner reuses the editor's own loader keyframes, sized to sit next to the text.
+ */
+.bn-file-loading-preview {
+  align-items: center;
+  display: flex;
+  gap: 0.5em;
+}
+
+.bn-file-loading-preview::before {
+  content: "";
+  box-sizing: border-box;
+  width: 1em;
+  height: 1em;
+  border: 2px solid var(--bn-loader-color, currentColor);
+  border-radius: 50%;
+  animation:
+    1s linear infinite bn-loader-rotate,
+    2s linear infinite bn-loader-clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bn-file-loading-preview::before {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%);
+    animation: none;
+  }
+}

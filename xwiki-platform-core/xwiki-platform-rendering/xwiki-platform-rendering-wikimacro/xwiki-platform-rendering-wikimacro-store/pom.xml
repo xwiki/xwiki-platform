@@ -34,6 +34,12 @@
     <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Macro Store</xwiki.extension.name>
+    <!-- Internal placeholders for the content and the parameters of a wiki macro, resolved after its execution. Not
+         declared in xwiki.extension.components so that the editor doesn't suggest installing them -->
+    <xwiki.extension.components.macros.check.excluded>
+      wikimacrocontent
+      wikimacroparameter
+    </xwiki.extension.components.macros.check.excluded>
   </properties>
   <dependencies>
     <dependency>
@@ -65,6 +71,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-async-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-default</artifactId>
       <version>${project.version}</version>
     </dependency>
 

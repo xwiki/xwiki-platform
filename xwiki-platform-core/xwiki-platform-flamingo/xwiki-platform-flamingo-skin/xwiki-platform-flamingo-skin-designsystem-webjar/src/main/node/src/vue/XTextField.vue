@@ -18,12 +18,18 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { useRequiredMark } from "./requiredMark";
 import { useId } from "vue";
 import type { TextFieldProps } from "@xwiki/platform-dsapi";
 
-const { label, help } = defineProps<TextFieldProps>();
+// The props that are input attributes are not part of $attrs, since the text field API declares them: bind them to the
+// input field explicitly.
+const { label, help, name, required, autofocus, readonly, type } =
+  defineProps<TextFieldProps>();
 
 const model = defineModel<string>();
+
+const requiredMark = useRequiredMark(() => required);
 
 const textId = useId();
 
@@ -39,15 +45,27 @@ defineOptions({
 <template>
   <dl>
     <dt>
-      <label :for="textId">{{ label }}</label>
+      <label :for="textId"
+        >{{ label }}
+        <span class="xRequired" v-if="required && requiredMark">{{
+          requiredMark
+        }}</span></label
+      >
       <span class="xHint" v-if="help">{{ help }}</span>
     </dt>
     <dd>
       <!-- Optional default slot to display some content before the input field -->
       <slot></slot>
-      <input :id="textId" type="text" v-model="model" v-bind="$attrs" />
+      <input
+        :id="textId"
+        :type="type ?? 'text'"
+        :name
+        :required
+        :autofocus
+        :readonly
+        v-model="model"
+        v-bind="$attrs"
+      />
     </dd>
   </dl>
 </template>
-
-<style scoped></style>

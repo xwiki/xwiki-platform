@@ -27,6 +27,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 
+/**
+ * Represents the quick search field displayed in the page header, along with its search suggestions.
+ *
+ * @version $Id$
+ * @since 16.5.0RC1
+ * @since 16.4.0
+ */
 public class QuickSearchElement extends BaseElement
 {
     private static final By SOURCE_NAME_SELECTOR = By.cssSelector(".searchSuggest .results .sourceName");

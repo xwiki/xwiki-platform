@@ -32,6 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Skin - Tests - Page Objects</description>
   <properties>
+    <!-- Unlike other test modules, check the code style since this module is reused by other tests -->
+    <xwiki.checkstyle.skip>false</xwiki.checkstyle.skip>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

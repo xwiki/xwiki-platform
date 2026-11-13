@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -34,7 +33,6 @@ import org.xwiki.test.ui.po.BaseElement;
  * @since 18.4.7
  * @since 18.9.0RC1
  */
-@Unstable
 public class OfficeImporterDialog extends BaseElement
 {
     private final WebElement container;

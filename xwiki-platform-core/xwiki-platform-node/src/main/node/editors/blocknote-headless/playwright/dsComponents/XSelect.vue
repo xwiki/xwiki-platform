@@ -18,12 +18,18 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { useId } from "vue";
+import { computed, useId } from "vue";
 import type { SelectProps } from "@xwiki/platform-dsapi";
 
 const { label, items } = defineProps<SelectProps>();
 
 const model = defineModel<string>();
+
+const options = computed(() =>
+  items.map((item) =>
+    typeof item === "string" ? { value: item, label: item } : item,
+  ),
+);
 
 const selectId = useId();
 
@@ -35,8 +41,12 @@ defineOptions({
 <template>
   <label :for="selectId">{{ label }}</label>
   <select :id="selectId" v-model="model" v-bind="$attrs">
-    <option v-for="item in items" :key="item" :value="item">
-      {{ item }}
+    <option
+      v-for="option in options"
+      :key="option.value"
+      :value="option.value"
+    >
+      {{ option.label }}
     </option>
   </select>
 </template>

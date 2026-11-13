@@ -36,7 +36,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.LocalFileDetector;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
@@ -46,7 +45,6 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
  * @version $Id$
  * @since 1.19
  */
-@Unstable
 public class RichTextAreaElement extends BaseElement
 {
     /**
@@ -796,6 +794,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitForUploadsToFinish()
     {
+        waitForUploadsToFinish(getDriver().getTimeout());
+    }
+
+    protected void waitForUploadsToFinish(int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
                 return !Strings.CS.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
@@ -804,7 +807,7 @@ public class RichTextAreaElement extends BaseElement
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**

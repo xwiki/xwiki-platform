@@ -39,6 +39,9 @@
       org.xwiki.contrib:application-help-center
     </xwiki.extension.features>
     <help.base.path>${basedir}/src/main/resources/Help</help.base.path>
+    <!-- Example macro of the documentation, which nobody would install this extension for. Not declared in
+         xwiki.extension.components so that the editor doesn't suggest installing it -->
+    <xwiki.extension.components.macros.check.excluded>example</xwiki.extension.components.macros.check.excluded>
   </properties>
   <dependencies>
     <dependency>
@@ -185,6 +188,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-uiextension-api</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We publish template providers. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-pagetemplate-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
 

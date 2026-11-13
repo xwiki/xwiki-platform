@@ -25,8 +25,7 @@ import {
 } from "../../blocknote";
 import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
 import { BlockNoteEditor } from "@blocknote/core";
-import { beforeAll, describe, expect, test, vi } from "vitest";
-import type { LinkEditionHandler } from "../../components/links/linkEdition";
+import { beforeAll, describe, expect, test } from "vitest";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyEditor = BlockNoteEditor<any, any, any>;
@@ -52,7 +51,6 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
       syntax: FULL_SYNTAX,
       lang: "en",
       t,
-      linkEditionHandler: vi.fn(),
       openMacroInsertionEditor: undefined,
     });
 
@@ -76,47 +74,5 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
 
   test("the Link entry is filtered out by a query matching neither its title nor its alias", () => {
     expect(findLinkItem("table")).toBeUndefined();
-  });
-
-  // eslint-disable-next-line max-statements
-  test("clicking the Link entry opens the link editor, and submitting it creates the link and refocuses the editor", () => {
-    const linkEditionHandler: LinkEditionHandler = vi.fn();
-    const createLink = vi
-      .spyOn(editor, "createLink")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .mockImplementation((() => {}) as any);
-    const focus = vi.spyOn(editor, "focus").mockImplementation(() => {});
-
-    try {
-      const items = querySuggestionsMenuItems({
-        editor,
-        query: "",
-        macros: [],
-        syntax: FULL_SYNTAX,
-        lang: "en",
-        t,
-        linkEditionHandler,
-        openMacroInsertionEditor: undefined,
-      });
-      const linkItem = items.find(
-        (item) => item.title === "blocknote.slashMenu.link.title",
-      )!;
-
-      linkItem.onItemClick?.();
-
-      expect(linkEditionHandler).toHaveBeenCalledTimes(1);
-      const handlerProps = vi.mocked(linkEditionHandler).mock.calls[0][0];
-      expect(handlerProps.mode).toBe("createNew");
-      expect(handlerProps.current).toEqual({ title: "", url: "" });
-
-      // Submitting the link edition modal must insert the link and give focus back to the editor.
-      handlerProps.onSubmit({ title: "XWiki", url: "https://xwiki.org" });
-
-      expect(createLink).toHaveBeenCalledWith("https://xwiki.org", "XWiki");
-      expect(focus).toHaveBeenCalledTimes(1);
-    } finally {
-      createLink.mockRestore();
-      focus.mockRestore();
-    }
   });
 });

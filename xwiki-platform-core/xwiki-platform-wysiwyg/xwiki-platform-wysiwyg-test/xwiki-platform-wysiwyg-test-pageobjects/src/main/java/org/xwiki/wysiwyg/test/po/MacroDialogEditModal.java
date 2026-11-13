@@ -52,6 +52,8 @@ public class MacroDialogEditModal extends BaseElement
 
     private static final String DATA_ID = "data-id";
 
+    private static final String VALUE = "value";
+
     private final Consumer<Runnable> submitHandler;
 
     /**
@@ -141,7 +143,7 @@ public class MacroDialogEditModal extends BaseElement
      */
     public String getMacroParameter(String name)
     {
-        return getMacroParameterInput(name).getDomProperty("value");
+        return getMacroParameterInput(name).getDomProperty(VALUE);
     }
 
     /**
@@ -293,7 +295,7 @@ public class MacroDialogEditModal extends BaseElement
      */
     public String getMacroContent()
     {
-        return getMacroContentInput().getDomProperty("value");
+        return getMacroContentInput().getDomProperty(VALUE);
     }
 
     /**

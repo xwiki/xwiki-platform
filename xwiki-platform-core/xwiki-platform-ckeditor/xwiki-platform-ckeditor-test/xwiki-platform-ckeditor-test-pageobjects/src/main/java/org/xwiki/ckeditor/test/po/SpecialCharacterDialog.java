@@ -20,7 +20,6 @@
 package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
-import org.xwiki.stability.Unstable;
 
 /**
  * Models the CKEditor dialog used to insert special characters.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 18.4.7
  * @since 18.9.0RC1
  */
-@Unstable
 public class SpecialCharacterDialog extends CKEditorDialog
 {
     /**

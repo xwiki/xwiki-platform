@@ -54,10 +54,7 @@ class LiveDataXObjectEditConfirmationIT
      * Confirming the modal proceeds to edit; cancelling aborts it.
      */
     @ParameterizedTest
-    @WikisSource(extensions = {
-        "org.xwiki.platform:xwiki-platform-security-requiredrights-default",
-        "org.xwiki.platform:xwiki-platform-livetable-ui"
-    })
+    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-livetable-ui")
     @Order(1)
     void liveDataXObjectPropertyShowsRequiredRightsWarning(WikiReference wiki, TestLocalReference testLocalReference,
         TestUtils setup) throws Exception

@@ -30,6 +30,10 @@
   <artifactId>xwiki-platform-logging-test-pageobjects</artifactId>
   <name>XWiki Platform - Logging - Tests - Page Objects</name>
   <description>XWiki Platform - Logging - Tests - Page Objects</description>
+  <properties>
+    <!-- Unlike other test modules, check the code style since this module is reused by other tests -->
+    <xwiki.checkstyle.skip>false</xwiki.checkstyle.skip>
+  </properties>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>

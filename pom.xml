@@ -56,25 +56,25 @@
     <releaseProfiles>release</releaseProfiles>
 
     <!-- Dependencies versions -->
-    <batik.version>1.19</batik.version>
-    <tika.version>4.1.0</tika.version>
+    <batik.version>1.20</batik.version>
+    <tika.version>4.2.0</tika.version>
     <pdfbox.version>3.0.8</pdfbox.version>
-    <poi.version>5.5.1</poi.version>
+    <poi.version>6.0.0</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.14</jetty.server.version>
+    <jetty.server.version>12.1.15</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.19.Final</netty.version>
+    <netty.version>4.2.20.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
     <metaeffekt.version>0.159.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
-    <solr.version>9.4.1</solr.version>
-    <lucene.version>9.8.0</lucene.version>
+    <solr.version>9.11.0</solr.version>
+    <lucene.version>9.12.3</lucene.version>
     <solr.minimum.java.version>11</solr.minimum.java.version>
     <jersey.version>2.48</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.6</zookeeper.version>
+    <zookeeper.version>3.9.7</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>
     <calcite.version>1.42.0</calcite.version>
 
@@ -110,10 +110,10 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>26.7.0</mysql.version>
+    <mysql.version>26.10.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.10</mariadb.version>
+    <mariadb.version>4.0.0</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -122,7 +122,7 @@
     <pgsql.version>42.7.14</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc17</oracle.artifactId>
-    <oracle.version>23.26.3.0.0</oracle.version>
+    <oracle.version>23.26.4.0.0</oracle.version>
 
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
@@ -338,7 +338,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.15.0</version>
+        <version>2.15.1</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -422,7 +422,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>tom-select</artifactId>
-        <version>2.6.2</version>
+        <version>2.7.0</version>
         <scope>runtime</scope>
       </dependency>
 
@@ -534,7 +534,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.23.2</version>
+        <version>1.24.1</version>
       </dependency>
 
       <!-- PDF -->
@@ -599,7 +599,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.11</version>
+        <version>2.12</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -638,23 +638,23 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.4.3</version>
+        <version>1.4.7</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
         <classifier>native</classifier>
-        <version>1.4.3</version>
+        <version>1.4.7</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-constants</artifactId>
-        <version>0.11.2</version>
+        <version>0.11.4</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.3.3</version>
+        <version>2.3.7</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -664,7 +664,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.2.4</version>
+        <version>3.2.8</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -676,7 +676,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>6.2</version>
+        <version>6.2.2</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -710,7 +710,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>2.1.14</version>
+        <version>2.1.15</version>
         <exclusions>
           <!--  -->
           <exclusion>
@@ -718,6 +718,11 @@
             <artifactId>jakarta.mail</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.simplejavamail</groupId>
+        <artifactId>simple-java-mail</artifactId>
+        <version>9.3.10</version>
       </dependency>
 
       <!-- Jetty client libraries -->
@@ -843,13 +848,6 @@
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-api</artifactId>
         <version>${solr.version}</version>
-        <exclusions>
-          <!-- Wrong ids -->
-          <exclusion>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
@@ -865,10 +863,6 @@
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
           </exclusion>
           <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>
@@ -927,7 +921,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.opennlp</groupId>
-        <artifactId>opennlp</artifactId>
+        <artifactId>opennlp-tools</artifactId>
         <version>1.9.5</version>
       </dependency>
       <dependency>
@@ -1115,6 +1109,13 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Shared by the Jersey 2 used by XWiki and the Jersey 3 embedded in the shaded Solr core (it has the same API in
+           both lines) -->
+      <dependency>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>osgi-resource-locator</artifactId>
+        <version>3.0.0</version>
+      </dependency>
       <dependency>
         <groupId>aopalliance</groupId>
         <artifactId>aopalliance</artifactId>
@@ -1186,12 +1187,12 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.44</version>
+        <version>3.5.45</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.4.12</version>
+        <version>11.4.18</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
@@ -1201,7 +1202,7 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-bom</artifactId>
-        <version>7.1.1</version>
+        <version>7.1.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

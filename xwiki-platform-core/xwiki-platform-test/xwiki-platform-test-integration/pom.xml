@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Integration Tests Framework</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.26</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
@@ -121,6 +121,12 @@
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
+    </dependency>
+    <!-- Needed by the Plexus container to read the component descriptors (plexus-utils 4 doesn't contain the XML
+         classes anymore) -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
     </dependency>
   </dependencies>
   <build>

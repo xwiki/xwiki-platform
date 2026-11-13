@@ -238,6 +238,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <!-- Real URL security manager, used to sanitize the comment reply button URL in the page tests. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

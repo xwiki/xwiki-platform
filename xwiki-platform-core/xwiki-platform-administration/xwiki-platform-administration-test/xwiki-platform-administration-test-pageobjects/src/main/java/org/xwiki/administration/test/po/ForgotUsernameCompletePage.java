@@ -22,7 +22,6 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -59,7 +58,6 @@ public class ForgotUsernameCompletePage extends ViewPage
      * @since 12.10.5
      * @since 13.2RC1
      */
-    @Unstable
     public String getMessage()
     {
         return this.messageBox.getText();
@@ -70,7 +68,6 @@ public class ForgotUsernameCompletePage extends ViewPage
      * @since 12.10.5
      * @since 13.2RC1
      */
-    @Unstable
     public boolean isForgotUsernameQuerySent()
     {
         // If there is no form and we see an info box, then the request was sent.

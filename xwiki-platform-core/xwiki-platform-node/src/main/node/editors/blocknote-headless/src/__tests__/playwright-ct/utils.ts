@@ -18,7 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import type { test } from "@playwright/experimental-ct-vue";
 import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
+
+// The Playwright page type, taken from the test fixtures since the component testing package doesn't export it.
+type Page = Parameters<Parameters<typeof test>[2]>[0]["page"];
 
 interface PageWithKeyboard {
   keyboard: { press(key: string): Promise<void> };
@@ -48,6 +52,22 @@ async function pressKeySettled(
   );
 }
 
+/**
+ * Fills the display text field of the link modal, expanding the "Options" section that holds it if needed.
+ *
+ * @param page - the page displaying the link modal
+ * @param text - the display text to fill in
+ */
+async function fillDisplayText(page: Page, text: string): Promise<void> {
+  const options = page.locator("[data-test='linkOptions']");
+  if (
+    !(await options.evaluate((details: HTMLDetailsElement) => details.open))
+  ) {
+    await options.locator("> summary").click();
+  }
+  await page.locator("[data-test='linkDisplayText']").fill(text);
+}
+
 function buildParagraphs(blocks: string[]): BlockType[] {
   return blocks.map((blockText) => ({
     id: Math.random().toString(),
@@ -68,4 +88,4 @@ function buildParagraphs(blocks: string[]): BlockType[] {
   }));
 }
 
-export { buildParagraphs, pressKeySettled };
+export { buildParagraphs, fillDisplayText, pressKeySettled };

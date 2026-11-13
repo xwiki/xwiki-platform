@@ -51,6 +51,12 @@ public abstract class AbstractExtensionTestUtils
     private static final LocalDocumentReference SERVICE_REFERENCE =
         new LocalDocumentReference("ExtensionTest", "Service");
 
+    private static final String EXTENSION_ID = "extensionId";
+
+    private static final String EXTENSION_VERSION = "extensionVersion";
+
+    private static final String EXTENSION_NAMESPACE = "extensionNamespace";
+
     /**
      * The generic test utility methods.
      */
@@ -124,7 +130,7 @@ public abstract class AbstractExtensionTestUtils
     public void uninstall(String extensionId, boolean keepLocalCache) throws Exception
     {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("extensionId", extensionId);
+        parameters.put(EXTENSION_ID, extensionId);
         parameters.put("keepLocalCache", String.valueOf(keepLocalCache));
 
         doAction("uninstall", parameters);
@@ -153,11 +159,11 @@ public abstract class AbstractExtensionTestUtils
     public void install(ExtensionId extensionId, Namespace namespace) throws Exception
     {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("extensionId", extensionId.getId());
-        parameters.put("extensionVersion", extensionId.getVersion().getValue());
+        parameters.put(EXTENSION_ID, extensionId.getId());
+        parameters.put(EXTENSION_VERSION, extensionId.getVersion().getValue());
         if (namespace != null) {
             String namespaceString = namespace.serialize();
-            parameters.put("extensionNamespace", namespaceString != null ? namespaceString : "");
+            parameters.put(EXTENSION_NAMESPACE, namespaceString != null ? namespaceString : "");
         }
 
         doAction("install", parameters);
@@ -171,21 +177,32 @@ public abstract class AbstractExtensionTestUtils
         doAction("finish", new HashMap<String, String>());
     }
 
+    /**
+     * @param extensionId the id of the extension to check
+     * @return {@code true} if the specified extension is installed (on any namespace), {@code false} otherwise
+     * @throws Exception if the check fails
+     */
     public boolean isInstalled(ExtensionId extensionId) throws Exception
     {
         return isInstalled(extensionId, null);
     }
 
+    /**
+     * @param extensionId the id of the extension to check (the version is optional)
+     * @param namespace the namespace where to check, or {@code null} to check on any namespace
+     * @return {@code true} if the specified extension is installed on the given namespace, {@code false} otherwise
+     * @throws Exception if the check fails
+     */
     public boolean isInstalled(ExtensionId extensionId, Namespace namespace) throws Exception
     {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("extensionId", extensionId.getId());
+        parameters.put(EXTENSION_ID, extensionId.getId());
         if (extensionId.getVersion() != null) {
-            parameters.put("extensionVersion", extensionId.getVersion().getValue());
+            parameters.put(EXTENSION_VERSION, extensionId.getVersion().getValue());
         }
         if (namespace != null) {
             String namespaceString = namespace.serialize();
-            parameters.put("extensionNamespace", namespaceString != null ? namespaceString : "");
+            parameters.put(EXTENSION_NAMESPACE, namespaceString != null ? namespaceString : "");
         }
 
         return "true".equals(execute("is_installed", parameters));

@@ -33,12 +33,22 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class LinkCheckerAllDocsPage extends AllDocsPage
 {
+    /**
+     * Go to the AllDocs page.
+     *
+     * @return the page object for the AllDocs page
+     */
     public static LinkCheckerAllDocsPage gotoPage()
     {
         getUtil().gotoPage("Main", "AllDocs");
         return new LinkCheckerAllDocsPage();
     }
 
+    /**
+     * Opens the tab listing the external links checked by the LinkChecker.
+     *
+     * @return the live table listing the checked links, once it's ready
+     */
     public LiveTableElement clickLinkCheckerTab()
     {
         WebElement linkCheckerTab = getDriver().findElement(By.xpath("//li[@id='xwikiexternalLinks']/a"));

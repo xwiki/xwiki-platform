@@ -367,6 +367,19 @@ public class LiveDataElement extends BaseElement
     }
 
     /**
+     * Only the part of an element inside the viewport can be captured in a screenshot, so the advanced panels are
+     * scrolled into view before being returned.
+     *
+     * @return the element holding the advanced panels of this Live Data, scrolled into view, e.g. to take a screenshot
+     *     of the opened panels
+     * @since 18.10.0RC1
+     */
+    public WebElement getAdvancedPanels()
+    {
+        return getDriver().scrollTo(getRootElement().findElement(By.className("livedata-advanced-panels")));
+    }
+
+    /**
      * Clear all custom sorting that might have been put.
      */
     public void clearAllSort()

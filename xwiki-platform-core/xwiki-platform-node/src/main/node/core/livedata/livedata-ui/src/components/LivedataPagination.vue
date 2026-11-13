@@ -394,4 +394,23 @@ export default {
 .livedata-pagination .pagination-page-size select {
   padding: 2px 4px;
 }
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  /* Stack the pagination elements vertically. */
+  .xwiki-livedata .livedata-pagination {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+  }
+
+  /* Hide the page size element. */
+  .xwiki-livedata .livedata-pagination .pagination-page-size {
+    display: none;
+  }
+
+  .xwiki-livedata .livedata-pagination .pagination-indexes {
+    margin-left: 0;
+  }
+}
 </style>

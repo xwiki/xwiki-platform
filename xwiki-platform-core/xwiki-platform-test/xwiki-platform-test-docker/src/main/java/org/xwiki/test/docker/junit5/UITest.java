@@ -20,6 +20,7 @@
 package org.xwiki.test.docker.junit5;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -47,11 +48,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Marks a test as being a functional UI Test.
+ * <p>
+ * The annotation is inherited, so several test classes can share the same configuration by extending a common
+ * (abstract) base class that holds it. This is useful when each of them must also be runnable on its own, using the
+ * same XWiki instance setup (e.g. to reuse a running XWiki instance between test classes).
  *
  * @version $Id$
  * @since 10.6RC1
  */
 @Documented
+@Inherited
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ExtendWith(ValidateConsoleExtension.class)

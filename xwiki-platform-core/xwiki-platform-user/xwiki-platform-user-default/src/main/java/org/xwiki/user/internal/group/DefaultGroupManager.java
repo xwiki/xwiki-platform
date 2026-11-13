@@ -417,8 +417,11 @@ public class DefaultGroupManager implements GroupManager
         }
 
         // The walk visited all the groups of the member: cache them so that the next check is a single lookup, like
-        // after getGroups. No lock is needed (and none is taken, to not slow down concurrent checks): concurrent walks
-        // all compute the same complete set, and the entry publishes it safely through an unmodifiable wrapper.
+        // after getGroups. Concurrent walks of the same member don't need to be serialized since they all compute the
+        // same complete set, published safely through an unmodifiable wrapper. Like the recursive getGroups, this
+        // doesn't protect against a group modified during the walk, whose invalidation can miss this entry (see
+        // XWIKI-25766: Group cache can keep a stale recursive membership when a group is modified while it's being
+        // resolved).
         visited.remove(memberReference);
         entry.setAll(visited);
 

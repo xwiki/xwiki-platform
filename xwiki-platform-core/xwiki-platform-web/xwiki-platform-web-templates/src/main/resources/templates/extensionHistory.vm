@@ -274,41 +274,43 @@
 #macro (getExtensionHistoryRecords $all)
   #if ("$!request.source" != '')
     ## History File
-    #set ($sourceFile = $xwiki.getDocument('XWiki.ExtensionHistoryUploads').getAttachment($request.source))
+    #set ($macro.sourceFile = $xwiki.getDocument('XWiki.ExtensionHistoryUploads').getAttachment($request.source))
     #set ($records = [])
     #set ($limit = $NULL)
-    #if ($sourceFile.mimeType == 'application/xml')
-      #set ($records = $services.extension.history.read($sourceFile.contentInputStream))
+    #if ($macro.sourceFile.mimeType == 'application/xml')
+      #set ($records = $services.extension.history.read($macro.sourceFile.contentInputStream))
       ## Display the most recent records first.
       #set ($discard = $collectiontool.reverseModifiable($records))
     #end
   #else
     ## Local History
     ## Show by default only the jobs that affect the wiki.
-    #set ($jobTypes = ['install', 'uninstall', 'repairxar'])
+    #set ($macro.jobTypes = ['install', 'uninstall', 'repairxar'])
     ## The page size, used to display the records and to decide if there are more records to load.
     #set ($limit = 10)
     ## A negative limit means no limit.
-    #set ($fetchLimit = $limit)
+    #set ($macro.fetchLimit = $limit)
     #if ($all)
-      #set ($fetchLimit = -1)
+      #set ($macro.fetchLimit = -1)
     #end
-    #set ($recordsFilter = $services.extension.history.records)
-    #set ($records = $recordsFilter.fromThisWiki().ofType($jobTypes).list($request.offsetRecordId, $fetchLimit))
+    #set ($macro.recordsFilter = $services.extension.history.records)
+    #set ($records = $macro.recordsFilter.fromThisWiki().ofType($macro.jobTypes).list($request.offsetRecordId,
+      $macro.fetchLimit))
   #end
 #end
 
 #macro (getSelectedExtensionHistoryRecords)
-  #set ($selectedRecordIds = $request.getParameterValues('extensionHistoryRecord'))
-  #if ($selectedRecordIds && $selectedRecordIds.size() > 0)
-    #set ($selectedRecordIdsSet = $collectiontool.set)
-    #set ($discard = $selectedRecordIdsSet.addAll($selectedRecordIds.subList(0, $selectedRecordIds.size())))
+  #set ($macro.selectedRecordIds = $request.getParameterValues('extensionHistoryRecord'))
+  #if ($macro.selectedRecordIds && $macro.selectedRecordIds.size() > 0)
+    #set ($macro.selectedRecordIdsSet = $collectiontool.set)
+    #set ($discard = $macro.selectedRecordIdsSet.addAll(
+      $macro.selectedRecordIds.subList(0, $macro.selectedRecordIds.size())))
     ## The selected records may come from several pages of records (the user can load more records before selecting
     ## them) so we have to look for them in the entire history, not only in the first page.
     #getExtensionHistoryRecords(true)
     #set ($selectedRecords = [])
     #foreach ($record in $records)
-      #if ($selectedRecordIdsSet.contains($record.id))
+      #if ($macro.selectedRecordIdsSet.contains($record.id))
         #set ($discard = $selectedRecords.add($record))
       #end
     #end

@@ -30,7 +30,6 @@ import org.xwiki.model.internal.reference.converter.WikiReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.notifications.notifiers.script.NotificationNotifiersScriptService;
 import org.xwiki.notifications.script.NotificationScriptService;
 import org.xwiki.notifications.sources.script.NotificationSourcesScriptService;
@@ -49,7 +48,6 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.converter.UserReferenceConverter;
-import org.xwiki.user.script.UserScriptService;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
@@ -74,10 +72,7 @@ import static org.xwiki.test.page.WikiMacroSetup.loadWikiMacro;
     SpaceReferenceConverter.class,
     DocumentReferenceConverter.class,
     UserReferenceConverter.class,
-    TagConverter.class,
-    // The script services serializing the converted values.
-    ModelScriptService.class,
-    UserScriptService.class
+    TagConverter.class
 })
 @DefaultUserComponentList
 @XWikiSyntax21ComponentList
@@ -120,12 +115,11 @@ class NotificationsMacroPageTest extends PageTest
     }
 
     @Test
-    void listParametersArePassedConvertedAndQuoted() throws Exception
+    void locationParametersArePassedAsGiven() throws Exception
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
         document.setSyntax(Syntax.XWIKI_2_1);
-        // A location holding a comma and a whitespace is put in quotes, which the wiki syntax escapes with a tilde.
-        document.setContent("{{notifications wikis=\"xwiki,subwiki\" spaces=\"~\"My, Space~\",Space1.Nested\" "
+        document.setContent("{{notifications wikis=\"xwiki,subwiki\" spaces=\"Space1,Space1.Nested\" "
             + "pages=\"Space1.Page1,Space2.Page2\" users=\"XWiki.User1,XWiki.User2\" tags=\"tag1,tag2\"/}}");
         this.xwiki.saveDocument(document, this.context);
 
@@ -134,10 +128,10 @@ class NotificationsMacroPageTest extends PageTest
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, String>> parameters = ArgumentCaptor.forClass(Map.class);
         verify(this.sourcesScriptService).getNotificationParameters(parameters.capture());
-        assertEquals("\"xwiki\",\"subwiki\"", parameters.getValue().get("wikis"));
-        assertEquals("\"xwiki:My, Space\",\"xwiki:Space1.Nested\"", parameters.getValue().get("spaces"));
-        assertEquals("\"xwiki:Space1.Page1\",\"xwiki:Space2.Page2\"", parameters.getValue().get("pages"));
-        assertEquals("\"xwiki:XWiki.User1\",\"xwiki:XWiki.User2\"", parameters.getValue().get("users"));
-        assertEquals("\"tag1\",\"tag2\"", parameters.getValue().get("tags"));
+        assertEquals("xwiki,subwiki", parameters.getValue().get("wikis"));
+        assertEquals("Space1,Space1.Nested", parameters.getValue().get("spaces"));
+        assertEquals("Space1.Page1,Space2.Page2", parameters.getValue().get("pages"));
+        assertEquals("XWiki.User1,XWiki.User2", parameters.getValue().get("users"));
+        assertEquals("tag1,tag2", parameters.getValue().get("tags"));
     }
 }

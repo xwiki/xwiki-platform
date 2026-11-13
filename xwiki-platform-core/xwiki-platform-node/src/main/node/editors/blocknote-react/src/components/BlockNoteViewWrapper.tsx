@@ -24,7 +24,7 @@ import { FilePanel } from "./files/FilePanel";
 import { ImageSuggestionController } from "./images/ImageSuggestionController";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import { LinkSuggestionController } from "./links/LinkSuggestionController";
-import { queryMentionMenuItems } from "./mentions/mentionMenu";
+import { MentionSuggestionController } from "./mentions/MentionSuggestionController";
 import {
   createBlockNoteSchema,
   createDictionary,
@@ -459,12 +459,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
             {/* The mention macro is a server-rendered inline macro, so mentions need the syntax to support those. */}
             {userSuggest && syntax.features.inlineContents.macros && (
-              <SuggestionMenuController
-                triggerCharacter={"@"}
-                getItems={async (query) =>
-                  queryMentionMenuItems({ query, editor, userSuggest, t })
-                }
-              />
+              <MentionSuggestionController userSuggest={userSuggest} />
             )}
 
             {/* TODO: suggestions menu for inline macros */}

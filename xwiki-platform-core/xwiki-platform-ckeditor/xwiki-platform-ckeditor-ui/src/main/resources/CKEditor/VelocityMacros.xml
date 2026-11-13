@@ -135,8 +135,8 @@
   }))
   #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-wysiwyg-webjar' 'webjar.bundle.min.css')
   ## Tree styles needed for the document/attachment tree picker.
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
-    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
     'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
 #end

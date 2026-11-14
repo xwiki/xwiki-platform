@@ -202,6 +202,10 @@ public @interface UITest
     int[] sshPorts() default {};
 
     /**
+     * The profiles listed in the {@code xwiki.test.ui.profiles} System property (comma-separated) are added to these
+     * ones (rather than replacing them), so that a build can activate a profile for all tests (for example
+     * {@code clover}) while a test keeps the profiles it needs.
+     *
      * @return the list of Maven profiles to activate when resolving dependencies for the current POM.
      * @since 10.11RC1
      */
@@ -270,7 +274,9 @@ public @interface UITest
     /**
      * @return the list of network aliases to use for the servlet engine Docker container; this is useful when you need
      *         to access the same XWiki instance using different domains, e.g. because you need to login with different
-     *         XWiki users in the same browser instance (but different tabs).
+     *         XWiki users in the same browser instance (but different tabs). The aliases listed in the
+     *         {@code xwiki.test.ui.servletEngineNetworkAliases} System property (comma-separated) are added to these
+     *         ones (rather than replacing them).
      * @since 15.10.12
      * @since 16.4.1
      * @since 16.6.0RC1

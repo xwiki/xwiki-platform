@@ -370,11 +370,15 @@ public class TestConfiguration
 
     private void mergeProfiles(List<String> profiles)
     {
-        List<String> mergedProfiles = getProfiles();
-        if (profiles != null) {
-            mergedProfiles.addAll(profiles);
+        this.profiles = mergeWithoutDuplicates(getProfiles(), profiles);
+    }
+
+    private List<String> mergeWithoutDuplicates(List<String> mergedValues, List<String> values)
+    {
+        if (values != null) {
+            values.stream().filter(value -> !mergedValues.contains(value)).forEach(mergedValues::add);
         }
-        this.profiles = mergedProfiles;
+        return mergedValues;
     }
 
     private void mergeForbiddenServletEngines(List<ServletEngine> forbiddenServletEngines)
@@ -409,11 +413,7 @@ public class TestConfiguration
 
     private void mergeServletEngineNetworkAliases(List<String> aliases)
     {
-        List<String> mergedAliases = getServletEngineNetworkAliases();
-        if (aliases != null) {
-            mergedAliases.addAll(aliases);
-        }
-        this.servletEngineNetworkAliases = mergedAliases;
+        this.servletEngineNetworkAliases = mergeWithoutDuplicates(getServletEngineNetworkAliases(), aliases);
     }
 
     private void mergeBlobStore(BlobStore blobStore) throws DockerTestException

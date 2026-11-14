@@ -152,8 +152,10 @@ class ValidateConsoleExtensionTest
             SummaryGeneratingListener summaryListener = new SummaryGeneratingListener();
             launcher.execute(request, summaryListener);
 
-            // Stderr is restored once the console has been validated.
+            // The console streams are restored once the console has been validated.
+            PrintStream restoredOut = System.out;
             PrintStream restoredErr = System.err;
+            assertSame(psOut, restoredOut);
             assertSame(psErr, restoredErr);
 
             TestExecutionSummary summary = summaryListener.getSummary();

@@ -92,12 +92,6 @@
           <includes combine.self="override">
             <include>**/*Test.java</include>
           </includes>
-          <systemPropertyVariables>
-            <whitelistedWCAGClasses>
-              Panels.PanelClass
-              XWiki.XWikiGroups
-            </whitelistedWCAGClasses>
-          </systemPropertyVariables>
         </configuration>
       </plugin>
     </plugins>

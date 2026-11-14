@@ -21,24 +21,17 @@ package org.xwiki.test.webstandards;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -49,9 +42,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -76,8 +66,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Verifies that the pages of the flavor, and the administration and RSS URLs listed in the pom, are valid against
- * HTML5, XWiki's own rules, the Dutch Web Guidelines and RSS, and that XWiki doesn't log any error while rendering
- * them.
+ * HTML5, XWiki's own rules and RSS, and that XWiki doesn't log any error while rendering them.
  *
  * @version $Id$
  */
@@ -89,12 +78,6 @@ class WebStandardsTest
         new DefaultStringEntityReferenceSerializer();
 
     private static final WikiReference WIKI_REFERENCE = new WikiReference("xwiki");
-
-    /**
-     * The Dutch Web Guidelines skip hidden pages, except the ones holding an object of one of these classes.
-     */
-    private static final List<String> DWG_WHITELISTED_CLASSES =
-        Arrays.asList(StringUtils.split(System.getProperty("whitelistedWCAGClasses", "")));
 
     private static XWikiHTTPClient adminClient;
 
@@ -151,21 +134,13 @@ class WebStandardsTest
     @TestFactory
     Stream<DynamicTest> html5() throws Exception
     {
-        return validate(new HTML5Validator(), getTargets(false), target -> { });
+        return validate(new HTML5Validator(), getTargets());
     }
 
     @TestFactory
     Stream<DynamicTest> xwiki() throws Exception
     {
-        return validate(new XWikiValidator(), getTargets(false), target -> { });
-    }
-
-    @TestFactory
-    Stream<DynamicTest> dutchWebGuidelines() throws Exception
-    {
-        CustomDutchWebGuidelinesValidator validator = new CustomDutchWebGuidelinesValidator();
-        return validate(validator, getTargets(true),
-            target -> validator.setDocumentReference(target.documentReference()));
+        return validate(new XWikiValidator(), getTargets());
     }
 
     @TestFactory
@@ -174,10 +149,10 @@ class WebStandardsTest
         List<Target> targets = new ArrayList<>();
         targets.addAll(getURLTargets("rssUrlsToTestAsAdmin", adminClient));
         targets.addAll(getURLTargets("rssUrlsToTestAsGuest", guestClient));
-        return validate(new RSSValidator(), targets, target -> { });
+        return validate(new RSSValidator(), targets);
     }
 
-    private Stream<DynamicTest> validate(Validator validator, List<Target> targets, Consumer<Target> beforeValidation)
+    private Stream<DynamicTest> validate(Validator validator, List<Target> targets)
     {
         return targets.stream().map(target -> DynamicTest.dynamicTest(target.getName(), () -> {
             // Capture the XWiki logs (XWiki is started by this JVM which prints them) to detect server-side errors.
@@ -187,7 +162,6 @@ class WebStandardsTest
             Throwable failure = null;
             try {
                 byte[] responseBody = getResponseBody(target);
-                beforeValidation.accept(target);
                 validator.setDocument(new ByteArrayInputStream(responseBody));
                 assertValid(validator.validate(), target, responseBody);
             } catch (Throwable e) {
@@ -270,15 +244,13 @@ class WebStandardsTest
     }
 
     /**
-     * @param skipTechnicalPages true to skip the hidden pages, except the ones holding an object of a whitelisted
-     *     class
      * @return the pages of the flavor (filtered with the {@code documentsToTest} regex, if set) and the
      *     administration URLs, all as Admin, plus the URLs to test as guest
      */
-    private List<Target> getTargets(boolean skipTechnicalPages) throws Exception
+    private List<Target> getTargets() throws Exception
     {
         List<Target> targets = new ArrayList<>();
-        for (DocumentReference documentReference : readXarContents(skipTechnicalPages)) {
+        for (DocumentReference documentReference : readXarContents()) {
             targets.add(new Target(getURL(documentReference), documentReference, adminClient));
         }
         targets.addAll(getURLTargets("urlsToTestAsAdmin", adminClient));
@@ -306,57 +278,21 @@ class WebStandardsTest
         return url.toString();
     }
 
-    private List<DocumentReference> readXarContents(boolean skipTechnicalPages) throws Exception
+    private List<DocumentReference> readXarContents() throws Exception
     {
         // The pages of the flavor, exported by the packager plugin.
         String path = System.getProperty("pathToDocuments");
         String patternFilter = System.getProperty("documentsToTest");
         Pattern pattern = StringUtils.isEmpty(patternFilter) ? null : Pattern.compile(patternFilter);
-        DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
         List<DocumentReference> result = new ArrayList<>();
         for (XarEntry entry : new XarPackage(new File(path)).getEntries()) {
-            if ((pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches())
-                && !(skipTechnicalPages && isTechnicalPage(path, entry, documentBuilder))) {
+            if (pattern == null || pattern.matcher(SERIALIZER.serialize(entry)).matches()) {
                 result.add(new DocumentReference(entry, WIKI_REFERENCE));
             }
         }
         // Don't let the tests pass without validating any page if the export of the pages went wrong.
         assertFalse(result.isEmpty(), String.format("No page found in [%s]", path));
-        return result;
-    }
-
-    private boolean isTechnicalPage(String directoryPath, XarEntry entry, DocumentBuilder documentBuilder)
-        throws Exception
-    {
-        try (InputStream inputStream = new FileInputStream(new File(directoryPath, entry.getEntryName()))) {
-            Document parsedDocument = documentBuilder.parse(inputStream);
-
-            // A page holding an object of a whitelisted class must be checked.
-            for (Node objectElement : getChildElementsOfName(parsedDocument.getDocumentElement(), "object")) {
-                for (Node className : getChildElementsOfName(objectElement, "className")) {
-                    if (DWG_WHITELISTED_CLASSES.contains(className.getTextContent())) {
-                        return false;
-                    }
-                }
-            }
-
-            // Otherwise, a hidden page is considered as a technical page.
-            List<Node> hiddenElements = getChildElementsOfName(parsedDocument.getDocumentElement(), "hidden");
-            return hiddenElements.size() == 1 && "true".equals(hiddenElements.get(0).getTextContent());
-        }
-    }
-
-    private List<Node> getChildElementsOfName(Node element, String nodeName)
-    {
-        List<Node> result = new ArrayList<>();
-        NodeList childNodes = element.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node node = childNodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE && nodeName.equals(node.getNodeName())) {
-                result.add(node);
-            }
-        }
         return result;
     }
 }

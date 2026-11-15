@@ -147,7 +147,7 @@ const Constants = Object.freeze({
    * The debounce delay in milliseconds added to the "selectionchange" event listener
    * @type {number}
    */
-  DEBOUNCE_SELECTIONCHANGE_MS: 515,
+  DEBOUNCE_SELECTIONCHANGE_MS: 500,
   /**
    * The debounce delay in milliseconds added to the "resize" event listener
    * @type {number}

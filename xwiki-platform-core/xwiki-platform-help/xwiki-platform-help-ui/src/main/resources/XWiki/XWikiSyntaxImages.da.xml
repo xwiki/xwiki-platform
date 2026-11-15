@@ -136,4 +136,4 @@ Det fulde format for et billede er enten **##image~: (reference)##** eller **##~
 *** **##alt##**: En parameter, der angiver, hvilken tekst der skal vises, hvis browseren ikke kan vise billedet. Da det er en obligatorisk HTML-attribut, bruger XWiki filnavnet, hvis parameteren ##alt## ikke er angivet. Eksempel: ##alt="img.png"##
 *** **Mere**: Du kan læse en mere grundig forklaring af HTML-tagget ##&lt;img&gt;##, herunder flere attributter, [[i HTML-standarden&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
 ** **##queryString##**: Gør det muligt at sende forespørgsler til serveren, når linket til at hente billedet dannes. Eksempel: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## virker ikke, hvis parametrene ##width## og ##height## angives ud over ##queryString##!**)</content>
-  </xwikidoc>
+</xwikidoc>

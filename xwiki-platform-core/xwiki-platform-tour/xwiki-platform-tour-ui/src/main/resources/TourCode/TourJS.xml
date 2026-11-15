@@ -362,7 +362,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
             setTimeout(function() {
               buttonContainer.removeClass('hint-opened');
               // Completely hide it after the transition
-              setTimeout(() => buttonContainer.addClass('hint-closed'), 200);
+              setTimeout(() =&gt; buttonContainer.addClass('hint-closed'), 200);
               popover.removeAttr('open');
             }, 7000);
           }

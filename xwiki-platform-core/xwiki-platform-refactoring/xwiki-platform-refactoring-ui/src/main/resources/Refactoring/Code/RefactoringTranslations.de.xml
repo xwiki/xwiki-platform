@@ -42,4 +42,4 @@ Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=Kan
 Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=Wenn diese Option auf Ja gesetzt ist, können fortgeschrittene Benutzer wählen, ob die Seiten beim Löschen in den Papierkorb verschoben oder dauerhaft gelöscht werden sollen. Bei der Einstellung Nein werden die Seiten immer in den Papierkorb gesendet, wenn dieser aktiv ist, andernfalls werden sie immer endgültig gelöscht. Der Standardwert ist Nein.
 refactoring.configuration.delete.emptySection=In diesem Abschnitt gibt es nichts zu konfigurieren.
 </content>
-  </xwikidoc>
+</xwikidoc>

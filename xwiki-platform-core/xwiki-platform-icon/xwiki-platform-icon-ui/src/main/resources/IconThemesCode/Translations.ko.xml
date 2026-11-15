@@ -47,4 +47,4 @@ rendering.macro.iconPicker.parameter.class.description=선택기가 적용될 �
 rendering.macro.iconPicker.parameter.prefix.name=접두사
 rendering.macro.iconPicker.parameter.prefix.description=입력 필드의 아이콘 이름 앞에 추가할 접두어(기본값: "image:icon:")
 </content>
-  </xwikidoc>
+</xwikidoc>

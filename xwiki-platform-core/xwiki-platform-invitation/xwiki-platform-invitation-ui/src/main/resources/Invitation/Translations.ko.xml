@@ -46,4 +46,4 @@ Invitation.WebHome_smtp_port.hint=사용할 SMTP 서버 의 포트입니다 .
 Invitation.WebHome_smtp_server.hint=보낼 SMTP 서버 입니다.
 Invitation.WebHome_javamail_extra_props.hint=사용할 추가 JavaMail 속성 목록입니다 .
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -54,4 +54,4 @@ XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=URL-адреса, що в
 XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=URL-адреса відгуків
 XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=URL-адреса, яка використовуватиметься як віддалене джерело для перевірок сканування безпеки (значення за умовчанням: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
 </content>
-  </xwikidoc>
+</xwikidoc>

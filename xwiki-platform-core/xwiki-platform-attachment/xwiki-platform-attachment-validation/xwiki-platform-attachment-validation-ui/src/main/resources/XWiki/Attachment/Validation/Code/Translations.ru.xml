@@ -46,4 +46,4 @@ XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimet
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=Запрещенные MIME-типы 
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=Определяет список запрещенных MIME-типов вложений. По умолчанию этот список пуст, но вы можете указать список запрещенных MIME-типов, разделенных запятыми. Обратите внимание, что джокер (*) может быть использован для обозначения любого типа мультимедиа. Если этот список не пуст, то любое вложение, соответствующее одному из перечисленных MIME-типов, будет отклонено. Например, если вы хотите блокировать простой текст и любые изображения, вы можете задать список в виде: text/plain,image/*
 </content>
-  </xwikidoc>
+</xwikidoc>

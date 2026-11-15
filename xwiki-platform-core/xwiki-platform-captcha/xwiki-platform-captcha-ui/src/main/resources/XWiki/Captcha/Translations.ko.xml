@@ -43,4 +43,4 @@ captcha.admin.configure.title={0} 설정
 captcha.admin.sample.title=샘플 보안 문자
 captcha.admin.sample.description=예를 들어 구성된 CAPTCHA가 양식에 표시될 때의 모습입니다.
 </content>
-  </xwikidoc>
+</xwikidoc>

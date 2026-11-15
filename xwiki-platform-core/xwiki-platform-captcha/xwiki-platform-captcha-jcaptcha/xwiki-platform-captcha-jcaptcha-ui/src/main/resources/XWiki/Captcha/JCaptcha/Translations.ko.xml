@@ -62,4 +62,4 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptc
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=간단한 수학
 captcha.jcaptcha.engine.custom=사용자 정의:
 </content>
-  </xwikidoc>
+</xwikidoc>

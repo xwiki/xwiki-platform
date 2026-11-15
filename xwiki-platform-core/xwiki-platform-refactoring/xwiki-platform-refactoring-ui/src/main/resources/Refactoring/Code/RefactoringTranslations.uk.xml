@@ -42,4 +42,4 @@ Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=М�
 Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=Якщо встановлено значення "Так", розширені користувачі можуть вибирати, чи хочуть вони надсилати сторінки до кошика чи остаточно видаляти їх під час видалення сторінок. Якщо встановлено значення "Ні", сторінки завжди надсилаються до кошика, якщо той активний, в іншому випадку вони завжди видаляються остаточно. Значення за умовчанням — "Ні".
 refactoring.configuration.delete.emptySection=У цьому розділі нічого не потрібно налаштовувати.
 </content>
-  </xwikidoc>
+</xwikidoc>

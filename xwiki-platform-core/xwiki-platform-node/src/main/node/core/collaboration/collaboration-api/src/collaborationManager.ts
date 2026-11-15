@@ -39,11 +39,15 @@ interface CollaborationManager {
   /**
    * Attempts to connect to the realtime collaboration session for the specified document (or the current document), and
    * returns the joined collaboration once the connection is established and the initial synchronization is done.
+   * Implementations can also give up waiting for the connection, returning a disconnected collaboration (see its
+   * connection status) that synchronizes the shared document when the connection is eventually established.
    *
    * @param documentReference - the reference of the document for which to join the realtime collaboration session;
    *   falls back to the current document reference when not specified
    * @returns a promise that resolves with the joined collaboration, once the connection is established and the initial
-   *   synchronization is done
+   *   synchronization is done, or once the implementation gives up waiting for the connection
+   * @throws Error if the collaboration session can't be created (e.g. the current user details can't be retrieved);
+   *   joining again retries
    */
   join(documentReference?: DocumentReference): Promise<Collaboration>;
 

@@ -33,9 +33,9 @@ import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for {@link UserPreferencesConfigurationSource}.
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  */
 @ComponentTest
-public class UserPreferencesConfigurationSourceTest
+class UserPreferencesConfigurationSourceTest
 {
     @InjectMockComponents
     private UserPreferencesConfigurationSource source;
@@ -98,7 +98,8 @@ public class UserPreferencesConfigurationSourceTest
     {
         DocumentReference userDocumentReference = new DocumentReference("wiki", "space", "user");
         when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(userDocumentReference);
-        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(userReferenceMock);
 
         this.source.getProperty("key");
 

@@ -119,7 +119,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 throw new WikiManagerException("Failed to get wiki ids", e);
             }
 
-            wikiIds = new HashSet<>(documentNames.size());
+            wikiIds = HashSet.newHashSet(documentNames.size());
 
             boolean foundMainWiki = false;
 
@@ -239,7 +239,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext != null ? xcontext.isMainWiki(wikiId) : true;
+        return xcontext == null || xcontext.isMainWiki(wikiId);
     }
 
     @Override

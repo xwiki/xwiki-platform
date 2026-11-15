@@ -80,28 +80,30 @@ public abstract class AbstractDataSource implements DataSource
      */
     protected void validateParameters(Map<String, String> parameters) throws MacroExecutionException
     {
-        for (String key : parameters.keySet()) {
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
             if (DATASET_PARAM.equals(key)) {
-                datasetType = DatasetType.forName(parameters.get(key));
+                datasetType = DatasetType.forName(value);
                 if (datasetType == null) {
-                    invalidParameterValue(DATASET_PARAM, parameters.get(key));
+                    invalidParameterValue(DATASET_PARAM, value);
                 }
                 continue;
             }
             if (PLOT_TYPE_PARAM.equals(key)) {
-                plotType = PlotType.forName(parameters.get(key));
+                plotType = PlotType.forName(value);
                 if (plotType == null) {
-                    invalidParameterValue(PLOT_TYPE_PARAM, parameters.get(key));
+                    invalidParameterValue(PLOT_TYPE_PARAM, value);
                 }
                 continue;
             }
-            if (localeConfiguration.setParameter(key, parameters.get(key))) {
+            if (localeConfiguration.setParameter(key, value)) {
                 continue;
             }
-            if (axisConfigurator.setParameter(key, parameters.get(key))) {
+            if (axisConfigurator.setParameter(key, value)) {
                 continue;
             }
-            setParameter(key, parameters.get(key));
+            setParameter(key, value);
         }
 
         localeConfiguration.validateParameters();

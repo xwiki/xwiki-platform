@@ -58,7 +58,7 @@ public class DefaultWikiReferenceProvider implements Provider<WikiReference>
             EntityReference reference = this.provider.getDefaultReference(EntityType.WIKI);
 
             this.cachedReference = this.factory.getReference(
-                reference instanceof WikiReference ? (WikiReference) reference : new WikiReference(reference));
+                reference instanceof WikiReference wikiReference ? wikiReference : new WikiReference(reference));
         }
 
         return this.cachedReference;

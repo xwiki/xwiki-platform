@@ -39,7 +39,7 @@ public abstract class AbstractBinaryOperatorNode extends AbstractOperatorNode
      * @param leftOperand the left operand
      * @param rightOperand the right operand
      */
-    public AbstractBinaryOperatorNode(AbstractNode leftOperand, AbstractNode rightOperand)
+    protected AbstractBinaryOperatorNode(AbstractNode leftOperand, AbstractNode rightOperand)
     {
         if (leftOperand == null || rightOperand == null) {
             throw new NullPointerException("A binary operand should have its two operands defined.");
@@ -68,9 +68,9 @@ public abstract class AbstractBinaryOperatorNode extends AbstractOperatorNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof AbstractBinaryOperatorNode
-                && leftOperand.equals(((AbstractBinaryOperatorNode) o).leftOperand)
-                && rightOperand.equals(((AbstractBinaryOperatorNode) o).rightOperand));
+        return (o instanceof AbstractBinaryOperatorNode abstractBinaryOperatorNode
+                && leftOperand.equals(abstractBinaryOperatorNode.leftOperand)
+                && rightOperand.equals(abstractBinaryOperatorNode.rightOperand));
     }
 
     @Override

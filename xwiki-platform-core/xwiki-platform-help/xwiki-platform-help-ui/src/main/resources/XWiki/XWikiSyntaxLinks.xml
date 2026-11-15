@@ -89,7 +89,7 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 ** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
 * **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
-* **##target##**: An optional string corresponding to the Hhttps://TML ##target## attribute for a HTML ##A## link element. This element is used when rendering the link. It defaults to opening the link in the current window. Examples: ##_self##, ##_blank##
+* **##target##**: An optional string corresponding to the HTML ##target## attribute for a HTML ##A## link element. This element is used when rendering the link. It defaults to opening the link in the current window. Examples: ##_self##, ##_blank##
 
 === 2.0 Links ===
 

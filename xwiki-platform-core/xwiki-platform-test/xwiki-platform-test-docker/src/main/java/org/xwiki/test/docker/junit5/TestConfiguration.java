@@ -30,6 +30,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.tool.extension.ExtensionOverride;
 
@@ -41,6 +42,17 @@ import org.xwiki.tool.extension.ExtensionOverride;
  */
 public class TestConfiguration
 {
+    /**
+     * The width, in pixels, of the screen of the browser container when the test doesn't specify one. It is one of
+     * the resolutions most used by our users.
+     */
+    public static final int DEFAULT_SCREEN_WIDTH = 1280;
+
+    /**
+     * The height, in pixels, of the screen of the browser container when the test doesn't specify one.
+     */
+    public static final int DEFAULT_SCREEN_HEIGHT = 960;
+
     private static final String DEFAULT = "default";
 
     private Browser browser;
@@ -63,6 +75,10 @@ public class TestConfiguration
 
     private String jdbcDriverVersion;
 
+    private int screenWidth;
+
+    private int screenHeight;
+
     private boolean vnc;
 
     private boolean wcag;
@@ -83,6 +99,8 @@ public class TestConfiguration
 
     private boolean office;
 
+    private boolean standardFlavor;
+
     private List<ServletEngine> forbiddenServletEngines;
 
     private Properties databaseCommands;
@@ -90,6 +108,8 @@ public class TestConfiguration
     private PropertiesMerger propertiesMerger = new PropertiesMerger();
 
     private boolean saveDatabaseData;
+
+    private boolean testExtensionRepository;
 
     private boolean savePermanentDirectoryData;
 
@@ -105,10 +125,14 @@ public class TestConfiguration
 
     private XWikiInstances xwikiInstances;
 
+    private WikiDescriptorTarget wikiDescriptorTarget;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
      */
+    // This is a flat sequence of one merge call per configuration option; splitting it would only hurt readability.
+    @SuppressWarnings("ExecutableStatementCount")
     public void merge(TestConfiguration testConfiguration) throws DockerTestException
     {
         mergeBrowser(testConfiguration.getBrowser());
@@ -121,6 +145,8 @@ public class TestConfiguration
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
         mergeBrowserTag(testConfiguration.getBrowserTag());
+        mergeScreenWidth(testConfiguration.screenWidth);
+        mergeScreenHeight(testConfiguration.screenHeight);
         mergeVNC(testConfiguration.vnc());
         mergeWCAG(testConfiguration.isWCAG());
         mergeWCAGStopOnError(testConfiguration.shouldWCAGStopOnError());
@@ -131,9 +157,11 @@ public class TestConfiguration
         mergeSSHPorts(testConfiguration.getSSHPorts());
         mergeProfiles(testConfiguration.getProfiles());
         mergeOffice(testConfiguration.isOffice());
+        mergeStandardFlavor(testConfiguration.isStandardFlavor());
         mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
+        mergeTestExtensionRepository(testConfiguration.isTestExtensionRepository());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
         mergeBlobStore(testConfiguration.blobStore);
@@ -141,6 +169,7 @@ public class TestConfiguration
         mergeSolrMode(testConfiguration.solrMode);
         mergeRemoteSolrTag(testConfiguration.getRemoteSolrTag());
         mergeXWikiInstances(testConfiguration.getXWikiInstances());
+        mergeWikiDescriptorTarget(testConfiguration.wikiDescriptorTarget);
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -288,6 +317,13 @@ public class TestConfiguration
         }
     }
 
+    private void mergeStandardFlavor(boolean standardFlavor)
+    {
+        if (!isStandardFlavor() && standardFlavor) {
+            this.standardFlavor = true;
+        }
+    }
+
     private void mergeProperties(Properties properties) throws DockerTestException
     {
         this.properties = this.propertiesMerger.merge(getProperties(), properties, false);
@@ -334,11 +370,15 @@ public class TestConfiguration
 
     private void mergeProfiles(List<String> profiles)
     {
-        List<String> mergedProfiles = getProfiles();
-        if (profiles != null) {
-            mergedProfiles.addAll(profiles);
+        this.profiles = mergeWithoutDuplicates(getProfiles(), profiles);
+    }
+
+    private List<String> mergeWithoutDuplicates(List<String> mergedValues, List<String> values)
+    {
+        if (values != null) {
+            values.stream().filter(value -> !mergedValues.contains(value)).forEach(mergedValues::add);
         }
-        this.profiles = mergedProfiles;
+        return mergedValues;
     }
 
     private void mergeForbiddenServletEngines(List<ServletEngine> forbiddenServletEngines)
@@ -357,6 +397,13 @@ public class TestConfiguration
         }
     }
 
+    private void mergeTestExtensionRepository(boolean testExtensionRepository)
+    {
+        if (!isTestExtensionRepository() && testExtensionRepository) {
+            this.testExtensionRepository = true;
+        }
+    }
+
     private void mergeSavePermanentDirectoryData(boolean savePermanentDirectoryData)
     {
         if (!isPermanentDirectoryDataSaved() && savePermanentDirectoryData) {
@@ -366,11 +413,7 @@ public class TestConfiguration
 
     private void mergeServletEngineNetworkAliases(List<String> aliases)
     {
-        List<String> mergedAliases = getServletEngineNetworkAliases();
-        if (aliases != null) {
-            mergedAliases.addAll(aliases);
-        }
-        this.servletEngineNetworkAliases = mergedAliases;
+        this.servletEngineNetworkAliases = mergeWithoutDuplicates(getServletEngineNetworkAliases(), aliases);
     }
 
     private void mergeBlobStore(BlobStore blobStore) throws DockerTestException
@@ -423,6 +466,30 @@ public class TestConfiguration
         }
     }
 
+    private void mergeWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget) throws DockerTestException
+    {
+        if (this.wikiDescriptorTarget != null) {
+            if (wikiDescriptorTarget != null && this.wikiDescriptorTarget != wikiDescriptorTarget) {
+                throw new DockerTestException(
+                    String.format("Cannot merge wiki descriptor target [%s] since it was already specified as [%s]",
+                        wikiDescriptorTarget, this.wikiDescriptorTarget));
+            }
+        } else {
+            this.wikiDescriptorTarget = wikiDescriptorTarget;
+        }
+    }
+
+    private void mergeScreenWidth(int screenWidth)
+    {
+        // The tests merged together share a single browser container, so keep the largest screen asked for.
+        this.screenWidth = Math.max(this.screenWidth, screenWidth);
+    }
+
+    private void mergeScreenHeight(int screenHeight)
+    {
+        this.screenHeight = Math.max(this.screenHeight, screenHeight);
+    }
+
     private void mergeXWikiInstances(XWikiInstances xwikiInstances)
     {
         // Select the configuration with the biggest number of instances.
@@ -430,6 +497,42 @@ public class TestConfiguration
             || (xwikiInstances != null && xwikiInstances.value() > getXWikiInstances().value())) {
             setXWikiInstances(xwikiInstances);
         }
+    }
+
+    /**
+     * @return the width, in pixels, of the screen of the browser container
+     * @since 18.9.0RC1
+     */
+    public int getScreenWidth()
+    {
+        return this.screenWidth > 0 ? this.screenWidth : DEFAULT_SCREEN_WIDTH;
+    }
+
+    /**
+     * @param screenWidth see {@link #getScreenWidth()}
+     * @since 18.9.0RC1
+     */
+    public void setScreenWidth(int screenWidth)
+    {
+        this.screenWidth = screenWidth;
+    }
+
+    /**
+     * @return the height, in pixels, of the screen of the browser container
+     * @since 18.9.0RC1
+     */
+    public int getScreenHeight()
+    {
+        return this.screenHeight > 0 ? this.screenHeight : DEFAULT_SCREEN_HEIGHT;
+    }
+
+    /**
+     * @param screenHeight see {@link #getScreenHeight()}
+     * @since 18.9.0RC1
+     */
+    public void setScreenHeight(int screenHeight)
+    {
+        this.screenHeight = screenHeight;
     }
 
     /**
@@ -784,13 +887,17 @@ public class TestConfiguration
      */
     public String getName()
     {
-        return String.format("%s-%s-%s-%s-%s-%s",
+        // Note: the standardFlavor mode is part of the name so that the minimal-WAR and standard-flavor variants get
+        // distinct output directories (and thus distinct build.marker files). Otherwise switching modes for the same
+        // db/servlet/browser combination would reuse a stale WAR.
+        return String.format("%s-%s-%s-%s-%s-%s%s",
             getDatabase().name().toLowerCase(),
             StringUtils.isEmpty(getDatabaseTag()) ? DEFAULT : getDatabaseTag(),
             StringUtils.isEmpty(getJDBCDriverVersion()) ? DEFAULT : getDatabaseTag(),
             getServletEngine().name().toLowerCase(),
             StringUtils.isEmpty(getServletEngineTag()) ? DEFAULT : getServletEngineTag(),
-            getBrowser().name().toLowerCase());
+            getBrowser().name().toLowerCase(),
+            isStandardFlavor() ? "-standardflavor" : "");
     }
 
     /**
@@ -837,6 +944,46 @@ public class TestConfiguration
     }
 
     /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution: the WAR's {@code WEB-INF/lib} is built from the standard distribution WAR
+     *         dependencies (instead of the minimal set) and the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically. See
+     *         {@link org.xwiki.test.docker.junit5.UITest#standardFlavor()}.
+     * @since 18.6.0RC1
+     */
+    public boolean isStandardFlavor()
+    {
+        return this.standardFlavor;
+    }
+
+    /**
+     * @param standardFlavor see {@link #isStandardFlavor()}
+     * @since 18.6.0RC1
+     */
+    public void setStandardFlavor(boolean standardFlavor)
+    {
+        this.standardFlavor = standardFlavor;
+    }
+
+    /**
+     * @return the artifactId (in the {@code org.xwiki.platform} groupId) of the {@code pom} artifact whose
+     *         dependencies define the JARs to put in the WAR's {@code WEB-INF/lib}: the full standard distribution
+     *         dependencies when {@link #isStandardFlavor()} is true (the {@code legacy} variant when the
+     *         {@code legacy} profile is active), or the minimal set otherwise. Used by both the WAR builder and the
+     *         extension installer so that they agree on what is bundled versus provisioned.
+     * @since 18.6.0RC1
+     */
+    public String getWARDependenciesRootArtifactId()
+    {
+        if (!isStandardFlavor()) {
+            return "xwiki-platform-minimaldependencies";
+        }
+        return getProfiles().contains("legacy")
+            ? "xwiki-platform-distribution-war-legacydependencies"
+            : "xwiki-platform-distribution-war-dependencies";
+    }
+
+    /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
      *         then the test will be skipped
      * @since 10.11RC1
@@ -862,6 +1009,29 @@ public class TestConfiguration
     public boolean isDatabaseDataSaved()
     {
         return this.saveDatabaseData;
+    }
+
+    /**
+     * @return true if the extensions declared in the resources of the module executing the test are made available to
+     *     the XWiki instances as an extension repository
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    public boolean isTestExtensionRepository()
+    {
+        return this.testExtensionRepository;
+    }
+
+    /**
+     * @param testExtensionRepository see {@link #isTestExtensionRepository()}
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    public void setTestExtensionRepository(boolean testExtensionRepository)
+    {
+        this.testExtensionRepository = testExtensionRepository;
     }
 
     /**
@@ -1012,11 +1182,53 @@ public class TestConfiguration
     }
 
     /**
+     * @return the host/port to set as the default one in the wiki descriptor for all the tests of the XWiki instance,
+     *         that is {@link WikiDescriptorTarget#BROWSER} when it's not specified. Note that a test can override
+     *         it with {@link UseWikiDescriptorTarget}. See {@link UITest#wikiDescriptorTarget()}.
+     * @since 18.8.0RC1
+     */
+    public WikiDescriptorTarget getWikiDescriptorTarget()
+    {
+        return this.wikiDescriptorTarget != null ? this.wikiDescriptorTarget : WikiDescriptorTarget.BROWSER;
+    }
+
+    /**
+     * @param wikiDescriptorTarget see {@link #getWikiDescriptorTarget()}
+     * @since 18.8.0RC1
+     */
+    public void setWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget)
+    {
+        this.wikiDescriptorTarget = wikiDescriptorTarget;
+    }
+
+    /**
      * @return true if the test configuration is for a cluster setup (i.e. more than 1 XWiki instance), false otherwise
      * @since 18.3.0RC1
      */
     public boolean isCluster()
     {
         return getXWikiInstances().value() > 1;
+    }
+
+    /**
+     * @return {@code true} if the XWiki instances of the test share a filesystem blob store, i.e. when they form a
+     *     cluster using the filesystem blob store, {@code false} otherwise
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     */
+    public boolean isSharedFileSystemBlobStore()
+    {
+        return isCluster() && getBlobStore() == BlobStore.FILESYSTEM;
+    }
+
+    /**
+     * @return true if the database is embedded in the XWiki instance, false if it runs in its own Docker container.
+     *         Only HSQLDB can be embedded and only when there's a single XWiki instance since an embedded database
+     *         cannot be shared: in a cluster it runs in server mode instead.
+     * @since 18.7.0RC1
+     */
+    public boolean isDatabaseEmbedded()
+    {
+        return getDatabase() == Database.HSQLDB && !isCluster();
     }
 }

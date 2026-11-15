@@ -101,6 +101,7 @@ class BlobDeleteTransactionRunnableTest
         // After preRun(), before run.
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertFalse(temp.exists());
@@ -122,6 +123,7 @@ class BlobDeleteTransactionRunnableTest
         // After run() before onCommit()
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertTrue(temp.exists());

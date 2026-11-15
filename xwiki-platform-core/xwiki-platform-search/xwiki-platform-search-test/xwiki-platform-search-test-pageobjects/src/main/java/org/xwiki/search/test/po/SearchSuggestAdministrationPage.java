@@ -37,6 +37,14 @@ public class SearchSuggestAdministrationPage extends AdministrationSectionPage
     private WebElement searchSuggestActivationSelect;
 
     /**
+     * Default constructor.
+     */
+    public SearchSuggestAdministrationPage()
+    {
+        super(SECTION_ID, true);
+    }
+
+    /**
      * Open the Search Suggest administration section.
      *
      * @return the Search Suggest administration section
@@ -48,13 +56,10 @@ public class SearchSuggestAdministrationPage extends AdministrationSectionPage
     }
 
     /**
-     * Default constructor.
+     * Selects whether the search suggest feature is activated. The configuration still needs to be saved.
+     *
+     * @param activated {@code true} to activate the search suggest, {@code false} to deactivate it
      */
-    public SearchSuggestAdministrationPage()
-    {
-        super(SECTION_ID, true);
-    }
-
     public void setActivated(boolean activated)
     {
         Select select = new Select(this.searchSuggestActivationSelect);

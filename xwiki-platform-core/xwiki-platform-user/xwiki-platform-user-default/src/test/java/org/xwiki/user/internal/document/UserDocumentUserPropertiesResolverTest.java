@@ -37,7 +37,7 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  */
 @ComponentTest
-public class UserDocumentUserPropertiesResolverTest
+class UserDocumentUserPropertiesResolverTest
 {
     @InjectMockComponents
     private UserDocumentUserPropertiesResolver resolver;

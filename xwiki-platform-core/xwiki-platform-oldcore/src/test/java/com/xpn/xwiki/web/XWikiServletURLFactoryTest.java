@@ -142,7 +142,7 @@ class XWikiServletURLFactoryTest
      * @param wikiName the wiki name
      * @throws XWikiException if creating the wiki fails
      */
-    private void createWiki(String wikiName) throws XWikiException, WikiManagerException
+    private void createWiki(String wikiName) throws WikiManagerException
     {
         WikiDescriptor wikidescriptor = new WikiDescriptor(wikiName, wikiName + "server");
 
@@ -465,7 +465,7 @@ class XWikiServletURLFactoryTest
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        // Set a deamon request
+        // Set a daemon request
         initDaemonRequest("request", 42);
 
         this.oldcore.getXWikiContext().setWikiId("wiki1");
@@ -591,6 +591,21 @@ class XWikiServletURLFactoryTest
             XWikiServletURLFactory
                 .normalizeURL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35"
                     + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en", this.oldcore.getXWikiContext())
+                .toString());
+    }
+
+    /**
+     * Verify that removing the jsessionid from the URL keeps the fragment, with or without a query string.
+     */
+    @Test
+    void normalizeURLWithAnchor() throws MalformedURLException
+    {
+        assertEquals("http://www.xwiki.org/xwiki/bin/view/Space/Page#HTest",
+            XWikiServletURLFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Space/Page"
+                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F#HTest", this.oldcore.getXWikiContext()).toString());
+        assertEquals("http://www.xwiki.org/xwiki/bin/view/Space/Page?language=en#HTest",
+            XWikiServletURLFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Space/Page"
+                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en#HTest", this.oldcore.getXWikiContext())
                 .toString());
     }
 

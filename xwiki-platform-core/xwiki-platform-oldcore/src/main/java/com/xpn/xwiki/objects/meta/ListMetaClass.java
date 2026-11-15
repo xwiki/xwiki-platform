@@ -38,7 +38,7 @@ public class ListMetaClass extends PropertyMetaClass
      */
     public ListMetaClass()
     {
-        addPresentationMetaProperties();
+        addListPresentationMetaProperties();
 
         BooleanClass relationalStorageClass = newCheckBox(false);
         relationalStorageClass.setName("relationalStorage");
@@ -61,7 +61,7 @@ public class ListMetaClass extends PropertyMetaClass
     /**
      * Adds the meta properties that control how the XClass property is displayed in edit and view mode.
      */
-    private void addPresentationMetaProperties()
+    private void addListPresentationMetaProperties()
     {
         StaticListClass displayTypeClass = new StaticListClass(this);
         displayTypeClass.setName("displayType");
@@ -123,8 +123,8 @@ public class ListMetaClass extends PropertyMetaClass
     private BooleanClass newCheckBox(boolean checked)
     {
         BooleanClass checkBox = new BooleanClass(this);
-        checkBox.setDisplayType("yesno");
-        checkBox.setDisplayFormType("checkbox");
+        checkBox.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        checkBox.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         checkBox.setDefaultValue(checked ? 1 : 0);
         return checkBox;
     }

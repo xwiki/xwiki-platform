@@ -54,7 +54,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
   };
 
   var onSelectHistorySource = function(event) {
-    event && event.preventDefault();
+    event?.preventDefault();
     var source = $(this).closest('.extension-history-source');
     if (source.hasClass('selected')) {
       // Source already selected.
@@ -184,7 +184,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
 
   $('.extension-history-replay-options a.btn-default').on('click', function(event) {
     event.preventDefault();
-    replayPlanRequest && replayPlanRequest.abort();
+    replayPlanRequest?.abort();
     $(event.target).closest('.extension-history-replay-options').addClass('hidden').prevAll().show();
   });
 
@@ -226,7 +226,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     $.post(form.attr('action'), data).then(data => {
       // Make sure we remove the document fragment identifier from the end of the URL.
       var replayStatusURL = window.location.href.replace(/#.*$/, '');
-      replayStatusURL += replayStatusURL.indexOf('?') < 0 ? '?' : '&';
+      replayStatusURL += replayStatusURL.includes('?') ? '&' : '?';
       window.location = replayStatusURL + $.param({
         'data': 'replayStatus',
         'jobId': data.jobId

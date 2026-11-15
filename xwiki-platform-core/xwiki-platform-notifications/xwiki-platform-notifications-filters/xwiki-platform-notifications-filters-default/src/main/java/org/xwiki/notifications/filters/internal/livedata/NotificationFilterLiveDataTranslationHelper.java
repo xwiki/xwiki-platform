@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.internal.livedata;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -152,7 +151,7 @@ public class NotificationFilterLiveDataTranslationHelper
             return recordableEventDescriptors.stream().map(descriptor -> Map.of(
                 "value", descriptor.getEventType(),
                 "label", getTranslationWithFallback(descriptor.getDescription())
-            )).collect(Collectors.toList());
+            )).toList();
         } catch (EventStreamException e) {
             throw new LiveDataException("Error while retrieving event descriptors", e);
         }

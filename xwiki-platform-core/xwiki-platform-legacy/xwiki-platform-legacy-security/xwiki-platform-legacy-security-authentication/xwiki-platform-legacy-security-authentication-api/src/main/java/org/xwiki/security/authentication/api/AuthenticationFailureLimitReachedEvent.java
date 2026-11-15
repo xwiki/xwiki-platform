@@ -34,9 +34,9 @@ import org.xwiki.observation.event.Event;
  *
  * @version $Id$
  * @since 11.6RC1
- * @deprecated Since 13.1RC1, use {@link org.xwiki.security.authentication.AuthenticationFailureLimitReachedEvent}.
+ * @deprecated Use {@link org.xwiki.security.authentication.AuthenticationFailureLimitReachedEvent}.
  */
-@Deprecated
+@Deprecated(since = "13.1RC1")
 public class AuthenticationFailureLimitReachedEvent implements Event
 {
     @Override

@@ -472,8 +472,6 @@ class DefaultGroupingEventStrategyTest
         DocumentReference userA = new DocumentReference("xwiki", "XWiki", "UserA");
 
         // Example taken from a real case
-        Event event0 =
-            createMockedEvent("update", userA, userA, new Date(1510567729000L), "1997830249-1510567729000-Puhs4MSa");
         Event event1 =
             createMockedEvent("update", userA, userA, new Date(1510567724000L), "1997830249-1510567724000-aCjmsmSh");
         Event event2 =

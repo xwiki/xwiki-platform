@@ -110,7 +110,7 @@ class SystemUserNotificationFilterTest
     }
 
     @Test
-    void getName() throws Exception
+    void getName()
     {
         assertEquals(SystemUserNotificationFilter.FILTER_NAME, this.filter.getName());
     }

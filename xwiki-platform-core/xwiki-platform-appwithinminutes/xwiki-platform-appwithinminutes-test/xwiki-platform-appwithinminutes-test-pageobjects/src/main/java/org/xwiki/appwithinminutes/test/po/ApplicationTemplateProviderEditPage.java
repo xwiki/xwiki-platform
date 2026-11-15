@@ -132,7 +132,7 @@ public class ApplicationTemplateProviderEditPage extends ApplicationEditPage
 
     public boolean hasTerminalOption()
     {
-        return getDriver().findElementsWithoutWaiting(By.cssSelector("select#XWiki\\.TemplateProviderClass_0_terminal"))
-            .size() > 0;
+        return !getDriver()
+            .findElementsWithoutWaiting(By.cssSelector("select#XWiki\\.TemplateProviderClass_0_terminal")).isEmpty();
     }
 }

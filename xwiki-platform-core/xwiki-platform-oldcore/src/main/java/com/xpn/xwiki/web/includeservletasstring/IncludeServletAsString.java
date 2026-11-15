@@ -40,20 +40,18 @@ public class IncludeServletAsString
     {
     }
 
-    static public String invokeServletAndReturnAsString(String url, HttpServletRequest servletRequest,
+    public static String invokeServletAndReturnAsString(String url, HttpServletRequest servletRequest,
         HttpServletResponse servletResponse) throws IOException, ServletException
     {
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Including url \"" + url + "\"...");
-        }
+        LOGGER.debug("Including url [{}]...", url);
 
         RequestDispatcher requestDispatcher = servletRequest.getRequestDispatcher(url);
 
         if (requestDispatcher == null) {
             IllegalArgumentException iae =
                 new IllegalArgumentException("Failed to get RequestDispatcher for url: " + url);
-            LOGGER.error(iae.getMessage(), iae);
+            LOGGER.error("Failed to get the RequestDispatcher for url [{}]", url, iae);
             throw iae;
         }
 
@@ -62,13 +60,9 @@ public class IncludeServletAsString
         requestDispatcher.include(servletRequest, bufferedResponse);
 
         byte[] buffer = bufferedResponse.getBufferAsByteArray();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Buffer returned with " + buffer.length + " bytes.");
-        }
+        LOGGER.debug("Buffer returned with [{}] bytes.", buffer.length);
 
-        String bufferString = new String(buffer, servletResponse.getCharacterEncoding());
-
-        return bufferString;
+        return new String(buffer, servletResponse.getCharacterEncoding());
     }
 
 }

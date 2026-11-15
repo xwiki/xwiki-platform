@@ -22,6 +22,7 @@ package org.xwiki.resource.internal;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReference;
@@ -51,23 +52,27 @@ class MainResourceReferenceHandlerManagerTest
     @InjectMockComponents
     private MainResourceReferenceHandlerManager handlerManager;
 
+    @Mock(name = "handler1")
+    private ResourceReferenceHandler<ResourceType> handler1;
+
+    @Mock(name = "handler2")
+    private ResourceReferenceHandler<ResourceType> handler2;
+
     @Test
     void handleWithOrder(ComponentManager componentManager) throws Exception
     {
         // First Handler component will lower priority
-        ResourceReferenceHandler testHandler = mock(ResourceReferenceHandler.class, "handler1");
-        when(testHandler.getSupportedResourceReferences()).thenReturn(Arrays.asList(new ResourceType("test")));
+        when(this.handler1.getSupportedResourceReferences()).thenReturn(Arrays.asList(new ResourceType("test")));
 
         // Second Handler component will higher priority so that it's executed first
-        ResourceReferenceHandler beforeTestHandler = mock(ResourceReferenceHandler.class, "handler2");
-        when(beforeTestHandler.getSupportedResourceReferences()).thenReturn(Arrays.asList(new ResourceType("test")));
-        // We return 1 to mean that the second Handler has a higher priority than the first Handler
-        when(beforeTestHandler.compareTo(testHandler)).thenReturn(-1);
+        when(this.handler2.getSupportedResourceReferences()).thenReturn(Arrays.asList(new ResourceType("test")));
+        // We return -1 to mean that the second Handler has a higher priority than the first Handler
+        when(this.handler2.compareTo(this.handler1)).thenReturn(-1);
 
         ComponentManager contextComponentManager = componentManager.getInstance(ComponentManager.class, "context");
-        when(contextComponentManager.<ResourceReferenceHandler>getInstanceList(
+        when(contextComponentManager.<ResourceReferenceHandler<?>>getInstanceList(
             new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class)))
-                .thenReturn(Arrays.asList(testHandler, beforeTestHandler));
+                .thenReturn(Arrays.<ResourceReferenceHandler<?>>asList(this.handler1, this.handler2));
 
         ResourceReference reference = mock(ResourceReference.class);
         when(reference.getType()).thenReturn(new ResourceType("test"));
@@ -75,24 +80,23 @@ class MainResourceReferenceHandlerManagerTest
         handlerManager.handle(reference);
 
         // Verify that the second Action is called (since it has a higher priority).
-        verify(beforeTestHandler).handle(same(reference), any(ResourceReferenceHandlerChain.class));
+        verify(this.handler2).handle(same(reference), any(ResourceReferenceHandlerChain.class));
     }
 
     @Test
     void matches()
     {
-        ResourceReferenceHandler resourceReferenceHandler1 = mock(ResourceReferenceHandler.class);
-        ResourceReferenceHandler resourceReferenceHandler2 = mock(ResourceReferenceHandler.class);
         ResourceType resourceType1 = new ResourceType("test1");
         ResourceType resourceType2 = new ResourceType("test2");
 
-        when(resourceReferenceHandler1.getSupportedResourceReferences()).thenReturn(Arrays.asList(resourceType1));
-        when(resourceReferenceHandler2.getSupportedResourceReferences()).thenReturn(Arrays.asList(resourceType1, resourceType2));
+        when(this.handler1.getSupportedResourceReferences()).thenReturn(Arrays.asList(resourceType1));
+        when(this.handler2.getSupportedResourceReferences())
+            .thenReturn(Arrays.asList(resourceType1, resourceType2));
 
-        assertTrue(handlerManager.matches(resourceReferenceHandler1, resourceType1));
-        assertFalse(handlerManager.matches(resourceReferenceHandler1, resourceType2));
+        assertTrue(this.handlerManager.matches(this.handler1, resourceType1));
+        assertFalse(this.handlerManager.matches(this.handler1, resourceType2));
 
-        assertTrue(handlerManager.matches(resourceReferenceHandler2, resourceType1));
-        assertTrue(handlerManager.matches(resourceReferenceHandler2, resourceType2));
+        assertTrue(this.handlerManager.matches(this.handler2, resourceType1));
+        assertTrue(this.handlerManager.matches(this.handler2, resourceType2));
     }
 }

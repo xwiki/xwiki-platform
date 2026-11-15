@@ -123,7 +123,7 @@ public class Range
                 max = list.size();
             }
 
-            // with both start and size negative the maximum becomes the mininum & vice versa
+            // with both start and size negative the maximum becomes the minimum & vice versa
             if (min > max) {
                 int oldmax = max;
                 max = min;

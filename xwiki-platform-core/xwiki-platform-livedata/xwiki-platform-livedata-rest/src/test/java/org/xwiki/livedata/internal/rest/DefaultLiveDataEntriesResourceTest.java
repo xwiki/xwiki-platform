@@ -146,7 +146,8 @@ class DefaultLiveDataEntriesResourceTest
     void setUp() throws Exception
     {
         FieldUtils.writeField(this.resource, "uriInfo", this.uriInfo, true);
-        when(this.uriInfo.getQueryParameters()).thenReturn(mock(MultivaluedMap.class));
+        MultivaluedMap<String, String> multivaluedMapMock = mock();
+        when(this.uriInfo.getQueryParameters()).thenReturn(multivaluedMapMock);
         when(this.uriInfo.getAbsolutePath()).thenReturn(URI.create("https://mywiki"));
         when(this.uriInfo.getBaseUri()).thenReturn(URI.create("https://mywiki"));
         when(this.xcontext.getWikiId()).thenReturn("s1");

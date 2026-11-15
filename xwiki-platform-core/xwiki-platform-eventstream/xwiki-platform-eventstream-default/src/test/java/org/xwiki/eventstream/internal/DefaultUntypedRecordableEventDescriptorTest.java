@@ -25,7 +25,6 @@ import java.util.concurrent.Callable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.Extensions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.namespace.Namespace;
@@ -52,7 +51,7 @@ import static org.mockito.Mockito.when;
  * @since 10.6RC1
  * @since 9.11.6
  */
-@Extensions({ @ExtendWith({ MockitoComponentManagerExtension.class }) })
+@ExtendWith({ MockitoComponentManagerExtension.class })
 class DefaultUntypedRecordableEventDescriptorTest
 {
     @Mock
@@ -181,7 +180,8 @@ class DefaultUntypedRecordableEventDescriptorTest
             .thenThrow(new Exception("Some error"));
         assertEquals("applicationName", this.descriptor.getApplicationName());
         assertEquals("Failed to render the translation key [applicationName] in the namespace "
-            + "[wiki:someWiki] for the event descriptor of [eventType].", this.logCapture.getMessage(0));
+            + "[wiki:someWiki] for the event descriptor of [eventType]",
+            this.logCapture.getMessage(0));
     }
 
     @Test
@@ -194,6 +194,7 @@ class DefaultUntypedRecordableEventDescriptorTest
         when(this.namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
         assertEquals("eventDescription", this.descriptor.getDescription());
         assertEquals("Failed to render the translation key [eventDescription] in the namespace "
-            + "[wiki:someWiki] for the event descriptor of [eventType].", this.logCapture.getMessage(0));
+            + "[wiki:someWiki] for the event descriptor of [eventType]",
+            this.logCapture.getMessage(0));
     }
 }

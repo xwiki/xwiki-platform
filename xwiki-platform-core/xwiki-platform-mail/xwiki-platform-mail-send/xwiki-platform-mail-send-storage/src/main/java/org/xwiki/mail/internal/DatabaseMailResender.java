@@ -105,7 +105,7 @@ public class DatabaseMailResender implements MailResender
         int count) throws MailStoreException
     {
         return resendGeneric(filterMap, offset, count,
-            (batchId, messageId) -> resendAsynchronously(batchId, messageId));
+            this::resendAsynchronously);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class DatabaseMailResender implements MailResender
         throws MailStoreException
     {
         return resendGeneric(filterMap, offset, count,
-            (batchId, messageId) -> resend(batchId, messageId));
+            this::resend);
     }
 
     private List<Pair<MailStatus, MailStatusResult>> resendGeneric(Map<String, Object> filterMap, int offset,
@@ -149,8 +149,7 @@ public class DatabaseMailResender implements MailResender
 
     private MimeMessage loadMessage(Session session, String batchId, String mailId) throws MailStoreException
     {
-        MimeMessage message = this.mailContentStore.load(session, batchId, mailId);
-        return message;
+        return this.mailContentStore.load(session, batchId, mailId);
     }
 
     private MailStatusResult resend(String batchId, String uniqueMessageId) throws MailStoreException

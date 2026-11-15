@@ -141,7 +141,8 @@ class MoveStatusPagesTest extends PageTest
         when(this.jobScriptService.getJobStatus(List.of("refactoring", "moveAttachment", "42")))
             .thenReturn(jobStatus);
         when(jobStatus.getRequest()).thenReturn(jobRequest);
-        when(jobStatus.getLogTail()).thenReturn(mock(LoggerTail.class));
+        LoggerTail loggerTailMock = mock();
+        when(jobStatus.getLogTail()).thenReturn(loggerTailMock);
         when(this.xwiki.formatDate(any(), isNull(), eq(this.context))).thenReturn("NOW");
 
         Document document = Jsoup.parse(this.templateManager.render(MOVE_STATUS_TEMPLATE));

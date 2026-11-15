@@ -93,8 +93,6 @@ public abstract class AbstractInstanceFilterStreamTest
         // Users
 
         this.userReferenceResolver = this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
-        //DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
-        //UserReference contextUserReference = mockUserReference(contextUser);
     }
 
     protected void importFromXML(String resource) throws FilterException

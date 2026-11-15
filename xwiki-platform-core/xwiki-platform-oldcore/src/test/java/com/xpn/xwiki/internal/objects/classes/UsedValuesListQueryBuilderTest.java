@@ -86,7 +86,7 @@ class UsedValuesListQueryBuilderTest
     private UsedValuesListQueryBuilder usedValuesListQueryBuilder;
 
     @BeforeEach
-    void before(MockitoComponentManager componentManager) throws Exception
+    void before(MockitoComponentManager componentManager)
     {
         DocumentReference oneReference = new DocumentReference("wiki", "Page", "one");
         when(this.documentReferenceResolver.resolve("alice")).thenReturn(oneReference);

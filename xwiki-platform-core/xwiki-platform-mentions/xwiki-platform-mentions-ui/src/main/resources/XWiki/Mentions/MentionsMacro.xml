@@ -150,7 +150,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
 
   /**
    * Compute a new unique anchor for the given reference.
-   * The unique anchor is based on the mentionned user id, concatenaed with a random string of 6 alphanumeric
+   * The unique anchor is based on the mentioned user id, concatenated with a random string of 6 alphanumeric
    * characters.
    * The chances of collision are quite low, about 46k mentions for a given mentioned user on a given page (assuming
    * that no mentions are ever deleted).

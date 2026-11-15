@@ -50,7 +50,6 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import static com.xpn.xwiki.doc.XWikiDocument.COMMENTSCLASS_REFERENCE;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
 import static org.xwiki.mentions.MentionLocation.ANNOTATION;
@@ -135,7 +134,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
             // Retrieve new mentions with a new anchor
             List<String> anchorsToNotify = newAnchorIds.stream().filter(
                 value -> !isEmpty(value) && !oldAnchorsIds.contains(value))
-                .collect(toList());
+                .toList();
 
             // Compute if there's new mentions without an anchor
             long newEmptyAnchorsNumber = newAnchorIds.stream().filter(StringUtils::isEmpty).count();
@@ -224,8 +223,8 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
                     });
             } else {
                 for (Object o : baseObject.getProperties()) {
-                    if (o instanceof LargeStringProperty) {
-                        handleProperty(oldBaseObject, (LargeStringProperty) o, version, TEXT_FIELD, authorReference,
+                    if (o instanceof LargeStringProperty largeStringProperty) {
+                        handleProperty(oldBaseObject, largeStringProperty, version, TEXT_FIELD, authorReference,
                             syntax).ifPresent(mentionNotificationParametersList::add);
                     }
                 }
@@ -251,7 +250,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         String version, MentionLocation location, String authorReference, Syntax syntax)
     {
         Optional<XDOM> oldDom = oldBaseObject.flatMap(it -> ofNullable(it.getField(largeStringProperty.getName())))
-            .filter(it -> it instanceof LargeStringProperty)
+            .filter(LargeStringProperty.class::isInstance)
             .flatMap(it -> this.xdomService.parse(((LargeStringProperty) it).getValue(), syntax));
         return this.xdomService.parse(largeStringProperty.getValue(), syntax).flatMap(xdom -> {
             EntityReference entityReference = largeStringProperty.getReference();

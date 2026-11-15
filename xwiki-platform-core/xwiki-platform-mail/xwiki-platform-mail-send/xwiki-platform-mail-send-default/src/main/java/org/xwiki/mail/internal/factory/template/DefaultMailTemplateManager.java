@@ -40,9 +40,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -243,8 +243,8 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         } else {
             // Note: we support both a Locale type and String mostly for backward-compatibility reasons (the first
             // version of this API only supported String and we've moved to support Locale).
-            if (languageValue instanceof Locale) {
-                locale = (Locale) languageValue;
+            if (languageValue instanceof Locale localeValue) {
+                locale = localeValue;
             } else {
                 locale = LocaleUtils.toLocale(languageValue.toString());
             }

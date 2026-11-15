@@ -37,8 +37,23 @@ import org.xwiki.rest.model.jaxb.Properties;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/objects/{className}/{objectNumber}/properties")
 public interface ObjectPropertiesAtPageVersionResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Retrieves the properties of an object attached to a given version of a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the object, for example {@code WebHome}
+     * @param version the page revision to read the object from, for example {@code 2.1}
+     * @param className the reference of the XClass of the object, for example {@code XWiki.XWikiUsers}
+     * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
+     *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name), at some extra cost; defaults to {@code false}
+     * @return all the properties of the requested object as stored in the given page version
+     * @throws XWikiRestException if the properties cannot be retrieved, for example the page or the given version does
+     *  not exist
+     */
     @GET Properties getObjectProperties(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

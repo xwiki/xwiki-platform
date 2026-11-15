@@ -24,7 +24,7 @@ import type { Reactive, Ref } from "vue";
 
 /**
  * Present the public API of the logic used inside the Live Data UI.
- * It provides the operations and data to display Live Datas. It is build to be shared by most of the UI elements of
+ * It provides the operations and data to display Live Data. It is build to be shared by most of the UI elements of
  * a Live Data.
  * @since 18.2.0RC1
  * @beta
@@ -48,7 +48,7 @@ export interface Logic {
   /**
    * Listen for an event.
    * @param event - the event to listen to
-   * @param callback - a callback, taking the received event in paramter
+   * @param callback - a callback, taking the received event in parameter
    */
   onEvent(event: string, callback: (e: Event) => void): void;
 
@@ -82,6 +82,33 @@ export interface Logic {
    * @returns the entry id
    */
   getEntryId(entry: Values): string | undefined;
+
+  /**
+   * Return a key identifying an entry, stable across the refreshes of the live data and across the creation of the
+   * entry of a new row.
+   * @param entry - an entry
+   * @returns the key of the entry
+   * @since 18.9.0RC1
+   */
+  getEntryKey(entry: Values): string;
+
+  /**
+   * Return the keys of the given entries, in the same order. Each entry gets the key returned by
+   * getEntryKey, made unique among the given entries in case of inconsistent data, for instance
+   * duplicated entry IDs.
+   * @param entries - the entries to get the keys of
+   * @returns the keys of the entries
+   * @since 18.9.0RC1
+   */
+  getEntryKeys(entries: Values[]): string[];
+
+  /**
+   * Delete an entry, or drop the row when its entry does not exist yet.
+   * @param entry - the entry to delete
+   * @returns a promise completing when the entry is deleted
+   * @since 18.9.0RC1
+   */
+  deleteEntry(entry: Values): Promise<void>;
 
   /**
    * Trigger a refresh of the Live Data.
@@ -228,4 +255,18 @@ export interface Logic {
    * @param panel - the panel to add
    */
   registerPanel(panel: Panel): void;
+
+  /**
+   * Indicates whether the view is currently maximized.
+   *
+   * @returns whether the Live Data is currently displayed maximized
+   * @since 18.9.0RC1
+   */
+  isMaximized(): boolean;
+
+  /**
+   * Switches between the maximized view and the normal view.
+   * @since 18.9.0RC1
+   */
+  toggleMaximized(): void;
 }

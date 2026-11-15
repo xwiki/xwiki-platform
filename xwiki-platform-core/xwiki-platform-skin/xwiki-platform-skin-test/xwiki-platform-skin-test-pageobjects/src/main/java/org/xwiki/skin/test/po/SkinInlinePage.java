@@ -41,6 +41,12 @@ public class SkinInlinePage extends InlinePage
     @FindBy(id = "overrideSection")
     private WebElement overrideSection;
 
+    /**
+     * Adds a template override to the skin.
+     *
+     * @param templatePath the path of the template to override
+     * @return the element used to edit the added template override
+     */
     public SkinTemplateElement addTemplate(String templatePath)
     {
         this.templatePathInput.clear();
@@ -50,6 +56,11 @@ public class SkinInlinePage extends InlinePage
         return getTemplate(templatePath, false);
     }
 
+    /**
+     * @param templatePath the path of the overridden template
+     * @param open {@code true} to expand the template override, {@code false} if it's already expanded
+     * @return the element used to edit the template override
+     */
     public SkinTemplateElement getTemplate(String templatePath, boolean open)
     {
         WebElement overrideObject = this.overrideSection.findElement(

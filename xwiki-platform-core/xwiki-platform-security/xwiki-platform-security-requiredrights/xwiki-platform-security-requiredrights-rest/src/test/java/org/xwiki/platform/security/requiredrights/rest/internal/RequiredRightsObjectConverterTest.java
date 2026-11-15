@@ -85,8 +85,10 @@ class RequiredRightsObjectConverterTest
         RequiredRightAnalysisResult analysisResult = mock();
         when(analysisResult.getRequiredRights())
             .thenReturn(List.of(new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true)));
-        when(analysisResult.getSummaryMessage()).thenReturn(mock());
-        when(analysisResult.getDetailedMessage()).thenReturn(mock());
+        Block summaryMessageMock = mock();
+        when(analysisResult.getSummaryMessage()).thenReturn(summaryMessageMock);
+        Block detailedMessageMock = mock();
+        when(analysisResult.getDetailedMessage()).thenReturn(detailedMessageMock);
         when(analysisResult.getEntityReference()).thenReturn(documentReference);
 
         when(this.availableRightsManager.computeAvailableRights(any(), eq(documentReference)))

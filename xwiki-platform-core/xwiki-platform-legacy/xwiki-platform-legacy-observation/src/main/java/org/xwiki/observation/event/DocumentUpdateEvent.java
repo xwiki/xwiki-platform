@@ -25,9 +25,9 @@ import org.xwiki.observation.event.filter.EventFilter;
  * An event triggered when an existing document is saved (updated).
  * 
  * @version $Id$
- * @deprecated since 2.7RC1 use {@link org.xwiki.bridge.event.DocumentUpdatedEvent} instead
+ * @deprecated use {@link org.xwiki.bridge.event.DocumentUpdatedEvent} instead
  */
-@Deprecated
+@Deprecated(since = "2.7RC1")
 public class DocumentUpdateEvent extends AbstractDocumentEvent
 {
     /**

@@ -20,7 +20,6 @@
 package org.xwiki.messagestream.internal;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -29,6 +28,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of the default implementation of {@link org.xwiki.messagestream.MessageStreamConfiguration}.
@@ -50,13 +50,13 @@ class DefaultMessageStreamConfigurationTest
     void isActive()
     {
         DocumentReference configClass1 = new DocumentReference("wiki1", "XWiki", "MessageStreamConfig");
-        Mockito.when(this.documentAccessBridge.getProperty(configClass1, configClass1, "active")).thenReturn(1);
+        when(this.documentAccessBridge.getProperty(configClass1, configClass1, "active")).thenReturn(1);
 
         DocumentReference configClass2 = new DocumentReference("wiki2", "XWiki", "MessageStreamConfig");
-        Mockito.when(this.documentAccessBridge.getProperty(configClass2, configClass2, "active")).thenReturn(0);
+        when(this.documentAccessBridge.getProperty(configClass2, configClass2, "active")).thenReturn(0);
 
         DocumentReference configClass3 = new DocumentReference("wiki3", "XWiki", "MessageStreamConfig");
-        Mockito.when(this.documentAccessBridge.getProperty(configClass3, configClass3, "active")).thenReturn(null);
+        when(this.documentAccessBridge.getProperty(configClass3, configClass3, "active")).thenReturn(null);
 
         assertTrue(this.defaultMessageStream.isActive("wiki1"));
         assertFalse(this.defaultMessageStream.isActive("wiki2"));

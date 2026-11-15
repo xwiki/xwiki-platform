@@ -60,8 +60,9 @@ class DocumentReferenceTest
     @Test
     void testInvalidType()
     {
+        EntityReference reference = new EntityReference("page", EntityType.SPACE);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new DocumentReference(new EntityReference("page", EntityType.SPACE)));
+            () -> new DocumentReference(reference));
 
         assertEquals("Invalid type [SPACE] for a document reference", e.getMessage());
     }
@@ -78,8 +79,9 @@ class DocumentReferenceTest
     @Test
     void testInvalidParentType()
     {
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, new WikiReference("wiki"));
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new DocumentReference(new EntityReference("page", EntityType.DOCUMENT, new WikiReference("wiki"))));
+            () -> new DocumentReference(reference));
 
         assertEquals("Invalid parent reference [Wiki wiki] in a document reference", e.getMessage());
     }

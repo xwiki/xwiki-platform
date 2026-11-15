@@ -47,6 +47,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -145,8 +146,9 @@ class UnsafeTagsSelectorTest
     /**
      * The stream of arguments contains two {@link Arguments}
      * <ol>
-     *     <li>The first one is a {@link List} of {@link String}. The elements represent tags returned from the
-     *     database
+     *     <li>The first one is a {@link List} of {@link Object} arrays. Index 0 is a tag, and Index 1 is the number of
+     *     documents carrying it. This corresponds to the values returned by the database, which counts the tags
+     *     itself, grouping them by their exact case
      *     <li>The second one is a {@link Map} of {@link String} and {@link Integer} of the expected tags and their
      *     respective count
      * </ol>
@@ -161,17 +163,37 @@ class UnsafeTagsSelectorTest
                 List.of(),
                 Map.of()
             ),
-            // A single result, the page is viewable
+            // A single tag
             Arguments.of(
-                List.of("Tag0"),
+                List.<Object[]>of(
+                    new Object[] { "Tag0", 1L }
+                ),
                 Map.of("Tag0", 1)
             ),
+            // The counts of the case variants of a tag are summed
             Arguments.of(
-                List.of("Page0", "All", "Page1", "all"),
+                List.of(
+                    new Object[] { "Page0", 1L },
+                    new Object[] { "All", 1L },
+                    new Object[] { "Page1", 1L },
+                    new Object[] { "all", 1L }
+                ),
                 Map.of(
                     "All", 2,
                     "Page0", 1,
                     "Page1", 1
+                )
+            ),
+            // The first case variant in a case-insensitive order is the one returned
+            Arguments.of(
+                List.of(
+                    new Object[] { "beta", 3L },
+                    new Object[] { "Alpha", 2L },
+                    new Object[] { "ALPHA", 5L }
+                ),
+                Map.of(
+                    "Alpha", 7,
+                    "beta", 3
                 )
             )
         );
@@ -179,10 +201,15 @@ class UnsafeTagsSelectorTest
 
     @ParameterizedTest
     @MethodSource("getTagCountForQuerySource")
-    void getTagCountForQuery(List<String> values, Map<String, Integer> expectedTags) throws Exception
+    void getTagCountForQuery(List<Object[]> values, Map<String, Integer> expectedTags) throws Exception
     {
         when(this.query.execute()).thenReturn(new ArrayList<>(values));
         assertEquals(expectedTags, this.tagsSelector.getTagCountForQuery(null, null, (List<Object>) null));
+        // The counting must be delegated to the database, so that a single row is returned per distinct tag value.
+        verify(this.queryManager).createQuery("select item, count(*) "
+            + "from XWikiDocument as doc, BaseObject as tagobject, DBStringListProperty as prop join prop.list item"
+            + " where tagobject.name=doc.fullName and tagobject.className='XWiki.TagClass' and "
+            + "tagobject.id=prop.id.id and prop.id.name='tags' and doc.translation=0 group by item", Query.HQL);
         verifyNoInteractions(this.stringDocumentReferenceResolver);
         verifyNoInteractions(this.contextualAuthorizationManager);
     }

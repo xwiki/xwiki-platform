@@ -182,9 +182,9 @@ public interface WikiDocumentFilter
 
     /**
      * @type {@link String}
-     * @deprecated since 14.0RC1, use {@link #PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR} instead
+     * @deprecated use {@link #PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR} instead
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     String PARAMETER_REVISION_AUTHOR = PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR;
 
     /**

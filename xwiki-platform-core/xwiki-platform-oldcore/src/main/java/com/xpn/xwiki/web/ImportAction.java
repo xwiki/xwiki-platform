@@ -168,7 +168,7 @@ public class ImportAction extends XWikiAction
         @SuppressWarnings("resource")
         InputSource source = new XWikiAttachmentContentInputSource(packFile.getAttachmentContent(context));
 
-        // Get the history handling stategy
+        // Get the history handling strategy
         String historyStrategy = request.getParameter("historyStrategy");
 
         // Get the backup switch value

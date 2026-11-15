@@ -45,6 +45,7 @@ function initWrapper(options = {}) {
               getPropertyDescriptors: () => {
                 return [];
               },
+              isEditMode: () => false,
               data: {
                 query: {
                   properties: [],

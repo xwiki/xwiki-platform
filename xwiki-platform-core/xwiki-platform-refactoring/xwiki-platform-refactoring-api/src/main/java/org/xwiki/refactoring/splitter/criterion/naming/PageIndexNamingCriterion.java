@@ -50,10 +50,10 @@ public class PageIndexNamingCriterion extends AbstractNamingCriterion
      * 
      * @param baseDocumentName base name to be used for generating new document names.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
-     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     * @deprecated inject this as a component instead and set the base reference through
      *             {@link #getParameters()}
      */
-    @Deprecated
+    @Deprecated(since = "14.10.2,15.0RC1")
     public PageIndexNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge)
     {
         getParameters().setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));

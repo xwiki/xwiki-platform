@@ -30,7 +30,9 @@
       so that it align well with the entries selectors of the rows
       and the select-all entries in the header
     -->
-    <th v-if="isSelectionEnabled" class="entry-selector"></th>
+    <th v-if="isSelectionEnabled" class="entry-selector">
+      <span class="sr-only">{{ $t("livedata.table.entrySelector.hint") }}</span>
+    </th>
 
     <!-- The filters cells -->
     <th
@@ -43,7 +45,10 @@
         :property-id="property.id"
         :index="0"
       />
+      <span v-else class="sr-only">{{ property.name }}</span>
     </th>
+    <!-- Spacer for the actions column in edit mode -->
+    <th v-if="logic.isEditMode()"></th>
   </tr>
 </template>
 
@@ -91,5 +96,14 @@ export default {
 
 .layout-table .column-filters th.entry-selector {
   width: 0;
+}
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .layout-table .column-filters th {
+    /* Overwrite the filters width so they don't overflow the table. */
+    width: 100%;
+    border-top: none;
+  }
 }
 </style>

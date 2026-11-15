@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script service wrapping a {@link CSRFToken} component.
@@ -38,7 +39,9 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class CSRFTokenScriptService implements CSRFToken, ScriptService
 {
-    /** Wrapped CSRF token component. */
+    /**
+     * Wrapped CSRF token component.
+     */
     @Inject
     private CSRFToken csrf;
 
@@ -48,7 +51,14 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
         return this.csrf.getToken();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @deprecated tokens are derived from the authentication validation key, the current user and the current time
+     *             period and cannot be cleared, there is no replacement
+     */
     @Override
+    @Deprecated(since = "18.9.0RC1")
     public void clearToken()
     {
         this.csrf.clearToken();
@@ -64,6 +74,20 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
     public String getResubmissionURL()
     {
         return this.csrf.getResubmissionURL();
+    }
+
+    /**
+     * @return {@code true} if a request identified by the given id can be resubmitted.
+     * @param srid the request identifier
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    @Unstable
+    @Override
+    public boolean isResubmitAllowedForRequestId(String srid)
+    {
+        return this.csrf.isResubmitAllowedForRequestId(srid);
     }
 
     @Override

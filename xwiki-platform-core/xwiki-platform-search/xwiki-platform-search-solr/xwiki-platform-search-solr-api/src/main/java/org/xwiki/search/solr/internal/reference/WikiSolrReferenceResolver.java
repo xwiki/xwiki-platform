@@ -89,7 +89,7 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
             try {
                 this.spaceResolverProvider.get().getReferences(spaceReference).forEach(result::add);
             } catch (Exception e) {
-                this.logger.error("Failed to resolve references for space [" + spaceReference + "]", e);
+                this.logger.error("Failed to resolve references for space [{}]", spaceReference, e);
             }
         }
 

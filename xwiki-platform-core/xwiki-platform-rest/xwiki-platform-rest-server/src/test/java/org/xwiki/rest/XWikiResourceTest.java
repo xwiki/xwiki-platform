@@ -36,7 +36,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 /**
@@ -62,33 +61,18 @@ class XWikiResourceTest
     @Test
     void parseSpaceSegments() throws Exception
     {
-        try {
-            this.xwikiResource.parseSpaceSegments("");
-            fail();
-        } catch (XWikiRestException e) {
-            assertEquals("Malformed URL: a space name cannot be empty.", e.getMessage());
-        }
+        XWikiRestException e =
+            assertThrows(XWikiRestException.class, () -> this.xwikiResource.parseSpaceSegments(""));
+        assertEquals("Malformed URL: a space name cannot be empty.", e.getMessage());
 
-        try {
-            this.xwikiResource.parseSpaceSegments("/one");
-            fail();
-        } catch (XWikiRestException e) {
-            assertEquals("Malformed URL: a space name cannot be empty.", e.getMessage());
-        }
+        e = assertThrows(XWikiRestException.class, () -> this.xwikiResource.parseSpaceSegments("/one"));
+        assertEquals("Malformed URL: a space name cannot be empty.", e.getMessage());
 
-        try {
-            this.xwikiResource.parseSpaceSegments("/spaces");
-            fail();
-        } catch (XWikiRestException e) {
-            assertEquals("Malformed URL: a space name cannot be empty.", e.getMessage());
-        }
+        e = assertThrows(XWikiRestException.class, () -> this.xwikiResource.parseSpaceSegments("/spaces"));
+        assertEquals("Malformed URL: a space name cannot be empty.", e.getMessage());
 
-        try {
-            this.xwikiResource.parseSpaceSegments("one/two");
-            fail();
-        } catch (XWikiRestException e) {
-            assertEquals("Malformed URL: the spaces section is invalid.", e.getMessage());
-        }
+        e = assertThrows(XWikiRestException.class, () -> this.xwikiResource.parseSpaceSegments("one/two"));
+        assertEquals("Malformed URL: the spaces section is invalid.", e.getMessage());
 
         assertEquals(List.of("one"), this.xwikiResource.parseSpaceSegments("one/"));
         assertEquals(Arrays.asList("one", "two"), this.xwikiResource.parseSpaceSegments("one/spaces/two"));
@@ -96,12 +80,9 @@ class XWikiResourceTest
 
         assertEquals(Arrays.asList("on e", "tw/o"), this.xwikiResource.parseSpaceSegments("on%20e/spaces/tw%2Fo"));
 
-        try {
-            this.xwikiResource.parseSpaceSegments("one%2");
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("URLDecoder: Incomplete trailing escape (%) pattern", e.getMessage());
-        }
+        IllegalArgumentException iae =
+            assertThrows(IllegalArgumentException.class, () -> this.xwikiResource.parseSpaceSegments("one%2"));
+        assertEquals("URLDecoder: Incomplete trailing escape (%) pattern", iae.getMessage());
     }
 
     @Test

@@ -124,7 +124,7 @@ public interface Query
     /**
      * Bind named parameter variable with a value that will be constructed using calls to
      * {@link QueryParameter#literal(String)}, {@link QueryParameter#anychar()} and {@link QueryParameter#anyChars()}.
-     * In order to perserve the fluent API, it's also possible to call {@link QueryParameter#query()} to get back the
+     * In order to preserve the fluent API, it's also possible to call {@link QueryParameter#query()} to get back the
      * {@link Query}.
      *
      * @param variable the variable in the query statement ({@code :variable}).

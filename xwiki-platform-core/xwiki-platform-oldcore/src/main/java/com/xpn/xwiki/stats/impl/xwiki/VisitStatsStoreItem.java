@@ -92,9 +92,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
                     // TODO Fix use of deprecated call.
                     store.deleteXWikiCollection(oldVisitStats, this.context, true, true);
                 } catch (Exception e) {
-                    if (LOGGER.isWarnEnabled()) {
-                        LOGGER.error("Failed to delete old visit statistics object from database [{}]", getId(), e);
-                    }
+                    LOGGER.error("Failed to delete old visit statistics object from database [{}]", getId(), e);
                 }
             }
 

@@ -39,13 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @since 6.1RC1
  */
 @ComponentTest
-public class AddressesConverterTest
+class AddressesConverterTest
 {
     @InjectMockComponents
     private AddressesConverter converter;
 
     @Test
-    public void convert() throws Exception
+    void convert() throws Exception
     {
         InternetAddress[] addresses = new InternetAddress[2];
         addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
@@ -55,13 +55,13 @@ public class AddressesConverterTest
     }
 
     @Test
-    public void convertWhenNull()
+    void convertWhenNull()
     {
         assertNull(this.converter.convert(Address.class, null));
     }
 
     @Test
-    public void convertWhenTypeIsAlreadyAnAddressArray() throws Exception
+    void convertWhenTypeIsAlreadyAnAddressArray() throws Exception
     {
         InternetAddress[] addresses = new InternetAddress[2];
         addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
@@ -70,7 +70,7 @@ public class AddressesConverterTest
     }
 
     @Test
-    public void convertWhenInvalid()
+    void convertWhenInvalid()
     {
         Throwable exception = assertThrows(ConversionException.class, () -> {
             this.converter.convert(Address[].class, "invalid(");

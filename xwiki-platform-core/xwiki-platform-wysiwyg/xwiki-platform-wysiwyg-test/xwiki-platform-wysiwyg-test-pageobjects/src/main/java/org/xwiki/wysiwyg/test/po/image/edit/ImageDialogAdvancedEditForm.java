@@ -32,6 +32,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class ImageDialogAdvancedEditForm extends BaseElement
 {
+    private static final String VALUE = "value";
+
     /**
      * Select the centered alignment.
      *
@@ -54,6 +56,17 @@ public class ImageDialogAdvancedEditForm extends BaseElement
     }
 
     /**
+     * Remove the alignment by selecting the "none" option.
+     *
+     * @return the current page object
+     * @since 18.6.0
+     */
+    public ImageDialogAdvancedEditForm removeAlignment()
+    {
+        return selectAlignment("none");
+    }
+
+    /**
      * Select the centered alignment.
      *
      * @return the current page object
@@ -71,7 +84,7 @@ public class ImageDialogAdvancedEditForm extends BaseElement
      */
     public String getAlignment()
     {
-        return getDriver().findElement(By.cssSelector("#advanced [name='alignment']:checked")).getDomProperty("value");
+        return getDriver().findElement(By.cssSelector("#advanced [name='alignment']:checked")).getDomProperty(VALUE);
     }
 
     /**
@@ -94,7 +107,7 @@ public class ImageDialogAdvancedEditForm extends BaseElement
             // Input the chars one by one to wait for the size ratio computation to be applied before typing in the next
             // characters. If the chars are entered too fast, some are ignored.  
             getDriver().waitUntilCondition(input -> {
-                String value = imageWidth.getDomProperty("value");
+                String value = imageWidth.getDomProperty(VALUE);
                 return value.length() == expectedSize;
             });
             // Without this wait, the next iteration might fail when sending the key since the element is not 
@@ -109,7 +122,7 @@ public class ImageDialogAdvancedEditForm extends BaseElement
      */
     public String getWidth()
     {
-        return getImageWidthElement().getDomProperty("value");
+        return getImageWidthElement().getDomProperty(VALUE);
     }
 
     /**

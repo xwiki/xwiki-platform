@@ -101,8 +101,8 @@ public class OfficeAttachmentImporter implements AttachmentImporter
     @Override
     public String toHTML(AttachmentReference attachmentReference, Map<String, Object> parameters) throws Exception
     {
-        boolean filterStyles = Boolean.valueOf(String.valueOf(parameters.get("filterStyles")));
-        if (Boolean.valueOf(String.valueOf(parameters.get("useOfficeViewer")))) {
+        boolean filterStyles = Boolean.parseBoolean(String.valueOf(parameters.get("filterStyles")));
+        if (Boolean.parseBoolean(String.valueOf(parameters.get("useOfficeViewer")))) {
             return this.officeMacroImporter
                 .render(this.officeMacroImporter.buildXDOM(attachmentReference, filterStyles));
         } else {
@@ -187,7 +187,7 @@ public class OfficeAttachmentImporter implements AttachmentImporter
         }
 
         throw new OfficeImporterException(
-            String.format("Cannot find temporary uplodaded attachment [%s]", attachmentReference));
+            String.format("Cannot find temporary uploaded attachment [%s]", attachmentReference));
     }
 
     /**

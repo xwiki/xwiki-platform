@@ -73,7 +73,7 @@ class AsyncMacroTest
     private BlockAsyncRendererExecutor executor;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.executor = this.componentManager.getInstance(BlockAsyncRendererExecutor.class);
     }

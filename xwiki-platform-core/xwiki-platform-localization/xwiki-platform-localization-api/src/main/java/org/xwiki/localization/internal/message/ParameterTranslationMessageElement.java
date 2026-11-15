@@ -57,7 +57,7 @@ public class ParameterTranslationMessageElement implements TranslationMessageEle
     private Parser plainParser;
 
     /**
-     * @param index the index of the paramater to return
+     * @param index the index of the parameter to return
      * @param plainParser used to parse the String content
      */
     public ParameterTranslationMessageElement(int index, Parser plainParser)
@@ -72,8 +72,8 @@ public class ParameterTranslationMessageElement implements TranslationMessageEle
         Object parameter = parameters[index];
 
         Block block;
-        if (parameter instanceof Block) {
-            block = (Block) parameter;
+        if (parameter instanceof Block parameterBlock) {
+            block = parameterBlock;
         } else if (parameter != null) {
             try {
                 XDOM xdom = this.plainParser.parse(new StringReader(parameter.toString()));

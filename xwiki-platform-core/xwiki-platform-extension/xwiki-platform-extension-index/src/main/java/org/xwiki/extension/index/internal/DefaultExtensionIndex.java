@@ -104,7 +104,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
         try {
             return this.store.getSolrExtension(extensionId);
         } catch (Exception e) {
-            this.logger.warn("Failed to get the extension [{}] from the index: {}", extensionId,
+            this.logger.warn("Failed to get the extension [{}] from the index: [{}]", extensionId,
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
@@ -148,7 +148,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
         try {
             return this.store.exists(extensionId);
         } catch (Exception e) {
-            this.logger.error("Failed to check existance of extension [{}]", extensionId, e);
+            this.logger.error("Failed to check existence of extension [{}]", extensionId, e);
 
             return false;
         }

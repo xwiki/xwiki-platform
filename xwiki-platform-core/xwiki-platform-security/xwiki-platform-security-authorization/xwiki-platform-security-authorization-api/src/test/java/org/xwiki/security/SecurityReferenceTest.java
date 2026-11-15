@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ComponentList({EntityReferenceFactory.class})
-public class SecurityReferenceTest
+class SecurityReferenceTest
 {
     private EntityReference xwiki = new EntityReference("xwiki", EntityType.WIKI);
 
@@ -89,7 +89,7 @@ public class SecurityReferenceTest
     private DefaultSecurityReferenceFactory factory;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach()
     {
         when(xwikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
         when(xwikiBridge.toCompatibleEntityReference(any(EntityReference.class)))
@@ -104,7 +104,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testEquality() throws Exception
+    void testEquality()
     {
         assertThat(factory.newEntityReference(mainEntity), equalTo(factory.newEntityReference(mainEntity)));
         assertThat(factory.newEntityReference(subEntity), equalTo(factory.newEntityReference(subEntity)));
@@ -113,7 +113,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testGetReversedSecurityReferenceChain() throws Exception
+    void testGetReversedSecurityReferenceChain()
     {
         List<SecurityReference> subList =
             (List<SecurityReference>) factory.newEntityReference(subEntity).getReversedSecurityReferenceChain();
@@ -137,7 +137,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testSecurityReferenceForNullReference() throws Exception
+    void testSecurityReferenceForNullReference()
     {
         assertThat(factory.newEntityReference(null), equalTo(factory.newEntityReference(xwiki)));
         assertThat(factory.newUserReference(null), equalTo(factory.newEntityReference(xwiki)));
@@ -151,7 +151,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testGetSecurityType() throws Exception
+    void testGetSecurityType()
     {
         assertThat(factory.newEntityReference(null).getSecurityType(), equalTo(SecurityReference.FARM));
         assertThat(factory.newEntityReference(xwiki).getSecurityType(), equalTo(SecurityReference.FARM));
@@ -163,7 +163,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testGetOriginalWikiReference() throws Exception
+    void testGetOriginalWikiReference()
     {
         assertThat(factory.newEntityReference(null).getOriginalWikiReference(), equalTo(xwiki));
         assertThat(factory.newEntityReference(xwiki).getOriginalWikiReference(), equalTo(xwiki));
@@ -175,7 +175,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testGetOriginalSpaceReference() throws Exception
+    void testGetOriginalSpaceReference()
     {
         assertThat(factory.newEntityReference(null).getOriginalSpaceReference(), nullValue());
         assertThat(factory.newEntityReference(xwiki).getOriginalSpaceReference(), nullValue());
@@ -187,7 +187,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testGetOriginalDocumentReference() throws Exception
+    void testGetOriginalDocumentReference()
     {
         assertThat(factory.newEntityReference(null).getOriginalDocumentReference(), nullValue());
         assertThat(factory.newEntityReference(xwiki).getOriginalDocumentReference(), nullValue());
@@ -199,7 +199,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testIsGlobal() throws Exception
+    void testIsGlobal()
     {
         assertThat(factory.newUserReference(userRef).isGlobal(), is(true));
         assertThat(factory.newUserReference(anotherWikiUserRef).isGlobal(), is(false));
@@ -208,7 +208,7 @@ public class SecurityReferenceTest
     }
 
     @Test
-    public void testGetWikiReference() throws Exception
+    void testGetWikiReference()
     {
         assertThat(factory.newUserReference(userRef).getWikiReference(), equalTo(xwiki));
         assertThat(factory.newUserReference(anotherWikiUserRef).getWikiReference(), equalTo(wiki));

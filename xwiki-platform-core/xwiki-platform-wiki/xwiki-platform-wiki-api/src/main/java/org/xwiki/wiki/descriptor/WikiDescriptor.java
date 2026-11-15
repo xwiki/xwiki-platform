@@ -356,7 +356,7 @@ public class WikiDescriptor implements Cloneable
         descriptor.aliases = new ArrayList<>(this.aliases);
 
         // Clone properties
-        descriptor.propertyGroups = new HashMap<>(this.propertyGroups.size());
+        descriptor.propertyGroups = HashMap.newHashMap(this.propertyGroups.size());
         for (WikiPropertyGroup group : this.propertyGroups.values()) {
             descriptor.propertyGroups.put(group.getId(), group.clone());
         }

@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Represents the preview iframe of when customizing a theme.
  * Be careful when using it: the context is switched to be inside the iframe when the box is created. You need to call
- * explicitely {@link #switchToDefaultContent()} to come back on the main frame.
+ * explicitly {@link #switchToDefaultContent()} to come back on the main frame.
  *
  * @version $Id$
  */

@@ -32,7 +32,8 @@ import type {
 const MINIMAL_SYNTAX_NAME = "_minimal";
 
 /**
- * Configuration for the `xwiki/2.1` syntax
+ * Configuration for the minimal syntax, which disables all editor features. Used as a fallback when
+ * the document's syntax has no dedicated configuration.
  *
  * @since 18.6.0RC1
  * @beta

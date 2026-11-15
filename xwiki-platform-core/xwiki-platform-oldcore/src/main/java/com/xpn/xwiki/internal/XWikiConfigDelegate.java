@@ -44,8 +44,8 @@ public class XWikiConfigDelegate extends XWikiConfig
     {
         this.source = source;
 
-        if (this.source instanceof XWikiCfgConfigurationSource) {
-            this.defaults = ((XWikiCfgConfigurationSource) this.source).getProperties();
+        if (this.source instanceof XWikiCfgConfigurationSource xwikiCfgConfigurationSource) {
+            this.defaults = xwikiCfgConfigurationSource.getProperties();
         }
     }
 

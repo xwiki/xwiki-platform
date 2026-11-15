@@ -35,6 +35,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.xml.XMLUtils;
 
 /**
  * Default implementation of {@link BlockAsyncRendererExecutor}.
@@ -46,6 +47,14 @@ import org.xwiki.rendering.syntax.Syntax;
 @Singleton
 public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExecutor
 {
+    private static final String CLASS_ATTRIBUTE = "class";
+
+    private static final String PLACEHOLDER_CLASS = "xwiki-async";
+
+    private static final String ASYNC_ID_ATTRIBUTE = "data-xwiki-async-id";
+
+    private static final String ASYNC_CLIENT_ID_ATTRIBUTE = "data-xwiki-async-client-id";
+
     private static class DecoratorWrapper extends AsyncRendererWrapper implements BlockAsyncRenderer
     {
         private BlockAsyncRendererDecorator decorator;
@@ -138,10 +147,10 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         } else {
             placeholder = new GroupBlock();
         }
-        placeholder.setParameter("class", "xwiki-async");
+        placeholder.setParameter(CLASS_ATTRIBUTE, PLACEHOLDER_CLASS);
         // Provide it directly as it's going to be used in the client side (the URL fragment to use in the ajax request)
-        placeholder.setParameter("data-xwiki-async-id", response.getJobIdHTTPPath());
-        placeholder.setParameter("data-xwiki-async-client-id", response.getAsyncClientId());
+        placeholder.setParameter(ASYNC_ID_ATTRIBUTE, response.getJobIdHTTPPath());
+        placeholder.setParameter(ASYNC_CLIENT_ID_ATTRIBUTE, response.getAsyncClientId());
 
         return placeholder;
     }
@@ -161,20 +170,24 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         }
 
         // Return a placeholder waiting for the result
+        String elementName = renderer.isInline() ? "span" : "div";
         StringBuilder str = new StringBuilder();
 
-        if (renderer.isInline()) {
-            str.append("<span ");
-        } else {
-            str.append("<div ");
-        }
-
-        str.append("class=xwiki-async");
+        str.append('<').append(elementName);
+        appendAttribute(CLASS_ATTRIBUTE, PLACEHOLDER_CLASS, str);
         // Provide it directly as it's going to be used in the client side (the URL fragment to use in the ajax request)
-        str.append("data-xwiki-async-id=").append(response.getJobIdHTTPPath());
-        str.append("data-xwiki-async-client-id=").append(response.getAsyncClientId());
-        str.append("/>");
+        appendAttribute(ASYNC_ID_ATTRIBUTE, response.getJobIdHTTPPath(), str);
+        appendAttribute(ASYNC_CLIENT_ID_ATTRIBUTE, response.getAsyncClientId(), str);
+        // Don't use a self-closing tag as HTML doesn't support it for div and span elements
+        str.append("></").append(elementName).append('>');
 
         return str.toString();
+    }
+
+    private void appendAttribute(String name, String value, StringBuilder str)
+    {
+        if (value != null) {
+            str.append(' ').append(name).append("=\"").append(XMLUtils.escapeAttributeValue(value)).append('"');
+        }
     }
 }

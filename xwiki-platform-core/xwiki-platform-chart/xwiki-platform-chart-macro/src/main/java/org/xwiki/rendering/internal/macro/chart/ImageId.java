@@ -19,10 +19,11 @@
  */
 package org.xwiki.rendering.internal.macro.chart;
 
-import org.xwiki.rendering.macro.chart.ChartMacroParameters;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Compute a unique id for the image that the chart macro generates.
+ * Identifies the image that the chart macro generates: an id computed from the image content, and the document holding
+ * the charted data.
  *
  * @version $Id$
  * @since 4.2M1
@@ -30,25 +31,47 @@ import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 public class ImageId
 {
     /**
-     * @see ImageId#ImageId(org.xwiki.rendering.macro.chart.ChartMacroParameters)
+     * @see #getId()
      */
-    private ChartMacroParameters macroParameters;
+    private final String id;
 
     /**
-     * @param macroParameters the chart macro parameters
+     * @see #getDataDocumentReference()
      */
-    public ImageId(ChartMacroParameters macroParameters)
+    private final DocumentReference dataDocumentReference;
+
+    /**
+     * @param id the id of the image, computed from its content
+     * @param dataDocumentReference the reference of the document holding the data displayed by the chart
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     * @since 16.10.20
+     */
+    public ImageId(String id, DocumentReference dataDocumentReference)
     {
-        this.macroParameters = macroParameters;
+        this.id = id;
+        this.dataDocumentReference = dataDocumentReference;
     }
 
     /**
-     * Compute a unique id based on the macro parameters.
-     *
-     * @return the unique image id used for storing the generated chart image
+     * @return the id of the image, used for storing the generated chart image; identical images have the same id
      */
     public String getId()
     {
-        return String.format("%s", Math.abs(this.macroParameters.hashCode()));
+        return this.id;
+    }
+
+    /**
+     * @return the reference of the document holding the data displayed by the chart; the image reveals this data, so
+     *         it is accessible only to those who can view this document
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     * @since 16.10.20
+     */
+    public DocumentReference getDataDocumentReference()
+    {
+        return this.dataDocumentReference;
     }
 }

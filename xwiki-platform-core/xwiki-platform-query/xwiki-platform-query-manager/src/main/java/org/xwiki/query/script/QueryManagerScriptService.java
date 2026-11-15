@@ -137,9 +137,9 @@ public class QueryManagerScriptService implements ScriptService
     private Query createQuery(String statement, String language, boolean checkCurrentUser) throws QueryException
     {
         Query query = this.secureQueryManager.createQuery(statement, language);
-        if (query instanceof SecureQuery) {
-            ((SecureQuery) query).checkCurrentAuthor(true);
-            ((SecureQuery) query).checkCurrentUser(checkCurrentUser);
+        if (query instanceof SecureQuery secureQuery) {
+            secureQuery.checkCurrentAuthor(true);
+            secureQuery.checkCurrentUser(checkCurrentUser);
         }
 
         return new ScriptQuery(query, this.componentManager);

@@ -43,7 +43,7 @@ public class SafeConflictQuestion extends AbstractSafeObject<ConflictQuestion>
         super(question, safeProvider);
     }
 
-    // Datas
+    // Data
 
     public Document getCurrentDocument()
     {

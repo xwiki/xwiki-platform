@@ -22,12 +22,13 @@ package org.xwiki.livedata.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -105,7 +106,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     private LiveDataConfiguration mergeBaseConfig(LiveDataConfiguration config) throws LiveDataException, IOException
     {
         InputStream baseConfigInputStream = getClass().getResourceAsStream("/liveDataConfiguration.json");
-        String baseConfigJSON = IOUtils.toString(baseConfigInputStream, "UTF-8");
+        String baseConfigJSON = IOUtils.toString(baseConfigInputStream, StandardCharsets.UTF_8);
         LiveDataConfiguration baseConfig = this.stringLiveDataConfigResolver.resolve(baseConfigJSON);
 
         // Make sure both configurations have the same id so that they are properly merged.
@@ -178,16 +179,24 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
                     .filter(baseConfigLayout -> Objects.equals(baseConfigLayout.getId(), configLayout.getId()))
                     .findFirst()
                     .orElse(configLayout))
-                .collect(Collectors.toList()));
+                .toList());
         }
     }
 
     private LiveDataConfiguration translate(LiveDataConfiguration config)
     {
-        config.getMeta().getLayouts().stream().filter(Objects::nonNull).forEach(this::translate);
-        config.getMeta().getFilters().stream().filter(Objects::nonNull).forEach(this::translate);
-        config.getMeta().getActions().stream().filter(Objects::nonNull).forEach(this::translate);
+        LiveDataMeta meta = config.getMeta();
+        if (meta != null) {
+            streamNonNull(meta.getLayouts()).forEach(this::translate);
+            streamNonNull(meta.getFilters()).forEach(this::translate);
+            streamNonNull(meta.getActions()).forEach(this::translate);
+        }
         return config;
+    }
+
+    private <T> Stream<T> streamNonNull(Collection<T> collection)
+    {
+        return collection == null ? Stream.empty() : collection.stream().filter(Objects::nonNull);
     }
 
     private void translate(LiveDataLayoutDescriptor layout)

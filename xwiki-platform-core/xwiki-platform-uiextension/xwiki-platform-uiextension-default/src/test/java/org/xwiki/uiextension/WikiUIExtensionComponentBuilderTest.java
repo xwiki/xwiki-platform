@@ -19,15 +19,6 @@
  */
 package org.xwiki.uiextension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,8 +55,10 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
+import org.xwiki.uiextension.internal.parameters.UIXParameterValueFactory;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -73,8 +66,16 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 @OldcoreTest
-@ComponentList(WikiUIExtension.class)
+@ComponentList({WikiUIExtension.class, UIXParameterValueFactory.class, VelocityDetector.class})
 class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 {
     @MockComponent
@@ -126,8 +127,10 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 
         // Components accessed through dynamic lookup.
         VelocityManager velocityManager = componentManager.registerMockComponent(VelocityManager.class);
-        when(velocityManager.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
-        when(velocityManager.getVelocityContext()).thenReturn(mock(VelocityContext.class));
+        VelocityEngine velocityEngineMock = mock();
+        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngineMock);
+        VelocityContext velocityContextMock = mock();
+        when(velocityManager.getVelocityContext()).thenReturn(velocityContextMock);
 
         ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);
         when(modelContext.getCurrentEntityReference()).thenReturn(DOC_REF);
@@ -192,14 +195,9 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
         UIExtension uiExtension = (UIExtension) components.get(0);
         Map<String, String> parameters = uiExtension.getParameters();
 
-        assertEquals(3, parameters.size());
-        verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
-            eq("name:key"), eq("value=foo"));
-        verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
-            eq("name:key2"), eq("value2"));
-        verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
-            eq("name:empty"), eq(""));
-
+        assertEquals(Map.of("key", "value=foo", "key2", "value2", "empty", ""), parameters);
+        // Values without Velocity code aren't evaluated.
+        verifyNoInteractions(velocityManager.getVelocityEngine());
     }
 
     private BaseObject createExtensionObject(String id, String extensionPointId, String content, String parameters,

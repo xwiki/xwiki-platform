@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-form-validation-async', ['jquery'], function($) {
-  // Enable or disable the first submit button from the specifid HTML form.
+  // Enable or disable the first submit button from the specified HTML form.
   const enableSubmit = (form, enabled) => {
     form.find('input[type="submit"], button[type="submit"]').first().prop('disabled', !enabled);
   };
@@ -33,7 +33,7 @@ define('xwiki-form-validation-async', ['jquery'], function($) {
 
   const hasValidationsWithState = function(validations, states) {
     return validations.some(validation => {
-      return states.indexOf(validation.__state) >= 0;
+      return states.includes(validation.__state);
     });
   };
 

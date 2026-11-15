@@ -20,6 +20,7 @@
 package org.xwiki.csrf;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides configuration for the {@link CSRFToken} component.
@@ -36,4 +37,18 @@ public interface CSRFTokenConfiguration
      * @return true if the component is enabled, false otherwise
      */
     boolean isEnabled();
+
+    /**
+     * The lifetime of a token, in hours. The token of a user is derived from the current time period, so it changes
+     * every lifetime; the token of the previous period is still accepted, which means a token stays valid between one
+     * and two lifetimes.
+     * 
+     * @return the lifetime of the tokens in hours, {@code 0} or a negative value meaning that the tokens never expire
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    default int getTokenLifetime()
+    {
+        return 24;
+    }
 }

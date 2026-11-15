@@ -133,8 +133,7 @@ public class JAXBConverter implements Initializable
         Object value = any;
 
         // Parse elements
-        if (any instanceof Element) {
-            Element valueElement = (Element) any;
+        if (any instanceof Element valueElement) {
             if (valueElement.hasChildNodes()) {
                 NodeList children = valueElement.getChildNodes();
                 for (int i = 0; i < children.getLength(); ++i) {

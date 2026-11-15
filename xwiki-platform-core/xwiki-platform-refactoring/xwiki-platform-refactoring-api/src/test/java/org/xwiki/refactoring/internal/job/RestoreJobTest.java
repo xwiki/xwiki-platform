@@ -126,7 +126,7 @@ class RestoreJobTest extends AbstractJobTest
     }
 
     @Test
-    void jobGroupAtWikiLevel() throws Exception
+    void jobGroupAtWikiLevel()
     {
         RestoreRequest request = createRequest();
         this.restoreJob.initialize(request);

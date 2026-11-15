@@ -181,7 +181,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
  *
  * $config (XObject) configuration for the inviter.
  *
- * $emailContainer (Document) the document contaning the mail message.
+ * $emailContainer (Document) the document containing the mail message.
  *###
 #macro(generateAndSendMail, $config, $recipients, $messageSubject, $messageContent)
   #set($messages = [])
@@ -209,7 +209,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 
       (%id="invitation-action-message"%)(((##
       #if($errors.size() &gt; 0)
-        ## An error has occured while sending the message.
+        ## An error has occurred while sending the message.
         {{error}}$services.localization.render('xe.invitation.errorWhileSending'){{/error}}##
       #else
         ## Your message has been sent.
@@ -234,7 +234,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
  *
  * $config (XObject) configuration for the inviter.
  *
- * $emailContainer (Document) the document contaning the mail messages.
+ * $emailContainer (Document) the document containing the mail messages.
  *###
 #macro(sendMail, $messages, $config, $emailContainer)
   ##
@@ -322,7 +322,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #set($invalid = [])
     #validateAddressFormat($recipients, $emailRegex, $invalid)
     #set($discard = $sendTo.removeAll($invalid))
-    #set($messageGroupID = $mathtool.getRandom())
+    #set($messageGroupID = $stringtool.nextAlphanumeric(5))
   #else
     ## If we're just doing a test run, no recipients but we still want to generate a message.
     #set($sendTo = [''])
@@ -334,10 +334,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     $message.set('sentDate', '')##
     $message.set('messageGroupID', $messageGroupID)##
     $message.set('recipient', $recipient)##
-    ## Set the message id to a random number string, set it to $messageID variable so it can be used by the template.
-    #set($messageID = "$mathtool.getRandom().toString().replaceAll('\.','')##
-                       $mathtool.getRandom().toString().replaceAll('\.','')##
-                       $mathtool.getRandom().toString().replaceAll('\.','')")
+    #set($messageID = $stringtool.nextAlphanumeric(10))
     $message.set('messageID', $messageID)##
     ##
     ## Need to make $subjectLine and $messageBody available to $doc.getRenderedContent.
@@ -468,7 +465,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 ##
 #*
  * Get the list of recipients from the user input string.
- * Splits on space but is tolerent of commas.
+ * Splits on space but is tolerant of commas.
  * Each email in the list may only appear in the output once (no duplicates.)
  *
  * $recipientString (String) the String input by the user eg: "alice@example.com bob@example.com"

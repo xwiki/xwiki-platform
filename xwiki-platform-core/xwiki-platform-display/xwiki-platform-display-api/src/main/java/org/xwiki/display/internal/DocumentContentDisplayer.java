@@ -92,7 +92,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
             // Execute
             Block block = this.executor.execute(renderer, configuration);
 
-            return block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block));
+            return block instanceof XDOM xdom ? xdom : new XDOM(Arrays.asList(block));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {

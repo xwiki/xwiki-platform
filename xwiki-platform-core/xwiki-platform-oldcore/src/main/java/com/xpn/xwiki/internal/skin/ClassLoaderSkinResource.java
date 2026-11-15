@@ -44,7 +44,7 @@ public class ClassLoaderSkinResource extends AbstractSkinResource
      *
      * @param path the path of the resource in the skin (for instance, {@code "/templates/display.vm"})
      * @param resourceName the name of the resource (for instance, {@code "display.vm"})
-     * @param repository the resource repository, used to access the respository's id
+     * @param repository the resource repository, used to access the repository's id
      * @param classloader the classloader used to resolve the resources
      * @param xcontextProvider the context provider, used to access the context when resolving the resources URLs
      * @param urlConfiguration the url configuration, used when resolving the resources URLs

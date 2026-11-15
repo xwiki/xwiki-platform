@@ -26,6 +26,12 @@ type DialogProps = {
   title: string;
   width?: string | number | undefined;
   modelValue?: boolean;
+  /**
+   * Whether the dialog stays open when the user clicks outside of it, so that what is typed in it is not lost by
+   * accident. It can still be closed with the Escape key or its close button. Default: false.
+   * @since 18.10.0RC1
+   */
+  persistent?: boolean;
 };
 
 export type { DialogProps };

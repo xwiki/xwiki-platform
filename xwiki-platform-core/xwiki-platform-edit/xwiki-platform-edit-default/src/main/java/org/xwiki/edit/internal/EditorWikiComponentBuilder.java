@@ -34,12 +34,16 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
+import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.edit.Editor;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Builds {@link Editor} components defined in wiki pages using {@code XWiki.EditorClass} objects.
@@ -66,12 +70,32 @@ public class EditorWikiComponentBuilder implements WikiComponentBuilder
     @SuppressWarnings("rawtypes")
     private Provider<EditorWikiComponent> editorWikiComponentProvider;
 
+    @Inject
+    private DocumentAuthorizationManager authorization;
+
     @Override
     public List<WikiComponent> buildComponents(DocumentReference reference) throws WikiComponentException
     {
         EditorWikiComponent<?> editorWikiComponent = this.editorWikiComponentProvider.get();
         editorWikiComponent.initialize(reference);
+        checkRights(editorWikiComponent, reference);
         return Collections.singletonList(editorWikiComponent);
+    }
+
+    private void checkRights(EditorWikiComponent<?> editorWikiComponent, DocumentReference reference)
+        throws WikiComponentException
+    {
+        WikiComponentScope scope = editorWikiComponent.getScope();
+        DocumentReference authorReference = editorWikiComponent.getAuthorReference();
+        if (scope == WikiComponentScope.GLOBAL) {
+            if (!this.authorization.hasAccess(Right.PROGRAM, null, authorReference, reference)) {
+                throw new WikiComponentException("Registering global editors requires programming rights");
+            }
+        } else if (scope == WikiComponentScope.WIKI
+            && !this.authorization.hasAccess(Right.ADMIN, EntityType.WIKI, authorReference, reference))
+        {
+            throw new WikiComponentException("Registering editors at wiki level requires wiki administration rights");
+        }
     }
 
     @Override

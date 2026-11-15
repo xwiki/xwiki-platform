@@ -122,9 +122,7 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
 
                     while (it.hasNext()) {
                         Object[] result = it.next();
-                        if (R6079XWIKI1878DataMigration.this.logger.isInfoEnabled()) {
-                            R6079XWIKI1878DataMigration.this.logger.info("Fixing document [{}]...", result[2]);
-                        }
+                        R6079XWIKI1878DataMigration.this.logger.info("Fixing document [{}]...", result[2]);
 
                         // Reconstruct a XWikiRCSNodeContent object with isDiff set to false and update it.
                         XWikiRCSNodeId nodeId = (XWikiRCSNodeId) result[0];

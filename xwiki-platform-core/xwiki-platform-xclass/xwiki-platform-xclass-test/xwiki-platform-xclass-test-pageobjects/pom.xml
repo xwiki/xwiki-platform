@@ -25,15 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-xclass-test</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-xclass-test-pageobjects</artifactId>
   <name>XWiki Platform - XClass - Page Objects</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - XClass - Page Objects</description>
   <properties>
-    <!-- None of the classes is valid -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!-- Unlike other test modules, check the code style since this module is reused by other tests -->
+    <xwiki.checkstyle.skip>false</xwiki.checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>

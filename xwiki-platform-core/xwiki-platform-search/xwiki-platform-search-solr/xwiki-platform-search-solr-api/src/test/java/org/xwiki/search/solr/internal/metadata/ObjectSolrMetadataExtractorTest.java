@@ -92,12 +92,10 @@ class ObjectSolrMetadataExtractorTest
         EntityReference objectReference = this.xobject.getReference();
         DocumentReference documentReference = (DocumentReference) objectReference.getParent();
 
-        ///////////////////
         // Call
 
         SolrInputDocument solrDocument = this.metadataExtractor.getSolrDocument(objectReference);
 
-        ///////////////////
         // Assert
 
         assertEquals("wiki:Path.To.Page.WebHome^Path.To.Class[0]", solrDocument.getFieldValue(FieldUtils.ID));

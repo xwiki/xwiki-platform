@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "isolatedDeclarations": false,
+    "types": [
+      "@xwiki/platform-dsapi"
+    ]
+  },
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
+}

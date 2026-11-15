@@ -58,10 +58,10 @@ public interface XDOMOfficeDocumentSplitter
      *         name for the corresponding xdom office document
      * @throws OfficeImporterException if an error occurs while splitting
      * @since 2.2M1
-     * @deprecated since 14.10.2 / 15.0RC1 use {@link #split(XDOMOfficeDocument, OfficeDocumentSplitterParameters)}
+     * @deprecated use {@link #split(XDOMOfficeDocument, OfficeDocumentSplitterParameters)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "14.10.2,15.0RC1")
     default Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
         throws OfficeImporterException

@@ -99,7 +99,7 @@ public interface WikiMacroConstants
     String MACRO_CONTENT_TYPE_WIKI = "Wiki";
 
     /**
-     * Constant for the "Unkown" choice for Macro Content Type.
+     * Constant for the "Unknown" choice for Macro Content Type.
      */
     String MACRO_CONTENT_TYPE_UNKNOWN = "Unknown";
 
@@ -202,7 +202,7 @@ public interface WikiMacroConstants
     String PARAMETER_TYPE_WIKI = MACRO_CONTENT_TYPE_WIKI;
 
     /**
-     * Constant for the "Unkown" choice for Macro Content Type.
+     * Constant for the "Unknown" choice for Macro Content Type.
      *
      * @since 15.3RC1
      */

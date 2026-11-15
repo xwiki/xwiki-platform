@@ -171,13 +171,13 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean copy(DocumentReference source, DocumentReference destination)
+    public boolean copy(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             String language = source.getLocale() != null ? source.getLocale().toString() : null;
-            boolean result =
-                xcontext.getWiki().copyDocument(source, destination, language, false, true, true, xcontext);
+            boolean result = xcontext.getWiki().copyDocument(source, destination, language, false, true, true,
+                modifiedByContextUser, xcontext);
             if (result) {
                 this.logger.info("Document [{}] has been copied to [{}].", source, destination);
             } else {
@@ -201,24 +201,28 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public boolean delete(DocumentReference reference, boolean skipRecycleBin)
     {
+        return delete(reference, skipRecycleBin, false);
+    }
+
+    @Override
+    public boolean delete(DocumentReference reference, boolean skipRecycleBin, boolean deletedByContextUser)
+    {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
             if (document.getTranslation() == 1) {
-                xcontext.getWiki().deleteDocument(document, !skipRecycleBin, xcontext);
-                this.logger
-                    .info("Document [{}] has been deleted (to the recycle bin: [{}]).", reference, !skipRecycleBin);
+                xcontext.getWiki().deleteDocument(document, !skipRecycleBin, deletedByContextUser, xcontext);
+                this.logger.info("Document [{}] has been deleted (to the recycle bin: [{}]).", reference,
+                    !skipRecycleBin);
             } else {
-                xcontext.getWiki().deleteAllDocuments(document, !skipRecycleBin, xcontext);
-                this.logger
-                    .info("Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
-                        reference,
-                        !skipRecycleBin);
+                xcontext.getWiki().deleteAllDocuments(document, !skipRecycleBin, deletedByContextUser, xcontext);
+                this.logger.info("Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+                    reference, !skipRecycleBin);
             }
             return true;
         } catch (Exception e) {
-            this.logger
-                .error("Failed to delete document [{}] (to the recycle bin: [{}]).", reference, !skipRecycleBin, e);
+            this.logger.error("Failed to delete document [{}] (to the recycle bin: [{}]).", reference, !skipRecycleBin,
+                e);
             return false;
         }
     }
@@ -238,7 +242,7 @@ public class DefaultModelBridge implements ModelBridge
             return true;
         } catch (Exception e) {
             // Just warn, since it's a recoverable situation.
-            this.logger.warn("Failed to unlock document [{}].", reference, e);
+            this.logger.warn("Failed to unlock document [{}]", reference, e);
             return false;
         }
     }
@@ -312,7 +316,7 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         XWikiContext xcontext = this.xcontextProvider.get();
-        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        Set<DocumentReference> documentReferences = HashSet.newHashSet(references.size());
         for (EntityReference entityReference : references) {
             documentReferences.add(this.documentReferenceResolver.resolve(entityReference, xcontext));
         }
@@ -362,7 +366,7 @@ public class DefaultModelBridge implements ModelBridge
 
             List<DocumentReference> childReferences = oldParentDocument.getChildrenReferences(context);
 
-            if (childReferences.size() > 0) {
+            if (!childReferences.isEmpty()) {
                 this.progressManager.pushLevelProgress(childReferences.size(), this);
                 popLevelProgress = true;
             }
@@ -382,7 +386,7 @@ public class DefaultModelBridge implements ModelBridge
                 this.progressManager.endStep(this);
             }
 
-            if (childReferences.size() > 0) {
+            if (!childReferences.isEmpty()) {
                 this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.",
                     oldParentReference, newParentReference, childReferences.size());
             }
@@ -728,13 +732,12 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean rename(DocumentReference source, DocumentReference destination)
+    public boolean rename(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
-            return xcontext.getWiki()
-                .renameDocument(source, destination, true,
-                    Collections.emptyList(), Collections.emptyList(), xcontext);
+            return xcontext.getWiki().renameDocument(source, destination, true, Collections.emptyList(),
+                Collections.emptyList(), modifiedByContextUser, xcontext);
         } catch (Exception e) {
             this.logger.error("Failed to rename [{}] to [{}].", source, destination, e);
         }

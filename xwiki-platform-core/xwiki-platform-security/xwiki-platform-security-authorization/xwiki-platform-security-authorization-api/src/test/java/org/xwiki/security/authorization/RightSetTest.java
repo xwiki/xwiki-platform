@@ -22,11 +22,7 @@ package org.xwiki.security.authorization;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.apache.commons.collections4.set.AbstractSetTest;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.apache.commons.collections4.set.AbstractTypedSetTest;
 
 /**
  * Test Set interface of RightSet.
@@ -34,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @version $Id$
  * @since 4.0M2
  */
-class RightSetTest extends AbstractSetTest<Right>
+class RightSetTest extends AbstractTypedSetTest<Right>
 {
     @Override
     public RightSet makeObject()
@@ -76,32 +72,5 @@ class RightSetTest extends AbstractSetTest<Right>
     public boolean isTestSerialization()
     {
         return false;
-    }
-
-    // Methods we need to override because AbstractSetTest use Strings to validate the Set
-
-    /**
-     * Tests {@link Set#equals(Object)}.
-     */
-    @Test
-    @Override
-    public void testSetEquals()
-    {
-        resetEmpty();
-        assertEquals(getCollection(), getConfirmed(), "Empty sets should be equal");
-        verify();
-
-        final Set<Right> set2 = makeConfirmedCollection();
-        // CUSTOM: the standard #testSetEquals add a String here, which does not make any sense for RightSet
-        set2.add(Right.VIEW);
-        assertFalse(getCollection().equals(set2), "Empty set shouldn't equal nonempty set");
-
-        resetFull();
-        assertEquals(getCollection(), getConfirmed(), "Full sets should be equal");
-        verify();
-
-        set2.clear();
-        set2.addAll(Arrays.asList(getOtherElements()));
-        assertFalse(getCollection().equals(set2), "Sets with different contents shouldn't be equal");
     }
 }

@@ -20,7 +20,7 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +50,6 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -89,7 +88,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     @Inject
     private RSSFeedRenderer rssFeedRenderer;
 
-    private boolean hasAccess(String userId) throws XWikiException
+    private boolean hasAccess(String userId)
     {
         if (!StringUtils.isEmpty(userId)) {
             DocumentReference userDoc = this.documentReferenceResolver.resolve(userId);
@@ -158,7 +157,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         return validateAndGetLimit(NumberUtils.toInt(maxCount, defaultMaxCount));
     }
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
@@ -263,13 +262,13 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             displayReadStatus, tags, currentWiki, async, asyncId, "alert");
     }
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "java:S107"})
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
         String displayReadEvents, String tags, String currentWiki, boolean onlyUnread) throws NotificationException
     {
-        Map<ParametersKey, String> parametersMap = new HashMap<>();
+        Map<ParametersKey, String> parametersMap = new EnumMap<>(ParametersKey.class);
         parametersMap.put(ParametersKey.USE_USER_PREFERENCES, useUserPreferences);
         parametersMap.put(ParametersKey.USER_ID, userId);
         parametersMap.put(ParametersKey.UNTIL_DATE, untilDate);

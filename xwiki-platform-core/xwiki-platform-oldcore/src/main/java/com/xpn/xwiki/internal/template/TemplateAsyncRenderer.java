@@ -130,15 +130,14 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         }
 
         if (this.content.getSourceSyntax() != null) {
-            return renderWiki(async, cached);
+            return renderWiki(async);
         } else {
-            return renderVelocity(async, cached);
+            return renderVelocity(cached);
         }
     }
 
-    private BlockAsyncRendererResult renderWiki(boolean async, boolean cached) throws RenderingException
+    private BlockAsyncRendererResult renderWiki(boolean async) throws RenderingException
     {
-        ///////////////////////////////////////
         // Parsing and execution
 
         XDOM xdom;
@@ -154,7 +153,6 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
             throw new RenderingException("Failed to execute template", e);
         }
 
-        ///////////////////////////////////////
         // Rendering
 
         String resultString = null;
@@ -166,14 +164,12 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         return new BlockAsyncRendererResult(resultString, xdom);
     }
 
-    private BlockAsyncRendererResult renderVelocity(boolean async, boolean cached) throws RenderingException
+    private BlockAsyncRendererResult renderVelocity(boolean cached) throws RenderingException
     {
-        ///////////////////////////////////////
         // Velocity
 
         String result = evaluateContent(this.template, this.content);
 
-        ///////////////////////////////////////
         // XDOM
 
         XDOM xdom;
@@ -194,7 +190,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
     private void transform(Block block) throws TransformationException
     {
         TransformationContext transformationContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
+            new TransformationContext(block instanceof XDOM xdom ? xdom : new XDOM(Arrays.asList(block)),
                 this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
 
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally

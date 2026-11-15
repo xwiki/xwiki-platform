@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
  *
  * @version $Id$
  */
-public class LikeExistCacheEntryListenerTest
+class LikeExistCacheEntryListenerTest
 {
     private LikeManagerCacheHelper.LikeExistCacheEntryListener cacheEntryListener;
 

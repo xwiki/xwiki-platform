@@ -1,0 +1,64 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## The parameters of the export come from the URL, so both their names and their values are user input and have to be
+## escaped, in the list that shows them as well as in the inputs that submit them again.
+#set ($exportParameters = {})
+#foreach ($entry in $request.parameterMap.entrySet())
+  #if ($entry.key != 'form_token')
+    #set ($discard = $exportParameters.put($entry.key, $entry.value))
+  #end
+#end
+<div id="document-title"><h1>$escapetool.xml($services.localization.render('core.export.resubmit.title'))</h1></div>
+<p>$escapetool.xml($services.localization.render('core.export.resubmit.message'))</p>
+<form id="exportResubmit" class="xform half" method="post" action="$escapetool.xml($doc.getURL('export'))">
+  #if ($exportParameters.isEmpty())
+    <p class="xHint">$escapetool.xml($services.localization.render('core.export.resubmit.parameters.none'))</p>
+  #else
+    <dl class="export-parameters">
+      #foreach ($entry in $exportParameters.entrySet())
+        <dt>$escapetool.xml($entry.key)</dt>
+        #foreach ($value in $entry.value)
+          <dd>$escapetool.xml($value)</dd>
+        #end
+      #end
+    </dl>
+  #end
+  <div class="hidden">
+    ## The token is the one of the current user, not the one that may have been passed in the request, so that the
+    ## export is submitted by whoever reads this page rather than by whoever built the URL that led here.
+    <input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)" />
+    #foreach ($entry in $exportParameters.entrySet())
+      #foreach ($value in $entry.value)
+        <input type="hidden" name="$escapetool.xml($entry.key)" value="$escapetool.xml($value)" />
+      #end
+    #end
+  </div>
+  <div class="buttons">
+    <span class="buttonwrapper">
+      <input type="submit" value="$escapetool.xml($services.localization.render('export'))" class="button" />
+    </span>
+    <span class="buttonwrapper">
+      <a class="secondary button" href="$escapetool.xml($doc.getURL('view'))">
+        $escapetool.xml($services.localization.render('cancel'))
+      </a>
+    </span>
+  </div>
+</form>
+<div class="clearfloats"></div>

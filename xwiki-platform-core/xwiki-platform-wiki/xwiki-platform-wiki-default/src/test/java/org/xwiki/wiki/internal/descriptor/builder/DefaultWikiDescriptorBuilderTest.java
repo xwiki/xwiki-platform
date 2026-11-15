@@ -160,7 +160,7 @@ class DefaultWikiDescriptorBuilderTest
     }
 
     @Test
-    void buildDescriptorObjectWhenInvalidName() throws Exception
+    void buildDescriptorObjectWhenInvalidName()
     {
         // Mocks
         List<BaseObject> objects = new ArrayList<>();

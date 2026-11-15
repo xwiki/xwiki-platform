@@ -201,7 +201,7 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
             this.logger.warn(
                 "The macro block required rights analyzer for macro [{}] failed to be initialized, root cause: [{}]",
                 macroId, ExceptionUtils.getRootCauseMessage(e));
-            this.logger.debug("Full exception trace: ", e);
+            this.logger.debug("Full exception trace:", e);
         }
 
         return Optional.empty();

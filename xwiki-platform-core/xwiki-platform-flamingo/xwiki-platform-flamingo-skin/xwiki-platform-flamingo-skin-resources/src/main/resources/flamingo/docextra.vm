@@ -67,7 +67,12 @@
     #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
     ## Params are evaluated as string
     #if ($params.show && $params.show == 'true')
-      #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
+      ## The itemnumber parameter is optional: a negative number means that no item count is displayed.
+      #set ($itemNumber = $params.itemnumber)
+      #if ("$!itemNumber" == '')
+        #set ($itemNumber = -1)
+      #end
+      #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $itemNumber, $template, $params.shortcut])
       #set ($discard = $docextras.add($newDocExtra))
     #end
   #end

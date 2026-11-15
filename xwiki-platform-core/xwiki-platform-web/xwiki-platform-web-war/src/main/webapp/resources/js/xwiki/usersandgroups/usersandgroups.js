@@ -151,13 +151,15 @@ window.MSCheckbox = Class.create({
 
       var action = "";
       var nxtst = (self.state + 1) % self.nrstates;
+      var denymessage;
+      var clearmessage;
 
       // 1. The current user is clearing / denying himself any right.
       if (self.currentUorG == window.currentUser) {
         if (nxtst == 2) {
-          var denymessage = l10n['rightsmanager.denyrightforcurrentuser'].replace('__right__', self.right);
+          denymessage = l10n['rightsmanager.denyrightforcurrentuser'].replace('__right__', self.right);
           if (!confirm(denymessage)) {
-            var clearmessage = l10n['rightsmanager.clearrightforcurrentuserinstead'].replace('__right__', self.right);
+            clearmessage = l10n['rightsmanager.clearrightforcurrentuserinstead'].replace('__right__', self.right);
             if (confirm(clearmessage)) {
               action = "clear";
               self.state = 2;
@@ -167,7 +169,7 @@ window.MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = l10n['rightsmanager.clearrightforcurrentuser'].replace('__right__', self.right);
+          clearmessage = l10n['rightsmanager.clearrightforcurrentuser'].replace('__right__', self.right);
           if (!confirm(clearmessage)) {
             return;
           }
@@ -176,10 +178,10 @@ window.MSCheckbox = Class.create({
       // 2. The current user is clearing / denying any rights for a group he belongs to.
       else if (self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
         if (nxtst == 2) {
-          var denymessage = l10n['rightsmanager.denyrightforgroup'].replace(/__right__/g, self.right);
+          denymessage = l10n['rightsmanager.denyrightforgroup'].replaceAll('__right__', self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
-            var clearmessage = l10n['rightsmanager.clearrightforgroupinstead'].replace(/__right__/g, self.right);
+            clearmessage = l10n['rightsmanager.clearrightforgroupinstead'].replaceAll('__right__', self.right);
             clearmessage = clearmessage.replace('__name__', self.currentUorG);
             if (confirm(clearmessage)) {
               action = "clear";
@@ -190,7 +192,7 @@ window.MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = l10n['rightsmanager.clearrightforgroup'].replace(/__right__/g, self.right);
+          clearmessage = l10n['rightsmanager.clearrightforgroup'].replaceAll('__right__', self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -200,13 +202,13 @@ window.MSCheckbox = Class.create({
       // 3. The current user is is clearing / denying admin right for any user / group.
       else if (self.right == "admin") {
         if (nxtst == 2) {
-          var denymessage = l10n['rightsmanager.denyrightforuorg'].replace('__right__', self.right);
+          denymessage = l10n['rightsmanager.denyrightforuorg'].replace('__right__', self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
             return;
           }
         } else if (nxtst == 0) {
-          var clearmessage = l10n['rightsmanager.clearrightforuorg'].replace('__right__', self.right);
+          clearmessage = l10n['rightsmanager.clearrightforuorg'].replace('__right__', self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -436,7 +438,6 @@ function displayMembers(row, i, table, form_token)
   */
 function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
 {
-  var userurl = row.userurl;
   var uorg = table.json.uorg;
   // Rights are case insensitive in XWiki security module, and the reference rights defined in rightsUI.vm
   // are lowercase, hence we make sure to convert all applying rights to lowercase before comparing them with the
@@ -593,7 +594,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
 }
 
 /*
- * Depricated Since 2.3M1
+ * Deprecated Since 2.3M1
  * Use setBooleanPropertyFromLiveCheckbox
  */
 function setGuestExtendedRights(self)
@@ -617,22 +618,20 @@ function setGuestExtendedRights(self)
             pivot.alt = "no";
         }});
       }
+    } else if (self.id.indexOf('view') > 0) {
+      new Ajax.Request(url, {
+        method: 'post',
+        parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
+        onSuccess: function() {
+          pivot.alt = "yes";
+      }});
     } else {
-      if (self.id.indexOf('view') > 0) {
-        new Ajax.Request(url, {
-          method: 'post',
-          parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
-          onSuccess: function() {
-            pivot.alt = "yes";
-        }});
-      } else {
-        new Ajax.Request(url, {
-          method: 'post',
-          parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
-          onSuccess: function() {
-            pivot.alt = "yes";
-        }});
-      }
+      new Ajax.Request(url, {
+        method: 'post',
+        parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
+        onSuccess: function() {
+          pivot.alt = "yes";
+      }});
     }
   }
 }

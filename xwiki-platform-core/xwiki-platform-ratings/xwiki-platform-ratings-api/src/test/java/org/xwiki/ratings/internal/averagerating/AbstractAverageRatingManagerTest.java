@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class AbstractAverageRatingManagerTest
+class AbstractAverageRatingManagerTest
 {
     private RatingsManager ratingsManager;
     private AverageRating averageRating;
@@ -51,7 +51,7 @@ public class AbstractAverageRatingManagerTest
     private ObservationManager observationManager;
 
     @Component
-    public class DumbAsbtractAverageRatingsManager extends AbstractAverageRatingManager {
+    class DumbAsbtractAverageRatingsManager extends AbstractAverageRatingManager {
         boolean isSaved;
 
         @Override
@@ -203,10 +203,10 @@ public class AbstractAverageRatingManagerTest
         UpdatedAverageRatingEvent expectedEvent2 =
             new UpdatedAverageRatingEvent(expectedAverageRating, oldAverageVote, oldTotalVotes);
 
-        AverageRating averageRating =
+        AverageRating actualAverageRating =
             this.averageRatingsManager.resetAverageRating(this.entityReference, newAverageVote, newTotalVotes);
-        expectedAverageRating.setUpdatedAt(averageRating.getUpdatedAt());
-        assertEquals(expectedAverageRating, averageRating);
+        expectedAverageRating.setUpdatedAt(actualAverageRating.getUpdatedAt());
+        assertEquals(expectedAverageRating, actualAverageRating);
         assertTrue(this.averageRatingsManager.isSaved);
         verify(this.observationManager).notify(expectedEvent1, managerId,
             Collections.singletonList(expectedAverageRating));

@@ -38,6 +38,8 @@ import org.xwiki.administration.test.po.ResetPasswordCompletePage;
 import org.xwiki.administration.test.po.ResetPasswordPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.UseWikiDescriptorTarget;
+import org.xwiki.test.docker.junit5.WikiDescriptorTarget;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
@@ -96,6 +98,9 @@ public class ResetPasswordIT
         logCaptureConfiguration.registerExcludes("Secret CSRF token verification failed");
     }
 
+    // The reset link sent by mail is built from the server URL configured in the wiki descriptor, and the test opens
+    // it with the browser: the descriptor must thus target the browser, whatever the default is.
+    @UseWikiDescriptorTarget(WikiDescriptorTarget.BROWSER)
     @Test
     public void resetForgottenPassword(TestUtils setup) throws Exception
     {
@@ -108,6 +113,9 @@ public class ResetPasswordIT
         // Create a user
         setup.createUser(userName, password, null);
         ResetPasswordPage resetPasswordPage = ResetPasswordPage.gotoPage();
+
+        // The user name field must expose its purpose to browsers and password managers.
+        assertEquals("username", resetPasswordPage.getUserNameAutocomplete());
 
         // Try to reset the password of a non existent user
         resetPasswordPage.setUserName("SomeUserThatDoesNotExist");
@@ -132,8 +140,9 @@ public class ResetPasswordIT
             setup.getSecretToken());
         setup.forceGuestUser();
 
-        // Actually reset the user's password
-        resetPasswordPage = ResetPasswordPage.gotoPage();
+        // Actually reset the user's password, starting from the link of the login page, as a user would do.
+        LoginPage.gotoPage().clickForgotPassword();
+        resetPasswordPage = new ResetPasswordPage();
         resetPasswordPage.setUserName(userName);
         ResetPasswordPage newResetPasswordPage = resetPasswordPage.clickResetPassword();
         assertTrue(newResetPasswordPage.getMessage().contains("An e-mail was sent"),
@@ -150,7 +159,7 @@ public class ResetPasswordIT
         MimeMessage receivedEmail = receivedEmails[0];
         assertEquals("Password reset request for " + userName, receivedEmail.getSubject());
         String receivedMailContent = getMessageContent(receivedEmail).get("textPart");
-        String passwordResetLink = getResetLink(setup, receivedMailContent, "xwiki%3AXWiki." + userName);
+        String passwordResetLink = getResetLink(receivedMailContent, "xwiki%3AXWiki." + userName);
         // Use the password reset link
         setup.gotoPage(passwordResetLink);
         // We should now be on the ResetPasswordComplete page
@@ -215,12 +224,11 @@ public class ResetPasswordIT
         return null;
     }
 
-    private String getResetLink(TestUtils setup, String emailContent, String userName)
+    private String getResetLink(String emailContent, String userName)
     {
         String result;
         // Use a regex to extract the password reset link
-        String pattern =
-            String.format("(%s)\\?u=%s\\&v=\\w+", ResetPasswordPage.getResetPasswordURL(), userName);
+        String pattern = String.format("(%s)\\?u=%s&v=\\w+", ResetPasswordPage.getResetPasswordURL(), userName);
         Pattern resetLinkPattern = Pattern.compile(pattern);
         Matcher matcher = resetLinkPattern.matcher(emailContent);
         if (matcher.find()) {

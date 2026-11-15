@@ -41,9 +41,6 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.cache.CacheMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -80,11 +77,10 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
     private MacroContentParser contentParser;
 
     /**
-     * Renders the optional id parameter as plain text to use the result as a cache key.
+     * Computes the key under which the result of a macro call is cached.
      */
     @Inject
-    @Named("plain/1.0")
-    private BlockRenderer plainTextBlockRenderer;
+    private CacheEntryKeyGenerator cacheEntryKeyGenerator;
 
     /**
      * Map of all caches. There's one cache per timeToLive/maxEntry combination since currently we cannot set these
@@ -112,19 +108,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
     public List<Block> execute(CacheMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        // Idea for improvement: use context.getId() (which contains the document name) as part of the cache key to
-        // make it even more unique (when the cache macro parameter id is not specified).
-        String cacheKey;
-        if (parameters.getId() != null) {
-            // Consider that the id contains wiki syntax and parse it with the same wiki parser than the current
-            // transformation is using and render the result as plain text.
-            WikiPrinter printer = new DefaultWikiPrinter();
-            this.plainTextBlockRenderer.render(this.contentParser.parse(parameters.getId(), context, true, false),
-                printer);
-            cacheKey = printer.toString();
-        } else {
-            cacheKey = content;
-        }
+        String cacheKey = this.cacheEntryKeyGenerator.generate(parameters, content, context);
 
         Cache<List<Block>> contentCache = getContentCache(parameters.getTimeToLive(), parameters.getMaxEntries());
         List<Block> result = contentCache.get(cacheKey);

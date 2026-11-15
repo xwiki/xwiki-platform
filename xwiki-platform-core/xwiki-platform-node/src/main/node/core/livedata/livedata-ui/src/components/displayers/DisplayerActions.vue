@@ -66,7 +66,6 @@
 <script>
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
-import { XWiki } from "../../services/xwiki.js";
 import XWikiIcon from "../utilities/XWikiIcon.vue";
 
 export default {

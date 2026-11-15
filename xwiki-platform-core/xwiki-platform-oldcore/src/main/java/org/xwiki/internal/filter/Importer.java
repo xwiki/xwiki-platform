@@ -168,7 +168,7 @@ public class Importer
             // Generate import report
             generateReport(importLogger, context);
         } catch (Exception e) {
-            this.logger.warn("Failed to close the log queue: {}", ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to close the log queue: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

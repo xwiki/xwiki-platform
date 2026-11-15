@@ -35,4 +35,9 @@ public class AllIT
     class NestedClassSheetIT extends ClassSheetIT
     {
     }
+
+    @Nested
+    class NestedXClassCacheVisibilityIT extends XClassCacheVisibilityIT
+    {
+    }
 }

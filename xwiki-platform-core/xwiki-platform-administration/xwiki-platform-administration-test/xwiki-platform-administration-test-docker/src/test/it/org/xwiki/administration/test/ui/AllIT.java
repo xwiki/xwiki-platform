@@ -52,11 +52,6 @@ public class AllIT
     }
 
     @Nested
-    class NestedPageTemplatesIT extends PageTemplatesIT
-    {
-    }
-    
-    @Nested
     class NestedRegisterIT extends RegisterIT
     {
     }
@@ -78,6 +73,11 @@ public class AllIT
 
     @Nested
     class NestedEditingIT extends EditingIT
+    {
+    }
+
+    @Nested
+    class NestedIconThemeIT extends IconThemeIT
     {
     }
 }

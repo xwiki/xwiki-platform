@@ -25,12 +25,9 @@ import java.lang.annotation.Annotation;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.core.MediaType;
@@ -39,9 +36,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.container.Container;
-import org.xwiki.container.Request;
-import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.rest.JAXRSUtils;
 
 /**
@@ -54,9 +48,6 @@ import org.xwiki.rest.JAXRSUtils;
 @Singleton
 public class DefaultJAXRSUtils implements JAXRSUtils
 {
-    @Inject
-    private Container container;
-
     @Override
     public Charset getCharset(MediaType mediaType)
     {
@@ -91,29 +82,13 @@ public class DefaultJAXRSUtils implements JAXRSUtils
         boolean decode = decode(annotations);
         Charset charset = getCharset(mediaType);
 
+        // The request body is read directly from the entity stream. When an upstream filter has already consumed it
+        // (e.g. by reading a request parameter), the Jersey layer restores it from the servlet-cached parameters
+        // (see ConsumedBodyRestoringRequestWrapper), so no getParameterMap() fallback is needed here anymore.
         String encoded = IOUtils.toString(entityStream, charset);
-
-        // If the content is empty, there is a very high change that it was actually consumed by a Servlet filter
-        // upstream, so we have to the from through servlet request parameters
-        if (encoded.isEmpty()) {
-            readFormFromEntity(map);
-        } else {
-            readFormFromEntity(encoded, decode, charset, map);
-        }
+        readFormFromEntity(encoded, decode, charset, map);
 
         return map;
-    }
-
-    private void readFormFromEntity(MultivaluedMap<String, String> map)
-    {
-        // Get the current request
-        Request request = this.container.getRequest();
-        if (request instanceof ServletRequest servletRequest) {
-            HttpServletRequest httpRequest = servletRequest.getHttpServletRequest();
-
-            // Gather the request parameters
-            httpRequest.getParameterMap().forEach((k, v) -> map.put(k, Arrays.asList(v)));
-        }
     }
 
     private void readFormFromEntity(String encoded, boolean decode, Charset charset, MultivaluedMap<String, String> map)

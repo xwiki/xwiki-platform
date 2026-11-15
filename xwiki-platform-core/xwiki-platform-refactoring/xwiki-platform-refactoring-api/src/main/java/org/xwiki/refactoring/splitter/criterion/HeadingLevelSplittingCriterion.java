@@ -59,8 +59,7 @@ public class HeadingLevelSplittingCriterion implements SplittingCriterion
     public boolean shouldSplit(Block block, int depth)
     {
         boolean shouldSplit = false;
-        if (block instanceof SectionBlock) {
-            SectionBlock section = (SectionBlock) block;
+        if (block instanceof SectionBlock section) {
             Block firstChild = section.getChildren().get(0);
             shouldSplit = (firstChild instanceof HeaderBlock) && (Arrays.binarySearch(headingLevels, depth) >= 0);
         }

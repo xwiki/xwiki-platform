@@ -19,12 +19,6 @@
  */
 package org.xwiki.security.authentication.internal;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +34,12 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DisableAccountFailureStrategy}.
@@ -60,7 +60,7 @@ class DisableAccountFailureStrategyTest
     private XWikiDocument updatedDocument;
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
         DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
 

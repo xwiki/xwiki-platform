@@ -22,7 +22,6 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,10 +78,11 @@ public class DownloadAction extends XWikiAction
 
     /** List of authorized attachment mimetypes. */
     public static final List<String> MIMETYPE_WHITELIST =
-        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
-            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
-            "image/png", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf", "video/mpeg",
-            "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
+        List.of("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
+            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/avif", "image/gif", "image/jpeg",
+            "image/jxl", "image/pjpeg", "image/png", "image/tiff", "image/webp", "text/csv", "text/plain", "text/xml",
+            "text/rtf", "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska",
+            "video/x-ms-wmv", "video/x-flv");
 
     /** Key of the whitelist in xwiki.properties. */
     public static final String WHITELIST_PROPERTY = "attachment.download.whitelist";
@@ -103,7 +103,7 @@ public class DownloadAction extends XWikiAction
     private static final String RANGE_HEADER_NAME = "Range";
 
     /** The format of a valid range header. */
-    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
+    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=(\\d+)?-(\\d+)?");
 
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
@@ -250,7 +250,7 @@ public class DownloadAction extends XWikiAction
                 end = attachment.getContentLongSize(context) - 1L;
             }
             end = Math.min(end, attachment.getContentLongSize(context) - 1L);
-            writeByteRange(attachment, start, end, request, response, context);
+            writeByteRange(attachment, start, end, response, context);
             return true;
         }
         return false;
@@ -263,18 +263,17 @@ public class DownloadAction extends XWikiAction
      * @param attachment the attachment to get content from
      * @param start the first byte to write
      * @param end the last byte to write
-     * @param request the current client request
      * @param response the response to write to.
      * @param context the current request context
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end, final XWikiRequest request,
+    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end,
         final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
             try (InputStream data = attachment.getContentInputStream(context)) {
-                InputStream boundedData = new BoundedInputStream(data, end + 1);
+                InputStream boundedData = BoundedInputStream.builder().setInputStream(data).setMaxCount(end + 1).get();
                 long skip = boundedData.skip(start);
                 if (skip != start) {
                     throw new IOException(
@@ -422,6 +421,12 @@ public class DownloadAction extends XWikiAction
 
     private XWikiAttachment getAttachment(XWikiRequest request, XWikiDocument document, String filename)
     {
+        // The document comes from the context and is null when the URL didn't resolve to one. There's then no
+        // attachment to look for here and the caller falls back on re-parsing the URL.
+        if (document == null) {
+            return null;
+        }
+
         XWikiAttachment attachment = null;
 
         String idStr = request.getParameter("id");
@@ -477,6 +482,9 @@ public class DownloadAction extends XWikiAction
         boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(attachment);
         response.addHeader("Content-disposition",
             attachmentSecurityManager.getContentDispositionHeader(attachment.getFilename(), shouldBeDownloaded));
+        // Make sure browsers honor the declared content type, from which the content disposition is also computed.
+        response.setHeader(XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_HEADER,
+            XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_NOSNIFF);
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Advertise that downloads can be resumed
@@ -488,9 +496,9 @@ public class DownloadAction extends XWikiAction
      * at least one of the ends must be specified, and if both are present, the range end must be greater than the range
      * start.
      *
-     * @param start the requested range start, i.e. the first byte to be transfered, or {@code null} if missing from the
-     *            Range header
-     * @param end the requested range end, i.e. the last byte to be transfered, or {@code null} if missing from the
+     * @param start the requested range start, i.e. the first byte to be transferred, or {@code null} if missing from
+     *            the Range header
+     * @param end the requested range end, i.e. the last byte to be transferred, or {@code null} if missing from the
      *            Range header
      * @return {@code true} if the range is valid, {@code false} otherwise
      */

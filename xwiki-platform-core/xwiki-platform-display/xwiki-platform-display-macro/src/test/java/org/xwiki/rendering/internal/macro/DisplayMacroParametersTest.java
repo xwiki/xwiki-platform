@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * 
  * @version $Id$
  */
-public class DisplayMacroParametersTest
+class DisplayMacroParametersTest
 {
     @Test
-    public void setPage()
+    void setPage()
     {
         DisplayMacroParameters parameters = new DisplayMacroParameters();
 

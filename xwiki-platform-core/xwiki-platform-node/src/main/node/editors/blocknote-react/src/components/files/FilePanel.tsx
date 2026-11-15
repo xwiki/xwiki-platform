@@ -19,20 +19,13 @@
  */
 import { ImageFilePanel } from "../images/ImageFilePanel";
 import type { EditorType } from "../../blocknote";
-import type { LinkEditionContext } from "../../misc/linkSuggest";
-import type React from "react";
 
 export type FilePanelProps = {
   editor: EditorType;
   blockId: string;
-  linkEditionCtx: LinkEditionContext;
 };
 
-export const FilePanel: React.FC<FilePanelProps> = ({
-  blockId,
-  editor,
-  linkEditionCtx,
-}) => {
+export const FilePanel: React.FC<FilePanelProps> = ({ blockId, editor }) => {
   const block = editor.getBlock(blockId);
 
   if (!block) {
@@ -42,10 +35,10 @@ export const FilePanel: React.FC<FilePanelProps> = ({
   }
 
   if (block.type === "image") {
-    return (
-      <ImageFilePanel linkEditionCtx={linkEditionCtx} currentBlock={block} />
-    );
+    return <ImageFilePanel currentBlock={block} />;
   }
 
-  throw new Error(`Assertion failed: unkown block type: ${block.type}`);
+  // The file, video and audio blocks are saved as macro calls, but those macros don't exist yet, and we have no
+  // generic file panel, backed by an attachment selector, to show for them in the meantime.
+  return null;
 };

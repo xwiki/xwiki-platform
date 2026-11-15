@@ -123,7 +123,7 @@
     // Destroy the editor without updating the content / value of the underlying element because we're going to use the
     // given content. Wait for the async destroy handlers to be executed.
     await editor.destroy(/* noUpdate: */ true);
-    // Trigger the actual reload of the editor, passing custom editor configuration. Note that the statup mode is not
+    // Trigger the actual reload of the editor, passing custom editor configuration. Note that the startup mode is not
     // taken into account when the editor is loaded in-line. This is why we still need to set the edit mode below after
     // the editor is re-loaded.
     callReloadAsyncHandlers({startupMode: mode});

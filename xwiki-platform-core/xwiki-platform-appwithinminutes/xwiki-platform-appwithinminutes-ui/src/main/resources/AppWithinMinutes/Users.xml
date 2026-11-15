@@ -156,7 +156,7 @@
       <priority>1</priority>
     </property>
     <property>
-      <properties>multiSelect</properties>
+      <properties>multiSelect includeInactiveUsers</properties>
     </property>
   </object>
 </xwikidoc>

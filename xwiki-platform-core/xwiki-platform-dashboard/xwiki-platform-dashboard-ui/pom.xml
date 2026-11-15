@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-dashboard</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-dashboard-ui</artifactId>
   <name>XWiki Platform - Dashboard - UI</name>
@@ -55,6 +55,14 @@
       <artifactId>xwiki-platform-ckeditor-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- We publish a template provider. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-pagetemplate-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 

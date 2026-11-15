@@ -90,7 +90,7 @@ public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
 
         this.documentReference = document.getDocumentReference();
 
-        if (this.asyncProperties.isAsyncAllowed() || this.asyncProperties.isCacheAllowed()) {
+        if (isAsyncAllowed() || isCacheAllowed()) {
             this.id = createId("display", "document", "content",
                 this.defaultEntityReferenceSerializer.serialize(this.documentReference), this.parameters.getSectionId(),
                 this.parameters.getTargetSyntax() != null ? this.parameters.getTargetSyntax().toIdString() : "",
@@ -98,7 +98,7 @@ public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
                 this.parameters.isTransformationContextRestricted(), this.parameters.isTransformationContextIsolated());
         }
 
-        this.executor.initialize(transformationId, document, parameters);
+        this.executor.initialize(transformationId, document, parameters, isAsyncAllowed());
 
         return this.asyncProperties.getContextElements();
     }
@@ -121,13 +121,22 @@ public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
     @Override
     public boolean isAsyncAllowed()
     {
-        return this.asyncProperties.isAsyncAllowed();
+        // Content which is not transformed by the displayer, like the content of a document included in the current
+        // context, is executed by the caller in its own context and with the author it chooses (the include macro can
+        // execute it with the author of the included content). The asynchronous execution transforms the content in
+        // a background job instead, so it would be executed outside of that context and with another author. Since
+        // the asynchronous execution is configured by the author of the displayed document and not by the caller, this
+        // is a normal use case and not a mistake.
+        return this.asyncProperties.isAsyncAllowed() && this.parameters.isContentTransformed();
     }
 
     @Override
     public boolean isCacheAllowed()
     {
-        return this.asyncProperties.isCacheAllowed();
+        // The result of displaying content which is not transformed by the displayer is the XDOM that the caller then
+        // transforms in place, in its own context. Caching it would give the caller a shared XDOM which already
+        // contains the result of a previous execution, in another context.
+        return this.asyncProperties.isCacheAllowed() && this.parameters.isContentTransformed();
     }
 
     @Override

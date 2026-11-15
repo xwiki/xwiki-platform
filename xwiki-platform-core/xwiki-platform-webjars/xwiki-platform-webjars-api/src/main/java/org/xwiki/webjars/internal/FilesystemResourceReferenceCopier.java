@@ -30,6 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -113,9 +114,13 @@ public class FilesystemResourceReferenceCopier
                     String targetPath = targetPrefix + entry.getName().substring(resourcePrefix.length());
                     File exportDirectory = exportContext.getExportDir();
                     File targetLocation = new File(exportDirectory, targetPath);
-                    // Check if the canonical file is within the export directory to avoid path traversal issues
-                    String canonicalTargetPath = targetLocation.getCanonicalPath();
-                    String canonicalExportPath = exportDirectory.getCanonicalPath();
+                    // Only copy resources that end up inside the export directory, since a JAR entry name is
+                    // attacker-controlled and can walk out of it. The containment test compares Paths rather than
+                    // path strings so that it stops on a path component boundary: a sibling directory whose name
+                    // merely starts with the export directory's name (e.g. "export-evil" next to "export") is not
+                    // inside the export directory.
+                    Path canonicalTargetPath = targetLocation.getCanonicalFile().toPath();
+                    Path canonicalExportPath = exportDirectory.getCanonicalFile().toPath();
                     if (canonicalTargetPath.startsWith(canonicalExportPath)) {
                         if (!targetLocation.exists()) {
                             targetLocation.getParentFile().mkdirs();

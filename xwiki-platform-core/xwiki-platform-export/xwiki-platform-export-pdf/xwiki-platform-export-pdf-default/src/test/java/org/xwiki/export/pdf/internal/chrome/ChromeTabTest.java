@@ -57,8 +57,8 @@ import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguratio
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -273,13 +273,10 @@ class ChromeTabTest
         when(exceptionDetails.getException()).thenReturn(exception);
         when(exception.getValue()).thenReturn("'xwiki-page-ready' module not found");
 
-        try {
-            this.chromeTab.navigate(url, (Cookie[]) null, true);
-            fail("Navigation should have thrown an exception.");
-        } catch (IOException e) {
-            assertEquals("Timeout waiting for page to be ready.", e.getMessage());
-            assertEquals("'xwiki-page-ready' module not found", e.getCause().getMessage());
-        }
+        IOException e = assertThrows(IOException.class, () -> this.chromeTab.navigate(url, (Cookie[]) null, true),
+            "Navigation should have thrown an exception.");
+        assertEquals("Timeout waiting for page to be ready.", e.getMessage());
+        assertEquals("'xwiki-page-ready' module not found", e.getCause().getMessage());
 
         verify(this.runtime, times(6)).evaluate(
             /* expression */ pageReadyPromise,

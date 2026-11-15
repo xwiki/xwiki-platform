@@ -176,7 +176,7 @@ public class UserEventDispatcher
                     try {
                         completableFutures.add(prefilterEvent(event, types));
                     } catch (Exception e) {
-                        this.logger.warn("Failed to pre filter event with id [{}]: {}", event.getId(),
+                        this.logger.warn("Failed to pre filter event with id [{}]: [{}]", event.getId(),
                             ExceptionUtils.getRootCauseMessage(e));
                         // Remember the failed event to not query it again
                         failedEvents.add(event.getId());
@@ -253,7 +253,7 @@ public class UserEventDispatcher
                     this.logger.warn("Failed to verify if user [{}] exists. Cause: [{}]", userReference,
                         ExceptionUtils.getRootCauseMessage(e));
                 } catch (GroupException e) {
-                    this.logger.warn("Failed to get the member of the entity [{}]: {}", entity,
+                    this.logger.warn("Failed to get the member of the entity [{}]: [{}]", entity,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }

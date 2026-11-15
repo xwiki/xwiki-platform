@@ -36,7 +36,7 @@ import org.xwiki.template.Template;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * This class is meant to be instanciated and then registered to the Component Manager by the
+ * This class is meant to be instantiated and then registered to the Component Manager by the
  * {@link WikiEmailNotificationRendererComponentBuilder} component every time a document containing a
  * NotificationEmailRendererClass is added, updated or deleted.
  *

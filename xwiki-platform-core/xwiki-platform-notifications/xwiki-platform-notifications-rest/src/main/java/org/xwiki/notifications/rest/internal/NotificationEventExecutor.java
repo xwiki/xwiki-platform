@@ -178,8 +178,12 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
         private Object execute() throws Exception
         {
+            // Get the epoch before the events are retrieved below, so that the result is not cached for the current
+            // epoch if the events change in the meantime.
+            long epoch = notificationCacheManager.getEpoch();
+
             // Check if the result is already in the event cache
-            Object result = notificationCacheManager.getFromCache(this.cacheKey, this.count, this.composite);
+            Object result = notificationCacheManager.getFromCache(this.cacheKey, this.count, this.composite, epoch);
             if (result != null) {
                 return result;
             }
@@ -194,7 +198,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
                 // Execute the callable
                 List events = this.callable.call();
-                notificationCacheManager.setInCache(this.cacheKey, events, this.count, this.composite);
+                notificationCacheManager.setInCache(this.cacheKey, events, this.count, this.composite, epoch);
 
                 if (this.count) {
                     result = events.size();
@@ -221,7 +225,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
                 }
 
                 // Notify the waiting client that the execution is done
-                this.asyncIds.stream().forEach(asyncId -> shortCache.set(asyncId, result));
+                this.asyncIds.forEach(asyncId -> shortCache.set(asyncId, result));
             }
         }
 
@@ -307,7 +311,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
     public Object submit(String cacheKey, Callable<List> callable, boolean async, boolean count,
         boolean composite) throws Exception
     {
-        Object cached = this.notificationCacheManager.getFromCache(cacheKey, count, composite);
+        Object cached = this.notificationCacheManager.getFromCache(cacheKey, count, composite,
+            this.notificationCacheManager.getEpoch());
 
         if (cached != null) {
             return cached;
@@ -371,8 +376,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
             this.shortCache.remove(asyncId);
         }
 
-        if (result instanceof Throwable) {
-            throw new NotificationException("Asynchronous notifications gathering failed", (Throwable) result);
+        if (result instanceof Throwable throwable) {
+            throw new NotificationException("Asynchronous notifications gathering failed", throwable);
         }
 
         return result;

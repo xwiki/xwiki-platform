@@ -110,7 +110,7 @@ public class ScopeNotificationFilter implements NotificationFilter
             }
 
             case CUSTOM ->
-                this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}] ",
+                this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}]",
                     event, user);
 
             default -> {
@@ -178,8 +178,8 @@ public class ScopeNotificationFilter implements NotificationFilter
 
         for (NotificationPreference preference : preferences) {
             Object eventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-            if (preference.isNotificationEnabled() && eventType != null && eventType instanceof String) {
-                AbstractOperatorNode node = value(EventProperty.TYPE).eq(value((String) eventType))
+            if (preference.isNotificationEnabled() && eventType instanceof String eventTypeString) {
+                AbstractOperatorNode node = value(EventProperty.TYPE).eq(value(eventTypeString))
                         .and(value(EventProperty.DATE).greaterThan(value(preference.getStartDate())));
                 if (topNode == null) {
                     topNode = node;

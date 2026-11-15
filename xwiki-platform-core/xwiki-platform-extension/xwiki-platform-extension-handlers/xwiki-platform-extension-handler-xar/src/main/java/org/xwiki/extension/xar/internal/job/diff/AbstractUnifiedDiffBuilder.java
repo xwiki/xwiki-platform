@@ -91,7 +91,7 @@ public abstract class AbstractUnifiedDiffBuilder
             List<UnifiedDiffBlock<String, Character>> diff =
                 createUnifiedDiff(previousValue == null ? null : previousValue.toString(), nextValue == null ? null
                     : nextValue.toString());
-            if (diff.size() > 0) {
+            if (!diff.isEmpty()) {
                 diffs.put(key, diff);
                 return true;
             }
@@ -109,7 +109,7 @@ public abstract class AbstractUnifiedDiffBuilder
             return this.unifiedDiffDisplayer.display(diffResult, config);
         } catch (DiffException e) {
             this.logger
-                .warn("Failed to compute the differences. Root cause: {}", ExceptionUtils.getRootCauseMessage(e));
+                .warn("Failed to compute the differences. Root cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
             return Collections.emptyList();
         }
     }

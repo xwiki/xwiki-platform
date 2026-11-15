@@ -42,6 +42,9 @@ public class CustomNotificationFilterModal extends BaseModal
     private static final String INCLUSIVE = "inclusive";
     private static final String EXCLUSIVE = "exclusive";
 
+    private static final By SAVED_MESSAGE =
+        By.xpath("//div[contains(@class, 'xnotification-done') and contains(., 'Saved!')]");
+
     /**
      * Available notification formats.
      */
@@ -67,12 +70,14 @@ public class CustomNotificationFilterModal extends BaseModal
     }
 
     /**
-     * @return the tree allowing to select the locations.
+     * @return the tree allowing to select the locations, once it is loaded
      */
     public DocumentTreeElement getLocations()
     {
+        // The tree is initialized asynchronously when the modal is opened: opening it to a node before its root nodes
+        // are loaded may have no effect.
         return new DocumentTreeElement(getDriver().findElementWithoutWaiting(this.container,
-            By.className("location-tree")));
+            By.className("location-tree"))).waitForIt();
     }
 
     /**
@@ -233,6 +238,10 @@ public class CustomNotificationFilterModal extends BaseModal
         getSubmitButton().click();
         waitForClosed();
 
+        // The Live Data is refreshed once the "Saved!" success message is displayed.
         tableLayout.waitUntilRowCountEqualsTo(rowCount + offset);
+        // Wait for the success message to disappear (it hides itself after a short delay) so that it doesn't cover the
+        // Submit button of the next filter added.
+        getDriver().waitUntilElementDisappears(SAVED_MESSAGE);
     }
 }

@@ -19,10 +19,10 @@
  */
 package com.xpn.xwiki.cache.api;
 
+import java.util.Properties;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
-
-import java.util.Properties;
 
 @Deprecated
 public interface XWikiCacheService

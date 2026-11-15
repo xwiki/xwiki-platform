@@ -29,7 +29,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
@@ -116,8 +117,8 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
         String contentType = "text/html; charset=utf-8";
 
         // POST request means answer
-        if (request instanceof ServletRequest) {
-            HttpServletRequest httpRequest = ((ServletRequest) request).getHttpServletRequest();
+        if (request instanceof ServletRequest servletRequest) {
+            HttpServletRequest httpRequest = servletRequest.getRequest();
 
             if ("POST".equals(httpRequest.getMethod())) {
                 String token = httpRequest.getParameter("form_token");
@@ -136,7 +137,7 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
 
         String jobType = job.getType();
 
-        // Provide informations about the job to the template
+        // Provide information about the job to the template
         this.scriptContextManager.getCurrentScriptContext().setAttribute("job", job, ScriptContext.ENGINE_SCOPE);
 
         String[] templates = getTemplates(question.getClass(), jobType, prefix);
@@ -170,9 +171,9 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
         }
 
         // Cancel if supported
-        if (job.getStatus() instanceof CancelableJobStatus
+        if (job.getStatus() instanceof CancelableJobStatus cancelableJobStatus
             && Boolean.parseBoolean(request.getParameter(CANCEL))) {
-            ((CancelableJobStatus) job.getStatus()).cancel();
+            cancelableJobStatus.cancel();
         }
 
         // Answer question

@@ -35,7 +35,7 @@ import type { FormProps } from "./XForm";
 import type { LoadProps } from "./XLoad";
 import type { MenuItemProps } from "./XMenuItem";
 import type { MenuLabelProps } from "./XMenuLabel";
-import type { SelectProps } from "./XSelect";
+import type { SelectItem, SelectProps } from "./XSelect";
 import type { TabProps } from "./XTab";
 import type { TabGroupProps } from "./XTabGroup";
 import type { TabPanelProps } from "./XTabPanel";
@@ -125,6 +125,7 @@ export type {
   LoadProps,
   MenuItemProps,
   MenuLabelProps,
+  SelectItem,
   SelectProps,
   TabGroupProps,
   TabPanelProps,

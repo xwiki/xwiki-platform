@@ -45,7 +45,7 @@ import org.xwiki.yjs.websocket.internal.event.RoomScriptAuthorChangeEvent;
  * Keeps track of the script author associated with each Yjs collaboration room. This is important because the users
  * that join a collaboration room can have different script righs and the content synchronized through a Yjs room can
  * contain scripts that must be evaluated server-side with the rights of the room script author (i.e. with the least
- * script rights amoung the users that have made changes).
+ * script rights among the users that have made changes).
  *
  * @version $Id$
  * @since 18.4.0RC1

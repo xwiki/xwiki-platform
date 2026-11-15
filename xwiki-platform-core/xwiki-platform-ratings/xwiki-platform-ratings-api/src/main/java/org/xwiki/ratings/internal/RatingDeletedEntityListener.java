@@ -91,11 +91,9 @@ public class RatingDeletedEntityListener extends AbstractEventListener
         if (event instanceof DocumentDeletedEvent && !this.observationContext.isIn(RENAMING_EVENT)) {
             XWikiDocument sourceDoc = (XWikiDocument) source;
             this.handleDeletedReference(sourceDoc.getDocumentReference());
-        } else if (event instanceof XObjectDeletedEvent) {
-            XObjectDeletedEvent xObjectDeletedEvent = (XObjectDeletedEvent) event;
+        } else if (event instanceof XObjectDeletedEvent xObjectDeletedEvent) {
             this.handleDeletedReference(xObjectDeletedEvent.getReference());
-        } else if (event instanceof WikiDeletedEvent) {
-            WikiDeletedEvent wikiDeletedEvent = (WikiDeletedEvent) event;
+        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
             this.handleDeletedReference(new WikiReference(wikiDeletedEvent.getWikiId()));
         }
     }

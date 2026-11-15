@@ -73,6 +73,7 @@ public class DefaultTestDefinitionParser extends DefaultHandler implements Eleme
     /** Default constructor. */
     public DefaultTestDefinitionParser()
     {
+        // Nothing to initialize here: the parser state is set up at the beginning of each parse().
     }
 
     @Override

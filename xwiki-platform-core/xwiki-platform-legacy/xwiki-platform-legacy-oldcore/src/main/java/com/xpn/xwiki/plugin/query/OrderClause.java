@@ -22,9 +22,9 @@ package com.xpn.xwiki.plugin.query;
 @Deprecated
 public class OrderClause
 {
-    public final static int ASC = 1;
+    public static final int ASC = 1;
 
-    public final static int DESC = 2;
+    public static final int DESC = 2;
 
     private String property;
 

@@ -62,8 +62,4 @@ export default {
   justify-content: flex-start;
   align-items: center;
 }
-
-.livedata-dropdown-menu {
-  margin-left: 1rem;
-}
 </style>

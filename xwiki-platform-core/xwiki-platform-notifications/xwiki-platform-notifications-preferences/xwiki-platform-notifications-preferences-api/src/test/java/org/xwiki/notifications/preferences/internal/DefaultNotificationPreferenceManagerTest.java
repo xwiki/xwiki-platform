@@ -20,7 +20,7 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +42,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -88,9 +87,9 @@ class DefaultNotificationPreferenceManagerTest
     @BeforeEach
     void setUp()
     {
-        Map<NotificationPreferenceProperty, Object> map1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> map1 = new EnumMap<>(NotificationPreferenceProperty.class);
         map1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
-        Map<NotificationPreferenceProperty, Object> map2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> map2 = new EnumMap<>(NotificationPreferenceProperty.class);
         map1.put(NotificationPreferenceProperty.EVENT_TYPE, "addComment");
         this.mockPreference11 = new NotificationPreferenceImplementation(true, NotificationFormat.ALERT,
                 NotificationPreferenceCategory.DEFAULT, null, "1", map1);
@@ -180,6 +179,6 @@ class DefaultNotificationPreferenceManagerTest
                 List.of(this.mockPreference11, this.mockPreference12, this.mockPreference21, this.mockPreference22));
 
         verify(this.mockPreferenceProvider1)
-            .savePreferences(eq(List.of(this.mockPreference11, this.mockPreference12)));
+            .savePreferences(List.of(this.mockPreference11, this.mockPreference12));
     }
 }

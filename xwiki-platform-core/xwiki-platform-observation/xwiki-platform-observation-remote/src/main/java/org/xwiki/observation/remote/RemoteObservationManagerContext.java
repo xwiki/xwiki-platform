@@ -22,7 +22,7 @@ package org.xwiki.observation.remote;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Provide informations about the event in the current thread.
+ * Provide information about the event in the current thread.
  *
  * @version $Id$
  * @since 2.0M3

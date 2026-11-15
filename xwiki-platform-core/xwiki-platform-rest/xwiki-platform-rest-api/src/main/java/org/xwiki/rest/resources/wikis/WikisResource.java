@@ -31,7 +31,13 @@ import org.xwiki.rest.model.jaxb.Wikis;
 @Path("/wikis")
 public interface WikisResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the wikis of the current instance that are visible to the current user.
+     *
+     * @return the wikis the current user may access, that is those they have view rights on, plus those that accept
+     *  global users without requiring an invitation, plus those they hold a pending invitation to; the result also
+     *  carries a {@code query} link pointing to the cross-wiki query resource
+     * @throws XWikiRestException if the list of wikis cannot be retrieved
+     */
     @GET Wikis getWikis() throws XWikiRestException;
 }

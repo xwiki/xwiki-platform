@@ -49,7 +49,7 @@ public enum MessageType
 
     /**
      * Used by the client to notify the server about changes in the client's awareness state (e.g. the user's cursor
-     * position or text selection). Some clients may send this messsage even when there is no actual change, just to
+     * position or text selection). Some clients may send this message even when there is no actual change, just to
      * keep the connection alive. In that case they expect the server to acknowledge the message by sending it back to
      * them (at least when they are alone in the room).
      */

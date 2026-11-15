@@ -185,9 +185,7 @@ public class CompareQueryCondition extends AbstractPropertyQueryCondition
             return true;
         }
 
-        if (obj instanceof CompareQueryCondition) {
-            CompareQueryCondition compare = (CompareQueryCondition) obj;
-
+        if (obj instanceof CompareQueryCondition compare) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));

@@ -19,8 +19,15 @@
  */
 package org.xwiki.realtime.test.po;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -32,16 +39,24 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class CoeditorElement extends BaseElement
 {
-    private WebElement container;
+    private final Supplier<WebElement> containerSupplier;
 
     /**
-     * Creates a new instance based on the given coeditor element.
-     * 
-     * @param container the WebElement used to display the coeditor
+     * Creates a new instance based on the given coeditor element supplier.
+     * <p>
+     * The coeditor element is looked up each time it is needed, rather than being kept, because the list of coeditors
+     * is updated while the realtime editing session is going on, which can invalidate the element in between two
+     * calls.
+     *
+     * @param containerSupplier provides the WebElement used to display the coeditor
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     * @since 17.10.12
+     * @since 16.10.19
      */
-    public CoeditorElement(WebElement container)
+    public CoeditorElement(Supplier<WebElement> containerSupplier)
     {
-        this.container = container;
+        this.containerSupplier = containerSupplier;
     }
 
     /**
@@ -50,7 +65,7 @@ public class CoeditorElement extends BaseElement
      */
     public boolean isDisplayed()
     {
-        return this.container.isDisplayed();
+        return readContainer(WebElement::isDisplayed);
     }
 
     /**
@@ -58,7 +73,7 @@ public class CoeditorElement extends BaseElement
      */
     public String getId()
     {
-        return this.container.getDomAttribute("data-id");
+        return readContainer(CoeditorElement::getId);
     }
 
     /**
@@ -66,7 +81,7 @@ public class CoeditorElement extends BaseElement
      */
     public String getName()
     {
-        return this.container.findElement(By.className("realtime-user-name")).getText();
+        return readContainer(container -> container.findElement(By.className("realtime-user-name")).getText());
     }
 
     /**
@@ -74,7 +89,7 @@ public class CoeditorElement extends BaseElement
      */
     public String getReference()
     {
-        return this.container.getDomAttribute("data-reference");
+        return readContainer(container -> container.getDomAttribute("data-reference"));
     }
 
     /**
@@ -82,7 +97,7 @@ public class CoeditorElement extends BaseElement
      */
     public String getURL()
     {
-        return this.container.getDomAttribute("href");
+        return readContainer(container -> container.getDomAttribute("href"));
     }
 
     /**
@@ -90,7 +105,7 @@ public class CoeditorElement extends BaseElement
      */
     public String getAvatarURL()
     {
-        return getAvatar().getDomAttribute("src");
+        return readContainer(container -> getAvatar(container).getDomAttribute("src"));
     }
 
     /**
@@ -98,7 +113,7 @@ public class CoeditorElement extends BaseElement
      */
     public String getAvatarHint()
     {
-        return getAvatar().getDomAttribute("title");
+        return readContainer(CoeditorElement::getAvatarHint);
     }
 
     /**
@@ -106,7 +121,9 @@ public class CoeditorElement extends BaseElement
      */
     public String getAbbreviation()
     {
-        return this.container.findElement(By.className("realtime-user-avatar-wrapper")).getDomAttribute("data-abbr");
+        return readContainer(
+            container -> container.findElement(By.className("realtime-user-avatar-wrapper")).getDomAttribute(
+                "data-abbr"));
     }
 
     /**
@@ -114,11 +131,84 @@ public class CoeditorElement extends BaseElement
      */
     public void click()
     {
-        this.container.click();
+        readContainer(container -> {
+            container.click();
+            return null;
+        });
     }
 
-    private WebElement getAvatar()
+    /**
+     * @param coeditor the element used to display the coeditor
+     * @return the identifier of the given coeditor
+     */
+    static String getId(WebElement coeditor)
     {
-        return this.container.findElement(By.className("realtime-user-avatar"));
+        return coeditor.getDomAttribute("data-id");
+    }
+
+    /**
+     * @param coeditor the element used to display the coeditor
+     * @return the hint displayed when hovering the avatar of the given coeditor
+     */
+    static String getAvatarHint(WebElement coeditor)
+    {
+        return getAvatar(coeditor).getDomAttribute("title");
+    }
+
+    /**
+     * Reads some information from each coeditor matching the given selector, retrying the whole list while the
+     * coeditor list is updated in the middle of it.
+     * <p>
+     * All the values are read from the same lookup, so that the result is a consistent snapshot of the coeditor list
+     * rather than a mix of several updates. This is why the values can't be read through {@link CoeditorElement},
+     * which looks up and retries each access on its own and would thus hide the updates from us.
+     *
+     * @param <T> the type of information to read
+     * @param driver the driver used to look up the coeditors
+     * @param coeditorsSelector selects the coeditors to read
+     * @param reader reads the information from a coeditor element
+     * @return the information read from each coeditor, in the order they are displayed
+     */
+    static <T> List<T> readCoeditors(XWikiWebDriver driver, By coeditorsSelector, Function<WebElement, T> reader)
+    {
+        return driver.waitUntilCondition(condition -> {
+            try {
+                return driver.findElements(coeditorsSelector).stream().map(reader).toList();
+            } catch (StaleElementReferenceException e) {
+                // The coeditor list was updated while we were reading it, retry.
+                return null;
+            }
+        });
+    }
+
+    private static WebElement getAvatar(WebElement container)
+    {
+        return container.findElement(By.className("realtime-user-avatar"));
+    }
+
+    /**
+     * Reads some information from the coeditor element, retrying while the element can't be resolved.
+     * <p>
+     * The coeditor list is updated whenever someone joins or leaves the realtime editing session, which replaces the
+     * elements we're reading. Since the information we read doesn't depend on when it is read, retrying with a freshly
+     * looked up element gives the same result.
+     *
+     * @param <T> the type of information to read
+     * @param reader reads the information from the coeditor element
+     * @return the information read from the coeditor element
+     */
+    private <T> T readContainer(Function<WebElement, T> reader)
+    {
+        // The result is wrapped in a list because it can be null (e.g. a missing attribute) and the wait would
+        // understand a null value as "the condition is not met yet".
+        return getDriver().waitUntilCondition(driver -> {
+            try {
+                return Collections.singletonList(reader.apply(this.containerSupplier.get()));
+            } catch (StaleElementReferenceException | IndexOutOfBoundsException e) {
+                // The coeditor list was updated while we were reading it: either the element we had was replaced
+                // (stale) or it is not at the expected position anymore (out of bounds). Retry.
+                return null;
+            }
+        }).get(0);
     }
 }

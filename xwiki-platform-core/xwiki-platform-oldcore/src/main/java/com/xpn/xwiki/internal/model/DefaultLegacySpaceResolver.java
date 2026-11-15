@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Uses a {@code relative} Entity Reference Resolver to resolve the String representing one or serveral space names.
+ * Uses a {@code relative} Entity Reference Resolver to resolve the String representing one or several space names.
  *
  * @version $Id$
  * @since 7.2M1

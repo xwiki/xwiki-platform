@@ -19,11 +19,6 @@
  */
 package org.xwiki.url.internal.standard;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +51,11 @@ import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link StandardURLStringEntityReferenceResolver}.
@@ -90,7 +90,7 @@ class StandardURLStringEntityReferenceResolverTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
-    public void configure(MockitoComponentManager componentManager) throws Exception
+    void configure(MockitoComponentManager componentManager) throws Exception
     {
         XWikiRequest request = mock(XWikiRequest.class);
         when(request.getContextPath()).thenReturn("/xwiki");

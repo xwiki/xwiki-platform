@@ -183,7 +183,7 @@
           #end
           #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
           ## FIXME: Check if this is indeed a property of the class. Hint: $propType can be used.
-          ## Conditions are put on the object coresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
+          ## Conditions are put on the object corresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
           #if ($whereParams.entrySet())
             #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = :${safe_tableAlias}_name")
             #set($discard = $whereParams.put("${safe_tableAlias}_name", "${order}"))
@@ -1050,7 +1050,7 @@
     #set ($defaultStringMatchType = 'partial')
   #end
   #livetable_getMatchTypes($colname $filterValues.size() $defaultStringMatchType)
-  ## Group the filter values by match type so that we cann optimize the query.
+  ## Group the filter values by match type so that we can optimize the query.
   #livetable_groupFilterValuesByMatchType($matchTypes $filterValues)
   #if ($whereParams.entrySet())
     #set ($paramPrefix = "${safe_tableAlias}_value_")

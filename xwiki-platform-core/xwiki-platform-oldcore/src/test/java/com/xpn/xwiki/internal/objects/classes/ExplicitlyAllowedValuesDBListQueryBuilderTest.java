@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
  * @since 9.8RC1
  */
 @ComponentTest
-public class ExplicitlyAllowedValuesDBListQueryBuilderTest
+class ExplicitlyAllowedValuesDBListQueryBuilderTest
 {
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("math", "Some", "Page");
 
@@ -96,7 +96,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     private DBListClass dbListClass = new DBListClass();
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         XWikiDocument ownerDocument = mock(XWikiDocument.class);
         when(ownerDocument.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
@@ -113,7 +113,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithScriptRight() throws Exception
+    void buildWithScriptRight() throws Exception
     {
         when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
             DOCUMENT_REFERENCE)).thenReturn(true);
@@ -148,7 +148,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithoutScriptRight() throws Exception
+    void buildWithoutScriptRight() throws Exception
     {
         Query query = mock(Query.class);
         when(this.secureQueryManager.createQuery(this.dbListClass.getSql(), Query.HQL)).thenReturn(query);
@@ -161,7 +161,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithDocFullNameAppliesViewableFilter() throws Exception
+    void buildWithDocFullNameAppliesViewableFilter() throws Exception
     {
         String sqlWithFullName = "select distinct doc.fullName as unfilterableRightCheck, doc.web from XWikiDocument "
             + "doc where doc.name = 'WebHome' order by doc.web";

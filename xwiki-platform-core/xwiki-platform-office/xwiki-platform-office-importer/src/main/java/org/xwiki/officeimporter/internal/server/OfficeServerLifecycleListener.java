@@ -97,7 +97,7 @@ public class OfficeServerLifecycleListener implements EventListener
             try {
                 this.officeServer.start();
             } catch (OfficeServerException ex) {
-                this.logger.error(ex.getMessage(), ex);
+                this.logger.error("Failed to start the office server", ex);
             }
         }
     }
@@ -112,7 +112,7 @@ public class OfficeServerLifecycleListener implements EventListener
         try {
             this.officeServer.stop();
         } catch (OfficeServerException ex) {
-            this.logger.error(ex.getMessage(), ex);
+            this.logger.error("Failed to stop the office server", ex);
         }
     }
 }

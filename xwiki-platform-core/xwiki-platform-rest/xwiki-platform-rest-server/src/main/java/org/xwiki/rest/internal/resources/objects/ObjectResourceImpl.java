@@ -71,8 +71,10 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
     }
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response updateObject(String wikiName, String spaceName, String pageName, String className,
-        Integer objectNumber, Boolean minorRevision, Object restObject) throws XWikiRestException
+        Integer objectNumber, Boolean minorRevision, String comment, Object restObject) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -90,7 +92,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
             this.factory.toObject(xwikiObject, restObject);
 
-            doc.save("", Boolean.TRUE.equals(minorRevision));
+            saveDocument(doc, comment, minorRevision);
 
             BaseObject baseObject = getBaseObject(doc, className, objectNumber);
 
@@ -102,8 +104,8 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
     }
 
     @Override
-    public void deleteObject(String wikiName, String spaceName, String pageName, String className, Integer objectNumber)
-        throws XWikiRestException
+    public void deleteObject(String wikiName, String spaceName, String pageName, String className, Integer objectNumber,
+        Boolean minorRevision, String comment) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -121,7 +123,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
             doc.removeObject(object);
 
-            doc.save();
+            saveDocument(doc, comment, minorRevision);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

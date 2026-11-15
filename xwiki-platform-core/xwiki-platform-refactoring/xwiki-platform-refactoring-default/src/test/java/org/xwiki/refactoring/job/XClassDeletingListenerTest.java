@@ -256,7 +256,7 @@ class XClassDeletingListenerTest
 
         // Check
         verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
-        verify(event).cancel(eq("Question has been interrupted."));
+        verify(event).cancel("Question has been interrupted.");
         assertEquals("Confirm question has been interrupted.", this.logCapture.getMessage(0));
     }
 
@@ -304,6 +304,6 @@ class XClassDeletingListenerTest
 
         // Check
         verify(status).ask(any(), eq(1L), eq(TimeUnit.MINUTES));
-        verify(event).cancel(eq("The question has been canceled because this refactoring is forbidden."));
+        verify(event).cancel("The question has been canceled because this refactoring is forbidden.");
     }
 }

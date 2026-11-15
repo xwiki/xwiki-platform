@@ -144,11 +144,11 @@
 }
 
 #import ul.xlist li.xunderline {
-  border: 0 !important;
+  border: 0;
 }
 
 #packagelist ul.xlist {
-  margin: 0 !important;
+  margin: 0;
 }
 
 #import div#package ul.package {

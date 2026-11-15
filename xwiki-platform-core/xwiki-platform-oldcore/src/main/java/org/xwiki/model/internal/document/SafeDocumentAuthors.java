@@ -103,8 +103,8 @@ public class SafeDocumentAuthors extends AbstractWrappingObject<DocumentAuthors>
     @Override
     public boolean equals(Object obj)
     {
-        if (obj instanceof SafeDocumentAuthors) {
-            return Objects.equals(this.getWrapped(), ((SafeDocumentAuthors) obj).getWrapped());
+        if (obj instanceof SafeDocumentAuthors safeDocumentAuthors) {
+            return Objects.equals(this.getWrapped(), safeDocumentAuthors.getWrapped());
         }
         return super.equals(obj);
     }

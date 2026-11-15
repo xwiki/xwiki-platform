@@ -96,9 +96,7 @@ public class GeneralMailConfigurationUpdatedEventGenerator implements EventListe
     {
         ObservationManager observationManager = this.observationManagerProvider.get();
 
-        if (source instanceof XWikiDocument) {
-            XWikiDocument document = (XWikiDocument) source;
-
+        if (source instanceof XWikiDocument document) {
             // Test that the document is really a mail configuration document.
             LocalDocumentReference localDocumentReference = new LocalDocumentReference(document.getDocumentReference());
             if (!AbstractMailConfigClassDocumentConfigurationSource.MAILCONFIG_REFERENCE
@@ -127,8 +125,8 @@ public class GeneralMailConfigurationUpdatedEventGenerator implements EventListe
 
     private void clearCache(ConfigurationSource mainWikiMailConfigSource)
     {
-        if (mainWikiMailConfigSource instanceof AbstractGeneralMailConfigClassDocumentConfigurationSource) {
-            ((AbstractGeneralMailConfigClassDocumentConfigurationSource) mainWikiMailConfigSource).clearCache();
+        if (mainWikiMailConfigSource instanceof AbstractGeneralMailConfigClassDocumentConfigurationSource config) {
+            config.clearCache();
         }
     }
 }

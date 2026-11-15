@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.edit.EditException;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.security.authorization.AuthorExecutor;
@@ -106,7 +108,7 @@ public class TextAreaClass extends StringClass
         }
 
         /**
-         * Retreive the {@link EditorType} based on its value.
+         * Retrieve the {@link EditorType} based on its value.
          * <p>
          * The search is case insensitive.
          *
@@ -168,7 +170,7 @@ public class TextAreaClass extends StringClass
         }
 
         /**
-         * Retreive the {@link ContentType} based on its value.
+         * Retrieve the {@link ContentType} based on its value.
          * <p>
          * The search is case insensitive.
          *
@@ -447,7 +449,14 @@ public class TextAreaClass extends StringClass
         parameters.put(ROWS, getRows());
         parameters.put("disabled", isDisabled());
         parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
+        // The document reference is used client-side (e.g. to resolve relative references and build URLs).
         parameters.put("sourceDocumentReference", ownerDocument.getDocumentReferenceWithLocale());
+        // The property reference is used server-side to render the content with the rights of the document's author
+        // (instead of the current user) when the content is the unmodified stored value of an object property.
+        // For class properties, there is no equivalent meta property reference, so we don't set it.
+        if (object.getReference() instanceof ObjectReference objectReference) {
+            parameters.put("sourcePropertyReference", new ObjectPropertyReference(name, objectReference));
+        }
         Syntax syntax = null;
         String contentType = getContentType();
 
@@ -487,28 +496,28 @@ public class TextAreaClass extends StringClass
         String contentTypeString = getContentType();
         ContentType contentType = ContentType.getByValue(contentTypeString);
 
-        if (contentType == ContentType.PURE_TEXT) {
-            super.displayView(buffer, name, prefix, object, context);
-        } else if (contentType == ContentType.VELOCITY_CODE) {
-            displayVelocityCode(buffer, name, prefix, object, context);
-        } else {
-            BaseProperty<?> property = (BaseProperty<?>) object.safeget(name);
-            if (property != null) {
-                String content = property.toText();
-                XWikiDocument sdoc = getObjectDocument(object, context);
+        switch (contentType) {
+            case PURE_TEXT -> super.displayView(buffer, name, prefix, object, context);
+            case VELOCITY_CODE -> displayVelocityCode(buffer, name, prefix, object, context);
+            case null, default -> {
+                BaseProperty<?> property = (BaseProperty<?>) object.safeget(name);
+                if (property != null) {
+                    String content = property.toText();
+                    XWikiDocument sdoc = getObjectDocument(object, context);
 
-                if (contentType == ContentType.VELOCITYWIKI) {
-                    content = maybeEvaluateContent(name, isolated, content, sdoc);
-                }
+                    if (contentType == ContentType.VELOCITYWIKI) {
+                        content = maybeEvaluateContent(name, isolated, content, sdoc);
+                    }
 
-                if (sdoc != null) {
-                    sdoc = ensureContentAuthorIsMetadataAuthor(sdoc);
+                    if (sdoc != null) {
+                        sdoc = ensureContentAuthorIsMetadataAuthor(sdoc);
 
-                    buffer.append(
-                        context.getDoc().getRenderedContent(content, sdoc.getSyntax(), isRestricted(), sdoc,
-                            isolated, context));
-                } else {
-                    buffer.append(XMLUtils.escapeElementText(content));
+                        buffer.append(
+                            context.getDoc().getRenderedContent(content, sdoc.getSyntax(), isRestricted(), sdoc,
+                                isolated, context));
+                    } else {
+                        buffer.append(XMLUtils.escapeElementText(content));
+                    }
                 }
             }
         }

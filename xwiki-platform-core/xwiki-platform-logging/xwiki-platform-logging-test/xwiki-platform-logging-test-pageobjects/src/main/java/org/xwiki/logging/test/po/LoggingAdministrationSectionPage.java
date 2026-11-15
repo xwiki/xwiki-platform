@@ -35,6 +35,8 @@ import org.xwiki.livedata.test.po.TableLayoutElement;
  * in its "Actions" column, a form to select a new level and submit it.
  *
  * @version $Id$
+ * @since 17.10.10
+ * @since 18.4.3
  * @since 18.5.0RC1
  */
 public class LoggingAdministrationSectionPage extends AdministrationSectionPage
@@ -64,6 +66,14 @@ public class LoggingAdministrationSectionPage extends AdministrationSectionPage
     private static final By SET_BUTTON = By.cssSelector("input[name='loggeraction_set']");
 
     /**
+     * Creates a page object for the Logging administration section, which must be the current page.
+     */
+    public LoggingAdministrationSectionPage()
+    {
+        super(SECTION_ID);
+    }
+
+    /**
      * Open the Logging administration section.
      *
      * @return the Logging administration section
@@ -72,11 +82,6 @@ public class LoggingAdministrationSectionPage extends AdministrationSectionPage
     {
         AdministrationSectionPage.gotoPage(SECTION_ID);
         return new LoggingAdministrationSectionPage();
-    }
-
-    public LoggingAdministrationSectionPage()
-    {
-        super(SECTION_ID);
     }
 
     /**

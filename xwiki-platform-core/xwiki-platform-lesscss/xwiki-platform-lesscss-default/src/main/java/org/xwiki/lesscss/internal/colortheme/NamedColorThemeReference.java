@@ -42,8 +42,7 @@ public class NamedColorThemeReference implements ColorThemeReference
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof NamedColorThemeReference) {
-            NamedColorThemeReference namedColorThemeReference = (NamedColorThemeReference) o;
+        if (o instanceof NamedColorThemeReference namedColorThemeReference) {
             return colorThemeName.equals(namedColorThemeReference.colorThemeName);
         }
         return false;

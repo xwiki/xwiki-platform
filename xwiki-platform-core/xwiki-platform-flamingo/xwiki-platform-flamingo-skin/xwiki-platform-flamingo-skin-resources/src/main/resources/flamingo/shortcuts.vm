@@ -110,7 +110,7 @@
      * Also note that JQuery is not supported here, so we use a starndard XMLHttpRequest.
      *
      * @param restUrl the URL to use
-     * @param errorMessage the message to display if an error ocurred in the request
+     * @param errorMessage the message to display if an error occurred in the request
      */
     var developerShortcutsRestCall = function(restUrl, errorMessage) {
         const req = new XMLHttpRequest();
@@ -138,7 +138,7 @@
         req.send(null);
     };
 
-    // Append developer shortcuts for toggeling userType and hiddenDocuments in the current user profile
+    // Append developer shortcuts for toggling userType and hiddenDocuments in the current user profile
     shortcut.add("$services.localization.render('core.shortcuts.developer.user.type')", function() {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/usertype/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.type.error'))");

@@ -37,7 +37,7 @@ public class NullLoggerManager implements LoggerManager
     @Override
     public void pushLogListener(EventListener listener)
     {
-        
+        // Nothing to do, this logger manager voluntarily does nothing.
     }
 
     @Override
@@ -49,7 +49,7 @@ public class NullLoggerManager implements LoggerManager
     @Override
     public void setLoggerLevel(String loggerName, LogLevel level)
     {
-
+        // Nothing to do, this logger manager voluntarily does nothing.
     }
 
     @Override

@@ -33,7 +33,7 @@ public abstract class NumberProperty<N extends Number> extends BaseProperty
 
     private Class<N> numberClass;
 
-    public NumberProperty()
+    protected NumberProperty()
     {
         ParameterizedType genericType =
             (ParameterizedType) ReflectionUtils.resolveType(NumberProperty.class, getClass());

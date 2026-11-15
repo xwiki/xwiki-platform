@@ -32,21 +32,6 @@
  * Displays a class name without its space prefix. XML-escapes the output.
  *#
 #macro(cleanClassname $classname)$!{escapetool.xml($classname.substring($classname.indexOf('.')).substring(1))}#end
-
-#*
- * Displays a warning box, with an extra class. Note that the implementation of this macro should be very close to the 
- * one of the #warning macro defined in the web templates macros.
- * This is the only place where we use this extraClass feature, so the implementation is contained here.
- * Note that the exact context this content is rendered in is not fixed, using the XWiki macro 
- * would have ended up in unstable behaviour.
- *#
-#macro (_warningWithExtraClass $text $extraClass)
-<div class="box warningmessage ${extraClass}">
-  <span class="icon-block">$services.icon.renderHTML('warning')</span>
-  <span class="sr-only">$services.localization.render('warning')</span>
-  <div>$text</div>
-</div>
-#end
 ##
 #*
  * Display an object
@@ -123,7 +108,7 @@
         </button>
       </div>
     #end
-    #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
+    #warning($warningMessageContent 'deprecatedProperties')
   #end
 </div>
 #end
@@ -284,7 +269,7 @@
         </button>
       </div>
     #end
-    #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
+    #warning($warningMessageContent 'deprecatedProperties')
   #end
 #end ## checkPropertyDeprecation
 ##

@@ -21,8 +21,8 @@ package org.xwiki.skin.test.ui;
 
 import java.net.URI;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.Strings;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.test.docker.junit5.UITest;
@@ -45,12 +45,12 @@ class SXSkinIT
         URI uri = new URI(
             Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest") + "bin/jsx/Main/WebHome?resource=" + resource);
 
-        GetMethod response = setup.rest().executeGet(uri);
+        CloseableHttpResponse response = setup.rest().executeGet(uri);
 
         try {
-            assertNotEquals(200, response.getStatusCode());
+            assertNotEquals(200, response.getCode());
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
 }

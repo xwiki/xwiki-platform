@@ -67,7 +67,7 @@ class DefaultNotificationEmailUserPreferenceManagerTest
     private DocumentReference currentUser;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
 
@@ -83,7 +83,7 @@ class DefaultNotificationEmailUserPreferenceManagerTest
     }
 
     @Test
-    void getDiffType() throws Exception
+    void getDiffType()
     {
         // Default value
         assertEquals(NotificationEmailDiffType.STANDARD, this.emailUserPreferenceManager.getDiffType());
@@ -117,7 +117,7 @@ class DefaultNotificationEmailUserPreferenceManagerTest
     }
 
     @Test
-    void getInterval() throws Exception
+    void getInterval()
     {
         // Default value
         assertEquals(NotificationEmailInterval.DAILY, this.emailUserPreferenceManager.getInterval());

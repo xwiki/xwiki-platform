@@ -401,7 +401,7 @@ public class LocalizationScriptService implements ScriptService
             iterator.close();
 
         } catch (Exception e) {
-            this.logger.warn("Exception while looking for XWiki Locales.", e);
+            this.logger.warn("Exception while looking for XWiki Locales", e);
         }
 
         return locales;

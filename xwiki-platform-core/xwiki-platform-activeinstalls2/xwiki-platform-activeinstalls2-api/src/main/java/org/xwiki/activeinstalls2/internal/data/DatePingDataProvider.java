@@ -131,7 +131,7 @@ public class DatePingDataProvider extends AbstractPingDataProvider
                 .index(ElasticsearchClientManager.INDEX)
                 .query(q -> q
                     .term(t -> t
-                        .field(getDistributionKey(DistributionPingDataProvider.PROPERTY_INSTANCE_ID))
+                        .field(DistributionPingDataProvider.FIELD_INSTANCE_ID)
                         .value(v -> v.stringValue(this.instanceIdManager.getInstanceId().toString()))
                     ))
                 .aggregations(getDateKey(PROPERTY_SERVER_TIME), a1 -> a1
@@ -172,11 +172,6 @@ public class DatePingDataProvider extends AbstractPingDataProvider
     private String getDateKey(String suffix)
     {
         return getKey(PROPERTY_DATE, suffix);
-    }
-
-    private String getDistributionKey(String suffix)
-    {
-        return getKey(DistributionPingDataProvider.PROPERTY_DISTRIBUTION, suffix);
     }
 
     private String getKey(String prefix, String suffix)

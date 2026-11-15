@@ -120,9 +120,9 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
         // Resolve nested spaces
         Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
         for (SpaceReference space : databaseSpaces) {
-            for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
+            for (EntityReference parent = space.getParent(); parent instanceof SpaceReference spaceReference; parent =
                 parent.getParent()) {
-                spaces.add((SpaceReference) parent);
+                spaces.add(spaceReference);
             }
         }
 
@@ -141,10 +141,10 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
         // Resolve nested spaces
         Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
         for (SpaceReference space : databaseSpaces) {
-            for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
+            for (EntityReference parent = space.getParent(); parent instanceof SpaceReference spaceReference; parent =
                 parent.getParent()) {
                 if (!visibleSpaces.contains(parent)) {
-                    spaces.add((SpaceReference) parent);
+                    spaces.add(spaceReference);
                 }
             }
         }

@@ -180,7 +180,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
                     return applySheet(document, sheetReference, parameters);
                 } catch (Exception e) {
                     String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
-                    logger.warn("Failed to apply sheet [{}].", sheetStringReference, e);
+                    logger.warn("Failed to apply sheet [{}]", sheetStringReference, e);
                 }
             }
         }

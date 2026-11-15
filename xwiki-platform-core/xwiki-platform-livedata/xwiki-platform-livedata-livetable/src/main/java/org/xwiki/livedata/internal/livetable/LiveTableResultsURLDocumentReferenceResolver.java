@@ -85,8 +85,8 @@ public class LiveTableResultsURLDocumentReferenceResolver
             ExtendedURL extendedURL = new ExtendedURL(url, xcontext.getRequest().getContextPath());
             ResourceType type = this.typeResolver.resolve(extendedURL, Collections.emptyMap());
             ResourceReference reference = this.resourceResolver.resolve(extendedURL, type, Collections.emptyMap());
-            if (reference instanceof EntityResourceReference) {
-                EntityReference entityReference = ((EntityResourceReference) reference).getEntityReference();
+            if (reference instanceof EntityResourceReference entityResourceReference) {
+                EntityReference entityReference = entityResourceReference.getEntityReference();
                 DocumentReference documentReference =
                     this.currentEntityDocumentReferenceResolver.resolve(entityReference);
                 return this.defaultEntityReferenceSerializer.serialize(documentReference);

@@ -49,7 +49,7 @@ class DefaultStandardURLConfigurationTest
     private ConfigurationSource source;
 
     @Test
-    void isPathBasedMultiWiki() throws Exception
+    void isPathBasedMultiWiki()
     {
         when(this.source.getProperty("url.standard.multiwiki.isPathBased", Boolean.TRUE)).thenReturn(Boolean.TRUE);
 
@@ -57,7 +57,7 @@ class DefaultStandardURLConfigurationTest
     }
 
     @Test
-    void getWikiPathPrefix() throws Exception
+    void getWikiPathPrefix()
     {
         when(this.source.getProperty("url.standard.multiwiki.wikiPathPrefix", "wiki")).thenReturn("wiki");
 
@@ -65,7 +65,7 @@ class DefaultStandardURLConfigurationTest
     }
 
     @Test
-    void getEntityPathPrefix() throws Exception
+    void getEntityPathPrefix()
     {
         when(this.source.getProperty("url.standard.entityPathPrefix", "bin")).thenReturn("bin");
 
@@ -73,7 +73,7 @@ class DefaultStandardURLConfigurationTest
     }
 
     @Test
-    void isViewActionHidden() throws Exception
+    void isViewActionHidden()
     {
         when(source.getProperty("url.standard.hideViewAction", false)).thenReturn(false);
 

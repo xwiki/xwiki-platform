@@ -64,7 +64,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 18.0.0RC1
  */
-public class HTMLCleanerTest
+class HTMLCleanerTest
 {
     private static final String DEFAULT_PATTERN = ".*\\.test";
 

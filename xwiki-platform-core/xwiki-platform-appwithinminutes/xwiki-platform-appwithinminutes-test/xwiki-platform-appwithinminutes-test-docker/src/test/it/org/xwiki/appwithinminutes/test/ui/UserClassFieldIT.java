@@ -38,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
 import static java.util.Arrays.asList;
@@ -88,6 +89,14 @@ class UserClassFieldIT
         createUser(setup, "XXX");
         createUser(setup, "YYY");
         createUser(setup, "ZZZ");
+
+        // Create an active and a disabled user, both matching "Person", to verify that the picker excludes disabled
+        // users by default and suggests them only when the field is configured to include inactive users
+        // (XWIKI-18766). We need to be super admin to be allowed to disable the user.
+        setup.loginAsSuperAdmin();
+        setup.createUser("ActivePerson", "ActivePerson", null, "first_name", "Active", "last_name", "Person");
+        setup.createUser("DisabledPerson", "DisabledPerson", null, "first_name", "Disabled", "last_name", "Person",
+            "active", "0");
     }
 
     private void createUser(TestUtils setup, String userSuffix)
@@ -128,7 +137,7 @@ class UserClassFieldIT
         assertUserSuggestion(suggestions.get(0), "Eduard Moraru", "Enygma2002");
 
         // The guest user shouldn't be suggested.
-        suggestions = userPicker.clear().sendKeys("guest").waitForSuggestions().getSuggestions();
+        suggestions = userPicker.clear().sendKeys("guest").getSuggestions();
         assertTrue(suggestions.isEmpty());
 
         // Default administrator user should be suggested.
@@ -201,7 +210,7 @@ class UserClassFieldIT
 
         // Select 2 users.
         userPicker.sendKeys("tmortagne").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        userPicker.clear().sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
+        userPicker.clear().sendKeys("2002").selectByValue("XWiki.Enygma2002");
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
@@ -319,14 +328,50 @@ class UserClassFieldIT
 
         // Change the selected user.
         userPicker.clearSelectedSuggestions().sendKeys("eduard").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        entryEditPage.clickSaveAndView();
+        ViewPage entryViewPage = entryEditPage.clickSaveAndView();
 
-        // Assert the view mode.
-        List<WebElement> users = setup.getDriver().findElements(By.className("user"));
+        // Assert the view mode. Look for the displayed users only in the page content, since the page UI (e.g. the
+        // drawer) displays the current user too.
+        List<WebElement> users = entryViewPage.getContentContainer().findElements(By.className("user"));
         assertEquals(1, users.size());
         assertEquals("Eduard Moraru", users.get(0).getText());
         assertTrue(
             users.get(0).findElement(By.className("user-avatar")).getAttribute("src").contains("/Enygma2002.png?"));
+    }
+
+    @Test
+    @Order(6)
+    void inactiveUsersSuggestions(TestUtils setup, TestReference testReference)
+    {
+        ApplicationClassEditPage editor = goToEditor(testReference);
+        SuggestClassFieldEditPane userField = new SuggestClassFieldEditPane(editor.addField("User").getName());
+        SuggestInputElement userPicker = userField.getPicker();
+
+        // By default the disabled user must not be suggested: typing "Person" only matches the active user.
+        List<SuggestionElement> suggestions =
+            userPicker.sendKeys("Person").waitForNonTypedSuggestions().getSuggestions();
+        assertEquals(1, suggestions.size());
+        assertUserSuggestion(suggestions.get(0), "Active Person", "ActivePerson", "user");
+
+        // Configure the field to also suggest inactive users and save the class so that the application entry picker
+        // uses this configuration.
+        userField.openConfigPanel();
+        userField.setIncludeInactiveUsers(true);
+        userField.closeConfigPanel();
+        editor.clickSaveAndView();
+
+        // Create an application entry and check that the disabled user is now suggested along with the active one.
+        ClassSheetPage classSheetPage = new ClassSheetPage();
+        String location = setup.serializeLocalReference(testReference.getLastSpaceReference());
+        classSheetPage.createNewDocument(location, "Entry");
+
+        String className = setup.serializeReference(
+            new DocumentReference("Class", testReference.getLastSpaceReference()).getLocalDocumentReference());
+        userPicker = new SuggestInputElement(setup.getDriver().findElement(By.id(className + "_0_user1")));
+        suggestions = userPicker.sendKeys("Person").waitForNonTypedSuggestions().getSuggestions();
+        assertEquals(2, suggestions.size());
+        assertUserSuggestion(suggestions.get(0), "Active Person", "ActivePerson", "user");
+        assertUserSuggestion(suggestions.get(1), "Disabled Person", "DisabledPerson", "user");
     }
 
     private ApplicationClassEditPage goToEditor(TestReference testReference)

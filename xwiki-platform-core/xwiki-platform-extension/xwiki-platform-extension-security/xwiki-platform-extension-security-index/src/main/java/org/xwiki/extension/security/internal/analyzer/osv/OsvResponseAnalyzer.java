@@ -40,7 +40,6 @@ import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
 import org.xwiki.extension.index.security.SecurityVulnerabilityDescriptor;
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.AffectObject;
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.OsvResponse;
-import org.xwiki.extension.security.internal.analyzer.osv.model.response.RangeObject;
 import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnObject;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
@@ -152,21 +151,13 @@ public class OsvResponseAnalyzer
 
     private boolean checkRanges(String version, AffectObject affected)
     {
-        boolean matchesOneRange = false;
-        if (!affected.getRanges().isEmpty()) {
-            List<RangeObject> ranges = affected.getRanges();
-            matchesOneRange = ranges.stream().anyMatch(range -> {
-                String start = range.getStart();
-                String end = range.getEnd();
-                return isInRange(start, end, version);
-            });
-        }
-        return matchesOneRange;
+        return affected.getRanges().stream()
+            .anyMatch(range -> isInRange(range.getStart(), range.getEnd(), range.isEndInclusive(), version));
     }
 
-    private boolean isInRange(Object introduced, Object fixed, String version)
+    private boolean isInRange(String introduced, String end, boolean endInclusive, String version)
     {
-        String range = String.format("[%s,%s]", introduced, fixed == null ? "" : fixed);
+        String range = String.format("[%s,%s%s", introduced, end == null ? "" : end, endInclusive ? "]" : ")");
         try {
             return VersionRange.createFromVersionSpec(range).containsVersion(new DefaultArtifactVersion(version));
         } catch (InvalidVersionSpecificationException e) {

@@ -40,7 +40,7 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  * @since 12.9RC1
  */
-public class DefaultRatingTest
+class DefaultRatingTest
 {
     @Test
     void simpleConstructor()

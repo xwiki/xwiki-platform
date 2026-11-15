@@ -149,7 +149,7 @@ public class XarScriptService implements ScriptService
         boolean available = false;
 
         // Check the value of the xwiki.action.export.xar.usefilter config parameter in xwiki.cfg
-        int useFilter = this.xwikiCfgConfigurationSource.getProperty(EXPORT_USEFILTER_KEY, (Integer) 1);
+        int useFilter = this.xwikiCfgConfigurationSource.getProperty(EXPORT_USEFILTER_KEY, 1);
         if (useFilter == 1) {
             // Are the following 2 components available?
             ComponentManager cm = this.contextComponentManagerProvider.get();

@@ -90,7 +90,7 @@ public class PartialEntityReference extends EntityReference
                 if (!isNameEqual(entity.getName())) {
                     return false;
                 } else {
-                    return getParent() != null ? getParent().equals(entity.getParent()) : true;
+                    return getParent() == null || getParent().equals(entity.getParent());
                 }
             }
         }

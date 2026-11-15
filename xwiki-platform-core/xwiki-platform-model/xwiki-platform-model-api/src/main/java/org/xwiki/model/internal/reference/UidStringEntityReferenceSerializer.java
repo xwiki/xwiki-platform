@@ -57,8 +57,8 @@ public class UidStringEntityReferenceSerializer extends AbstractStringEntityRefe
         representation.append(name.length()).append(':').append(name);
 
         // Append Locale
-        if (currentReference instanceof AbstractLocalizedEntityReference) {
-            Locale locale = ((AbstractLocalizedEntityReference) currentReference).getLocale();
+        if (currentReference instanceof AbstractLocalizedEntityReference reference) {
+            Locale locale = reference.getLocale();
             if (locale != null) {
                 String localeString = locale.toString();
                 representation.append(localeString.length()).append(":").append(localeString);

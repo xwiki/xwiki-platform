@@ -56,7 +56,7 @@ public abstract class AbstractStoreTypeDataMigration extends AbstractFileStoreDa
      * @param tableName the name of the table linked to the attachment table
      * @param fieldName the name of the field containing the store id
      */
-    public AbstractStoreTypeDataMigration(String tableName, String fieldName)
+    protected AbstractStoreTypeDataMigration(String tableName, String fieldName)
     {
         this.tableName = tableName;
         this.updateQuery = "UPDATE XWikiAttachment SET " + fieldName + " = :store WHERE id IN (:ids)";

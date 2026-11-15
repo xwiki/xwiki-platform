@@ -89,11 +89,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param storeType - the way to store the document
      * @param deleter - user which delete document
      * @param deleteDate - date of delete action
-     * @throws XWikiException if any error
      * @since 9.0RC1
      */
     private XWikiDeletedDocument(String fullName, Locale locale, String storeType, String deleter, Date deleteDate)
-        throws XWikiException
     {
         this.fullName = fullName;
         this.locale = locale;
@@ -209,9 +207,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * @return {@link XWikiDocument#getLanguage()}
-     * @deprecated since 8.0M1, use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getLanguage()
     {
         return getLocale().toString();
@@ -228,9 +226,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * @param locale - {@link XWikiDocument#getLanguage()} to set
-     * @deprecated since 8.0M1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     protected void setLanguage(String locale)
     {
         this.locale = LocaleUtils.toLocale(Util.normalizeLanguage(locale), Locale.ROOT);
@@ -336,11 +334,11 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param doc - the deleted document
      * @param context - used in {@link XWikiDocument#toXML(XWikiContext)}
      * @throws XWikiException in error in {@link XWikiDocument#toXML(XWikiContext)}
-     * @deprecated since 9.0RC1, use
+     * @deprecated use
      *             {@link XWikiDeletedDocument#XWikiDeletedDocument(String, Locale, String, String, Date, XWikiDeletedDocumentContent)
      *             instead}
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     protected void setDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         this.content = new XWikiHibernateDeletedDocumentContent(doc);

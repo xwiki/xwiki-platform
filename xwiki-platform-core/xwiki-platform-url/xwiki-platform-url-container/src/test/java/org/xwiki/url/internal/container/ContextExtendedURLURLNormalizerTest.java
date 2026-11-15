@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
-import javax.servlet.ServletContext;
+
+import jakarta.servlet.ServletContext;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
@@ -52,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 6.1M2
  */
 @ComponentTest
-public class ContextExtendedURLURLNormalizerTest
+class ContextExtendedURLURLNormalizerTest
 {
     @InjectMockComponents
     private ContextExtendedURLURLNormalizer normalizer;
@@ -112,10 +113,10 @@ public class ContextExtendedURLURLNormalizerTest
     }
 
     @Test
-    void normalizeWhenNoConfigurationPropertyButEnvironment() throws Exception
+    void normalizeWhenNoConfigurationPropertyButEnvironment()
     {
         ServletContext sc = mock(ServletContext.class);
-        when(this.environment.getServletContext()).thenReturn(sc);
+        when(this.environment.getJakartaServletContext()).thenReturn(sc);
         when(sc.getContextPath()).thenReturn("/xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
@@ -123,10 +124,10 @@ public class ContextExtendedURLURLNormalizerTest
     }
 
     @Test
-    void normalizeWhenNoConfigurationPropertyButEnvironmentWithMultiLevelContextPath() throws Exception
+    void normalizeWhenNoConfigurationPropertyButEnvironmentWithMultiLevelContextPath()
     {
         ServletContext sc = mock(ServletContext.class);
-        when(this.environment.getServletContext()).thenReturn(sc);
+        when(this.environment.getJakartaServletContext()).thenReturn(sc);
         when(sc.getContextPath()).thenReturn("/l1/l2/xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
@@ -134,10 +135,10 @@ public class ContextExtendedURLURLNormalizerTest
     }
 
     @Test
-    void normalizeWhenNoConfigurationPropertyButEnvironmentWithRootContext() throws Exception
+    void normalizeWhenNoConfigurationPropertyButEnvironmentWithRootContext()
     {
         ServletContext sc = mock(ServletContext.class);
-        when(this.environment.getServletContext()).thenReturn(sc);
+        when(this.environment.getJakartaServletContext()).thenReturn(sc);
         when(sc.getContextPath()).thenReturn("");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));

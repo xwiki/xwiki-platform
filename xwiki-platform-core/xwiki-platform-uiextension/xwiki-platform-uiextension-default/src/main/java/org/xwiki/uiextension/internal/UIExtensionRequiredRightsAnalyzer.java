@@ -102,32 +102,33 @@ public class UIExtensionRequiredRightsAnalyzer implements RequiredRightAnalyzer<
         BaseObjectReference reference = object.getReference();
 
         // Analyze the scope and rights required for the scope.
-        if (scope == WikiComponentScope.GLOBAL) {
-            result.add(new RequiredRightAnalysisResult(
+        switch (scope) {
+            case GLOBAL -> result.add(new RequiredRightAnalysisResult(
                 reference,
                 this.translationBlockSupplierProvider.get("uiextension.requiredrights.global"),
                 this.objectBlockSupplierProvider.get(object),
                 List.of(RequiredRight.PROGRAM)
             ));
-        } else if (scope == WikiComponentScope.WIKI) {
-            result.add(new RequiredRightAnalysisResult(
+            case WIKI -> result.add(new RequiredRightAnalysisResult(
                 reference,
                 this.translationBlockSupplierProvider.get("uiextension.requiredrights.wiki"),
                 this.objectBlockSupplierProvider.get(object),
                 List.of(RequiredRight.WIKI_ADMIN)
             ));
-        } else {
-            // Some UI extension points only consider extensions whose authors have wiki admin right.
-            // TODO: Make it possible to extend the list of admin-only extension points.
-            String extensionPoint = object.getStringValue(WikiUIExtensionConstants.EXTENSION_POINT_ID_PROPERTY);
-            if (StringUtils.isNotBlank(extensionPoint) && ADMIN_ONLY_EXTENSION_POINTS.contains(extensionPoint)) {
-                result.add(new RequiredRightAnalysisResult(
-                    reference,
-                    this.translationBlockSupplierProvider.get("uiextension.requiredrights.adminOnly",
-                        extensionPoint),
-                    this.objectBlockSupplierProvider.get(object),
-                    List.of(RequiredRight.WIKI_ADMIN)
-                ));
+            case null, default -> {
+                // Some UI extension points only consider extensions whose authors have wiki admin right.
+                // TODO: Make it possible to extend the list of admin-only extension points.
+                String extensionPoint =
+                    object.getStringValue(WikiUIExtensionConstants.EXTENSION_POINT_ID_PROPERTY);
+                if (StringUtils.isNotBlank(extensionPoint) && ADMIN_ONLY_EXTENSION_POINTS.contains(extensionPoint)) {
+                    result.add(new RequiredRightAnalysisResult(
+                        reference,
+                        this.translationBlockSupplierProvider.get("uiextension.requiredrights.adminOnly",
+                            extensionPoint),
+                        this.objectBlockSupplierProvider.get(object),
+                        List.of(RequiredRight.WIKI_ADMIN)
+                    ));
+                }
             }
         }
 

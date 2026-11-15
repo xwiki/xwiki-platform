@@ -22,7 +22,6 @@ package org.xwiki.extension.security.internal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -220,8 +219,8 @@ class ExtensionSecuritySolrClientTest
 
     private static boolean sameArraysNoOrder(String[] a1, String[] a2)
     {
-        List<String> sl1 = Arrays.stream(a1).sorted().collect(Collectors.toList());
-        List<String> sl2 = Arrays.stream(a2).sorted().collect(Collectors.toList());
+        List<String> sl1 = Arrays.stream(a1).sorted().toList();
+        List<String> sl2 = Arrays.stream(a2).sorted().toList();
         return Objects.equals(sl1, sl2);
     }
 }

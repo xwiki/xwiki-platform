@@ -74,7 +74,7 @@ public class DefaultMentionXDOMService implements MentionXDOMService
 
     private static boolean matchMentionMacro(Block block)
     {
-        return block instanceof MacroBlock && Objects.equals(((MacroBlock) block).getId(), MENTION_MACRO_NAME);
+        return block instanceof MacroBlock macroBlock && Objects.equals(macroBlock.getId(), MENTION_MACRO_NAME);
     }
 
     @Override

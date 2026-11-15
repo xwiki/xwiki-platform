@@ -18,7 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { unescapeXML } from "@xwiki/platform-fn-utils";
 import { LinkType, name } from "@xwiki/platform-link-suggest-api";
+import { EntityType } from "@xwiki/platform-model-api";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/platform-api";
 import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
@@ -67,12 +69,10 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     query: string,
   ) {
     const baseURL = this.cristalApp.getWikiConfig().baseURL;
-    const fqs = this.initializeSolrQueryParameters(type, mimetype);
     const params: Record<string, string> = {
-      query: fqs.map((it) => `fq=${it}`).join("\n"),
+      ...this.getSearchParameters(type, mimetype, query),
       nb: "20",
       media: "json",
-      input: `*${query}*`,
     };
 
     const getParams = new URLSearchParams(params).toString();
@@ -88,17 +88,60 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     return await response.json();
   }
 
+  /**
+   * @param type - the type of the entities to search for, all types when not specified
+   * @param mimetype - the media type of the attachments to search for, all types when not specified
+   * @param query - the text typed by the user
+   * @returns the search query and its input, as expected by the search suggest service
+   */
+  private getSearchParameters(
+    type: LinkType | undefined,
+    mimetype: string | undefined,
+    query: string,
+  ): { query: string; input: string } {
+    const queryParameters = this.initializeSolrQueryParameters(
+      type,
+      mimetype,
+    ).map((it) => `fq=${it}`);
+    // Wildcard each word individually instead of the whole query: Solr wildcard terms are matched against
+    // the raw indexed tokens (bypassing the analyzer), so wrapping a multi-word or punctuated query (e.g., a
+    // file name like "image.gif") in a single "*...*" pattern fails to match the separately indexed tokens
+    // ("image", "gif"). Wildcarding word-by-word keeps partial/prefix matching working for each token.
+    let input = this.wildcardQuery(query);
+    if (!input) {
+      // The service doesn't search without an input, so an empty query (e.g. before the user types anything)
+      // matches everything instead, the most recent first, like the WYSIWYG editors suggest.
+      input = "*";
+      queryParameters.push(
+        `sort=${type == LinkType.ATTACHMENT ? "attdate_sort" : "date"} desc`,
+      );
+    }
+    return { query: queryParameters.join("\n"), input };
+  }
+
+  private wildcardQuery(query: string): string {
+    // Split on any run of non-alphanumeric characters, not just whitespace: the indexed content is tokenized
+    // the same way (e.g., a file name like "image.gif" is indexed as the two separate tokens "image" and
+    // "gif"), so a single word containing punctuation (like a file extension) needs splitting too.
+    return query
+      .trim()
+      .split(/[^\p{L}\p{N}]+/u)
+      .filter((word) => word.length > 0)
+      .map((word) => `*${word}*`)
+      .join(" ");
+  }
+
   private initializeSolrQueryParameters(
     type: LinkType | undefined,
     mimetype: string | undefined,
   ) {
     const fqs = ["locale:*", "wiki:xwiki"];
 
-    if (type) {
+    if (type !== undefined) {
       if (type == LinkType.ATTACHMENT) {
         fqs.push("type:ATTACHMENT");
       } else {
-        fqs.push("type:PAGE");
+        fqs.push("type:DOCUMENT");
       }
     }
 
@@ -137,14 +180,22 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     title_: string;
     name: string;
     reference: string;
+    // The (XML escaped) labels of the pages containing the entity, separated by " / ".
+    location?: string;
   }) {
-    const reference = result.reference;
     const type = result.type;
+    const hint = unescapeXML(result.location?.trim() ?? "");
+    const reference = this.stripEntityTypePrefix(result.reference, type);
+    // The type is needed to parse an attachment reference, which would otherwise be taken for a page reference.
+    const entityType =
+      type == "ATTACHMENT" ? EntityType.ATTACHMENT : EntityType.DOCUMENT;
     const xwikiURL =
       this.remoteURLSerializerProvider
         .get()
         ?.serialize(
-          this.modelReferenceParserProvider.get()?.parse(reference),
+          this.modelReferenceParserProvider
+            .get()
+            ?.parse(reference, { type: entityType }),
         ) ?? "";
 
     if (type == "ATTACHMENT") {
@@ -154,7 +205,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
         url: xwikiURL,
         reference,
         label: result.filename[0],
-        hint: result.filename[0],
+        hint,
       };
     } else if (type == "DOCUMENT") {
       const label = result.title_;
@@ -164,9 +215,25 @@ class XWikiLinkSuggestService implements LinkSuggestService {
         url: xwikiURL,
         reference,
         label,
-        hint: label,
+        hint,
       };
     }
+  }
+
+  /**
+   * The Solr "reference" field is the serialized entity reference prefixed with the (lower case) entity type, e.g.
+   * "document:wiki:Space.Page", while a link reference is a plain entity reference. Drop that prefix: the entity
+   * reference resolver parses from the right, so it would otherwise take "document:wiki" for the wiki name.
+   *
+   * @param reference - the value of the Solr "reference" field
+   * @param type - the value of the Solr "type" field
+   * @returns the entity reference the given Solr reference designates
+   */
+  private stripEntityTypePrefix(reference: string, type: string): string {
+    const prefix = `${type.toLowerCase()}:`;
+    return reference.startsWith(prefix)
+      ? reference.substring(prefix.length)
+      : reference;
   }
 
   private async getCredentials(): Promise<{ Authorization?: string }> {

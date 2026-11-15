@@ -140,7 +140,7 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         }
     }
 
-    private List<String> getAllUsers(Session session) throws HibernateException, XWikiException
+    private List<String> getAllUsers(Session session) throws HibernateException
     {
         // We select only XWikiUsers documents that have not been migrated yet:
         // i.e. those that does not have an email_checked property yet.

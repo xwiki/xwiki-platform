@@ -147,6 +147,12 @@ administration.section.groups.deleteUserFromGroup.loading=Исключение �
 administration.section.groups.deleteUserFromGroup.success=Участник успешно исключен из группы
 administration.section.groups.deleteUserFromGroup.failure=Не удалось исключить участника из группы
 
+# Rights for page section
+### Missing: administration.section.pagerights.hint=These rights apply on this page only. They do not affect the {0}children{1}.
+
+# Rights for page and children section
+### Missing: administration.section.pageandchildrenrights.hint=These rights apply on this page and {0}all its children{1}.
+
 # Other Category
 admin.other=Прочее
 admin.other.description=Различные настройки для расширений.

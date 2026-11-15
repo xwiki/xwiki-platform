@@ -110,7 +110,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
                 steps.add(0, welcomeStep);
             } catch (ComponentLookupException e1) {
-                this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
+                this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID, e1);
             }
 
             // Add the Report step.
@@ -121,7 +121,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
                 steps.add(welcomeStep);
             } catch (ComponentLookupException e1) {
-                this.logger.error("Failed to get step instance for id [{}]", ReportDistributionStep.ID);
+                this.logger.error("Failed to get step instance for id [{}]", ReportDistributionStep.ID, e1);
             }
         }
 
@@ -266,7 +266,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
                 distributionJobThread.setName("Wikis non-interfactive distribution jobs");
                 distributionJobThread.start();
             } catch (WikiManagerException e) {
-                this.logger.error("Failed to get the list of wikis. Sub-wikis ditribution jobs won't be triggered.", e);
+                this.logger.error("Failed to get the list of wikis. Sub-wikis distribution jobs won't be triggered.",
+                    e);
             }
         }
     }

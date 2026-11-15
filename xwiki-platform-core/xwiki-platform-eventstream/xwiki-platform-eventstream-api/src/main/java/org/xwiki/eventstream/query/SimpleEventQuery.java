@@ -569,9 +569,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
             return true;
         }
 
-        if (obj instanceof SimpleEventQuery) {
-            SimpleEventQuery query = (SimpleEventQuery) obj;
-
+        if (obj instanceof SimpleEventQuery query) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));

@@ -19,11 +19,11 @@
  */
 package org.xwiki.notifications.notifiers.email;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-
-import java.util.List;
 
 /**
  * Defines how the events should be grouped to be sent in individual emails.

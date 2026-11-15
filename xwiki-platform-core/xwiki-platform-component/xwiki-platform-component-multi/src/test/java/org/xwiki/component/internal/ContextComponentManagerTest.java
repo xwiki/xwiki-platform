@@ -348,8 +348,9 @@ class ContextComponentManagerTest
     void testRegisterComponentInContextComponentManagerThrowsException() throws Exception
     {
         ComponentManager contextCM = this.componentManager.getInstance(ComponentManager.class, "context");
+        DefaultComponentDescriptor<Role> descriptor = new DefaultComponentDescriptor<>();
         RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> contextCM.registerComponent(new DefaultComponentDescriptor<Role>()));
+            () -> contextCM.registerComponent(descriptor));
         assertEquals(
             "The Context Component Manager should only be used for read access. Write operations "
                 + "should be done against specific Component Managers.",

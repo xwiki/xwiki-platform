@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "isolatedDeclarations": false,
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ]
+  },
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "include": [
+    "src/**/*",
+    "global.d.ts"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
+  "vueCompilerOptions": {
+    "strictTemplates": true,
+    "dataAttributes": [
+      "data-*"
+    ]
+  }
+}

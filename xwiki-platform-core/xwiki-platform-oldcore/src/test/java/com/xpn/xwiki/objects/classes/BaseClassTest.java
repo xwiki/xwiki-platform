@@ -33,6 +33,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -156,6 +157,38 @@ class BaseClassTest
         baseClass.addNumberField("field", "int pretty name", 30, "int");
 
         assertTrue(baseClass.addTextAreaField("field", "pretty name", 55, 33));
+    }
+
+    @Test
+    void addTemplateField()
+    {
+        BaseClass baseClass = new BaseClass();
+
+        assertTrue(baseClass.addTemplateField("template", "Template"));
+
+        TextAreaClass templateClass = (TextAreaClass) baseClass.get("template");
+        assertEquals("puretext", templateClass.getEditor());
+        assertEquals("puretext", templateClass.getContentType());
+        assertFalse(templateClass.isWikiContent());
+
+        // Calling it again on an up to date field doesn't modify the class.
+        assertFalse(baseClass.addTemplateField("template", "Template"));
+    }
+
+    @Test
+    void addTemplateFieldWhenExistingFieldHasNoContentType()
+    {
+        BaseClass baseClass = new BaseClass();
+
+        // The way template fields used to be created: a pure text editor but no content type, which means wiki
+        // content.
+        baseClass.addTextAreaField("template", "Template", 80, 15, EditorType.PURE_TEXT);
+        TextAreaClass templateClass = (TextAreaClass) baseClass.get("template");
+        assertTrue(templateClass.isWikiContent());
+
+        // The existing field is updated so that the template is not considered as wiki content anymore.
+        assertTrue(baseClass.addTemplateField("template", "Template"));
+        assertFalse(templateClass.isWikiContent());
     }
 
     @Test

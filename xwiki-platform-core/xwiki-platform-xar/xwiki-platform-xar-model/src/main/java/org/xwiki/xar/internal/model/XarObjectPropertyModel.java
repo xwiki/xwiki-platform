@@ -20,6 +20,8 @@
 package org.xwiki.xar.internal.model;
 
 /**
+ * Helper class holding constants of the XAR XML model for the object property element.
+ * 
  * @version $Id$
  * @since 5.4M1
  */
@@ -28,4 +30,12 @@ public class XarObjectPropertyModel
     public static final String ELEMENT_PROPERTY = "property";
 
     public static final String ATTRIBUTE_TYPE = "type";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarObjectPropertyModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

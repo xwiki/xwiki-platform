@@ -70,12 +70,13 @@ class RefactoringMacrosPageTest extends PageTest
         throws Exception
     {
         XWikiDocument document = this.xwiki.getDocument(DOCUMENT_REFERENCE, this.context);
-        document.setContent(String.format("{{velocity}}\n"
-                + "#template('attachment/refactoring_macros.vm')\n"
-                + "#set($isAdvancedUser = %s)\n"
-                + "#set($isSuperAdmin = %s)\n"
-                + "{{html}}#displayAttachmentLinksCheckbox(){{/html}}\n"
-                + "{{/velocity}}",
+        document.setContent(String.format("""
+            {{velocity}}
+            #template('attachment/refactoring_macros.vm')
+            #set($isAdvancedUser = %s)
+            #set($isSuperAdmin = %s)
+            {{html}}#displayAttachmentLinksCheckbox(){{/html}}
+            {{/velocity}}""",
             isAdvancedUser, isSuperAdmin));
         document.setSyntax(Syntax.XWIKI_2_1);
         this.xwiki.saveDocument(document, this.context);
@@ -94,10 +95,11 @@ class RefactoringMacrosPageTest extends PageTest
         when(attachmentScriptService.backlinksCount(any())).thenReturn(10L);
 
         XWikiDocument document = this.xwiki.getDocument(DOCUMENT_REFERENCE, this.context);
-        document.setContent("{{velocity}}\n"
-            + "#template('attachment/refactoring_macros.vm')\n"
-            + "{{html}}#displayAttachmentLinksCheckbox(){{/html}}\n"
-            + "{{/velocity}}");
+        document.setContent("""
+            {{velocity}}
+            #template('attachment/refactoring_macros.vm')
+            {{html}}#displayAttachmentLinksCheckbox(){{/html}}
+            {{/velocity}}""");
         document.setSyntax(Syntax.XWIKI_2_1);
         this.xwiki.saveDocument(document, this.context);
 

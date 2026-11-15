@@ -36,10 +36,23 @@ public class UserAuthenticatedEvent implements Event
     private final UserReference userReference;
 
     /**
+     * Match all user authentications.
+     * 
+     * @since 16.10.19
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     * @since 17.10.12
+     */
+    public UserAuthenticatedEvent()
+    {
+        this(null);
+    }
+
+    /**
      * This event will match only events of the same type affecting the same user.
      *
-     * @param userReference The reference related to an authenticated user for whom a {@link UserAuthenticatedEvent}
-     * has been triggered.
+     * @param userReference The reference related to an authenticated user for whom a {@link UserAuthenticatedEvent} has
+     *            been triggered.
      */
     public UserAuthenticatedEvent(UserReference userReference)
     {
@@ -57,8 +70,10 @@ public class UserAuthenticatedEvent implements Event
     @Override
     public boolean matches(Object other)
     {
-        return other instanceof UserAuthenticatedEvent;
+        if (other instanceof UserAuthenticatedEvent userEvent) {
+            return this.userReference == null || this.userReference.equals(userEvent.userReference);
+        }
+
+        return false;
     }
-
 }
-

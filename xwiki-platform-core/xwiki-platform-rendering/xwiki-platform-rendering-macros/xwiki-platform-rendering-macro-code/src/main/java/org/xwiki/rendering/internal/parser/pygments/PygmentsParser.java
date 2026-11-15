@@ -20,15 +20,17 @@
 package org.xwiki.rendering.internal.parser.pygments;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -91,6 +93,8 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
      */
     private static final String ENGINE_ID = "python";
 
+    private static final String SCRIPT_RESOURCE = "pygments/code.py";
+
     /**
      * The syntax identifier.
      */
@@ -104,45 +108,40 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private Parser plainTextParser;
 
     /**
-     * Pygments highligh parser configuration.
+     * Pygments highlight parser configuration.
      */
     @Inject
     private PygmentsParserConfiguration configuration;
 
     /**
-     * The JSR223 Script Engine we use to evaluate Python scripts.
+     * The Python script used to manipulate Pygments, compiled once since compiling it is much more expensive than
+     * highlighting a typical snippet, and creates a new Java class each time.
      */
-    private ScriptEngine engine;
-
-    /**
-     * The Python script used to manipulate Pygments.
-     */
-    private String script;
+    private CompiledScript script;
 
     @Override
     public void initialize() throws InitializationException
     {
-        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-
         // Get the script
-        InputStream is = getClass().getResourceAsStream("/pygments/code.py");
-        if (is != null) {
-            try {
-                this.script = IOUtils.toString(is, "UTF8");
-            } catch (Exception e) {
-                throw new InitializationException("Failed to read resource /pygments/code.py resource", e);
-            } finally {
-                IOUtils.closeQuietly(is);
-            }
-        } else {
-            throw new InitializationException("Failed to find resource /pygments/code.py resource");
+        String scriptSource;
+        try {
+            scriptSource =
+                IOUtils.resourceToString(SCRIPT_RESOURCE, StandardCharsets.UTF_8, getClass().getClassLoader());
+        } catch (IOException e) {
+            throw new InitializationException("Failed to read resource " + SCRIPT_RESOURCE, e);
         }
 
         // Get the Python engine
-        this.engine = scriptEngineManager.getEngineByName(ENGINE_ID);
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName(ENGINE_ID);
 
-        if (this.engine == null) {
-            throw new InitializationException("Failed to find engine for Python script language");
+        if (!(engine instanceof Compilable compilable)) {
+            throw new InitializationException("Failed to find a compiling engine for Python script language");
+        }
+
+        try {
+            this.script = compilable.compile(scriptSource);
+        } catch (ScriptException e) {
+            throw new InitializationException("Failed to compile resource " + SCRIPT_RESOURCE, e);
         }
 
         String highlightSyntaxId = getSyntaxId() + "-highlight";
@@ -165,7 +164,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             throw new ParseException("Failed to read source", e);
         }
 
-        if (code.length() == 0) {
+        if (code.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -205,7 +204,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         scriptContext.setAttribute(PY_STYLE_VARNAME, this.configuration.getStyle(), ScriptContext.ENGINE_SCOPE);
         scriptContext.setAttribute(PY_LISTENER_VARNAME, listener, ScriptContext.ENGINE_SCOPE);
 
-        this.engine.eval(this.script, scriptContext);
+        this.script.eval(scriptContext);
 
         List<Block> blocks;
         if (scriptContext.getAttribute(PY_LEXER_VARNAME) != null) {

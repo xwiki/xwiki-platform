@@ -47,7 +47,7 @@ admin.documentanalysis=Dokumentanalyse
 
 index.spacesMacro.title=Områder
 index.spacesMacro.spaceIndex.title=Se områdeindhold
-index.spacesMacro.spaceIndex.alt=Indholdsfortegnelse
+index.spacesMacro.spaceIndex.alt=Indeks over områder
 index.spacesMacro.spaceAdministration.title=Se område-administration
 index.spacesMacro.spaceAdministration.alt=Administrer område
 index.spacesMacro.createSpace.link=Opret nyt område

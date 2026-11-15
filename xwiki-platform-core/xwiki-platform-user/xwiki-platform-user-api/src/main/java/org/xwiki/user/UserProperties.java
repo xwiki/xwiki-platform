@@ -25,7 +25,7 @@ import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Represents all the properties of an XWiki user. It can represent direct properites or inherited properties.
+ * Represents all the properties of an XWiki user. It can represent direct properties or inherited properties.
  * Note that it's independent from where users are stored, and should remain that way, so that we can switch the user
  * store in the future.
  *

@@ -225,7 +225,7 @@
       #set ($newSize = $newSize.trim())
     #end
     #if ($oldSize == $newSize)
-      ## Sometimes the change is too small to have an effect on the displaed value (e.g. you add one byte to a one MB
+      ## Sometimes the change is too small to have an effect on the displayed value (e.g. you add one byte to a one MB
       ## file). In this case fallback on the raw size values (in bytes).
       #set ($oldSize = $oldAttachment.longSize)
       #set ($newSize = $newAttachment.longSize)

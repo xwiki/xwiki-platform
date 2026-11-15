@@ -59,6 +59,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.xar.XarException;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 
 /**
@@ -217,6 +218,9 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     }
 
     /**
+     * Reset the passed document to its standard state. It's interpreted as an action done by the context user (so the
+     * usual edition protections are applied).
+     *
      * @param reference the reference of the document to reset to its standard state (what it looks like in the
      *            extension XAR)
      * @param jobId the id of the job which computed the diff if any
@@ -229,12 +233,18 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
         setError(null);
 
         try {
+            XWikiContext xcontext = this.xcontextProvider.get();
+
             // Only current author is allowed to modify (and so reset) the target document
-            this.genericAuthorization.checkAccess(Right.EDIT, this.xcontextProvider.get().getAuthorReference(),
-                reference);
+            this.genericAuthorization.checkAccess(Right.EDIT, xcontext.getAuthorReference(), reference);
+
+            // Since the author is set to be the current user, it does not make sense to allow it if the current user is
+            // not allowed to do this kind of changes (that would require another API which is documented as using the
+            // context author as document author)
+            this.genericAuthorization.checkAccess(Right.EDIT, xcontext.getUserReference(), reference);
 
             // Reset the document in the DB
-            this.packager.reset(reference, this.xcontextProvider.get().getUserReference());
+            this.packager.resetWithContextUser(reference);
 
             // Update the existing job status if any
             if (jobId != null) {

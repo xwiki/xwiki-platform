@@ -51,14 +51,11 @@ public class AttachController extends FsAbstractController
 {
     private static final BitField<Access> READ_ONLY = BitField.of(READ);
 
-    private final AttachDriver driver;
-
     private ComponentManager componentManager;
 
-    AttachController(AttachDriver driver, FsModel model, ComponentManager componentManager)
+    AttachController(FsModel model, ComponentManager componentManager)
     {
         super(model);
-        this.driver = driver;
         this.componentManager = componentManager;
     }
 

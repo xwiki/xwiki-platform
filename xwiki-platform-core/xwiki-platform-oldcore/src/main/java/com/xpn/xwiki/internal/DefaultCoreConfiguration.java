@@ -70,11 +70,11 @@ public class DefaultCoreConfiguration implements CoreConfiguration
     /**
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      * @since 2.3M1
-     * @deprecated starting with 11.0, use
+     * @deprecated use
      *     {@link org.xwiki.rendering.configuration.ExtendedRenderingConfiguration#getDefaultContentSyntax()}
      */
     @Override
-    @Deprecated
+    @Deprecated(since = "11.0")
     public Syntax getDefaultDocumentSyntax()
     {
         // If the found value is an empty string then default to the configuration value in the main configuration
@@ -93,8 +93,8 @@ public class DefaultCoreConfiguration implements CoreConfiguration
         try {
             syntax = Syntax.valueOf(syntaxId);
         } catch (ParseException e) {
-            this.logger.warn("Invalid default document Syntax [{}], defaulting to [{}] instead", syntaxId,
-                Syntax.XWIKI_2_1.toIdString(),  e);
+            this.logger.warn("Invalid default document Syntax [{}], defaulting to [{}] instead",
+                syntaxId, Syntax.XWIKI_2_1.toIdString(), e);
             syntax = Syntax.XWIKI_2_1;
         }
 

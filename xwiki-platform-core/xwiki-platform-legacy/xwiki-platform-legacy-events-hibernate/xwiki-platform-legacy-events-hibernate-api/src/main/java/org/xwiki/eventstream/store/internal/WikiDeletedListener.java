@@ -19,17 +19,18 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.Arrays;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Arrays;
 
 /**
  * Listener that start a EventStreamWikiCleanerJob when a wiki is deleted. The idea is to clean the event stream when

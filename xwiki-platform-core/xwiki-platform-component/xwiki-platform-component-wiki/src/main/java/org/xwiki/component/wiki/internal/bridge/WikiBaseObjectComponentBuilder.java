@@ -45,7 +45,7 @@ public interface WikiBaseObjectComponentBuilder extends WikiObjectComponentBuild
      * @param baseObject the XObject that should be used to create the component.
      * @return the new components
      * @throws WikiComponentException if the given {@link EntityReference} is incompatible with the current builder or
-     * if the {@link WikiComponentBuilder} has not been able to instanciate the component.
+     * if the {@link WikiComponentBuilder} has not been able to instantiate the component.
      */
     List<WikiComponent> buildComponents(BaseObject baseObject) throws WikiComponentException;
 

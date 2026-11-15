@@ -28,7 +28,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import com.xpn.xwiki.XWiki;
 
 /**
- * Update XWiki.XWikiGlobalRights document with all required informations.
+ * Update XWiki.XWikiGlobalRights document with all required information.
  *
  * @version $Id$
  * @since 4.3M1

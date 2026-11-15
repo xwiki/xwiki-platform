@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.ExtendedMimeMessage;
@@ -51,6 +50,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -97,8 +97,8 @@ class DatabaseMailListenerTest
         this.message.setHeader("Message-ID", this.mimeMessageId);
         this.messageId = this.message.getUniqueMessageId();
 
-        ExecutionContext executionContext = Mockito.mock(ExecutionContext.class);
-        XWikiContext xcontext = Mockito.mock(XWikiContext.class);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWikiId()).thenReturn("mywiki");
         when(executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xcontext);
         when(this.execution.getContext()).thenReturn(executionContext);

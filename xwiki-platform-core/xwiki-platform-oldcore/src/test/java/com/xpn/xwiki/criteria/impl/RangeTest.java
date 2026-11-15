@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.criteria.impl;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -50,10 +50,10 @@ class RangeTest
     private void doConstructorTest(int start, int size)
     {
         Range i = new Range(start, size);
-        assertEquals(i.getStart(), start);
-        assertEquals(i.getSize(), size);
-        assertEquals(i.getAbsoluteStart(), Math.abs(start));
-        assertEquals(i.getAbsoluteSize(), Math.abs(size));
+        assertEquals(start, i.getStart());
+        assertEquals(size, i.getSize());
+        assertEquals(Math.abs(start), i.getAbsoluteStart());
+        assertEquals(Math.abs(size), i.getAbsoluteSize());
     }
 
     public static final List<String> zeroToHeight =
@@ -63,14 +63,14 @@ class RangeTest
     void subListWithStartZeroAndSizeZero()
     {
         Range range = new Range(0, 0);
-        assertEquals(range.subList(zeroToHeight), zeroToHeight);
+        assertEquals(zeroToHeight, range.subList(zeroToHeight));
     }
 
     @Test
     void subListWithStartZeroAndSizeOneThousand()
     {
         Range range = new Range(0, 1000);
-        assertEquals(range.subList(zeroToHeight), zeroToHeight);
+        assertEquals(zeroToHeight, range.subList(zeroToHeight));
     }
 
     @Test
@@ -78,7 +78,7 @@ class RangeTest
     {
         Range range = RangeFactory.createHeadRange(1);
         List<String> zero = Arrays.asList(new String[]{"0"});
-        assertEquals(range.subList(zeroToHeight), zero);
+        assertEquals(zero, range.subList(zeroToHeight));
     }
 
     @Test
@@ -86,7 +86,7 @@ class RangeTest
     {
         Range range = RangeFactory.createTailRange(1);
         List<String> height = Arrays.asList(new String[]{"8"});
-        assertEquals(range.subList(zeroToHeight), height);
+        assertEquals(height, range.subList(zeroToHeight));
     }
 
     @Test
@@ -94,7 +94,7 @@ class RangeTest
     {
         Range range = new Range(0, 4);
         List<String> zeroToThree = Arrays.asList(new String[]{"0", "1", "2", "3"});
-        assertEquals(range.subList(zeroToHeight), zeroToThree);
+        assertEquals(zeroToThree, range.subList(zeroToHeight));
     }
 
     @Test
@@ -102,7 +102,7 @@ class RangeTest
     {
         Range range = new Range(0, -4);
         List<String> fiveToHeight = Arrays.asList(new String[]{"5", "6", "7", "8"});
-        assertEquals(range.subList(zeroToHeight), fiveToHeight);
+        assertEquals(fiveToHeight, range.subList(zeroToHeight));
     }
 
     @Test
@@ -110,7 +110,7 @@ class RangeTest
     {
         Range range = new Range(-2, 4);
         List<String> sevenToHeight = Arrays.asList(new String[]{"7", "8"});
-        assertEquals(range.subList(zeroToHeight), sevenToHeight);
+        assertEquals(sevenToHeight, range.subList(zeroToHeight));
     }
 
     @Test
@@ -118,7 +118,7 @@ class RangeTest
     {
         Range range = new Range(-2, -4);
         List<String> threeToSix = Arrays.asList(new String[]{"3", "4", "5", "6"});
-        assertEquals(range.subList(zeroToHeight), threeToSix);
+        assertEquals(threeToSix, range.subList(zeroToHeight));
     }
 
     @Test
@@ -126,6 +126,6 @@ class RangeTest
     {
         Range range = new Range(2, -4);
         List<String> zeroToOne = Arrays.asList(new String[]{"0", "1"});
-        assertEquals(range.subList(zeroToHeight), zeroToOne);
+        assertEquals(zeroToOne, range.subList(zeroToHeight));
     }
 }

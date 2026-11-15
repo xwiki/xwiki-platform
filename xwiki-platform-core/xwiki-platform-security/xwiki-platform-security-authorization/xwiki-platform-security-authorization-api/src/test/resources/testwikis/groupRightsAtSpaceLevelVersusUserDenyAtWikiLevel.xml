@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#groupRightsAtSpaceLevelVersusUserDenyAtWikiLevel() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki denying the edit right to userA">
+    <user name="userA" alt="a user member of groupA and denied the edit right at wiki level" />
+    <user name="userB" alt="a user not member of groupA" />
+    <group name="groupA">
+      <user name="userA" />
+    </group>
+
+    <denyUser name="userA" type="edit" />
+
+    <space name="any space" alt="a space without any rule">
+      <document name="any document" />
+    </space>
+
+    <space name="spaceAllowGroupA" alt="a space allowing view, comment and edit to groupA">
+      <allowGroup name="groupA" type="view" />
+      <allowGroup name="groupA" type="comment" />
+      <allowGroup name="groupA" type="edit" />
+
+      <document name="any document" />
+    </space>
+  </wiki>
+</wikis>

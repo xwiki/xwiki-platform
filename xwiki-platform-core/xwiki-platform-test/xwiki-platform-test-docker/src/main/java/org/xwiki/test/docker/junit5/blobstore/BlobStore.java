@@ -28,7 +28,7 @@ package org.xwiki.test.docker.junit5.blobstore;
 public enum BlobStore
 {
     /**
-     * Represents the default blob store.
+     * Represents the default blob store (depends if clustering is enabled or not).
      * @since 18.3.0RC1
      */
     DEFAULT(null),
@@ -39,7 +39,7 @@ public enum BlobStore
     FILESYSTEM("filesystem"),
 
     /**
-     * Represents the S3 blob store using MinIO (default in case of cluster).
+     * Represents the S3 blob store using Silo, a MinIO fork (default in case of cluster).
      */
     S3("s3");
 

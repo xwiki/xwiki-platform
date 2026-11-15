@@ -39,14 +39,18 @@ define('xwiki-realtime-userData', [
   let module = {}, online, myId;
 
   function startInitializing() {
-    module._initializing = new Promise(resolve => {
+    module._initializing = new Promise((resolve, reject) => {
       module._notifyReady = () => {
         // Mark the UserData as ready right away (rather than using a promise callback which would be called on the next
         // tick), to be visible to the code executed right after _notifyReady is called.
         module._initializing = false;
         resolve();
       };
+      module._notifyError = reject;
     });
+    // Only start() waits for the initialization, so mark the failure as handled when we reconnect, because nobody else
+    // is waiting for it then (onError logs it).
+    module._initializing.catch(() => {});
   }
 
   function createConfig(network, key, configData) {
@@ -93,6 +97,33 @@ define('xwiki-realtime-userData', [
         } else {
           module.chainpad.abort();
           online = false;
+        }
+      },
+
+      beforeReconnecting: async function(callback) {
+        let currentKey;
+        try {
+          currentKey = configData.getChannel ? await configData.getChannel() : key;
+        } catch (error) {
+          console.debug('Failed to get the user data channel.', error);
+        }
+        if (currentKey === key) {
+          // The channel we used before the WebSocket connection was closed is still available.
+          callback(key, this.initialState);
+        } else {
+          // The server removes a channel when its last user leaves it, so the channel we used before the WebSocket
+          // connection was closed may not be available anymore. Don't rejoin it: the editor will start a new user data
+          // synchronization using the new channel.
+          module.chainpad.abort();
+          online = false;
+        }
+      },
+
+      onError: function(error) {
+        console.warn('User data synchronization error.', error);
+        if (module._initializing) {
+          // Let the caller of start() know that we couldn't join the channel.
+          module._notifyError(error);
         }
       }
     };

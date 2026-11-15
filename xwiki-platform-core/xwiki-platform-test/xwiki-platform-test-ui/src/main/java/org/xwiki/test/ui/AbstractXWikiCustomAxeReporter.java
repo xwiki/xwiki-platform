@@ -36,10 +36,10 @@
  */
 package org.xwiki.test.ui;
 
+import java.util.List;
+
 import com.deque.html.axecore.results.CheckedNode;
 import com.deque.html.axecore.results.Rule;
-
-import java.util.List;
 
 /**
  * Creates a human-readable report from an axe-core scan result.

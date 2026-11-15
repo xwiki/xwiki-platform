@@ -66,10 +66,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     /**
      * Used to find if the current document's author has programming rights.
      *
-     * @deprecated since 2.5M1 (not used any more)
+     * @deprecated (not used any more)
      */
     @Inject
-    @Deprecated
+    @Deprecated(since = "2.5M1")
     protected org.xwiki.bridge.DocumentAccessBridge documentAccessBridge;
 
     /**
@@ -106,7 +106,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     /**
      * @param macroName the name of the macro (eg "groovy")
      */
-    public AbstractScriptMacro(String macroName)
+    protected AbstractScriptMacro(String macroName)
     {
         super(macroName, null, ScriptMacroParameters.class);
 
@@ -117,7 +117,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      */
-    public AbstractScriptMacro(String macroName, String macroDescription)
+    protected AbstractScriptMacro(String macroName, String macroDescription)
     {
         super(macroName, macroDescription, ScriptMacroParameters.class);
 
@@ -129,7 +129,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param macroDescription the text description of the macro.
      * @param contentDescriptor the description of the macro content.
      */
-    public AbstractScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
+    protected AbstractScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
     {
         super(macroName, macroDescription, contentDescriptor, ScriptMacroParameters.class);
 
@@ -141,7 +141,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param macroDescription the text description of the macro.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractScriptMacro(String macroName, String macroDescription,
+    protected AbstractScriptMacro(String macroName, String macroDescription,
         Class< ? extends ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, parametersBeanClass);
@@ -155,7 +155,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param contentDescriptor the description of the macro content.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
+    protected AbstractScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
         Class< ? extends ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
@@ -236,10 +236,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param context the context of the macro transformation.
      * @return the result of script execution.
      * @throws MacroExecutionException failed to evaluate provided content.
-     * @deprecated since 2.4M2 use {@link #evaluateString(ScriptMacroParameters, String, MacroTransformationContext)}
+     * @deprecated use {@link #evaluateString(ScriptMacroParameters, String, MacroTransformationContext)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "2.4M2")
     protected String evaluate(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

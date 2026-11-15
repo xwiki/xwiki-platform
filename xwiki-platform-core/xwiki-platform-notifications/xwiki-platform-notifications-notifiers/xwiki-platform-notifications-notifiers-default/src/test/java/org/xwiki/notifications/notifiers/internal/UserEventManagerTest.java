@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class UserEventManagerTest
+class UserEventManagerTest
 {
     @InjectMockComponents
     private UserEventManager userEventManager;

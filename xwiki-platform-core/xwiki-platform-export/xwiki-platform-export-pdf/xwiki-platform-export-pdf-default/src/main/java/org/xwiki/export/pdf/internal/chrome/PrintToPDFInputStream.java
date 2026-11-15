@@ -45,6 +45,8 @@ public class PrintToPDFInputStream extends InputStream
 
     private boolean finished;
 
+    private boolean closed;
+
     private int bufferOffset;
 
     private byte[] buffer = new byte[] {};
@@ -125,9 +127,12 @@ public class PrintToPDFInputStream extends InputStream
     @Override
     public void close() throws IOException
     {
-        this.io.close(this.stream);
-        if (this.closeCallback != null) {
-            this.closeCallback.run();
+        if (!this.closed) {
+            this.closed = true;
+            this.io.close(this.stream);
+            if (this.closeCallback != null) {
+                this.closeCallback.run();
+            }
         }
     }
 }

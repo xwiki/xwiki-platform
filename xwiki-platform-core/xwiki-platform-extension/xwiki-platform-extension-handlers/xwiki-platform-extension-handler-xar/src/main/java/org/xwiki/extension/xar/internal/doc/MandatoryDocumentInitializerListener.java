@@ -111,12 +111,12 @@ public class MandatoryDocumentInitializerListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof MandatoryDocumentsInitializedEvent) {
-            getMandatoryDocuments(this.wikiDescriptorManagerProvider.get().getCurrentWikiId()).stream()
+            getMandatoryDocuments(this.wikiDescriptorManagerProvider.get().getCurrentWikiId())
                 .forEach(this.tree::addExtensionPage);
         } else if (event instanceof ComponentDescriptorAddedEvent) {
-            getMandatoryDocuments(event).stream().forEach(this.tree::addExtensionPage);
+            getMandatoryDocuments(event).forEach(this.tree::addExtensionPage);
         } else if (event instanceof ComponentDescriptorRemovedEvent) {
-            getMandatoryDocuments(event).stream().forEach(this.tree::removeExtensionPage);
+            getMandatoryDocuments(event).forEach(this.tree::removeExtensionPage);
         }
     }
 

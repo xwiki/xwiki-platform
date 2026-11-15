@@ -55,13 +55,16 @@ public interface ModelBridge
      * 
      * @param source the document to copy
      * @param destination the reference of the document copy that is going to be created
+     * @param modifiedByContextUser if the rename was triggered by a user and should be validated
      * @return {@code true} if the document was copied successfully, {@code false} if the copy failed
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     * @since 17.10.13
      */
-    boolean copy(DocumentReference source, DocumentReference destination);
+    boolean copy(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser);
 
     /**
-     * Delete the specified document.
-     * If the recycle bin is activated, the document is sent to the recycle bin.
+     * Delete the specified document. If the recycle bin is activated, the document is sent to the recycle bin.
      * Otherwise the document is removed permanently.
      * 
      * @param documentReference the reference of the document to delete
@@ -71,14 +74,32 @@ public interface ModelBridge
 
     /**
      * Delete or move to the recycle bin the specified document.
+     * 
      * @param documentReference the reference of the document to delete or move to the recycle bin
      * @param skipRecycleBin if {@code false}, the document is moved to the recycle bin (if the recycle bin is not
-     *                    activated, the document is removed permanently nevertheless), if {@code true},
-     *                    the document is removed permanently
+     *            activated, the document is removed permanently nevertheless), if {@code true}, the document is removed
+     *            permanently
      * @return {@code true} if the document was deleted successfully, {@code false} if the delete operation failed
      * @since 12.8RC1
      */
     boolean delete(DocumentReference documentReference, boolean skipRecycleBin);
+
+    /**
+     * Delete or move to the recycle bin the specified document.
+     * 
+     * @param documentReference the reference of the document to delete or move to the recycle bin
+     * @param skipRecycleBin if {@code false}, the document is moved to the recycle bin (if the recycle bin is not
+     *            activated, the document is removed permanently nevertheless), if {@code true}, the document is removed
+     *            permanently
+     * @param deletedByContextUser true if the document is potentially deleted by a user, in which case some protection
+     *            must be applied, false if it's done by the system
+     * @return {@code true} if the document was deleted successfully, {@code false} if the delete operation failed
+     * @since 18.9.0RC1
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 16.10.20
+     */
+    boolean delete(DocumentReference documentReference, boolean skipRecycleBin, boolean deletedByContextUser);
 
     /**
      * Remove the edit lock from the specified document.
@@ -196,8 +217,11 @@ public interface ModelBridge
      *
      * @param source the document to rename
      * @param destination the reference of the document that is going to be created
+     * @param modifiedByContextUser if the rename was triggered by a user and should be validated
      * @return {@code true} if the document was renamed successfully, {@code false} if the rename failed
-     * @since 12.5RC1
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     * @since 17.10.13
      */
-    boolean rename(DocumentReference source, DocumentReference destination);
+    boolean rename(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser);
 }

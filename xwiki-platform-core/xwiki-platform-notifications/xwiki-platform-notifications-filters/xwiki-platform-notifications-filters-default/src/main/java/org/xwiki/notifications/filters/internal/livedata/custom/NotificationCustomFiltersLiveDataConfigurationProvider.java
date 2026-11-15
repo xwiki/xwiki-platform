@@ -115,7 +115,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         {
             return this.fieldName;
         }
-    };
+    }
 
     @Inject
     private ContextualLocalizationManager l10n;

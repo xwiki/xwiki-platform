@@ -131,7 +131,7 @@ define('xwiki-attachment-picker',
         return this.solrSearch.search(query, isGlobal).then(this.cb)
           .catch((error) => {
             console.log(error);
-            new XWiki.widgets.Notification(translations.get('solrSearch.query.errorMessage'), 'error');
+            XWiki.widgets.Notification.show(translations.get('solrSearch.query.errorMessage'), 'error');
           }).finally(() => {
             this.resultsBlock.removeClass(loadingClass);
           });
@@ -227,11 +227,10 @@ define('xwiki-attachment-picker',
           .prop('href', downloadURL)
           .data('index', index)
           .append($('<span>').append(preview).addClass('previewWrapper'))
-          .append('<br/>')
           .append(textSpan);
 
         const attachmentGroup = $('<span class="attachmentGroup">')
-          .append($('<div/>').append(link))
+          .append(link)
           .data('id', result.id);
         if (result.isLocal) {
           attachmentGroup.addClass('localAttachment');

@@ -32,9 +32,9 @@ public interface WikiMacro extends Macro<WikiMacroParameters>
 {
     /**
      * @return the id under which this macro is registered with the component manager
-     * @deprecated since 2.3M1, use {@link org.xwiki.rendering.macro.descriptor.MacroDescriptor#getId()} instead
+     * @deprecated use {@link org.xwiki.rendering.macro.descriptor.MacroDescriptor#getId()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     String getId();
 
     /**

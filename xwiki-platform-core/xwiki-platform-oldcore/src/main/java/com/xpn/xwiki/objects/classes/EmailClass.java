@@ -119,7 +119,7 @@ public class EmailClass extends StringClass
             }
             return emailAddressObfuscator.obfuscate(addresses[0]);
         } catch (AddressException e) {
-            LOGGER.debug("Invalid email address value when trying to obfuscate [{}] falling back on null.", value);
+            LOGGER.debug("Invalid email address value when trying to obfuscate [{}] falling back on null.", value, e);
             return null;
         }
     }

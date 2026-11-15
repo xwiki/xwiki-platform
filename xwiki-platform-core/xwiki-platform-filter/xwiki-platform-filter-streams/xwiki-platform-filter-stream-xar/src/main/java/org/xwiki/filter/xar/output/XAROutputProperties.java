@@ -82,17 +82,17 @@ public class XAROutputProperties extends XMLOutputProperties
     private String packageExtensionId;
 
     /**
-     * @return Indicate if all revisions related informations should be serialized
+     * @return Indicate if all revisions related information should be serialized
      */
-    @PropertyName("Preserve revisions informations")
-    @PropertyDescription("Indicate if all revisions related informations should be serialized")
+    @PropertyName("Preserve revisions information")
+    @PropertyDescription("Indicate if all revisions related information should be serialized")
     public boolean isPreserveVersion()
     {
         return this.preserveVersion;
     }
 
     /**
-     * @param preserveVersion Indicate if all revisions related informations should be serialized
+     * @param preserveVersion Indicate if all revisions related information should be serialized
      */
     public void setPreserveVersion(boolean preserveVersion)
     {
@@ -140,7 +140,7 @@ public class XAROutputProperties extends XMLOutputProperties
     // package.xml
 
     /**
-     * @return Indicate if all revisions related informations should be serialized
+     * @return Indicate if all revisions related information should be serialized
      */
     @PropertyName("Package Name")
     @PropertyDescription("The name to put in package.xml")
@@ -150,7 +150,7 @@ public class XAROutputProperties extends XMLOutputProperties
     }
 
     /**
-     * @param packageName Indicate if all revisions related informations should be serialized
+     * @param packageName Indicate if all revisions related information should be serialized
      */
     public void setPackageName(String packageName)
     {

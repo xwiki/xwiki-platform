@@ -136,7 +136,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * </p>
      *
      * @param element <code>{@link Element}</code> to output.
-     * @param rd <code>{@link Reader}</code> that will be fully read and transfered into the element content.
+     * @param rd <code>{@link Reader}</code> that will be fully read and transferred into the element content.
      * @throws IOException a problem occurs during reading or writing.
      */
     public void write(Element element, Reader rd) throws IOException
@@ -151,11 +151,11 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * org.dom4j.Attribute}</code>s, using the <code>{@link InputStream}</code> for its content.
      * <p>
      * Note that no decoding/encoding of the InputStream will be ensured during this operation. The byte content is
-     * transfered untouched.
+     * transferred untouched.
      * </p>
      *
      * @param element <code>{@link Element}</code> to output.
-     * @param is <code>{@link InputStream}</code> that will be fully read and transfered into the element content.
+     * @param is <code>{@link InputStream}</code> that will be fully read and transferred into the element content.
      * @throws IOException a problem occurs during reading or writing.
      */
     public void write(Element element, InputStream is) throws IOException

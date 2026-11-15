@@ -50,7 +50,7 @@ import org.xwiki.ratings.RatingsManagerFactory;
  *   4. it set in the newly instance of {@link RatingsManager} some information such as its identifiers
  *      and configuration
  *   5. it creates a new {@link ComponentDescriptor} by copying the descriptor of the retrieved
- *      {@link RatingsManager}, modifies it to specify the asked hint and by changing the instatiation strategy
+ *      {@link RatingsManager}, modifies it to specify the asked hint and by changing the instantiation strategy
  *      so that it's only instantiated once
  *   6. finally it registers the new component descriptor it in the current component manager so that in next request of
  *      a {@link RatingsManager} with the same hint, the retrieved instance will be returned.

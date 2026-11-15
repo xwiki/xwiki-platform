@@ -19,15 +19,16 @@
  */
 package org.xwiki.notifications.preferences.internal;
 
-import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.LocalDocumentReference;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.List;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
+
+import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Define the NotificationEmailGroupingStrategyPreferenceClass XClass.
@@ -43,7 +44,7 @@ public class NotificationEmailGroupingStrategyPreferenceDocumentInitializer exte
     /**
      * The path to the class parent document.
      */
-    public static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+    public static final List<String> PARENT_PATH = List.of("XWiki", "Notifications", "Code");
 
     /**
      * The reference of the class of the object holding the notification email preferences.

@@ -24,9 +24,6 @@
 
 <configuration>
 
-  <!-- Register SLF4J against the JMX MBean Server automatically -->
-  <jmxConfigurator objectName="logback:type=xwiki"/>
-
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <!-- Direct log messages to stdout -->
     <Target>System.out</Target>
@@ -81,7 +78,7 @@
   <!-- Deactivate Struts warnings -->
   <logger name="org.apache.struts.util.RequestUtils" level="error"/>
 
-  <!-- Deactive PDF Export CSS Applier warnings -->
+  <!-- Deactivate PDF Export CSS Applier warnings -->
   <logger name="org.apache.fop.layoutmgr.inline.ContentLayoutManager" level="error"/>
   <logger name="info.informatica.doc.style.css.dom" level="error"/>
 

@@ -38,33 +38,33 @@
   <hidden>true</hidden>
   <content>= Programmering =
 
-== Skript ==
+== Scripts ==
 
-=== 1.0 Skript-koder ===
+=== 1.0 Scripts ===
 
-{{info}}I XWiki Syntax 1.0 var det muligt at indsætte Velocity-kode direkte i siden. Dette kan føre til problemer, når f.eks. brugeren ved et uheld indsætter Velocity-kommandoer. Det overbelaster også sider, der ikke har brug for Velocity-indhold. Der er andre tekniske begrænsninger. Det samme gælder Groovy-kode.{{/info}}
+{{info}}I XWiki Syntax 1.0 var det muligt at skrive Velocity-scripts direkte hvor som helst på siden. Det kan give problemer, fx hvis brugeren uforvarende skrev Velocity-indhold. Det koster også ydeevne på sider, der ikke har brug for Velocity-indhold. Der er også flere andre tekniske begrænsninger. Det samme gælder Groovy-scripts.{{/info}}
 
-|=Feature|=XWiki Syntax 1.0
-|Velocity script|((({{{
+|=Funktion|=XWiki Syntax 1.0
+|Velocity-script|((({{{
 #set ($var = "whatever")
 }}})))
-|Groovy script|((({{{
+|Groovy-script|((({{{
 &lt;%
 def var = "whatever"
 %&gt;
 }}})))
 
-=== 2.0 Skript-koder ===
+=== 2.0 Scripts ===
 
-{{info}}I XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} skal Velocity-koder ved at bruge ###velocity### makroer. Det samme gælder for Groovy-koder.{{/info}}
+{{info}}XWiki [[understøtter flere scriptsprog&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Scripting/]].{{/info}}
 
-|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
-|Velocity script|((({{{
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
+|Velocity-script|((({{{
 {{velocity}}
 #set ($var = "whatever")
 {{/velocity}}
 }}})))
-|Groovy script|((({{{
+|Groovy-script|((({{{
 {{groovy}}
 def var = "whatever"
 {{/groovy}}

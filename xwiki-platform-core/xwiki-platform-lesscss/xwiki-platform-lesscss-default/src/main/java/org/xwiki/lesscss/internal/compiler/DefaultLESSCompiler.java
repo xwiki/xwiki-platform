@@ -76,7 +76,9 @@ public class DefaultLESSCompiler extends AbstractCachedCompiler<String> implemen
     @Override
     protected String cloneResult(String toClone)
     {
-        return new String(toClone);
+        // No need to clone since String is immutable: the point of cloneResult() is to prevent the caller from
+        // modifying the instance stored in the cache, and a String cannot be modified.
+        return toClone;
     }
 
     @Override

@@ -139,10 +139,10 @@ public class CreateActionRequestHandler
     /**
      * The property name for the spaces in the template provider object.
      *
-     * @deprecated since 8.3M2. Use {@link #TP_CREATION_RESTRICTIONS_PROPERTY} or
+     * @deprecated Use {@link #TP_CREATION_RESTRICTIONS_PROPERTY} or
      *             {@value #TP_VISIBILITY_RESTRICTIONS_PROPERTY} instead for the explicit restriction you need to add.
      */
-    @Deprecated
+    @Deprecated(since = "8.3M2")
     private static final String SPACES_PROPERTY = "spaces";
 
     /**
@@ -452,7 +452,7 @@ public class CreateActionRequestHandler
 
                     List<String> creationRestrictions =
                         getTemplateProviderRestrictions(templateObject, TP_CREATION_RESTRICTIONS_PROPERTY);
-                    if (creationRestrictions.size() > 0 && isTemplateProviderAllowedInSpace(templateObject,
+                    if (!creationRestrictions.isEmpty() && isTemplateProviderAllowedInSpace(templateObject,
                         spaceReference, TP_CREATION_RESTRICTIONS_PROPERTY)) {
                         // Consider providers that have creations restrictions matching the current space as
                         // "recommended" and handle them separately.
@@ -485,8 +485,7 @@ public class CreateActionRequestHandler
                             Utils.getComponent(SpaceReferenceResolver.TYPE_STRING);
                         SpaceReference restrictionSpaceReference = spaceResolver.resolve(restriction);
                         // The specificity score.
-                        int specificity = restrictionSpaceReference.getReversedReferenceChain().size();
-                        return specificity;
+                        return restrictionSpaceReference.getReversedReferenceChain().size();
                     }).max()
                     // Or 0 if no restrictions are set or if none match the current space.
                     .orElse(0);
@@ -517,7 +516,7 @@ public class CreateActionRequestHandler
     {
         // Check the allowed spaces list.
         List<String> restrictions = getTemplateProviderRestrictions(templateObject, restrictionsProperty);
-        if (restrictions.size() > 0) {
+        if (!restrictions.isEmpty()) {
             EntityReferenceSerializer<String> localSerializer = getLocalEntityReferenceSerializer();
             String spaceStringReference = localSerializer.serialize(spaceReference);
 
@@ -567,7 +566,7 @@ public class CreateActionRequestHandler
     private List<String> getTemplateProviderRestrictions(BaseObject templateObject, String restrictionsProperty)
     {
         List<String> creationRestrictions = templateObject.getListValue(restrictionsProperty);
-        if (creationRestrictions.size() == 0) {
+        if (creationRestrictions.isEmpty()) {
             // Backwards compatibility for template providers created before 8.3M2, where the "spaces" property handled
             // both visibility and creation.
             creationRestrictions = templateObject.getListValue(SPACES_PROPERTY);
@@ -743,12 +742,12 @@ public class CreateActionRequestHandler
     /**
      * @param reference the new document reference to check
      * @return true if the serialized document path is too long according to the limitation provided by
-     *         {@link XWikiDocument#getLocalReferenceMaxLength()}.
+     *         {@link XWiki#getDocumentLocalReferenceMaxLength(XWikiContext)}.
      * @since 11.4RC1
      */
     public boolean isDocumentPathTooLong(DocumentReference reference)
     {
-        int maxLength = document.getLocalReferenceMaxLength();
+        int maxLength = this.context.getWiki().getDocumentLocalReferenceMaxLength(this.context);
         String serializedDocumentName = getLocalEntityReferenceSerializer().serialize(reference);
         boolean isTooLong = serializedDocumentName.length() > maxLength;
 
@@ -816,9 +815,9 @@ public class CreateActionRequestHandler
 
     /**
      * @return the {@link VelocityContext} for the context we are handling
-     * @deprecated since 8.3M1, use {@link #getCurrentScriptContext()} instead
+     * @deprecated use {@link #getCurrentScriptContext()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.3M1")
     public VelocityContext getVelocityContext()
     {
         return Utils.getComponent(VelocityManager.class).getVelocityContext();

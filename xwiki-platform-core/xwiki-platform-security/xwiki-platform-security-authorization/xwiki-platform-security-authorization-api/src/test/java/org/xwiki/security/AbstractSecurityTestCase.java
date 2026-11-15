@@ -126,7 +126,7 @@ public abstract class AbstractSecurityTestCase
     }
 
     @BeforeEach
-    public void setUp() throws Exception
+    public void setUp()
     {
         xwikiRef = newEntityReference(new WikiReference("xwiki"));
         wikiRef = newEntityReference(new WikiReference("wiki"));

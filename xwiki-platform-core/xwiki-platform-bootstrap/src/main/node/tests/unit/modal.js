@@ -444,6 +444,17 @@ $(function () {
     // simulate overflow scroll
     $body.css({ height: '2000px' })
 
+    // Force the overflowing path. With overlay scrollbars (headless browsers) and no body margin, the body width
+    // equals the window width, so the modal would otherwise skip setScrollbar and never save the inline padding.
+    // That path is broken, see XWIKI-25705: Closing a Bootstrap modal removes the inline padding-right of fixed
+    // navbars when scrollbars take no width.
+    var Modal = $.fn.bootstrapModal.Constructor
+    var checkScrollbar = Modal.prototype.checkScrollbar
+    Modal.prototype.checkScrollbar = function () {
+      checkScrollbar.call(this)
+      this.bodyIsOverflowing = true
+    }
+
     $('<div id="modal-test"/>')
       .on('hidden.bs.modal', function () {
         assert.strictEqual($fixedTop.css('padding-right'), '10px',
@@ -456,6 +467,8 @@ $(function () {
         $fixedBottom.remove()
         $body.removeAttr('style')
         $styleshhet.remove()
+        // restore original checkScrollbar
+        Modal.prototype.checkScrollbar = checkScrollbar
         done()
       })
       .on('shown.bs.modal', function () {

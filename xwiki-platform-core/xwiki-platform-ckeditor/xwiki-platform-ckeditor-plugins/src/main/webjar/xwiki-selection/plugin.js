@@ -76,6 +76,10 @@
         // window. This is especially important when running functional tests were we have to switch between the browser
         // tabs but we want to simulate multiple users editing.
         editor._.textSelection.restoreFocus = this.isEditingAreaFocused(editor);
+        // The saved selection is scrolled into view when restored only if the content is overwritten after this point
+        // (see the setData listener below). The text selection is reused, so we have to clear the flag that a previous
+        // overwrite may have set, otherwise every following restore would scroll the selection into view.
+        editor._.textSelection.contentOverwritten = false;
       } else {
         delete editor._.textSelection;
       }
@@ -118,6 +122,14 @@
     _applySelection: function({editor, editable, textSelection, ranges}) {
       const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
       if (focus) {
+        // The editor saves (locks) the selection when the editing area loses the focus, in order to restore it when
+        // the editing area is focused again. That saved selection can become stale while the editing area doesn't
+        // have the focus (e.g. when editing in realtime, a remote change can shorten the text node holding the
+        // selection), in which case restoring it throws an IndexSizeError. The error is thrown from a focus listener
+        // so we can't catch it here, and it leaves the editor selection in an inconsistent state, with the caret at
+        // the start of the content. We set the selection ourselves right after, so we simply drop the saved one.
+        editor.unlockSelection(false);
+
         // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable area
         // that contains the selection when we apply it.
         editable.$.focus(focus);

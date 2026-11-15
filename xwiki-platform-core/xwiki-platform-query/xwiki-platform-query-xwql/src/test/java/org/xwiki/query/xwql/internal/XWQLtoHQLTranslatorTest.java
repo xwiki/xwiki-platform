@@ -59,7 +59,7 @@ class XWQLtoHQLTranslatorTest
         when(this.dab.getPropertyType(any(), eq("category"))).thenReturn("DBStringListProperty");
         when(this.dab.getPropertyType(any(), eq("stringlist"))).thenReturn("StringListProperty");
         when(this.dab.isPropertyCustomMapped(any(), any())).thenReturn(false);
-        when(this.dab.isPropertyCustomMapped(eq("Custom.Mapping"), eq("cmprop"))).thenReturn(true);
+        when(this.dab.isPropertyCustomMapped("Custom.Mapping", "cmprop")).thenReturn(true);
     }
 
     private void assertTranslate(String input, String expectedOutput) throws Exception
@@ -71,9 +71,11 @@ class XWQLtoHQLTranslatorTest
             String e = i < exp.length ? exp[i] : null;
             String a = i < actual.length ? actual[i] : null;
             if (!StringUtils.equalsIgnoreCase(e, a)) {
-                fail(String.format(
-                    "translate assertion. input = [%s]\n expected output = [%s]\n actual output = [%s]\n"
-                        + " first mismatch: [%s]!=[%s]",
+                fail(String.format("""
+                    translate assertion. input = [%s]
+                     expected output = [%s]
+                     actual output = [%s]
+                     first mismatch: [%s]!=[%s]""",
                     input, expectedOutput, output, e, a));
             }
         }

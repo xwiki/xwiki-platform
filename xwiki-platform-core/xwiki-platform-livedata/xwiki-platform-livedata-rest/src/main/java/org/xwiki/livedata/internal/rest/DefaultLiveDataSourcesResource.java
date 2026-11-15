@@ -22,7 +22,6 @@ package org.xwiki.livedata.internal.rest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
@@ -53,7 +52,7 @@ public class DefaultLiveDataSourcesResource extends AbstractLiveDataResource imp
             Link self = new Link().withRel(Relations.SELF).withHref(this.uriInfo.getAbsolutePath().toString());
 
             List<Source> sources = sourceIds.get().stream().map(this::getLiveDataQuerySource)
-                .map(querySource -> createSource(querySource, namespace)).collect(Collectors.toList());
+                .map(querySource -> createSource(querySource, namespace)).toList();
             return (Sources) new Sources().withSources(sources).withLinks(self);
         } else {
             throw new WebApplicationException(Response.Status.NOT_FOUND);

@@ -102,8 +102,9 @@ class MacroBlockSignatureGeneratorTest
     @Test
     void incompatibleBlockSignature()
     {
+        WordBlock block = new WordBlock("macro");
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> this.signer.generate(new WordBlock("macro"), CMS_PARAMS));
+            () -> this.signer.generate(block, CMS_PARAMS));
         assertEquals("Unsupported block [org.xwiki.rendering.block.WordBlock].", exception.getMessage());
     }
 }

@@ -66,8 +66,8 @@ public class IntegrationTests extends RenderingTest
             @Override
             public Block render(Locale locale, Object... parameters)
             {
-                return parameters.length > 0 ? new WordBlock("entranslationmessage" + Arrays.toString(parameters))
-                    : new WordBlock("entranslationmessage");
+                return new WordBlock(parameters.length > 0
+                    ? "entranslationmessage" + Arrays.toString(parameters) : "entranslationmessage");
             }
 
             @Override
@@ -106,8 +106,8 @@ public class IntegrationTests extends RenderingTest
             @Override
             public Block render(Locale locale, Object... parameters)
             {
-                return parameters.length > 0 ? new WordBlock("frtranslationmessage" + Arrays.toString(parameters))
-                    : new WordBlock("frtranslationmessage");
+                return new WordBlock(parameters.length > 0
+                    ? "frtranslationmessage" + Arrays.toString(parameters) : "frtranslationmessage");
             }
 
             @Override

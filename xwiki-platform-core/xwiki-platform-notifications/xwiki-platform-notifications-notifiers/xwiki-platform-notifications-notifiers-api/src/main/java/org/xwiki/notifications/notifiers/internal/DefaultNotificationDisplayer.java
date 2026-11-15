@@ -29,8 +29,8 @@ import javax.script.ScriptContext;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
@@ -76,7 +76,7 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
     private Template getSpecificTemplate(CompositeEvent eventNotification)
     {
         String templateName = String.format("notification/%s.vm",
-            eventNotification.getType().replaceAll("\\/", "."));
+            eventNotification.getType().replace("/", "."));
         return this.templateManager.getTemplate(templateName);
     }
 

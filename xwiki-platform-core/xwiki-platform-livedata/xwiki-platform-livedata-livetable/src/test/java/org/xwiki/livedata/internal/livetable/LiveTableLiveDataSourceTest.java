@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @since 12.10
  */
 @ComponentTest
-public class LiveTableLiveDataSourceTest
+class LiveTableLiveDataSourceTest
 {
     @InjectMockComponents
     private LiveTableLiveDataSource liveTableSource;

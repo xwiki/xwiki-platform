@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.ui;
 
+import java.util.regex.Pattern;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @XWikiSyntax21ComponentList
 class SearchSuggestSourceSheetPageTest extends PageTest
 {
+    private static final Pattern LABEL_PREFIX = Pattern.compile("^.*_");
+
     private static final String WIKI_NAME = "xwiki";
 
     private static final String XWIKI_SPACE = "XWiki";
@@ -97,7 +101,7 @@ class SearchSuggestSourceSheetPageTest extends PageTest
         for (String property : properties) {
             int iLabel = -1;
             for (int i = 0; i < labels.size(); i++) {
-                if (labels.get(i).text().replaceAll("^.*_", "").equals(property)) {
+                if (LABEL_PREFIX.matcher(labels.get(i).text()).replaceAll("").equals(property)) {
                     iLabel = i;
                     break;
                 }

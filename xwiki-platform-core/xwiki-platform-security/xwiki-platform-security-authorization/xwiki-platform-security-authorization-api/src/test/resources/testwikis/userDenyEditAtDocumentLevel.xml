@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#userDenyEditAtDocumentLevel() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki without any rule">
+    <user name="userA" alt="the user the edit right is denied to on the document below" />
+    <user name="userB" alt="a user no rule is targeting" />
+
+    <space name="space" alt="a space without any rule">
+      <document name="any document" />
+
+      <document name="docDenyEditToUserA" alt="a document denying the edit right to userA">
+        <denyUser name="userA" type="edit" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

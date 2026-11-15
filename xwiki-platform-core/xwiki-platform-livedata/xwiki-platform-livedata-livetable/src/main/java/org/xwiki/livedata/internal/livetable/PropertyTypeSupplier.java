@@ -69,8 +69,8 @@ public class PropertyTypeSupplier
         try {
             XWikiDocument classDocument = xcontext.getWiki().getDocument(classReference, xcontext);
             PropertyInterface property = classDocument.getXClass().get(propertyName);
-            if (property instanceof PropertyClass) {
-                return ((PropertyClass) property).getClassType();
+            if (property instanceof PropertyClass propertyClass) {
+                return propertyClass.getClassType();
             }
         } catch (XWikiException e) {
             this.logger.warn("Failed to read the type of property [{}] from [{}]. Root cause is [{}].", propertyName,

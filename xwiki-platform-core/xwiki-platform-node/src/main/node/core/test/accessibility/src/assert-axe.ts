@@ -32,7 +32,7 @@ async function assertAxe(wrapper: VueWrapper): Promise<void> {
     runOnly: {
       type: "tags",
       // Note: this list needs to be in sync with org.xwiki.test.ui.WCAGContext.VALIDATE_TAGS
-      values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"],
+      values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"],
     },
   });
   expect(axeRun.violations).toEqual([]);

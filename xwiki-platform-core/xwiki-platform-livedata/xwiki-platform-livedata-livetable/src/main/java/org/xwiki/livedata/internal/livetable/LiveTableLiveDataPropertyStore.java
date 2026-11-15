@@ -191,22 +191,22 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         descriptor.setDescription(xproperty.getHint());
         descriptor.setType(xproperty.getClassType());
         // List properties are sortable by default, but only if they have single selection.
-        if (xproperty instanceof ListClass && ((ListClass) xproperty).isMultiSelect()) {
+        if (xproperty instanceof ListClass listClass && listClass.isMultiSelect()) {
             descriptor.setSortable(false);
         }
         // The returned property value is the displayer output.
         descriptor.setDisplayer(new DisplayerDescriptor("xObjectProperty"));
         if (xproperty instanceof ListClass) {
             FilterDescriptor filterList = new FilterDescriptor("list");
-            if (xproperty instanceof LevelsClass) {
+            if (xproperty instanceof LevelsClass levelsClass) {
                 // We need to provide a list of maps of value / labels so that selectize can interpret them.
-                filterList.setParameter("options", ((LevelsClass) xproperty).getList(xcontext)
+                filterList.setParameter("options", levelsClass.getList(xcontext)
                     .stream()
                     .map(item -> Map.of(
                         "value", item,
                         "label", getRightTranslationWithFallback(item)
                     ))
-                    .collect(Collectors.toList()));
+                    .toList());
             } else {
                 filterList.setParameter("searchURL", getSearchURL(xproperty));
             }
@@ -219,8 +219,8 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
                 filterList.setDefaultOperator(EQUALS_OPERATOR);
             }
             descriptor.setFilter(filterList);
-        } else if (xproperty instanceof DateClass) {
-            String dateFormat = ((DateClass) xproperty).getDateFormat();
+        } else if (xproperty instanceof DateClass dateClass) {
+            String dateFormat = dateClass.getDateFormat();
             if (!StringUtils.isEmpty(dateFormat)) {
                 descriptor.setFilter(new FilterDescriptor("date"));
                 descriptor.getFilter().setParameter("dateFormat", dateFormat);

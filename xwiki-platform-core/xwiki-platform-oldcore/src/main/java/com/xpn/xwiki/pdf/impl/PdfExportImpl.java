@@ -38,9 +38,9 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -193,7 +193,7 @@ public class PdfExportImpl implements PdfExport
      */
     private String convertToStrictXHtml(String input)
     {
-        LOGGER.debug("Cleaning HTML:\n{}", input);
+        LOGGER.debug("Cleaning HTML:\n[{}]", input);
 
         HTMLCleaner cleaner = Utils.getComponent(HTMLCleaner.class);
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
@@ -201,7 +201,7 @@ public class PdfExportImpl implements PdfExport
         filters.add(Utils.getComponent(HTMLFilter.class, "uniqueId"));
         config.setFilters(filters);
         String result = HTMLUtils.toString(cleaner.clean(new StringReader(input), config));
-        LOGGER.debug("Cleaned XHTML:\n{}", result);
+        LOGGER.debug("Cleaned XHTML:\n[{}]", result);
         return result;
     }
 
@@ -221,15 +221,15 @@ public class PdfExportImpl implements PdfExport
     protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
-        LOGGER.debug("Final XHTML for export:\n{}", xhtml);
+        LOGGER.debug("Final XHTML for export:\n[{}]", xhtml);
 
         // XSL Transformation to XML-FO
         String xmlfo = convertXHtmlToXMLFO(xhtml, context);
 
         // Debug output
-        LOGGER.debug("Final XSL-FO source:\n{}", xmlfo);
+        LOGGER.debug("Final XSL-FO source:\n[{}]", xmlfo);
 
-        renderXSLFO(xmlfo, out, type, context);
+        renderXSLFO(xmlfo, out, type);
     }
 
     /**
@@ -256,7 +256,7 @@ public class PdfExportImpl implements PdfExport
             LOGGER.error("Failed to close the XSLT stream", e);
         }
 
-        LOGGER.debug("Intermediary XSL-FO:\n{}", xmlfo);
+        LOGGER.debug("Intermediary XSL-FO:\n[{}]", xmlfo);
 
         return applyXSLT(xmlfo, getFopCleanupXslt(context));
     }
@@ -267,10 +267,9 @@ public class PdfExportImpl implements PdfExport
      * @param xmlfo the source FO to render
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
-     * @param context the XWiki Context used by the custom URI Resolver we use to locate image attachment data
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type, final XWikiContext context)
+    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type)
         throws XWikiException
     {
         try {
@@ -499,7 +498,8 @@ public class PdfExportImpl implements PdfExport
                  this.dab.getDocumentInstance(templateReference).getAuthors().getEffectiveMetadataAuthor());
         } catch (Exception e) {
             LOGGER.warn("Error fetching the author of template [{}] during PDF conversion. Using the [{}] property of "
-                + "the document's value without applying Velocity.", templateName, propertyName);
+                + "the document's value without applying Velocity. Root cause is [{}]", templateName, propertyName,
+                ExceptionUtils.getRootCauseMessage(e));
             return result;
         }
 

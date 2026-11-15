@@ -60,7 +60,7 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
             throws NotificationException
     {
         // Generate the full template name
-        String templateName = String.format(templatePath, event.getType().replaceAll("\\/", "."));
+        String templateName = String.format(templatePath, event.getType().replace("/", "."));
         // Get the template
         Template template = templateManager.getTemplate(templateName);
         if (template == null) {

@@ -73,7 +73,7 @@ class AddUsersStepTest
         List<String> members = new ArrayList<>();
         request.setMembers(members);
 
-        Exception exception = new WikiUserManagerException("Execption in WikiUserManager.");
+        Exception exception = new WikiUserManagerException("Exception in WikiUserManager.");
         doThrow(exception).when(this.wikiUserManager).addMembers(anyCollection(), any());
 
         // Test and verify

@@ -33,8 +33,15 @@ import org.xwiki.rest.model.jaxb.Space;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}")
 public interface SpaceResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the metadata of a space, including a reference to its home page ({@code WebHome}) when that page exists.
+     *
+     * @param wikiName the identifier of the wiki storing the space, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) to return the metadata for; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @return the metadata of the space; the home page details are omitted when the space has no {@code WebHome} page
+     * @throws XWikiRestException if the space metadata cannot be retrieved
+     */
     @GET Space getSpace(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName

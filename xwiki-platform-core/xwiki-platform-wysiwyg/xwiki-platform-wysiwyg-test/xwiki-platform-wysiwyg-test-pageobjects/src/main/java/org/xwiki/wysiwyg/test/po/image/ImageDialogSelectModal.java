@@ -23,11 +23,11 @@ import java.util.function.Supplier;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.BaseModal;
 import org.xwiki.wysiwyg.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.wysiwyg.test.po.image.select.ImageDialogTreeSelectForm;
 import org.xwiki.wysiwyg.test.po.image.select.ImageDialogUploadSelectForm;
 import org.xwiki.wysiwyg.test.po.image.select.ImageDialogUrlSelectForm;
-import org.xwiki.test.ui.po.BaseModal;
 
 /**
  * Page Object for the image selection modal.

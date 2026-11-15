@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-integration</artifactId>
   <name>XWiki Platform - Test - Integration Tests Framework</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Integration Tests Framework</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.26</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
@@ -116,6 +116,17 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-resolver-provider</artifactId>
+    </dependency>
+    <!-- Used to get the Maven RepositorySystem the same way Maven does -->
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.plexus</artifactId>
+    </dependency>
+    <!-- Needed by the Plexus container to read the component descriptors (plexus-utils 4 doesn't contain the XML
+         classes anymore) -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
     </dependency>
   </dependencies>
   <build>

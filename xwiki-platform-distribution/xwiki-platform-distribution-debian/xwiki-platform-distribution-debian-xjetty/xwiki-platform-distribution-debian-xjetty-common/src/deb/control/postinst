@@ -7,31 +7,31 @@ set -e
 # Rights
 #########################
 
+# Make sure XWiki owns the passed directory
+own_directory() {
+  if [ ! 'xwiki' = `stat -c '%U' "$1"` ]; then
+    chown -R xwiki:xwiki "$1"
+  fi
+}
+
+# Make sure the passed directory exists and is owned by XWiki
+prepare_directory() {
+  if [ ! -d "$1" ]; then
+    mkdir "$1"
+  fi
+  own_directory "$1"
+}
+
 # Create the xwiki user as defined in /usr/lib/sysusers.d/xwiki.conf
 systemd-sysusers
 
 # Make sure XWiki is able to write in the data directory
-if [ ! 'xwiki' = `stat -c '%U' /var/lib/xwiki/data` ]; then
-  chown -R xwiki:xwiki /var/lib/xwiki/data
-fi
+own_directory /var/lib/xwiki/data
 
-# Make sure the log directory exist
-if [ ! -d /var/log/xwiki ]; then
-  mkdir /var/log/xwiki
-fi
-# Make sure XWiki is able to write in the log directory
-if [ ! 'xwiki' = `stat -c '%U' /var/log/xwiki` ]; then
-  chown -R xwiki:xwiki /var/log/xwiki
-fi
-
-# Make sure the tmp directory exist
-if [ ! -d /var/lib/xwiki/tmp ]; then
-  mkdir /var/lib/xwiki/tmp
-fi
-# Make sure XWiki is able to write in the tmp directory
-if [ ! 'xwiki' = `stat -c '%U' /var/lib/xwiki/tmp` ]; then
-  chown -R xwiki:xwiki /var/lib/xwiki/tmp
-fi
+# Make sure XWiki is able to write in the log, tmp and work directories
+prepare_directory [[debian.jetty.log.path]]
+prepare_directory [[debian.jetty.tmp.path]]
+prepare_directory [[debian.jetty.work.path]]
 
 #########################
 # Reload the service

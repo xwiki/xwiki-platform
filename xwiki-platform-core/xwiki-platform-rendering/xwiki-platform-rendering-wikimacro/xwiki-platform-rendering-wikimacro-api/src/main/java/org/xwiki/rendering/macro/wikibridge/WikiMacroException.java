@@ -35,7 +35,7 @@ public class WikiMacroException extends Exception
     /**
      * Builds a new {@link WikiMacroException} with the given error message.
      * 
-     * @param message error messge.
+     * @param message error message.
      */
     public WikiMacroException(String message)
     {

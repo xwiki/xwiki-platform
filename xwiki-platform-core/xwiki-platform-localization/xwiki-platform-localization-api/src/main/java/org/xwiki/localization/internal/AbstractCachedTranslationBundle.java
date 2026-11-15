@@ -49,7 +49,7 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
     /**
      * @param id the identifier of the bundle
      */
-    public AbstractCachedTranslationBundle(String id)
+    protected AbstractCachedTranslationBundle(String id)
     {
         super(id);
     }
@@ -58,7 +58,7 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
      * @param id the identifier of the bundle
      * @param priority the priority of the bundle
      */
-    public AbstractCachedTranslationBundle(String id, int priority)
+    protected AbstractCachedTranslationBundle(String id, int priority)
     {
         super(id, priority);
     }

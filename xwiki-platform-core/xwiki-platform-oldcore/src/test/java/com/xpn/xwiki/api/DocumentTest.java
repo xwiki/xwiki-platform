@@ -91,6 +91,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -133,7 +134,7 @@ class DocumentTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
-    void setUp() throws AuthorizationException, ComponentLookupException
+    void setUp() throws ComponentLookupException
     {
         this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
 
@@ -278,7 +279,7 @@ class DocumentTest
 
         this.oldcore.getXWikiContext().dropPermissions();
 
-        Throwable exception = assertThrows(XWikiException.class, () -> doc.saveAsAuthor());
+        Throwable exception = assertThrows(XWikiException.class, doc::saveAsAuthor);
         assertTrue(
             exception.getMessage()
                 .contains("Access denied; user null, acting through script in "
@@ -299,6 +300,50 @@ class DocumentTest
         assertEquals(XWikiRightService.GUEST_USER_FULLNAME, document.getCreator());
         assertEquals(XWikiRightService.GUEST_USER_FULLNAME, document.getAuthor());
         assertEquals(XWikiRightService.GUEST_USER_FULLNAME, document.getContentAuthor());
+    }
+
+    @Test
+    void delete() throws XWikiException
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
+        Document document = xdoc.newDocument(xcontext);
+
+        when(this.oldcore.getMockRightService().hasAccessLevel("delete", xcontext.getUser(),
+            document.getPrefixedFullName(), xcontext)).thenReturn(true);
+
+        document.delete();
+
+        // The delete is done by the context user, so the corresponding protections must be applied
+        verify(this.oldcore.getSpyXWiki()).deleteDocument(xdoc, true, true, xcontext);
+    }
+
+    @Test
+    void deleteWithoutDeleteRight() throws XWikiException
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
+        Document document = xdoc.newDocument(xcontext);
+
+        XWikiException exception = assertThrows(XWikiException.class, document::delete);
+        assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, exception.getCode());
+
+        verify(this.oldcore.getMockStore(), never()).deleteXWikiDoc(any(), any());
+    }
+
+    @Test
+    void deleteWithProgrammingRights() throws XWikiException
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        XWikiDocument xdoc = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
+        Document document = xdoc.newDocument(xcontext);
+
+        when(this.oldcore.getMockRightService().hasProgrammingRights(xcontext)).thenReturn(true);
+
+        document.deleteWithProgrammingRights();
+
+        // Programming right bypasses the protections applied to a delete done by the context user
+        verify(this.oldcore.getSpyXWiki()).deleteDocument(xdoc, true, false, xcontext);
     }
 
     @Test
@@ -500,7 +545,7 @@ class DocumentTest
         when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
             document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(false);
 
-        assertThrows(XWikiException.class, () -> document.save());
+        assertThrows(XWikiException.class, document::save);
 
         when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
             document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(true);

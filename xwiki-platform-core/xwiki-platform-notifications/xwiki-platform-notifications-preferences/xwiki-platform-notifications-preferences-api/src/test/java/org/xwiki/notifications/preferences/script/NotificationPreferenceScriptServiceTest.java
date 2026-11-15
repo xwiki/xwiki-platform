@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.preferences.script;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -106,7 +105,7 @@ class NotificationPreferenceScriptServiceTest
         private NotificationPreferenceImpl(boolean isNotificationEnabled, NotificationFormat format,
                 String eventType)
         {
-            super(isNotificationEnabled, format, null, null, null, new HashMap<>());
+            super(isNotificationEnabled, format, null, null, null, new EnumMap<>(NotificationPreferenceProperty.class));
             properties.put(NotificationPreferenceProperty.EVENT_TYPE, eventType);
         }
     }
@@ -123,7 +122,7 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreferenceImpl existingPref3 = new NotificationPreferenceImpl(false,
                 NotificationFormat.EMAIL, "delete");
 
-        when(notificationPreferenceManager.getAllPreferences(eq(userRef))).thenReturn(
+        when(notificationPreferenceManager.getAllPreferences(userRef)).thenReturn(
                 List.of(existingPref1, existingPref2, existingPref3));
 
         final MutableBoolean isOk = new MutableBoolean(false);
@@ -162,12 +161,12 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreference pref2 = mock(NotificationPreference.class);
 
         when(pref1.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref1.getProperties()).thenReturn(properties1);
 
         when(pref2.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref2.getProperties()).thenReturn(properties2);
         when(pref2.isNotificationEnabled()).thenReturn(true);
@@ -215,12 +214,12 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreference pref2 = mock(NotificationPreference.class);
 
         when(pref1.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref1.getProperties()).thenReturn(properties1);
 
         when(pref2.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref2.getProperties()).thenReturn(properties2);
         when(pref2.isNotificationEnabled()).thenReturn(true);

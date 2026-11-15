@@ -35,8 +35,22 @@ import org.xwiki.rest.model.jaxb.Page;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations/{language}/history/{version}")
 public interface PageTranslationVersionResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns all the metadata and content for a specific version of one translation of a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page whose translation version is returned, for example {@code WebHome}
+     * @param language the locale of the translation whose version is returned, for example {@code fr} or {@code en}
+     * @param version the document revision to return, for example {@code 2.1}
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name and the document title) in addition to the technical references, at some extra cost; defaults to
+     *  {@code false}
+     * @return the metadata and content of the requested page translation version
+     * @throws XWikiRestException if the current user is not allowed to view the page or if the version cannot be
+     *  retrieved
+     */
     @GET Page getPageTranslationVersion(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

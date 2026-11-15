@@ -118,9 +118,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
             @Override
             public void onEvent(Event event, Object source, Object data)
             {
-                if (event instanceof TemplateEvent) {
-                    TemplateEvent templateEvent = (TemplateEvent) event;
-
+                if (event instanceof TemplateEvent templateEvent) {
                     XWikiVelocityManager.this.velocityEngines.remove(templateEvent.getId());
                 }
             }
@@ -231,7 +229,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
             try {
                 injectBaseMacros(velocityEngine, skinMacrosTemplate);
             } catch (Exception e) {
-                this.logger.warn("Failed to load global macros for engine with key [{}]: {}", cacheKey,
+                this.logger.warn("Failed to load global macros for engine with key [{}]: [{}]", cacheKey,
                     ExceptionUtils.getRootCauseMessage(e));
             }
 

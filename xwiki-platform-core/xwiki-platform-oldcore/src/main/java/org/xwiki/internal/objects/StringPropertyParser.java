@@ -19,14 +19,14 @@
  */
 package org.xwiki.internal.objects;
 
+import jakarta.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
-
-import jakarta.inject.Singleton;
 
 /**
  * Component implementation for string property types.

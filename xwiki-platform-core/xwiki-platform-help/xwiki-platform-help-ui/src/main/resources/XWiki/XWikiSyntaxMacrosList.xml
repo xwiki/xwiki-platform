@@ -58,7 +58,8 @@
 #foreach ($descriptor in $collectiontool.sort($services.rendering.getMacroDescriptors('xwiki/2.1'), 'id.id:asc'))
   #set ($wikiMacroData = $wikiMacroMap.get($descriptor.id.id))
   #if ("$!wikiMacroData" != '')
-    #set ($displayId = "[[$services.rendering.escape($services.rendering.escape($descriptor.id, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$wikiMacroData.get(0)]]")
+    #set ($macroDocumentReference = "doc:$wikiMacroData.get(0)")
+    #set ($displayId = "[[$services.rendering.escape($services.rendering.escape($descriptor.id, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($macroDocumentReference, 'xwiki/2.1')]]")
     #set ($displayVisibility = $wikiMacroData.get(1))
   #else
     #set ($displayId = $services.rendering.escape($descriptor.id, 'xwiki/2.1'))

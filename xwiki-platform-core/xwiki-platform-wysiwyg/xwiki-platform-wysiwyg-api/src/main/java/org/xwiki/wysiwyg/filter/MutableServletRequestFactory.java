@@ -30,7 +30,7 @@ import org.xwiki.wysiwyg.internal.filter.http.JavaxToJakartaMutableHttpServletRe
 /**
  * A factory for mutable servlet requests. This factory is needed because concrete mutable servlet requests don't have a
  * default constructor and I couldn't make the component manager (Plexus) inject the current servlet request when
- * instantiating mutable servlet requets.
+ * instantiating mutable servlet requests.
  * 
  * @version $Id$
  */

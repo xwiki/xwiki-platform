@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.xwiki.query.Query;
 import org.xwiki.query.WrappingQuery;
@@ -37,8 +38,6 @@ import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 
 /**
  * Wraps a {@link Query} to perform modifications on it in order to modify the parameters and statements to change
@@ -51,6 +50,10 @@ import net.sf.jsqlparser.statement.select.SelectBody;
 public class EscapeLikeParametersQuery extends WrappingQuery
 {
     private static final String ESCAPED_REPLACEMENT = "!$1";
+
+    private static final Pattern LIKE_SPECIAL_CHARS = Pattern.compile("([%_!])");
+
+    private static final Pattern ESCAPE_CHARACTER = Pattern.compile("(!)");
 
     private List<String> modifiedNamedParameters;
 
@@ -83,9 +86,9 @@ public class EscapeLikeParametersQuery extends WrappingQuery
             Map<T, Object> escapedMap = new LinkedHashMap<>();
             for (Map.Entry<T, Object> entry : parametersToEscape.entrySet()) {
                 // TODO: Also handle Arrays and collections in the future
-                if (modifiedParameters.contains(entry.getKey()) && entry.getValue() instanceof DefaultQueryParameter) {
+                if (modifiedParameters.contains(entry.getKey())
+                    && entry.getValue() instanceof DefaultQueryParameter queryParameter) {
                     // Join the parameter parts and escape the literal parts
-                    DefaultQueryParameter queryParameter = (DefaultQueryParameter) entry.getValue();
                     StringBuffer buffer = new StringBuffer();
                     for (ParameterPart part : queryParameter.getParts()) {
                         if (part instanceof LiteralParameterPart) {
@@ -97,10 +100,10 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                             // See https://jira.xwiki.org/browse/XWIKI-14217 and
                             // https://groups.google.com/d/msg/h2-database/jT0O3rNgpSw/hU_JKXRkZNoJ
                             // Thus we don't escape '[' FTM meaning that the query could fail on Sybase and SQL Server
-                            buffer.append(part.getValue().replaceAll("([%_!])", ESCAPED_REPLACEMENT));
+                            buffer.append(LIKE_SPECIAL_CHARS.matcher(part.getValue()).replaceAll(ESCAPED_REPLACEMENT));
                         } else if (part instanceof LikeParameterPart) {
                             // Escape the escape character
-                            buffer.append(part.getValue().replaceAll("([!])", ESCAPED_REPLACEMENT));
+                            buffer.append(ESCAPE_CHARACTER.matcher(part.getValue()).replaceAll(ESCAPED_REPLACEMENT));
                         } else {
                             buffer.append(part.getValue());
                         }
@@ -142,35 +145,34 @@ public class EscapeLikeParametersQuery extends WrappingQuery
     private String modifyStatement(String statementString) throws JSQLParserException
     {
         Statement statement = CCJSqlParserUtil.parse(statementString);
-        if (statement instanceof Select) {
-            Select select = (Select) statement;
-            SelectBody selectBody = select.getSelectBody();
-            if (selectBody instanceof PlainSelect) {
-                PlainSelect plainSelect = (PlainSelect) selectBody;
-                Expression where = plainSelect.getWhere();
-                where.accept(new XWikiExpressionVisitor());
-            }
+        if (statement instanceof PlainSelect plainSelect) {
+            Expression where = plainSelect.getWhere();
+            where.accept(new XWikiExpressionVisitor());
         }
 
         return statement.toString();
     }
 
-    private final class XWikiExpressionVisitor extends ExpressionVisitorAdapter
+    private final class XWikiExpressionVisitor extends ExpressionVisitorAdapter<Void>
     {
         @Override
-        public void visit(LikeExpression expr)
+        public <S> Void visit(LikeExpression expr, S context)
         {
             if (expr.getEscape() == null) {
                 expr.setEscape(new StringValue("!"));
             }
-            expr.accept(new XWikiLikeExpressionVisitor());
+            // Visit the LIKE expression again with a visitor collecting the parameters it uses. Since that visitor does
+            // not override the LikeExpression handling, the default one is applied and the children are visited.
+            expr.accept(new XWikiLikeExpressionVisitor(), context);
+
+            return null;
         }
     }
 
-    private final class XWikiLikeExpressionVisitor extends ExpressionVisitorAdapter
+    private final class XWikiLikeExpressionVisitor extends ExpressionVisitorAdapter<Void>
     {
         @Override
-        public void visit(JdbcParameter parameter)
+        public <S> Void visit(JdbcParameter parameter, S context)
         {
             if (modifiedPositionalParameters == null) {
                 modifiedPositionalParameters = new ArrayList<>();
@@ -185,15 +187,19 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                 // but HQL positional parameters start a 0.
                 modifiedPositionalParameters.add(index - 1);
             }
+
+            return null;
         }
 
         @Override
-        public void visit(JdbcNamedParameter parameter)
+        public <S> Void visit(JdbcNamedParameter parameter, S context)
         {
             if (modifiedNamedParameters == null) {
                 modifiedNamedParameters = new ArrayList<>();
             }
             modifiedNamedParameters.add(parameter.getName());
+
+            return null;
         }
     }
 }

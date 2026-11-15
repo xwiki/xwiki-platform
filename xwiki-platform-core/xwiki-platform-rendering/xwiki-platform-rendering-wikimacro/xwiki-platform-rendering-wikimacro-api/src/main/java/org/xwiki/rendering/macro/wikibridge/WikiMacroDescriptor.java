@@ -54,6 +54,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
          */
         public Builder()
         {
+            // Nothing to initialize here: the descriptor being built is created as a field initializer.
         }
 
         /**

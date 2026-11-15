@@ -19,15 +19,15 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.grouping;
 
+import java.util.List;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This component offers a strategy for sending one email per composite event to notify to the user.
@@ -48,6 +48,6 @@ public class OneMailPerCompositeEmailGroupingStrategy implements NotificationEma
     public List<List<CompositeEvent>> groupEventsPerMail(List<CompositeEvent> compositeEvents)
             throws NotificationException
     {
-        return compositeEvents.stream().map(List::of).collect(Collectors.toList());
+        return compositeEvents.stream().map(List::of).toList();
     }
 }

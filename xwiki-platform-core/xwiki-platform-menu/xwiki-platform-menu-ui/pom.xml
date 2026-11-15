@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-menu</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-menu-ui</artifactId>
   <name>XWiki Platform - Menu - UI</name>
@@ -44,6 +44,10 @@
       when inserting the macro. The WYSIWYG editor can't load the translations on demand because there's no mapping
       between macros and their translation pages. -->
     <xar.verify.translationVisibility.skip>true</xar.verify.translationVisibility.skip>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/menu
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <!-- JavaScript dependencies -->
@@ -121,6 +125,13 @@
       <type>xar</type>
       <scope>runtime</scope>
       <optional>true</optional>
+    </dependency>
+    <!-- Used by the MenuTemplate page when creating a new menu -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies. -->
     <dependency>

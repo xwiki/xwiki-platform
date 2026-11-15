@@ -1,0 +1,19 @@
+//
+// Mixins
+// --------------------------------------------------
+
+// This file holds the LESS mixins of the skin, so that they stay available to the LESS stylesheets of the skin and to
+// the LESS skin extensions while the styles themselves are migrated to plain CSS.
+// The mixins are declared with parentheses so that LESS doesn't output them as classes. The classes with the same names
+// are defined in plain CSS, see css/type.css.
+// This file should be removed once CSS supports mixins natively and the stylesheets calling these mixins are converted
+// to CSS. See the CSS Custom Functions and Mixins Module: https://drafts.csswg.org/css-mixins-1/
+
+.text-smaller() {
+  font-size: floor(@font-size-base * 0.95);
+}
+
+.text-muted-smaller() {
+  .text-muted;
+  .text-smaller;
+}

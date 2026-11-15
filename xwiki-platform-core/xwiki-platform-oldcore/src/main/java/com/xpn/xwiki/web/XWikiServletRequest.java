@@ -37,6 +37,8 @@ import com.xpn.xwiki.util.Util;
 public class XWikiServletRequest extends HttpServletRequestWrapper
     implements XWikiRequest, JavaxToJakartaWrapper<jakarta.servlet.http.HttpServletRequest>
 {
+    private static final String X_FORWARDED_FOR = "x-forwarded-for";
+
     public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = Request.ATTRIBUTE_EFFECTIVE_AUTHOR;
 
     public XWikiServletRequest(HttpServletRequest request)
@@ -97,8 +99,8 @@ public class XWikiServletRequest extends HttpServletRequestWrapper
     public String getRemoteAddr()
     {
         HttpServletRequest request = getHttpServletRequest();
-        if (request.getHeader("x-forwarded-for") != null) {
-            return request.getHeader("x-forwarded-for");
+        if (request.getHeader(X_FORWARDED_FOR) != null) {
+            return request.getHeader(X_FORWARDED_FOR);
         }
 
         return request.getRemoteAddr();
@@ -108,8 +110,8 @@ public class XWikiServletRequest extends HttpServletRequestWrapper
     public String getRemoteHost()
     {
         HttpServletRequest request = getHttpServletRequest();
-        if (request.getHeader("x-forwarded-for") != null) {
-            return request.getHeader("x-forwarded-for");
+        if (request.getHeader(X_FORWARDED_FOR) != null) {
+            return request.getHeader(X_FORWARDED_FOR);
         }
 
         return request.getRemoteHost();

@@ -70,13 +70,13 @@ class ProvidingTransactionRunnableTest
 
     private static class ImplementationWithDataA1 implements MyInterfaceWithDataA1
     {
-        private final DBTransaction DBTrans;
+        private final DBTransaction dbTrans;
 
         private final String dataA1;
 
         public ImplementationWithDataA1(final DBTransaction transact, final String dataA1)
         {
-            this.DBTrans = transact;
+            this.dbTrans = transact;
             this.dataA1 = dataA1;
         }
 
@@ -87,7 +87,7 @@ class ProvidingTransactionRunnableTest
 
         public String getConnection()
         {
-            return this.DBTrans.getConnection();
+            return this.dbTrans.getConnection();
         }
     }
 
@@ -120,6 +120,7 @@ class ProvidingTransactionRunnableTest
 
     private class TR2 extends TransactionRunnable<DBTransaction>
     {
+        @Override
         protected void onRun()
         {
             assertEquals(DB_CONNECTION, this.getContext().getConnection(), "DB Connection was not correct in TR2");
@@ -128,6 +129,7 @@ class ProvidingTransactionRunnableTest
 
     private class TR3 extends TransactionRunnable<MyInterfaceWithDataA1>
     {
+        @Override
         protected void onRun()
         {
             assertEquals(DATA_A1, this.getContext().getDataA1(), "Data A1 was not correct in TR3");

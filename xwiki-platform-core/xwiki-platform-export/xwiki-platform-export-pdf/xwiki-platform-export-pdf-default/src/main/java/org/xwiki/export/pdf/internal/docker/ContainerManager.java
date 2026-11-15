@@ -51,6 +51,7 @@ import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Volume;
+import com.github.dockerjava.api.model.WaitResponse;
 
 /**
  * Help perform various operations on Docker containers.
@@ -80,6 +81,24 @@ public class ContainerManager implements Initializable
         public String getResult()
         {
             return result.toString();
+        }
+    }
+
+    /**
+     * Callback to wait for a container to stop, accepting that it doesn't exist anymore: the containers are created
+     * with automatic removal, so Docker can remove a stopped container before the wait request reaches it.
+     */
+    private static final class StopResultCallback extends Adapter<WaitResponse>
+    {
+        @Override
+        public void onError(Throwable throwable)
+        {
+            if (throwable instanceof NotFoundException) {
+                // The container was removed after being stopped: there's nothing left to wait for.
+                onComplete();
+            } else {
+                super.onError(throwable);
+            }
         }
     }
 
@@ -119,9 +138,8 @@ public class ContainerManager implements Initializable
         List<Container> containers =
             exec(this.client.listContainersCmd().withNameFilter(Arrays.asList(containerName)).withShowAll(true));
         // The previous name filtering doesn't perform exact matching (it's more of a partial / contains search).
-        containers = containers.stream().filter(container -> {
-            return Arrays.asList(container.getNames()).contains("/" + containerName);
-        }).toList();
+        containers = containers.stream()
+            .filter(container -> Arrays.asList(container.getNames()).contains("/" + containerName)).toList();
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
@@ -241,7 +259,7 @@ public class ContainerManager implements Initializable
 
             // Wait for the container to be fully stopped before continuing.
             this.logger.debug("Wait for the Docker container [{}] to stop.", containerId);
-            wait(this.client.waitContainerCmd(containerId));
+            wait(this.client.waitContainerCmd(containerId), new StopResultCallback());
         } catch (NotFoundException e) {
             // Do nothing (the container doesn't exist anymore).
         }

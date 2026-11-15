@@ -85,8 +85,8 @@ class DefaultSearchSuggestCustomConfigDeleterTest
         objects.add(objConfig4);
         objects.add(objConfig5);
         objects.add(objConfig6);
-        when(searchSuggestConfigDoc.getXObjects(eq(new DocumentReference("mainWiki", "XWiki",
-            "SearchSuggestSourceClass")))).thenReturn(objects);
+        when(searchSuggestConfigDoc.getXObjects(new DocumentReference("mainWiki", "XWiki",
+            "SearchSuggestSourceClass"))).thenReturn(objects);
 
         // Object 1
         when(objConfig1.getStringValue("name")).thenReturn("platform.workspace.searchSuggestSourceWorkspaces");

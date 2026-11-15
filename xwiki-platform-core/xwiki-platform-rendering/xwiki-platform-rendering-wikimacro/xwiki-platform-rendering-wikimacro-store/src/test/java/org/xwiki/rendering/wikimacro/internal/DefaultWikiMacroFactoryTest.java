@@ -44,8 +44,8 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.Right;
@@ -81,7 +81,7 @@ import static org.mockito.Mockito.when;
 @ComponentList(DefaultWikiMacro.class)
 class DefaultWikiMacroFactoryTest
 {
-    private final static DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
 
     private BaseObject macroObject;
 
@@ -257,7 +257,7 @@ class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    void isAllowed() throws Exception
+    void isAllowed()
     {
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
@@ -313,7 +313,7 @@ class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    void createWikiMacroWithEmptyCode() throws Exception
+    void createWikiMacroWithEmptyCode()
     {
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "");
         saveDocument();

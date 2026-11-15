@@ -32,7 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
@@ -209,6 +210,7 @@ class DownloadActionTest
         verify(this.response).setContentType(mime);
         verify(this.response).setHeader("Accept-Ranges", "bytes");
         verify(this.response).addHeader("Content-disposition", disposition);
+        verify(this.response).setHeader("X-Content-Type-Options", "nosniff");
         verify(this.response).setDateHeader("Last-Modified", modified);
         if (length > -1) {
             verify(this.response).setContentLengthLong(length);
@@ -219,18 +221,13 @@ class DownloadActionTest
 
     private void verifyOutputExpectations(final int start, final int end) throws IOException
     {
-        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
-        {
-            @Override
-            public boolean matches(byte[] argument)
-            {
-                for (int i = start; i < end; ++i) {
-                    if (argument[i - start] != DownloadActionTest.this.fileContent[i]) {
-                        return false;
-                    }
+        verify(this.out).write(argThat(argument -> {
+            for (int i = start; i < end; ++i) {
+                if (argument[i - start] != this.fileContent[i]) {
+                    return false;
                 }
-                return true;
             }
+            return true;
         }), eq(0), eq(end - start));
     }
 
@@ -304,6 +301,17 @@ class DownloadActionTest
     void downloadWhenMissingFile()
     {
         setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
+        XWikiException xWikiException =
+            assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());
+    }
+
+    @Test
+    void downloadWhenNoDocumentInContext()
+    {
+        setRequestExpectations("/xwiki/bin/download/space/page/file.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
+        this.oldcore.getXWikiContext().setDoc(null);
+
         XWikiException xWikiException =
             assertThrows(XWikiException.class, () -> this.action.render(this.oldcore.getXWikiContext()));
         assertEquals("Error number 11003 in 11: Attachment [file.txt] not found", xWikiException.getMessage());
@@ -397,6 +405,41 @@ class DownloadActionTest
         verifyOutputExpectations(0, this.fileContent.length);
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "file.webp, image/webp",
+        "file.avif, image/avif",
+        "file.jxl, image/jxl",
+        "file.png, image/png"
+    })
+    void downloadWhenRasterImageDisplayedInline(String fileName, String mimeType) throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, fileName);
+        setRequestExpectations("/xwiki/bin/download/space/page/" + fileName, null, null, null, -1l, fileName);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, mimeType,
+            "inline; filename*=utf-8''" + fileName);
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    void downloadWhenSVGImage() throws XWikiException, IOException
+    {
+        Date d = new Date();
+        createAttachment(d, "file.svg");
+        setRequestExpectations("/xwiki/bin/download/space/page/file.svg", null, null, null, -1l, "file.svg");
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        // SVG images can contain scripts so they are never displayed inline by default.
+        verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/svg+xml",
+            "attachment; filename*=utf-8''file.svg");
+        verifyOutputExpectations(0, this.fileContent.length);
+    }
+
     @Test
     void downloadWithRealDate() throws XWikiException, IOException
     {
@@ -429,7 +472,7 @@ class DownloadActionTest
     void downloadWhenNameWithSpacesEncodedWithPercent() throws XWikiException, IOException
     {
         Date d = new Date();
-        XWikiAttachment attachment = createAttachment(d, "file name.txt");
+        createAttachment(d, "file name.txt");
         when(this.engineContext.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
@@ -443,7 +486,7 @@ class DownloadActionTest
     void downloadWhenNameWithNonAsciiChars() throws XWikiException, IOException
     {
         Date d = new Date();
-        XWikiAttachment attachment = createAttachment(d, "file\u021B.txt");
+        createAttachment(d, "file\u021B.txt");
 
         when(this.engineContext.getMimeType("file\u021B.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l, "file\u021B.txt");
@@ -714,9 +757,9 @@ class DownloadActionTest
         when(attachment.getMimeType(xcontext)).thenReturn("mimetype");
 
         // Set the current doc
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getAttachment("file.ext")).thenReturn(attachment);
-        xcontext.setDoc(document);
+        XWikiDocument documentMock = mock(XWikiDocument.class);
+        when(documentMock.getAttachment("file.ext")).thenReturn(attachment);
+        xcontext.setDoc(documentMock);
 
         // Set the Plugin Manager
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
@@ -753,9 +796,9 @@ class DownloadActionTest
             .thenReturn("http://localhost:8080/xwiki/bin/download/space/page/file.ext/some/path");
 
         // Set the current doc and current wiki
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getAttachment("path")).thenReturn(null);
-        xcontext.setDoc(document);
+        XWikiDocument documentMock = mock(XWikiDocument.class);
+        when(documentMock.getAttachment("path")).thenReturn(null);
+        xcontext.setDoc(documentMock);
         xcontext.setWikiId("wiki");
         xcontext.setAction("download");
 
@@ -792,7 +835,7 @@ class DownloadActionTest
         ExecutionContextManager ecm = this.oldcore.getMocker().registerMockComponent(ExecutionContextManager.class);
         ExecutionContext ec = this.oldcore.getExecutionContext();
         when(ecm.clone(ec)).thenReturn(ec);
-        VelocityManager vm = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
+        this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
 
         // Set the Plugin Manager
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);

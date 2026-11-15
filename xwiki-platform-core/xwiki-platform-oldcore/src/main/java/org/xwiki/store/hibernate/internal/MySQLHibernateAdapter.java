@@ -102,15 +102,34 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     {
         String rowFormat = rowFormats.get(tableName);
 
-        this.logger.debug("Row format for table [{}]: {}", tableName, rowFormat);
+        this.logger.debug("Row format for table [{}]: [{}]", tableName, rowFormat);
 
         String expectedRowFormat = compressed ? getCompressedRowFormat() : getDefaultRowFormat();
 
         if (!StringUtils.equalsIgnoreCase(rowFormat, expectedRowFormat)) {
-            return "ALTER TABLE " + tableName + " ROW_FORMAT=" + expectedRowFormat;
+            // Qualify the table with the database of the current wiki: the statement is executed on a session obtained
+            // straight from the session factory, whose pooled connection is still on the database selected by whoever
+            // used it last. An unqualified table would be resolved in that other database.
+            return "ALTER TABLE " + getQualifiedTableName(tableName) + " ROW_FORMAT=" + expectedRowFormat;
         }
 
         return null;
+    }
+
+    /**
+     * @param tableName the name of the table to qualify
+     * @return the table name prefixed with the database of the current wiki, so that the statement does not depend on
+     *         the database currently selected in the JDBC connection
+     */
+    private String getQualifiedTableName(String tableName)
+    {
+        String database = getDatabaseFromWikiName();
+
+        if (database == null) {
+            return tableName;
+        }
+
+        return escapeDatabaseName(database) + '.' + tableName;
     }
 
     /**
@@ -125,7 +144,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
 
         List<Object[]> results = query.list();
 
-        Map<String, String> rowFormats = new HashMap<>(results.size());
+        Map<String, String> rowFormats = HashMap.newHashMap(results.size());
         for (Object[] entry : results) {
             String completeName = (String) entry[0];
             String tableName = completeName.substring(completeName.indexOf('/') + 1);

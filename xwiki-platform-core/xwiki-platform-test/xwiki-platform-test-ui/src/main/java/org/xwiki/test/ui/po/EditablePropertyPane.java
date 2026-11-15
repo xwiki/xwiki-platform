@@ -62,6 +62,46 @@ public class EditablePropertyPane<T> extends BaseElement
     public EditablePropertyPane<T> clickEdit()
     {
         this.editButton.click();
+        return waitUntilEditing();
+    }
+
+    /**
+     * Clicks the edit button without waiting for the editor to become visible. This is useful when clicking the button
+     * may trigger a confirmation modal before the editor is shown.
+     *
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public void clickEditWithoutWaiting()
+    {
+        this.editButton.click();
+    }
+
+    /**
+     * @return {@code true} if the editor is currently visible (i.e., the property is being edited)
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public boolean isEditing()
+    {
+        return this.editor.isDisplayed();
+    }
+
+    /**
+     * Waits until the editor becomes visible (i.e., the property enters edit mode).
+     *
+     * @return this property pane
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public EditablePropertyPane<T> waitUntilEditing()
+    {
         getDriver().waitUntilCondition(visibilityOf(this.editor));
         return this;
     }

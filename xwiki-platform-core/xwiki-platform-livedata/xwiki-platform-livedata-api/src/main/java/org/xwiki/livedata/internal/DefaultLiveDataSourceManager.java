@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -72,8 +73,8 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
         if (cm != null && cm.hasComponent(LiveDataSource.class, sourceConfig.getId())) {
             try {
                 LiveDataSource liveDataSource = cm.getInstance(LiveDataSource.class, sourceConfig.getId());
-                if (liveDataSource instanceof WithParameters) {
-                    ((WithParameters) liveDataSource).getParameters().putAll(sourceConfig.getParameters());
+                if (liveDataSource instanceof WithParameters withParameters) {
+                    withParameters.getParameters().putAll(sourceConfig.getParameters());
                 }
                 return Optional.of(liveDataSource);
             } catch (ComponentLookupException e) {
@@ -92,13 +93,27 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
             return Optional.empty();
         } else {
             return Optional.of(cm.getComponentDescriptorList((Type) LiveDataSource.class).stream()
-                .map(descriptor -> descriptor.getRoleHint()).collect(Collectors.toSet()));
+                .map(ComponentDescriptor::getRoleHint).collect(Collectors.toSet()));
         }
     }
 
     private ComponentManager getComponentManager(String namespace)
     {
-        return "".equals(namespace) ? this.contextComponentManagerProvider.get()
-            : this.componentManagerManager.getComponentManager(namespace, false);
+        if ("".equals(namespace)) {
+            return this.contextComponentManagerProvider.get();
+        }
+
+        ComponentManager componentManager = this.componentManagerManager.getComponentManager(namespace, false);
+
+        // The component manager of a namespace is created lazily (e.g. when a wiki component is registered for it), so
+        // it might not exist yet for a freshly created wiki, in particular in an integration test. In that case, fall
+        // back to the root component manager instead of giving up: globally-registered sources (such as "liveTable")
+        // are always visible from the root. Without this fallback, requesting a source on a wiki whose component
+        // manager hasn't been initialized yet would wrongly report the source as missing.
+        if (componentManager == null) {
+            componentManager = this.componentManagerManager.getComponentManager(null, false);
+        }
+
+        return componentManager;
     }
 }

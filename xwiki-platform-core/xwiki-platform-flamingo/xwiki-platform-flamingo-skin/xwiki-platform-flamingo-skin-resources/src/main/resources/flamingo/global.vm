@@ -31,9 +31,8 @@
   <div id="globallinks">
   </div> ## globallinks
   <div class="clearfloats"></div>
-  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.header.after', {'sortByParameter': 'order'}))
-    $services.rendering.render($uix.execute(), 'xhtml/1.0')
-  #end
+  $services.uix.renderExtensions('org.xwiki.platform.template.header.after', 'html/5.0',
+    {'sortByParameter': 'order'})
 </div> ## headerglobal
 #end
 ### TODO: Format the header for pdf output

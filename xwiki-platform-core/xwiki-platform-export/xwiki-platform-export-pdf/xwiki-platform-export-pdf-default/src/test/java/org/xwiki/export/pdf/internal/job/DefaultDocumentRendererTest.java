@@ -19,14 +19,6 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,8 +30,6 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -63,6 +53,14 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultDocumentRenderer}.
@@ -134,25 +132,16 @@ class DefaultDocumentRendererTest
         XDOM titleXDOM = new XDOM(Arrays.asList(new WordBlock("title")));
         XDOM xdom = new XDOM(Arrays.asList(new WordBlock("content")));
         when(this.documentDisplayer.display(same(this.translatedDocument), any(DocumentDisplayerParameters.class)))
-            .then(new Answer<XDOM>()
-            {
-                @Override
-                public XDOM answer(InvocationOnMock invocation) throws Throwable
-                {
-                    DocumentDisplayerParameters params = (DocumentDisplayerParameters) invocation.getArgument(1);
-                    params.getIdGenerator().generateUniqueId("H", "heading");
-                    return params.isTitleDisplayed() ? titleXDOM : xdom;
-                }
+            .then(invocation -> {
+                DocumentDisplayerParameters params = (DocumentDisplayerParameters) invocation.getArgument(1);
+                params.getIdGenerator().generateUniqueId("H", "heading");
+                return params.isTitleDisplayed() ? titleXDOM : xdom;
             });
 
-        doAnswer(new Answer<Void>()
-        {
-            public Void answer(InvocationOnMock invocation)
-            {
-                WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
-                printer.print("some content");
-                return null;
-            }
+        doAnswer(invocation -> {
+            WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
+            printer.print("some content");
+            return null;
         }).when(this.html5Renderer).render(same(xdom), any(WikiPrinter.class));
 
         DocumentRendererParameters rendererParameters = new DocumentRendererParameters();

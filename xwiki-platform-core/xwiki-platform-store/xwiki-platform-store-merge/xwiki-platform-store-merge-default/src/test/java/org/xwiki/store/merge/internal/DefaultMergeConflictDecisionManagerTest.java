@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
     DefaultCacheManagerConfiguration.class,
     InfinispanCacheFactory.class })
 @ComponentTest
-public class DefaultMergeConflictDecisionManagerTest
+class DefaultMergeConflictDecisionManagerTest
 {
     @InjectMockComponents
     private DefaultMergeConflictDecisionsManager mergeConflictDecisionsManager;
@@ -77,13 +77,13 @@ public class DefaultMergeConflictDecisionManagerTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         doAnswer(AdditionalAnswers.returnsArgAt(1)).when(configurationSource).getProperty(anyString(), anyString());
     }
 
     @Test
-    public void recordDecisions()
+    void recordDecisions()
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
         EntityReference userReference = new DocumentReference("xwiki", "XWiki", "User");
@@ -113,7 +113,7 @@ public class DefaultMergeConflictDecisionManagerTest
         assertEquals("Cannot find a conflict with reference [unexisting] for document identifier [null_null]",
             logCapture.getMessage(0));
         assertTrue(mergeConflictDecisionsManager.recordDecision(documentReference, userReference, "conflict2",
-            ConflictDecision.DecisionType.CUSTOM, Arrays.asList("Someting", "Custom")));
+            ConflictDecision.DecisionType.CUSTOM, Arrays.asList("Something", "Custom")));
 
         List<ConflictDecision> conflictDecisionList =
             mergeConflictDecisionsManager.getConflictDecisionList(documentReference, userReference);
@@ -128,7 +128,7 @@ public class DefaultMergeConflictDecisionManagerTest
         assertEquals(Arrays.asList("some", "elements"), conflictDecisionList.get(0).getChunk().getElements());
 
         assertEquals(42, conflictDecisionList.get(1).getChunk().getIndex());
-        assertEquals(Arrays.asList("Someting", "Custom"), conflictDecisionList.get(1).getChunk().getElements());
+        assertEquals(Arrays.asList("Something", "Custom"), conflictDecisionList.get(1).getChunk().getElements());
 
         mergeConflictDecisionsManager.removeConflictDecisionList(documentReference, userReference);
         assertNull(mergeConflictDecisionsManager.getConflictDecisionList(documentReference, userReference));

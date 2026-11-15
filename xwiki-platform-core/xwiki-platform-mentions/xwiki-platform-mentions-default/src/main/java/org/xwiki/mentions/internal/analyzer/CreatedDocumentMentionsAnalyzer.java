@@ -45,8 +45,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
 
-import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
+import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 
 /**
  * Analyzes the new mentions on newly created documents.
@@ -160,8 +160,7 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     {
         List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         for (Object o : baseObject.getProperties()) {
-            if (o instanceof LargeStringProperty) {
-                LargeStringProperty largeStringProperty = (LargeStringProperty) o;
+            if (o instanceof LargeStringProperty largeStringProperty) {
                 String content = largeStringProperty.getValue();
                 this.xdomService
                     .parse(content, syntax)

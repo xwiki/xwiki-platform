@@ -27,7 +27,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 
 /**
- * Generate the final translation based or variables informations (parameters, etc.).
+ * Generate the final translation based or variables information (parameters, etc.).
  * 
  * @version $Id$
  * @since 4.3M2

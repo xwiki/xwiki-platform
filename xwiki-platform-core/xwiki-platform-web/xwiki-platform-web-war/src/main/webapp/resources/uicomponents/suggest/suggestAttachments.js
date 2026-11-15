@@ -66,7 +66,7 @@ define('xwiki-attachments-store', ['jquery'], function($) {
       dataType: 'json',
       xhr: function() {
         var xhr = $.ajaxSettings.xhr();
-        xhr.upload && xhr.upload.addEventListener('progress', function(event) {
+        xhr.upload?.addEventListener('progress', function(event) {
           if (event.lengthComputable) {
             deferred.notify({
               loaded: event.loaded,
@@ -138,7 +138,7 @@ define('xwiki-attachments-filter', ['jquery'], function($) {
           return true;
         }
       // Verify if the file media type contains the allowed media type.
-      } else if (typeof attachment.mimeType === 'string' && attachment.mimeType.indexOf(type) >= 0) {
+      } else if (typeof attachment.mimeType === 'string' && attachment.mimeType.includes(type)) {
         return true;
       }
     }
@@ -387,7 +387,7 @@ define('xwiki-suggestAttachments', [
     var oldRenderItem = selectize.settings.render.item;
     selectize.settings.render.item = function(attachment) {
       var output = oldRenderItem.apply(this, arguments);
-      if (attachment.data && attachment.data.upload) {
+      if (attachment.data?.upload) {
         output.addClass('upload create-' + attachment.data.upload.status);
         if (attachment.data.upload.status === 'running') {
           output.css('background', 'linear-gradient(90deg, #dff0d8 ' +
@@ -414,7 +414,7 @@ define('xwiki-suggestAttachments', [
     var attachments = convertFilesToAttachments(files, selectize.settings);
     attachments = attachmentsFilter.filter(attachments, selectize.settings.accept);
     if (selectize.settings.maxItems === 1) {
-      // Upload only a single file if single selecion is on.
+      // Upload only a single file if single selection is on.
       attachments = attachments.slice(0, 1);
     }
     attachments = processAttachments(selectize.settings, {attachments: attachments});
@@ -426,7 +426,7 @@ define('xwiki-suggestAttachments', [
       // Select the attachments.
       selectize.addItem(attachment.value);
       // Use the local file as icon while the file is being uploaded.
-      attachment.icon.promise && attachment.icon.promise.then(function() {
+      attachment.icon.promise?.then(function() {
         selectize.updateOption(attachment.value, attachment);
       });
       var uploadNextFile = uploadFileAndShowProgress.bind(null, attachment, selectize);
@@ -567,7 +567,7 @@ define('xwiki-attachmentResourcePicker', ['jquery', 'xwiki-suggestAttachments'],
     var oldLoadSelected = this.selectize.settings.loadSelected;
     this.selectize.settings.loadSelected = function(value, callback) {
       var option = this.options[value];
-      if (!option || !option.data) {
+      if (!option?.data) {
         // Load attachment information.
         oldLoadSelected.apply(this, arguments);
       } else {
@@ -601,7 +601,7 @@ define('xwiki-attachmentResourcePicker', ['jquery', 'xwiki-suggestAttachments'],
     var separatorIndex = value.indexOf(':');
     if (separatorIndex >= 0) {
       var type = value.substring(0, separatorIndex).toLowerCase();
-      if (supportedResourceTypes.indexOf(type) >= 0) {
+      if (supportedResourceTypes.includes(type)) {
         return {type: type, reference: value.substring(separatorIndex + 1)};
       }
     }
@@ -628,7 +628,7 @@ define('xwiki-attachmentResourcePicker', ['jquery', 'xwiki-suggestAttachments'],
 
 require(['jquery', 'xwiki-suggestAttachments', 'xwiki-attachmentResourcePicker', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.suggest-attachments').suggestAttachments();
     container.find('.pick-attachment-resource').pickAttachmentResource();
   };

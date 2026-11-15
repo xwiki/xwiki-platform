@@ -26,6 +26,10 @@ const userConfig: UserConfig = defineConfig({
     reporters: ["junit"],
     outputFile: "target/unit-tests.xml",
     passWithNoTests: true,
+    // Bound the number of concurrent worker processes each Vitest run may spawn. Without this, Vitest defaults to
+    // roughly one worker per CPU core; combined with the packages Nx runs in parallel, the resulting jsdom worker
+    // processes exhaust the memory of the CI agents, which get killed by the OOM killer.
+    maxWorkers: 2,
   },
 });
 export default userConfig;

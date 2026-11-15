@@ -112,7 +112,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     private void maybeUpdateLinksAfterDelete(Event event) throws RefactoringException
     {
         DeleteJob job = (DeleteJob) this.jobContext.getCurrentJob();
-        DeleteRequest request = (DeleteRequest) job.getRequest();
+        DeleteRequest request = job.getRequest();
         Predicate<EntityReference> canEdit = entityReference -> (job.hasAccess(Right.EDIT, entityReference));
         DocumentDeletedEvent deletedEvent = (DocumentDeletedEvent) event;
 
@@ -129,12 +129,12 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
             entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
 
         Map<EntityReference, EntityReference> updatedEntities = Map.of();
-        if (source instanceof MoveJob) {
+        if (source instanceof MoveJob moveJob) {
             MoveRequest request = (MoveRequest) data;
             updateLinks = request.isUpdateLinks();
             // Check access rights taking into account the move request.
-            canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
-            updatedEntities = ((MoveJob) source).getSelectedEntities();
+            canEdit = entityReference -> moveJob.hasAccess(Right.EDIT, entityReference);
+            updatedEntities = moveJob.getSelectedEntities();
         }
 
         if (updateLinks) {

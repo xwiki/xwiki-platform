@@ -188,11 +188,6 @@ div.suggestItems .hide-button {
   }
 }
 
-// FIX: Auto-save
-.skin-flamingo #autosaveControl input.autosave-frequency {
-  width: 3em;
-}
-
 // FIX: user profile
 .skin-flamingo {
   .user-menu-profile:before, .user-menu-preferences:before, .user-menu-watchlist:before, .user-menu-network:before, .user-menu-wikis:before, .user-menu-dashboard:before {
@@ -212,7 +207,7 @@ div.suggestItems .hide-button {
 // FIX: login
 #loginForm {
   .panel {
-    max-width: @loginFormMaxWidth;
+    max-width: @login-form-max-width;
     margin: auto;
     text-align: left;
   }
@@ -235,7 +230,7 @@ div.suggestItems .hide-button {
 }
 
 .resetpasswordpanel, .forgotusernamepanel {
-  max-width: @loginFormMaxWidth;
+  max-width: @login-form-max-width;
   margin: auto;
   text-align: left;
 

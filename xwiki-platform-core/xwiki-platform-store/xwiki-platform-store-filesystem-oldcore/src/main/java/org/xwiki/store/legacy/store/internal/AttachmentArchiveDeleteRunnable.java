@@ -44,7 +44,7 @@ public class AttachmentArchiveDeleteRunnable extends StartableTransactionRunnabl
     /**
      * @param archive the attachment archive to delete.
      * @param fileTools tools for getting the metadata and versions of the attachment and locks.
-     * @param provider the file provider for gettign the files to delete.
+     * @param provider the file provider for getting the files to delete.
      */
     public AttachmentArchiveDeleteRunnable(final XWikiAttachmentArchive archive, final FilesystemStoreTools fileTools,
         final AttachmentBlobProvider provider) throws BlobStoreException

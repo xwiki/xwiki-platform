@@ -106,9 +106,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
     @Override
     public void init(XWikiContext context)
     {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Start statistics service initialization");
-        }
+        LOGGER.info("Start statistics service initialization");
 
         if (StatsUtil.isStatsEnabled(context)) {
             // Start statistics store thread
@@ -174,7 +172,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
                 this.statsRegister.addStats(document, action, context);
             }
         } catch (Exception e) {
-            LOGGER.error("Faild to get filter users list", e);
+            LOGGER.error("Failed to get filter users list", e);
         }
     }
 

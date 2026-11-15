@@ -74,7 +74,7 @@ public class URLSecurityScriptService implements ScriptService
         } catch (SecurityException e)
         {
             this.logger.info("The URI [{}] is considered not safe: [{}]", uriRepresentation, e.getMessage());
-            this.logger.debug("Security exception stack trace: ", e);
+            this.logger.debug("Security exception stack trace:", e);
             return null;
         }
     }

@@ -259,7 +259,7 @@ class AuthorizationManagerTest extends AbstractWikiTest
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
 
-        assertAccessTrue("Main wiki oner shoudl have Programming Right", Right.PROGRAM,
+        assertAccessTrue("Main wiki oner should have Programming Right", Right.PROGRAM,
             new DocumentReference("wiki", "XWiki", "Admin"), null, ctx);
     }
 

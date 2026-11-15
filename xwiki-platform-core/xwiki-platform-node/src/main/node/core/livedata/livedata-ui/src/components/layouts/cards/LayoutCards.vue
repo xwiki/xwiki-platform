@@ -39,7 +39,7 @@
       <template #right>
         <LivedataPagination side="right" />
         <LivedataEntrySelectorAll v-if="isSelectionEnabled" />
-        <LivedataDropdownMenu />
+        <LivedataActions />
       </template>
     </LivedataTopbar>
 
@@ -56,12 +56,12 @@
         Implement property reorder
       -->
       <!--
-        We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
-        That way even if two entries have the same id, the keys will not be equals.
+        The keys stay the same when the entries are refreshed or reordered, and when the entry of a new row is created.
+        They are made unique in case of inconsistent data, in this case duplicated entry IDs.
       -->
       <LayoutCardsCard
         v-for="(entry, idx) in entries"
-        :key="`card-${logic.getEntryId(entry)}-${idx}`"
+        :key="entryKeys[idx]"
         :entry="entry"
         :entry-idx="idx"
       />
@@ -81,8 +81,8 @@
 <script>
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
+import LivedataActions from "../../LivedataActions.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
@@ -93,9 +93,9 @@ export default {
   name: "layout-cards",
 
   components: {
+    LivedataActions,
     LivedataBottombar,
     LivedataTopbar,
-    LivedataDropdownMenu,
     LivedataEntrySelectorAll,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
@@ -116,6 +116,9 @@ export default {
     },
     entries() {
       return this.logic.data.data.entries;
+    },
+    entryKeys() {
+      return this.logic.getEntryKeys(this.entries);
     },
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();
@@ -144,10 +147,10 @@ export default {
   /* Make the cards 30rem large, and display as many of them on one row */
   .layout-cards .layout-table-root {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 30rem);
+    grid-template-columns: repeat(auto-fill, 22rem);
     grid-auto-rows: min-content;
-    gap: 1.5rem;
-    grid-gap: 1.5rem; /* safari */
+    gap: 1rem;
+    grid-gap: 1rem; /* safari */
   }
 }
 

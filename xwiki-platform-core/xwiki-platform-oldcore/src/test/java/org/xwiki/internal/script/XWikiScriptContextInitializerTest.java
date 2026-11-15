@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class XWikiScriptContextInitializerTest
+class XWikiScriptContextInitializerTest
 {
     @InjectMockitoOldcore
     MockitoOldcore oldcore;
@@ -63,7 +63,7 @@ public class XWikiScriptContextInitializerTest
     ScriptContext scriptContext = new SimpleScriptContext();
 
     @Test
-    public void getServletContext()
+    void getServletContext()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub()
         {

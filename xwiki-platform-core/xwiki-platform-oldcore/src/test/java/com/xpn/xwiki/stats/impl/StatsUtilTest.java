@@ -154,10 +154,10 @@ class StatsUtilTest
         doReturn("XWiki.user,XWiki.user2,otherwiki:XWiki.group").when(wiki).Param(any());
         doReturn(groupDoc)
             .when(wiki)
-            .getDocument(eq(groupReference), eq(context));
+            .getDocument(groupReference, context);
         doReturn(user3Doc)
             .when(wiki)
-            .getDocument(eq(user3Reference), eq(context));
+            .getDocument(user3Reference, context);
 
         assertEquals(Set.of(userReference, user2Reference, user3Reference), StatsUtil.getRequestFilteredUsers(context));
     }

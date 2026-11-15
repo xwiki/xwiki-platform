@@ -28,7 +28,7 @@ export interface QueryConstraint {
    */
   operator: string;
   /**
-   * An arbitrary value to apply on the operator (e.g., a string to use for the equals comparion).
+   * An arbitrary value to apply on the operator (e.g., a string to use for the equals comparison).
    */
   value: unknown;
 }

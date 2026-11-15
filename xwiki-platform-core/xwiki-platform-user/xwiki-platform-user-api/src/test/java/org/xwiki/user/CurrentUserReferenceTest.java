@@ -29,13 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @version $Id$
  */
-public class CurrentUserReferenceTest
+class CurrentUserReferenceTest
 {
     @Test
     void isGlobal()
     {
         Throwable exception = assertThrows(RuntimeException.class,
-            () -> CurrentUserReference.INSTANCE.isGlobal());
+            CurrentUserReference.INSTANCE::isGlobal);
         assertEquals("You need to resolve the current user first to find if it's a global user or not.",
             exception.getMessage());
     }

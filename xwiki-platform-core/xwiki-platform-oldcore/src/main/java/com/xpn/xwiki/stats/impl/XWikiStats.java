@@ -199,11 +199,7 @@ public class XWikiStats extends BaseCollection
             return false;
         }
 
-        if (getNumber() != ((BaseCollection) obj).getNumber()) {
-            return false;
-        }
-
-        return true;
+        return getNumber() == ((BaseCollection) obj).getNumber();
     }
 
     @Override
@@ -213,10 +209,8 @@ public class XWikiStats extends BaseCollection
         Element oel = new DOMElement(XMLNODE_OBJECT);
 
         // Add Class
-        if (bclass != null) {
-            if (bclass.getFieldList().size() > 0) {
-                oel.add(bclass.toXML());
-            }
+        if (bclass != null && !bclass.getFieldList().isEmpty()) {
+            oel.add(bclass.toXML());
         }
 
         Element el = new DOMElement(XMLNODE_NAME);
@@ -244,7 +238,7 @@ public class XWikiStats extends BaseCollection
     /**
      * Initialize statistics object from XML schema.
      *
-     * @param oel the XML root node containing statistics datas.
+     * @param oel the XML root node containing statistics data.
      * @throws XWikiException error when parsing XML schema.
      */
     @Override

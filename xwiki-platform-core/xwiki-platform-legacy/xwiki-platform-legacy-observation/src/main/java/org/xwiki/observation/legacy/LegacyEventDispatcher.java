@@ -82,32 +82,25 @@ public class LegacyEventDispatcher implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return new ArrayList<Event>()
-        {
-            {
-                add(new DocumentDeletedEvent());
-                add(new DocumentCreatedEvent());
-                add(new DocumentUpdatedEvent());
-                add(new ActionExecutedEvent());
-            }
-        };
+        return new ArrayList<>(List.of(new DocumentDeletedEvent(), new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent(), new ActionExecutedEvent()));
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentDeletedEvent) {
+        if (event instanceof DocumentDeletedEvent documentDeletedEvent) {
             this.getObservationManager().notify(
-                new DocumentDeleteEvent(((DocumentDeletedEvent) event).getEventFilter()), source, data);
-        } else if (event instanceof DocumentCreatedEvent) {
-            this.getObservationManager().notify(new DocumentSaveEvent(((DocumentCreatedEvent) event).getEventFilter()),
+                new DocumentDeleteEvent(documentDeletedEvent.getEventFilter()), source, data);
+        } else if (event instanceof DocumentCreatedEvent documentCreatedEvent) {
+            this.getObservationManager().notify(new DocumentSaveEvent(documentCreatedEvent.getEventFilter()),
                 source, data);
-        } else if (event instanceof DocumentUpdatedEvent) {
+        } else if (event instanceof DocumentUpdatedEvent documentUpdatedEvent) {
             this.getObservationManager().notify(
-                new DocumentUpdateEvent(((DocumentUpdatedEvent) event).getEventFilter()), source, data);
-        } else if (event instanceof ActionExecutedEvent) {
+                new DocumentUpdateEvent(documentUpdatedEvent.getEventFilter()), source, data);
+        } else if (event instanceof ActionExecutedEvent actionExecutedEvent) {
             this.getObservationManager().notify(
-                new ActionExecutionEvent(((ActionExecutedEvent) event).getActionName()), source, data);
+                new ActionExecutionEvent(actionExecutedEvent.getActionName()), source, data);
         }
     }
 

@@ -90,9 +90,7 @@ public class DefaultEntityEvent implements EntityEvent
             return true;
         }
 
-        if (obj instanceof EntityEvent) {
-            EntityEvent otherEvent = (EntityEvent) obj;
-
+        if (obj instanceof EntityEvent otherEvent) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.append(getEvent(), otherEvent.getEvent());

@@ -163,9 +163,6 @@ rendering.macro.wikis.description=List alle wikier
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Arbeidsområder (Legacy)
 rendering.macro.workspaces.description=Utdatert makro som ikke skal brukes av kompatibilitetsårsaker. Bruk "wikis"-makroen i stedet.
-
-## Browse
-platform.wiki.browse=Vis wikier
 platform.wiki.browse.emptyvalue=I/T
 platform.wiki.browse.wikiprettyname=Navn
 platform.wiki.browse.description=Beskrivelse
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Fullfør
 #######################################
 platform.wiki.delete.confirmation.yes=Ja, slett denne wiki-en!
 platform.wiki.delete.confirmation.no=Nei, ta meg tilbake!
+
+## Browse
+platform.wiki.browse=Vis wikier
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

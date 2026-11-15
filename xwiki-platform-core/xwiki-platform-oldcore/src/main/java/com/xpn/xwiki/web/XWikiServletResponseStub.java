@@ -85,6 +85,6 @@ public class XWikiServletResponseStub extends HttpServletResponseWrapper
     @Override
     public void removeCookie(String cookieName, XWikiRequest request)
     {
-
+        // Nothing to do, this stub does not manage cookies.
     }
 }

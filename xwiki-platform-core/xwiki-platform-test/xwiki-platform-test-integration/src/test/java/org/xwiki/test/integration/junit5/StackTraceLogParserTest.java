@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 11.4RC1
  */
-public class StackTraceLogParserTest
+class StackTraceLogParserTest
 {
     @Test
-    public void parseLogWithStackTrace() throws Exception
+    void parseLogWithStackTrace() throws Exception
     {
         String log = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream("stacktrace.txt"), "UTF-8");
         StackTraceLogParser parser = new StackTraceLogParser();
@@ -53,7 +53,7 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithInvalidStacktrace()
+    void parseWithInvalidStacktrace()
     {
         // Verify that it works if the third line is shorter or equal to the searched patterns.
         String log = "date - line1\n"
@@ -74,13 +74,14 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithLeadingStacktrace()
+    void parseWithLeadingStacktrace()
     {
-        String log = "date - line1\n"
-            + "date - line2\n"
-            + "date - \tat x\n"
-            + "date - Caused by: x\n"
-            + "date - test";
+        String log = """
+            date - line1
+            date - line2
+            date - \tat x
+            date - Caused by: x
+            date - test""";
         StackTraceLogParser parser = new StackTraceLogParser();
         List<String> results = parser.parse(log);
 
@@ -90,7 +91,7 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithCapturedLogs()
+    void parseWithCapturedLogs()
     {
         String log = ""
             + "date [x] INFO  Class - STDOUT: date [main] ERROR OtherClass"
@@ -107,12 +108,12 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithNoPrefixedLogs()
+    void parseWithNoPrefixedLogs()
     {
-        String log = ""
-            + "WARN  - stacktrace\n"
-            + "java.lang.Exception: exception\n"
-            + "\tat doSomething(ValidateConsoleExtensionTest.java:94)";
+        String log = """
+            WARN  - stacktrace
+            java.lang.Exception: exception
+            \tat doSomething(ValidateConsoleExtensionTest.java:94)""";
         StackTraceLogParser parser = new StackTraceLogParser();
         List<String> results = parser.parse(log);
 

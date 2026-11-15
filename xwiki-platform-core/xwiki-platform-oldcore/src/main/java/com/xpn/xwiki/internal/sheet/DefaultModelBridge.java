@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -70,8 +71,9 @@ public class DefaultModelBridge implements ModelBridge
         try {
             return ((XWikiDocument) document).getDefaultEditMode(this.xcontextProvider.get());
         } catch (XWikiException e) {
-            this.logger.warn("Failed to get the default edit mode for [{}].",
-                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
+            this.logger.warn("Failed to get the default edit mode for [{}]. Root cause is [{}]",
+                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()),
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
@@ -88,7 +90,7 @@ public class DefaultModelBridge implements ModelBridge
             } catch (XWikiException e) {
                 String stringReference =
                     this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-                this.logger.warn("Failed to load the default translation of [{}].", stringReference, e);
+                this.logger.warn("Failed to load the default translation of [{}]", stringReference, e);
             }
         }
         return document;

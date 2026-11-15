@@ -29,7 +29,7 @@ import org.xwiki.chart.ChartCustomizer;
 import org.xwiki.component.annotation.Component;
 
 /**
- * Customize visiblity of items on the chart.
+ * Customize visibility of items on the chart.
  *
  * @version $Id$
  * @since 7.4.3

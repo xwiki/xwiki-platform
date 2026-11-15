@@ -95,7 +95,7 @@ class WikiUserFromXEMMigrationTest
         when(this.xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerSubwiki")),
             any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
         when(oldDescriptorDocument.getXObject(
-            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass")))).thenReturn(null);
+            new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))).thenReturn(null);
 
         // Run
         this.wikiUserFromXEMMigration.hibernateMigrate();
@@ -104,7 +104,7 @@ class WikiUserFromXEMMigrationTest
         WikiUserConfiguration expectedConfiguration = new WikiUserConfiguration();
         expectedConfiguration.setUserScope(UserScope.LOCAL_AND_GLOBAL);
         expectedConfiguration.setMembershipType(MembershipType.INVITE);
-        verify(this.wikiUserConfigurationHelper).saveConfiguration(eq(expectedConfiguration), eq("subwiki"));
+        verify(this.wikiUserConfigurationHelper).saveConfiguration(expectedConfiguration, "subwiki");
     }
 
     @Test
@@ -120,7 +120,7 @@ class WikiUserFromXEMMigrationTest
         // Mocks about the old workspace object
         BaseObject oldObject = mock(BaseObject.class);
         when(oldDescriptorDocument.getXObject(
-            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass")))).thenReturn(oldObject);
+            new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))).thenReturn(oldObject);
         when(oldObject.getStringValue("membershipType")).thenReturn("request");
 
         // Mocks about candidacies
@@ -132,7 +132,7 @@ class WikiUserFromXEMMigrationTest
         List<BaseObject> oldCandidacies = new ArrayList<>();
         BaseObject oldCandidacy = mock(BaseObject.class);
         oldCandidacies.add(oldCandidacy);
-        when(memberGroupDoc.getXObjects(eq(candidacyOldClass))).thenReturn(oldCandidacies);
+        when(memberGroupDoc.getXObjects(candidacyOldClass)).thenReturn(oldCandidacies);
         LocalDocumentReference newCandidacyClassRef = WikiCandidateMemberClassInitializer.REFERENCE;
         BaseObject newCandidacyObject = mock(BaseObject.class);
         when(memberGroupDoc.newXObject(eq(newCandidacyClassRef), any(XWikiContext.class)))
@@ -154,7 +154,7 @@ class WikiUserFromXEMMigrationTest
         WikiUserConfiguration expectedConfiguration = new WikiUserConfiguration();
         expectedConfiguration.setUserScope(UserScope.GLOBAL_ONLY);
         expectedConfiguration.setMembershipType(MembershipType.REQUEST);
-        verify(this.wikiUserConfigurationHelper).saveConfiguration(eq(expectedConfiguration), eq("workspace"));
+        verify(this.wikiUserConfigurationHelper).saveConfiguration(expectedConfiguration, "workspace");
 
         // Verify the old workspace object has been removed and the descriptor saved
         verify(oldDescriptorDocument).removeXObject(oldObject);
@@ -170,10 +170,10 @@ class WikiUserFromXEMMigrationTest
         verify(newCandidacyObject).setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_COMMENT, "ff");
         verify(newCandidacyObject).setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_PRIVATE_COMMENT,
             "gg");
-        verify(newCandidacyObject).setDateValue(eq(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CREATION),
-            eq(new Date(2000)));
-        verify(newCandidacyObject).setDateValue(eq(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE),
-            eq(new Date(8000)));
+        verify(newCandidacyObject).setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CREATION,
+            new Date(2000));
+        verify(newCandidacyObject).setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE,
+            new Date(8000));
 
         // Verify the old candidacy has been removed and the document saved
         verify(memberGroupDoc).removeXObject(oldCandidacy);
@@ -209,6 +209,6 @@ class WikiUserFromXEMMigrationTest
         WikiUserConfiguration expectedConfiguration = new WikiUserConfiguration();
         expectedConfiguration.setUserScope(UserScope.GLOBAL_ONLY);
         expectedConfiguration.setMembershipType(MembershipType.INVITE);
-        verify(this.wikiUserConfigurationHelper).saveConfiguration(eq(expectedConfiguration), eq("workspacetemplate"));
+        verify(this.wikiUserConfigurationHelper).saveConfiguration(expectedConfiguration, "workspacetemplate");
     }
 }

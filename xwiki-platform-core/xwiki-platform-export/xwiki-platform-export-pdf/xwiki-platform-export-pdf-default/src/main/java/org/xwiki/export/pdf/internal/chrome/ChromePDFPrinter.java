@@ -23,13 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.export.pdf.browser.AbstractBrowserPDFPrinter;
 import org.xwiki.export.pdf.browser.BrowserManager;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Prints the content of a given URL using a (headless) Chrome web browser (that may be running inside a Docker
@@ -47,18 +44,9 @@ public class ChromePDFPrinter extends AbstractBrowserPDFPrinter
     @Named("chrome")
     private Provider<BrowserManager> chromeManagerProvider;
 
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
     @Override
     protected BrowserManager getBrowserManager()
     {
         return this.chromeManagerProvider.get();
-    }
-
-    @Override
-    protected HttpServletRequest getRequest()
-    {
-        return this.xcontextProvider.get().getRequest();
     }
 }

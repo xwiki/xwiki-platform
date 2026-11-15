@@ -25,6 +25,8 @@ import {
   createReactInlineContentSpec,
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
+import { RiFileList3Fill } from "react-icons/ri";
+import type { InlineContentType } from ".";
 import type {
   BlockConfig,
   CustomInlineContentConfig,
@@ -40,14 +42,16 @@ import type {
   StyleSchema,
 } from "@blocknote/core";
 import type {
+  BlockTypeSelectItem,
   ReactCustomBlockImplementation,
   ReactInlineContentImplementation,
 } from "@blocknote/react";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type {
-  MacroWithUnknownParamsType,
-  UnknownMacroParamsType,
-} from "@xwiki/platform-macros-api";
-import type { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+  InlineMacroInvocation as UniAstInlineMacroInvocation,
+  MacroBlockInvocation as UniAstMacroBlockInvocation,
+} from "@xwiki/platform-uniast-api";
+import type { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import type { JSX, ReactNode } from "react";
 
 /**
@@ -179,13 +183,13 @@ const MACRO_NAME_PREFIX = "Macro_";
 
 /**
  * Description of a macro adapted by `adaptMacroForBlockNote`
- *
- * @since 18.0.0RC1
- * @internal
  */
 type BlockNoteConcreteMacro = {
   /** Type-erased macro */
   macro: MacroWithUnknownParamsType;
+
+  /** Dropdown item for changing the selection to the current macro */
+  dropdownTransformItem: BlockTypeSelectItem | null;
 
   /** Rendering part */
   bnRendering: // Block macro
@@ -214,17 +218,115 @@ type BlockNoteConcreteMacro = {
  */
 type ContextForMacros = {
   /**
-   * Request the opening of an UI to edit the macro's parameters (e.g. a modal)
+   * Request the opening of a UI to edit an existing macro call (e.g. a modal)
    *
-   * @param macro - Description of the macro being edited
-   * @param params - Current parameters of the macro
-   * @param update - Calling this function will replace the existing macro's parameters with the provided ones
+   * When not provided, the actions to edit a macro call are hidden.
+   *
+   * @param invocation - The macro call being edited
+   * @param update - Calling this function will replace the edited macro call with the provided one
    */
-  openParamsEditor(
-    macro: MacroWithUnknownParamsType,
-    params: UnknownMacroParamsType,
-    update: (newProps: UnknownMacroParamsType) => void,
+  openParamsEditor?(
+    invocation: MacroBlockInvocation | InlineMacroInvocation,
+    update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void,
   ): void;
+
+  /**
+   * Request the opening of a UI (e.g. modal) to insert a new block macro
+   *
+   * When not provided, the action to insert a macro is hidden.
+   *
+   * @param prefill - Information to prefill the modal with (ID, body, ...)
+   * @param insert - Insert the new macro, replacing the user-selected content (if any)
+   *
+   * @since 18.5.0RC1
+   * @beta
+   */
+  openInsertionEditor?(
+    prefill: MacroInsertionEditorPrefillData,
+    insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
+  ): void;
+
+  /**
+   * Retrieve the output of a server-rendered macro call (`xwikiMacroBlock` / `xwikiInlineMacro`). The output is not
+   * part of the edited content because it is rendered for the current user (it can contain information that only the
+   * current user is allowed to view) while the edited content can be shared with other users (realtime editing).
+   *
+   * When not provided, or when it doesn't return anything, the macro is displayed as a placeholder.
+   *
+   * @param id - identifies the macro call: the block id for a block macro, the `id` property for an inline macro or
+   *   for a macro nested in the parameters or content of another macro call
+   * @param call - the current macro call (JSON); no output should be returned if the macro call was modified after its
+   *   output was rendered
+   * @returns the macro output (an array of BlockNote-shaped nodes), or undefined if not available
+   *
+   * @since 18.10.0RC1
+   * @beta
+   */
+  getMacroOutput?(id: string, call: string): unknown[] | undefined;
+};
+
+/**
+ * A macro call's parameter map: parameter name to primitive value.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
+type MacroCallParams = Record<string, boolean | number | string>;
+
+/**
+ * Information to fill the insertion modal UI with
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type MacroInsertionEditorPrefillData = {
+  /** Type of the macro to insert */
+  kind: "block" | "inline";
+
+  /** ID of the macro to insert */
+  id: string | null;
+
+  /** Parameters of the macro */
+  params: MacroCallParams | null;
+
+  /** Body of the macro */
+  body: MacroBlockInvocation["body"] | InlineMacroInvocation["body"] | null;
+};
+
+/**
+ * Information about a macro block invocation.
+ *
+ * Identical to `MacroBlockInvocation` from `@xwiki/platform-uniast-api`, except for `body` which is a BlockNote AST
+ * piece here.
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type MacroBlockInvocation = Omit<UniAstMacroBlockInvocation, "body"> & {
+  // NOTE: 'InlineContentType[]' should become 'BlockType[]' once BlockNote supports nesting
+  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+  body:
+    | { type: "inlineContents"; content: InlineContentType[] }
+    | { type: "raw"; content: string }
+    | { type: "none" };
+};
+
+/**
+ * Information about an inline macro invocation.
+ *
+ * Identical to `InlineMacroInvocation` from `@xwiki/platform-uniast-api`, except for `body` which is a BlockNote AST
+ * piece here.
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+type InlineMacroInvocation = Omit<UniAstInlineMacroInvocation, "body"> & {
+  // NOTE: 'InlineContentType' should become 'InlineContentType[]' once BlockNote supports nesting
+  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
+  body:
+    | { type: "inlineContent"; content: InlineContentType }
+    | { type: "raw"; content: string }
+    | { type: "none" };
 };
 
 /**
@@ -232,17 +334,18 @@ type ContextForMacros = {
  *
  * @param macro - The macro to adapt
  * @param ctx - The context used to handle the macro inside BlockNote
- * @param jsxConverter - A converter that transforms macro ASTs to React JSX
+ * @param jsxConverter - A converter that transforms a macro's rendered UniAst content to React JSX
  *
  * @returns - The BlockNote-compatible macro
  *
  * @since 18.0.0RC1
  * @beta
  */
+// eslint-disable-next-line max-statements
 function adaptMacroForBlockNote(
   macro: MacroWithUnknownParamsType,
   ctx: ContextForMacros,
-  jsxConverter: MacrosAstToReactJsxConverter,
+  jsxConverter: UniAstToReactJsxConverter,
 ): BlockNoteConcreteMacro {
   const { id, name, params, defaultParameters } = macro.infos;
 
@@ -303,9 +406,15 @@ function adaptMacroForBlockNote(
     // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-742
     update: (newParams: Props<PropSchema>) => void,
   ): JSX.Element {
-    const openParamsEditor = () =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ctx.openParamsEditor(macro, props, update as any);
+    // When no params editor is available, no double-click handler is attached. The client-rendered macro is exposed to
+    // the params editor as a macro invocation, and the updated invocation's parameters are written back as block props.
+    const openParamsEditor = ctx.openParamsEditor
+      ? () =>
+          ctx.openParamsEditor!(
+            macroToInvocation(macro, props, content),
+            (updated) => update(updated.params as Props<PropSchema>),
+          )
+      : undefined;
 
     /** The macro's raw body */
     const rawBody =
@@ -435,7 +544,20 @@ function adaptMacroForBlockNote(
           }),
         };
 
-  return { macro, bnRendering };
+  const dropdownTransformItem =
+    macro.renderAs === "block"
+      ? ({
+          type: blockNoteName,
+          icon: (props) => <RiFileList3Fill {...props} />,
+          name: macro.infos.name,
+          props:
+            macro.infos.defaultParameters !== false
+              ? macro.infos.defaultParameters
+              : {},
+        } satisfies BlockTypeSelectItem)
+      : null;
+
+  return { macro, bnRendering, dropdownTransformItem };
 }
 
 /**
@@ -486,6 +608,156 @@ function buildMacroRawContent(
   return { type: "text", text: content, styles: {} };
 }
 
+/**
+ * Build a macro invocation from a client-rendered macro (System B) and its current block props / content, so that the
+ * generic (invocation-based) params editor can edit it. The parameters are carried over, and the body is mapped
+ * according to the macro's body type: a raw body to `raw`, a WYSIWYG body to `inlineContents` (block) / `inlineContent`
+ * (inline) so the editable content is preserved, and no body to `none`.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
+function macroToInvocation(
+  macro: MacroWithUnknownParamsType,
+  params: Props<PropSchema>,
+  content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[],
+): MacroBlockInvocation | InlineMacroInvocation {
+  const macroParams = params as MacroCallParams;
+  // The default inline content schema is a subset of the editor's, so widening the content is safe here.
+  const inlineContent = content as unknown as InlineContentType[];
+
+  let body: MacroBlockInvocation["body"] | InlineMacroInvocation["body"] = {
+    type: "none",
+  };
+  if (macro.infos.bodyType === "raw") {
+    body = { type: "raw", content: extractMacroRawContent(content) };
+  } else if (macro.infos.bodyType === "wysiwyg") {
+    body =
+      macro.renderAs === "block"
+        ? { type: "inlineContents", content: inlineContent }
+        : // NOTE: an inline macro invocation body currently holds a single inline content (see InlineMacroInvocation),
+          // so only the first inline content is carried over. This should carry the whole run once the invocation model
+          // supports it (same tracking issue as InlineMacroInvocation.body).
+          { type: "inlineContent", content: inlineContent[0] };
+  }
+
+  return macro.renderAs === "block"
+    ? {
+        kind: "block",
+        id: macro.infos.id,
+        params: macroParams,
+        body: body as MacroBlockInvocation["body"],
+      }
+    : {
+        kind: "inline",
+        id: macro.infos.id,
+        params: macroParams,
+        body: body as InlineMacroInvocation["body"],
+      };
+}
+
+/**
+ * A server-side macro call, as stored (JSON-serialized) in the `call` prop of the {@link macro.tsx} `xwikiMacroBlock` /
+ * `xwikiInlineMacro` specs and produced/consumed by the server-side BlockNote syntax: the macro name, its parameters
+ * and an optional body. Whether the macro is inline or block-level is carried by the block/inline-content type, not by
+ * this object. A parameter value and the body can each be either a plain string or a BlockNote fragment (an array of
+ * blocks or inline content) when the macro output uses it verbatim (so it can be edited in-place).
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
+type MacroCall = {
+  name: string;
+  parameters: Record<string, unknown>;
+  content?: unknown;
+};
+
+/** Convert an editor macro invocation into the {@link MacroCall} stored in a macro block's `call` prop. */
+function invocationToMacroCall(
+  invocation: MacroBlockInvocation | InlineMacroInvocation,
+): MacroCall {
+  const call: MacroCall = {
+    name: invocation.id,
+    parameters: invocation.params,
+  };
+  const body = invocation.body;
+  // A raw body is a string; an inline(Contents) body is a BlockNote fragment. Both are carried verbatim into the call
+  // content; a "none" body leaves the content unset.
+  if (
+    body.type === "raw" ||
+    body.type === "inlineContents" ||
+    body.type === "inlineContent"
+  ) {
+    call.content = body.content;
+  }
+  return call;
+}
+
+/** Convert a {@link MacroCall} (read from a macro block's `call` prop) into an editor macro invocation. */
+function macroCallToInvocation(
+  call: MacroCall,
+  kind: "block" | "inline",
+): MacroBlockInvocation | InlineMacroInvocation {
+  const params = (call.parameters ?? {}) as MacroCallParams;
+  const { content } = call;
+  const hasContent =
+    content !== undefined && content !== null && content !== "";
+
+  if (kind === "block") {
+    const body: MacroBlockInvocation["body"] = !hasContent
+      ? { type: "none" }
+      : typeof content === "string"
+        ? { type: "raw", content }
+        : // A fragment content is carried verbatim (it may be a block or inline-content array).
+          { type: "inlineContents", content: content as InlineContentType[] };
+    return { kind: "block", id: call.name, params, body };
+  }
+
+  const body: InlineMacroInvocation["body"] = !hasContent
+    ? { type: "none" }
+    : typeof content === "string"
+      ? { type: "raw", content }
+      : // A fragment content is carried verbatim. NOTE: the inline body currently holds a single inline content (see
+        // InlineMacroInvocation), but the server fragment can be an array; it is preserved as-is and round-trips.
+        { type: "inlineContent", content: content as InlineContentType };
+  return { kind: "inline", id: call.name, params, body };
+}
+
+/**
+ * Insert (or replace the given selected block with) a server-rendered macro represented by the {@link macro.tsx}
+ * `xwikiMacroBlock` / `xwikiInlineMacro` specs. The call (name, parameters and body) is stored as the JSON `call` prop.
+ * The inserted macro has no output (it is displayed as a placeholder) until it is rendered server-side.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
+function insertMacroInvocation(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  editor: BlockNoteEditor<any, any, any>,
+  invocation: MacroBlockInvocation | InlineMacroInvocation,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  selectedBlock?: any,
+): void {
+  const props = {
+    call: JSON.stringify(invocationToMacroCall(invocation)),
+  };
+  if (invocation.kind === "block") {
+    // NOTE: the schema is dynamically typed with macros, so the types are incorrect here.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const block = { type: "xwikiMacroBlock", props } as any;
+    if (selectedBlock) {
+      editor.replaceBlocks([selectedBlock], [block]);
+    } else {
+      insertOrUpdateBlockForSlashMenu(editor, block);
+    }
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    editor.insertInlineContent([{ type: "xwikiInlineMacro", props } as any], {
+      updateSelection: true,
+    });
+  }
+}
+
 export {
   MACRO_NAME_PREFIX,
   adaptMacroForBlockNote,
@@ -493,6 +765,18 @@ export {
   createCustomBlockSpec,
   createCustomInlineContentSpec,
   extractMacroRawContent,
+  insertMacroInvocation,
+  invocationToMacroCall,
+  macroCallToInvocation,
+  macroToInvocation,
 };
 
-export type { BlockNoteConcreteMacro, ContextForMacros };
+export type {
+  BlockNoteConcreteMacro,
+  ContextForMacros,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroCall,
+  MacroCallParams,
+  MacroInsertionEditorPrefillData,
+};

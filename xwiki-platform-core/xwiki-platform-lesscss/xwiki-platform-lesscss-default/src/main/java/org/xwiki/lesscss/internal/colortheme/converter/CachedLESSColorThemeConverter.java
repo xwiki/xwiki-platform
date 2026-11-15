@@ -28,9 +28,9 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
 import org.xwiki.lesscss.internal.colortheme.ColorTheme;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
 
 /**
  * Computes a color theme corresponding to a LESS file. To be used with AbstractCachedCompiler.

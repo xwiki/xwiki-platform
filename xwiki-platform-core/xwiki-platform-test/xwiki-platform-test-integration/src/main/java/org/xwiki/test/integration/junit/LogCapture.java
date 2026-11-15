@@ -65,9 +65,8 @@ public class LogCapture
         System.setOut(this.savedOut);
 
         // Put back stderr
-        System.setOut(this.savedErr);
+        System.setErr(this.savedErr);
 
-        String outputContent = this.collectingContentStream.toString();
-        return outputContent;
+        return this.collectingContentStream.toString();
     }
 }

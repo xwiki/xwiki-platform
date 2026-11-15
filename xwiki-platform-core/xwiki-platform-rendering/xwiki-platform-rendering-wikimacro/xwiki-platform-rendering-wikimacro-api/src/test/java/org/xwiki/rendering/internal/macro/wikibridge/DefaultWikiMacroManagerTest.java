@@ -36,7 +36,6 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -232,7 +231,7 @@ class DefaultWikiMacroManagerTest
     }
 
     @Test
-    void registerWikiMacroWhenGlobalVisibilityAndNotAllowed() throws Exception
+    void registerWikiMacroWhenGlobalVisibilityAndNotAllowed()
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
 
@@ -248,7 +247,7 @@ class DefaultWikiMacroManagerTest
     }
 
     @Test
-    void unregisterWikiMacroWhenGlobalVisibilityAndNotAllowed() throws Exception
+    void unregisterWikiMacroWhenGlobalVisibilityAndNoLongerAllowed() throws Exception
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
 
@@ -275,19 +274,19 @@ class DefaultWikiMacroManagerTest
         verify(this.bridge).setCurrentUser("authorwiki:authorspace.authorpage");
         verify(this.modelContext).setCurrentEntityReference(wikiMacro.getDocumentReference());
 
-        // Simulate a user who's not allowed for the GLOBAL visibility
+        // The macro document no longer grants the right required by the GLOBAL visibility (e.g., it was deleted or
+        // its required rights are enforced below programming right): the macro must still be unregistered.
         when(this.wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL))
             .thenReturn(false);
 
-        Throwable exception = assertThrows(WikiMacroException.class, () -> {
-            this.wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());
-        });
-        assertEquals("Unable to unregister macro [testwikimacro] in [wiki:space.space] for visibility [GLOBAL] due "
-            + "to insufficient privileges", exception.getMessage());
+        this.wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());
+
+        assertFalse(this.wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
+        assertFalse(this.componentManager.hasComponent(Macro.class, "testwikimacro"));
     }
 
     @Test
-    void registerWikiMacroWhenWikiVisibilityAndNotAllowed() throws Exception
+    void registerWikiMacroWhenWikiVisibilityAndNotAllowed()
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.WIKI);
 
@@ -303,7 +302,7 @@ class DefaultWikiMacroManagerTest
     }
 
     @Test
-    void registerWikiMacroWhenUserVisibilityAndNotAllowed() throws Exception
+    void registerWikiMacroWhenUserVisibilityAndNotAllowed()
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.USER);
 
@@ -318,7 +317,7 @@ class DefaultWikiMacroManagerTest
             + "to insufficient privileges", exception.getMessage());
     }
 
-    private WikiMacro generateWikiMacro(WikiMacroVisibility visibility) throws Exception
+    private WikiMacro generateWikiMacro(WikiMacroVisibility visibility)
     {
         DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"), "space");
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().id(new MacroId("testwikimacro"))

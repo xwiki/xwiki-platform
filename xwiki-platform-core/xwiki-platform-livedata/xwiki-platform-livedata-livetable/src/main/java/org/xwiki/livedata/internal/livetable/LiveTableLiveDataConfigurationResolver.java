@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -209,7 +208,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
                         Filter filter = new Filter();
                         filter.setProperty(entry.getKey());
                         filter.getConstraints()
-                            .addAll(entry.getValue().stream().map(Constraint::new).collect(Collectors.toList()));
+                            .addAll(entry.getValue().stream().map(Constraint::new).toList());
                         filters.add(filter);
                     } else if (entry.getValue().size() == 1) {
                         // Convert to a live data source parameter.

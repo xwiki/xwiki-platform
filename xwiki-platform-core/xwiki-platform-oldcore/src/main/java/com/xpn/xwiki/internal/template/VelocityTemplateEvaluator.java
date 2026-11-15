@@ -86,9 +86,9 @@ public class VelocityTemplateEvaluator
         if (namespace == null) {
             namespace = template.getId() != null ? template.getId() : "unknown namespace";
 
-            if (this.renderingContext instanceof MutableRenderingContext) {
+            if (this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
                 // Make the current velocity template id available
-                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+                mutableRenderingContext.push(this.renderingContext.getTransformation(),
                     this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(), namespace,
                     this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
 
@@ -122,9 +122,7 @@ public class VelocityTemplateEvaluator
     private VelocityTemplate getVelocityTemplate(Template template, TemplateContent content)
         throws XWikiVelocityException
     {
-        if (content instanceof DefaultTemplateContent) {
-            DefaultTemplateContent templateContent = (DefaultTemplateContent) content;
-
+        if (content instanceof DefaultTemplateContent templateContent) {
             // Check if the content already been compiled
             if (!(templateContent.compiledContent instanceof VelocityTemplate)) {
                 // Velocity is not a fan of null template name

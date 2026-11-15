@@ -28,7 +28,7 @@ define(['jquery'], function($) {
   var oldPrototypeFire = Element.fire;
 
   var shouldBridgeEvent = function(eventName) {
-    return eventName && eventName.substr(0, 6) === 'xwiki:';
+    return eventName?.substr(0, 6) === 'xwiki:';
   };
 
   var newJQueryTrigger = function(event, data, element, onlyHandlers) {

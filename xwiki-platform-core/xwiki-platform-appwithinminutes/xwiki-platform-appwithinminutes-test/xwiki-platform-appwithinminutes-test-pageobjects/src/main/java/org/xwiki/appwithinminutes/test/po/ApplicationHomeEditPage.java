@@ -213,7 +213,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     {
         String escapedColumnLabel = columnLabel.replace("\\", "\\\\").replace("'", "\\'");
         String xpath = "//ul[@class = 'hList']/li[starts-with(., '" + escapedColumnLabel + "')]";
-        return getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).isEmpty();
     }
 
     /**
@@ -234,10 +234,10 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     public void removeAllDeprecatedLiveTableColumns(boolean yes)
     {
         WebElement warningMessage = getDriver().findElementWithoutWaiting(getForm(), By.className("warningmessage"));
-        WebElement linkElement =
-            getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No"));
-        getDriver().scrollTo(linkElement);
-        linkElement.click();
+        WebElement button = getDriver().findElementWithoutWaiting(warningMessage,
+            By.className(yes ? "removeDeprecatedColumns" : "keepDeprecatedColumns"));
+        getDriver().scrollTo(button);
+        button.click();
     }
 
     /**

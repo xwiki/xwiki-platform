@@ -39,7 +39,9 @@
     class="displayer-actions-popover"
     :interactive="true"
     :trigger="
-      isEditable && !duringEditing ? 'mouseenter focus manual' : 'manual'
+      isEditable && !duringEditing && !isEditMode
+        ? 'mouseenter focus manual'
+        : 'manual'
     "
     theme="light-border"
     follow-cursor="horizontal"
@@ -47,14 +49,17 @@
     ref="tippy"
     :ignore-attributes="true"
     :z-index="99999"
-    tabindex="0"
+    :tabindex="isView ? 0 : -1"
     :aria="{ expanded: false }"
     tag="div"
+    @focusin="onDisplayerFocus"
+    @focusout="onDisplayerBlur"
   >
     <div
       :class="{ view: isView, edit: !isView, editable: isEditable }"
       ref="displayerRoot"
-      @keydown.self.enter="setEdit"
+      @keydown.enter.exact="onEnter(false)"
+      @keydown.enter.ctrl="onEnter(true)"
       v-touch:tap="touchHandler"
     >
       <!--
@@ -80,10 +85,13 @@
         </span>
       </div>
 
-      <!-- The slot containing the displayer Editor widget -->
+      <!--
+        The slot containing the displayer Editor widget.
+        We stop the Escape signal here to close the editor without also leaving the maximized view.
+      -->
       <div
-        @keydown.enter="applyEdit"
-        @keydown.esc.capture="cancelEdit"
+        @keydown.esc.capture.stop="cancelEdit"
+        @focusin="editorFocused = true"
         v-if="!isView && !isLoading"
         ref="editBlock"
       >
@@ -156,6 +164,7 @@ export default {
   data() {
     return {
       duringEditing: false,
+      editorFocused: false,
       href: undefined,
     };
   },
@@ -196,6 +205,12 @@ export default {
       }
       return isViewable;
     },
+    isEditMode() {
+      return this.logic.isEditMode();
+    },
+    isEditorShown() {
+      return !this.isView && !this.isLoading;
+    },
   },
 
   // The following methods are only used by the BaseDisplayer component
@@ -204,6 +219,7 @@ export default {
     // Switches the displayer to edit mode.
     setEdit() {
       if (this.isEditable && this.isView) {
+        this.editorFocused = false;
         this.$emit("update:isView", false);
         this.logic.getEditBus().start(this.entry, this.propertyId);
       }
@@ -230,6 +246,15 @@ export default {
       // Switches to view mode.
       this.$emit("update:isView", true);
     },
+    // Tell assistive technologies which fields an entry cannot be created without.
+    markMandatoryFields() {
+      const editBlock = this.$refs["editBlock"];
+      if (editBlock && this.propertyDescriptor?.mandatory) {
+        editBlock
+          .querySelectorAll("input:not([type=hidden]), select, textarea")
+          .forEach((field) => field.setAttribute("aria-required", "true"));
+      }
+    },
     closePopover() {
       this.$refs.tippy.tippy.hide();
     },
@@ -255,46 +280,95 @@ export default {
         }
       }
     },
-  },
-  mounted() {
-    // Monitors clicks outside of the current cell. We switch back to view mode whenever a click is done outside of
-    // the current cell.
+    onDisplayerFocus() {
+      // In edit mode, focusing an editable cell should make it editable.
+      if (this.logic.isEditMode()) {
+        this.setEdit();
+      }
+    },
+    // Monitors focus switching outside of the current cell.
+    // We switch back to view mode whenever focus of the current cell is lost.
     // eslint-disable-next-line max-statements
-    const listener = (evt) => {
+    async onDisplayerBlur(evt) {
+      const displayerElement = this.$refs["displayerRoot"];
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];
 
-        if (editBlock.contains(evt.target)) {
+        // The editor has not been focused yet, so this focusout either comes
+        // from the action popover closing right after it opened the editor,
+        // or an edit confirmation modal is currently displayed. Keep editing.
+        if (!this.editorFocused) {
           return;
         }
 
-        // Wait a little before switching back to view mode, otherwise the change can cause a column
-        // width change// and make the user click on the wrong column. For instance, when trying to
-        // edit the next column by double clicking on it.
-        setTimeout(() => this.applyEdit(), 200);
-      } else {
-        const displayerElement = this.$refs["displayerRoot"];
+        // Focus moved to another element of this cell: keep editing.
+        if (evt.relatedTarget && displayerElement.contains(evt.relatedTarget)) {
+          return;
+        }
 
+        // In some cases, a focusout without a related target can be caused by
+        // a focus bounce. So we wait for the focus to settle and we skip the
+        // event if it actually landed back inside this cell.
+        if (!evt.relatedTarget) {
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          if (
+            editBlock !== this.$refs["editBlock"] ||
+            displayerElement.contains(document.activeElement)
+          ) {
+            return;
+          }
+        }
+
+        await this.applyEdit();
+      } else {
         if (!displayerElement) {
           return;
         }
 
-        if (displayerElement.contains(evt.target)) {
+        if (evt.relatedTarget && displayerElement.contains(evt.relatedTarget)) {
           return;
         }
+
         this.closePopover();
       }
-    };
-    document.addEventListener("click", listener);
-    if (this.interceptTouch) {
-      // When activated, we also listen to touch events outside of the current displayer.
-      document.addEventListener("touchstart", listener);
-    }
-
+    },
+    async onEnter(addNewEntry) {
+      // Applying the edit creates the entry of a new row, through the edit bus.
+      const wasNew = this.entry?._new;
+      await this.applyEdit();
+      await this.logic.getEditBus().whenSaved();
+      // A row still waiting for a mandatory value has no entry yet, so it stays the row to fill.
+      if (addNewEntry && wasNew && !this.entry?._new) {
+        this.logic.addEntry();
+      }
+    },
+  },
+  mounted() {
     // We need to listen on the edit bus event because isEditable is not reactive.
     this.logic.getEditBus().onAnyEvent(() => {
       this.duringEditing = !this.logic.getEditBus().isEditable();
     });
+  },
+  watch: {
+    isEditorShown: {
+      // A displayer can start in edit mode.
+      immediate: true,
+      async handler(shown) {
+        if (shown) {
+          // The editor fields are only in the DOM once rendered.
+          await this.$nextTick();
+          this.markMandatoryFields();
+        }
+      },
+    },
+    // The disable prop behaves weirdly, so we handle that manually instead.
+    isEditMode(newValue) {
+      if (newValue) {
+        this.$refs.tippy.tippy.disable();
+      } else {
+        this.$refs.tippy.tippy.enable();
+      }
+    },
   },
 };
 </script>

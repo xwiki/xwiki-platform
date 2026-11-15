@@ -80,7 +80,7 @@ class MailSenderApiTest
     }
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.mockConfiguration.getHost()).thenReturn(mailserver.getSmtp().getBindTo());
         when(this.mockConfiguration.getPort()).thenReturn(mailserver.getSmtp().getPort());
@@ -118,7 +118,7 @@ class MailSenderApiTest
     }
 
     @Test
-    void sendMailWithCustomConfiguration() throws Exception
+    void sendMailWithCustomConfiguration()
     {
         Mail mail = this.api.createMail();
         mail.setFrom("john@acme.org");

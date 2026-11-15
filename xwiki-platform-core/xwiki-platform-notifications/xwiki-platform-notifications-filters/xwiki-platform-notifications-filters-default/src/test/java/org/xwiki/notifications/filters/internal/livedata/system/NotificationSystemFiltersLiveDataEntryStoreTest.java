@@ -202,7 +202,7 @@ class NotificationSystemFiltersLiveDataEntryStoreTest
         when(filter6.getFormats()).thenReturn(List.of(NotificationFormat.EMAIL));
         when(filter7.getFormats()).thenReturn(List.of(NotificationFormat.EMAIL, NotificationFormat.ALERT));
 
-        // There's explicitely no activation data for filter2 and filter6
+        // There's explicitly no activation data for filter2 and filter6
         ToggleableNotificationFilterActivation activationFilter4 = mock(ToggleableNotificationFilterActivation.class,
             filter4Name);
         ToggleableNotificationFilterActivation activationFilter5 = mock(ToggleableNotificationFilterActivation.class,
@@ -380,7 +380,7 @@ class NotificationSystemFiltersLiveDataEntryStoreTest
         when(filter6.getFormats()).thenReturn(List.of(NotificationFormat.EMAIL));
         when(filter7.getFormats()).thenReturn(List.of(NotificationFormat.EMAIL, NotificationFormat.ALERT));
 
-        // There's explicitely no activation data for filter2 and filter6
+        // There's explicitly no activation data for filter2 and filter6
         ToggleableNotificationFilterActivation activationFilter4 = mock(ToggleableNotificationFilterActivation.class,
             filter4Name);
         ToggleableNotificationFilterActivation activationFilter5 = mock(ToggleableNotificationFilterActivation.class,

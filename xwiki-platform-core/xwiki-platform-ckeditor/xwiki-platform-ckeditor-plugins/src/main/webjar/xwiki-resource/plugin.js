@@ -141,7 +141,7 @@
           // Fix the tab-key navigation.
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
           var resourceTypeButton = this.getElement().findOne('button.resourceType');
-          var resourceReferenceInput = this.getElement().findOne('.ts-control > input');
+          var resourceReferenceInput = this.getResourceReferenceInput();
           var tabIndex = this.tabIndex;
           [resourceTypeDropDownToggle, resourceTypeButton, resourceReferenceInput].forEach(function(field) {
             var dialog = this;
@@ -156,13 +156,8 @@
               dialog._.currentFocusIndex = this._focusable.focusIndex;
             });
           }, this.getDialog());
-          // Fix the binding between the label and the input.
-          let id = resourceReferenceInput.getAttribute('id');
-          if (!id) {
-            id = CKEDITOR.tools.getNextId();
-            resourceReferenceInput.setAttribute('id', id);
-          }
-          this.getElement().findOne('label').setAttribute('for', id);
+          this.resourceReferenceFocusable = resourceReferenceInput._focusable;
+          this.initResourceReferenceInput();
         },
         validate: function() {
           var resourceReference = this.getValue();
@@ -172,6 +167,12 @@
             if (resourceTypeConfig.allowEmptyReference !== true) {
               return this.getDialog().getParentEditor().localization.get('xwiki-resource.notSpecified',
                 this.getLabelElement().getText());
+            } else if (resourceTypeConfig.mustBeSelected && resourceReference.notSelected &&
+                !hasResourceParameters(resourceReference)) {
+              // An empty reference targets the current entity (e.g. the current page), which is what the user wants
+              // when they select it explicitly or when the link has an anchor or a query string (e.g.
+              // [[label>>||anchor=Section]]), but not when they simply left the field empty.
+              return this.getDialog().getParentEditor().localization.get('xwiki-resource.selectValue');
             }
           } else if (resourceReference.notSelected && resourceTypeConfig.mustBeSelected) {
             return this.validateInput(resourceReference);
@@ -241,6 +242,51 @@
             reference: resourceReference
           });
         },
+        /**
+         * Preselect the resource that would be created from the given text (e.g. the text selected in the rich text
+         * area), so that the user doesn't end up with an empty resource reference when they validate the dialog
+         * without touching this field. The resource is computed on the server, following the configured page name
+         * strategy, so the preselection is asynchronous and it is applied only if the user doesn't interact with the
+         * resource picker in the meantime. Does nothing if the resource type doesn't support creating new resources
+         * from free text.
+         *
+         * @param label the free text to compute the new resource from; it is not interpreted as a resource reference
+         * @return a promise resolved when the preselection is done
+         */
+        preselectNewResource: async function(label) {
+          const suggester = $resource.suggesters[this.resourceTypes[0]];
+          if (!label || typeof suggester?.suggestNew !== 'function') {
+            return;
+          }
+          const dialog = this.getDialog();
+          // Prevent the dialog from being submitted before we know the resource reference.
+          dialog.setState(CKEDITOR.DIALOG_STATE_BUSY);
+          try {
+            const stateBeforeRequest = this.getPickerState();
+            const resource = await suggester.suggestNew(label, this.getBase());
+            // Don't overwrite the user's choice: they may have selected a resource, typed a resource reference or
+            // changed the resource type while we were waiting for the server response.
+            if (resource && this.getPickerState() === stateBeforeRequest) {
+              this.setValue(resource.reference);
+            }
+          } finally {
+            dialog.setState(CKEDITOR.DIALOG_STATE_IDLE);
+          }
+        },
+        /**
+         * @return the part of the resource picker state that the user can change, used to detect whether the user
+         *   interacted with the resource picker while an asynchronous operation was in progress
+         */
+        getPickerState: function() {
+          return [
+            // The selected resource.
+            this.getResourcePickerInput().getValue(),
+            // The text typed in the resource reference input.
+            this.getResourceReferenceInput().getValue(),
+            // The selected resource type.
+            this.getElement().findOne('button.resourceType').getValue()
+          ].join('\n');
+        },
         getBase: function () {
           var currentInstance = CKEDITOR.currentInstance;
           var base;
@@ -255,6 +301,39 @@
         getResourcePickerInput: function() {
           return this.getElement().findOne('input');
         },
+        /**
+         * @return the input the resource reference is typed in, which is the input created by the suggestion widget
+         *   when the selected resource type has a suggester, and the resource reference input otherwise
+         */
+        getResourceReferenceInput: function() {
+          return this.getElement().findOne('.ts-control > input') ||
+            this.getElement().findOne('input.resourceReference');
+        },
+        /**
+         * Initializes the focusable and the label of the resource reference to target the input that is currently
+         * displayed. The suggestion widget is destroyed and recreated whenever the resource type changes, so the
+         * input it had created is removed from the page.
+         */
+        initResourceReferenceInput: function() {
+          const dialog = this.getDialog();
+          const focusable = this.resourceReferenceFocusable;
+          const input = this.getResourceReferenceInput();
+          focusable.element = input;
+          // isFocusable() is bound to the input that was passed when the focusable was created.
+          focusable.isFocusable = function() {
+            return !input.getAttribute('disabled') && input.isVisible();
+          };
+          input.on('focus', function() {
+            dialog._.currentFocusIndex = focusable.focusIndex;
+          });
+          // Fix the binding between the label and the input.
+          let id = input.getAttribute('id');
+          if (!id) {
+            id = CKEDITOR.tools.getNextId();
+            input.setAttribute('id', id);
+          }
+          this.getElement().findOne('label').setAttribute('for', id);
+        },
         getLabelElement: function() {
           return this.getElement().findOne('.cke_dialog_ui_labeled_label');
         },
@@ -262,6 +341,10 @@
           // Update the label.
           var resourceTypeConfig = $resource.types[data.newValue] || {label: data.newValue};
           this.getLabelElement().setText(resourceTypeConfig.label);
+          // This event is also fired while the resource picker is being created, before the focusable exists.
+          if (this.resourceReferenceFocusable) {
+            this.initResourceReferenceInput();
+          }
         },
         onSelectResource: function(event, resource) {
           this.selectedResource = resource;
@@ -340,6 +423,11 @@
       // Hide the element. We show the resource picker instead.
       element.hidden = true;
     }
+  };
+
+  var hasResourceParameters = function(resourceReference) {
+    // Note that only the parameters with a non-empty value are collected, see the resource picker's getValue().
+    return Object.keys(resourceReference.parameters || {}).length > 0;
   };
 
   var parseQueryString = function(queryString) {

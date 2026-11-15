@@ -36,12 +36,65 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 
 
 /**
- * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.classes.ListClass} class.
- * 
+ * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.classes.ListClass} class and its
+ * {@link com.xpn.xwiki.objects.classes.UsersClass} and {@link com.xpn.xwiki.objects.classes.GroupsClass} subclasses.
+ * <p>
+ * The {@code UsersClass} and {@code GroupsClass} inter-type declarations are kept here rather than in dedicated aspects
+ * because an aspect that only targets them can make the AspectJ compiler check these classes before the
+ * {@code PropertyClass#displaySearch} inter-type implementation they inherit is registered, which fails the build with
+ * "must implement abstract inter-type declaration" depending on the (file system specific) order of the source files.
+ *
  * @version $Id$
  */
 public aspect ListClassCompatibiityAspect
 {
+    /**
+     * @return {@code true} if the list box that is used to select the users should be filled with all the available
+     *         users, {@code false} otherwise
+     * @deprecated this meta property is not used anymore because we changed the default displayer
+     */
+    @Deprecated(since = "4.3M2")
+    public boolean UsersClass.isUsesList()
+    {
+        return getIntValue("usesList") == 1;
+    }
+
+    /**
+     * Sets whether to list all the available users in the list box used to select the users.
+     *
+     * @param usesList {@code true} to fill the list box that is used to select the users with all the available
+     *            users, {@code false} otherwise
+     * @deprecated this meta property is not used anymore because we changed the default displayer
+     */
+    @Deprecated(since = "4.3M2")
+    public void UsersClass.setUsesList(boolean usesList)
+    {
+        setIntValue("usesList", usesList ? 1 : 0);
+    }
+
+    /**
+     * @return {@code true} if the list box that is used to select the groups should be filled with all the available
+     *         groups, {@code false} otherwise
+     * @deprecated this meta property is not used anymore because we changed the default displayer
+     */
+    @Deprecated(since = "4.3M2")
+    public boolean GroupsClass.isUsesList()
+    {
+        return getIntValue("usesList") == 1;
+    }
+
+    /**
+     * Sets whether to list all the available groups in the list box used to select the groups.
+     *
+     * @param usesList {@code true} to fill the list box that is used to select the groups with all the available
+     *            groups, {@code false} otherwise
+     * @deprecated this meta property is not used anymore because we changed the default displayer
+     */
+    @Deprecated(since = "4.3M2")
+    public void GroupsClass.setUsesList(boolean usesList)
+    {
+        setIntValue("usesList", usesList ? 1 : 0);
+    }
 
     @Deprecated
     public String ListClass.displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)

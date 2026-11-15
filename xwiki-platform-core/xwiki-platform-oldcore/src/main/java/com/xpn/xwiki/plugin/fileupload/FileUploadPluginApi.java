@@ -74,7 +74,7 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
      * Loads the list of uploaded files in the context if there are any uploaded files.
      *
      * @param uploadMaxSize Maximum size of the uploaded files.
-     * @param uploadSizeThreashold Threashold over which the file data should be stored on disk, and not in memory.
+     * @param uploadSizeThreashold Threshold over which the file data should be stored on disk, and not in memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
      * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum

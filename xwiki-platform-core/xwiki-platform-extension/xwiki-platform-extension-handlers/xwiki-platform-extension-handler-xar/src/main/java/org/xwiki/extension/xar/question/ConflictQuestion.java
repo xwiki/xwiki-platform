@@ -109,7 +109,7 @@ public class ConflictQuestion
         {
             return this.actions;
         }
-    };
+    }
 
     public enum GlobalAction
     {
@@ -143,9 +143,9 @@ public class ConflictQuestion
          * configure default answers in the request for example.
          */
         ASK
-    };
+    }
 
-    // Question datas
+    // Question data
 
     private final ConflictType type;
 
@@ -159,7 +159,7 @@ public class ConflictQuestion
 
     private List<Conflict<?>> documentConflicts;
 
-    // Answer datas
+    // Answer data
 
     private GlobalAction globalAction;
 
@@ -170,9 +170,9 @@ public class ConflictQuestion
     private Map<Conflict<?>, ConflictDecision<?>> conflictDecisions;
 
     /**
-     * @deprecated since 9.2RC1, use
+     * @deprecated use
      */
-    @Deprecated
+    @Deprecated(since = "9.2RC1")
     public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
         XWikiDocument mergedDocument)
     {
@@ -245,7 +245,7 @@ public class ConflictQuestion
 
     /**
      * @since 11.8RC1
-     * @return the conflicts occured during the merge of documents.
+     * @return the conflicts occurred during the merge of documents.
      */
     public List<Conflict<?>> getDocumentConflicts()
     {
@@ -305,9 +305,9 @@ public class ConflictQuestion
     {
         Conflict conflict = this.findConflictFromReference(conflictReference);
 
-        ConflictDecision.DecisionType type = ConflictDecision.DecisionType.valueOf(decisionType.toUpperCase());
+        ConflictDecision.DecisionType newType = ConflictDecision.DecisionType.valueOf(decisionType.toUpperCase());
         ConflictDecision decision = new DefaultConflictDecision<>(conflict);
-        decision.setType(type);
+        decision.setType(newType);
         if (!StringUtils.isEmpty(customValue)) {
             decision.setCustom(Collections.singletonList(customValue));
         }

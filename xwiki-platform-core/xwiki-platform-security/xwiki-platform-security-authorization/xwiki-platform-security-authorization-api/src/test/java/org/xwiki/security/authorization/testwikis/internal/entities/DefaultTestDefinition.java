@@ -24,8 +24,8 @@ import java.util.Collection;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.testwikis.TestWiki;
 import org.xwiki.security.authorization.testwikis.TestDefinition;
+import org.xwiki.security.authorization.testwikis.TestWiki;
 
 /**
  * Entity representing the root of the hierarchy, and containing wikis.

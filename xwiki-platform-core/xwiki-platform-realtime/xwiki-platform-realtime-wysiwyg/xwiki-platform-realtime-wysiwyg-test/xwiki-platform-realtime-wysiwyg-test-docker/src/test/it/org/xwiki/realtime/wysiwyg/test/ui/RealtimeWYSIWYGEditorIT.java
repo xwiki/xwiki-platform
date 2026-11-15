@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
@@ -38,7 +39,6 @@ import org.openqa.selenium.WindowType;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
-import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -116,6 +116,28 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 {
     public static final String XWIKI_ALIAS = "xwiki-alias";
 
+    /**
+     * Whether the wiki was made multilingual by the current test, in which case the localization settings have to be
+     * restored after the test.
+     */
+    private boolean multiLingual;
+
+    @AfterEach
+    void restoreLocalizationSettings(TestUtils setup) throws Exception
+    {
+        if (this.multiLingual) {
+            this.multiLingual = false;
+            // Make the wiki monolingual again, otherwise the following tests would use the locale remembered by the
+            // language cookie (set when a page is accessed with the language parameter) and thus a translated user
+            // interface. We don't have to remove that cookie, from all the browser tabs and domains where it may have
+            // been set, because the remembered locale is ignored when the wiki is not multilingual. Note also that we
+            // restore the settings after each test, rather than at the end of the test that changes them, so that they
+            // are restored even when that test fails.
+            setup.setWikiPreference("multilingual", "false");
+            setup.setWikiPreference("languages", "en");
+        }
+    }
+
     @Test
     @Order(1)
     void editAlone(TestReference testReference, TestUtils setup)
@@ -176,10 +198,28 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         editor = new RealtimeCKEditor();
         textArea = editor.getRichTextArea();
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
-        textArea.sendKeys("zero");
+        textArea.sendKeys("ze");
+        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
+
+        // Verify that we reconnect after a connection loss. We're editing alone, so the server removes the realtime
+        // session when we're disconnected and we have to join a new one (regression test for XWIKI-25236).
+        inplaceEditablePage.getToolbar().simulateConnectionLoss();
+
+        // The changes we made before the connection loss are still unsaved.
+        assertEquals(SaveStatus.UNSAVED, inplaceEditablePage.getToolbar().getSaveStatus());
+
+        // We can continue editing (at the end of the first line), once the content is editable again.
+        editor = new RealtimeCKEditor();
+        textArea = editor.getRichTextArea();
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.HOME));
+        textArea.sendKeys(Keys.END, "ro");
+        textArea.waitUntilTextContains("zero");
+
+        // The user data (e.g. our caret position) is synchronized again.
+        assertEquals("John",
+            textArea.getCoeditorPosition(inplaceEditablePage.getToolbar().getUserId()).getAvatarHint());
 
         // Wait for auto-save.
-        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
 
         setup.leaveEditMode();
@@ -265,7 +305,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
         assertEquals("John", self.getAvatarHint());
         assertEquals("Jo", self.getAbbreviation());
-        assertEquals(2, secondEditPage.getToolbar().getVisibleCoeditors().size());
+        assertEquals(2, secondEditPage.getToolbar().getVisibleCoeditorCount());
 
         // Verify the placeholder text is present, because the content is empty.
         secondTextArea.waitForPlaceholder("Start typing here...");
@@ -288,7 +328,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
         assertEquals("John", self.getAvatarHint());
         assertEquals("Jo", self.getAbbreviation());
-        assertEquals(2, firstEditPage.getToolbar().getVisibleCoeditors().size());
+        assertEquals(2, firstEditPage.getToolbar().getVisibleCoeditorCount());
 
         // Type in the first tab to see that it gets propagated to the second tab.
         firstTextArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three");
@@ -384,12 +424,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         secondTextArea.waitUntilTextContains("one");
-        secondTextArea.sendKeys("/info");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/info", "Info Box");
-        secondTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.insertMacro("/info", "Info Box");
 
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -756,12 +791,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 
-        firstTextArea.sendKeys("/info");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/info", "Info Box");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.insertMacro("/info", "Info Box");
 
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -800,7 +830,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("two");
         firstMacroEditModal.setMacroContent("one two");
         firstMacroEditModal.clickSubmit();
-        firstTextArea.waitForContentRefresh();
 
         // Move to the information box title field and type something.
         firstTextArea.sendKeys(Keys.ARROW_UP, Keys.END, " title");
@@ -816,9 +845,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
         secondMacroEditModal.setMacroParameter("title", "Some title");
         secondMacroEditModal.clickSubmit();
-        // The content is refreshed 3 times: after the macro is inserted, after the macro is updated from the first tab
-        // and after the macro is updated from the second tab.
-        secondTextArea.waitForContentRefresh("3");
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
@@ -1033,24 +1059,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 
         // Type some text and insert an information box.
-        firstTextArea.sendKeys("before", Keys.ENTER, "/info");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/info", "Info Box");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.sendKeys("before", Keys.ENTER);
+        firstTextArea.insertMacro("/info", "Info Box");
 
         // Select the default information message and delete it.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
         firstTextArea.sendKeys(Keys.BACK_SPACE);
 
         // Insert a nested error box.
-        firstTextArea.sendKeys("inside", Keys.ENTER, "/err");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/err", "Error Box");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.sendKeys("inside", Keys.ENTER);
+        firstTextArea.insertMacro("/err", "Error Box");
 
         // Replace the default error message.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -1203,13 +1221,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Insert a Velocity macro.
         secondTextArea.sendKeys("before", Keys.RETURN);
-        secondTextArea.sendKeys("/velo");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
-        secondTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.insertMacroWithRequiredParameters("/velo", "Velocity")
+            .setMacroContent("$xcontext.userReference.name").clickSubmit();
         String text = secondTextArea.getText();
         assertTrue(text.contains("superadmin"));
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
@@ -1244,9 +1257,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains(" dinner");
 
         // Edit the macro again.
-        secondTextArea.sendKeys(Keys.ENTER);
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.editSelectedMacro().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
         text = secondTextArea.getText();
         // This time the script macro is not executed because John has been associated as script author of the realtime
         // session.
@@ -1268,13 +1279,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Try to inject a script macro.
         firstTextArea.sendKeys(Keys.HOME);
         firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
-        firstTextArea.sendKeys(Keys.ENTER, Keys.ENTER, Keys.ARROW_UP, "/velo");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
-        firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
-        firstTextArea.waitForContentRefresh();
+        firstTextArea.sendKeys(Keys.ENTER, Keys.ENTER, Keys.ARROW_UP);
+        firstTextArea.insertMacroWithRequiredParameters("/velo", "Velocity").setMacroContent("injected").clickSubmit();
         text = firstTextArea.getText();
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
         String firstRefreshCounter = firstTextArea.getRefreshCounter();
@@ -1295,9 +1301,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
 
         // Edit again the macro to see that the script level doesn't change.
-        secondTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("Current: $xcontext.userReference").clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        secondTextArea.sendKeys(Keys.ARROW_RIGHT);
+        secondTextArea.editSelectedMacro().setMacroContent("Current: $xcontext.userReference").clickSubmit();
         text = secondTextArea.getText();
         assertFalse(text.contains("Current: superadmin"), "Unexpected text content: " + text);
         assertTrue(text.contains("Failed to execute the [velocity] macro."), "Unexpected text content: " + text);
@@ -1351,13 +1356,10 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // * different channels are used to synchronize the content of different translations
         // * each translation has its own script author
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        secondTextArea.sendKeys("French content", Keys.ENTER, "/velo");
-        AutocompleteDropdown qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
-        secondTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitUntilTextContains("superadmin");
+        secondTextArea.sendKeys("French content", Keys.ENTER);
+        secondTextArea.insertMacroWithRequiredParameters("/velo", "Velocity")
+            .setMacroContent("$xcontext.userReference.name").clickSubmit();
+        assertTrue(secondTextArea.getText().contains("superadmin"));
 
         //
         // First Tab
@@ -1366,13 +1368,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
 
         // Try to insert a script macro. The current user doesn't have script right.
-        firstTextArea.sendKeys(Keys.ENTER, "/velo");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
-        firstTextArea.waitUntilTextContains("default content\nFailed to execute the [velocity] macro.");
+        firstTextArea.insertMacroWithRequiredParameters("/velo", "Velocity").setMacroContent(" ").clickSubmit();
+        assertTrue(firstTextArea.getText().contains("default content\nFailed to execute the [velocity] macro."));
 
         // Verify that we're editing alone.
         assertTrue(firstEditPage.getToolbar().isEditingAlone());
@@ -1444,8 +1442,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("Deutsch");
         assertEquals("Deutsch content", firstTextArea.getText());
 
-        assertEquals("John, superadmin", firstEditPage.getToolbar().getVisibleCoeditors().stream()
-            .map(CoeditorElement::getAvatarHint).reduce((a, b) -> a + ", " + b).get());
+        assertEquals(List.of("John", "superadmin"), firstEditPage.getToolbar().getVisibleCoeditorAvatarHints());
     }
 
     @Test
@@ -2928,8 +2925,43 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals(6, viewPage.openHistoryDocExtraPane().showMinorEdits().getNumberOfVersions());
     }
 
+    @Test
+    @Order(29)
+    void failGracefullyIfWeCannotReconnect(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a page that guests can't edit, so that we can't rejoin the realtime session once our user
+        // session has expired.
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "");
+        setup.setRights(testReference, "", "XWiki.XWikiGuest", "edit", false);
+        loginAsJohn(setup);
+
+        RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeRichTextAreaElement textArea = editPage.getContenEditor().getRichTextArea();
+        textArea.sendKeys("one");
+
+        // Our user session expires so we can't get the realtime session channels when the connection is restored
+        // (regression test for XWIKI-25236).
+        RealtimeTestUtils.simulateSessionExpiration(setup);
+        editPage.getToolbar().simulateConnectionLoss(false);
+
+        // We leave the realtime session and continue editing alone.
+        editPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+        assertFalse(editPage.getToolbar().isCollaborating());
+        assertTrue(editPage.getToolbar().canJoinCollaboration());
+        textArea.sendKeys(" two");
+        assertEquals("one two", textArea.getText());
+
+        setup.maybeLeaveEditMode();
+        loginAsJohn(setup);
+    }
+
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)
     {
+        // Remember that the localization settings have to be restored after the test.
+        this.multiLingual = isMultiLingual;
+
         AdministrationPage adminPage = AdministrationPage.gotoPage();
         LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
         sectionPage.setMultiLingual(isMultiLingual);

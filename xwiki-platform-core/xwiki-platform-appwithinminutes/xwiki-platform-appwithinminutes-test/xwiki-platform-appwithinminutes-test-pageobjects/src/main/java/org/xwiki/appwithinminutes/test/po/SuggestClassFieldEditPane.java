@@ -55,6 +55,20 @@ public class SuggestClassFieldEditPane extends ClassFieldEditPane
     }
 
     /**
+     * Sets whether this field should also suggest inactive (disabled) users.
+     *
+     * @param include {@code true} to also suggest inactive users, {@code false} to suggest only active users
+     * @since 18.6.0RC1
+     */
+    public void setIncludeInactiveUsers(boolean include)
+    {
+        WebElement includeInactiveUsersCheckBox = getPropertyInput("includeInactiveUsers");
+        if (includeInactiveUsersCheckBox.isSelected() != include) {
+            includeInactiveUsersCheckBox.click();
+        }
+    }
+
+    /**
      * @return the picker
      */
     public SuggestInputElement getPicker()

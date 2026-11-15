@@ -141,7 +141,7 @@ public class PackageMojo extends AbstractOldCoreMojo
     private Map<String, String> contextPathMapping;
 
     /**
-     * Indicate of the package mojo is used for tests. Among other things it means it's then possible to skip it using
+     * Indicate if the package mojo is used for tests. Among other things it means it's then possible to skip it using
      * skipTests system property.
      *
      * @since 6.0M2
@@ -273,9 +273,12 @@ public class PackageMojo extends AbstractOldCoreMojo
     private boolean isSkipTests()
     {
         if (this.test) {
-            String property = System.getProperty("skipTests");
+            String property = System.getProperty("skipITs");
+            if (property != null) {
+                return Boolean.parseBoolean(property);
+            }
 
-            return Boolean.parseBoolean(property);
+            return Boolean.parseBoolean(System.getProperty("skipTests"));
         } else {
             return false;
         }
@@ -409,11 +412,10 @@ public class PackageMojo extends AbstractOldCoreMojo
 
             // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an
             // ordered LinkedHashSet behind the scene)
-            List<Artifact> dependenciesFirstArtifacts = new ArrayList<>(xarArtifacts);
-            Collections.reverse(dependenciesFirstArtifacts);
+            List<Artifact> artifacts = new ArrayList<>(xarArtifacts);
 
             // Import the xars
-            for (Artifact xarArtifact : dependenciesFirstArtifacts) {
+            for (Artifact xarArtifact : artifacts.reversed()) {
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
 
                 try {
@@ -777,8 +779,8 @@ public class PackageMojo extends AbstractOldCoreMojo
     {
         Map<String, Object> properties = new HashMap<>(getDefaultConfigurationProperties());
         final Properties projectProperties = this.project.getProperties();
-        for (Object key : projectProperties.keySet()) {
-            properties.put(key.toString(), projectProperties.get(key).toString());
+        for (Map.Entry<Object, Object> entry : projectProperties.entrySet()) {
+            properties.put(entry.getKey().toString(), entry.getValue().toString());
         }
 
         VelocityContext context = new VelocityContext(properties);

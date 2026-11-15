@@ -144,7 +144,7 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
      * @param filter the text filter
      * @param propertyDefinition the property definition
      * @return value of {@see getValueFromQueryResult} with the first query result or null if no results.
-     * @throws QueryException if an error occured during the query execution
+     * @throws QueryException if an error occurred during the query execution
      */
     protected PropertyValue getValue(Query query, String filter, T propertyDefinition) throws QueryException
     {
@@ -184,8 +184,7 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         // Oracle databases treat NULL and empty strings similarly. Thus the list passed as parameter can have some
         // elements being NULL (for XWiki string properties which were empty strings). This means we need to check
         // for NULL and ignore NULL entries from the list.
-        if (result instanceof Object[]) {
-            Object[] row = (Object[]) result;
+        if (result instanceof Object[] row) {
             if (row.length > 0 && row[0] != null) {
                 value = new PropertyValue(row[0]);
                 if (row.length > 1 && row[1] != null) {

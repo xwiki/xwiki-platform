@@ -33,6 +33,7 @@
     -->
     <select
       class="operator-select"
+      :aria-label="$t('livedata.panel.filter.operator.hint', [propertyName])"
       @change="
         logic.filter(propertyId, filterIndex, { operator: $event.target.value })
       "
@@ -94,6 +95,12 @@ export default {
         this.filterIndex
       ];
     },
+
+    // The display name of the property being filtered, used to give the
+    // operator select an accessible name.
+    propertyName() {
+      return this.logic.getPropertyDescriptor(this.propertyId)?.name;
+    },
   },
 };
 </script>
@@ -126,5 +133,13 @@ export default {
 
 .livedata-filter-container .delete-filter:active {
   background-color: unset;
+}
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .livedata-filter-container .delete-filter {
+    /* Always show the delete icon on small screens because we can't rely on hover. */
+    visibility: visible;
+  }
 }
 </style>

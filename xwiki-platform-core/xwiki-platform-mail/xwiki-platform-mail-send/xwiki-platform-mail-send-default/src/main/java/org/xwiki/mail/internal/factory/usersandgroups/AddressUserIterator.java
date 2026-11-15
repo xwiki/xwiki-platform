@@ -73,7 +73,7 @@ public class AddressUserIterator extends UserIterator<Address>
     public boolean hasNext()
     {
         if (this.lookaheadAddress == null) {
-            this.lookaheadAddress = getNext();
+            this.lookaheadAddress = getNextAddress();
         }
         return this.lookaheadAddress != null;
     }
@@ -85,7 +85,7 @@ public class AddressUserIterator extends UserIterator<Address>
         if (address != null) {
             this.lookaheadAddress = null;
         } else {
-            address = getNext();
+            address = getNextAddress();
             if (address == null) {
                 throw new NoSuchElementException(String.format("No more addresses to extract from [%s]",
                     this.usersAndGroupsSource));
@@ -94,7 +94,7 @@ public class AddressUserIterator extends UserIterator<Address>
         return address;
     }
 
-    private Address getNext()
+    private Address getNextAddress()
     {
         Address address;
 

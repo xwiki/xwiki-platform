@@ -63,11 +63,16 @@ public class AttachmentsRedirectionFilter implements RedirectionFilter
     {
         boolean redirect = false;
         if (Objects.equals(context.getAction(), ACTION_NAME)) {
-            AttachmentReference attachmentReference = getAttachmentReference();
-            Optional<AttachmentReference> redirection = this.attachmentsManager.getRedirection(attachmentReference);
-            if (redirection.isPresent()) {
-                doRedirect(context, redirection.get());
-                redirect = true;
+            Optional<AttachmentReference> attachmentReference = getAttachmentReference();
+            // A download URL without a file name (e.g., /bin/download/Space/Page) doesn't target any attachment, so
+            // there is nothing to redirect; the download action is left to answer with a not found error.
+            if (attachmentReference.isPresent()) {
+                Optional<AttachmentReference> redirection =
+                    this.attachmentsManager.getRedirection(attachmentReference.get());
+                if (redirection.isPresent()) {
+                    doRedirect(context, redirection.get());
+                    redirect = true;
+                }
             }
         }
         return redirect;
@@ -87,10 +92,14 @@ public class AttachmentsRedirectionFilter implements RedirectionFilter
         }
     }
 
-    private AttachmentReference getAttachmentReference()
+    private Optional<AttachmentReference> getAttachmentReference()
     {
-        EntityResourceReference entityResource =
-            (EntityResourceReference) this.resourceReferenceManager.getResourceReference();
-        return new AttachmentReference(entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT));
+        // The current resource is missing outside of a request (and is not an entity for non-entity URLs), in which
+        // case there is no attachment to redirect.
+        if (this.resourceReferenceManager.getResourceReference() instanceof EntityResourceReference entityResource) {
+            return Optional.ofNullable(entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT))
+                .map(AttachmentReference::new);
+        }
+        return Optional.empty();
     }
 }

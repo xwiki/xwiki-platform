@@ -28,8 +28,6 @@ import org.apache.commons.io.IOUtils;
 import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.document.DocumentFamily;
 import org.jodconverter.core.document.DocumentFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterException;
 import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
@@ -43,11 +41,6 @@ import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
 public class DefaultOfficeConverter implements OfficeConverter
 {
     private static final String CONVERSION_ERROR_MESSAGE = "Error while performing conversion.";
-
-    /**
-     * The logger to log.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOfficeConverter.class);
 
     /**
      * Converter provided by JODConverter library.

@@ -37,13 +37,13 @@ import static org.mockito.Mockito.when;
  * @since 10.6
  */
 @ComponentTest
-public class ImplicitlyAllowedValuesPageQueryBuilderTest
+class ImplicitlyAllowedValuesPageQueryBuilderTest
 {
     @InjectMockComponents
     private ImplicitlyAllowedValuesPageQueryBuilder queryBuilder;
 
     @Test
-    public void build() throws Exception
+    void build() throws Exception
     {
         PageClass pageClass = mock(PageClass.class);
         DBListClass dbListClass = mock(DBListClass.class);

@@ -497,13 +497,14 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
     #set($userSpace = 'XWiki.')
 
-    #set($userLink = $xwiki.getUserName("$userSpace$userName"))
-    #define($registrationSuccessMessage)
+    ## Like the message configured in XWiki.RegistrationConfig, the default success message is Velocity code that is
+    ## evaluated once the user is registered, so it's kept unparsed here.
+    #define($registrationSuccessMessage)#[[
       #set($message = $services.localization.render('core.register.successful', 'xwiki/2.1', ['USERLINK', $userName]))
       #set($userLink = $xwiki.getUserName("$userSpace$userName"))
       {{info}}$message.replace('USERLINK', "{{html clean=false}}$userLink{{/html}}"){{/info}}
-    #end
-    #set ($registrationConfig.registrationSuccessMessage = $registrationSuccessMessage)
+    ]]##end
+    #set ($registrationConfig.registrationSuccessMessage = "$registrationSuccessMessage")
   #else
     #set($configObject = $configDocument.getObject($configurationClassName))
     #if ($xcontext.action == 'register')

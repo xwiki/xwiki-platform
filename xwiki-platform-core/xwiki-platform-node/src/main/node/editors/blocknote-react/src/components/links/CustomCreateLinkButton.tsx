@@ -17,70 +17,65 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkEditor } from "./LinkEditor";
+import { insertLink } from "./insertLink";
 import { useEditor } from "../../hooks";
+import { selectionHasInlineContent } from "../../selection";
 import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkEditionContext } from "../../misc/linkSuggest";
+import type { LinkEditionData, LinkEditionHandler } from "./linkEdition";
+import type { LinkEditionHooks } from "./linkEditionHooks";
 
 export type CustomCreateLinkButtonProps = {
-  linkEditionCtx: LinkEditionContext;
+  linkEditionHandler: LinkEditionHandler;
+  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
-  linkEditionCtx,
+  linkEditionHandler,
+  linkEditionHooks,
 }) => {
   const editor = useEditor();
   const Components = useComponentsContext()!;
   const dict = useDictionary();
 
-  const [opened, setOpened] = useState(false);
-
-  const insertLink = useCallback(
-    (url: string) => {
-      editor.createLink(url);
-      editor.focus();
-    },
-    [editor],
+  const insertSelectionLink = useCallback(
+    // When the link label differs from the selected text, the selection is replaced with the new label, keeping the
+    // formatting shared by the whole selection, like typing over it does.
+    (linkData: LinkEditionData, selectedText: string) =>
+      insertLink(editor, linkData, linkEditionHooks, selectedText),
+    [editor, linkEditionHooks],
   );
 
-  // TODO: check if we need to update in realtime when the selection change?
-  const selected = editor.getSelectedText();
+  // Links are inline content, so they can only wrap editable inline content. Hide the button when the
+  // selection has no such content (e.g. a block-level macro or other content-less block is selected),
+  // mirroring BlockNote's default Create Link button.
+  if (!selectionHasInlineContent(editor)) {
+    return null;
+  }
 
   return (
-    <Components.Generic.Popover.Root open={opened}>
-      <Components.Generic.Popover.Trigger>
-        {/* TODO: hide tooltip on click
-              (note: this comment is from BlockNote's source code but may remain relevant here) */}
-        <Components.FormattingToolbar.Button
-          className={"bn-button"}
-          data-test="createLink"
-          label={dict.formatting_toolbar.link.tooltip}
-          mainTooltip={dict.formatting_toolbar.link.tooltip}
-          secondaryTooltip={formatKeyboardShortcut(
-            dict.formatting_toolbar.link.secondary_tooltip,
-            dict.generic.ctrl_shortcut,
-          )}
-          icon={<RiLink />}
-          onClick={() => setOpened(true)}
-        />
-      </Components.Generic.Popover.Trigger>
-      <Components.Generic.Popover.Content
-        className={"bn-popover-content bn-form-popover"}
-        variant={"form-popover"}
-      >
-        <LinkEditor
-          creationMode
-          linkEditionCtx={linkEditionCtx}
-          current={{
-            title: selected,
-            url: "",
-          }}
-          updateLink={({ url }) => insertLink(url)}
-        />
-      </Components.Generic.Popover.Content>
-    </Components.Generic.Popover.Root>
+    <Components.FormattingToolbar.Button
+      className={"bn-button"}
+      data-test="createLink"
+      label={dict.formatting_toolbar.link.tooltip}
+      mainTooltip={dict.formatting_toolbar.link.tooltip}
+      secondaryTooltip={formatKeyboardShortcut(
+        dict.formatting_toolbar.link.secondary_tooltip,
+        dict.generic.ctrl_shortcut,
+      )}
+      icon={<RiLink />}
+      onClick={() => {
+        // The display text is pre-filled with the text selected when the link modal is opened, which
+        // also tells, on submit, whether the user changed it.
+        const selectedText = editor.getSelectedText();
+        linkEditionHandler({
+          mode: "createNew",
+          current: { title: selectedText, url: "" },
+          onSubmit: (linkData) => insertSelectionLink(linkData, selectedText),
+        });
+      }}
+    />
   );
 };

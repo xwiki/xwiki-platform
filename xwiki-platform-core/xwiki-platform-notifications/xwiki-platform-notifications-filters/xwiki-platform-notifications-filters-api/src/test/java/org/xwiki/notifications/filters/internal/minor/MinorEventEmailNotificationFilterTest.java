@@ -60,7 +60,7 @@ class MinorEventEmailNotificationFilterTest
     }
 
     @Test
-    void filterExpression() throws Exception
+    void filterExpression()
     {
         NotificationPreference fakePreference = mock(NotificationPreference.class);
 
@@ -73,7 +73,7 @@ class MinorEventEmailNotificationFilterTest
     }
 
     @Test
-    void filterExpressionWithWrongParameters() throws Exception
+    void filterExpressionWithWrongParameters()
     {
         DocumentReference randomUser = new DocumentReference("xwiki", "XWiki", "UserA");
         assertNull(this.filter.filterExpression(randomUser, List.of(),

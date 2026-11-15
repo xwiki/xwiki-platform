@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -153,7 +152,7 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     private XDOM aggregateRenderingResults(List<DocumentRenderingResult> renderingResults)
     {
         return new XDOM(renderingResults.stream().map(DocumentRenderingResult::getXDOM).map(XDOM::getChildren)
-            .flatMap(List::stream).collect(Collectors.toList()));
+            .flatMap(List::stream).toList());
     }
 
     private List<Block> generateToc(XDOM content, int depth, MacroTransformationContext context)

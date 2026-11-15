@@ -26,7 +26,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.ServletContext;
+
+import jakarta.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -78,7 +79,7 @@ public class ServletContainerPingDataProvider extends AbstractPingDataProvider
     {
         if (this.environment instanceof ServletEnvironment servletEnvironment) {
             try {
-                ServletContext servletContext = servletEnvironment.getServletContext();
+                ServletContext servletContext = servletEnvironment.getJakartaServletContext();
                 // Format of getServerInfo() is "name/version (text)" where " (text)" is optional.
                 String serverInfo = servletContext.getServerInfo();
                 ServletContainerPing servletContainerPing = new ServletContainerPing();

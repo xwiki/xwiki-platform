@@ -97,6 +97,6 @@ public class AnchorFilter extends AbstractHTMLFilter
      */
     private boolean isAnchor(Node node)
     {
-        return node instanceof Element && !"".equals(((Element) node).getAttribute(ATTRIBUTE_NAME));
+        return node instanceof Element element && !"".equals(element.getAttribute(ATTRIBUTE_NAME));
     }
 }

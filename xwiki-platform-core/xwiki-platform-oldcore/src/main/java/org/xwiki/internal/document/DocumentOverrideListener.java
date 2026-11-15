@@ -22,22 +22,25 @@ package org.xwiki.internal.document;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.refactoring.event.DocumentCopyingEvent;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 
 /**
  * Cancel any save that tries to save a new document if the document already exists.
- *
  * <p>
- *     This can happen when the context document is set to an empty document because the user doesn't have view right,
- *     but the user still has, e.g., edit right. In this situation, the user would still be able to to save but it is
- *     hard to imagine a scenario where this would make sense. This listener therefore cancels the save in this
- *     situation.
+ * This can happen when the context document is set to an empty document because the user doesn't have view right, but
+ * the user still has, e.g., edit right. In this situation, the user would still be able to to save but it is hard to
+ * imagine a scenario where this would make sense. This listener therefore cancels the save in this situation.
  * </p>
  *
  * @version $Id$
@@ -55,6 +58,13 @@ public class DocumentOverrideListener extends AbstractEventListener
      */
     public static final String NAME = "org.xwiki.internal.document.DocumentOverrideListener";
 
+    private static final DocumentRenamingEvent DOCUMENT_RENAMING_EVENT = new DocumentRenamingEvent();
+
+    private static final DocumentCopyingEvent DOCUMENT_COPYING_EVENT = new DocumentCopyingEvent();
+
+    @Inject
+    private ObservationContext observationContext;
+
     /**
      * The default constructor.
      */
@@ -66,12 +76,16 @@ public class DocumentOverrideListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        XWikiDocument document = (XWikiDocument) source;
-        XWikiDocument originalDocument = document.getOriginalDocument();
+        // Copy and rename have their own handling of override, so we don't want to interfere
+        if (!this.observationContext.isIn(DOCUMENT_RENAMING_EVENT)
+            && !this.observationContext.isIn(DOCUMENT_COPYING_EVENT)) {
+            XWikiDocument document = (XWikiDocument) source;
+            XWikiDocument originalDocument = document.getOriginalDocument();
 
-        if (document.isNew() && originalDocument != null && !originalDocument.isNew()) {
-            ((CancelableEvent) event).cancel(
-                "The document already exists but the document to be saved is marked as new.");
+            if (document.isNew() && originalDocument != null && !originalDocument.isNew()) {
+                ((CancelableEvent) event)
+                    .cancel("The document already exists but the document to be saved is marked as new.");
+            }
         }
     }
 }

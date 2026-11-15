@@ -45,6 +45,11 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderPluginApi.class);
 
     /**
+     * The key under which the error message is stored in the XWiki context.
+     */
+    private static final String ERROR_KEY = "error";
+
+    /**
      * API constructor.
      * 
      * @param plugin The wrapped plugin object.
@@ -119,7 +124,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         } catch (Exception e) {
             // If the exception is a null pointer exception there is no message and e.getMessage() is null.
             if (e.getMessage() != null) {
-                this.context.put("error", e.getMessage());
+                this.context.put(ERROR_KEY, e.getMessage());
             }
             LOGGER.error("sendMessageFromTemplate", e);
             return -1;
@@ -150,7 +155,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         } catch (Exception e) {
             // If the exception is a null pointer exception there is no message and e.getMessage() is null.
             if (e.getMessage() != null) {
-                this.context.put("error", e.getMessage());
+                this.context.put(ERROR_KEY, e.getMessage());
             }
             LOGGER.error("sendMessageFromTemplate", e);
             return -1;
@@ -172,9 +177,12 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         } catch (Exception e) {
             // If the exception is a null pointer exception there is no message and e.getMessage() is null.
             if (e.getMessage() != null) {
-                this.context.put("error", e.getMessage());
+                this.context.put(ERROR_KEY, e.getMessage());
             }
-            LOGGER.error("Failed to send email [" + mail.toString() + "]", e);
+            // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a Mail holds the
+            // body and the attachments, none of which its toString() prints.
+            LOGGER.error("Failed to send email [{}]", mail.toString(), e);
             result = -1;
         }
 
@@ -196,10 +204,13 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         } catch (Exception e) {
             // If the exception is a null pointer exception there is no message and e.getMessage() is null.
             if (e.getMessage() != null) {
-                this.context.put("error", e.getMessage());
+                this.context.put(ERROR_KEY, e.getMessage());
             }
-            LOGGER.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
-                + mailConfiguration.toString() + "]", e);
+            // Build the Strings on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons). A Mail holds the body
+            // and the attachments, and MailConfiguration.toString() masks the SMTP password that the object carries.
+            LOGGER.error("Failed to send email [{}] using mail configuration [{}]", mail.toString(),
+                mailConfiguration.toString(), e);
             result = -1;
         }
 

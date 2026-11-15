@@ -23,6 +23,7 @@ import java.io.File;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.attachment.test.po.AttachmentPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
@@ -82,7 +83,7 @@ class MoveAttachmentIT
         sourceAttachmentsPane.waitForUploadToFinish(SOURCE_FILENAME);
 
         // Switch to a second user U2 and come back to the attachment pane of the source page.
-        setup.createUserAndLogin("U1", "pU2");
+        setup.createUserAndLogin("U2", "pU2");
         setup.gotoPage(sourcePage);
         new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
@@ -96,10 +97,11 @@ class MoveAttachmentIT
 
         ViewPage viewTargetPage = setup.gotoPage(targetPage);
 
-        // Validate the history pane first because we'll move to the attachment history page when validating the 
+        // Validate the history pane first because we'll move to the attachment history page when validating the
         // attachment pane.
-        // Verify that the author is correct in the history.
-        assertEquals("U1", viewTargetPage.openHistoryDocExtraPane().getCurrentAuthor());
+        // The document was modified by the move (attachment added and content refactored), so its current author is
+        // the user who performed the move (U2), not the original attachment author (U1).
+        assertEquals("U2", viewTargetPage.openHistoryDocExtraPane().getCurrentAuthor());
 
         // Validate the attachments pane.
         AttachmentsPane attachmentsPaneTarget = new AttachmentsViewPage().openAttachmentsDocExtraPane();
@@ -125,6 +127,70 @@ class MoveAttachmentIT
 
         // Verify that the refactoring is properly applied.
         assertEquals("[[attach:newname.txt]]", setup.rest().<Page>get(targetPage).getContent());
+    }
+
+    @Test
+    @Order(2)
+    void renameAttachmentInSameDocument(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        DocumentReference page = new DocumentReference("RenameSameDocument", testReference.getLastSpaceReference());
+
+        setup.loginAsSuperAdmin();
+        setup.deletePage(page);
+
+        // Create the page and upload the attachment with a first user U3, so that the rename below is performed by
+        // another user and we can tell the attachment author apart from the document author.
+        setup.createUserAndLogin("U3", "pU3");
+        setup.createPage(page, "");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFileToUpload(buildMovemePath(testConfiguration, "v0"));
+        attachmentsPane.waitForUploadToFinish(SOURCE_FILENAME);
+
+        // Switch to a second user U4 and come back to the attachment pane of the page.
+        setup.createUserAndLogin("U4", "pU4");
+        setup.gotoPage(page);
+        new AttachmentsViewPage().openAttachmentsDocExtraPane();
+
+        // Rename the attachment without changing its location, i.e. move it inside the document it is already in.
+        AttachmentPane movePane = AttachmentPane.moveAttachment(SOURCE_FILENAME);
+        movePane.setName(TARGET_FILENAME);
+        movePane.setRedirect(true);
+        movePane.submit();
+        movePane.waitForJobDone();
+
+        ViewPage viewPage = setup.gotoPage(page);
+
+        // Validate the history pane first because we'll move to the attachment history page when validating the
+        // attachment pane.
+        // The document was modified by the rename, so its current author is the user who performed it (U4), not the
+        // attachment author (U3).
+        assertEquals("U4", viewPage.openHistoryDocExtraPane().getCurrentAuthor());
+
+        // The page must hold exactly one attachment, the renamed one, i.e. the attachment must not be lost by the
+        // rename.
+        AttachmentsPane attachmentsPaneAfterRename = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(1, attachmentsPaneAfterRename.getNumberOfAttachments());
+        assertEquals(TARGET_FILENAME, attachmentsPaneAfterRename.getAttachmentNameByIndex(1));
+        // Verify that the rename preserves the attachment author and version.
+        assertEquals("U3", attachmentsPaneAfterRename.getUploaderOfAttachment(TARGET_FILENAME));
+        assertEquals("1.1", attachmentsPaneAfterRename.getLatestVersionOfAttachment(TARGET_FILENAME));
+
+        // Validate that the attachment history is still right after the rename.
+        AttachmentHistoryPage attachmentHistoryPage = attachmentsPaneAfterRename.goToAttachmentHistory(TARGET_FILENAME);
+        assertEquals("1.1", attachmentHistoryPage.getVersion(1));
+        assertEquals(13, attachmentHistoryPage.getSize(1));
+        assertEquals("U3", attachmentHistoryPage.getAuthor(1));
+        assertEquals("Move me (v0).", attachmentHistoryPage.geAttachmentContent(1));
+
+        // Verify that the redirection object has been created on the page.
+        Object object = setup.rest().object(page, setup.serializeReference(REFERENCE));
+        assertNotNull(object);
+
+        // Verify that the redirection is effective and not just recorded: downloading the attachment under its old
+        // name must serve the renamed attachment.
+        setup.getDriver().get(setup.getURL(new AttachmentReference(SOURCE_FILENAME, page), "download", ""));
+        assertEquals("Move me (v0).", setup.getDriver().findElementWithoutWaiting(By.xpath("/*")).getText());
     }
 
     private String buildMovemePath(TestConfiguration testConfiguration, String dirName)

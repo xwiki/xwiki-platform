@@ -23,7 +23,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -72,6 +71,7 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     {
         // We use a fixed version of Chrome, instead of latest, for which we know the tests are passing (reproducible
         // builds), because Chrome changes often lead to changes in the PDF export output.
+        // Keep in sync with the documented default of export.pdf.chromeDockerImage in xwiki.properties.vm.
         return getProperty("chromeDockerImage", "femtopixel/google-chrome-headless:144.0.7524.3");
     }
 
@@ -140,7 +140,7 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
         List<String> templates = this.configDocument.getProperty("templates", List.class,
             Collections.singletonList("XWiki.PDFExport.Template"));
         return templates.stream().filter(StringUtils::isNotBlank)
-            .map(template -> this.documentReferenceResolver.resolve(template)).collect(Collectors.toList());
+            .map(template -> this.documentReferenceResolver.resolve(template)).toList();
     }
 
     @Override

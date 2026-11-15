@@ -24,6 +24,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Base class for all BlockNote integration tests.
  *
@@ -45,6 +47,11 @@ abstract class AbstractBlockNoteIT
         // Create a user without administration and script rights, then make it advanced in order to have access to the
         // edit dropdown and also to be able to edit in-place.
         setup.createUserAndLogin("John", "pass", "editor", "Wysiwyg", "usertype", "Advanced");
+
+        // The BlockNote tests are often failing because clicking on the "Edit" goes to Wiki edit mode instead of
+        // loading the in-place edit mode. The cause seems to be that we're not logged in as John. Adding an assert here
+        // for debugging purposes, to catch the problem earlier.
+        assertEquals("John", setup.getLoggedInUserName());
     }
 
     @AfterEach

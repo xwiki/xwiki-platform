@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @since 10.9
  */
 @ComponentTest
-public class AbstractPanelsUIExtensionManagerTest
+class AbstractPanelsUIExtensionManagerTest
 {
     @MockComponent
     @Named("currentmixed")
@@ -69,9 +69,9 @@ public class AbstractPanelsUIExtensionManagerTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @Test
-    public void get() throws Exception
+    void get() throws Exception
     {
-        // We create a mock of the component manager to control the order on which the extensions will be retreived.
+        // We create a mock of the component manager to control the order on which the extensions will be retrieved.
         WikiUIExtension wikiUIExtensionMenu1 = mock(WikiUIExtension.class);
         UIExtension fooExtension = mock(UIExtension.class);
         UIExtension barUIExtension = mock(UIExtension.class);
@@ -116,7 +116,7 @@ public class AbstractPanelsUIExtensionManagerTest
     }
 
     @Test
-    public void getWhenLookupError() throws Exception
+    void getWhenLookupError() throws Exception
     {
         ComponentManager failingCM = mock(ComponentManager.class);
         when(contextComponentManagerProvider.get()).thenReturn(failingCM);
@@ -130,7 +130,7 @@ public class AbstractPanelsUIExtensionManagerTest
 
         // Verify the log (both message and parameter)
         ILoggingEvent logEvent = logCapture.getLogEvent(0);
-        assertEquals("Failed to lookup Panels instances, error: [{}]", logEvent.getMessage());
+        assertEquals("Failed to lookup Panels instances", logEvent.getMessage());
         assertEquals("error!", logEvent.getThrowableProxy().getMessage());
     }
 }

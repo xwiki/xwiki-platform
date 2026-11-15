@@ -85,6 +85,15 @@ public class DrawerMenu extends BaseElement
     }
 
     /**
+     * @return the element containing the whole drawer, e.g. to take a screenshot of it
+     * @since 18.10.0RC1
+     */
+    public WebElement getContainer()
+    {
+        return this.drawerContainer;
+    }
+
+    /**
      * Click the passed menu entry link.
      *
      * @param entryName the displayed name of the entry link
@@ -102,7 +111,7 @@ public class DrawerMenu extends BaseElement
     public boolean hasEntry(String entryName)
     {
         show();
-        return getDriver().findElementsWithoutWaiting(By.xpath(getEntryXPath(entryName))).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(By.xpath(getEntryXPath(entryName))).isEmpty();
     }
 
     private String getEntryXPath(String entryName)
@@ -117,9 +126,14 @@ public class DrawerMenu extends BaseElement
             ExpectedConditions.attributeContains(this.drawerContainer, "class", "drawer-transitioning")
         );
         if (visible) {
+            // The drawer-transitioning class is removed as soon as the drawer is shown, while the drawer keeps sliding
+            // in, so we also wait for the slide in animation to end.
+            ExpectedCondition<Boolean> slideInEnded = driver -> Boolean.TRUE.equals(getDriver().executeScript(
+                "return arguments[0].getAnimations().length === 0;", this.drawerContainer));
             getDriver().waitUntilCondition(ExpectedConditions.and(
                 ExpectedConditions.visibilityOf(this.drawerContainer),
-                transitionEnded
+                transitionEnded,
+                slideInEnded
             ));
         } else {
             getDriver().waitUntilCondition(ExpectedConditions.and(

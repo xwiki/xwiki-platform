@@ -95,7 +95,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      */
     public boolean hasPreviousStep()
     {
-        return getDriver().findElementsWithoutWaiting(By.linkText("Previous Step")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(By.linkText("Previous Step")).isEmpty();
     }
 
     /**

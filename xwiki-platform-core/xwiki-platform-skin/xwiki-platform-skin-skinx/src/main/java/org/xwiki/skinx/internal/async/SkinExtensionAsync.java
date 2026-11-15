@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.async.AsyncContext;
 
 /**
- * Manager asynchronous rendering related informations.
+ * Manager asynchronous rendering related information.
  * 
  * @version $Id$
  * @since 10.10RC1

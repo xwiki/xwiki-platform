@@ -110,9 +110,9 @@ class DefaultImageStylesResourceTest
     void getDefaultStyleIdentifierNotFound() throws Exception
     {
         when(this.imageStyleConfiguration.getDefaultStyle("wiki", "xwiki:Space.Page")).thenReturn("");
-        Response response = this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page");
-        assertEquals(Map.of(), response.getEntity());
-        assertEquals(OK.getStatusCode(), response.getStatus());
+        Response actualResponse = this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page");
+        assertEquals(Map.of(), actualResponse.getEntity());
+        assertEquals(OK.getStatusCode(), actualResponse.getStatus());
    }
 
     private String toJson(Styles wiki) throws JsonProcessingException

@@ -36,6 +36,7 @@ import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.refactoring.script.RequestFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
@@ -110,7 +111,8 @@ class UndeleteActionTest
     /**
      * The object being tested.
      */
-    private UndeleteAction undeleteAction = new UndeleteAction();
+    @InjectMockComponents
+    private UndeleteAction undeleteAction;
 
     @BeforeEach
     void beforeEach() throws Exception

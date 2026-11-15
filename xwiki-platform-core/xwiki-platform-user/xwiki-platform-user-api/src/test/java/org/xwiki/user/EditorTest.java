@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @version $Id$
  */
-public class EditorTest
+class EditorTest
 {
     @Test
     void fromString()

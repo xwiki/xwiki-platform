@@ -47,14 +47,6 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected transient List<String> list;
 
     /**
-     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
-     *             defined in {@link ListClass} and that is where they are now handled through
-     *             {@link ListClass#toFormString(BaseProperty)}.
-     */
-    @Deprecated
-    private String formStringSeparator = ListClass.DEFAULT_SEPARATOR;
-
-    /**
      * This is the actual list. It will be used during serialization/deserialization.
      */
     private List<String> actualList = new ArrayList<>();
@@ -65,28 +57,6 @@ public class ListProperty extends BaseProperty implements Cloneable
     public ListProperty()
     {
         this.list = new NotifyList(this.actualList, this);
-    }
-
-    /**
-     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
-     *             defined in {@link ListClass} and that is where they are now handled through
-     *             {@link ListClass#toFormString(BaseProperty)}.
-     */
-    @Deprecated
-    public String getFormStringSeparator()
-    {
-        return this.formStringSeparator;
-    }
-
-    /**
-     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
-     *             defined in {@link ListClass} and that is where they are now handled through
-     *             {@link ListClass#toFormString(BaseProperty)}.
-     */
-    @Deprecated
-    public void setFormStringSeparator(String formStringSeparator)
-    {
-        this.formStringSeparator = formStringSeparator;
     }
 
     @Override
@@ -119,16 +89,6 @@ public class ListProperty extends BaseProperty implements Cloneable
         return ListClass.getStringFromList(this.getList(), ListClass.DEFAULT_SEPARATOR);
     }
 
-    /**
-     * @deprecated Since 7.0M2. This method is here for a long time but it does not seem to have ever been used and it
-     *             does not bring any value compared to the existing {@link #toFormString()} method.
-     */
-    @Deprecated
-    public String toSingleFormString()
-    {
-        return super.toFormString();
-    }
-
     @Override
     public boolean equals(Object obj)
     {
@@ -146,11 +106,11 @@ public class ListProperty extends BaseProperty implements Cloneable
 
         // If the collection was not yet initialized by Hibernate
         // Let's use the super result..
-        if ((list1 instanceof PersistentCollection) && (!((PersistentCollection) list1).wasInitialized())) {
+        if (list1 instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized()) {
             return true;
         }
 
-        if ((list2 instanceof PersistentCollection) && (!((PersistentCollection) list2).wasInitialized())) {
+        if (list2 instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized()) {
             return true;
         }
 
@@ -252,7 +212,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public String toString()
     {
-        if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
+        if (getList() instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized()) {
             return "";
         }
 

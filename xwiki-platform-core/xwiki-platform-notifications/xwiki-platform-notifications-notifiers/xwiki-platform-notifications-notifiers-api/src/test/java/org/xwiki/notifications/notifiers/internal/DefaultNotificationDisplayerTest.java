@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultNotificationDisplayerTest
+class DefaultNotificationDisplayerTest
 {
     @InjectMockComponents
     private DefaultNotificationDisplayer displayer;

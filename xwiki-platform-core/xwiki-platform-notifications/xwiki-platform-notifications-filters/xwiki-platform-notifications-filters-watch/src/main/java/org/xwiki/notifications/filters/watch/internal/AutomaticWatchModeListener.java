@@ -64,7 +64,7 @@ public class AutomaticWatchModeListener extends AbstractEventListener
     /**
      * The skipped events group matcher.
      */
-    private static final BeginEvent SKIPPED_EVENTS = event -> event instanceof BeginFoldEvent;
+    private static final BeginEvent SKIPPED_EVENTS = BeginFoldEvent.class::isInstance;
 
     /**
      * The events to match.
@@ -142,8 +142,8 @@ public class AutomaticWatchModeListener extends AbstractEventListener
                 watchedEntitiesManager.watchEntity(
                         factory.createWatchedLocationReference(currentDoc.getDocumentReference()), userReference);
             } catch (NotificationException e) {
-                logger.warn("Failed to watch document [{}] for user [{}]", currentDoc.getDocumentReference(),
-                        userReference, e);
+                logger.warn("Failed to watch document [{}] for user [{}]",
+                    currentDoc.getDocumentReference(), userReference, e);
             }
         }
     }

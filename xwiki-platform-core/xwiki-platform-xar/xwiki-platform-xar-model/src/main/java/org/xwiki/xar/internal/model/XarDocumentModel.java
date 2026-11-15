@@ -20,6 +20,8 @@
 package org.xwiki.xar.internal.model;
 
 /**
+ * Helper class holding constants of the XAR XML model for the document root element.
+ * 
  * @version $Id$
  * @since 5.4M1
  */
@@ -77,7 +79,11 @@ public class XarDocumentModel
 
     /**
      * The current version.
-     * 
+     * <p>
+     * When adding a new version, also raise {@code HIGHEST_KNOWN_FORMAT_VERSION} in
+     * {@code org.xwiki.tool.xar.internal.XWikiDocument} (xwiki-commons XAR Maven plugin), and backport it along with
+     * this change: {@code xar:verify} fails pages declaring a version higher than it.
+     *
      * @since 9.0RC1
      */
     public static final String VERSION_CURRENT = VERSION_17;
@@ -106,9 +112,9 @@ public class XarDocumentModel
     public static final String ATTRIBUTE_DOCUMENT_LOCALE = "locale";
 
     /**
-     * @deprecated starting with 7.2M1, use {@link #ATTRIBUTE_DOCUMENT_SPECVERSION} instead
+     * @deprecated use {@link #ATTRIBUTE_DOCUMENT_SPECVERSION} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public static final String ATTRIBUTE_STREAMVERSION = ATTRIBUTE_DOCUMENT_SPECVERSION;
 
     public static final String ELEMENT_SPACE = "web";
@@ -187,4 +193,12 @@ public class XarDocumentModel
     public static final String ELEMENT_REVISION_MINOR = "minorEdit";
 
     public static final String ELEMENT_REVISIONS = "versions";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarDocumentModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

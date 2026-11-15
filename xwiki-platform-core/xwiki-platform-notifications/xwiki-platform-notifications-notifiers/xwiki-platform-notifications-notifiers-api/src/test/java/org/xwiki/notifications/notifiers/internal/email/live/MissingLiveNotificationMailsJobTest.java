@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class MissingLiveNotificationMailsJobTest
+class MissingLiveNotificationMailsJobTest
 {
     @InjectMockComponents
     private MissingLiveNotificationMailsJob job;

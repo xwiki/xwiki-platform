@@ -32,12 +32,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class RegexEntityReferenceTest
+// RegexEntityReference.equals() is an asymmetric matcher: it runs the regex only when the regex
+// reference is the receiver. The assertions below therefore call equals() explicitly, so that the
+// receiver is visible at the call site. Using assertEquals()/assertNotEquals() would move the call into
+// JUnit's internals and would invite a later SonarQube S3415 "swap these arguments" change, which would
+// call the concrete reference's equals() instead and skip regex matching altogether. That is why those
+// methods carry @SuppressWarnings("java:S5785").
+class RegexEntityReferenceTest
 {
     private static final DocumentReference REFERENCETOMATCH = new DocumentReference("wiki", "space", "page");
 
     @Test
-    public void equalsWhenExact()
+    @SuppressWarnings("java:S5785")
+    void equalsWhenExact()
     {
         EntityReference wikiReference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
@@ -53,7 +60,8 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWithOnlyPage()
+    @SuppressWarnings("java:S5785")
+    void equalsWithOnlyPage()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT);
@@ -62,7 +70,8 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWithOnlyWiki()
+    @SuppressWarnings("java:S5785")
+    void equalsWithOnlyWiki()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
@@ -72,7 +81,8 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWithPattern()
+    @SuppressWarnings("java:S5785")
+    void equalsWithPattern()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("p.*"), EntityType.DOCUMENT);
 
@@ -80,7 +90,8 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWhenPatternNotMatching()
+    @SuppressWarnings("java:S5785")
+    void equalsWhenPatternNotMatching()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
 
@@ -88,7 +99,8 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWhenNonRegexParent()
+    @SuppressWarnings("java:S5785")
+    void equalsWhenNonRegexParent()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile("space"), EntityType.SPACE, new EntityReference("wiki",

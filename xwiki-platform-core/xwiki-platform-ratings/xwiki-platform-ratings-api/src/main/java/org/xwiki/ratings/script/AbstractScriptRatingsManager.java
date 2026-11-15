@@ -20,7 +20,7 @@
 package org.xwiki.ratings.script;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -97,8 +96,7 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
                     result = Optional.of(rating);
                 }
             } catch (RatingsException e) {
-                this.logger.error("Error while trying to rate reference [{}].", reference,
-                    ExceptionUtils.getRootCause(e));
+                this.logger.error("Error while trying to rate reference [{}].", reference, e);
             }
         }
         return result;
@@ -114,12 +112,13 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
     public List<Rating> getRatings(EntityReference reference, int offset, int limit, boolean asc)
     {
         try {
-            Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+            Map<RatingsManager.RatingQueryField, Object> queryParameters =
+                new EnumMap<>(RatingsManager.RatingQueryField.class);
             queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
             return this.ratingsManager.getRatings(queryParameters, offset, limit,
                 RatingsManager.RatingQueryField.UPDATED_DATE, asc);
         } catch (RatingsException e) {
-            logger.error("Error when getting ratings for reference [{}].", reference, ExceptionUtils.getRootCause(e));
+            logger.error("Error when getting ratings for reference [{}].", reference, e);
             return Collections.emptyList();
         }
     }
@@ -130,8 +129,7 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
         try {
             return Optional.of(this.ratingsManager.getAverageRating(reference));
         } catch (RatingsException e) {
-            logger.error("Error when getting average rating for reference [{}]", reference,
-                ExceptionUtils.getRootCause(e));
+            logger.error("Error when getting average rating for reference [{}]", reference, e);
         }
         return Optional.empty();
     }
@@ -143,8 +141,7 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
             try {
                 return Optional.of(this.ratingsManager.recomputeAverageRating(reference));
             } catch (RatingsException e) {
-                logger.error("Error when computing average rating for reference [{}]", reference,
-                    ExceptionUtils.getRootCause(e));
+                logger.error("Error when computing average rating for reference [{}]", reference, e);
             }
         } else {
             logger.warn("Recomputation of average rating is not authorized for users without programming rights. "
@@ -158,7 +155,8 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
     public Optional<Rating> getRating(EntityReference reference, UserReference author)
     {
         Optional<Rating> result = Optional.empty();
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, author);
         try {
@@ -168,8 +166,7 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
                 result = Optional.of(ratings.get(0));
             }
         } catch (RatingsException e) {
-            logger.error("Error when getting rating for reference [{}] by user [{}].", reference, author,
-                ExceptionUtils.getRootCause(e));
+            logger.error("Error when getting rating for reference [{}] by user [{}].", reference, author, e);
         }
         return result;
     }
@@ -178,14 +175,14 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
     public List<Rating> getCurrentUserRatings(int offset, int limit, boolean asc)
     {
         List<Rating> result;
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, this.getCurrentUserReference());
         try {
             result = this.ratingsManager.getRatings(queryParameters, offset, limit,
                 RatingsManager.RatingQueryField.UPDATED_DATE, asc);
         } catch (RatingsException e) {
-            logger.error("Error when getting ratings of user [{}].", this.getCurrentUserReference(),
-                ExceptionUtils.getRootCause(e));
+            logger.error("Error when getting ratings of user [{}].", this.getCurrentUserReference(), e);
             result = Collections.emptyList();
         }
         return result;

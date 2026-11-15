@@ -98,10 +98,7 @@ public class PropAddAction extends XWikiAction
 
                 String comment = localizePlainOrKey("core.comment.addClassProperty");
 
-                // Make sure the user is allowed to make this modification
-                context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
-
-                xwiki.saveDocument(doc, comment, true, context);
+                xwiki.saveDocument(doc, comment, true, true, context);
             }
         }
         // forward to edit

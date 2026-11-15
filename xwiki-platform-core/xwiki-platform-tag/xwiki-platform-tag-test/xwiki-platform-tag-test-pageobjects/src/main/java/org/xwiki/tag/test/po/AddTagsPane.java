@@ -20,6 +20,7 @@
 package org.xwiki.tag.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -38,6 +39,8 @@ public class AddTagsPane extends BaseElement
      * The class name applied to the add tags HTML form.
      */
     private static final String FORM_CLASS_NAME = "tag-add-form";
+
+    private static final By SUGGESTIONS_LOCATOR = By.cssSelector(".suggestItems li");
 
     /**
      * The input field used to enter tags.
@@ -79,10 +82,11 @@ public class AddTagsPane extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return getDriver().findElements(By.className("xnotification-error")).size() == 0;
+                return getDriver().findElements(By.className("xnotification-error")).isEmpty();
             }
         });
 
+        closeSuggestions();
         addTagsForm.findElement(addButtonLocator).click();
 
         // Wait until the add tags panel disappears or
@@ -92,13 +96,27 @@ public class AddTagsPane extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return getDriver().findElements(By.className(FORM_CLASS_NAME)).size() == 0
-                    || getDriver().findElements(By.className("xnotification-error")).size() > 0;
+                return getDriver().findElements(By.className(FORM_CLASS_NAME)).isEmpty()
+                    || !getDriver().findElements(By.className("xnotification-error")).isEmpty();
             }
         });
 
         // If the add tags panel is still visible then there was a problem adding the tags.
-        return getDriver().findElementsWithoutWaiting(By.className(FORM_CLASS_NAME)).size() == 0;
+        return getDriver().findElementsWithoutWaiting(By.className(FORM_CLASS_NAME)).isEmpty();
+    }
+
+    /**
+     * Closes the tag suggestions, which are displayed below the tags input, over the add button. The suggestions are
+     * requested with a delay after each key stroke, so they can still show up after the tags have been typed. Leaving
+     * the tags input with Tab makes the suggestion widget drop the suggestions it is still waiting for, then Escape
+     * closes the suggestions that are already displayed (Tab only moves the focus to the first of them, without
+     * selecting it).
+     */
+    private void closeSuggestions()
+    {
+        this.tagsInput.sendKeys(Keys.TAB);
+        this.tagsInput.sendKeys(Keys.ESCAPE);
+        getDriver().waitUntilElementDisappears(this.addTagsForm, SUGGESTIONS_LOCATOR);
     }
 
     /**

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-notifications</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-notification-activitymacro</artifactId>
   <name>XWiki Platform - Legacy - Notification Activity Macro</name>
@@ -37,6 +37,8 @@
          By setting this property, we make sure this application would be automatically uninstalled if the administrator
          installs the old Activity Stream Application. -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream-ui</xwiki.extension.features>
+    <!-- Legacy macro, not declared in xwiki.extension.components so that the editor doesn't suggest installing it -->
+    <xwiki.extension.components.macros.check.excluded>activity</xwiki.extension.components.macros.check.excluded>
   </properties>
   <description>Provide a macro implemented with the Notifications Application to keep a backward compatibility with Activity Stream.</description>
   <dependencies>

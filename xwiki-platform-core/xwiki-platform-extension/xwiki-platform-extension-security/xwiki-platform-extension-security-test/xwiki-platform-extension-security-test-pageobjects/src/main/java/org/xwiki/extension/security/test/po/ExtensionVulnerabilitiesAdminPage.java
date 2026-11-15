@@ -37,6 +37,8 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ExtensionVulnerabilitiesAdminPage extends ViewPage
 {
+    private static final String SCAN_STATUS_CLASS = "extension-security-scan-status";
+
     /**
      * Go to the extension vulnerabilities section of the administration.
      *
@@ -89,6 +91,29 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
         getDriver().addPageNotYetReloadedMarker();
         getDriver().findElement(By.cssSelector("form input.button")).click();
         getDriver().waitUntilPageIsReloaded();
+    }
+
+    /**
+     * Waits until the security scan is done. The page is reloaded as long as it does not display any scan status,
+     * since the scan only starts once the extensions indexation is done. When the scan is still running when the page
+     * is rendered, a progress bar is displayed and then replaced by the job result once the scan is done. When the
+     * scan is already finished when the page is rendered, only the scan date is displayed, without any progress bar.
+     *
+     * @param timeout the maximum time to wait for, in seconds
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public void waitUntilScanIsDone(int timeout)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            if (!getDriver().hasElementWithoutWaiting(By.className(SCAN_STATUS_CLASS))) {
+                driver.navigate().refresh();
+                return false;
+            }
+            return !getDriver()
+                .hasElementWithoutWaiting(By.cssSelector(String.format(".%s .ui-progress", SCAN_STATUS_CLASS)));
+        }, timeout);
     }
 
     /**

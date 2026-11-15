@@ -37,6 +37,7 @@ import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -226,10 +227,10 @@ class DefaultModelBridgeTest
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         DocumentReference copyReference = new DocumentReference("wiki", "Space", "Copy");
 
-        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true,
+        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true, false,
             this.xcontext)).thenReturn(true);
 
-        assertTrue(this.modelBridge.copy(sourceReference, copyReference));
+        assertTrue(this.modelBridge.copy(sourceReference, copyReference, false));
         assertLog(Level.INFO, "Document [{}] has been copied to [{}].", sourceReference, copyReference);
     }
 
@@ -243,7 +244,7 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, true);
     }
 
@@ -257,8 +258,38 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference, true);
 
-        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, false, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, false);
+    }
+
+    @Test
+    void deleteByContextUser() throws Exception
+    {
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(1);
+
+        assertTrue(this.modelBridge.delete(sourceReference, false, true));
+
+        verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, true, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted (to the recycle bin: [{}]).", sourceReference, true);
+    }
+
+    @Test
+    void deleteAllTranslationsByContextUser() throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
+
+        XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
+        when(sourceDocument.getTranslation()).thenReturn(0);
+
+        assertTrue(this.modelBridge.delete(sourceReference, true, true));
+
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, false, true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
+            sourceReference, false);
     }
 
     @Test
@@ -286,7 +317,7 @@ class DefaultModelBridgeTest
 
         this.modelBridge.delete(sourceReference);
 
-        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, this.xcontext);
+        verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, true, false, this.xcontext);
         assertLog(Level.INFO, "Document [{}] has been deleted with all its translations (to the recycle bin: [{}]).",
             sourceReference, true);
     }
@@ -300,9 +331,11 @@ class DefaultModelBridgeTest
         XWikiDocument oldDocument = mock(XWikiDocument.class);
         when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        BaseObject baseObjectMock = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .thenReturn(mock(BaseObject.class));
-        when(oldDocument.getAuthors()).thenReturn(mock());
+            .thenReturn(baseObjectMock);
+        DocumentAuthors documentAuthorsMock = mock();
+        when(oldDocument.getAuthors()).thenReturn(documentAuthorsMock);
         when(oldDocument.isNew()).thenReturn(true);
 
         UserReference userReference = mock();
@@ -329,9 +362,11 @@ class DefaultModelBridgeTest
         XWikiDocument oldDocument = mock(XWikiDocument.class);
         when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        BaseObject baseObjectMock2 = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .thenReturn(mock(BaseObject.class));
-        when(oldDocument.getAuthors()).thenReturn(mock());
+            .thenReturn(baseObjectMock2);
+        DocumentAuthors documentAuthorsMock = mock();
+        when(oldDocument.getAuthors()).thenReturn(documentAuthorsMock);
         when(oldDocument.isNew()).thenReturn(false);
 
         UserReference userReference = mock();
@@ -675,8 +710,8 @@ class DefaultModelBridgeTest
 
         // this could be improved later: right now we don't get the rights in the test because the components are not
         // all properly loaded from oldcore.
-        assertLog(0, Level.WARN, "Exception while checking if entry [{}] can be removed from the recycle bin",
-            deletedDocumentId);
+        assertLog(0, Level.WARN,
+            "Failed to check if entry [{}] can be removed from the recycle bin", deletedDocumentId);
     }
 
     @Test
@@ -791,9 +826,8 @@ class DefaultModelBridgeTest
     }
 
     @Test
-    void canRestoreDeletedDocument() throws Exception
+    void canRestoreDeletedDocument()
     {
-        long deletedDocumentId = 42;
         String deletedDocumentFullName = "Space.DeletedDocument";
 
         DocumentReference userReferenceToCheck = new DocumentReference("wiki", "Space", "User");
@@ -875,8 +909,8 @@ class DefaultModelBridgeTest
 
         assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
 
-        assertLog(0, Level.WARN, "Exception while checking if entry [{}] can be removed from the recycle bin",
-            deletedDocumentId);
+        assertLog(0, Level.WARN,
+            "Failed to check if entry [{}] can be removed from the recycle bin", deletedDocumentId);
         assertLog(1, Level.ERROR, "You are not allowed to permanently delete document [{}] with ID [{}]",
             documentReference, deletedDocumentId);
         verify(recycleBin, never()).deleteFromRecycleBin(anyLong(), any(), anyBoolean());
@@ -915,7 +949,8 @@ class DefaultModelBridgeTest
 
         assertFalse(this.modelBridge.canOverwriteSilently(documentReference));
 
-        when(document.getXObject(RedirectClassDocumentInitializer.REFERENCE)).thenReturn(mock(BaseObject.class));
+        BaseObject baseObjectMock3 = mock(BaseObject.class);
+        when(document.getXObject(RedirectClassDocumentInitializer.REFERENCE)).thenReturn(baseObjectMock3);
 
         assertTrue(this.modelBridge.canOverwriteSilently(documentReference));
     }
@@ -959,10 +994,10 @@ class DefaultModelBridgeTest
         DocumentReference source = new DocumentReference("wiki", "space", "sourcePage");
         DocumentReference target = new DocumentReference("wiki", "space", "targetPage");
 
-        when(this.xwiki.renameDocument(source, target, true, List.of(), List.of(), this.xcontext)).thenReturn(true);
-        assertTrue(this.modelBridge.rename(source, target));
+        when(this.xwiki.renameDocument(source, target, true, List.of(), List.of(), false, this.xcontext)).thenReturn(true);
+        assertTrue(this.modelBridge.rename(source, target, false));
 
-        verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), this.xcontext);
+        verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), false, this.xcontext);
     }
 
     @Test

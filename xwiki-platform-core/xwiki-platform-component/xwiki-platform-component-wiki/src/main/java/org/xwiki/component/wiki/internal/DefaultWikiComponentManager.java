@@ -20,15 +20,16 @@
 package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -43,6 +44,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentManager;
 import org.xwiki.component.wiki.WikiComponentScope;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
@@ -80,10 +82,16 @@ public class DefaultWikiComponentManager implements WikiComponentManager
      * Role Types and we cannot ask the Component Manager for wiki component only (which we need to do when we need to
      * unregister them). A wiki page can hold one or several wiki components.
      */
-    private Map<EntityReference, List<WikiComponent>> registeredComponents = new ConcurrentHashMap<>();
+    private final Map<EntityReference, CopyOnWriteArrayList<WikiComponent>> registeredComponents =
+        new ConcurrentHashMap<>();
 
     @Override
     public void registerWikiComponent(WikiComponent component) throws WikiComponentException
+    {
+        registerWikiComponent(component, true);
+    }
+
+    private void registerWikiComponent(WikiComponent component, boolean initialize) throws WikiComponentException
     {
         // Save current context information
         DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
@@ -100,7 +108,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             this.wikiComponentManagerContext.setCurrentEntityReference(component.getEntityReference());
 
             // Since we are responsible to create the component instance, we also are responsible of its initialization
-            if (this.isInitializable(component.getClass().getInterfaces())) {
+            if (initialize && this.isInitializable(component.getClass().getInterfaces())) {
                 try {
                     ((Initializable) component).initialize();
                 } catch (InitializationException e) {
@@ -128,14 +136,8 @@ public class DefaultWikiComponentManager implements WikiComponentManager
 
     private void cacheWikiComponent(WikiComponent component)
     {
-        List<WikiComponent> wikiComponents = this.registeredComponents.get(component.getEntityReference());
-        if (wikiComponents == null) {
-            wikiComponents = new ArrayList<>();
-            this.registeredComponents.put(component.getEntityReference(), wikiComponents);
-        }
-        if (!wikiComponents.contains(component)) {
-            wikiComponents.add(component);
-        }
+        this.registeredComponents.computeIfAbsent(component.getEntityReference(), key -> new CopyOnWriteArrayList<>())
+            .addIfAbsent(component);
     }
 
     @Override
@@ -147,24 +149,22 @@ public class DefaultWikiComponentManager implements WikiComponentManager
     @Override
     public void unregisterWikiComponents(EntityReference reference) throws WikiComponentException
     {
-        List<WikiComponent> wikiComponents = this.registeredComponents.get(reference);
+        CopyOnWriteArrayList<WikiComponent> wikiComponents = this.registeredComponents.get(reference);
         if (wikiComponents != null) {
-            Iterator<WikiComponent> iterator = wikiComponents.iterator();
-            while (iterator.hasNext()) {
-                unregisterWikiComponent(iterator);
+            // Iterating a copy-on-write list works on a snapshot, so removing elements while iterating is safe.
+            for (WikiComponent wikiComponent : wikiComponents) {
+                unregisterWikiComponent(wikiComponent);
+                // Remove from the wiki component cache
+                wikiComponents.remove(wikiComponent);
             }
             // Clean up wiki component cache for the passed reference, if it doesn't contain any wiki component
-            wikiComponents = this.registeredComponents.get(reference);
-            if (wikiComponents.isEmpty()) {
-                this.registeredComponents.remove(reference);
-            }
+            this.registeredComponents.computeIfPresent(reference, (key, list) -> list.isEmpty() ? null : list);
         }
     }
 
-    private void unregisterWikiComponent(Iterator<WikiComponent> iterator)
-        throws WikiComponentException
+    private void unregisterWikiComponent(WikiComponent wikiComponent) throws WikiComponentException
     {
-        WikiComponent wikiComponent = iterator.next();
+        WikiComponent shadowedComponent = null;
 
         // Save current context information
         DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
@@ -174,11 +174,10 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             // unregister
             this.wikiComponentManagerContext.setCurrentUserReference(wikiComponent.getAuthorReference());
             this.wikiComponentManagerContext.setCurrentEntityReference(wikiComponent.getEntityReference());
-            // Remove from the Component Manager
-            getComponentManager(wikiComponent.getScope()).unregisterComponent(wikiComponent.getRoleType(),
-                wikiComponent.getRoleHint());
-            // Remove from the wiki component cache
-            iterator.remove();
+            ComponentManager componentManager = getComponentManager(wikiComponent.getScope());
+            if (unregisterFromComponentManager(wikiComponent, componentManager)) {
+                shadowedComponent = getShadowedComponent(wikiComponent);
+            }
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s]",
                 wikiComponent.getScope()), e);
@@ -186,6 +185,104 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             this.wikiComponentManagerContext.setCurrentUserReference(currentUserReference);
             this.wikiComponentManagerContext.setCurrentEntityReference(currentEntityReference);
         }
+
+        // Register again the wiki component that was replaced by the unregistered one, if any, as otherwise its role
+        // would be left without any wiki component even though its definition still exists.
+        if (shadowedComponent != null) {
+            try {
+                // The component has already been initialized when it was first registered.
+                registerWikiComponent(shadowedComponent, false);
+            } catch (WikiComponentException e) {
+                this.logger.warn("Failed to register again the wiki component defined in [{}]: [{}]",
+                    shadowedComponent.getEntityReference(), ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+    }
+
+    /**
+     * Removes the passed wiki component from the Component Manager, unless it has been replaced in the meantime by
+     * another component with the same role type and hint.
+     *
+     * @param wikiComponent the wiki component to unregister
+     * @param componentManager the Component Manager the wiki component has been registered in
+     * @return {@code true} if a component has been removed from the Component Manager, {@code false} otherwise
+     */
+    private boolean unregisterFromComponentManager(WikiComponent wikiComponent, ComponentManager componentManager)
+    {
+        Type roleType = wikiComponent.getRoleType();
+        String roleHint = wikiComponent.getRoleHint();
+
+        Object registeredInstance;
+        try {
+            registeredInstance = componentManager.getInstance(roleType, roleHint);
+        } catch (ComponentLookupException e) {
+            registeredInstance = null;
+        }
+
+        boolean result = false;
+        if (registeredInstance == wikiComponent) {
+            componentManager.unregisterComponent(roleType, roleHint);
+            result = true;
+        } else if (!isReplacedBy(wikiComponent, registeredInstance)) {
+            // The lookup returns a component of a parent Component Manager when it has a higher priority, while the
+            // wiki component might still be registered, hidden, in its own Component Manager. Unregistering through
+            // the descriptor only removes the component registered in that Component Manager, and only if it has the
+            // same descriptor, i.e., if it's a wiki component of the same type and priority and not, e.g., a Java
+            // component that replaced it.
+            ComponentDescriptor<?> descriptor = createComponentDescriptor(roleType, wikiComponent);
+            if (descriptor.equals(componentManager.getComponentDescriptor(roleType, roleHint))) {
+                componentManager.unregisterComponent(descriptor);
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @param wikiComponent a wiki component
+     * @param registeredInstance the component currently registered for the role type and hint of the wiki component
+     * @return {@code true} if the passed instance is another wiki component that replaced the passed one in the same
+     *         Component Manager
+     */
+    private boolean isReplacedBy(WikiComponent wikiComponent, Object registeredInstance)
+    {
+        return registeredInstance instanceof WikiComponent registeredWikiComponent
+            && isSameComponentManagerKey(wikiComponent, registeredWikiComponent);
+    }
+
+    /**
+     * @param unregisteredComponent the wiki component that has just been unregistered from the Component Manager
+     * @return the best wiki component that has been replaced by the passed one in the same Component Manager, i.e.,
+     *         that has the same role type, role hint and scope, isn't defined in the same entity and targets the same
+     *         wiki (wiki scope) or user (user scope), or {@code null} if there is none
+     */
+    private WikiComponent getShadowedComponent(WikiComponent unregisteredComponent)
+    {
+        return this.registeredComponents.entrySet().stream()
+            .filter(entry -> !entry.getKey().equals(unregisteredComponent.getEntityReference()))
+            .flatMap(entry -> entry.getValue().stream())
+            .filter(candidate -> isSameComponentManagerKey(unregisteredComponent, candidate))
+            .min(Comparator.comparingInt(WikiComponent::getRoleHintPriority))
+            .orElse(null);
+    }
+
+    private boolean isSameComponentManagerKey(WikiComponent component, WikiComponent candidate)
+    {
+        boolean result = component.getScope() == candidate.getScope()
+            && component.getRoleType().equals(candidate.getRoleType())
+            && Objects.equals(component.getRoleHint(), candidate.getRoleHint());
+
+        if (result) {
+            result = switch (component.getScope()) {
+                case USER -> Objects.equals(component.getAuthorReference(), candidate.getAuthorReference());
+                case WIKI -> Objects.equals(component.getEntityReference().extractReference(EntityType.WIKI),
+                    candidate.getEntityReference().extractReference(EntityType.WIKI));
+                default -> true;
+            };
+        }
+
+        return result;
     }
 
     /**

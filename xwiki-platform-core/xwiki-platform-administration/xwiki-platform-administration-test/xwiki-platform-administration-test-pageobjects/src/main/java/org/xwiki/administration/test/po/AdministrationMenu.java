@@ -82,12 +82,12 @@ public class AdministrationMenu extends BaseElement
 
     public boolean hasNotCategoryWithId(String categoryId)
     {
-        return getDriver().findElementsWithoutWaiting(this.container, categoryById(categoryId)).size() == 0;
+        return getDriver().findElementsWithoutWaiting(this.container, categoryById(categoryId)).isEmpty();
     }
 
     public boolean hasNotCategoryWithName(String categoryName)
     {
-        return getDriver().findElementsWithoutWaiting(this.container, categoryByName(categoryName)).size() == 0;
+        return getDriver().findElementsWithoutWaiting(this.container, categoryByName(categoryName)).isEmpty();
     }
 
     public AdministrationMenu expandCategoryWithId(String categoryId)
@@ -143,13 +143,13 @@ public class AdministrationMenu extends BaseElement
 
     public boolean hasNotSectionWithId(String sectionId)
     {
-        return getDriver().findElementsWithoutWaiting(this.container, sectionById(sectionId)).size() == 0;
+        return getDriver().findElementsWithoutWaiting(this.container, sectionById(sectionId)).isEmpty();
     }
 
     public boolean hasNotSectionWithName(String categoryName, String sectionName)
     {
         return getDriver().findElementsWithoutWaiting(this.container, sectionByName(categoryName, sectionName))
-            .size() == 0;
+            .isEmpty();
     }
 
     /**

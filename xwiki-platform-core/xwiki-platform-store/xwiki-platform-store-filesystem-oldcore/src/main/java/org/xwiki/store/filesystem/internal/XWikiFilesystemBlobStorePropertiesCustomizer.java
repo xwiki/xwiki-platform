@@ -88,27 +88,39 @@ public class XWikiFilesystemBlobStorePropertiesCustomizer implements BlobStorePr
 
     private static boolean deleteEmptyDirs(final File location, int depth)
     {
-        if (location != null && location.exists() && location.isDirectory()) {
-            final File[] files = location.listFiles();
-            boolean empty = true;
-            if (files != null) {
-                for (File file : files) {
-                    if (!deleteEmptyDirs(file, depth + 1)) {
-                        empty = false;
-                    }
-                }
-            }
+        if (location == null || !location.exists() || !location.isDirectory()) {
+            return false;
+        }
 
-            if (empty && depth != 0) {
-                try {
-                    Files.delete(location.toPath());
-                    return true;
-                } catch (IOException e) {
-                    return false;
+        if (areChildrenEmpty(location, depth) && depth != 0) {
+            return tryDelete(location);
+        }
+
+        return false;
+    }
+
+    private static boolean areChildrenEmpty(final File location, int depth)
+    {
+        final File[] files = location.listFiles();
+        boolean empty = true;
+        if (files != null) {
+            for (File file : files) {
+                if (!deleteEmptyDirs(file, depth + 1)) {
+                    empty = false;
                 }
             }
         }
 
-        return false;
+        return empty;
+    }
+
+    private static boolean tryDelete(final File location)
+    {
+        try {
+            Files.delete(location.toPath());
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

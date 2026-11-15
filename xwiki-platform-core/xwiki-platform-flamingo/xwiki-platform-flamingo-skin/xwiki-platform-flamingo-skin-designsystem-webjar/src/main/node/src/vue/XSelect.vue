@@ -18,12 +18,21 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import { useId } from "vue";
+import { useRequiredMark } from "./requiredMark";
+import { computed, useId } from "vue";
 import type { SelectProps } from "@xwiki/platform-dsapi";
 
 const { items, label, required, help } = defineProps<SelectProps>();
 
 const selected = defineModel<string>();
+
+const requiredMark = useRequiredMark(() => required);
+
+const options = computed(() =>
+  items.map((item) =>
+    typeof item === "string" ? { value: item, label: item } : item,
+  ),
+);
 
 const selectId = useId();
 
@@ -38,7 +47,12 @@ defineOptions({
 <template>
   <dl>
     <dt>
-      <label :for="selectId">{{ label }}</label>
+      <label :for="selectId"
+        >{{ label }}
+        <span class="xRequired" v-if="required && requiredMark">{{
+          requiredMark
+        }}</span></label
+      >
       <span class="xHint" v-if="help">{{ help }}</span>
     </dt>
     <dd>
@@ -49,8 +63,12 @@ defineOptions({
         v-model="selected"
         :required
       >
-        <option v-for="item in items" :key="item" :value="item">
-          {{ item }}
+        <option
+          v-for="option in options"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ option.label }}
         </option>
       </select>
     </dd>

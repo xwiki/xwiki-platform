@@ -42,16 +42,7 @@ export default defineConfig({
         "vue",
         "@xwiki/platform-livedata-componentstore",
       ],
-      output: {
-        globals: {
-          vue: "Vue",
-        },
-      },
     },
-  },
-  define: {
-    // define process to avoid runtime error with jquery
-    "process.env": {},
   },
   plugins: [vue()],
   resolve: {

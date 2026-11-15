@@ -214,7 +214,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   // The HTML input to select the icon theme to use for the preview
   var iconThemeSelector = 0;
   
-  // Picker Dimmensions
+  // Picker Dimensions
   var PICKER_WIDTH = 520;
   var PICKER_HEIGHT = 300;
 

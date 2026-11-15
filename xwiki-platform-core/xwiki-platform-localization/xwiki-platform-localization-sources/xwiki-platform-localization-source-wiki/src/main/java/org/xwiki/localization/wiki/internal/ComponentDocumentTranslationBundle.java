@@ -21,6 +21,7 @@ package org.xwiki.localization.wiki.internal;
 
 import java.util.Locale;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -92,7 +93,8 @@ public class ComponentDocumentTranslationBundle extends AbstractDocumentTranslat
                     this.factory.checkRegistrationAuthorizationForDocumentLocaleBundle(document, defaultLocaleDocument);
                 } catch (AccessDeniedException e) {
                     this.logger.warn("Failed to load and register the translation for locale [{}] from document [{}]. "
-                        + "Falling back to default locale.", locale, document.getDocumentReference());
+                        + "Falling back to default locale. Root cause is [{}].", locale,
+                        document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
                     // We return the default translation bundle if the requested one has permission issues.
                     return defaultLocaleDocument;
                 }

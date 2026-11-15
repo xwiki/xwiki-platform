@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.internal.macro.LiveDataMacroComponentList;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
@@ -100,8 +99,9 @@ class ClassSheetPageTest extends PageTest
     void setUp() throws Exception
     {
         // Spy the jsfx plugin used during the macro rendering to return a mock of its API when required. 
+        SkinExtensionPluginApi skinExtensionPluginApiMock = mock();
         when(this.oldcore.getSpyXWiki().getPluginApi("jsfx", this.context))
-            .thenReturn(mock(SkinExtensionPluginApi.class));
+            .thenReturn(skinExtensionPluginApiMock);
 
         // Return minimal icons metadata since this is not what we want to test in this test suite.
         IconManager iconManager = this.componentManager.registerMockComponent(IconManager.class);

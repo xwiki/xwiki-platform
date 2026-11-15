@@ -35,7 +35,7 @@ public abstract class AbstractMailQueueManager<T extends MailQueueItem> implemen
 {
     /**
      * The Mail queue that the mail prepare & sender threads will use to send mails. We use separate threads to allow
-     * preaparing and sending mail asynchronously.
+     * preparing and sending mail asynchronously.
      */
     protected BlockingQueue<T> mailQueue;
 

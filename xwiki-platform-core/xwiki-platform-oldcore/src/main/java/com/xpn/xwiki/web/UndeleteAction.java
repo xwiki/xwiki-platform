@@ -26,9 +26,10 @@ import java.util.Locale;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -70,7 +71,8 @@ public class UndeleteAction extends XWikiAction
 
     private static final String VIEW_ACTION = "view";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UndeleteAction.class);
+    @Inject
+    private Logger logger;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -138,7 +140,7 @@ public class UndeleteAction extends XWikiAction
 
             result = xwiki.getDeletedDocument(index, context);
         } catch (Exception e) {
-            LOGGER.error("Failed to get deleted document with ID [{}]", sindex, e);
+            this.logger.error("Failed to get deleted document with ID [{}]", sindex, e);
         }
 
         return result;

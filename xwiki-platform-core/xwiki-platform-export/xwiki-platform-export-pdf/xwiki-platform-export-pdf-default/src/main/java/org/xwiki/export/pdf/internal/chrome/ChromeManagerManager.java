@@ -275,7 +275,7 @@ public class ChromeManagerManager implements Disposable
      */
     private void setupChromeProxy(ContainerManager containerManager, int remoteDebuggingPort, int localDebuggingPort)
     {
-        this.logger.debug("Setting up the proxy for Chrome remote debugging: {}:{} -> 127.0.0.1:{}",
+        this.logger.debug("Setting up the proxy for Chrome remote debugging: [{}:{}] -> [127.0.0.1:{}]",
             remoteDebuggingPort, remoteDebuggingPort, localDebuggingPort);
 
         // Install socat in the container (needs to be done as root).
@@ -285,18 +285,19 @@ public class ChromeManagerManager implements Disposable
         // Wait for Chrome to listen on the local port.
         String waitForChromeReady =
             "timeout 30 bash -c 'until curl -s http://127.0.0.1:%s/json/version; do sleep 1; done'";
-        this.logger.debug("Waiting for Chrome to start on port {}...", localDebuggingPort);
+        this.logger.debug("Waiting for Chrome to start on port [{}]...", localDebuggingPort);
         containerManager.execInContainer(this.containerId,
             bashCommand(waitForChromeReady.formatted(localDebuggingPort)));
 
-        // Start the socat proxy and leave it runnning in the background.
-        this.logger.debug("Starting socat proxy: 0.0.0.0:{} -> 127.0.0.1:{}", remoteDebuggingPort, localDebuggingPort);
+        // Start the socat proxy and leave it running in the background.
+        this.logger.debug("Starting socat proxy: [0.0.0.0:{}] -> [127.0.0.1:{}]", remoteDebuggingPort,
+            localDebuggingPort);
         String startSocat = "nohup socat TCP-LISTEN:%s,fork,reuseaddr TCP:127.0.0.1:%s > /dev/null 2>&1 &";
         containerManager.execInContainer(this.containerId,
             bashCommand(startSocat.formatted(remoteDebuggingPort, localDebuggingPort)));
 
         // Wait for socat proxy to be ready by checking if it can forward requests to Chrome.
-        this.logger.debug("Waiting for socat proxy to be ready on port {}...", remoteDebuggingPort);
+        this.logger.debug("Waiting for socat proxy to be ready on port [{}]...", remoteDebuggingPort);
         String response = containerManager.execInContainer(this.containerId,
             bashCommand(waitForChromeReady.formatted(remoteDebuggingPort)));
 

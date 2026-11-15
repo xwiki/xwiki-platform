@@ -42,7 +42,6 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -92,9 +91,9 @@ class ProvisionWikiStepTest
         this.provisionWikiStep.execute(request);
 
         // Verify
-        verify(this.extensionInstaller).installExtension(eq("wikiId"), eq(extensionId));
-        verify(this.observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
-        verify(this.observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
+        verify(this.extensionInstaller).installExtension("wikiId", extensionId);
+        verify(this.observationManager).notify(new WikiProvisioningEvent("wikiId"), "wikiId", this.xcontext);
+        verify(this.observationManager).notify(new WikiProvisionedEvent("wikiId"), "wikiId", this.xcontext);
         verifyNoInteractions(this.wikiCopier);
     }
 
@@ -110,11 +109,10 @@ class ProvisionWikiStepTest
         this.provisionWikiStep.execute(request);
 
         // Verify
-        verify(this.wikiCopier).copyDocuments(eq("template"), eq("wikiId"), eq(false));
-        verify(this.observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
-        verify(this.observationManager).notify(eq(new WikiCopiedEvent("template", "wikiId")), eq("template"),
-            eq(this.xcontext));
-        verify(this.observationManager).notify(eq(new WikiProvisionedEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
+        verify(this.wikiCopier).copyDocuments("template", "wikiId", false);
+        verify(this.observationManager).notify(new WikiProvisioningEvent("wikiId"), "wikiId", this.xcontext);
+        verify(this.observationManager).notify(new WikiCopiedEvent("template", "wikiId"), "template", this.xcontext);
+        verify(this.observationManager).notify(new WikiProvisionedEvent("wikiId"), "wikiId", this.xcontext);
         verifyNoInteractions(this.extensionInstaller);
     }
 
@@ -136,9 +134,8 @@ class ProvisionWikiStepTest
             () -> this.provisionWikiStep.execute(request));
         assertEquals("Failed to provision the wiki [wikiId].", caughtException.getMessage());
         assertEquals(exception, caughtException.getCause());
-        verify(this.observationManager).notify(eq(new WikiProvisioningEvent("wikiId")), eq("wikiId"), eq(this.xcontext));
-        verify(this.observationManager).notify(eq(new WikiProvisioningFailedEvent("wikiId")), eq("wikiId"),
-            eq(this.xcontext));
+        verify(this.observationManager).notify(new WikiProvisioningEvent("wikiId"), "wikiId", this.xcontext);
+        verify(this.observationManager).notify(new WikiProvisioningFailedEvent("wikiId"), "wikiId", this.xcontext);
     }
 
     @Test

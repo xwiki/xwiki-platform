@@ -66,7 +66,38 @@ type Block =
        * @since 18.0.0RC1
        * @beta
        */
-      call: MacroInvocation;
+      call: MacroBlockInvocation;
+    }
+  | {
+      /**
+       * @since 18.10.0RC1
+       * @beta
+       */
+      type: "rawHtml";
+
+      /**
+       * @since 18.10.0RC1
+       * @beta
+       */
+      html: string;
+    }
+  | {
+      /**
+       * A WYSIWYG-editable slot inside a macro's own rendered block output.
+       *
+       * Unlike `macroBlock` (an invocation placeholder waiting to be rendered), this marks where a
+       * macro's user-editable body should be mounted inside the macro's *own* render() output.
+       *
+       * @since 18.10.0RC1
+       * @beta
+       */
+      type: "macroBlockEditableArea";
+
+      /**
+       * @since 18.10.0RC1
+       * @beta
+       */
+      styles: BlockStyles;
     };
 
 /**
@@ -77,6 +108,12 @@ type BlockStyles = {
   textColor?: string;
   backgroundColor?: string;
   textAlignment?: Alignment;
+
+  /**
+   * @since 18.10.0RC1
+   * @beta
+   */
+  cssClasses?: string[];
 };
 
 /**
@@ -140,10 +177,11 @@ type TableCell = {
 };
 
 /**
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
-type MacroInvocation = {
+type MacroBlockInvocation = {
+  kind: "block";
   id: string;
   params: Record<string, boolean | number | string>;
   body:
@@ -151,7 +189,20 @@ type MacroInvocation = {
     | { type: "raw"; content: string }
     // NOTE: This one is for blocks, it should be changed to { type: "blocks", blocks: Block[] } when BlockNote supports nesting
     // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-    | { type: "inlineContents"; inlineContents: InlineContent[] }
+    | { type: "inlineContents"; inlineContents: InlineContent[] };
+};
+
+/**
+ * @since 18.5.0RC1
+ * @beta
+ */
+type InlineMacroInvocation = {
+  kind: "inline";
+  id: string;
+  params: Record<string, boolean | number | string>;
+  body:
+    | { type: "none" }
+    | { type: "raw"; content: string }
     // NOTE: This one is for inline contents, it should be changed to { type: "inlineContents", inlineContents: InlineContent[] } when BlockNote supports nesting
     // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
     | { type: "inlineContent"; inlineContent: InlineContent };
@@ -176,7 +227,32 @@ type InlineContent =
        * @since 18.0.0RC1
        * @beta
        */
-      call: MacroInvocation;
+      call: InlineMacroInvocation;
+    }
+  | {
+      /**
+       * @since 18.10.0RC1
+       * @beta
+       */
+      type: "rawHtml";
+
+      /**
+       * @since 18.10.0RC1
+       * @beta
+       */
+      html: string;
+    }
+  | {
+      /**
+       * A WYSIWYG-editable slot inside a macro's own rendered inline content output.
+       *
+       * Unlike `inlineMacro` (an invocation placeholder waiting to be rendered), this marks where a
+       * macro's user-editable body should be mounted inside the macro's *own* render() output.
+       *
+       * @since 18.10.0RC1
+       * @beta
+       */
+      type: "inlineMacroEditableArea";
     };
 
 /**
@@ -218,7 +294,7 @@ type LinkTarget =
       rawReference: string;
 
       /**
-       * Will be `null` if the raw reference is invalid and can't be parsed
+       * Will be `null` if the raw reference is invalid and can't be parsed.
        *
        * @since 18.0.0RC1
        * @beta
@@ -233,10 +309,11 @@ export type {
   BlockStyles,
   Image,
   InlineContent,
+  InlineMacroInvocation,
   Link,
   LinkTarget,
   ListItem,
-  MacroInvocation,
+  MacroBlockInvocation,
   TableCell,
   TableColumn,
   Text,

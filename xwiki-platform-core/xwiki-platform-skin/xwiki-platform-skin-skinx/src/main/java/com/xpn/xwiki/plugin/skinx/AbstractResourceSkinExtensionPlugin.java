@@ -40,7 +40,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
      * @param context The current request context.
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
-    public AbstractResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
+    protected AbstractResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
     }
@@ -96,7 +96,7 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
     public Set<String> getAlwaysUsedExtensions(XWikiContext context)
     {
         // There is no mean to define an always used extension for something else than a document extension now,
-        // so for resources-based extensions, we return an emtpy set.
+        // so for resources-based extensions, we return an empty set.
         // An idea for the future could be to have an API for plugins and components to register always used resources
         // extensions.
         return Collections.emptySet();

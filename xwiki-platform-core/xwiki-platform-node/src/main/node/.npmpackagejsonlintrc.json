@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "require-license": "error",
+    "valid-values-license": ["error", ["LGPL-2.1-or-later"]]
+  }
+}

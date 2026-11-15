@@ -80,19 +80,19 @@ public class TestDebugger extends TestWatcher
     @Override
     protected void starting(Description description)
     {
-        LOGGER.info("{} started", getTestName(description));
+        LOGGER.info("[{}] started", getTestName(description));
     }
 
     @Override
     protected void succeeded(Description description)
     {
-        LOGGER.info("{} passed", getTestName(description));
+        LOGGER.info("[{}] passed", getTestName(description));
     }
 
     @Override
     protected void failed(Throwable e, Description description)
     {
-        LOGGER.info("{} failed", getTestName(description));
+        LOGGER.info("[{}] failed", getTestName(description));
         takeScreenshot(description);
         LOGGER.info("Current page URL is [{}]", driver.getCurrentUrl());
         LOGGER.info("Current page source is [{}]", driver.getPageSource());

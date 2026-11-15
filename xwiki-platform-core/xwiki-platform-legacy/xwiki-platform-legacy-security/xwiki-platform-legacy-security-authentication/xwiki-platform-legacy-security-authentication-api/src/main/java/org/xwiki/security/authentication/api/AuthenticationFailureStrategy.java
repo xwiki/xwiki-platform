@@ -37,9 +37,9 @@ import org.xwiki.component.annotation.Role;
  *
  * @version $Id$
  * @since 11.6RC1
- * @deprecated Since 13.1RC1, use {@link org.xwiki.security.authentication.AuthenticationFailureStrategy}.
+ * @deprecated Use {@link org.xwiki.security.authentication.AuthenticationFailureStrategy}.
  */
-@Deprecated
+@Deprecated(since = "13.1RC1")
 @Role
 public interface AuthenticationFailureStrategy
 {

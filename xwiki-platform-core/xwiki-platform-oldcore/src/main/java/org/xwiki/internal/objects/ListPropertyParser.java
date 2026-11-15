@@ -21,6 +21,9 @@ package org.xwiki.internal.objects;
 
 import java.util.List;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 
@@ -29,9 +32,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.classes.ListClass;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 /**
  * Component implementation for all list types.

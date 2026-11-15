@@ -244,7 +244,7 @@
   #else
     #set($itemDoc = $xwiki.getDocument($docName))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
-    ## Some constants which are usefull while processing each item.
+    ## Some constants which are useful while processing each item.
     #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
     #set ($deleteWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'DeleteWiki'))
     #set ($joinWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'JoinWiki'))
@@ -406,7 +406,7 @@
     #else
       #set($propClass = $class)
     #end
-    ## Retrieve the property type as it might be usefull
+    ## Retrieve the property type as it might be useful
     #set($propType = '')
     #if($propClass.getPropertyNames().contains($colname))
       #set($propType = "$!propClass.get($colname).type")

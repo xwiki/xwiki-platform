@@ -90,7 +90,7 @@ public class AsyncRendererExecutorResponse
         StringBuilder builder = new StringBuilder();
 
         for (String element : id) {
-            if (builder.length() > 0) {
+            if (!builder.isEmpty()) {
                 builder.append('/');
             }
 

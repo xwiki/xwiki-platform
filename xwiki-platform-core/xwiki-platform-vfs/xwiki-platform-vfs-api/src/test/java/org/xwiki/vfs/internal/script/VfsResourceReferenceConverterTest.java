@@ -48,7 +48,7 @@ class VfsResourceReferenceConverterTest
     }
 
     @Test
-    void convertWithString() throws Exception
+    void convertWithString()
     {
         String value = "attach:Toto.WebHome@testvfs.zip///test.doc";
         VfsResourceReference expectedReference = new VfsResourceReference(URI.create(value));
@@ -56,7 +56,7 @@ class VfsResourceReferenceConverterTest
     }
 
     @Test
-    void convertWithSpecialString() throws Exception
+    void convertWithSpecialString()
     {
         String value = "attach:Toto.WebHome@testvfs.zip///logo xwiki.png";
         VfsResourceReference expectedReference =

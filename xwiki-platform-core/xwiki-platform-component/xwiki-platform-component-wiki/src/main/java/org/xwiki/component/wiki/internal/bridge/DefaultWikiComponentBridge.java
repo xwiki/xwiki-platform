@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -163,8 +164,9 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
                         Class< ? > implemented = Class.forName(iface.getStringValue(INTERFACE_NAME_FIELD));
                         interfaces.add(implemented);
                     } catch (Exception e) {
-                        this.logger.warn("Interface [{}] not found, declared for wiki component [{}]",
-                            iface.getStringValue(INTERFACE_NAME_FIELD), componentDocument.getDocumentReference());
+                        this.logger.warn("Interface [{}] not found, declared for wiki component [{}]. Root cause "
+                            + "is [{}]", iface.getStringValue(INTERFACE_NAME_FIELD),
+                            componentDocument.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
             }
@@ -187,8 +189,9 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
                     cd.setRoleHint(dependency.getStringValue(COMPONENT_ROLE_HINT_FIELD));
                     dependencies.put(dependency.getStringValue(DEPENDENCY_BINDING_NAME_FIELD), cd);
                 } catch (Exception e) {
-                    this.logger.warn("Interface [{}] not found, declared as dependency for wiki component [{}]",
-                        dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD), componentDocument.getDocumentReference());
+                    this.logger.warn("Interface [{}] not found, declared as dependency for wiki component [{}]. Root "
+                        + "cause is [{}]", dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD),
+                        componentDocument.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }

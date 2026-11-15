@@ -19,11 +19,12 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.web.Utils;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
 import com.xpn.xwiki.plugin.scheduler.AbstractJob;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * This job deletes all the events older than a configured number of days in the activitystream datastore.

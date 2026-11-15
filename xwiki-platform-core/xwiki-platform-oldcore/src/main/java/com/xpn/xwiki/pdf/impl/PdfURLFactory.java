@@ -49,6 +49,24 @@ public class PdfURLFactory extends FileSystemURLFactory
      */
     private XWikiServletURLFactory servletURLFactory = new XWikiServletURLFactory();
 
+    /**
+     * PdfURLFactory constructor.
+     */
+    public PdfURLFactory()
+    {
+    }
+
+    /**
+     * @param checkAccess true if the access to linked resources should be verified against the context user
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public PdfURLFactory(boolean checkAccess)
+    {
+        super(checkAccess);
+    }
+
     @Override
     public void init(XWikiContext context)
     {
@@ -119,12 +137,8 @@ public class PdfURLFactory extends FileSystemURLFactory
     {
         // Save Entity Reference pointed to by this URL in the Context so that it can be used at export time in the
         // PDFResourceResolver code.
-        Map<String, AttachmentReference> attachmentMap =
-            (Map<String, AttachmentReference>) context.get(PDF_EXPORT_CONTEXT_KEY);
-        if (attachmentMap == null) {
-            attachmentMap = new HashMap<>();
-            context.put(PDF_EXPORT_CONTEXT_KEY, attachmentMap);
-        }
+        Map<String, AttachmentReference> attachmentMap = (Map<String, AttachmentReference>) context
+            .computeIfAbsent(PDF_EXPORT_CONTEXT_KEY, key -> new HashMap<String, AttachmentReference>());
 
         attachmentMap.put(url.toString(), new AttachmentReference(fileName,
             new DocumentReference(wiki, this.legacySpaceResolver.resolve(spaces), page)));

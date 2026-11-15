@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.util.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -80,7 +80,11 @@ public final class DockerTestUtils
 
     private static final Pattern REPETITION_PATTERN = Pattern.compile("\\[test-template-invocation:#(.*)\\]");
 
-    private static final long DAY = 1000L * 60L * 60L * 24L;
+    /**
+     * How often to pull the images that we don't build ourselves, in milliseconds (once a day, to avoid the pull rate
+     * limit of dockerhub).
+     */
+    static final long PULL_INTERVAL = 1000L * 60L * 60L * 24L;
 
     private static List<String> pulledImages = new ArrayList<>();
 
@@ -153,8 +157,8 @@ public final class DockerTestUtils
         // Get the latest image in case the tag has been updated on dockerhub.
         String dockerImageName = container.getDockerImageName();
 
-        // TODO: Force pulling the selenium FF and Chrome docker images.
-        // Remove once https://github.com/testcontainers/testcontainers-java/issues/4608 is fixed
+        // Pull the selenium FF and Chrome docker images at most once a day, since the pull policy set below doesn't
+        // apply to them. Remove once https://github.com/testcontainers/testcontainers-java/issues/4608 is fixed
         BrowserTestUtils.pullBrowserImages(container, testConfiguration);
 
         // Don't pull if:
@@ -165,7 +169,7 @@ public final class DockerTestUtils
         if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)
             && !(container instanceof XWikiLocalGenericContainer)) {
             // Pull images once every day (to avoid the 200 pull rate limit of dockerhub when authenticated).
-            container.withImagePullPolicy(new DurationImagePullPolicy(DAY));
+            container.withImagePullPolicy(new DurationImagePullPolicy(PULL_INTERVAL));
             pulledImages.add(dockerImageName);
         }
 
@@ -238,7 +242,12 @@ public final class DockerTestUtils
      */
     public static File getScreenshotsDirectory(TestConfiguration testConfiguration)
     {
-        File directory = new File(String.format("%s/screenshots", testConfiguration.getOutputDirectory()));
+        // Save screenshots and videos directly under the Maven build directory (and not under the
+        // configuration-specific output directory returned by getOutputDirectory()) so that they always end up in
+        // "<maven.build.dir>/screenshots". This keeps a stable, predictable location for the CI pipeline that attaches
+        // them to failing tests. The configuration name is still part of the file name (see getResultFileLocation()) so
+        // that artifacts stay unique when Jenkins flattens them during archiving.
+        File directory = new File(String.format("%s/screenshots", testConfiguration.getMavenBuildDirectory()));
         directory.mkdirs();
         return directory;
     }
@@ -279,8 +288,8 @@ public final class DockerTestUtils
         // Note: There's currently a limitation in Jenkins when archiving artifacts: they are copied without caring
         // about their locations. And since we run the same test several times but with different configurations,
         // the test name is not enough to uniquely point to a given test in a given configuration. Thus we also
-        // need to save the configuration name, even though the directory in which we're saving the screenshot
-        // is already named after the executing configuration name.
+        // need to prefix the file name with the configuration name so that artifacts stay unique across
+        // configurations once Jenkins has flattened them.
         File newDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
         // Tests could be repeated and if they are we need to compute a file name that takes into account the repetition
         // There seems to be no easy way to get them right now, see https://github.com/junit-team/junit5/issues/1884
@@ -350,13 +359,22 @@ public final class DockerTestUtils
     }
 
     /**
+     * Each top level test class has its own store, shared with its nested test classes and its test methods. This
+     * allows several top level test classes to be executed in the same JVM, each with its own XWiki instances,
+     * browser, etc.
+     *
      * @param context the context where to find the store
-     * @return the store
+     * @return the store of the top level test class of the passed context (or the store of the root context when the
+     *     passed context is the root context)
      * @since 14.5
      */
     public static ExtensionContext.Store getStore(ExtensionContext context)
     {
-        return context.getRoot().getStore(NAMESPACE);
+        ExtensionContext topLevelContext = context;
+        while (topLevelContext.getParent().flatMap(ExtensionContext::getParent).isPresent()) {
+            topLevelContext = topLevelContext.getParent().get();
+        }
+        return topLevelContext.getStore(NAMESPACE);
     }
 
     /**

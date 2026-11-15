@@ -25,8 +25,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.url.URLNormalizer;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 
 /**
  * Normalizes the passed Relative URL into an absolute {@link java.net.URL}, adding the Server and port portions. It is

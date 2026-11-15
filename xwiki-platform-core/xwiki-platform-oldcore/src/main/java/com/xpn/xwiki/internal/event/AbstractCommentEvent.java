@@ -47,7 +47,7 @@ public abstract class AbstractCommentEvent extends AbstractDocumentEvent
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other comment event (add, update, delete).
      */
-    public AbstractCommentEvent()
+    protected AbstractCommentEvent()
     {
         // Nothing to do.
     }
@@ -59,7 +59,7 @@ public abstract class AbstractCommentEvent extends AbstractDocumentEvent
      * @param documentName the name of the updated document to match
      * @param identifier the identifier of the comment added/updated/deleted
      */
-    public AbstractCommentEvent(String documentName, String identifier)
+    protected AbstractCommentEvent(String documentName, String identifier)
     {
         // TODO: depreciate this constructor and add a constructor taking a document reference instead
         super(new FixedNameEventFilter(documentName));
@@ -71,7 +71,7 @@ public abstract class AbstractCommentEvent extends AbstractDocumentEvent
      *
      * @param eventFilter the filter to use for matching events
      */
-    public AbstractCommentEvent(EventFilter eventFilter)
+    protected AbstractCommentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
     }

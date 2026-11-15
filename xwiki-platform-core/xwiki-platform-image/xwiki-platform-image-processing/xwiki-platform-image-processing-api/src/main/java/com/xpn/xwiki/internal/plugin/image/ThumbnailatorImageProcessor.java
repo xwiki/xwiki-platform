@@ -68,8 +68,8 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
     @Override
     public void writeImage(RenderedImage image, String mimeType, float quality, OutputStream out) throws IOException
     {
-        if (image instanceof BufferedImage) {
-            Thumbnails.of((BufferedImage) image).scale(1).outputFormat(getFormatNameForMimeType(mimeType))
+        if (image instanceof BufferedImage bufferedImage) {
+            Thumbnails.of(bufferedImage).scale(1).outputFormat(getFormatNameForMimeType(mimeType))
                 .outputQuality(quality).toOutputStream(out);
         } else {
             super.writeImage(image, mimeType, quality, out);
@@ -79,9 +79,9 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
     @Override
     public RenderedImage scaleImage(Image image, int width, int height)
     {
-        if (image instanceof BufferedImage) {
+        if (image instanceof BufferedImage bufferedImage) {
             try {
-                return Thumbnails.of((BufferedImage) image).forceSize(width, height)
+                return Thumbnails.of(bufferedImage).forceSize(width, height)
                     .imageType(getBestImageTypeFor(image)).asBufferedImage();
             } catch (IOException e) {
                 // If the scaling fails with Thumbnailator, we fall back to the default image processor.

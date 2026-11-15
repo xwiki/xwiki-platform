@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -34,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections.EnumerationUtils;
+import org.xwiki.classloader.internal.ClassLoaderUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
@@ -80,9 +80,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
         DefaultLocalizedTranslationBundle localeBundle = new DefaultLocalizedTranslationBundle(this, locale);
 
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
-                String key = (String) entry.getKey();
-                String message = (String) entry.getValue();
+            if (entry.getKey() instanceof String key && entry.getValue() instanceof String message) {
 
                 TranslationMessage translationMessage = this.parser.parse(message);
 
@@ -108,7 +106,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
 
         Enumeration<URL> urls;
         try {
-            urls = getClass().getClassLoader().getResources(resourceName);
+            urls = ClassLoaderUtils.getResources(getClass().getClassLoader(), resourceName);
         } catch (IOException e) {
             this.logger.error("Failed to get resource URLs from class loader for name [{}]", resourceName, e);
 
@@ -125,9 +123,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
 
         // Load resources in reverse order to give priority to first found resources (follow ClassLoader#getResource
         // behavior)
-        for (ListIterator<URL> it = urlList.listIterator(urlList.size()); it.hasPrevious();) {
-            URL url = it.previous();
-
+        for (URL url : urlList.reversed()) {
             try {
                 InputStream componentListStream = url.openStream();
 

@@ -230,7 +230,8 @@ class DocumentRequiredRightsUpdaterTest
         requiredRights.getRights().add(right);
 
         Document document = mock();
-        when(document.getDocumentReference()).thenReturn(mock());
+        DocumentReference documentReferenceMock = mock();
+        when(document.getDocumentReference()).thenReturn(documentReferenceMock);
 
         assertThrows(WebApplicationException.class, () -> this.updater.updateRequiredRights(requiredRights, document));
     }

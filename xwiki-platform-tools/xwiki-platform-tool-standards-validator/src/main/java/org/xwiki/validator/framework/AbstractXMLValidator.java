@@ -63,7 +63,7 @@ public abstract class AbstractXMLValidator implements Validator
     /**
      * Constructor.
      */
-    public AbstractXMLValidator()
+    protected AbstractXMLValidator()
     {
         this(true);
     }
@@ -73,7 +73,7 @@ public abstract class AbstractXMLValidator implements Validator
      * 
      * @param validateXML indicate if the XML input should be validated.
      */
-    public AbstractXMLValidator(boolean validateXML)
+    protected AbstractXMLValidator(boolean validateXML)
     {
         // Error messages are localized and we skipped some of the errors based on their messages
         // See RSSErrorHandler for example.

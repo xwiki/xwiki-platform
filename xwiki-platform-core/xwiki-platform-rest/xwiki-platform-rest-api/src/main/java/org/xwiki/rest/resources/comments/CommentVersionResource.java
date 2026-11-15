@@ -35,9 +35,29 @@ import org.xwiki.rest.model.jaxb.Comment;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/comments/{id}")
 public interface CommentVersionResource
 {
+    /**
+     * Returns a specific comment as it was in a given version of a page, identified by its comment id.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the comment, for example {@code WebHome}
+     * @param version the revision of the page to read the comment from, for example {@code 2.1}
+     * @param id the number identifying the comment to retrieve, that is its 0-based object number in that page version
+     *  (for example {@code 0} for the first comment); a {@code 404} response is returned when that version has no
+     *  comment with this number
+     * @param start has no effect when retrieving a single comment: the comment is always located by {@code id}
+     *  regardless of this value; defaults to {@code 0}
+     * @param number has no effect when retrieving a single comment: the comment is always located by {@code id}
+     *  regardless of this value; defaults to {@code -1}
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the comment
+     *  author's display name) in addition to the technical references, at some extra cost; defaults to {@code false}
+     * @return the matching comment as stored in the requested page version
+     * @throws XWikiRestException if the comment cannot be retrieved, for example the page or the requested version does
+     *  not exist or the current user is not allowed to view it
+     */
     // Needs a lot of parameters to bind path and query parameters
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @GET Comment getCommentVersion(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

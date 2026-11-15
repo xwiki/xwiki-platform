@@ -156,8 +156,9 @@ class MacroBlockDumperTest
     @Test
     void illegalArgumentException()
     {
+        WordBlock block = new WordBlock("macro");
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> this.dumper.dump(new WordBlock("macro")));
+            () -> this.dumper.dump(block));
         assertEquals("Unsupported block [org.xwiki.rendering.block.WordBlock].", exception.getMessage());
     }
 }

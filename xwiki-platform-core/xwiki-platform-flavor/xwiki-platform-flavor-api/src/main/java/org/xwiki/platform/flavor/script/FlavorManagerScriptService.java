@@ -104,9 +104,9 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
      * 
      * @param query query to execute
      * @return flavors matching the query
-     * @deprecated since 8.0RC1, use {@link #searchFlavors(FlavorQuery)} instead
+     * @deprecated use {@link #searchFlavors(FlavorQuery)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0RC1")
     public IterableResult<Extension> getFlavors(FlavorQuery query)
     {
         setError(null);

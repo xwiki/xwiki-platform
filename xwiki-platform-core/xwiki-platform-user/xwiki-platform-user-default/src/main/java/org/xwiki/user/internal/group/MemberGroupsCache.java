@@ -50,7 +50,7 @@ public class MemberGroupsCache extends AbstractGroupCache
 
         if (wikis != null) {
             for (String wiki : wikis) {
-                if (builder.length() > 0) {
+                if (!builder.isEmpty()) {
                     builder.append('_');
                 }
                 builder.append(wiki);

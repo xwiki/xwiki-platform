@@ -52,8 +52,8 @@ public class DefaultReferencePageAttachmentReferenceResolver implements PageAtta
     @Override
     public PageAttachmentReference resolve(EntityReference attachmentReferenceRepresentation, Object... parameters)
     {
-        if (attachmentReferenceRepresentation instanceof PageAttachmentReference) {
-            return (PageAttachmentReference) attachmentReferenceRepresentation;
+        if (attachmentReferenceRepresentation instanceof PageAttachmentReference pageAttachmentReference) {
+            return pageAttachmentReference;
         }
 
         return new PageAttachmentReference(this.entityReferenceResolver.resolve(attachmentReferenceRepresentation,

@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Ažuriraj tablicu
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Povucite i ispustite za promjenu poretka
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Obrišite
 platform.appwithinminutes.liveTableEditorAddColumnHint=Dodajte
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti? &lt;a href\=""&gt;Da&lt;/a&gt; / &lt;a href\=""&gt;Ne&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti?
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Ikona aplikacije. Možete odabrati ikonu iz odabirača ikona ili možete referencirati pridruženu sliku.
 
@@ -266,5 +266,9 @@ platform.appwithinminutes.wizardStep3Description=Prilagodite početnu stranicu a
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Ime aplikacije
 appWithinMinutes.classEditor.title=Struktura aplikacije {0}
-appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}</content>
+appWithinMinutes.templateProviderEditor.title=Zapisi aplikacije {0}
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti? &lt;a href\=""&gt;Da&lt;/a&gt; / &lt;a href\=""&gt;Ne&lt;/a&gt;</content>
 </xwikidoc>

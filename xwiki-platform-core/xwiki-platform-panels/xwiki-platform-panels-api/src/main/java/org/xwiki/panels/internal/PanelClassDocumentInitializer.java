@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
 /**
- * Update XWiki.UIExtensionClass document with all required informations.
+ * Update XWiki.UIExtensionClass document with all required information.
  *
  * @version $Id$
  * @since 9.8RC1

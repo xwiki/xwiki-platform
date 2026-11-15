@@ -144,7 +144,7 @@ public class DefaultWikiUserConfigurationHelper implements WikiUserConfiguration
             xwiki.saveDocument(document, "Changed configuration.", context);
         } catch (XWikiException e) {
             throw new WikiUserManagerException(
-                    String.format("Fail to save the confguration document for wiki [%s].", wikiId), e);
+                    String.format("Fail to save the configuration document for wiki [%s].", wikiId), e);
         }
     }
 }

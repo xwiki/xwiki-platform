@@ -56,7 +56,7 @@ class UIExtensionManagerTest
     private UIExtension notuix;
 
     @Test
-    void get() throws Exception
+    void get()
     {
         assertEquals(Arrays.asList(), this.manager.get("extensionpoint"));
 

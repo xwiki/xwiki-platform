@@ -51,6 +51,7 @@ export interface ModelReferenceParser {
 export type ModelReferenceParserOptions = {
     type?: EntityType;
     relative?: boolean;
+    base?: EntityReference;
 };
 
 // @beta (undocumented)
@@ -62,7 +63,7 @@ export interface ModelReferenceParserProvider {
 // @beta (undocumented)
 export interface ModelReferenceSerializer {
     // (undocumented)
-    serialize(reference?: EntityReference): string | undefined;
+    serialize(reference?: EntityReference, base?: EntityReference): string | undefined;
 }
 
 // @beta (undocumented)

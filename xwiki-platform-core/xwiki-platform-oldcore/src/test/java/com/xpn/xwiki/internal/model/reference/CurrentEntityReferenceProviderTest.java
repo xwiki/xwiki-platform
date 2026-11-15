@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ComponentList(DefaultEntityReferenceProvider.class)
-public class CurrentEntityReferenceProviderTest
+class CurrentEntityReferenceProviderTest
 {
     private static final String CONTEXT_WIKI = "contextwiki";
 
@@ -120,7 +120,7 @@ public class CurrentEntityReferenceProviderTest
     private CurrentEntityReferenceProvider provider;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.mockitoOldcore.getXWikiContext().setWikiId(null);
 
@@ -143,7 +143,7 @@ public class CurrentEntityReferenceProviderTest
     }
 
     @Test
-    public void getDefaultReferenceWithoutContextDocument()
+    void getDefaultReferenceWithoutContextDocument()
     {
         assertEquals(DEFAULT_WIKI_REFERENCE, this.provider.getDefaultReference(EntityType.WIKI));
 
@@ -163,7 +163,7 @@ public class CurrentEntityReferenceProviderTest
     }
 
     @Test
-    public void getDefaultReferenceWithContextDocument() throws IllegalAccessException
+    void getDefaultReferenceWithContextDocument() throws IllegalAccessException
     {
         this.mockitoOldcore.getXWikiContext().setWikiId(CONTEXT_WIKI);
 

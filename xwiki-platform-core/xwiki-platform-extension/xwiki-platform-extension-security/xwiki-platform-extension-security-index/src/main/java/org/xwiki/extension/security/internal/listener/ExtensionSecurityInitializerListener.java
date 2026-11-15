@@ -67,8 +67,8 @@ public class ExtensionSecurityInitializerListener extends AbstractLocalEventList
     {
         // Clustering related note: since the JobFinishedEvent is only sent by node, the scheduler will also be stared 
         // on a single node. Therefore 
-        if (event instanceof JobFinishedEvent
-            && Objects.equals(((JobFinishedEvent) event).getJobType(), JOB_TYPE))
+        if (event instanceof JobFinishedEvent jobFinishedEvent
+            && Objects.equals(jobFinishedEvent.getJobType(), JOB_TYPE))
         {
             this.schedulerProvider.get().start();
         }

@@ -101,7 +101,7 @@ public class WikiObjectComponentManagerEventListenerProxy
                 wikiObjectsList.add(componentBuilder.getClassReference());
             }
         } catch (ComponentLookupException e) {
-            logger.warn("Unable to collect a list of wiki objects components: %s", e);
+            logger.warn("Unable to collect a list of wiki objects components", e);
         }
 
         return wikiObjectsList;
@@ -144,8 +144,8 @@ public class WikiObjectComponentManagerEventListenerProxy
                     }
                 }
             } catch (Exception e) {
-                logger.warn(String.format("Unable to register the components for [%s] XObjects: %s", xObjectClass,
-                    ExceptionUtils.getRootCauseMessage(e)));
+                logger.warn("Unable to register the components for [{}] XObjects: [{}]", xObjectClass,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -173,16 +173,16 @@ public class WikiObjectComponentManagerEventListenerProxy
              * the current event and build the components from it.
              */
             List<WikiComponent> wikiComponents;
-            if (componentBuilder instanceof WikiBaseObjectComponentBuilder) {
-                wikiComponents = ((WikiBaseObjectComponentBuilder) componentBuilder).buildComponents(baseObject);
+            if (componentBuilder instanceof WikiBaseObjectComponentBuilder objectComponentBuilder) {
+                wikiComponents = objectComponentBuilder.buildComponents(baseObject);
             } else {
                 wikiComponents = componentBuilder.buildComponents(objectReference);
             }
 
             this.wikiComponentManagerEventListenerHelper.registerComponentList(wikiComponents);
         } catch (WikiComponentException e) {
-            logger.warn(String.format("Unable to register the component associated to [%s]: %s", objectReference,
-                ExceptionUtils.getRootCauseMessage(e)));
+            logger.warn("Unable to register the component associated to [{}]: [{}]", objectReference,
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

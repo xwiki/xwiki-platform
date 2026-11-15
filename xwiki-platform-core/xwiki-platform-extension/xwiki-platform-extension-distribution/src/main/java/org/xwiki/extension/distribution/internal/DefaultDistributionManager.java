@@ -176,7 +176,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                     new ExtensionId(this.mainUIExtensionId.getId(), this.distributionExtension.getId().getVersion());
             }
 
-            // Subwikis defualt UI
+            // Subwikis default UI
             if (this.wikiUIExtensionId == null) {
                 String wikiUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
 
@@ -213,23 +213,18 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             request.setUserReference(xcontext.getUserReference());
             request.setInteractive(this.distributionConfiguration.isInteractiveDistributionWizardEnabledForMainWiki());
 
-            Thread distributionJobThread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    // Create a clean Execution Context
-                    ExecutionContext context = new ExecutionContext();
+            Thread distributionJobThread = new Thread(() -> {
+                // Create a clean Execution Context
+                ExecutionContext context = new ExecutionContext();
 
-                    try {
-                        executionContextManager.initialize(context);
-                    } catch (ExecutionContextException e) {
-                        throw new RuntimeException("Failed to initialize farm distribution job execution context", e);
-                    }
-
-                    farmDistributionJob.initialize(request);
-                    farmDistributionJob.run();
+                try {
+                    executionContextManager.initialize(context);
+                } catch (ExecutionContextException e) {
+                    throw new RuntimeException("Failed to initialize farm distribution job execution context", e);
                 }
+
+                farmDistributionJob.initialize(request);
+                farmDistributionJob.run();
             });
 
             distributionJobThread.setDaemon(true);
@@ -266,25 +261,20 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 DistributionJob wikiJob = this.componentManager.getInstance(Job.class, DefaultDistributionJob.HINT);
                 this.wikiDistributionJobs.put(wiki, wikiJob);
 
-                Thread distributionJobThread = new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        // Create a clean Execution Context
-                        ExecutionContext context = new ExecutionContext();
+                Thread distributionJobThread = new Thread(() -> {
+                    // Create a clean Execution Context
+                    ExecutionContext context = new ExecutionContext();
 
-                        try {
-                            executionContextManager.initialize(context);
-                        } catch (ExecutionContextException e) {
-                            throw new RuntimeException("Failed to initialize wiki distribution job execution context",
-                                e);
-                        }
-
-                        DistributionJob job = wikiDistributionJobs.get(request.getWiki());
-                        job.initialize(request);
-                        job.run();
+                    try {
+                        executionContextManager.initialize(context);
+                    } catch (ExecutionContextException e) {
+                        throw new RuntimeException("Failed to initialize wiki distribution job execution context",
+                            e);
                     }
+
+                    DistributionJob job = wikiDistributionJobs.get(request.getWiki());
+                    job.initialize(request);
+                    job.run();
                 });
 
                 distributionJobThread.setDaemon(true);
@@ -299,7 +289,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 return (DistributionJob) this.jobExecutor.execute(DefaultDistributionJob.HINT, request);
             }
         } catch (Exception e) {
-            this.logger.error("Failed to create distribution job for wiki [" + wiki + "]", e);
+            this.logger.error("Failed to create distribution job for wiki [{}]", wiki, e);
         }
 
         return null;
@@ -357,8 +347,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
         DistributionJobStatus farmJobStatus;
         if (jobStatus != null) {
-            if (jobStatus instanceof DistributionJobStatus) {
-                farmJobStatus = (DistributionJobStatus) jobStatus;
+            if (jobStatus instanceof DistributionJobStatus distributionJobStatus) {
+                farmJobStatus = distributionJobStatus;
             } else {
                 // RETRO-COMPATIBILITY: the status used to be a DistributionJobStatus
                 farmJobStatus = new DistributionJobStatus(jobStatus, this.observationManagerProvider.get(),

@@ -19,8 +19,6 @@
  */
 package org.xwiki.index.test.ui.docker;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +37,8 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Functional tests for the pinned pages feature.
@@ -83,10 +83,10 @@ class PinnedPagesIT
         PinnedPagesAdministrationSectionPage pinnedPagesAdminSection =
             PinnedPagesAdministrationSectionPage.gotoPage(levelTwo.getLastSpaceReference());
         SuggestInputElement pinnedPagesPicker = pinnedPagesAdminSection.getPinnedPagesPicker();
-        pinnedPagesPicker.sendKeys("Carol").waitForSuggestions().selectByIndex(0);
-        pinnedPagesPicker.clear().sendKeys("Bob").waitForSuggestions().selectByIndex(0);
-        pinnedPagesPicker.clear().sendKeys("Denis").waitForSuggestions().selectByIndex(0);
-        pinnedPagesPicker.clear().sendKeys("Alice").waitForSuggestions().selectByIndex(0);
+        pinnedPagesPicker.sendKeys("Carol").selectByIndex(0);
+        pinnedPagesPicker.clear().sendKeys("Bob").selectByIndex(0);
+        pinnedPagesPicker.clear().sendKeys("Denis").selectByIndex(0);
+        pinnedPagesPicker.clear().sendKeys("Alice").selectByIndex(0);
         // Close the suggestions dropdown because it may hide the save button.
         pinnedPagesPicker.sendKeys(Keys.ESCAPE);
         pinnedPagesAdminSection.clickSave();

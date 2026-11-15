@@ -52,7 +52,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       return document.evaluate(trigger.getAttribute('data-target-xpath'), trigger, null,
         XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     } catch (e) {
-      console && console.log(e);
+      console?.log(e);
       return null;
     }
   };

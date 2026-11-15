@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
  * @since 12.10
  */
 @ComponentTest
-public class PropertyTypeSupplierTest
+class PropertyTypeSupplierTest
 {
     @InjectMockComponents
     private PropertyTypeSupplier propertyTypeSupplier;

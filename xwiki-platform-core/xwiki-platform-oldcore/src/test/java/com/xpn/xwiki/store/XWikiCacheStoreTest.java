@@ -270,6 +270,78 @@ class XWikiCacheStoreTest
     }
 
     @Test
+    void documentSavedDuringExistsCheckIsNotCachedAsNotExisting() throws Exception
+    {
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+
+        XWikiStoreInterface hibernateStore = this.oldcore.getMockStore();
+        XWikiCacheStore store = new XWikiCacheStore(hibernateStore, this.oldcore.getXWikiContext());
+
+        CompletableFuture<XWikiDocument> arrivedInExistsFuture = new CompletableFuture<>();
+        CompletableFuture<Boolean> continueExistsFuture = new CompletableFuture<>();
+
+        when(hibernateStore.exists(any(), any())).then(invocation -> {
+            arrivedInExistsFuture.complete(document);
+            return continueExistsFuture.get(10, TimeUnit.SECONDS);
+        });
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<Boolean> existsFuture =
+                executorService.submit(() -> store.exists(document, this.oldcore.getXWikiContext()));
+
+            assertSame(document, arrivedInExistsFuture.get(10, TimeUnit.SECONDS));
+
+            // Save the document while the existence check is querying the database.
+            XWikiDocument savedDocument = document.clone();
+            savedDocument.setTitle("Saved");
+            store.saveXWikiDoc(savedDocument, this.oldcore.getXWikiContext());
+
+            // Let the check complete with the now stale information that the document doesn't exist.
+            continueExistsFuture.complete(false);
+
+            assertFalse(existsFuture.get(10, TimeUnit.SECONDS));
+
+            // The stale result must not have been stored in the cache.
+            String key = "4:wiki5:space4:page0:";
+            assertNull(this.existCache.get(key));
+
+            // Therefore, the next check needs to ask the store again.
+            when(hibernateStore.exists(any(), any())).thenReturn(true);
+
+            assertTrue(store.exists(document, this.oldcore.getXWikiContext()));
+            assertTrue(this.existCache.get(key));
+            verify(hibernateStore, times(2)).exists(document, this.oldcore.getXWikiContext());
+
+            // Now the result is cached, so no further call to the store.
+            assertTrue(store.exists(document, this.oldcore.getXWikiContext()));
+            verify(hibernateStore, times(2)).exists(document, this.oldcore.getXWikiContext());
+        } finally {
+            executorService.shutdown();
+        }
+        assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void existsExceptionIsPropagated() throws Exception
+    {
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+
+        XWikiStoreInterface hibernateStore = this.oldcore.getMockStore();
+        XWikiCacheStore store = new XWikiCacheStore(hibernateStore, this.oldcore.getXWikiContext());
+
+        XWikiException exception = new XWikiException();
+        when(hibernateStore.exists(any(), any())).thenThrow(exception);
+
+        XWikiException actualException =
+            assertThrows(XWikiException.class, () -> store.exists(document, this.oldcore.getXWikiContext()));
+        assertSame(exception, actualException);
+    }
+
+    @Test
     void loadExceptionIsPropagated() throws Exception
     {
         this.oldcore.getXWikiContext().setWikiId("wiki");

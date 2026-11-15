@@ -96,6 +96,7 @@ public class NotificationCustomFiltersQueryHelper
                     this.handleEventTypeFilter(queryFilter, queryWhereClauses, result);
 
                 default -> {
+                    // The other properties don't contribute to the where clause.
                 }
             }
         }

@@ -26,6 +26,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
@@ -34,6 +35,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -79,6 +82,9 @@ class DefaultSheetManagerTest
      * The reference of the document whose sheets are retrieved.
      */
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference(WIKI_NAME, "Space", "Page");
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private DefaultSheetManager sheetManager;
@@ -207,5 +213,61 @@ class DefaultSheetManagerTest
             .thenReturn(currentAction);
 
         assertEquals(List.of(classSheetReference), this.sheetManager.getSheets(this.document, currentAction));
+    }
+
+    /**
+     * Tests that the sheets bound to the document are returned when they match the current action.
+     */
+    @Test
+    void documentSheets() throws Exception
+    {
+        DocumentReference documentSheetReference = new DocumentReference(WIKI_NAME, "ABC", "DocumentSheet");
+        when(this.documentSheetBinder.getSheets(this.document))
+            .thenReturn(Collections.singletonList(documentSheetReference));
+        when(this.documentAccessBridge.exists(documentSheetReference)).thenReturn(true);
+        when(this.documentAccessBridge.getProperty(documentSheetReference, SHEET_CLASS_REFERENCE, ACTION_PROPERTY))
+            .thenReturn("view");
+
+        assertEquals(List.of(documentSheetReference), this.sheetManager.getSheets(this.document, "view"));
+    }
+
+    /**
+     * Tests that a class whose document can't be loaded contributes no sheet.
+     */
+    @Test
+    void classSheetsWhenClassDocumentCannotBeLoaded() throws Exception
+    {
+        DocumentReference classReference = new DocumentReference(WIKI_NAME, "Blog", "BlogPostClass");
+        when(this.documentSheetBinder.getSheets(this.document)).thenReturn(Collections.emptyList());
+        when(this.modelBridge.getXObjectClassReferences(this.document))
+            .thenReturn(Collections.singleton(classReference));
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(classReference))
+            .thenThrow(new Exception("Database is down"));
+        when(this.entityReferenceSerializer.serialize(classReference)).thenReturn("wiki:Blog.BlogPostClass");
+
+        assertTrue(this.sheetManager.getSheets(this.document, "view").isEmpty());
+
+        assertEquals("Failed to get class sheets for [wiki:Blog.BlogPostClass]. "
+            + "Reason: [Exception: Database is down]", this.logCapture.getMessage(0));
+    }
+
+    /**
+     * Tests that a sheet whose existence can't be checked is not matched.
+     */
+    @Test
+    void sheetIsNotMatchedWhenItsExistenceCannotBeChecked() throws Exception
+    {
+        this.context.setProperty(SHEET_PROPERTY, "Code.Sheet");
+        DocumentReference sheetReference = new DocumentReference(WIKI_NAME, "Code", "Sheet");
+        when(this.documentReferenceResolver.resolve("Code.Sheet", DOCUMENT_REFERENCE)).thenReturn(sheetReference);
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.documentAccessBridge.exists(sheetReference)).thenThrow(new Exception("Database is down"));
+        when(this.documentSheetBinder.getSheets(this.document)).thenReturn(Collections.emptyList());
+        when(this.modelBridge.getXObjectClassReferences(this.document)).thenReturn(Collections.emptySet());
+
+        assertTrue(this.sheetManager.getSheets(this.document, "view").isEmpty());
+
+        assertEquals("Failed to check for the existence of the sheet with reference [wiki:Code.Sheet]",
+            this.logCapture.getMessage(0));
     }
 }

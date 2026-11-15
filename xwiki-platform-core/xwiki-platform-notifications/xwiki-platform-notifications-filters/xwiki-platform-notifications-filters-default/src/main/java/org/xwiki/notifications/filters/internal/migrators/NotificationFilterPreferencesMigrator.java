@@ -21,7 +21,7 @@ package org.xwiki.notifications.filters.internal.migrators;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +83,6 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
     private static final String FIELD_FILTER_NAME = "filterName";
 
     private static final String FIELD_IS_ENABLED = "isEnabled";
-
-    private static final String FIELD_IS_ACTIVE = "isActive";
 
     private static final String FIELD_APPLICATIONS = "applications";
 
@@ -251,7 +249,8 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
     private Map<NotificationFilterProperty, List<String>> createNotificationFilterPropertiesMap(BaseObject obj)
     {
-        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties = new HashMap<>();
+        Map<NotificationFilterProperty, List<String>> filterPreferenceProperties =
+            new EnumMap<>(NotificationFilterProperty.class);
 
         filterPreferenceProperties.put(NotificationFilterProperty.APPLICATION,
             obj.getListValue(FIELD_APPLICATIONS));

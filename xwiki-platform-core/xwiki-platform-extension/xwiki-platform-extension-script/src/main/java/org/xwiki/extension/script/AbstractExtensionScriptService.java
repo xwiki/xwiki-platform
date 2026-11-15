@@ -176,7 +176,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      */
     public void contextualize(AbstractRequest request)
     {
-        // Provide informations on what started the job
+        // Provide information on what started the job
         request.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
         request.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
     }
@@ -227,7 +227,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
 
     /**
      * Call the passed callable but try/catch and return null in case of exception (and update the last error). A safe
-     * verison of the result is returned.
+     * version of the result is returned.
      * 
      * @param <R> the result type of method {@code call}
      * @param callable a task that returns a result and may throw an exception

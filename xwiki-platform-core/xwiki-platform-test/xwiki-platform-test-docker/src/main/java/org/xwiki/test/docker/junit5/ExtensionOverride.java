@@ -29,7 +29,7 @@ package org.xwiki.test.docker.junit5;
 public @interface ExtensionOverride
 {
     /**
-     * @return the idenfier of the extension
+     * @return the identifier of the extension
      */
     String extensionId();
 

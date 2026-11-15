@@ -43,6 +43,9 @@ public class RenamePage extends ViewPage
     @FindBy(className = "location-picker")
     private WebElement documentPickerElement;
 
+    @FindBy(id = "targetTitle")
+    private WebElement targetTitle;
+
     private DocumentPicker documentPicker;
 
     public boolean isPreserveChildren()
@@ -109,5 +112,21 @@ public class RenamePage extends ViewPage
         if (isTerminal != isTerminal()) {
             this.terminalCheckbox.click();
         }
+    }
+
+    /**
+     * Sets the new title of the page.
+     *
+     * @param title the new page title
+     * @return the current page object
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public RenamePage setNewTitle(String title)
+    {
+        this.targetTitle.clear();
+        this.targetTitle.sendKeys(title);
+        return this;
     }
 }

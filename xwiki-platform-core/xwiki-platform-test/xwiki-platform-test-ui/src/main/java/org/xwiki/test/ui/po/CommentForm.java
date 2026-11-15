@@ -74,7 +74,7 @@ public class CommentForm extends BaseElement
             .filter(it -> !it.getAttribute("class").contains("ckeditor-textarea"))
             .toList();
 
-        if (textareas.size() == 0 || !textareas.get(0).isDisplayed()) {
+        if (textareas.isEmpty() || !textareas.get(0).isDisplayed()) {
             WebElement iframe = getContainer().findElement(By.tagName("iframe"));
             getDriver().switchTo().frame(iframe);
             action.accept(getDriver().findElement(By.tagName("body")));

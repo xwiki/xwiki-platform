@@ -42,7 +42,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Read only lazy loading document.
  * <p>
- * The following informations are taken into account:
+ * The following information is taken into account:
  * <ul>
  * <li>document reference: the absolute reference of the document</li>
  * <li>document language: if provided the proper language version of the document is loaded. If not the default one is
@@ -176,12 +176,6 @@ public class LazyXWikiDocument extends XWikiDocument
     public DocumentReference getContentAuthorReference()
     {
         return getDocument().getContentAuthorReference();
-    }
-
-    @Override
-    public DocumentReference getCreatorReference()
-    {
-        return super.getCreatorReference();
     }
 
     @Override

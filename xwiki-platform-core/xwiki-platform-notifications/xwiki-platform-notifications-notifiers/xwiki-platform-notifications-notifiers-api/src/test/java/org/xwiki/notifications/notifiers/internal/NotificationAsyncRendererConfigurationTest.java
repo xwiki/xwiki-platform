@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class NotificationAsyncRendererConfigurationTest
+class NotificationAsyncRendererConfigurationTest
 {
     @Test
-    public void constructor()
+    void constructor()
     {
         NotificationParameters parameters = new NotificationParameters();
         NotificationAsyncRendererConfiguration configuration =

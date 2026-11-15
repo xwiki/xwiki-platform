@@ -36,7 +36,7 @@
     <template #viewer>
       <div
         :class="['html-wrapper', isLoading ? 'disabled' : '']"
-        v-html="sanitizeHtml(value)"
+        v-html="sanitizeHtml(viewField ?? value)"
         ref="xObjectPropertyView"
       />
     </template>
@@ -52,8 +52,8 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import displayerMixin from "./displayerMixin.js";
 import displayerStatesMixin from "./displayerStatesMixin.js";
-import { XWiki } from "../../services/xwiki.js";
-import { edit } from "../displayerXObjectPropertyHelper.js";
+import { edit, view } from "../displayerXObjectPropertyHelper.js";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 
 export default {
   name: "displayer-xobject-property",
@@ -70,6 +70,10 @@ export default {
   data() {
     return {
       editField: undefined,
+      // The rendered content of a row that has no entry yet, which no query result can hold.
+      viewField: undefined,
+      // Counts the calls to updateViewField, so that only the last one changes what is displayed.
+      viewFieldRequest: 0,
     };
   },
 
@@ -79,7 +83,7 @@ export default {
      */
     applyEdit() {
       const documentName = this.logic.getEntryId(this.entry);
-      if (!documentName) {
+      if (!documentName && !this.entry._new) {
         new XWiki.widgets.Notification(
           this.$t(
             "livedata.displayer.xObjectProperty.missingDocumentName.errorMessage",
@@ -137,47 +141,167 @@ export default {
      * @returns a `Promise` with the content of the updated view
      */
     update(updateMethod) {
+      // A row that has no entry yet is displayed against the location it is created in.
+      // Without one there is no document to load the field from, nor to check the edit rights against.
+      if (this.entry._new && !this.entry._displayReference) {
+        throw new Error("Unknown location for the row that has no entry yet.");
+      }
       this.isLoading = true;
-      const documentName = this.logic.getEntryId(this.entry);
-      const className = this.getClassName();
-      const property = this.propertyId;
-      return updateMethod(documentName, className, property);
+      const { documentName, className, property, pendingValues } =
+        this.getFieldArguments();
+      return updateMethod(documentName, className, property, pendingValues);
+    },
+
+    /**
+     * @returns what the field of this cell is loaded from: an entry, or the row it is not yet
+     */
+    getFieldArguments() {
+      // A row that has no entry yet is displayed against the location it is created in, which
+      // stores none of its values, so they are sent along to be rendered.
+      const isDraft = !!this.entry._new;
+      return {
+        documentName: isDraft
+          ? this.entry._displayReference
+          : this.logic.getEntryId(this.entry),
+        className: this.getClassName(),
+        property: this.propertyId,
+        pendingValues: isDraft ? this.getPendingValues() : undefined,
+      };
+    },
+
+    /**
+     * @returns the values held on the row, which are the ones the wiki has no way to know about
+     */
+    getPendingValues() {
+      return Object.fromEntries(
+        Object.entries(this.entry).filter(
+          ([name]) => !name.startsWith("_") && !name.startsWith("doc."),
+        ),
+      );
+    },
+
+    /**
+     * Render the content of a cell of a row that has no entry yet. The query results only hold
+     * rendered content for the entries of the store, so there is none for such a row.
+     */
+    async updateViewField() {
+      // An earlier call that finishes later must not replace the content of this one.
+      const request = ++this.viewFieldRequest;
+      // Only a row that has no entry yet needs this: the query results already hold the rendered
+      // content of the entries. Without a location, there is no document to render the content against.
+      if (
+        !this.entry._new ||
+        !this.entry._displayReference ||
+        this.value === undefined ||
+        this.value === ""
+      ) {
+        this.viewField = undefined;
+        return;
+      }
+      const { documentName, className, property, pendingValues } =
+        this.getFieldArguments();
+      // When the rendering fails, the value held on the row is displayed as it is.
+      const viewField = await view(
+        documentName,
+        className,
+        property,
+        pendingValues,
+      ).catch(() => undefined);
+      if (request === this.viewFieldRequest) {
+        this.viewField = viewField;
+      }
     },
 
     /**
      * Update the content of the editor slot.
      */
-    updateEdit() {
-      this.update(edit)
-        // eslint-disable-next-line promise/always-return
-        .then((html) => {
-          this.isLoading = false;
+    async updateEdit() {
+      const editConfirmationPromise = loadById("xwiki-edit-confirmation");
 
-          this.editField = html;
+      // Loads the edit field. If the server requires an edit confirmation it returns it as JSON with a 423 status
+      // instead of the editor; in that case we display the confirmation modal and, if the user confirms, retry the
+      // request forcing the confirmation so that the editor is returned.
+      const loadEditField = async (extraParams) => {
+        try {
+          return await this.update(
+            (documentName, className, property, pendingValues) =>
+              edit(
+                documentName,
+                className,
+                property,
+                extraParams,
+                pendingValues,
+              ),
+          );
+        } catch (error) {
+          const editConfirmation = await editConfirmationPromise;
+          // Re-throws the error if it's not an edit confirmation (423) response.
+          const confirmation =
+            editConfirmation.parseConfirmationResponse(error);
+          await editConfirmation.showConfirmationModal(confirmation);
+          const xcontext = await loadById("xwiki-meta");
+          return loadEditField({ force: 1, force_token: xcontext.form_token });
+        }
+      };
 
-          // Wait for the rendering to be finished after editField is updated, to have access to  xObjectPropertyEdit
-          // and be able to send the trigger event.
-          // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
-          this.$nextTick().then(() => {
-            const $ = this.jQuery;
-            // eslint-disable-next-line promise/always-return
-            if (this.$refs.xObjectPropertyEdit) {
-              $(document).trigger("xwiki:dom:updated", {
-                elements: [this.$refs.xObjectPropertyEdit],
-              });
-              // Focuses on the first visible field of the loaded form.
-              $(this.$refs.xObjectPropertyEdit)
-                .find(":input")
-                .filter(":visible")
-                .focus();
-            }
-          });
-        })
-        .catch(() => {
-          // Stop the loader and switch to view mode.
-          this.isLoading = false;
-          this.isView = true;
+      try {
+        await this.applyEditField(await loadEditField());
+      } catch (error) {
+        this.handleEditFieldFailure(error, await editConfirmationPromise);
+      }
+    },
+
+    /**
+     * Display the loaded edit field in the editor slot and enhance it (DOM updated event, focus).
+     *
+     * @param html - the edit field HTML returned by the server
+     */
+    async applyEditField(html) {
+      this.isLoading = false;
+      this.editField = html;
+
+      // Wait for the rendering to be finished after editField is updated, to have access to xObjectPropertyEdit
+      // and be able to send the trigger event.
+      await this.$nextTick();
+      const $ = this.jQuery;
+      if (this.$refs.xObjectPropertyEdit) {
+        $(document).trigger("xwiki:dom:updated", {
+          elements: [this.$refs.xObjectPropertyEdit],
         });
+        // Focuses on the first visible field of the loaded form.
+        $(this.$refs.xObjectPropertyEdit)
+          .find(":input")
+          .filter(":visible")
+          .first()
+          .focus();
+      }
+    },
+
+    /**
+     * Handle a failure to load the edit field by switching back to view mode and notifying the user, unless the user
+     * simply dismissed the edit confirmation.
+     *
+     * @param error - the error that occurred while loading the edit field
+     * @param editConfirmation - the edit confirmation module used to detect a dismissal
+     */
+    handleEditFieldFailure(error, editConfirmation) {
+      // Notify the edit bus that the edition is canceled. Switching to edit mode (BaseDisplayer.setEdit) started the
+      // edition on the bus, so it must be canceled here. Otherwise the Live Data keeps considering this property as
+      // being edited, which disables the edit popover of every cell until the page is reloaded.
+      this.logic.getEditBus().cancel(this.entry, this.propertyId);
+      // Stop the loader and switch to view mode.
+      this.isLoading = false;
+      this.isView = true;
+      // Notify the user of genuine failures, but not when they simply dismissed the edit confirmation.
+      if (!editConfirmation.isConfirmationDismissed(error)) {
+        new XWiki.widgets.Notification(
+          this.$t(
+            "livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+            ["edit"],
+          ),
+          "error",
+        );
+      }
     },
   },
 
@@ -187,6 +311,14 @@ export default {
       if (!isView) {
         this.updateEdit();
       }
+    },
+    // The content of a row that has no entry yet is rendered from the values it holds, so it is
+    // refreshed whenever they change, and dropped once the entry brings its own.
+    value: {
+      immediate: true,
+      handler: function () {
+        this.updateViewField();
+      },
     },
   },
 };

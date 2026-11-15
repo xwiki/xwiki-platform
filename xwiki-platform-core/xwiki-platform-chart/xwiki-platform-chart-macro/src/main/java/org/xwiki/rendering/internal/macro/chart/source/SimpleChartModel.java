@@ -49,6 +49,7 @@ public class SimpleChartModel implements ChartModel
      */
     public SimpleChartModel()
     {
+        // Nothing to do, the dataset and the axes are set afterwards.
     }
 
     /**

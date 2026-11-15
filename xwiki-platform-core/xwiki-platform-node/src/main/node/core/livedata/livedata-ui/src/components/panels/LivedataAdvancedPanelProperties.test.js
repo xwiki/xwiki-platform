@@ -19,6 +19,7 @@
  */
 import LivedataAdvancedPanelProperties from "./LivedataAdvancedPanelProperties.vue";
 import { mount } from "@vue/test-utils";
+import { assertAxe } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
 import { nextTick } from "vue";
@@ -33,6 +34,7 @@ function initWrapper({ provide } = {}) {
   global.XWiki = { contextPath: "http://localhost/" };
   let propertyIsVisible = true;
   return mount(LivedataAdvancedPanelProperties, {
+    attachTo: document.body,
     props: {
       panel: {
         id: "propertiesPanel",
@@ -97,6 +99,7 @@ describe("LivedataAdvancedPanelProperties.vue", () => {
     expect(wrapper.find(".panel-heading .title").text()).toBe(
       "list-bullets Properties",
     );
+    await assertAxe(wrapper);
   });
 
   it("Displays the properties", async () => {
@@ -104,6 +107,7 @@ describe("LivedataAdvancedPanelProperties.vue", () => {
     expect(wrapper.find(".property .property-name").text()).toBe(
       "Property Name",
     );
+    await assertAxe(wrapper);
   });
 
   it("Toggles the visibility on click", async () => {
@@ -113,5 +117,6 @@ describe("LivedataAdvancedPanelProperties.vue", () => {
     expect(wrapper.vm.logic.isPropertyVisible("id")).toBeFalsy();
     await nextTick();
     expect(wrapper.find("input[type = checkbox]").element.checked).toBe(false);
+    await assertAxe(wrapper);
   });
 });

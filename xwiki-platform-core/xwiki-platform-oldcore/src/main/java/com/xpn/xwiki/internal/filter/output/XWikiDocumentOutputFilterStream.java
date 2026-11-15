@@ -365,7 +365,7 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
         getBaseClassOutputFilterStream().setEntity(this.entity.getXClass());
     }
 
-    private void end(FilterEventParameters parameters)
+    private void end()
     {
         // Set content
         if (this.currentWikiPrinter != null) {
@@ -401,7 +401,7 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
     @Override
     public void endWikiDocument(String name, FilterEventParameters parameters) throws FilterException
     {
-        end(parameters);
+        end();
 
         super.endWikiDocument(name, parameters);
 
@@ -425,7 +425,7 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
     @Override
     public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
     {
-        end(parameters);
+        end();
 
         // Reset
         this.currentLocale = null;
@@ -445,7 +445,7 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
     @Override
     public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
     {
-        end(parameters);
+        end();
 
         // Remember some metadata for next entity
         this.previousCreationAuthor = this.entity.getAuthors().getCreator();

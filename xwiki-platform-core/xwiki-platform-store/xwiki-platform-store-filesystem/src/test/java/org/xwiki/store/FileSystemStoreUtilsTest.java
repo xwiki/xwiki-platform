@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class FileSystemStoreUtilsTest
+class FileSystemStoreUtilsTest
 {
     private void assertEncode(String encoded, String decoded, boolean caseInsensitive)
     {
@@ -40,7 +40,7 @@ public class FileSystemStoreUtilsTest
     // Tests
 
     @Test
-    public void encode()
+    void encode()
     {
         assertEncode("", "", true);
         assertEncode("", "", false);

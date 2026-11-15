@@ -97,8 +97,8 @@ public class DataMojo extends AbstractOldCoreMojo
             // Manually starts the consumer thread as it is not automatically started in the packaging setup.
             // This is also convenient as we can be sure that the tasks are all queued before being consumed.
             TaskManager taskManager = componentManager.getInstance(TaskManager.class);
-            if (taskManager instanceof DefaultTasksManager) {
-                ((DefaultTasksManager) taskManager).startThread();
+            if (taskManager instanceof DefaultTasksManager defaultTasksManager) {
+                defaultTasksManager.startThread();
             }
 
             getLog().info(

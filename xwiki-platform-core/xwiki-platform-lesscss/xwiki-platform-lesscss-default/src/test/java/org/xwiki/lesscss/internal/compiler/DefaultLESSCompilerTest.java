@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
@@ -48,6 +49,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -125,14 +128,15 @@ class DefaultLESSCompilerTest
             this.defaultLESSCompiler.compile(this.lessResourceReference, false, false, false));
 
         // Verify
-        verify(this.cache, never()).set(this.lessResourceReference, this.skinReference, this.colorThemeReference,
-            "cache output");
+        verify(this.cache, never()).set(any(LESSResourceReference.class), any(SkinReference.class),
+            any(ColorThemeReference.class), any(), anyLong());
     }
 
     @Test
     void compileWhenNotInCache() throws Exception
     {
         // Mocks
+        when(this.cache.getVersion()).thenReturn(3L);
         when(this.cachedLESSCompiler.compute(this.lessResourceReference, false, false, true, "skin"))
             .thenReturn("compiled output");
 
@@ -140,9 +144,13 @@ class DefaultLESSCompilerTest
         assertEquals("compiled output",
             this.defaultLESSCompiler.compile(this.lessResourceReference, false, false, false));
 
-        // Verify
-        verify(this.cache).set(this.lessResourceReference, this.skinReference, this.colorThemeReference,
-            "compiled output");
+        // Verify that the result is cached with the version read before the compilation, so that it is not cached
+        // when the cache is cleared during the compilation.
+        InOrder inOrder = inOrder(this.cache, this.cachedLESSCompiler);
+        inOrder.verify(this.cache).getVersion();
+        inOrder.verify(this.cachedLESSCompiler).compute(this.lessResourceReference, false, false, true, "skin");
+        inOrder.verify(this.cache).set(this.lessResourceReference, this.skinReference, this.colorThemeReference,
+            "compiled output", 3L);
     }
 
     @Test
@@ -158,7 +166,7 @@ class DefaultLESSCompilerTest
 
         // Verify
         verify(this.cache).set(any(LESSResourceReference.class), any(SkinReference.class),
-            any(ColorThemeReference.class), any());
+            any(ColorThemeReference.class), any(), anyLong());
         verify(this.cache, never()).get(this.lessResourceReference, this.skinReference, this.colorThemeReference);
     }
 
@@ -196,7 +204,7 @@ class DefaultLESSCompilerTest
 
         // Verify we don't put anything in the cache
         verify(this.cache, never()).set(any(LESSResourceReference.class), any(SkinReference.class),
-            any(ColorThemeReference.class), any());
+            any(ColorThemeReference.class), any(), anyLong());
     }
 
     @Test
@@ -213,7 +221,7 @@ class DefaultLESSCompilerTest
         // Asserts
         assertTrue(Strings.CS.startsWith(result, "/* org.xwiki.lesscss.compiler.LESSCompilerException: an exception"));
         assertTrue(Strings.CS.endsWith(result, "*/"));
-        verify(this.cache).set(this.lessResourceReference, this.skinReference, this.colorThemeReference, result);
+        verify(this.cache).set(this.lessResourceReference, this.skinReference, this.colorThemeReference, result, 0L);
         verify(this.logger).error("Error during the compilation of the resource [{}].", this.lessResourceReference,
             expectedException);
     }

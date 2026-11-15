@@ -101,8 +101,15 @@
   #if("$!{filterError}" != '')
     #set ($discard = $filterMap.put('errorSummary', "%${filterError.trim()}%"))
   #end
-  #set ($totalrows = $services.mail.storage.count($filterMap))
-  #set ($results = $services.mail.storage.load($filterMap, $offset, $limit, $order, $orderDirection))
+  ## Only the administrators of the wiki can see the mail statuses: the mail storage script service only checks the
+  ## rights of the author of this page.
+  #if ($services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
+    #set ($totalrows = $services.mail.storage.count($filterMap))
+    #set ($results = $services.mail.storage.load($filterMap, $offset, $limit, $order, $orderDirection))
+  #else
+    #set ($totalrows = 0)
+    #set ($results = [])
+  #end
   ## If there's an error then log it since we cannot return an error to the Livetable
   #if ($services.mail.sender.lastError)
     $services.logging.getLogger('Mail Status Livetable').error('Failed to load mails from store',
@@ -137,6 +144,7 @@
       #set($discard  = $row.put('wiki', $!item.wiki))
     #end
     #set ($actionHTML = "&lt;form action='' method='post'&gt;
+      &lt;input name='form_token' value='$escapetool.xml($services.csrf.token)' type='hidden'/&gt;
       &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
       &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;")
     #if("$!item.state" != 'sent')

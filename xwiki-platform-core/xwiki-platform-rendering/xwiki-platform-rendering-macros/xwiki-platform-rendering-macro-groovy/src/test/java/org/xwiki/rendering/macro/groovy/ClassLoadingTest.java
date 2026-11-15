@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.macro.groovy;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Objects;
@@ -44,6 +42,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 /**
  * Integration test to verify that we can pass extra JARs to the Groovy engine when executing a script.

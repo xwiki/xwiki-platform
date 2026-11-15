@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.TestUtils;
 
@@ -51,6 +51,12 @@ public abstract class AbstractExtensionTestUtils
     private static final LocalDocumentReference SERVICE_REFERENCE =
         new LocalDocumentReference("ExtensionTest", "Service");
 
+    private static final String EXTENSION_ID = "extensionId";
+
+    private static final String EXTENSION_VERSION = "extensionVersion";
+
+    private static final String EXTENSION_NAMESPACE = "extensionNamespace";
+
     /**
      * The generic test utility methods.
      */
@@ -58,7 +64,7 @@ public abstract class AbstractExtensionTestUtils
 
     private final Map<Integer, Boolean> initialized = new ConcurrentHashMap<>();
 
-    private UsernamePasswordCredentials adminCredentials = TestUtils.SUPER_ADMIN_CREDENTIALS;
+    private XWikiCredentials adminCredentials = TestUtils.SUPER_ADMIN_CREDENTIALS;
 
     /**
      * Creates a new instance.
@@ -76,7 +82,7 @@ public abstract class AbstractExtensionTestUtils
      * @param utils the generic test utility methods
      * @param adminCredentials the admin credentials to use
      */
-    protected AbstractExtensionTestUtils(TestUtils utils, UsernamePasswordCredentials adminCredentials)
+    protected AbstractExtensionTestUtils(TestUtils utils, XWikiCredentials adminCredentials)
     {
         this.utils = utils;
         this.adminCredentials = adminCredentials;
@@ -90,7 +96,7 @@ public abstract class AbstractExtensionTestUtils
             // Create the service page if it does not exist
             try (InputStream extensionTestService = this.getClass().getResourceAsStream("/extensionTestService.wiki")) {
                 // Make sure to save the service with superadmin
-                UsernamePasswordCredentials currentCredentials =
+                XWikiCredentials currentCredentials =
                     this.utils.setDefaultCredentials(this.adminCredentials);
 
                 // Save the service
@@ -124,22 +130,41 @@ public abstract class AbstractExtensionTestUtils
     public void uninstall(String extensionId, boolean keepLocalCache) throws Exception
     {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("extensionId", extensionId);
+        parameters.put(EXTENSION_ID, extensionId);
         parameters.put("keepLocalCache", String.valueOf(keepLocalCache));
 
         doAction("uninstall", parameters);
     }
 
     /**
-     * Installs the specified extension.
-     * 
+     * Installs the specified extension on the main wiki.
+     *
      * @param extensionId the id of the extension to install
      */
     public void install(ExtensionId extensionId) throws Exception
     {
+        install(extensionId, null);
+    }
+
+    /**
+     * Installs the specified extension on the passed namespace.
+     *
+     * @param extensionId the id of the extension to install
+     * @param namespace the namespace on which to install the extension, {@code null} to install it on the main wiki
+     *     and {@link Namespace#ROOT} to install it on the root namespace
+     * @since 17.10.14
+     * @since 18.4.7
+     * @since 18.7.0RC1
+     */
+    public void install(ExtensionId extensionId, Namespace namespace) throws Exception
+    {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("extensionId", extensionId.getId());
-        parameters.put("extensionVersion", extensionId.getVersion().getValue());
+        parameters.put(EXTENSION_ID, extensionId.getId());
+        parameters.put(EXTENSION_VERSION, extensionId.getVersion().getValue());
+        if (namespace != null) {
+            String namespaceString = namespace.serialize();
+            parameters.put(EXTENSION_NAMESPACE, namespaceString != null ? namespaceString : "");
+        }
 
         doAction("install", parameters);
     }
@@ -152,21 +177,32 @@ public abstract class AbstractExtensionTestUtils
         doAction("finish", new HashMap<String, String>());
     }
 
+    /**
+     * @param extensionId the id of the extension to check
+     * @return {@code true} if the specified extension is installed (on any namespace), {@code false} otherwise
+     * @throws Exception if the check fails
+     */
     public boolean isInstalled(ExtensionId extensionId) throws Exception
     {
         return isInstalled(extensionId, null);
     }
 
+    /**
+     * @param extensionId the id of the extension to check (the version is optional)
+     * @param namespace the namespace where to check, or {@code null} to check on any namespace
+     * @return {@code true} if the specified extension is installed on the given namespace, {@code false} otherwise
+     * @throws Exception if the check fails
+     */
     public boolean isInstalled(ExtensionId extensionId, Namespace namespace) throws Exception
     {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("extensionId", extensionId.getId());
+        parameters.put(EXTENSION_ID, extensionId.getId());
         if (extensionId.getVersion() != null) {
-            parameters.put("extensionVersion", extensionId.getVersion().getValue());
+            parameters.put(EXTENSION_VERSION, extensionId.getVersion().getValue());
         }
         if (namespace != null) {
             String namespaceString = namespace.serialize();
-            parameters.put("extensionNamespace", namespaceString != null ? namespaceString : "");
+            parameters.put(EXTENSION_NAMESPACE, namespaceString != null ? namespaceString : "");
         }
 
         return "true".equals(execute("is_installed", parameters));

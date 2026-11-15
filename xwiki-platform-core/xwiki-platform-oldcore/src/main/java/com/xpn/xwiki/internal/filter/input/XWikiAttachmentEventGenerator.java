@@ -276,7 +276,7 @@ public class XWikiAttachmentEventGenerator
                 try {
                     content.close();
                 } catch (IOException e) {
-                    this.logger.warn("Failed to close the content stream of the attachment [{}]: {}",
+                    this.logger.warn("Failed to close the content stream of the attachment [{}]: [{}]",
                         attachment.getReference(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }

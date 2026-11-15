@@ -557,7 +557,7 @@
 ##################################
 ##          CREATION
 ##
-## This step display a progess bar during
+## This step display a progress bar during
 ## the wiki creation
 ##################################
 #macro(creation)
@@ -644,7 +644,7 @@
 ##################################
 ##           CLEAN UP
 ##
-## Delete the wiki if errors has occured
+## Delete the wiki if errors has occurred
 ##################################
 #macro(cleanUp)
   #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
@@ -880,7 +880,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
     }else{
       $('wikiprettynamevalidation').innerHTML = '';
       prettyName.removeClassName('xErrorField');
-      // If the user has manually changed the wikiname, we don't generate it automaticaly anymore
+      // If the user has manually changed the wikiname, we don't generate it automatically anymore
       if(!isWikiNameSet){
         var wikiName = $('wikiname');
         wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
@@ -1298,7 +1298,7 @@ require(['jquery'], function($) {
       var activeTabContent = thisTabWidget.find('.xwiki-createwiki-tab.active');
       var targetTabContent = thisTabWidget.find($(this).attr('href') + '-tab');
       activeTabContent.removeClass('active').fadeOut(400, function() {
-        // Display the new tab container when the old one is completly hidden
+        // Display the new tab container when the old one is completely hidden
         targetTabContent.hide().fadeIn().removeClass('hidden').addClass('active');
       });
       // Do not follow the link

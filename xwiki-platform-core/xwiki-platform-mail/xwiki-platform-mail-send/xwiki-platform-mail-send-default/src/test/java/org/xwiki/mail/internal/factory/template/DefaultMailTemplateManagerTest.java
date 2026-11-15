@@ -103,7 +103,8 @@ class DefaultMailTemplateManagerTest
         // Needed so that xcontext.setURLFactory(new ExternalServletURLFactory(xcontext)); will not fail even
         // though we don't want this line to have any behavior.
         when(this.xwikiContext.getURL()).thenReturn(new URL("http://localhost:8080/dummy"));
-        when(this.xwikiContext.getRequest()).thenReturn(mock(XWikiRequest.class));
+        XWikiRequest xWikiRequestMock = mock(XWikiRequest.class);
+        when(this.xwikiContext.getRequest()).thenReturn(xWikiRequestMock);
     }
 
     @Test

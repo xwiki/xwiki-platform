@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.representations;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.ext.MessageBodyReader;
 
@@ -38,6 +39,6 @@ public abstract class AbstractTextPlainReader<T> implements MessageBodyReader<T>
         if (entityStream == null) {
             return "";
         }
-        return IOUtils.toString(entityStream);
+        return IOUtils.toString(entityStream, StandardCharsets.UTF_8);
     }
 }

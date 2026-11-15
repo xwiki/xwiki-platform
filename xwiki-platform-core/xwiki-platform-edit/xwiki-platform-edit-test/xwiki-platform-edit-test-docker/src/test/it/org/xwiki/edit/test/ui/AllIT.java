@@ -46,4 +46,29 @@ class AllIT
     class NestedInplaceEditWithAnnotationsIT extends InplaceEditWithAnnotationsIT
     {
     }
+
+    @Nested
+    class NestedTextAreaImageUploadIT extends TextAreaImageUploadIT
+    {
+    }
+
+    @Nested
+    class NestedDocumentLockIT extends DocumentLockIT
+    {
+    }
+
+    @Nested
+    class NestedWikiEditorIT extends WikiEditorIT
+    {
+    }
+
+    @Nested
+    class NestedInlineEditIT extends InlineEditIT
+    {
+    }
+
+    @Nested
+    class NestedPreviewIT extends PreviewIT
+    {
+    }
 }

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AbstractEntityNameValidationTest
+class AbstractEntityNameValidationTest
 {
     private class OnlyNameEntityNameValidationTestClass extends AbstractEntityNameValidation
     {
@@ -64,7 +64,7 @@ public class AbstractEntityNameValidationTest
         onlyNameValidatorTestClass = new OnlyNameEntityNameValidationTestClass("foo", "bar");
 
     @Test
-    public void transformation()
+    void transformation()
     {
         WikiReference wikiReference = new WikiReference("wiki");
         assertEquals(wikiReference, onlyNameValidatorTestClass.transform(wikiReference));
@@ -144,7 +144,7 @@ public class AbstractEntityNameValidationTest
     }
 
     @Test
-    public void isValid()
+    void isValid()
     {
         WikiReference wikiReference = new WikiReference("wiki");
         assertTrue(onlyNameValidatorTestClass.isValid(wikiReference));

@@ -82,9 +82,9 @@ class PathConverterTest
         VfsResourceReference reference = new VfsResourceReference(URI.create("attach:Sandbox.WebHome@my.zip"), "a/b/c");
         when(this.serializer.serialize(reference)).thenThrow(new SerializeResourceReferenceException("error"));
 
+        DefaultParameterizedType type = new DefaultParameterizedType(null, Path.class);
         ConversionException exception = assertThrows(ConversionException.class,
-            () -> this.converter.convert(new DefaultParameterizedType(null, Path.class),
-                "attach:Sandbox.WebHome@my.zip/a/b/c"));
+            () -> this.converter.convert(type, "attach:Sandbox.WebHome@my.zip/a/b/c"));
         assertEquals("Failed to convert [attach:Sandbox.WebHome@my.zip/a/b/c] to a Path object",
             exception.getMessage());
     }
@@ -97,9 +97,9 @@ class PathConverterTest
 
         doThrow(new VfsException("unauthorized")).when(this.permissionChecker).checkPermission(reference);
 
+        DefaultParameterizedType type = new DefaultParameterizedType(null, Path.class);
         ConversionException exception = assertThrows(ConversionException.class,
-            () -> this.converter.convert(new DefaultParameterizedType(null, Path.class),
-                "attach:Sandbox.WebHome@my.zip/a/b/c"));
+            () -> this.converter.convert(type, "attach:Sandbox.WebHome@my.zip/a/b/c"));
         assertEquals("Failed to convert [attach:Sandbox.WebHome@my.zip/a/b/c] to a Path object",
             exception.getMessage());
         assertEquals("VfsException: unauthorized", ExceptionUtils.getRootCauseMessage(exception));

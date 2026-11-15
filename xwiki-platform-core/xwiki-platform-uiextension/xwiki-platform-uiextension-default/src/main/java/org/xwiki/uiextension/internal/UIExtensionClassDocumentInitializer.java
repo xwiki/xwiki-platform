@@ -28,7 +28,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
 /**
- * Update XWiki.UIExtensionClass document with all required informations.
+ * Update XWiki.UIExtensionClass document with all required information.
  *
  * @version $Id$
  * @since 8.1RC1

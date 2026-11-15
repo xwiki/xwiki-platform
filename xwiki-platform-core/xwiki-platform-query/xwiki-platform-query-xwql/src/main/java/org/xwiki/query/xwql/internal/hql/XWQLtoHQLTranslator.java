@@ -23,14 +23,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.query.Query;
 import org.xwiki.query.internal.jpql.node.Start;
 import org.xwiki.query.jpql.internal.JPQLParser;
 import org.xwiki.query.xwql.internal.QueryAnalyzer;
 import org.xwiki.query.xwql.internal.QueryContext;
 import org.xwiki.query.xwql.internal.QueryTranslator;
-import org.xwiki.query.Query;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Component;
 
 @Component
 @Named("hql")
@@ -46,7 +46,7 @@ public class XWQLtoHQLTranslator implements QueryTranslator
         input = input.trim();
         String lcInput = input.toLowerCase();
         String addition = "select doc.fullName from Document as doc ";
-        if (lcInput.startsWith("where") || lcInput.startsWith("order") || lcInput.length() == 0) {
+        if (lcInput.startsWith("where") || lcInput.startsWith("order") || lcInput.isEmpty()) {
             input = addition + input;
         } else if (lcInput.startsWith("from")) {
             input = addition + "," + input.substring(4);

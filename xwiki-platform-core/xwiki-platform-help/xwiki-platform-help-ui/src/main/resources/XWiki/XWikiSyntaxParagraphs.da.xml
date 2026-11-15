@@ -1,0 +1,69 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="da">
+  <web>XWiki</web>
+  <name>XWikiSyntaxParagraphs</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWiki-syntaks: Afsnit</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Redigering =
+
+== Afsnit ==
+
+=== 1.0 Paragraphs ===
+
+Afsnit er tekstelementer, der er adskilt af 2 eller flere nye linjer.
+
+{{info}}Nye linjer respekteres ikke i XWiki Syntax 1.0. 
+Du skal i stedet indsætte en dobbelt omvendt skråstreg, fx: {{{}}}{{/info}}
+
+|=Funktion|=XWiki Syntax 1.0|=Resultat
+|Simpelt afsnit|Dette er et afsnit|Dette er et afsnit
+|Afsnit over flere linjer|Afsnit over{{{}}}flere linjer|Afsnit overflere linjer
+|To afsnit|Afsnit et\\Afsnit to|Afsnit et\\Afsnit to
+|Afsnit med parametre|&lt;p style="text-align:center;color:blue"&gt;Centreret og blåt afsnit&lt;/p&gt;|(% style="text-align:center;color:blue" %)Centreret og blåt afsnit
+
+=== 2.0 Paragraphs ===
+
+Afsnit er tekstelementer, der er adskilt af 2 eller flere nye linjer.
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Simpelt afsnit|Dette er et afsnit|Dette er et afsnit
+|Afsnit over flere linjer|Afsnit overflere linjer|Afsnit overflere linjer
+|To afsnit|Afsnit et\\Afsnit to|Afsnit et\\Afsnit to
+|Afsnit med parametre|{{{(% style="text-align:center;color:blue" %)}}}Centreret og blåt afsnit|(% style="text-align:center;color:blue" %)Centreret og blåt afsnit
+|Anden typografi på en del af afsnittets indhold|afsnit med {{{(% style="color:red" %)}}}rød{{{(%%)}}} anden typografi indeni|afsnit med (% style="color:red" %)rød(%%) tekst indeni</content>
+</xwikidoc>

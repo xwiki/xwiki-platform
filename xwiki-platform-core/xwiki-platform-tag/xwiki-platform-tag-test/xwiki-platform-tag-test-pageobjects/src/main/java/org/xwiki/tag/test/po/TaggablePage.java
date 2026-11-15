@@ -52,7 +52,7 @@ public class TaggablePage extends ViewPage
      */
     public boolean hasTag(String tagName)
     {
-        return getDriver().findElementsWithoutWaiting(this.tagsContainer, getTagLocator(tagName)).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(this.tagsContainer, getTagLocator(tagName)).isEmpty();
     }
 
     /**
@@ -74,7 +74,7 @@ public class TaggablePage extends ViewPage
     {
         List<WebElement> toDelete = getDriver().findElementsWithoutWaiting(this.tagsContainer,
             By.xpath("//a[contains(@href, '&tag=" + tagName + "') and . = 'X']"));
-        if (toDelete.size() > 0) {
+        if (!toDelete.isEmpty()) {
             toDelete.get(0).click();
             getDriver().waitUntilElementDisappears(getTagLocator(tagName));
             return true;

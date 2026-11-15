@@ -208,6 +208,9 @@ CKEDITOR.editorConfig = function(config) {
     // to Source while editing in-place. We still bundle the sourcearea plugin because we reuse its icons and
     // translations.
     removePlugins: 'bidi,colorbutton,font,justify,save,sourcearea',
+    // The media types of the files that are inserted as images (rather than links) when pasted, dropped or uploaded.
+    // We add the WebP, AVIF and JPEG XL raster image formats to the formats supported by default by CKEditor.
+    uploadImage_supportedTypes: /image\/(jpeg|png|gif|bmp|webp|avif|jxl)/, // jshint ignore:line
     versionCheck: false,
     'xwiki-macro': {
       // You can restrict here the type of content the users can input when editing the macro content / parameters

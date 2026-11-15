@@ -71,7 +71,7 @@ class IndexedObjectReferenceTest
     }
 
     @Test
-    public void testObjectNumber()
+    void testObjectNumber()
     {
         IndexedObjectReference reference =
             new IndexedObjectReference(new EntityReference("XWiki.Class[2]", EntityType.OBJECT, new EntityReference(

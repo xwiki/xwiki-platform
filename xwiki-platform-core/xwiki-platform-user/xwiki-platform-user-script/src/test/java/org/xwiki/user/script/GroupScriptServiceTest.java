@@ -68,6 +68,17 @@ class GroupScriptServiceTest
     private GroupManager groupManager;
 
     @Test
+    void isMember() throws Exception
+    {
+        when(this.groupManager.isMember(CANDIDATE_GROUP, TARGET_GROUP, true)).thenReturn(true);
+
+        assertTrue(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP, true));
+        assertFalse(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP, false));
+        // Recursive by default
+        assertTrue(this.groupScriptService.isMember(CANDIDATE_GROUP, TARGET_GROUP));
+    }
+
+    @Test
     void canAddGroupAsMember() throws Exception
     {
         when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenReturn(emptyList());
@@ -191,7 +202,7 @@ class GroupScriptServiceTest
     @Test
     void canAddGroupAsMemberTargetMembersError() throws Exception
     {
-        when(this.groupManager.getMembers(TARGET_GROUP, false)).thenThrow(new GroupException(""));
+        when(this.groupManager.getMembers(TARGET_GROUP, false)).thenThrow(new GroupException("target failure"));
 
         boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
 
@@ -207,7 +218,7 @@ class GroupScriptServiceTest
     void canAddGroupAsMemberCandidateMembersError() throws Exception
     {
         when(this.groupManager.getMembers(TARGET_GROUP, false)).thenReturn(emptyList());
-        when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenThrow(new GroupException(""));
+        when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenThrow(new GroupException("candidate failure"));
 
         boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
 

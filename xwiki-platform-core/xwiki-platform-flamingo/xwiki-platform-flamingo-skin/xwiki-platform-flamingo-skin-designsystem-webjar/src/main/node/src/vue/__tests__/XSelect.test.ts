@@ -37,7 +37,9 @@ describe("XSelect", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
     <!--v-if-->
   </dt>
   <dd><select id="v-0">
@@ -58,9 +60,39 @@ describe("XSelect", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label><span class="xHint">The help</span></dt>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label><span class="xHint">The help</span></dt>
   <dd><select id="v-0">
       <option value="i1">i1</option>
+    </select></dd>
+</dl>`);
+    },
+  );
+
+  runTest(
+    "render items with a value distinct from their label",
+    accessibilityMount({
+      props: {
+        label: "Select Label",
+        items: [
+          { value: "v1", label: "Same label" },
+          { value: "v2", label: "Same label" },
+          "i3",
+        ],
+      } satisfies SelectProps,
+    }),
+    (wrapper) => {
+      expect(wrapper.html()).toEqual(`<dl>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
+    <!--v-if-->
+  </dt>
+  <dd><select id="v-0">
+      <option value="v1">Same label</option>
+      <option value="v2">Same label</option>
+      <option value="i3">i3</option>
     </select></dd>
 </dl>`);
     },
@@ -77,7 +109,9 @@ describe("XSelect", () => {
     }),
     (wrapper) => {
       expect(wrapper.html()).toEqual(`<dl>
-  <dt><label for="v-0">Select Label</label>
+  <dt><label for="v-0">Select Label
+      <!--v-if-->
+    </label>
     <!--v-if-->
   </dt>
   <dd><select id="v-0" required="">

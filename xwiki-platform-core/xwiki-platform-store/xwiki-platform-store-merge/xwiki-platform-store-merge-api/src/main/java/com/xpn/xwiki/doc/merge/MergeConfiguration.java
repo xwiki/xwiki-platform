@@ -49,7 +49,7 @@ public class MergeConfiguration
          * Next version.
          */
         NEXT
-    };
+    }
 
     /**
      * @see #isProvidedVersionsModifiables()

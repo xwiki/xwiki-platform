@@ -96,7 +96,6 @@ public class ColorThemeListener implements EventListener
         List<BaseObject> colorThemeObjects = document.getXObjects(COLOR_THEME_CLASS);
         if (colorThemeObjects != null && !colorThemeObjects.isEmpty()) {
             clearCacheFromColorTheme(document);
-            return;
         }
     }
 

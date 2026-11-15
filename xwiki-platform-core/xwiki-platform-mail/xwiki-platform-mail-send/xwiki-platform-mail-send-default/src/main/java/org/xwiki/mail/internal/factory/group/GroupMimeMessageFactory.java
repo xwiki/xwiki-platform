@@ -38,12 +38,12 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @version $Id$
  * @since 6.4.1
- * @deprecated starting with 6.4.2 this is replaced by the {@code usersandroups} Mime Message Factory
+ * @deprecated this is replaced by the {@code usersandroups} Mime Message Factory
  */
 @Component
 @Named("group")
 @Singleton
-@Deprecated
+@Deprecated(since = "6.4.2")
 public class GroupMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 {
     private static final String HINT = "hint";
@@ -64,9 +64,8 @@ public class GroupMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 
         MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint);
 
-        GroupMimeMessageIterator iterator = new GroupMimeMessageIterator(groupReference, factory, parameters,
+        return new GroupMimeMessageIterator(groupReference, factory, parameters,
             this.componentManagerProvider.get());
-        return iterator;
     }
 
 }

@@ -131,7 +131,7 @@ public class AttachmentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
                 nextContent = nextAttachment.getContentInputStream(xcontext);
                 return IOUtils.contentEquals(previousContent, nextContent);
             } catch (Exception e) {
-                this.logger.warn("Failed to compare the content of attachment [{}]. Root cause: {}",
+                this.logger.warn("Failed to compare the content of attachment [{}]. Root cause: [{}]",
                     previousAttachment.getFilename(), ExceptionUtils.getRootCauseMessage(e));
                 return false;
             } finally {
@@ -155,7 +155,7 @@ public class AttachmentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
             try (InputStream stream = attachment.getContentInputStream(this.xcontextProvider.get())) {
                 return IOUtils.toString(stream);
             } catch (Exception e) {
-                this.logger.warn("Failed to read the content of attachment [{}]. Root cause: {}",
+                this.logger.warn("Failed to read the content of attachment [{}]. Root cause: [{}]",
                     attachment.getFilename(), ExceptionUtils.getRootCauseMessage(e));
             }
         }

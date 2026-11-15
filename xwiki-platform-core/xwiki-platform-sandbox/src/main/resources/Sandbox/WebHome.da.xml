@@ -36,49 +36,56 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>Sandkassen er en del af denne wiki, som du frit kan ændre. Formålet er du kan prøve at redigere. Du kan lære hvordan redigering sker og hvordan man opretter nye side. Klik blot på **Redigér** for at komme igang!
+  <content>Sandkassen er en del af din wiki, som du frit kan ændre. Den er beregnet til, at du kan øve dig i at redigere. Du lærer, hvordan redigering af sider virker, og du kan oprette nye sider. Klik bare på **Rediger** for at komme i gang!
 
-{{info}} Vær ikke bange for at overskrive eller miste indhold, når du redigerer siden. Du kan altid rulle rettelser tilbage til de originale ved at vælge den første version under "Historik" i bunden af siden.{{/info}}
+{{info}}
+Du skal ikke være bange for at overskrive eller miste noget, når du redigerer siden. Du kan altid rulle tilbage til sidens første version fra fanen "Historik" nederst på siden.
+{{/info}}
 
-Hvis du vil smugkigge på den underliggende [[Xwiki-kode&gt;&gt;XWiki.XWikiSyntax]] kan du klikke på "Vis kode" under menupunkt "Flere aktiviteter" øverst eller klik på "Kildekode" når du redigerer siden.
+Hvis du vil se den underliggende [[XWiki-syntaks&gt;&gt;XWiki.XWikiSyntax]], kan du klikke på "Wikikode" i menuen "Vis" eller klikke på fanen "Kilde", når du redigerer siden.
 
-Her er en række test-sider du kan lege med:
-* [[Sandkasse testside 1&gt;&gt;Sandbox.TestPage1]]
-* [[Sandkasse testside 2&gt;&gt;Sandbox.TestPage2]]
-* [[Sandkasse testside 3&gt;&gt;Sandbox.TestPage3]]
+Her er nogle testsider, du kan lege med:
 
-Nedenfor er en demonstration af [[XWiki kodesyntaks&gt;&gt;XWiki.XWikiSyntax]] som kan bruges i wikisiderne (overskrifter, billeder, tabeller).
+* [[Sandkassens testside 1&gt;&gt;Sandbox.TestPage1]]
+* [[Sandkassens testside 2&gt;&gt;Sandbox.TestPage2]]
+* [[Sandkassens testside 3&gt;&gt;Sandbox.TestPage3]]
+
+Nedenfor er en demonstration af den [[XWiki-syntaks&gt;&gt;XWiki.XWikiSyntax]], du kan bruge på wikisider (overskrifter, billeder, tabeller).
 
 == Overskrifter ==
 
-XWiki har 6 niveauer af overskrifter. Du angiver dem på følgende måde: 
+XWiki har 6 overskriftsniveauer. Du kan bruge dem til at give dine sider struktur.
 
-== Overskrift niveau 2 ==
+== Overskrift på niveau 2 ==
 
-=== Overskrift niveau 3 ===
+=== Overskrift på niveau 3 ===
 
-==== Overskrift niveau 4 ====
+==== Overskrift på niveau 4 ====
 
-===== Overskrift niveau 5 =====
+===== Overskrift på niveau 5 =====
 
-====== Overskrift niveau 6 ======
+====== Overskrift på niveau 6 ======
 
-== Skriftstil ==
+{{info title="Anbefaling om tilgængelighed"}}
+For at give brugere af hjælpemidler den bedste oplevelse på din wiki bør du undgå at bruge første overskriftsniveau i sidens indhold.
+{{/info}}
 
-Grundlæggende skriftstile i XWiki:
+== Typografier ==
 
-* **Tekst i fed skrift**
-* //Tekst i kursiv//
+XWiki understøtter de grundlæggende typografier:
+
+* **Fed tekst**
+* //Kursiv tekst//
 * __Understreget tekst__
-* --Overstreget teskt--
-* Tekst i ,,subscript,,
-* Tekst i ^^superscript^^
+* --Gennemstreget tekst--
+* Tekst med ,,sænket skrift,,
+* Tekst med ^^hævet skrift^^
 
 == Lister ==
 
-Du kan angive forskellige typer lister i dine wiki-sider:
+Du kan lave forskellige slags lister på dine wikisider:
 
-=== Punktliste ===
+=== Punktopstilling ===
 
 * Niveau 1
 ** Niveau 2
@@ -88,64 +95,70 @@ Du kan angive forskellige typer lister i dine wiki-sider:
 
 === Nummereret liste ===
 
-1. Element
-11. Underelement
-111. Element
-1. Underelement
+1. Punkt
+11. Underpunkt
+111. Punkt
+1. Underpunkt
 
 === Blandet liste ===
 
-1. Element 1
-11. Element 2
-11*. Element 3
-11*. Element 4
-1. Element 5
+1. Punkt 1
+11. Punkt 2
+11*. Punkt 3
+11*. Punkt 4
+1. Punkt 5
 
 == Tabeller ==
 
-Du kan oprette tabeller i wiki-siderne:
+Du kan lave tabeller direkte på wikisider:
 
-=== Tabeller med overskrifter i første række ===
+=== Tabel med overskrifter i øverste række ===
 
 |= tabeloverskrift |= tabeloverskrift |= tabeloverskrift
 | celle | celle | celle
 | celle | celle | celle
 
-=== Tabel med overskrifter i 1. række og venstre kolonne ===
+=== Tabel med overskrifter i øverste række og venstre kolonne ===
 
 |= tabeloverskrift |= tabeloverskrift |= tabeloverskrift
 |= tabeloverskrift | celle | celle
 |= tabeloverskrift | celle | celle
 
-== Henvisninger ==
+== Links ==
 
-XWiki tillader henvisninger til andre wiki-sider eller til internettes andre websider:
+I XWiki kan du lave links til andre sider i din wiki eller på nettet:
 
-* [[WebHome]] -&gt; Henvisning til startside på dette område.
-* [[Sandbox Home&gt;&gt;WebHome]] -&gt; Henvisninger kan have særlige navne
-* [[Wiki Start&gt;&gt;Main.WebHome]] -&gt; En henvisning kan angives ved Område.Sidenavn.
-* [[http://www.xwiki.org]] -&gt; Du kan henvise til sider på andre websites også.
-* [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; Henvisningsnavne kan også bruges på eksterne henvisninger.
+* [[WebHome]] -&gt; linker til startsiden for det aktuelle område
+* [[Sandkassens startside&gt;&gt;WebHome]] -&gt; links kan have etiketter
+* [[Wikiens startside&gt;&gt;Main.WebHome]] -&gt; et link kan bruge formatet OmrådeNavn.SideNavn for at linke til en side i et andet område
+* [[http://www.xwiki.org]] -&gt; du kan linke til wikisider eller til eksterne websteder
+* [[XWiki.org-webstedet&gt;&gt;http://www.xwiki.org]] -&gt; etiketter virker også for eksterne links
+
+Du kan også lave links til bilag:
+
+attach:XWikiLogo.png
 
 == Billeder ==
 
-Du kan indsætte billeder i wiki-siderne:
+Du kan indsætte billeder på dine wikisider:
 
-[[image:XWikiLogo.png]]
+image:XWikiLogo.png
 
 == Makroer ==
 
-Makroer gør det muligt at få indholdet til at se bedre ud og tilføje flere funktioner til wikien. Her er 2 eksempler på hvordan makroer kan anvendes:
+Med makroer kan du få wikiens indhold til at se bedre ud og tilføje flere funktioner til din wiki. Her er 2 eksempler på, hvordan makroer kan bruges på wikisider:
 
-=== Varselsmakro ===
+=== Advarselsmakro ===
 
-Denne makro markerer tekst på en måde, så læserens opmærksomhed fanges:
+Med denne makro kan du henlede brugernes opmærksomhed på en bestemt oplysning:
 
-{{warning}}Hej du der!{{/warning}}
+{{warning}}
+Hej verden
+{{/warning}}
 
 === Indholdsfortegnelse ===
 
-Denne makro laver automatisk en indholdsfortegnelse baseret på overskrifter i wiki-siden:
+Denne makro laver automatisk en indholdsfortegnelse over wikisiden ud fra overskrifterne:
 
 {{toc/}}</content>
 </xwikidoc>

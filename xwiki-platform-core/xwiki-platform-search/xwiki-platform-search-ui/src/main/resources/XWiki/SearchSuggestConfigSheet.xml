@@ -37,6 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="XWiki.SearchCode" /}}
+{{include reference="XWiki.SearchSuggestMacros" /}}
 
 {{velocity output="false"}}
 #macro (displayObjectPropertyValue $propertyName $mode)
@@ -45,12 +46,11 @@
 
 #macro (displaySearchSuggestSource $source)
   #set ($evaluatedSource = $source.evaluate())
-  #set ($icon = $source.getProperty('icon').value)
-  #if ($icon.startsWith('icon:'))
-    #set ($icon = $xwiki.getSkinFile("icons/silk/${icon.substring(5)}.png"))
-  #else
+  #resolveSearchSuggestSourceIcon($source.getProperty('icon').value)
+  #if (!$isIconThemeIcon)
     ## Evaluate the Velocity code for backward compatibility.
     #set ($icon = $evaluatedSource.icon)
+    #set ($iconHTML = "&lt;img class='icon' src='$escapetool.xml($!icon)' alt='' /&gt;")
   #end
   #set ($name = $source.getProperty('name').value)
   #if ($services.localization.get($name))
@@ -68,7 +68,7 @@
   #end
   &lt;li class="source"&gt;
     &lt;div class="$style"&gt;
-      &lt;img class="icon" src="$escapetool.xml($!icon)" alt="" /&gt;
+      $iconHTML
       &lt;span class="limit"&gt;$escapetool.xml($!source.getProperty('resultsNumber').value)&lt;/span&gt;
       &lt;span class="name"&gt;$escapetool.xml($!name)&lt;/span&gt;
       #if ($editing)

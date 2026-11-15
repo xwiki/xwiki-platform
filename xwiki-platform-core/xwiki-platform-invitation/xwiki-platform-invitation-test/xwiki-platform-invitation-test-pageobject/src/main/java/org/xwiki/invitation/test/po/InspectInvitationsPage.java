@@ -19,13 +19,13 @@
  */
 package org.xwiki.invitation.test.po;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.TableElement;
 
@@ -55,7 +55,7 @@ public abstract class InspectInvitationsPage extends BasePage
     public String getStatusAndMemo()
     {
         List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("message-status-and-memo"));
-        if (elements.size() > 0) {
+        if (!elements.isEmpty()) {
             return elements.get(0).getText();
         }
         return null;

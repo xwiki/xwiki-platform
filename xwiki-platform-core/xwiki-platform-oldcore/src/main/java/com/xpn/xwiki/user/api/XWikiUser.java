@@ -19,10 +19,8 @@
  */
 package com.xpn.xwiki.user.api;
 
-import java.util.Collection;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -65,6 +63,8 @@ public class XWikiUser
     public static final LocalDocumentReference ACCOUNT_VALIDATION_DOCUMENT_REFERENCE =
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "AccountValidation");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiUser.class);
+
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
@@ -75,8 +75,6 @@ public class XWikiUser
     private ContextualLocalizationManager localization;
 
     private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
-
-    private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
 
     private String fullName;
 
@@ -120,9 +118,9 @@ public class XWikiUser
      * Create a XWikiUser for the given user.
      * 
      * @param user the full name of the user on the form {@code XWiki.Foo}.
-     * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference)}.
+     * @deprecated use {@link #XWikiUser(DocumentReference)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public XWikiUser(String user)
     {
         this(user, false);
@@ -133,9 +131,9 @@ public class XWikiUser
      * 
      * @param user the full name of the user on the form {@code XWiki.Foo}.
      * @param main true if the user is global (i.e. registered in the main wiki)
-     * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference, boolean)}.
+     * @deprecated use {@link #XWikiUser(DocumentReference, boolean)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public XWikiUser(String user, boolean main)
     {
         setUser(user);
@@ -171,9 +169,9 @@ public class XWikiUser
 
     /**
      * @return user fullname
-     * @deprecated since 11.6RC1 use {@link #getFullName()}.
+     * @deprecated use {@link #getFullName()}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public String getUser()
     {
         return getFullName();
@@ -281,7 +279,7 @@ public class XWikiUser
                 // Default value of email_checked should be 1 (i.e. checked) if not set.
                 isChecked = userdoc.getIntValue(userClassReference, EMAIL_CHECKED_PROPERTY, 1) != 0;
             } catch (XWikiException e) {
-                this.logger.error("Error while checking email_checked status of user [{}]", getUser(), e);
+                LOGGER.error("Error while checking email_checked status of user [{}]", getUser(), e);
                 isChecked = true;
             }
         }
@@ -307,9 +305,9 @@ public class XWikiUser
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     EMAIL_CHECKED_PROPERTY, checkedFlag);
                 context.getWiki().saveDocument(userdoc, localizePlainOrKey(
-                    "core.users." + (checked ? "email_checked" : "email_unchecked") + ".saveComment"), context);
+                    "core.users." + (checked ? EMAIL_CHECKED_PROPERTY : "email_unchecked") + ".saveComment"), context);
             } catch (XWikiException e) {
-                this.logger.error("Error while setting email_checked status of user [{}]", getUser(), e);
+                LOGGER.error("Error while setting email_checked status of user [{}]", getUser(), e);
             }
         }
     }
@@ -334,7 +332,7 @@ public class XWikiUser
                 // Default value of active should be 1 (i.e. active) if not set
                 disabled = userdoc.getIntValue(userClassReference, ACTIVE_PROPERTY, 1) == 0;
             } catch (XWikiException e) {
-                this.logger.error("Error while checking active status of user [{}]", getUser(), e);
+                LOGGER.error("Error while checking active status of user [{}]", getUser(), e);
                 disabled = false;
             }
         }
@@ -359,19 +357,20 @@ public class XWikiUser
 
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
-                UserReference userReference =
+                UserReference authorReference =
                     getDocumentReferenceUserReferenceResolver().resolve(context.getUserReference());
                 // If there's no current user (ie if it's guest), then make the save as the new user for consistency
                 // since the user creation and other changes made to the user profile are currently done under the
                 // name of the new user.
-                if (GuestUserReference.INSTANCE.equals(userReference)) {
-                    userReference = getDocumentReferenceUserReferenceResolver().resolve(userdoc.getDocumentReference());
+                if (GuestUserReference.INSTANCE.equals(authorReference)) {
+                    authorReference = getDocumentReferenceUserReferenceResolver()
+                        .resolve(userdoc.getDocumentReference());
                 }
-                userdoc.getAuthors().setOriginalMetadataAuthor(userReference);
+                userdoc.getAuthors().setOriginalMetadataAuthor(authorReference);
                 context.getWiki().saveDocument(userdoc,
                     localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {
-                this.logger.error("Error while setting active status of user [{}]", getUser(), e);
+                LOGGER.error("Error while setting active status of user [{}]", getUser(), e);
             }
         }
     }
@@ -388,7 +387,7 @@ public class XWikiUser
             XWikiDocument userdoc = getUserDocument(context);
             exists = !userdoc.isNew();
         } catch (XWikiException e) {
-            this.logger.error("Error while checking existing status of user [{}]", getUser(), e);
+            LOGGER.error("Error while checking existing status of user [{}]", getUser(), e);
         }
         return exists;
     }
@@ -400,34 +399,6 @@ public class XWikiUser
 
         this.userReference = null;
         this.userReferenceSet = false;
-    }
-
-    /**
-     * Check if the user belongs to a group or not. This method only check direct membership (no recursive checking) in
-     * the current wiki.
-     *
-     * @param groupName The group to check.
-     * @param context The current {@link XWikiContext context}.
-     * @return {@code true} if the user does belong to the specified group, false otherwise or if an exception occurs.
-     * @throws XWikiException If an error occurs when checking the groups.
-     * @since 1.3
-     */
-    public boolean isUserInGroup(String groupName, XWikiContext context) throws XWikiException
-    {
-        if (!StringUtils.isEmpty(getUser())) {
-            XWikiGroupService groupService = context.getWiki().getGroupService(context);
-
-            DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(groupName);
-
-            Collection<DocumentReference> groups =
-                groupService.getAllGroupsReferencesForMember(getUserReference(), 0, 0, context);
-
-            if (groups.contains(groupReference)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -459,9 +430,7 @@ public class XWikiUser
         }
 
         boolean equals;
-        if (obj instanceof XWikiUser) {
-            XWikiUser otherUser = (XWikiUser) obj;
-
+        if (obj instanceof XWikiUser otherUser) {
             equals = otherUser.main == this.main && Objects.equals(getUserReference(), otherUser.getUserReference());
         } else {
             equals = false;

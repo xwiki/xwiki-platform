@@ -63,7 +63,7 @@ public abstract class AbstractX509IssuerAndSerialQuery extends AbstractX509Store
      * @param serializer the entity reference serializer to serialize the store reference for query
      * @throws CertificateStoreException on error creating required queries.
      */
-    public AbstractX509IssuerAndSerialQuery(EntityReference store, String select, String from, String where,
+    protected AbstractX509IssuerAndSerialQuery(EntityReference store, String select, String from, String where,
         BinaryStringEncoder encoder, QueryManager queryManager, EntityReferenceSerializer<String> serializer)
         throws CertificateStoreException
     {

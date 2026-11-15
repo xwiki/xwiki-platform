@@ -132,4 +132,16 @@ public privileged aspect DocumentCompatibilityAspect
         }
         return this.doc.displayTooltip(fieldname, obj.getBaseObject(), getXWikiContext());
     }
+
+    /**
+     * @return the maximum authorized length for a document full name (see {@link Document#getFullName()}).
+     * @since 11.4RC1
+     * @deprecated the limit comes from the store and is the same for all documents, use
+     *             {@link XWiki#getDocumentLocalReferenceMaxLength()} instead
+     */
+    @Deprecated(since = "18.9.0RC1")
+    public int Document.getLocalReferenceMaxLength()
+    {
+        return getXWikiContext().getWiki().getDocumentLocalReferenceMaxLength(getXWikiContext());
+    }
 }

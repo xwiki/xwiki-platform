@@ -22,7 +22,6 @@ package com.xpn.xwiki.internal.filter.input;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -217,22 +216,17 @@ public class XWikiDocumentLocaleEventGenerator
 
         if (properties.isWithWikiAttachments()) {
             List<XWikiAttachment> sortedAttachments = new ArrayList<>(document.getAttachmentList());
-            Collections.sort(sortedAttachments, new Comparator<XWikiAttachment>()
-            {
-                @Override
-                public int compare(XWikiAttachment attachement1, XWikiAttachment attachement2)
-                {
-                    if (attachement1 == null || attachement2 == null) {
-                        int result = 0;
-                        if (attachement1 != null) {
-                            result = -1;
-                        } else if (attachement2 != null) {
-                            result = 1;
-                        }
-                        return result;
+            Collections.sort(sortedAttachments, (attachement1, attachement2) -> {
+                if (attachement1 == null || attachement2 == null) {
+                    int result = 0;
+                    if (attachement1 != null) {
+                        result = -1;
+                    } else if (attachement2 != null) {
+                        result = 1;
                     }
-                    return attachement1.getFilename().compareTo(attachement2.getFilename());
+                    return result;
                 }
+                return attachement1.getFilename().compareTo(attachement2.getFilename());
             });
 
             for (XWikiAttachment attachment : sortedAttachments) {

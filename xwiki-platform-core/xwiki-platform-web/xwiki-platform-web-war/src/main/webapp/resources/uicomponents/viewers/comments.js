@@ -88,8 +88,8 @@ viewers.Comments = Class.create({
             this.addSubmitListener(this.form);
             this.addCancelListener();
             this.addPreview(this.form);
-            if(typeof CKEDITOR === 'undefined') {
-              // Focus on the textarea.
+            // Handle focus for plain text editor (WYSIWYG editors do it on their own).
+            if (this.isPlainTextEditor(this.form)) {
               this.form["XWiki.XWikiComments_comment"].focus();
             }
           }.bind(this)
@@ -105,6 +105,12 @@ viewers.Comments = Class.create({
     } else {
       this.form = undefined;
     }
+  },
+  /**
+   * @return whether the comment is edited with the plain text editor (a textarea), as opposed to a WYSIWYG editor
+   */
+  isPlainTextEditor: function (form) {
+    return form.down("input[name='defaultEditorId']").value === 'text';
   },
   // load the form only once, when it is first needed
   // the next calls to this method does nothing but calling the callback
@@ -215,7 +221,7 @@ viewers.Comments = Class.create({
                 item._x_notification.replace(new XWiki.widgets.Notification(
                     "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
                     "error"));
-              }.bind(this),
+              },
               on0 : function (response) {
                 response.request.options.onFailure(response);
               },
@@ -289,8 +295,10 @@ viewers.Comments = Class.create({
           this.addPreview(this.form);
           // Set the replyto field to the replied comment's number
           this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
-          // Focus on the textarea.
-          this.form["XWiki.XWikiComments_comment"].focus();
+          // Handle focus for plain text editor (WYSIWYG editors do it on their own).
+          if (this.isPlainTextEditor(this.form)) {
+            this.form["XWiki.XWikiComments_comment"].focus();
+          }
           // Hide the reply button
           item.hide();
         }.bind(this)
@@ -310,7 +318,13 @@ viewers.Comments = Class.create({
         event.stop();
         // triggers the copy of the content of the rich editor to hidden fields
         document.fire('xwiki:actions:beforeSave');
-        if (form.down('textarea').value != "") {
+        const comment = form.down('.xwikicomment');
+        let name = "XWiki.XWikiComments_comment";
+        if (comment !== undefined && this.hasCommentNumber(comment)) {
+          name = "XWiki.XWikiComments_" + this.extractCommentNumber(comment) + "_comment";
+        }
+        // The comment field is missing until the editor has loaded.
+        if (form[name]?.value) {
           var formData = new Hash(form.serialize(true));
           formData.set('xredirect',
               window.docgeturl + '?xpage=xpart&vm=commentsinline.vm&skin=' + encodeURIComponent(XWiki.skin));
@@ -319,7 +333,7 @@ viewers.Comments = Class.create({
           formData.set('xpage', 'xpart');
           formData.set('vm', 'commentsinline.vm');
           formData.set('skin', XWiki.skin);
-          // Strip form parameters from the form action query string to prevent them from being overwriten.
+          // Strip form parameters from the form action query string to prevent them from being overwritten.
           var queryStringParams = $H(form.action.toQueryParams());
           formData.keys().each(queryStringParams.unset.bind(queryStringParams));
           var url = form.action.replace(/\?.*/, '?' + queryStringParams.toQueryString());
@@ -342,7 +356,7 @@ viewers.Comments = Class.create({
               var failureReason = response.statusText || 'Server not responding';
               form._x_notification.replace(new XWiki.widgets.Notification(
                   "$services.localization.render('core.viewers.comments.add.failed')" + failureReason, "error"));
-            }.bind(this),
+            },
             on0 : function (response) {
               response.request.options.onFailure(response);
             },
@@ -351,14 +365,6 @@ viewers.Comments = Class.create({
               // form input fields and the user will get disabled fields when (soft) reloading the page.
               form.enable();
 
-              var comment = form.down('.xwikicomment');
-              var name = "XWiki.XWikiComments_comment";
-              if (comment !== undefined) {
-                if (this.hasCommentNumber(comment)) {
-                  const commentNbr = this.extractCommentNumber(comment);
-                  name = "XWiki.XWikiComments_" + commentNbr + "_comment";
-                }
-              }
               this.destroyEditor("[name='" + name + "']");
 
               if (this.requestSucceeded) {
@@ -437,7 +443,7 @@ viewers.Comments = Class.create({
    */
   addPreview : function(form) {
     // We only allow to preview comment if the user is using text editor.
-    if (!form || !XWiki.hasEdit || form.down("input[name='defaultEditorId']").value !== "text") {
+    if (!form || !XWiki.hasEdit || !this.isPlainTextEditor(form)) {
       return;
     }
 
@@ -497,7 +503,7 @@ viewers.Comments = Class.create({
           },
           onComplete: function (response) {
             form.previewButton.disabled = false;
-          }.bind(this)
+          }
         });
       } else {
         this.cancelPreview(form);
@@ -527,7 +533,7 @@ viewers.Comments = Class.create({
       commentElt.hide();
       $(form.previewButton).find('input')
         .val("$services.localization.render('core.viewers.comments.preview.button.back')");
-    }.bind(this))
+    })
   },
   /**
    * Display the comment textarea instead of the comment preview.
@@ -550,7 +556,7 @@ viewers.Comments = Class.create({
       if (commentElt) {
         commentElt.show();
       }
-    }.bind(this));
+    });
   },
   resetForm: function (event) {
     if (event) {
@@ -679,6 +685,34 @@ require(['jquery'], function($) {
   $(document).on('click', '#permalinkModal input.btn-primary', function() {
     window.location = $('#permalinkModal').find('.form-control').val();
   });
+  /**
+   * Copy the permalink to the clipboard, preferring the modern Clipboard API and falling back to the deprecated
+   * execCommand('copy') when it's unavailable or fails - e.g. because the document isn't focused, which is common
+   * in browsers automated by Selenium/WebDriver.
+   */
+  $(document).on('click', '#permalink-copy-button', function() {
+    const button = this;
+    const permalinkField = $('#permalinkModal').find('.form-control');
+    function notifyCopied() {
+      XWiki.widgets.Notification.show($(button).data('copiedMessage'), 'info');
+    }
+    function notifyFailed() {
+      XWiki.widgets.Notification.show($(button).data('copyFailedMessage'), 'error');
+    }
+    function copyWithExecCommand() {
+      permalinkField.select();
+      try {
+        document.execCommand('copy') ? notifyCopied() : notifyFailed();
+      } catch (e) {
+        notifyFailed();
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(permalinkField.val()).then(notifyCopied, copyWithExecCommand);
+    } else {
+      copyWithExecCommand();
+    }
+  });
 });
 
 /**
@@ -700,7 +734,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var notification;
     /**
      * Ajax request made for deleting the comment.
-     * Delete the HTML element on succes (replace it with a box message).
+     * Delete the HTML element on success (replace it with a box message).
      * Display error message on failure.
      * Disable the delete button before the request is send, so the user cannot resend it in case it takes longer.
      */

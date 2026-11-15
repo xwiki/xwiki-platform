@@ -197,7 +197,8 @@ class LikeScriptServiceTest
             .thenReturn(true);
         when(this.likeManager.saveLike(userReference, entityReference)).thenThrow(new LikeException("Problem"));
         assertFalse(this.likeScriptService.like(entityReference).isPresent());
-        assertEquals("Error while liking [xwiki:Foo.Foo] by [xwiki:XWiki.User]", logCapture.getMessage(0));
+        assertEquals("Error while liking [xwiki:Foo.Foo] by [xwiki:XWiki.User]. "
+            + "Root cause is [LikeException: Problem]", logCapture.getMessage(0));
     }
 
     @Test
@@ -241,7 +242,8 @@ class LikeScriptServiceTest
             .thenReturn(true);
         when(this.likeManager.removeLike(userReference, entityReference)).thenThrow(new LikeException("Problem"));
         assertFalse(this.likeScriptService.unlike(entityReference).isPresent());
-        assertEquals("Error while unliking [xwiki:Foo.Foo] by [xwiki:XWiki.User]", logCapture.getMessage(0));
+        assertEquals("Error while unliking [xwiki:Foo.Foo] by [xwiki:XWiki.User]. "
+            + "Root cause is [LikeException: Problem]", logCapture.getMessage(0));
     }
 
     @Test
@@ -262,7 +264,8 @@ class LikeScriptServiceTest
         EntityReference entityReference = new DocumentReference("xwiki", "Foo", "Foo");
         when(this.likeManager.getEntityLikes(entityReference)).thenThrow(new LikeException("Problem"));
         assertFalse(this.likeScriptService.getLikes(entityReference).isPresent());
-        assertEquals("Error while getting like information for [xwiki:Foo.Foo]", logCapture.getMessage(0));
+        assertEquals("Error while getting like information for [xwiki:Foo.Foo]. "
+            + "Root cause is [LikeException: Problem]", logCapture.getMessage(0));
     }
 
     @Test
@@ -283,7 +286,8 @@ class LikeScriptServiceTest
         EntityReference entityReference = new DocumentReference("xwiki", "Foo", "Foo");
         when(this.likeManager.isLiked(userReference, entityReference)).thenThrow(new LikeException("Problem"));
         assertFalse(this.likeScriptService.isLiked(entityReference));
-        assertEquals("Error while checking if [xwiki:Foo.Foo] is liked by [userReference]", logCapture.getMessage(0));
+        assertEquals("Error while checking if [xwiki:Foo.Foo] is liked by [userReference]. "
+            + "Root cause is [LikeException: Problem]", logCapture.getMessage(0));
     }
 
     @Test

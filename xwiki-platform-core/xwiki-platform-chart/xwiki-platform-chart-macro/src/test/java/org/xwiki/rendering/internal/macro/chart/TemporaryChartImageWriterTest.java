@@ -20,19 +20,34 @@
 package org.xwiki.rendering.internal.macro.chart;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.util.HexFormat;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.environment.Environment;
-import org.xwiki.model.ModelContext;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.ArgumentCaptor;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.rendering.macro.chart.ChartMacroParameters;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.url.ExtendedURL;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,41 +59,98 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class TemporaryChartImageWriterTest
 {
+    private static final DocumentReference DATA_DOCUMENT_REFERENCE = new DocumentReference("wiki", "space", "data");
+
+    private static final byte[] IMAGE_DATA = new byte[] { 1, 2, 3 };
+
     @InjectMockComponents
     private TemporaryChartImageWriter writer;
 
     @MockComponent
-    private ModelContext modelContext;
+    private TemporaryResourceStore temporaryResourceStore;
 
     @MockComponent
-    private Environment environment;
+    private ResourceReferenceSerializer<ResourceReference, ExtendedURL> resourceReferenceSerializer;
 
-    @MockComponent
-    private DocumentAccessBridge dab;
+    @TempDir
+    private File temporaryDirectory;
+
+    @BeforeEach
+    void beforeEach() throws Exception
+    {
+        when(this.temporaryResourceStore.getTemporaryFile(any())).then(invocation -> {
+            TemporaryResourceReference reference = invocation.getArgument(0);
+            return new File(this.temporaryDirectory,
+                reference.getModuleId() + '/' + reference.getOwningEntityReference().getName() + '/'
+                    + reference.getResourceName());
+        });
+    }
 
     @Test
-    void getStorageLocation() throws Exception
+    void writeImage() throws Exception
     {
-        WikiReference currentWikiReference = new WikiReference("wiki");
-        when(this.modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
+        ImageId imageId = this.writer.writeImage(IMAGE_DATA, DATA_DOCUMENT_REFERENCE);
 
-        when(this.environment.getTemporaryDirectory()).thenReturn(new File("/tmpdir"));
+        assertEquals(DATA_DOCUMENT_REFERENCE, imageId.getDataDocumentReference());
+        // The id is a keyed hash of the image content, not a plain hash that could be computed from the content.
+        assertEquals(64, imageId.getId().length());
+        assertNotEquals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(IMAGE_DATA)),
+            imageId.getId());
+        File imageFile = getImageFile(imageId);
+        assertArrayEquals(IMAGE_DATA, Files.readAllBytes(imageFile.toPath()));
+        // Only the image file is left in the directory.
+        assertEquals(1, imageFile.getParentFile().list().length);
+    }
 
-        File location = this.writer.getStorageLocation(new ImageId(new ChartMacroParameters()));
-        assertTrue(location.toString().matches("/tmpdir/temp/chart/wiki/space/page/.*\\.png"),
-            "Got: " + location);
+    @Test
+    void writeIdenticalImage() throws Exception
+    {
+        ImageId imageId = this.writer.writeImage(IMAGE_DATA, DATA_DOCUMENT_REFERENCE);
+        // Change the stored file to verify that it isn't written again.
+        Files.write(getImageFile(imageId).toPath(), new byte[] { 4 });
+
+        assertEquals(imageId.getId(), this.writer.writeImage(IMAGE_DATA.clone(), DATA_DOCUMENT_REFERENCE).getId());
+        assertArrayEquals(new byte[] { 4 }, Files.readAllBytes(getImageFile(imageId).toPath()));
+    }
+
+    @Test
+    void writeDifferentImages() throws Exception
+    {
+        assertNotEquals(this.writer.writeImage(IMAGE_DATA, DATA_DOCUMENT_REFERENCE).getId(),
+            this.writer.writeImage(new byte[] { 1, 2, 4 }, DATA_DOCUMENT_REFERENCE).getId());
+    }
+
+    @Test
+    void writeImageWithError() throws Exception
+    {
+        IOException exception = new IOException("Failure");
+        doThrow(exception).when(this.temporaryResourceStore).getTemporaryFile(any());
+
+        MacroExecutionException thrown = assertThrows(MacroExecutionException.class,
+            () -> this.writer.writeImage(IMAGE_DATA, DATA_DOCUMENT_REFERENCE));
+        assertEquals("Failed to write the generated chart image", thrown.getMessage());
+        assertSame(exception, thrown.getCause());
     }
 
     @Test
     void getURL() throws Exception
     {
-        WikiReference currentWikiReference = new WikiReference("wiki");
-        when(this.modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
+        ExtendedURL url = mock();
+        when(url.serialize()).thenReturn("/xwiki/tmp/chart/image.png");
+        ArgumentCaptor<ResourceReference> referenceCaptor = ArgumentCaptor.captor();
+        when(this.resourceReferenceSerializer.serialize(referenceCaptor.capture())).thenReturn(url);
+        ImageId imageId = new ImageId("id", DATA_DOCUMENT_REFERENCE);
 
-        when(this.dab.getDocumentURL(new DocumentReference("wiki", "space", "page"), "temp", null, null)).thenReturn(
-            "temp/Space/Page");
+        assertEquals("/xwiki/tmp/chart/image.png", this.writer.getURL(imageId));
+        TemporaryResourceReference reference = (TemporaryResourceReference) referenceCaptor.getValue();
+        assertEquals("chart", reference.getModuleId());
+        assertEquals(DATA_DOCUMENT_REFERENCE, reference.getOwningEntityReference());
+        assertEquals("id.png", reference.getResourceName());
+    }
 
-        String location = this.writer.getURL(new ImageId(new ChartMacroParameters()));
-        assertTrue(location.matches("temp/Space/Page/chart/.*\\.png"), "Got: " + location);
+    private File getImageFile(ImageId imageId) throws IOException
+    {
+        return this.temporaryResourceStore.getTemporaryFile(
+            new TemporaryResourceReference("chart", imageId.getId() + ".png", imageId.getDataDocumentReference()));
     }
 }

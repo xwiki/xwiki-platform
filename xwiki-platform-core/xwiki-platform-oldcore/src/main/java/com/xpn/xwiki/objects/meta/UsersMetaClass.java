@@ -51,10 +51,20 @@ public class UsersMetaClass extends ListMetaClass
         BooleanClass useListClass = new BooleanClass(this);
         useListClass.setName("usesList");
         useListClass.setPrettyName("Uses List");
-        useListClass.setDisplayType("yesno");
-        useListClass.setDisplayFormType("checkbox");
+        useListClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        useListClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         useListClass.setDefaultValue(0);
         safeput(useListClass.getName(), useListClass);
+
+        // When unchecked (the default), the picker suggests only active users, hiding users who have been disabled
+        // (e.g. accounts that never validated their registration or were purposely disabled by an administrator).
+        BooleanClass includeInactiveUsersClass = new BooleanClass(this);
+        includeInactiveUsersClass.setName(UsersClass.META_PROPERTY_INCLUDE_INACTIVE_USERS);
+        includeInactiveUsersClass.setPrettyName("Include Inactive Users");
+        includeInactiveUsersClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        includeInactiveUsersClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
+        includeInactiveUsersClass.setDefaultValue(0);
+        safeput(includeInactiveUsersClass.getName(), includeInactiveUsersClass);
     }
 
     @Override

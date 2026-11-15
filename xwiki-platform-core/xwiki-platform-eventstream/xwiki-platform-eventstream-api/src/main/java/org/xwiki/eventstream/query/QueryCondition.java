@@ -61,9 +61,7 @@ public class QueryCondition
             return true;
         }
 
-        if (obj instanceof QueryCondition) {
-            QueryCondition condition = (QueryCondition) obj;
-
+        if (obj instanceof QueryCondition condition) {
             return isReversed() == condition.isReversed();
         }
 

@@ -46,7 +46,7 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
         // default "binary" sorting.
         String collation = switch (loadedConfiguration.getDatabase()) {
             case MYSQL, MARIADB -> computeMysqlCollation(loadedConfiguration);
-            case HSQLDB_EMBEDDED -> "de_DE";
+            case HSQLDB -> "de_DE";
             case POSTGRESQL -> "unicode";
             case ORACLE -> "GENERIC_M_CI";
         };

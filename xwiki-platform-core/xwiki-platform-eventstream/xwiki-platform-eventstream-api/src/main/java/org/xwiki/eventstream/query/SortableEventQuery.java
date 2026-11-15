@@ -169,9 +169,7 @@ public interface SortableEventQuery extends EventQuery
                 return true;
             }
 
-            if (obj instanceof SortClause) {
-                SortClause otherSortClause = (SortClause) obj;
-
+            if (obj instanceof SortClause otherSortClause) {
                 EqualsBuilder builder = new EqualsBuilder();
 
                 builder.append(getProperty(), otherSortClause.getProperty());

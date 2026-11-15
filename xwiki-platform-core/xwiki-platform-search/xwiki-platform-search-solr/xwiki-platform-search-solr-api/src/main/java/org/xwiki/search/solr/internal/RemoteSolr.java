@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -128,6 +129,12 @@ public class RemoteSolr extends AbstractSolr implements Initializable
             String version = (String) systemInfo.findRecursive("lucene", "solr-impl-version");
             if (version != null) {
                 this.solrMajorVersion = Integer.parseInt(StringUtils.substringBefore(version, '.'));
+
+                if (this.solrMajorVersion < getCoreMajorVersion()) {
+                    this.logger.error("The version of the Solr server [{}] is older than the version of Solr the XWiki"
+                        + " cores are designed for ([{}]), the Solr server needs to be upgraded.", version,
+                        getCoreMajorVersion());
+                }
             } else {
                 throw new InitializationException(
                     "The Solr server does not give any information about its version in lucene -> solr-impl-version."
@@ -146,6 +153,34 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         } catch (IOException e) {
             this.logger.error("Failed to close Solr client", e);
         }
+    }
+
+    @Override
+    protected String getCoreLoadFailure(String xwikiCoreName, int solrMajorVersion) throws SolrException
+    {
+        String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
+
+        // The cores which failed to be loaded are not part of the status of the cores, but listed separately
+        Object failures;
+        try {
+            CoreAdminRequest request = new CoreAdminRequest();
+            request.setAction(CoreAdminAction.STATUS);
+            failures = request.process(this.rootClient).getResponse().get("initFailures");
+        } catch (Exception e) {
+            throw new SolrException("Failed to get the status of the cores", e);
+        }
+
+        Object failure = failures instanceof Map<?, ?> failureMap ? failureMap.get(solrCoreName) : null;
+
+        return failure != null ? failure.toString() : null;
+    }
+
+    @Override
+    protected String getImpossibleMigrationHint(int intermediateVersion)
+    {
+        return String.format("To keep the data, migrate it first with a Solr %d server: start XWiki with a Solr %d"
+            + " server containing both cores, then move the migrated core to the current Solr server.",
+            intermediateVersion, intermediateVersion);
     }
 
     private Set<String> getCores() throws SolrServerException, IOException
@@ -174,6 +209,16 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     }
 
     @Override
+    protected void reloadCore(XWikiSolrCore core) throws SolrException
+    {
+        try {
+            CoreAdminRequest.reloadCore(core.getSolrName(), this.rootClient);
+        } catch (Exception e) {
+            throw new SolrException("Failed to reload the Solr core [" + core.getSolrName() + "]", e);
+        }
+    }
+
+    @Override
     protected XWikiSolrCore getCore(String xwikiCoreName, int solrMajorVersion) throws SolrException
     {
         String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
@@ -190,7 +235,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
 
         // Create the client core handler
         SolrClient solrClient = new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
-        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, solrClient, getSolrMajorVersion());
+        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, solrClient, solrMajorVersion);
     }
 
     private String getCorePrefix()

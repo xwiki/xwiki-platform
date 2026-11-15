@@ -30,12 +30,20 @@ describe("DisplayerText.vue", () => {
   });
 
   it("Renders an entry in view mode", () => {
-    const wrapper = initWrapper(DisplayerText, {});
+    const wrapper = initWrapper(DisplayerText, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
     expect(wrapper.text()).toMatch("red");
   });
 
   it("Renders an entry in edit mode", async () => {
-    const wrapper = initWrapper(DisplayerText, {});
+    const wrapper = initWrapper(DisplayerText, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
 
     await wrapper.setProps({ isView: false });
 

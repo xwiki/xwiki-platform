@@ -38,11 +38,19 @@ public class ShareResultDialog extends BaseElement
     @FindBy(xpath = "//a[contains(@class, 'share-backlink')]")
     private WebElement backLink;
 
+    /**
+     * @return the message telling whether the email was sent or not
+     */
     public String getResultMessage()
     {
         return this.infoDiv.getText();
     }
 
+    /**
+     * Clicks the link that goes back to the shared page.
+     *
+     * @return the shared page
+     */
     public ViewPage clickBackLink()
     {
         this.backLink.click();

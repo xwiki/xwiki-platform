@@ -81,7 +81,7 @@ public class FarmTreeNode extends AbstractEntityTreeNode
         try {
             return this.wikiDescriptorManager.getAll().stream()
                 .filter(wikiDescriptor -> !getExcludedWikis().contains(wikiDescriptor.getId()))
-                .collect(Collectors.toList());
+                .toList();
         } catch (WikiManagerException e) {
             this.logger.warn("Failed to retrieve the list of wikis. Root cause [{}].",
                 ExceptionUtils.getRootCauseMessage(e));

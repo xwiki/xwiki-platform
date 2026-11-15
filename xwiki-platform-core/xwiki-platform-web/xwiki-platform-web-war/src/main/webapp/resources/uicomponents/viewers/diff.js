@@ -200,5 +200,5 @@ define('xwiki-diff', ['jquery', 'xwiki-events-bridge'], function($) {
 });
 
 // Execute the code when this file is loaded with $xwiki.jsfx.use(). This is not needed if the file is loaded with
-// RequireJS but it shoudn't hurt either. We do this in order to ensure that the module code is executed only once.
+// RequireJS but it shouldn't hurt either. We do this in order to ensure that the module code is executed only once.
 require(['xwiki-diff'], function() {});

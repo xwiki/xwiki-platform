@@ -63,12 +63,10 @@ class OnDemandDocumentTranslationBundle extends AbstractDocumentTranslationBundl
     {
         super.onEvent(event, source, data);
 
-        if (this.factory != null) {
-            if (event instanceof WikiDeletedEvent) {
-                // Clean on demand bundles cache here because DocumentTranslationBundleFactory won't (it does not
-                // receive document deleted event when a wiki is deleted)
-                this.factory.clear(this.uid);
-            }
+        if (this.factory != null && event instanceof WikiDeletedEvent) {
+            // Clean on demand bundles cache here because DocumentTranslationBundleFactory won't (it does not
+            // receive document deleted event when a wiki is deleted)
+            this.factory.clear(this.uid);
         }
     }
 }

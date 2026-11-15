@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @version $Id$
  */
-public class ArtifactCoordinateTest
+class ArtifactCoordinateTest
 {
     @Test
     void parseArtifacts()

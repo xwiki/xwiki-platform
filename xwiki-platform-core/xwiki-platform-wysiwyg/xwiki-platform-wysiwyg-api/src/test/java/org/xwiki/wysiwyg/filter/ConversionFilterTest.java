@@ -39,7 +39,7 @@ import org.xwiki.wysiwyg.converter.RequestParameterConverter;
 import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -103,12 +103,9 @@ class ConversionFilterTest
         IOException exception = new IOException("failure");
         when(defaultParameterConverter.convert(this.request, this.response)).thenThrow(exception);
 
-        try {
-            this.conversionFilter.doFilter(this.request, this.response, this.chain);
-            fail();
-        } catch (IOException e) {
-            assertSame(exception, e);
-        }
+        IOException e = assertThrows(IOException.class,
+            () -> this.conversionFilter.doFilter(this.request, this.response, this.chain));
+        assertSame(exception, e);
         verify(this.chain, never()).doFilter(any(ServletRequest.class), eq(this.response));
         verify(this.execution).popContext();
     }

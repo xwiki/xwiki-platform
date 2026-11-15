@@ -27,22 +27,20 @@
 <template>
   <!--
     The Livedata Dropdown
-    Uses the Bootstrap 3 dropdown syntax.
+    Opens as a popover, so that the containers of the Live Data can't clip it.
   -->
-  <div class="livedata-dropdown-menu btn-group">
+  <XWikiPopoverDropdown
+    class="livedata-dropdown-menu btn-group"
+    :toggle-title="$t('livedata.dropdownMenu.title')"
+    menu-class="dropdown-menu-right"
+  >
     <!-- Drowpdown open / close button-->
-    <button
-      class="btn btn-default dropdown-toggle"
-      :title="$t('livedata.dropdownMenu.title')"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
+    <template #toggle>
       <XWikiIcon :icon-descriptor="{ name: 'more-vertical' }" />
-    </button>
+    </template>
 
     <!-- Drowpdown body -->
-    <ul class="dropdown-menu dropdown-menu-right">
+    <template #default>
       <!-- Actions -->
       <li>
         <span class="dropdown-header">{{
@@ -58,6 +56,26 @@
             >
               <XWikiIcon :icon-descriptor="{ name: 'repeat' }" />
               {{ $t("livedata.action.refresh") }}
+            </a>
+          </li>
+          <!-- Maximized view, which displays the Live Data on its own, over the rest of the
+          page. -->
+          <li>
+            <a
+              href="#"
+              @click.prevent="logic.toggleMaximized()"
+              class="livedata-action-maximize"
+            >
+              <XWikiIcon
+                :icon-descriptor="{
+                  name: isMaximized ? 'minimize' : 'maximize',
+                }"
+              />
+              {{
+                isMaximized
+                  ? $t("livedata.action.minimize")
+                  : $t("livedata.action.maximize")
+              }}
             </a>
           </li>
         </ul>
@@ -104,18 +122,20 @@
           </li>
         </ul>
       </li>
-    </ul>
-  </div>
+    </template>
+  </XWikiPopoverDropdown>
 </template>
 
 <script>
 import XWikiIcon from "./utilities/XWikiIcon.vue";
+import XWikiPopoverDropdown from "./utilities/XWikiPopoverDropdown.vue";
 
 export default {
   name: "LivedataDropdownMenu",
 
   components: {
     XWikiIcon,
+    XWikiPopoverDropdown,
   },
 
   inject: ["logic"],
@@ -123,6 +143,9 @@ export default {
   computed: {
     data() {
       return this.logic.data;
+    },
+    isMaximized() {
+      return this.logic.isMaximized();
     },
   },
 
@@ -141,32 +164,11 @@ export default {
 
 <style>
 .livedata-dropdown-menu {
-  /* Similar to .flat-buttons() */
-  .btn-default {
-    background-color: var(--breadcrumb-bg);
-    background-image: none;
-    border-color: var(--dropdown-divider-bg);
-    box-shadow: none;
-    color: var(--dropdown-link-color);
-    text-shadow: none;
-  }
-
-  .btn-default:hover,
-  .btn-default:active,
-  .btn-default:focus,
-  .open .dropdown-toggle {
-    border-color: hsl(from var(--dropdown-divider-bg) h s calc(l - 0.1));
-  }
-
   /* Style each section of the dropdown */
   ul.dropdown-menu > li > ul {
     list-style: none;
     padding-left: 0;
   }
-}
-
-.livedata-dropdown-menu .btn-default span {
-  vertical-align: middle;
 }
 
 /*

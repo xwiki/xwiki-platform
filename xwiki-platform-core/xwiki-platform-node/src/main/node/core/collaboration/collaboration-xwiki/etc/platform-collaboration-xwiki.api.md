@@ -4,8 +4,11 @@
 
 ```ts
 
+import { Collaboration } from '@xwiki/platform-collaboration-api';
+import { CollaborationManager } from '@xwiki/platform-collaboration-api';
 import { Container } from 'inversify';
 import { WebsocketProvider } from 'y-websocket';
+import { XWikiDocument } from '@xwiki/platform-document-xwiki';
 
 // @beta (undocumented)
 export class ComponentInit {
@@ -14,6 +17,24 @@ export class ComponentInit {
 
 // @beta
 export function createXWikiWebSocketProvider(url: string, room: string, locale: string): WebsocketProvider;
+
+// @beta
+export type FormCollaboration = {
+    collaboration: Collaboration;
+    startAutoSave(): void;
+    leave(): void;
+};
+
+// @beta
+export type FormCollaborationOptions = {
+    collaborationManager: CollaborationManager;
+    document: XWikiDocument;
+    formId?: string;
+    autoSaveVersionSummary?: string;
+};
+
+// @beta
+export function joinFormCollaboration(options: FormCollaborationOptions): Promise<FormCollaboration>;
 
 // (No @packageDocumentation comment for this package)
 

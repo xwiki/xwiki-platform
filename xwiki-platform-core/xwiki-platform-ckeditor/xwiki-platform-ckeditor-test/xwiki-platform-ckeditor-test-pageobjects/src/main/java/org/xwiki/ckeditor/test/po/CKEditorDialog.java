@@ -21,7 +21,6 @@ package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
 import static org.openqa.selenium.By.cssSelector;
@@ -33,7 +32,6 @@ import static org.openqa.selenium.By.cssSelector;
  * @since 15.5.1
  * @since 15.6RC1
  */
-@Unstable
 public class CKEditorDialog extends BaseElement
 {
     private static final By DIALOG_CONTENTS = By.className("cke_dialog_contents");
@@ -51,8 +49,20 @@ public class CKEditorDialog extends BaseElement
      */
     public void submit()
     {
-        getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
+        clickOk();
         getDriver().waitUntilElementDisappears(DIALOG_CONTENTS);
+    }
+
+    /**
+     * Clicks the OK button without waiting for the dialog to be closed, e.g. because the dialog is expected to reject
+     * the submission.
+     *
+     * @since 18.4.6
+     * @since 18.8.0RC1
+     */
+    protected void clickOk()
+    {
+        getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
     }
 
     /**

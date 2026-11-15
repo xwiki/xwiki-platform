@@ -33,7 +33,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,7 +58,8 @@ class DefaultNotificationFilterDisplayerTest
     @BeforeEach
     void setUp()
     {
-        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
+        ScriptContext scriptContextMock = mock(ScriptContext.class);
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContextMock);
     }
 
     @Test
@@ -73,7 +73,7 @@ class DefaultNotificationFilterDisplayerTest
 
         this.defaultNotificationFilterDisplayer.display(filter, mock(NotificationFilterPreference.class));
 
-        verify(this.templateManager).execute(eq(fakeTemplate));
+        verify(this.templateManager).execute(fakeTemplate);
     }
 
     @Test
@@ -86,6 +86,6 @@ class DefaultNotificationFilterDisplayerTest
 
         this.defaultNotificationFilterDisplayer.display(filter, mock(NotificationFilterPreference.class));
 
-        verify(this.templateManager).execute(eq("notification/filters/default.vm"));
+        verify(this.templateManager).execute("notification/filters/default.vm");
     }
 }

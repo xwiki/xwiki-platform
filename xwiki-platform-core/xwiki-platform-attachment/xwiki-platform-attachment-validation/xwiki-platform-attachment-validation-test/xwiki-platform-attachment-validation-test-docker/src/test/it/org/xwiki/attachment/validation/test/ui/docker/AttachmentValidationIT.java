@@ -23,8 +23,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -97,10 +97,10 @@ class AttachmentValidationIT
         cleanNotification(setup, error);
 
         // Check if the same validation is applied when uploading through the REST API.
-        PutMethod putMethod = restUploadImage(setup, testReference, DISGUISED_FILE_NAME);
-        assertEquals(415, putMethod.getStatusCode());
+        CloseableHttpResponse response = restUploadImage(setup, testReference, DISGUISED_FILE_NAME);
+        assertEquals(415, response.getCode());
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> mapResult = objectMapper.readValue(putMethod.getResponseBodyAsStream(), Map.class);
+        Map<String, Object> mapResult = objectMapper.readValue(response.getEntity().getContent(), Map.class);
         assertEquals(Map.of(
             "message", "Invalid mimetype [text/plain]",
             "translationKey", "attachment.validation.mimetype.rejected",
@@ -146,10 +146,10 @@ class AttachmentValidationIT
         assertEquals("File image.gif is too large (194 bytes). Max file size: 10 bytes.", errorSize.getText());
 
         // Check if the attachment validators are also executed when uploading attachment through the rest API.
-        PutMethod putMethodText = restUploadImage(setup, subPage, TEXT_FILE_NAME);
-        assertEquals(415, putMethodText.getStatusCode());
+        CloseableHttpResponse testResponse = restUploadImage(setup, subPage, TEXT_FILE_NAME);
+        assertEquals(415, testResponse.getCode());
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> mapResult = objectMapper.readValue(putMethodText.getResponseBodyAsStream(), Map.class);
+        Map<String, Object> mapResult = objectMapper.readValue(testResponse.getEntity().getContent(), Map.class);
         Map<String, Object> expectedMap = Map.of(
             "message", "Invalid mimetype [text/plain]",
             "translationKey", "attachment.validation.mimetype.rejected",
@@ -157,9 +157,9 @@ class AttachmentValidationIT
         );
         assertEquals(expectedMap, mapResult);
 
-        PutMethod putMethodImage = restUploadImage(setup, subPage, IMAGE_FILE_NAME);
-        assertEquals(413, putMethodImage.getStatusCode());
-        mapResult = objectMapper.readValue(putMethodImage.getResponseBodyAsStream(), Map.class);
+        CloseableHttpResponse imageResponse = restUploadImage(setup, subPage, IMAGE_FILE_NAME);
+        assertEquals(413, imageResponse.getCode());
+        mapResult = objectMapper.readValue(imageResponse.getEntity().getContent(), Map.class);
         expectedMap = Map.of(
             "message", "File size too big",
             "translationKey", "attachment.validation.filesize.rejected",
@@ -172,7 +172,8 @@ class AttachmentValidationIT
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
     }
 
-    private PutMethod restUploadImage(TestUtils setup, DocumentReference subPage, String imageFileName) throws Exception
+    private CloseableHttpResponse restUploadImage(TestUtils setup, DocumentReference subPage, String imageFileName)
+        throws Exception
     {
         return setup.rest().executePut(AttachmentResource.class,
             IOUtils.toByteArray(this.getClass().getResourceAsStream("/" + imageFileName)),

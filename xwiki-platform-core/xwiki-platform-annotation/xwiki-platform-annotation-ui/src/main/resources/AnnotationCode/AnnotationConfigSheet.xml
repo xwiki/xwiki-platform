@@ -323,7 +323,7 @@ $annotationsConfigDoc.display('annotationClass', 'edit')
     function readSavedValues(savedValuesString) {
       // Extract the list and transform local space references to space webhome references as IDs in the tree.
       //
-      // When splitting by the separator char ('), we want to avoid values that contain the spliting char inside them, escaped.
+      // When splitting by the separator char ('), we want to avoid values that contain the splitting char inside them, escaped.
       // Trick: Since JavaScript does not support negative lookbehind regex "(?&lt;!\\)," we apply a negative lookahead ",(?!\\)" on the reversed string to properly split.
       return reverseString(savedValuesString).split(/\s*,(?!\\)\s*/).map(function(refString) {
         if (!refString) {

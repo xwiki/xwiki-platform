@@ -32,7 +32,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Update XWiki.XWikiComments document with all required informations.
+ * Update XWiki.XWikiComments document with all required information.
  *
  * @version $Id$
  * @since 4.3M1

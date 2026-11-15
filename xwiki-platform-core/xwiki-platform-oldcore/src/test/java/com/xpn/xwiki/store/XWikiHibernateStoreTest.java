@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.context.Execution;
@@ -51,8 +52,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
-import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -68,6 +69,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
@@ -79,16 +81,19 @@ import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -103,6 +108,8 @@ class XWikiHibernateStoreTest
     private static final String WIKI_NAME = "wiki";
 
     private static final WikiReference WIKI_REFERENCE = new WikiReference(WIKI_NAME);
+
+    private static final String DELETE_LOCK_QUERY = "delete from XWikiLock as lock where lock.docId = :docId";
 
     /**
      * A special component manager that mocks automatically all the dependencies of the component under test.
@@ -203,7 +210,7 @@ class XWikiHibernateStoreTest
     }
 
     @Test
-    void getColumnsForSelectStatement() throws Exception
+    void getColumnsForSelectStatement()
     {
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
@@ -277,19 +284,77 @@ class XWikiHibernateStoreTest
     }
 
     @Test
-    void createHibernateSequenceIfRequiredWhenNotInUpdateCommands() throws Exception
+    void loadLock() throws Exception
     {
-        Session session = mock(Session.class);
+        XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
+        when(this.session.get(XWikiLock.class, 13L)).thenReturn(lock);
+
+        assertSame(lock, this.store.loadLock(13L, this.xcontext, true));
+
+        // The lock is read with a single statement, so that it can't be removed concurrently between checking that it
+        // exists and loading it.
+        verify(this.session, never()).createQuery(any(String.class), any(Class.class));
+        verify(this.session, never()).load(any(Object.class), any());
+    }
+
+    @Test
+    void loadLockWhenThereIsNoLock() throws Exception
+    {
+        assertNull(this.store.loadLock(13L, this.xcontext, true));
+    }
+
+    @Test
+    void deleteLock() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+
+        this.store.deleteLock(new XWikiLock(13L, "XWiki.Alice"), this.xcontext, true);
+
+        // A bulk delete is used, rather than deleting the entity, so that removing a lock that has been removed in the
+        // mean time is a no-op.
+        verify(this.session, never()).delete(any());
+        verify(query).setParameter("docId", 13L);
+        verify(query).executeUpdate();
+        verify(this.hibernateStore).endTransaction(true);
+    }
+
+    @Test
+    void saveLock() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+
+        XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
+        this.store.saveLock(lock, this.xcontext, true);
+
+        // The previous lock, if any, is removed before the new one is saved, because updating it in place would fail if
+        // it has been removed in the mean time.
+        InOrder inOrder = inOrder(query, this.session);
+        inOrder.verify(query).executeUpdate();
+        inOrder.verify(this.session).save(lock);
+
+        verify(query).setParameter("docId", 13L);
+        verify(this.session, never()).update(any());
+        verify(this.hibernateStore).endTransaction(true);
+    }
+
+    @Test
+    void createHibernateSequenceIfRequiredWhenNotInUpdateCommands()
+    {
+        Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
-        this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", session);
+        this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", sessionMock);
 
-        verify(session).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery).executeUpdate();
     }
 
@@ -297,20 +362,20 @@ class XWikiHibernateStoreTest
      * We verify that the sequence is not created if it's already in the update script.
      */
     @Test
-    void createHibernateSequenceIfRequiredWhenInUpdateCommands() throws Exception
+    void createHibernateSequenceIfRequiredWhenInUpdateCommands()
     {
-        Session session = mock(Session.class);
+        Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(
-            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", session);
+            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", sessionMock);
 
-        verify(session, never()).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock, never()).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery, never()).executeUpdate();
     }
 
@@ -330,8 +395,9 @@ class XWikiHibernateStoreTest
 
         // Query to check if the object exists already (save versus update).
         when(xcontext.get("hibsession")).thenReturn(session);
+        Query queryMock = mock(Query.class);
         when(session.createQuery("select obj.id from BaseObject as obj where obj.id = :id", Long.class))
-            .thenReturn(mock(Query.class));
+            .thenReturn(queryMock);
 
         // Save each object property.
         String propertyName = "query";

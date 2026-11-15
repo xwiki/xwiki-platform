@@ -179,8 +179,8 @@ public class DisplayScriptService implements ScriptService
         try {
             content = document.getTranslatedContent();
         } catch (XWikiException e) {
-            this.logger.warn("Failed to get the translated content of document [{}].", document.getPrefixedFullName(),
-                e);
+            this.logger.warn("Failed to get the translated content of document [{}]",
+                document.getPrefixedFullName(), e);
             return null;
         }
         String renderedContent =

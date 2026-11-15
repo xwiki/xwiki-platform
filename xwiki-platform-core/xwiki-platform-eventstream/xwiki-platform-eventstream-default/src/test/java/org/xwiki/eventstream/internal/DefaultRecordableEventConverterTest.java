@@ -84,7 +84,7 @@ class DefaultRecordableEventConverterTest
     private static final Set<String> TARGETS = SetUtils.hashSet("userB", "groupC");
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         XWikiContext context = mock(XWikiContext.class);
         when(contextProvider.get()).thenReturn(context);
@@ -154,7 +154,7 @@ class DefaultRecordableEventConverterTest
     }
 
     @Test
-    void getSupportedEvents() throws Exception
+    void getSupportedEvents()
     {
         assertTrue(this.recordableEventConverter.getSupportedEvents().isEmpty());
     }

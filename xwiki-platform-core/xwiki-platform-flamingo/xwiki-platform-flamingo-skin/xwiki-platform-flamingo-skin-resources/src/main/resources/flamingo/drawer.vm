@@ -28,12 +28,22 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
     ## Drawer header (with elements concerning the current user: profile, login, logout, register, etc...)
     ##
     <li class="drawer-brand clearfix">
-      <a href="$xwiki.getURL($xcontext.user, 'view')">
-        #largeUserAvatar($xcontext.user)
-      </a>
+      #displayUser($xcontext.user {
+        'useInlineHTML': true,
+        'displayName': false,
+        'avatarClass': 'large-avatar circle-avatar'
+      })
       <div class="brand-links">
         #define ($logoutLink)
-          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout" rel="nofollow">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
+          ## In the event of a logout action being performed while currently on the logout page
+          ## (e.g., due to a CSRF error), we do not want to loop back to it. We also can't trust the original xredirect
+          ## if the CSRF token was invalid, so to be safe we redirect to the home page.
+          #if ($xcontext.action == 'logout')
+            #set ($logoutXRedirect = $xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference, 'view'))
+          #else
+            #set ($logoutXRedirect = $xwiki.relativeRequestURL)
+          #end
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', $escapetool.url({'xredirect': $logoutXRedirect, 'form_token': $services.csrf.getToken()}))" id="tmLogout" rel="nofollow">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
         #end
         #if ($xcontext.user != 'XWiki.XWikiGuest')
           <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.user, false)</a>
@@ -129,7 +139,7 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
         #drawerSeparator()
         #set ($canHaveMenuSeparator = false)
       #end
-      #set ($content = $services.rendering.render($uix.execute(), 'html/5.0'))
+      #set ($content = $services.uix.render($uix, 'html/5.0'))
       $content
       #if (!$canHaveMenuSeparator && $stringtool.isNotBlank($content))
         #set ($canHaveMenuSeparator = true)

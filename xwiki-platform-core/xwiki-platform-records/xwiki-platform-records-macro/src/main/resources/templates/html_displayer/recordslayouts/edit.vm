@@ -1,0 +1,42 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the layout picker of a Records table: one radio button per layout the macro offers.
+##
+## The macro editor collects the inputs whose name matches the parameter id, and when the first of them is a radio it
+## keeps the group and checks the one whose value matches the parameter value, so the group needs no JavaScript of
+## its own. It also puts the computed id on the first input and points the parameter label at it, which is why no id
+## is set here: each radio carries its own label instead, wrapping the input so that it needs no id to be associated
+## with it.
+##
+## The labels are Live Data's own layout names, already translated, rather than keys of this module: they name the
+## same thing the reader sees, and there is no reason for the dialog to call it something else.
+#set ($layouts = ['table', 'cards'])
+#foreach ($layout in $layouts)
+  <div class="radio">
+    <label>
+      <input type="radio" value="$escapetool.xml($layout)"#if ($layout == "$!displayer.value") checked#end
+        #foreach ($parameter in $displayer.parameters.entrySet())
+          $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+        #end
+      />
+      $escapetool.xml($services.localization.render("liveData.layout.$layout"))
+    </label>
+  </div>
+#end

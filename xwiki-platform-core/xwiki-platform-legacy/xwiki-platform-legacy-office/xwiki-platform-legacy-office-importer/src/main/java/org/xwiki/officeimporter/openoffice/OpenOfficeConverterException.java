@@ -24,9 +24,9 @@ package org.xwiki.officeimporter.openoffice;
  * 
  * @version $Id$
  * @since 2.2M1
- * @deprecated since 5.0M2, use {@link org.xwiki.officeimporter.converter.OfficeConverterException} instead
+ * @deprecated use {@link org.xwiki.officeimporter.converter.OfficeConverterException} instead
  */
-@Deprecated
+@Deprecated(since = "5.0M2")
 public class OpenOfficeConverterException extends Exception
 {
     /**

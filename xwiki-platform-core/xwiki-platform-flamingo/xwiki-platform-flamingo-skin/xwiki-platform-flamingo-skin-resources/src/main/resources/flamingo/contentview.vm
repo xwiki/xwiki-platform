@@ -43,9 +43,7 @@ $services.progress.startStep('Display the title and content')
 ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea" class="xcontent">
   #template('contentheader.vm')
-  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.content.header.after'))
-    $services.rendering.render($uix.execute(), 'xhtml/1.0')
-  #end
+  $services.uix.renderExtensions('org.xwiki.platform.template.content.header.after', 'html/5.0')
   ## --------------------------------------------------------------------------
   ## Drop permissions as they are no longer needed. This allows us not to have
   ## to review the code below for security holes since nothing bad can happen.

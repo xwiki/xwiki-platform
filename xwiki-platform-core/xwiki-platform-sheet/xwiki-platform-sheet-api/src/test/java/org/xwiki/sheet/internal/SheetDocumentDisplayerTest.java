@@ -26,17 +26,22 @@ import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.sheet.SheetManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
@@ -78,6 +83,12 @@ class SheetDocumentDisplayerTest
 
     @MockComponent
     private DocumentDisplayer documentDisplayer;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void configure()
@@ -187,5 +198,81 @@ class SheetDocumentDisplayerTest
 
         // The previous execution context must be restored.
         verify(this.documentAccessBridge).popDocumentFromContext(backupObjects);
+    }
+
+    /**
+     * Tests that the document is displayed by the default document displayer when the sheet is the document itself.
+     * This ensures the unsaved changes of the document are not lost by rendering the version from the database.
+     *
+     * @throws Exception if something wrong happens
+     */
+    @Test
+    void displayWithoutSheetWhenTheSheetIsTheDocumentItself() throws Exception
+    {
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+
+        setCurrentDocument(document);
+
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(DOCUMENT_REFERENCE));
+
+        XDOM output = new XDOM(List.of());
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        when(this.documentDisplayer.display(document, parameters)).thenReturn(output);
+
+        assertSame(output, this.displayer.display(document, parameters));
+    }
+
+    /**
+     * Tests that the default document displayer is used when the title is displayed but the sheet doesn't control it.
+     *
+     * @throws Exception if something wrong happens
+     */
+    @Test
+    void displayWithoutSheetWhenTheSheetDoesNotControlTheTitle() throws Exception
+    {
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+        // The sheet has no title.
+        mockDocument(SHEET_REFERENCE);
+
+        setCurrentDocument(document);
+
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(SHEET_REFERENCE));
+
+        XDOM output = new XDOM(List.of());
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        parameters.setTitleDisplayed(true);
+        when(this.documentDisplayer.display(document, parameters)).thenReturn(output);
+
+        assertSame(output, this.displayer.display(document, parameters));
+
+        // The sheet is not applied so there's no need to change the security document.
+        verify(this.modelBridge, never()).setSecurityDocument(any(DocumentModelBridge.class));
+    }
+
+    /**
+     * Tests that the default document displayer is used when applying the sheet fails.
+     *
+     * @throws Exception if something wrong happens
+     */
+    @Test
+    void displayWithoutSheetWhenApplyingTheSheetFails() throws Exception
+    {
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+
+        setCurrentDocument(document);
+
+        when(this.sheetManager.getSheets(document, "view")).thenReturn(List.of(SHEET_REFERENCE));
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(SHEET_REFERENCE))
+            .thenThrow(new Exception("Database is down"));
+        when(this.entityReferenceSerializer.serialize(SHEET_REFERENCE)).thenReturn("wiki2:Code.Sheet");
+
+        XDOM output = new XDOM(List.of());
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        when(this.documentDisplayer.display(document, parameters)).thenReturn(output);
+
+        assertSame(output, this.displayer.display(document, parameters));
+
+        assertEquals("Failed to apply sheet [wiki2:Code.Sheet]",
+            this.logCapture.getMessage(0));
     }
 }

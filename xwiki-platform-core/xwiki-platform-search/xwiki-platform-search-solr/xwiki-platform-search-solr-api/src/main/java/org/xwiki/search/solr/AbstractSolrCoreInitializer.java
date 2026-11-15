@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -159,6 +160,14 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_17_10_9 = 171009000;
 
     /**
+     * The base schema version for XWiki 18.10.
+     *
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public static final long SCHEMA_VERSION_18_10 = 181000000;
+
+    /**
      * The base schema version.
      */
     public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_17_10_9;
@@ -273,9 +282,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         // because they are required for things located in solrconfig.xml which is unfortunately impossible to
         // update at runtime
 
-        //////////
         // TYPES
-        //////////
 
         addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, SolrSchemaUtils.SOLR_FIELD_CLASS_STR,
             SOLR_FIELD_SORTMISSINGLAST, true, SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
@@ -325,9 +332,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     private void migrateBaseSchema(long xversion) throws SolrException
     {
         if (xversion < SCHEMA_VERSION_12_10) {
-            //////////
             // TYPES
-            //////////
 
             addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, false);
             addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERALS, true);
@@ -803,7 +808,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * Add a field in the Solr schema.
      * 
      * @param name the name of the field to add
-     * @param type the tpe of the field to addd
+     * @param type the type of the field to add
      * @param dynamic true to create a dynamic field
      * @param attributes attributed to add to the field definition
      * @throws SolrException when failing to add the field

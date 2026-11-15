@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.reference.DocumentReference;
@@ -68,6 +70,9 @@ public class RightsFilterListener extends AbstractEventListener
     public static final String NAME = "org.xwiki.security.authorization.internal.RightsFilterListener";
 
     @Inject
+    private Logger logger;
+
+    @Inject
     private AuthorizationManager authorization;
 
     @Inject
@@ -90,7 +95,7 @@ public class RightsFilterListener extends AbstractEventListener
 
         // Check local rights
         checkModifiedRights(userEvent.getUserReference(), document, XWikiRightsDocumentInitializer.CLASS_REFERENCE,
-            null);
+            (CancelableEvent) event);
 
         // Check global rights
         checkModifiedRights(userEvent.getUserReference(), document,
@@ -100,8 +105,7 @@ public class RightsFilterListener extends AbstractEventListener
         checkModifiedRequiredRights(userEvent.getUserReference(), document, (CancelableEvent) event);
     }
 
-    private void checkModifiedRequiredRights(DocumentReference user, XWikiDocument document,
-        CancelableEvent event)
+    private void checkModifiedRequiredRights(DocumentReference user, XWikiDocument document, CancelableEvent event)
     {
         XWikiDocument originalDocument = document.getOriginalDocument();
         DocumentRequiredRights originalRequiredRights =
@@ -132,38 +136,68 @@ public class RightsFilterListener extends AbstractEventListener
     {
         XWikiDocument originalDocument = document.getOriginalDocument();
 
-        List<BaseObject> originalRights = originalDocument.getXObjects(classReference);
-        List<BaseObject> rights = document.getXObjects(classReference);
-        try {
-            checkModifiedRights(user, document.getDocumentReference(), originalRights, rights);
-        } catch (AccessDeniedException e) {
-            if (event instanceof UserDeletingDocumentEvent) {
-                // Cancel the delete because it might have an impact on other documents
-                event.cancel("Deleting the document have an impact on rights the author does not have");
-            } else {
-                // Cancel all the right modifications
-                cancel(document, originalRights, rights);
-            }
-        }
-    }
+        // Copy the lists since the document ones are modified when reverting a modification
+        List<BaseObject> originalRights = new ArrayList<>(originalDocument.getXObjects(classReference));
+        List<BaseObject> rights = new ArrayList<>(document.getXObjects(classReference));
 
-    private void cancel(XWikiDocument document, List<BaseObject> originalRights, List<BaseObject> rights)
-    {
         for (int i = 0; i < originalRights.size() || i < rights.size(); ++i) {
             BaseObject originalRightObject = i < originalRights.size() ? originalRights.get(i) : null;
             BaseObject rightObject = i < rights.size() ? rights.get(i) : null;
 
-            if (originalRightObject != null) {
-                document.getXObjectsToRemove().remove(originalRightObject);
-                if (rightObject != null) {
-                    rightObject.apply(originalRightObject, true);
-                } else {
-                    document.setXObject(originalRightObject.getNumber(), originalRightObject.clone());
+            if (!Objects.equals(originalRightObject, rightObject)) {
+                try {
+                    checkModifiedRights(originalRightObject, user, document.getDocumentReference());
+                    checkModifiedRights(rightObject, user, document.getDocumentReference());
+                } catch (AccessDeniedException e) {
+                    if (event instanceof UserDeletingDocumentEvent) {
+                        // Cancel the delete because it might have an impact on other documents
+                        event.cancel("Deleting the document have an impact on rights the author does not have");
+
+                        // The whole delete is cancelled, no need to check the other rights
+                        break;
+                    }
+
+                    // Revert only the modification the user is not allowed to do and keep the other ones
+                    cancel(user, document, originalRightObject, rightObject);
                 }
-            } else if (rightObject != null) {
-                document.removeXObject(rightObject);
             }
         }
+    }
+
+    private void cancel(DocumentReference user, XWikiDocument document, BaseObject originalRightObject,
+        BaseObject rightObject)
+    {
+        if (originalRightObject != null) {
+            document.getXObjectsToRemove().remove(originalRightObject);
+            if (rightObject != null) {
+                this.logger.warn("The modification of the right [{}] in the document [{}] has been reverted because"
+                    + " the user [{}] is not allowed to do it", getRightDescription(rightObject),
+                    document.getDocumentReference(), user);
+
+                rightObject.apply(originalRightObject, true);
+            } else {
+                this.logger.warn("The right [{}] has been restored in the document [{}] because the user [{}] is not"
+                    + " allowed to remove it", getRightDescription(originalRightObject),
+                    document.getDocumentReference(), user);
+
+                document.setXObject(originalRightObject.getNumber(), originalRightObject.clone());
+            }
+        } else if (rightObject != null) {
+            this.logger.warn("The right [{}] has been removed from the document [{}] because the user [{}] is not"
+                + " allowed to set it", getRightDescription(rightObject), document.getDocumentReference(), user);
+
+            document.removeXObject(rightObject);
+        }
+    }
+
+    private String getRightDescription(BaseObject rightObject)
+    {
+        return String.format("%s[%s] with levels = [%s], users = [%s], groups = [%s] and allow = [%s]",
+            rightObject.getXClassReference().getName(), rightObject.getNumber(),
+            rightObject.getStringValue(XWikiConstants.LEVELS_FIELD_NAME),
+            rightObject.getStringValue(XWikiConstants.USERS_FIELD_NAME),
+            rightObject.getStringValue(XWikiConstants.GROUPS_FIELD_NAME),
+            rightObject.getIntValue(XWikiConstants.ALLOW_FIELD_NAME));
     }
 
     private void checkModifiedRights(BaseObject rightObject, DocumentReference user, DocumentReference document)
@@ -192,20 +226,6 @@ public class RightsFilterListener extends AbstractEventListener
                         this.authorization.checkAccess(right, user, document.getParent());
                     }
                 }
-            }
-        }
-    }
-
-    private void checkModifiedRights(DocumentReference user, DocumentReference document,
-        List<BaseObject> originalRightObjects, List<BaseObject> rightObjects) throws AccessDeniedException
-    {
-        for (int i = 0; i < originalRightObjects.size() || i < rightObjects.size(); ++i) {
-            BaseObject originalRightObject = i < originalRightObjects.size() ? originalRightObjects.get(i) : null;
-            BaseObject rightObject = i < rightObjects.size() ? rightObjects.get(i) : null;
-
-            if (!Objects.equals(originalRightObject, rightObject)) {
-                checkModifiedRights(originalRightObject, user, document);
-                checkModifiedRights(rightObject, user, document);
             }
         }
     }

@@ -559,7 +559,7 @@ XWiki.Dashboard = Class.create( {
     // get the currently last container, to add after it
     var lastContainer = this.containers.last();
     var currentlyLastContainerId = this._getContainerId(lastContainer);
-    var newIdNumber = 1 + parseInt(currentlyLastContainerId, 10);
+    var newIdNumber = 1 + Number.parseInt(currentlyLastContainerId, 10);
     var newId = 'gadgetcontainer_' + newIdNumber;
     // create the container
     var newContainer = new Element('div', {'class' : lastContainer.readAttribute('class'),
@@ -616,10 +616,8 @@ XWiki.Dashboard = Class.create( {
                 onComplete();
               }
             });
-          } else {
-            if (onComplete) {
-              onComplete();
-            }
+          } else if (onComplete) {
+            onComplete();
           }
         }.bind(this),
         onFailure: function(response) {

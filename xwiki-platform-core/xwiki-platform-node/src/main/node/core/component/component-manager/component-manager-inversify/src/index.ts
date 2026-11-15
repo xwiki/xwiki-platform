@@ -164,9 +164,10 @@ class DefaultManager implements Manager {
       if (!cached) {
         // getAsync + autobind triggers Inversify's resolution pipeline on Ctor:
         // it walks @inject metadata and awaits any further async (lazy) bindings.
-        cached = loader().then((Ctor) =>
-          container.getAsync(Ctor, { autobind: true }),
-        );
+        cached = (async () => {
+          const Ctor = await loader();
+          return container.getAsync(Ctor, { autobind: true });
+        })();
       }
       return cached;
     };

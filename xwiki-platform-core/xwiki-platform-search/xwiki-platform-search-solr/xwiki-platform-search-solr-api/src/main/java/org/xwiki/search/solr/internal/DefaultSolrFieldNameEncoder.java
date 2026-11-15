@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.inject.Singleton;
 
@@ -115,24 +116,20 @@ public class DefaultSolrFieldNameEncoder implements SolrFieldNameEncoder
      */
     protected void encode(char[] chars, StringBuilder output)
     {
-        try {
-            byte[] bytes = new String(chars).getBytes(UTF8);
-            for (int i = 0, length = bytes.length; i < length; i++) {
-                output.append(ESCAPE);
-                char ch = Character.forDigit((bytes[i] >> 4) & 0xF, 16);
-                // Use upper case letters in the hex value.
-                if (Character.isLetter(ch)) {
-                    ch -= CASE_DIFF;
-                }
-                output.append(ch);
-                ch = Character.forDigit(bytes[i] & 0xF, 16);
-                if (Character.isLetter(ch)) {
-                    ch -= CASE_DIFF;
-                }
-                output.append(ch);
+        byte[] bytes = new String(chars).getBytes(StandardCharsets.UTF_8);
+        for (int i = 0, length = bytes.length; i < length; i++) {
+            output.append(ESCAPE);
+            char ch = Character.forDigit((bytes[i] >> 4) & 0xF, 16);
+            // Use upper case letters in the hex value.
+            if (Character.isLetter(ch)) {
+                ch -= CASE_DIFF;
             }
-        } catch (UnsupportedEncodingException e) {
-            // Shouldn't never happen.
+            output.append(ch);
+            ch = Character.forDigit(bytes[i] & 0xF, 16);
+            if (Character.isLetter(ch)) {
+                ch -= CASE_DIFF;
+            }
+            output.append(ch);
         }
     }
 }

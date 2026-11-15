@@ -19,7 +19,9 @@
  */
 package org.xwiki.validator;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +48,7 @@ class XWikiValidatorTest
 
     private void validate(InputStream document)
     {
-        this.validator.setHTML5Document(document);
+        this.validator.setDocument(document);
         this.validator.validate();
     }
 
@@ -68,9 +70,31 @@ class XWikiValidatorTest
         assertEquals(errors, this.validator.getErrors());
         assertEquals(3, errors.size());
         assertEquals("Found rendering error", errors.get(0).getMessage());
+        assertEquals(ValidationError.Type.ERROR, errors.get(0).getType());
+        assertEquals("ERROR: Found rendering error", errors.get(0).toString());
         assertEquals("A h1 heading with empty id (\"H\") has been found", errors.get(1).getMessage());
         assertEquals("A h2 heading with empty id (\"H\") has been found", errors.get(2).getMessage());
         this.validator.clear();
+        assertTrue(this.validator.getErrors().isEmpty());
+    }
+
+    @Test
+    void validateURLsWithSeveralQueryStringDelimiters()
+    {
+        validate(new ByteArrayInputStream(("<html><body><a href=\"/xwiki/bin/view/A/B?x=1?y=2\">link</a>"
+            + "<img src=\"/image.png?a=1?b=2\" alt=\"\"/></body></html>").getBytes(StandardCharsets.UTF_8)));
+        List<ValidationError> errors = this.validator.getErrors();
+        assertEquals(2, errors.size());
+        assertEquals("A link contain two query parameter delimiter '?' (url: /xwiki/bin/view/A/B?x=1?y=2)",
+            errors.get(0).getMessage());
+        assertEquals("A resource img contain two query parameter delimiter '?' (url: /image.png?a=1?b=2)",
+            errors.get(1).getMessage());
+    }
+
+    @Test
+    void validateWithoutDocument()
+    {
+        validate(null);
         assertTrue(this.validator.getErrors().isEmpty());
     }
 }

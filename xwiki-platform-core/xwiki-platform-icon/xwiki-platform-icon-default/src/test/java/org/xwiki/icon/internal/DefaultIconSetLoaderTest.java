@@ -87,7 +87,7 @@ class DefaultIconSetLoaderTest
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
     }
 
-    private void verifies(IconSet result) throws Exception
+    private void verifies(IconSet result)
     {
         assertNotNull(result);
         assertEquals("http://url_to_css", result.getCss());

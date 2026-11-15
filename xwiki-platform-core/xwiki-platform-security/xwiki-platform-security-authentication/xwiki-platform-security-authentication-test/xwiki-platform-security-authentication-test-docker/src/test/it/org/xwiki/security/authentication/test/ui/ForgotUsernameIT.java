@@ -37,10 +37,13 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.LoginPage;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -186,11 +189,16 @@ class ForgotUsernameIT
         // Bypass the check that prevents to reload the current page
         testUtils.gotoPage(testUtils.getURLToNonExistentPage());
 
-        // test getting email for a forgot username request where the email is set in one account only
-        forgotUsernamePage = ForgotUsernamePage.gotoPage();
+        // test getting email for a forgot username request where the email is set in one account only, starting from
+        // the link of the login page, as a user would do.
+        LoginPage.gotoPage().clickForgotUsername();
+        forgotUsernamePage = new ForgotUsernamePage();
         forgotUsernamePage.setEmail(user3Email);
         forgotUsernameCompletePage = forgotUsernamePage.clickRetrieveUsername();
         assertTrue(forgotUsernameCompletePage.isForgotUsernameQuerySent());
+        // The message tells where the account information is sent.
+        assertThat(forgotUsernameCompletePage.getMessage(),
+            containsString("you will receive the account information on " + user3Email + "."));
         assertTrue(this.mail.waitForIncomingEmail(1));
         MimeMessage[] receivedEmails = this.mail.getReceivedMessages();
         assertEquals(1, receivedEmails.length);

@@ -111,6 +111,7 @@ export type DialogProps = {
     title: string;
     width?: string | number | undefined;
     modelValue?: boolean;
+    persistent?: boolean;
 };
 
 // @beta
@@ -154,9 +155,15 @@ export type MenuItemProps = {
 export type MenuLabelProps = unknown;
 
 // @beta
+export type SelectItem = string | {
+    value: string;
+    label: string;
+};
+
+// @beta
 export type SelectProps = {
     label: string;
-    items: Array<string>;
+    items: Array<SelectItem>;
     help?: string;
     required?: boolean;
     modelValue?: string;

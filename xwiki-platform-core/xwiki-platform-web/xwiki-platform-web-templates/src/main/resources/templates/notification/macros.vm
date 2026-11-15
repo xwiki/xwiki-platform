@@ -187,7 +187,7 @@
  * @param $onlyAvatars (boolean) do not display the user name, even when there's only one user to display.
  *#
 #macro(displayNotificationEventUsers $users $link $onlyAvatars)##
-## The indent is bad to not introduce space charaters in the results
+## The indent is bad to not introduce space characters in the results
 #if("$!link" == '')#set ($link = true)#end
 #foreach ($user in $users)##
 #if ($link)

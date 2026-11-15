@@ -41,7 +41,7 @@ public abstract class AbstractMessageDescriptor extends AbstractRecordableEventD
      *
      * @param descriptionTranslationKey the name of the translation key that describe the event
      */
-    public AbstractMessageDescriptor(String descriptionTranslationKey)
+    protected AbstractMessageDescriptor(String descriptionTranslationKey)
     {
         super(descriptionTranslationKey, "messagestream.descriptors.applicationName");
     }

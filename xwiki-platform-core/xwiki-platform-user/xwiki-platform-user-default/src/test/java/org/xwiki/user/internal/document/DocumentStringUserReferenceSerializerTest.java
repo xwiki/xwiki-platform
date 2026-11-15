@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DocumentStringUserReferenceSerializerTest
+class DocumentStringUserReferenceSerializerTest
 {
     @InjectMockComponents
     private DocumentStringUserReferenceSerializer serializer;

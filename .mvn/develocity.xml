@@ -35,7 +35,9 @@
     <publishing>
       <onlyIf><![CDATA[env['CI'] != null && authenticated]]></onlyIf>
     </publishing>
-    <captureGoalInputFiles>true</captureGoalInputFiles>
+    <capture>
+      <fileFingerprints>true</fileFingerprints>
+    </capture>
     <!-- Use background scans only locally to avoid potential issues on CI (the ephemeral docker agent could terminate
          as soon as the build is finished and thus the upload may be terminated before it completes) -->
     <backgroundBuildScanUpload><![CDATA[env['CI'] == null]]></backgroundBuildScanUpload>

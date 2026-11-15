@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Objects;
@@ -48,6 +48,9 @@ import com.xpn.xwiki.objects.BaseObject;
 public class AllObjectsForClassNameResourceImpl extends XWikiResource implements AllObjectsForClassNameResource
 {
     @Inject
+    private ModelFactory factory;
+
+    @Inject
     private ContextualAuthorizationManager authorization;
 
     @Override
@@ -64,8 +67,13 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
 
             String query = "select doc, obj from BaseObject as obj, XWikiDocument as doc "
                 + "where obj.name=doc.fullName and obj.className=:className";
+            // Always order by a unique key (document full name + object number) so that pagination via limit/offset
+            // returns a stable, deterministic order. Without it, the database is free to return rows in an arbitrary
+            // order that can differ between queries (observed on PostgreSQL), breaking paginated retrieval.
             if ("date".equals(order)) {
-                query += " order by doc.date desc";
+                query += " order by doc.date desc, doc.fullName asc, obj.number asc";
+            } else {
+                query += " order by doc.fullName asc, obj.number asc";
             }
 
             List<Object> queryResult = null;
@@ -85,10 +93,8 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
 
                     BaseObject xwikiObject = (BaseObject) fields[1];
 
-                    ObjectSummary objectSummary = DomainObjectFactory
-                        .createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                            componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager),
-                            withPrettyNames);
+                    ObjectSummary objectSummary = this.factory.toRestObjectSummary(uriInfo.getBaseUri(), doc,
+                        xwikiObject, false, withPrettyNames);
 
                     objects.getObjectSummaries().add(objectSummary);
                 }

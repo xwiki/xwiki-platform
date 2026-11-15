@@ -81,7 +81,7 @@ public class OldCoreHelper implements AutoCloseable
      */
     public OldCoreHelper()
     {
-
+        // Empty on purpose: initialization is done by create(String, File).
     }
 
     /**
@@ -236,6 +236,10 @@ public class OldCoreHelper implements AutoCloseable
 
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");
+
+        // Disable statistics as they are useless here and their storing thread is never stopped: it would keep the
+        // whole XWiki instance in memory until the end of the Maven build.
+        config.put("xwiki.stats", "0");
 
         XWiki xwiki = new XWiki(config, this.xcontext, null, true);
 

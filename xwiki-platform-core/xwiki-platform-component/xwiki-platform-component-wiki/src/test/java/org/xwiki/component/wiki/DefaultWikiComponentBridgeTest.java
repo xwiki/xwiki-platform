@@ -121,7 +121,7 @@ class DefaultWikiComponentBridgeTest implements WikiComponentConstants
     private MockitoComponentManager mockitoComponentManager;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         Utils.setComponentManager(this.mockitoComponentManager);
 

@@ -105,9 +105,7 @@ public class GroupQueryCondition extends QueryCondition
             return true;
         }
 
-        if (obj instanceof GroupQueryCondition) {
-            GroupQueryCondition group = (GroupQueryCondition) obj;
-
+        if (obj instanceof GroupQueryCondition group) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));

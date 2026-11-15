@@ -61,5 +61,6 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptch
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Простий список
 captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Проста математика
 captcha.jcaptcha.engine.custom=Користувацький:
+captcha.jcaptcha.engine.custom.input=Власний рушій
 </content>
 </xwikidoc>

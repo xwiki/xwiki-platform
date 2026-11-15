@@ -31,10 +31,10 @@ import org.xwiki.security.authentication.api.AuthenticationConfiguration;
  *
  * @version $Id$
  * @since 13.1RC1
- * @deprecated Since 13.1RC1. This component is only provided to allow injecting the deprecated role,
+ * @deprecated This component is only provided to allow injecting the deprecated role,
  * but should not be used.
  */
-@Deprecated
+@Deprecated(since = "13.1RC1")
 @Component
 @Singleton
 public class LegacyAuthenticationConfiguration implements AuthenticationConfiguration

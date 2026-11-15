@@ -24,7 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -40,12 +40,10 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
-import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -69,6 +67,12 @@ public class DocumentContentAsyncExecutor
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
+    /**
+     * The context property holding the document whose content author is used to check the script and programming
+     * rights.
+     */
+    private static final String SECURE_DOCUMENT = "sdoc";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -85,9 +89,6 @@ public class DocumentContentAsyncExecutor
     private ModelContext modelContext;
 
     @Inject
-    private ContentParser parser;
-
-    @Inject
     private TransformationManager transformationManager;
 
     @Inject
@@ -101,6 +102,18 @@ public class DocumentContentAsyncExecutor
 
     private DocumentModelBridge document;
 
+    /**
+     * The document the executed content is taken from: either {@link #document} or one of its translations. It's
+     * remembered so that the content is executed with the author of this document, which can differ from the author
+     * of the displayed document. Like the other fields, it's set once in
+     * {@link #initialize(String, DocumentModelBridge, DocumentDisplayerParameters, boolean)} and only read afterwards,
+     * possibly from another thread when the execution is asynchronous; this component is instantiated per lookup, so
+     * the field isn't shared between displays.
+     */
+    private DocumentModelBridge contentDocument;
+
+    private DocumentModelBridge asyncDocument;
+
     private Syntax syntax;
 
     private String transformationId;
@@ -109,30 +122,40 @@ public class DocumentContentAsyncExecutor
      * @param transformationId the transformation identifier
      * @param document the document to execute
      * @param parameters display parameters
+     * @param asyncAllowed {@code true} if the document might be executed asynchronously
      */
     public void initialize(String transformationId, DocumentModelBridge document,
-        DocumentDisplayerParameters parameters)
+        DocumentDisplayerParameters parameters, boolean asyncAllowed)
     {
         this.parameters = parameters;
 
         this.transformationId = transformationId;
-        this.xdom = getPreparedContent(document, parameters);
+        // The executed content can be the one of a translation, which can have a syntax of its own.
+        this.contentDocument = getContentSource(document, parameters);
+        this.xdom = getPreparedContent(this.contentDocument, parameters);
         this.documentReference = document.getDocumentReference();
-        this.syntax = document.getSyntax();
+        this.syntax = this.contentDocument.getSyntax();
         this.document = document;
+
+        // The asynchronous execution sets the displayed document as context document, and thus as secure document, in
+        // another thread. Copy it now so that the content is executed with the author of this version of the document
+        // even if the document instance is modified in the meantime.
+        if (asyncAllowed && parameters.isExecutionContextIsolated()) {
+            this.asyncDocument = ObjectUtils.cloneIfPossible(document);
+        }
     }
 
     /**
-     * Get the content to display (either the entire document content or the content of a specific section).
+     * Get the content to display (either the entire content of the given document or the content of a specific
+     * section).
      * 
-     * @param document the source document
+     * @param document the document the content is taken from
      * @param parameters the display parameters
      * @return the content as an XDOM tree
      */
     private XDOM getPreparedContent(DocumentModelBridge document, final DocumentDisplayerParameters parameters)
     {
-        XDOM content =
-            parameters.isContentTranslated() ? getPreparedTranslatedContent(document) : document.getPreparedXDOM();
+        XDOM content = document.getPreparedXDOM();
 
         if (parameters.getSectionId() != null) {
             HeaderBlock headerBlock =
@@ -150,101 +173,42 @@ public class DocumentContentAsyncExecutor
 
         IdGenerator idGenerator = parameters.getIdGenerator();
         if (idGenerator != null) {
-            content.setIdGenerator(idGenerator);
-            makeIdsUnique(content, idGenerator);
+            content.setIdGenerator(idGenerator, true);
         }
 
         return content;
     }
 
     /**
-     * Replace ids of heading and images by unique ids.
-     *
-     * @param content the XDOM to modify in-place
-     * @param idGenerator the id generator for unique ids
-     * @since 14.2RC1
-     */
-    private void makeIdsUnique(XDOM content, IdGenerator idGenerator)
-    {
-        // Traverse the XDOM and adapt all image and heading blocks.
-        content.getBlocks(block -> {
-            if (block instanceof ImageBlock) {
-                ImageBlock imageBlock = (ImageBlock) block;
-                imageBlock.setId(adaptId(idGenerator, imageBlock.getId()));
-            } else if (block instanceof HeaderBlock) {
-                HeaderBlock headerBlock = (HeaderBlock) block;
-                headerBlock.setId(adaptId(idGenerator, headerBlock.getId()));
-            }
-            return false;
-        }, Block.Axes.DESCENDANT);
-    }
-
-    /**
-     * @param idGenerator the id generator to use
-     * @param id the id to adapt to make it unique
-     * @return the unique id, can be the input if was already unique
-     * @since 14.2RC1
-     */
-    private String adaptId(IdGenerator idGenerator, String id)
-    {
-        if (StringUtils.isNotBlank(id)) {
-            String prefix = id.substring(0, 1);
-            String suffix = id.substring(1);
-            return idGenerator.generateUniqueId(prefix, suffix);
-        }
-        return id;
-    }
-
-    /**
-     * Get the translated content of the given document as XDOM tree. If the language of the given document matches the
-     * context language (meaning that the given document is the current translation) then we use the content of the
-     * given document (including the content changes that could have been made prior to calling this method). Otherwise
-     * we load the current translation from the database/cache and use its content.
+     * Get the document the executed content has to be taken from. When a translated content is requested and the given
+     * document is not the variant matching the context locale, the matching translation is loaded from the
+     * database/cache. Otherwise the given document is used, so that the content changes that could have been made prior
+     * to calling this method are taken into account.
      * 
      * @param document the source document
-     * @return the translated content of the given document, as XDOM tree
+     * @param parameters the display parameters
+     * @return the document holding the content to execute
      */
-    private XDOM getPreparedTranslatedContent(DocumentModelBridge document)
+    private DocumentModelBridge getContentSource(DocumentModelBridge document,
+        DocumentDisplayerParameters parameters)
     {
-        try {
-            DocumentModelBridge translatedDocument = this.documentAccessBridge.getTranslatedDocumentInstance(document);
+        if (parameters.isContentTranslated()) {
+            try {
+                DocumentModelBridge translatedDocument =
+                    this.documentAccessBridge.getTranslatedDocumentInstance(document);
 
-            // FIXME: This is not a reliable way to determine if the language of the given document matches the context
-            // language. For instance the given document can have "en" language set while the translated document
-            // returned by the document access bridge can have "" or "default" language set.
-            if (!document.getRealLanguage().equals(translatedDocument.getRealLanguage())) {
-                // The language of the given document doesn't match the context language. Use the translated content.
-                if (document.getSyntax().equals(translatedDocument.getSyntax())) {
-                    // Use getXDOM() because it caches the XDOM.
-                    return translatedDocument.getPreparedXDOM();
-                } else {
-                    // If the translated document has a different syntax then we have to parse its content using the
-                    // syntax of the given document.
-                    return parseContent(translatedDocument.getContent(), document.getSyntax(),
-                        document.getDocumentReference());
+                // Compare the locales returned by getLocale(): getRealLanguage() returns the default locale of the
+                // document for the original document (whose locale is empty), so it returns the same value for the
+                // original document and for a translation in the default locale of the document.
+                if (!document.getLocale().equals(translatedDocument.getLocale())) {
+                    return translatedDocument;
                 }
+            } catch (Exception e) {
+                // Use the content of the given document.
             }
-        } catch (Exception e) {
-            // Use the content of the given document.
         }
 
-        return document.getPreparedXDOM();
-    }
-
-    /**
-     * Parses a string content.
-     * 
-     * @param content the content to parse
-     * @param syntax the syntax of the given content
-     * @return the result of parsing the given content
-     */
-    private XDOM parseContent(String content, Syntax syntax, DocumentReference source)
-    {
-        try {
-            return this.parser.parse(content, syntax, source);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return document;
     }
 
     /**
@@ -336,7 +300,7 @@ public class DocumentContentAsyncExecutor
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
                 this.logger.warn("Failed to notify Velocity Macro cache for closing the [{}] namespace. Reason = [{}]",
-                    this.transformationId, e.getMessage());
+                    this.transformationId, ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -352,15 +316,20 @@ public class DocumentContentAsyncExecutor
         Map<String, Object> backupObjects = new HashMap<>();
         EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
-            // The following method call also clones the execution context.
-            if (async || this.document == null) {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, this.documentReference);
-            } else {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, this.document);
-            }
+            // Execute the content in the context of the document it comes from, so that it's executed with the rights
+            // of the author of that content. The following method call also clones the execution context.
+            this.documentAccessBridge.pushDocumentInContext(backupObjects,
+                async && this.asyncDocument != null ? this.asyncDocument : this.document);
 
             // Make sure to synchronize the context wiki with the context document's wiki.
             this.modelContext.setCurrentEntityReference(this.documentReference.getWikiReference());
+
+            // Changing the context document also resets the secure document to the context document. Make sure that
+            // translated content is executed with the rights of its own author and not with the rights of the author
+            // of the default translation.
+            if (this.contentDocument != this.document) {
+                getXWikiContextMap().put(SECURE_DOCUMENT, this.contentDocument);
+            }
 
             executeInCurrentExecutionContext(async);
         } catch (Exception e) {

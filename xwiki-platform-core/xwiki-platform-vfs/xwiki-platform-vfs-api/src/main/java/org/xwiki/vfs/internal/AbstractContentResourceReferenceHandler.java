@@ -63,9 +63,7 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
         //
         // Note that even though the stream returned by TrueVFS returns true for markSupported() in practice it
         // doesn't! Thus we need to wrap the stream to make it support mark and reset.
-        InputStream markResetSupportingStream = new BufferedInputStream(resourceStream);
-
-        try {
+        try (InputStream markResetSupportingStream = new BufferedInputStream(resourceStream)) {
             Response response = this.container.getResponse();
 
             String actualContentType = (contentType != null) ? contentType
@@ -76,12 +74,13 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
             boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(actualContentType);
             response.addHeader("Content-disposition",
                 attachmentSecurityManager.getContentDispositionHeader(resourceName, shouldBeDownloaded));
+            // Make sure browsers honor the declared content type, from which the content disposition is also computed.
+            response.setHeader(XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_HEADER,
+                XWikiAttachmentSecurityManager.CONTENT_TYPE_OPTIONS_NOSNIFF);
 
             IOUtils.copy(markResetSupportingStream, response.getOutputStream());
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(String.format("Failed to read resource [%s]", resourceName), e);
-        } finally {
-            IOUtils.closeQuietly(markResetSupportingStream);
         }
     }
 }

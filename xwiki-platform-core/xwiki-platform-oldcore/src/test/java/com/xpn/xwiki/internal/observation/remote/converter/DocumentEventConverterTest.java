@@ -70,7 +70,7 @@ class DocumentEventConverterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
-        // Setup of document which just been created and recived by a document event listener
+        // Setup of document which just been created and received by a document event listener
         XWikiDocument document =
             this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext());
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());

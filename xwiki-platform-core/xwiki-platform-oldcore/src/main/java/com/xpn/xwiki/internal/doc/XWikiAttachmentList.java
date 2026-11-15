@@ -308,8 +308,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment> 
     @Unstable
     public void setDirty(boolean dirty, boolean deep)
     {
-        this.map.values().forEach(attachment -> {
-            attachment.setDirty(dirty, deep);
-        });
+        this.map.values().forEach(attachment -> attachment.setDirty(dirty, deep));
     }
 }

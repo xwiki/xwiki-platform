@@ -154,7 +154,7 @@ public class TasksStore extends XWikiHibernateBaseStore
      * Return  an {@link XWikiDocument} by its id.
      *
      * @param wikiId the wiki in which to execute the query
-     * @param docId the id of the document to retrive
+     * @param docId the id of the document to retrieve
      * @return the document
      * @throws XWikiException in case of error when executing the query
      */

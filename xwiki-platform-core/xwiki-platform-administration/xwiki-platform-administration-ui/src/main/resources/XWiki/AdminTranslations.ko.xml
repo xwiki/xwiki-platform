@@ -147,6 +147,12 @@ admin.usersgroups.extensionrights=확장 권한
 ### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
 administration.section.groups.deleteUserFromGroup.failure=그룹에서 멤버를 제거하지 못했습니다
 
+# Rights for page section
+### Missing: administration.section.pagerights.hint=These rights apply on this page only. They do not affect the {0}children{1}.
+
+# Rights for page and children section
+### Missing: administration.section.pageandchildrenrights.hint=These rights apply on this page and {0}all its children{1}.
+
 # Other Category
 admin.other=다른
 admin.other.description=확장을 위한 다양한 구성.

@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
-import org.xwiki.export.pdf.internal.job.PDFExportJob;
+import org.xwiki.export.pdf.internal.job.AbstractPDFExportJob;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
 import org.xwiki.export.script.ExportScriptService;
@@ -144,7 +144,7 @@ public class PDFExportScriptService implements ScriptService
         }
 
         try {
-            return this.jobExecutor.execute(PDFExportJob.JOB_TYPE, request);
+            return this.jobExecutor.execute(AbstractPDFExportJob.JOB_TYPE, request);
         } catch (Exception e) {
             setError(e);
             return null;

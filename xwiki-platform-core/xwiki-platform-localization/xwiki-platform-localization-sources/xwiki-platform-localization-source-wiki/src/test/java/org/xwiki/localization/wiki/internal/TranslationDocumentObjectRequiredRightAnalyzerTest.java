@@ -35,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
-import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -118,7 +117,7 @@ class TranslationDocumentObjectRequiredRightAnalyzerTest
 
     @ParameterizedTest
     @CsvSource(value = {"GLOBAL, programming", "WIKI, admin", "USER, script" })
-    void analyze(String scope, Right requiredRight) throws RequiredRightsException
+    void analyze(String scope, Right requiredRight)
     {
         when(this.object.getStringValue("scope")).thenReturn(scope);
 

@@ -103,7 +103,7 @@ class DefaultBatchOperationExecutorTest
 
         // * the specified batch ID is used
         inOrder.verify(this.executionContext, times(1)).setProperty(
-            eq(DefaultBatchOperationExecutor.CONTEXT_PROPERTY), eq(specifiedBatchId));
+            DefaultBatchOperationExecutor.CONTEXT_PROPERTY, specifiedBatchId);
 
         // * the operation is executed
         inOrder.verify(operation).execute();

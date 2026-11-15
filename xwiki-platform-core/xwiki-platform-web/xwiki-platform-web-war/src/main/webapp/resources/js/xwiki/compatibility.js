@@ -36,20 +36,6 @@ function warn(message){
 }
 
 /**
- * Deprecated since 2.6RC2
- */
-if (typeof XWiki.widgets == 'object' && typeof XWiki.widgets.FullScreen == 'function') {
-  XWiki.editors = XWiki.editors || {};
-  XWiki.editors.FullScreenEditing = Class.create(XWiki.widgets.FullScreen, {
-    initialize: function($super){
-      warn("XWiki.editors.FullScreenEditing is deprecated since XWiki 2.6RC2. Use XWiki.widgets.FullScreen instead.");
-      $super();
-    }
-  });
-}
-
-
-/**
  * _xwk is an old namespace for XWiki code that was optional
  * Deprecated since 2.6RC1
  */
@@ -496,6 +482,21 @@ Object.extend(XWiki.watchlist, {
 });
 
 /**
+ * Rendering errors are made expandable by default. Trigger the xwiki:dom:updated event on the content you inserted
+ * instead, passing it in the elements property of the event data, which also initializes everything else that content
+ * needs.
+ *
+ * Deprecated since 18.10.0RC1
+ */
+XWiki.makeRenderingErrorsExpandable = function(content) {
+  warn("XWiki.makeRenderingErrorsExpandable is deprecated since XWiki 18.10.0RC1. Rendering errors are made expandable "
+    + "by default, trigger the xwiki:dom:updated event on the new content instead.");
+  require(['jquery'], function($) {
+    $(document).trigger('xwiki:dom:updated', {'elements': $(content || 'body').toArray()});
+  });
+};
+
+/**
  * Add some deprecated <meta> tags in the header of the page so that old script can still work. It is added via the
  * JavaScript since these <meta> tags are invalid with HTML5 and we want to have valid static HTML code.
  *
@@ -512,7 +513,7 @@ Object.extend(XWiki.watchlist, {
   var html = $$('html')[0];
   var head = $$('head')[0];
 
-  // Function that creates a meta tag with the value taken from the new HTML data-* attrribute
+  // Function that creates a meta tag with the value taken from the new HTML data-* attribute
   var addMetaTag = function(name, value) {
     head.insert(new Element('meta', {'name': name, 'content': html.readAttribute('data-xwiki-'+value)}));
   };

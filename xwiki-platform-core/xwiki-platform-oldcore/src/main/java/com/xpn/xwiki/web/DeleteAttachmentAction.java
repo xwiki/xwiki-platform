@@ -93,9 +93,6 @@ public class DeleteAttachmentAction extends XWikiAction
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             filename = request.getParameter("filename");
         } else {
-            // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
-            // we want to use our own decoding.
-            String requestUri = request.getRequestURI();
             filename = getFileName();
         }
 
@@ -140,10 +137,7 @@ public class DeleteAttachmentAction extends XWikiAction
         try {
             newdoc.removeAttachment(attachment);
 
-            // Make sure the user is allowed to make this modification
-            context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, context);
-
-            xwiki.saveDocument(newdoc, comment, context);
+            xwiki.saveDocument(newdoc, comment, false, true, context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 

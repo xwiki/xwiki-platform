@@ -76,9 +76,7 @@ public class DefaultEventStatus extends DefaultEntityEvent implements EventStatu
             return true;
         }
 
-        if (obj instanceof EventStatus) {
-            EventStatus otherEvent = (EventStatus) obj;
-
+        if (obj instanceof EventStatus otherEvent) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));

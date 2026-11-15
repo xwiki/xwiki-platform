@@ -185,7 +185,7 @@ class DefaultFilterPreferencesModelBridgeTest
     @Test
     void getToggleableFilterActivations() throws Exception
     {
-        DocumentReference user = new DocumentReference("subwiki", "XWiki", "Foo");
+        DocumentReference subwikiUser = new DocumentReference("subwiki", "XWiki", "Foo");
         WikiReference currentWiki = mock(WikiReference.class, "currentWiki");
         XWikiContext context = mock(XWikiContext.class);
         when(context.getWikiReference()).thenReturn(currentWiki);
@@ -194,7 +194,7 @@ class DefaultFilterPreferencesModelBridgeTest
         when(context.getWiki()).thenReturn(xwiki);
 
         XWikiDocument userDoc = mock(XWikiDocument.class, "userDoc");
-        when(xwiki.getDocument(user, context)).thenReturn(userDoc);
+        when(xwiki.getDocument(subwikiUser, context)).thenReturn(userDoc);
 
 
         NotificationFilter filter1 = mock(NotificationFilter.class, "filter1");
@@ -256,15 +256,15 @@ class DefaultFilterPreferencesModelBridgeTest
         when(filter7Obj.getIntValue(FIELD_IS_ENABLED, 0)).thenReturn(0);
 
         Map<String, ToggleableNotificationFilterActivation> expectedResult = Map.of(
-            "filter2", new ToggleableNotificationFilterActivation("filter2", true, user, 2),
-            "filter3", new ToggleableNotificationFilterActivation("filter3", true, user, -1),
-            "filter4", new ToggleableNotificationFilterActivation("filter4", false, user, 14),
-            "filter5", new ToggleableNotificationFilterActivation("filter5", false, user, -1),
-            "filter6", new ToggleableNotificationFilterActivation("filter6", true, user, 16),
-            "filter7", new ToggleableNotificationFilterActivation("filter7", false, user, 17)
+            "filter2", new ToggleableNotificationFilterActivation("filter2", true, subwikiUser, 2),
+            "filter3", new ToggleableNotificationFilterActivation("filter3", true, subwikiUser, -1),
+            "filter4", new ToggleableNotificationFilterActivation("filter4", false, subwikiUser, 14),
+            "filter5", new ToggleableNotificationFilterActivation("filter5", false, subwikiUser, -1),
+            "filter6", new ToggleableNotificationFilterActivation("filter6", true, subwikiUser, 16),
+            "filter7", new ToggleableNotificationFilterActivation("filter7", false, subwikiUser, 17)
         );
-        assertEquals(expectedResult, this.defaultModelBridge.getToggleableFilterActivations(user));
-        verify(context).setWikiReference(user.getWikiReference());
+        assertEquals(expectedResult, this.defaultModelBridge.getToggleableFilterActivations(subwikiUser));
+        verify(context).setWikiReference(subwikiUser.getWikiReference());
         verify(context).setWikiReference(currentWiki);
     }
 }

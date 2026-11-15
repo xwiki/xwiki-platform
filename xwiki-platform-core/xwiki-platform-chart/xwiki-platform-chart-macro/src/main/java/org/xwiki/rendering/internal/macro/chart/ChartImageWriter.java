@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.chart;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
 /**
@@ -33,13 +34,18 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 public interface ChartImageWriter
 {
     /**
-     * Writes the image to storage.
+     * Writes the image to storage, unless an identical image of the same document is already stored.
      *
-     * @param imageId the image id that we use to generate a unique storage location
      * @param imageData the image to store
+     * @param dataDocumentReference the reference of the document holding the data displayed by the chart
+     * @return the id of the stored image
      * @throws MacroExecutionException if an error happened when computing the location or saving the image
+     * @since 18.10.0RC1
+     * @since 18.4.8
+     * @since 17.10.15
+     * @since 16.10.20
      */
-    void writeImage(ImageId imageId, byte[] imageData) throws MacroExecutionException;
+    ImageId writeImage(byte[] imageData, DocumentReference dataDocumentReference) throws MacroExecutionException;
 
     /**
      * Compute the URL to use to access the stored generate chart image.

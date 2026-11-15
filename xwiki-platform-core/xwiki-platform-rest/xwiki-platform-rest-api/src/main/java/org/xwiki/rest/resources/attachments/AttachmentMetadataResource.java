@@ -38,8 +38,22 @@ import org.xwiki.rest.model.jaxb.Attachment;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}/metadata")
 public interface AttachmentMetadataResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the metadata of an attachment (such as its size, media type, version and author) without its binary
+     * content.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the attachment, for example {@code WebHome}
+     * @param attachmentName the file name of the attachment, for example {@code photo.png}
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name and the document title) in addition to the technical references, at some extra cost; defaults to
+     *  {@code false}
+     * @return the attachment metadata
+     * @throws XWikiRestException if the attachment metadata cannot be retrieved, for example the page or attachment
+     *  does not exist
+     */
     @GET
     Attachment getAttachment(@PathParam("wikiName") String wikiName, @PathParam("spaceName") @Encoded String spaceName,
         @PathParam("pageName") String pageName, @PathParam("attachmentName") String attachmentName,

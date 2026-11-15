@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class XWikiPluginManager
 
     private Vector<String> pluginClassNames = new Vector<>();
 
-    private Map<String, XWikiPluginInterface> plugins_classes = new HashMap<>();
+    private Map<String, XWikiPluginInterface> pluginsClasses = new HashMap<>();
 
     private Map<String, Vector<XWikiPluginInterface>> functionList = new HashMap<>();
 
@@ -64,9 +65,7 @@ public class XWikiPluginManager
     public void addPlugin(String name, String className, XWikiContext context)
     {
         if (this.pluginClassNames.contains(className)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info(String.format("Skipping already registered plugin [%s]", name));
-            }
+            LOGGER.info("Skipping already registered plugin [{}]", name);
             return;
         }
         try {
@@ -84,26 +83,23 @@ public class XWikiPluginManager
             XWikiPluginInterface plugin = pluginClass.getConstructor(classes).newInstance(args);
             if (plugin != null) {
                 this.plugins.add(plugin.getName());
-                this.plugins_classes.put(plugin.getName(), plugin);
+                this.pluginsClasses.put(plugin.getName(), plugin);
                 this.pluginClassNames.add(className);
                 initPlugin(plugin, pluginClass, context);
             }
         } catch (Exception ex) {
             // Log an error but do not fail
-            LOGGER.error("Cannot initialize plugin [" + className + "]. This plugin will not be available.", ex);
+            LOGGER.error("Cannot initialize plugin [{}]. This plugin will not be available.", className, ex);
         }
     }
 
     public void removePlugin(String className)
     {
         this.plugins.remove(className);
-        Object plugin = this.plugins_classes.get(className);
-        this.plugins_classes.remove(className);
+        Object plugin = this.pluginsClasses.get(className);
+        this.pluginsClasses.remove(className);
 
-        for (String name : this.functionList.keySet()) {
-            Vector<XWikiPluginInterface> pluginList = this.functionList.get(name);
-            pluginList.remove(plugin);
-        }
+        this.functionList.values().forEach(pluginList -> pluginList.remove(plugin));
     }
 
     public void addPlugins(String[] classNames, XWikiContext context)
@@ -120,7 +116,7 @@ public class XWikiPluginManager
 
     public XWikiPluginInterface getPlugin(String className)
     {
-        return this.plugins_classes.get(className);
+        return this.pluginsClasses.get(className);
     }
 
     public Vector<String> getPlugins()
@@ -164,6 +160,8 @@ public class XWikiPluginManager
             try {
                 plugin.virtualInit(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -174,7 +172,7 @@ public class XWikiPluginManager
             try {
                 plugin.flushCache(context);
             } catch (Exception e) {
-                LOGGER.error("Failed to flush cache in plugin [" + plugin.getClass() + "]", e);
+                LOGGER.error("Failed to flush cache in plugin [{}]", plugin.getClass(), e);
             }
         }
     }
@@ -185,6 +183,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.commonTagsHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -196,6 +196,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.startRenderingHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -207,6 +209,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.outsidePREHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -218,6 +222,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.insidePREHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -229,6 +235,8 @@ public class XWikiPluginManager
             try {
                 text = plugin.endRenderingHandler(text, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return text;
@@ -240,6 +248,8 @@ public class XWikiPluginManager
             try {
                 plugin.beginRendering(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -250,6 +260,8 @@ public class XWikiPluginManager
             try {
                 plugin.endRendering(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -260,6 +272,8 @@ public class XWikiPluginManager
             try {
                 plugin.beginParsing(context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
     }
@@ -270,6 +284,8 @@ public class XWikiPluginManager
             try {
                 content = plugin.endParsing(content, context);
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A plugin failing must not prevent the other plugins from being called.
             }
         }
         return content;
@@ -282,7 +298,8 @@ public class XWikiPluginManager
             try {
                 attach = plugin.downloadAttachment(attach, context);
             } catch (Exception ex) {
-                LOGGER.warn("downloadAttachment failed for plugin [" + plugin.getName() + "]: " + ex.getMessage());
+                LOGGER.warn("downloadAttachment failed for plugin [{}]: [{}]", plugin.getName(),
+                    ExceptionUtils.getRootCauseMessage(ex));
             }
         }
         return attach;

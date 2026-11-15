@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +34,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -45,7 +49,9 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Adds missing live data configuration values specific to the live table source.
@@ -77,6 +83,16 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+
+    @Inject
+    private Logger logger;
+
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
@@ -88,8 +104,62 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // (e.g. when you want to sort on the default property using a specified sort order).
         setDefaultSort(mergedConfig);
 
+        // We only enable the ability to add an entry if there is a naming strategy explicitly set and the current user
+        // has the rights to create a page.
+        Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
+        String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
+        if (namingStrategy != null
+            && this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
+            try {
+                LiveTableNewRowNamingStrategy strategy =
+                    this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
+                if (strategy.isCreationAllowed(sourceParams)) {
+                    List<String> undescribedProperties =
+                        setMandatory(mergedConfig.getMeta(), strategy.getMandatoryProperties(sourceParams));
+                    if (undescribedProperties.isEmpty()) {
+                        LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
+                        addEntry.setId("addEntry");
+                        strategy.getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
+                            .put("location", this.stringEntityReferenceSerializer.serialize(location)));
+                        mergedConfig.getMeta().getActions().add(addEntry);
+                    } else {
+                        // No entry could be created, since the user has no cell to give those values in.
+                        this.logger.warn("Adding entries is disabled because the mandatory properties {} have no "
+                            + "descriptor in this live data.", undescribedProperties);
+                    }
+                }
+            } catch (ComponentLookupException e) {
+                throw new LiveDataException(
+                    String.format("Failed to load the row naming strategy [%s].", namingStrategy), e);
+            }
+        }
+
         // Translate using the context locale.
         return translate(mergedConfig, config);
+    }
+
+    /**
+     * Flag as mandatory the descriptors of the properties a new entry cannot be created without.
+     *
+     * @param meta the metadata holding the property descriptors
+     * @param mandatoryProperties the identifiers of the properties that must hold a value
+     * @return the mandatory properties that have no descriptor
+     */
+    private List<String> setMandatory(LiveDataMeta meta, Set<String> mandatoryProperties)
+    {
+        List<LiveDataPropertyDescriptor> descriptors = new ArrayList<>();
+        List<String> undescribedProperties = new ArrayList<>();
+        for (String property : mandatoryProperties) {
+            meta.getPropertyDescriptors().stream()
+                .filter(Objects::nonNull)
+                .filter(candidate -> Objects.equals(property, candidate.getId()))
+                .findFirst()
+                .ifPresentOrElse(descriptors::add, () -> undescribedProperties.add(property));
+        }
+        if (undescribedProperties.isEmpty()) {
+            descriptors.forEach(descriptor -> descriptor.setMandatory(true));
+        }
+        return undescribedProperties.stream().sorted().toList();
     }
 
     @Override
@@ -114,8 +184,8 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private LiveDataPropertyDescriptorStore getPropertyStore(Source sourceConfig)
     {
         LiveDataPropertyDescriptorStore propertyStore = this.propertyStoreProvider.get();
-        if (propertyStore instanceof WithParameters && sourceConfig != null) {
-            ((WithParameters) propertyStore).getParameters().putAll(sourceConfig.getParameters());
+        if (propertyStore instanceof WithParameters withParameters && sourceConfig != null) {
+            withParameters.getParameters().putAll(sourceConfig.getParameters());
         }
         return propertyStore;
     }
@@ -147,7 +217,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         if (query.getSort() != null) {
             // Remove the sort entry if we couldn't find a default sort property.
             query.setSort(query.getSort().stream().filter(Objects::nonNull)
-                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).collect(Collectors.toList()));
+                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).toList());
         }
     }
 
@@ -174,7 +244,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
             .map(LiveDataPropertyDescriptor::getId).collect(Collectors.toSet());
         List<LiveDataPropertyDescriptor> missingDescriptors =
             properties.stream().filter(property -> !propertiesWithDescriptor.contains(property))
-                .map(this::getDefaultPropertyDescriptor).collect(Collectors.toList());
+                .map(this::getDefaultPropertyDescriptor).toList();
         if (!missingDescriptors.isEmpty()) {
             propertyDescriptors = new ArrayList<>(propertyDescriptors);
             propertyDescriptors.addAll(missingDescriptors);

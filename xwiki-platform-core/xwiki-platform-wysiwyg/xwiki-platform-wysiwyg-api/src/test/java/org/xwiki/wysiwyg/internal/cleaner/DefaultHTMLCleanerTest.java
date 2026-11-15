@@ -19,7 +19,14 @@
  */
 package org.xwiki.wysiwyg.internal.cleaner;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.wysiwyg.cleaner.HTMLCleaner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link DefaultHTMLCleaner}.
@@ -29,4 +36,19 @@ import org.xwiki.test.annotation.AllComponents;
 @AllComponents
 public class DefaultHTMLCleanerTest extends HTMLCleanerTest
 {
+    @Test
+    void cleanDoesNotModifyTheSpecificFilters() throws Exception
+    {
+        HTMLCleaner cleaner = getComponentManager().getInstance(HTMLCleaner.class);
+        // The cleaner is a singleton that can be called concurrently, so it must not modify the list of specific
+        // filters, which is shared by all the calls. We use an unmodifiable list to detect modifications.
+        List<HTMLFilter> specificFilters = getComponentManager().getInstanceList(HTMLFilter.class);
+        ReflectionUtils.setFieldValue(cleaner, "specificFilters", List.copyOf(specificFilters));
+
+        assertEquals("""
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE html>
+            <html><head></head><body><p>text</p></body></html>
+            """, cleaner.clean("<p>text</p>"));
+    }
 }

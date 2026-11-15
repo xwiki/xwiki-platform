@@ -93,8 +93,7 @@ public class LegacyEventStatus implements Serializable
     @Override
     public boolean equals(Object other)
     {
-        if (other instanceof LegacyEventStatus) {
-            LegacyEventStatus o = (LegacyEventStatus) other;
+        if (other instanceof LegacyEventStatus o) {
             return Strings.CS.equals(activityEvent.getEventId(), o.activityEvent.getEventId())
                 && Strings.CS.equals(entityId, o.entityId) && isRead == o.isRead();
         }

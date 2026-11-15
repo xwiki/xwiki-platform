@@ -34,6 +34,8 @@ public class ApplicationIndexHomePage extends ViewPage
 
     /**
      * Go to the home page of the Application Index application.
+     *
+     * @return the page object for the Application Index home page
      */
     public static ApplicationIndexHomePage gotoPage()
     {
@@ -47,11 +49,21 @@ public class ApplicationIndexHomePage extends ViewPage
                 "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]");
     }
 
+    /**
+     * @param applicationName the name of the application to look for
+     * @return {@code true} if the application is listed in the Application Index, {@code false} otherwise
+     */
     public boolean containsApplication(String applicationName)
     {
         return getDriver().hasElementWithoutWaiting(applicationElement(applicationName));
     }
 
+    /**
+     * Clicks on the given application in the Application Index.
+     *
+     * @param applicationName the name of the application to click on
+     * @return the page object for the application's home page
+     */
     public ViewPage clickApplication(String applicationName)
     {
         getDriver().findElementWithoutWaiting(applicationElement(applicationName)).click();

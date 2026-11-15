@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 12.9RC1
  */
-public class DefaultAverageRatingTest
+class DefaultAverageRatingTest
 {
     @Test
     void simpleConstructor()

@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ListPropertyTest
 {
     @Test
-    void dirtyFlagPropagation() throws Exception
+    void dirtyFlagPropagation()
     {
         ListProperty p = new ListProperty();
 
@@ -61,11 +61,11 @@ class ListPropertyTest
     }
 
     @Test
-    void cloneListProperty() throws Exception
+    void cloneListProperty()
     {
         ListProperty p = new ListProperty();
 
-        List<String> pList = p.getList();
+        p.getList();
 
         p.setValueDirty(false);
 

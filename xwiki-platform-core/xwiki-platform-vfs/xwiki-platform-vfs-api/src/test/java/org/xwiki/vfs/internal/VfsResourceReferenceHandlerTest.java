@@ -174,6 +174,9 @@ class VfsResourceReferenceHandlerTest
         this.handler.handle(this.reference, mock(ResourceReferenceHandlerChain.class));
 
         assertEquals("success!", this.baos.toString());
+
+        verify(this.response).setContentType("text/plain");
+        verify(this.response).setHeader("X-Content-Type-Options", "nosniff");
     }
 
     @Test
@@ -205,13 +208,13 @@ class VfsResourceReferenceHandlerTest
 
     private InputStream createZipInputStream(String fileName, String content) throws Exception
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+        ByteArrayOutputStream zipOutput = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(zipOutput)) {
             ZipEntry entry = new ZipEntry(fileName);
             zos.putNextEntry(entry);
             zos.write(content.getBytes());
             zos.closeEntry();
         }
-        return new ByteArrayInputStream(baos.toByteArray());
+        return new ByteArrayInputStream(zipOutput.toByteArray());
     }
 }

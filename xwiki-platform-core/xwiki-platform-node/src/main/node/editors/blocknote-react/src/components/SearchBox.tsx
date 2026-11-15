@@ -17,15 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DepsContainerContext } from "../contexts";
+import { toResourceReference } from "../misc/resourceReference";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
+import { debounceAsync } from "@xwiki/platform-fn-utils";
+import { EntityType } from "@xwiki/platform-model-api";
+import { ResourceType } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
-import { debounce } from "lodash-es";
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkEditionContext, LinkSuggestion } from "../misc/linkSuggest";
-import type { KeyboardEvent, ReactElement } from "react";
+import type { LinkType } from "@xwiki/platform-link-suggest-api";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
+import type { ReactElement } from "react";
 
-export type SearchBoxProps = {
+type SearchBoxProps = {
   /**
    * The search box's initial value
    */
@@ -37,11 +54,10 @@ export type SearchBoxProps = {
   placeholder: string;
 
   /**
-   * Link edition context, required for validate raw entity references on submit
-   *
-   * @since 18.0.0RC1
+   * The type of the entities designated by the search box (e.g. attachments for an image), used to parse the entity
+   * reference typed by the user: an entity reference doesn't hold the type of the entity.
    */
-  linkEditionCtx: LinkEditionContext | null;
+  entityType: EntityType.DOCUMENT | EntityType.ATTACHMENT;
 
   /**
    * Perform a search
@@ -63,15 +79,37 @@ export type SearchBoxProps = {
 
   /**
    * Triggered when a result is selected in the list of suggestions
+   *
+   * @param url - the URL of the selected result
+   * @param reference - the XWiki resource reference of the selected result
    */
-  onSelect: (url: string) => void;
+  onSelect: (url: string, reference: ResourceReference) => void;
 
   /**
    * Triggered when a result is submitted by the user
    *
    * e.g. when the user uses the `<Enter>` key on an URL
+   *
+   * @param url - the submitted URL
+   * @param reference - the XWiki resource reference matching the submitted value
    */
-  onSubmit: (url: string) => void;
+  onSubmit: (url: string, reference: ResourceReference) => void;
+};
+
+/**
+ * @since 18.4.0RC-1
+ * @beta
+ */
+type LinkSuggestion = {
+  title: string;
+  /**
+   * Additional information to distinguish suggestions with the same title (e.g. their location), empty when there's
+   * none.
+   */
+  hint: string;
+  reference: string;
+  url: string;
+  type: LinkType;
 };
 
 /**
@@ -84,12 +122,31 @@ export type SearchBoxProps = {
 export const SearchBox: React.FC<SearchBoxProps> = ({
   initialValue,
   placeholder,
-  linkEditionCtx,
+  entityType,
   getSuggestions,
   renderSuggestion,
   onSelect,
   onSubmit,
+  // eslint-disable-next-line max-statements
 }) => {
+  const depsContainer = useContext(DepsContainerContext);
+
+  if (!depsContainer) {
+    throw new Error("Missing dependencies container in React context");
+  }
+
+  const modelReferenceParser = depsContainer
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+
+  const remoteURLSerializer = depsContainer
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
+
+  const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
+    "ResourceReferenceParser",
+  );
+
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
@@ -109,8 +166,8 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   const isUrl = (value: string) =>
     value.startsWith("http://") || value.startsWith("https://");
 
-  const performSearch = useCallback(
-    debounce((search: string) => {
+  const runSearch = useCallback(
+    async (search: string) => {
       if (isUrl(search)) {
         setSuggestions({ status: "resolved", suggestions: [] });
         return;
@@ -118,58 +175,77 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       setSuggestions({ status: "loading" });
 
-      // eslint-disable-next-line promise/catch-or-return
-      getSuggestions(search).then((suggestions) => {
-        setSuggestions(
-          // eslint-disable-next-line promise/always-return
-          suggestions !== false
-            ? { status: "resolved", suggestions }
-            : { status: "backendSearchUnsupported" },
-        );
-      });
-    }),
+      const suggestions = await getSuggestions(search);
+      setSuggestions(
+        suggestions !== false
+          ? { status: "resolved", suggestions }
+          : { status: "backendSearchUnsupported" },
+      );
+    },
     [setSuggestions, getSuggestions],
   );
 
+  const performSearch = useMemo(() => debounceAsync(runSearch), [runSearch]);
+
   const submitRawValue = useCallback(
     // eslint-disable-next-line max-statements
-    async (e: KeyboardEvent<HTMLInputElement>, value: string) => {
+    async (value: string) => {
       if (isUrl(value)) {
-        onSubmit(value);
+        onSubmit(value, {
+          type: ResourceType.URL,
+          typed: false,
+          reference: value,
+          parameters: {},
+        });
         return;
       }
 
-      if (!linkEditionCtx) {
-        e.preventDefault();
+      if (!modelReferenceParser || !remoteURLSerializer) {
         return;
       }
 
-      const reference = await linkEditionCtx.modelReferenceParser
-        .parseAsync(value)
+      const reference = await modelReferenceParser
+        .parseAsync(value, { type: entityType })
         .catch(() => null);
 
       if (!reference) {
-        e.preventDefault();
         return;
       }
 
-      const url = linkEditionCtx.remoteURLSerializer.serialize(reference);
+      const url = remoteURLSerializer.serialize(reference);
 
       if (url === undefined) {
-        e.preventDefault();
         throw new Error("Failed to serialize entity reference: " + value);
       }
 
-      onSubmit(url);
+      // Build the resource reference directly from the typed entity reference, rather than parsing it
+      // back from the URL we just serialized.
+      onSubmit(url, {
+        type:
+          reference.type === EntityType.ATTACHMENT
+            ? ResourceType.ATTACHMENT
+            : ResourceType.DOCUMENT,
+        typed: true,
+        reference: value,
+        parameters: {},
+      });
     },
-    [onSubmit, linkEditionCtx],
+    [entityType, onSubmit, modelReferenceParser, remoteURLSerializer],
   );
 
-  // Automatically perform a search when the query changes
-  useEffect(() => performSearch(query), [query, performSearch]);
+  const isFirstSearch = useRef(true);
 
-  // Perform a search at the opening
-  useEffect(() => performSearch(""), []);
+  // Automatically perform a search when the query changes, starting with the initial value. The first
+  // search isn't debounced: there's no rapid typing to wait for yet, and the suggestions should be
+  // available as soon as possible (e.g. to be keyboard-navigable right away).
+  useEffect(() => {
+    if (isFirstSearch.current) {
+      isFirstSearch.current = false;
+      void runSearch(query);
+    } else {
+      void performSearch(query);
+    }
+  }, [query, runSearch, performSearch]);
 
   return (
     <Combobox
@@ -192,13 +268,21 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
         combobox.closeDropdown();
         setQuery(result.title);
-        onSelect(url);
+        onSelect(
+          url,
+          toResourceReference(
+            resourceReferenceParser,
+            result.reference,
+            result.type,
+          ),
+        );
       }}
     >
       <Combobox.Target>
         <InputBase
           leftSection={<RiLink />}
           rightSection=" "
+          data-test="searchBoxInput"
           placeholder={placeholder}
           value={query}
           onChange={(event) => {
@@ -211,9 +295,15 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
           onBlur={() => {
             combobox.closeDropdown();
           }}
-          onKeyDown={(e) =>
-            e.key === "Enter" && submitRawValue(e, e.currentTarget.value)
-          }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              // Prevent the default editing action of the Enter key: the submit handlers can move
+              // the focus back to the editor synchronously, in which case the browser would apply
+              // the default action to the editor's restored selection, deleting its content.
+              e.preventDefault();
+              submitRawValue(e.currentTarget.value);
+            }
+          }}
         />
       </Combobox.Target>
 
@@ -262,3 +352,5 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     </Combobox>
   );
 };
+
+export type { LinkSuggestion, SearchBoxProps };

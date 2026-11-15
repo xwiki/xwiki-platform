@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
@@ -84,7 +85,8 @@ public class CaptchaScriptService implements ScriptService
             return safeProvider.get(getCaptcha(captchaName));
         } catch (ComponentLookupException e) {
             // Nothing special, just a bad request; return null.
-            logger.warn("No CAPTCHA implementation named [{}] was found", captchaName);
+            logger.warn("No CAPTCHA implementation named [{}] was found. Root cause is [{}]", captchaName,
+                ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             // Log the actual error.
             logger.error("Failed to get CAPTCHA implementation with name [{}]", captchaName, e);

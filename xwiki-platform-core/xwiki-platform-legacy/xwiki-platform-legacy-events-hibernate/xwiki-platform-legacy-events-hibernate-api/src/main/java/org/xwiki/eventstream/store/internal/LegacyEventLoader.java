@@ -76,7 +76,7 @@ public class LegacyEventLoader
             List<Event> events = searchEvents(query);
             result.addEvents(events.toArray(new Event[0]));
         } catch (Exception e) {
-            logger.error("Failed to load related events for [%s].", event.getId(), e);
+            logger.error("Failed to load related events for [{}].", event.getId(), e);
         }
 
         return result;

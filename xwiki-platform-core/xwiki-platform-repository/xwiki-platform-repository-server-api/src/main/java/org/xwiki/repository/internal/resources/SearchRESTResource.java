@@ -112,9 +112,9 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // Rights
         // /////////////////
 
-        if (query instanceof SecureQuery) {
+        if (query instanceof SecureQuery secureQuery) {
             // Show only what the current user has the right to see
-            ((SecureQuery) query).checkCurrentUser(true);
+            secureQuery.checkCurrentUser(true);
         }
 
         // /////////////////
@@ -158,12 +158,15 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // Filtering
         // /////////////////
 
-        List<String> fq = new ArrayList<>(query.getFilters().size() + 1);
+        List<String> fq = new ArrayList<>(query.getFilters().size() + 2);
 
         // TODO: should be filter only on current wiki ?
 
         // We want only valid extensions documents
         fq.add(XWikiRepositoryModel.SOLRPROP_EXTENSION_VALIDEXTENSION + ":true");
+        // The index can be out of sync with the extension page and contain a valid extension without any last version,
+        // which clients cannot resolve (and older clients fail on), so make sure each returned extension has a version
+        fq.add(XWikiRepositoryModel.SOLRPROP_LASTVERSION + ":?*");
 
         // Request filters
         for (Filter fiter : query.getFilters()) {
@@ -177,7 +180,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
                 if (fiter.getComparison() == COMPARISON.EQUAL) {
                     builder.append(fiter.getValueString());
                 } else {
-                    builder.append('*' + fiter.getValueString() + '*');
+                    builder.append('*').append(fiter.getValueString()).append('*');
                 }
 
                 fq.add(builder.toString());

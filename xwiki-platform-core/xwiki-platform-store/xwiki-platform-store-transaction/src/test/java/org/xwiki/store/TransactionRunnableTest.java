@@ -45,7 +45,8 @@ class TransactionRunnableTest
     void infiniloopTest()
     {
         TransactionRunnable transactionRunnable = new TransactionRunnable();
-        assertThrows(IllegalArgumentException.class, () -> this.testCase.runIn(transactionRunnable.runIn(this.testCase)));
+        TransactionRunnable chainedRunnable = transactionRunnable.runIn(this.testCase);
+        assertThrows(IllegalArgumentException.class, () -> this.testCase.runIn(chainedRunnable));
     }
 
     /**
@@ -67,19 +68,21 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onPreRun()
             {
                 fail("Run in wrong order.");
             }
         }.runIn(new TransactionRunnable()
         {
+            @Override
             protected void onPreRun() throws Exception
             {
                 throw new CustomException();
             }
         } .runIn(this.testCase));
 
-        assertThrows(TransactionException.class, () -> this.testCase.preRun());
+        assertThrows(TransactionException.class, this.testCase::preRun);
     }
 
     /**
@@ -90,6 +93,7 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onPreRun() throws Exception
             {
                 throw new CustomException();
@@ -98,13 +102,14 @@ class TransactionRunnableTest
 
         new TransactionRunnable()
         {
+            @Override
             protected void onPreRun()
             {
                 fail("Run in wrong order.");
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.preRun());
+        assertThrows(TransactionException.class, this.testCase::preRun);
     }
 
     /**
@@ -115,19 +120,21 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRun()
             {
                 fail("Run in wrong order.");
             }
         }.runIn(new TransactionRunnable()
         {
+            @Override
             protected void onRun() throws Exception
             {
                 throw new CustomException();
             }
         }.runIn(this.testCase));
 
-        assertThrows(TransactionException.class, () -> this.testCase.run());
+        assertThrows(TransactionException.class, this.testCase::run);
     }
 
     /**
@@ -138,6 +145,7 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRun() throws Exception
             {
                 throw new CustomException();
@@ -146,13 +154,14 @@ class TransactionRunnableTest
 
         new TransactionRunnable()
         {
+            @Override
             protected void onRun()
             {
                 fail("Run in wrong order.");
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.run());
+        assertThrows(TransactionException.class, this.testCase::run);
     }
 
     /**
@@ -164,6 +173,7 @@ class TransactionRunnableTest
         new TransactionRunnable()
         {
             // Child first
+            @Override
             protected void onCommit() throws Exception
             {
                 throw new CustomException();
@@ -171,13 +181,14 @@ class TransactionRunnableTest
         }.runIn(new TransactionRunnable()
         {
             // Then parent
+            @Override
             protected void onCommit()
             {
                 fail("Run in wrong order.");
             }
         }.runIn(this.testCase));
 
-        assertThrows(TransactionException.class, () -> this.testCase.commit());
+        assertThrows(TransactionException.class, this.testCase::commit);
     }
 
     /**
@@ -188,6 +199,7 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onCommit()
             {
                 fail("Run in wrong order.");
@@ -196,13 +208,14 @@ class TransactionRunnableTest
 
         new TransactionRunnable()
         {
+            @Override
             protected void onCommit() throws Exception
             {
                 throw new CustomException();
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.commit());
+        assertThrows(TransactionException.class, this.testCase::commit);
     }
 
     /**
@@ -214,6 +227,7 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRollback() throws Exception
             {
                 assertFalse(hasRun(), "Child rolled back after parent.");
@@ -221,6 +235,7 @@ class TransactionRunnableTest
             }
         }.runIn(new TransactionRunnable()
         {
+            @Override
             protected void onRollback() throws Exception
             {
                 itRan();
@@ -228,7 +243,7 @@ class TransactionRunnableTest
         }.runIn(this.testCase));
 
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.rollback());
+        var e = assertThrows(TransactionException.class, this.testCase::rollback);
         assertTrue(e.isNonRecoverable(), "onRollback failed and exception did not indicate the possibility of "
             + "storage corruption.");
         assertTrue(hasRun(), "onRollback did not run for a child of a runnable which threw an exception.");
@@ -243,6 +258,7 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRollback()
             {
                 itRan();
@@ -251,6 +267,7 @@ class TransactionRunnableTest
 
         new TransactionRunnable()
         {
+            @Override
             protected void onRollback() throws Exception
             {
                 assertFalse(hasRun(), "Siblings rolled back in same order as they were registered.");
@@ -259,7 +276,7 @@ class TransactionRunnableTest
         }.runIn(this.testCase);
 
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.rollback());
+        var e = assertThrows(TransactionException.class, this.testCase::rollback);
         assertTrue(e.isNonRecoverable(), "onRollback failed and exception did not indicate the possibility of storage"
             + " corruption.");
         assertTrue(hasRun(), "onRollback did not run for the sibling of a runnable which threw an exception.");
@@ -274,6 +291,7 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onComplete() throws Exception
             {
                 itRan();
@@ -281,6 +299,7 @@ class TransactionRunnableTest
             }
         }.runIn(new TransactionRunnable()
         {
+            @Override
             protected void onComplete()
             {
                 assertTrue(hasRun(), "Child run after parent.");
@@ -288,7 +307,7 @@ class TransactionRunnableTest
         }.runIn(this.testCase));
 
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.complete());
+        var e = assertThrows(TransactionException.class, this.testCase::complete);
         assertFalse(e.isNonRecoverable(), "onComplete failed and exception erroniously indicated the possibility of storage corruption.");
         assertTrue(hasRun(), "onComplete did not run for a child of a runnable which threw an exception.");
     }
@@ -302,6 +321,7 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onComplete() throws Exception
             {
                 assertTrue(hasRun(), "onComplete for siblings run in same order as registered.");
@@ -311,13 +331,14 @@ class TransactionRunnableTest
 
         new TransactionRunnable()
         {
+            @Override
             protected void onComplete()
             {
                 itRan();
             }
         }.runIn(this.testCase);
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.complete());
+        var e = assertThrows(TransactionException.class, this.testCase::complete);
         assertFalse(e.isNonRecoverable(), "onComplete failed and exception erroniously indicated the possibility of storage corruption.");
         assertTrue(hasRun(), "onComplete did not run for the sibling of a runnable which threw an exception.");
     }
@@ -330,11 +351,13 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onPreRun() throws Exception
             {
                 throw new CustomException();
             }
 
+            @Override
             protected void onComplete()
             {
                 itRan();
@@ -343,13 +366,14 @@ class TransactionRunnableTest
 
         new TransactionRunnable()
         {
+            @Override
             protected void onComplete()
             {
                 fail("onComplete ran for a TransactionRunnable which did not have onPreRun called.");
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.preRun());
+        assertThrows(TransactionException.class, this.testCase::preRun);
         assertTrue(hasRun(), "onComplete did not run for runnable which was preRun.");
     }
 
@@ -361,11 +385,13 @@ class TransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRun() throws Exception
             {
                 throw new CustomException();
             }
 
+            @Override
             protected void onRollback()
             {
                 itRan();
@@ -374,13 +400,14 @@ class TransactionRunnableTest
 
         new TransactionRunnable()
         {
+            @Override
             protected void onRollback()
             {
                 fail("onRollback ran for a TransactionRunnable which did not have onRun called.");
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.run());
+        assertThrows(TransactionException.class, this.testCase::run);
         assertTrue(hasRun(), "onRollback did not run for runnable which was run.");
     }
 

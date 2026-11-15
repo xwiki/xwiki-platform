@@ -43,6 +43,7 @@ describe("DisplayerLink.vue", () => {
             propertyHref: "colorHref",
           };
         },
+        isEditMode: () => false,
       },
     });
     expect(wrapper.text()).toMatch("yellow");
@@ -57,6 +58,7 @@ describe("DisplayerLink.vue", () => {
         };
       },
       isContentTrusted: () => false,
+      isEditMode: () => false,
     };
     const wrapperHttpLink = initWrapper(DisplayerLink, {
       props: {
@@ -98,6 +100,7 @@ describe("DisplayerLink.vue", () => {
             propertyHref: "colorHref",
           };
         },
+        isEditMode: () => false,
       },
       mocks: {
         $t: (key) => key,
@@ -123,6 +126,7 @@ describe("DisplayerLink.vue", () => {
         isActionAllowed() {
           return false;
         },
+        isEditMode: () => false,
       },
       mocks: {
         $t: (key) => key,
@@ -132,7 +136,11 @@ describe("DisplayerLink.vue", () => {
   });
 
   it("Renders an entry in edit mode", async () => {
-    const wrapper = initWrapper(DisplayerLink, {});
+    const wrapper = initWrapper(DisplayerLink, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
 
     await wrapper.setProps({ isView: false });
 
@@ -150,6 +158,7 @@ describe("DisplayerLink.vue", () => {
             html: false,
           };
         },
+        isEditMode: () => false,
       },
       editBus: {
         start() {},

@@ -21,6 +21,7 @@ package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -65,6 +66,8 @@ import com.xpn.xwiki.web.ViewAction;
  */
 public class XWikiStatsReader
 {
+    private static final String START = "start";
+
     /**
      * Logging tool.
      */
@@ -97,9 +100,7 @@ public class XWikiStatsReader
                 Object[] actionsarray = actions.toArray();
                 CollectionUtils.reverseArray(actionsarray);
                 int nb = Math.min(actions.size(), size);
-                for (int i = 0; i < nb; i++) {
-                    list.add(actionsarray[i]);
-                }
+                list.addAll(Arrays.asList(actionsarray).subList(0, nb));
             }
         }
 
@@ -129,7 +130,7 @@ public class XWikiStatsReader
      */
     private String getHqlValidDomain(String domain)
     {
-        if (domain == null || domain.trim().length() == 0) {
+        if (domain == null || domain.trim().isEmpty()) {
             return "%";
         }
 
@@ -217,7 +218,7 @@ public class XWikiStatsReader
     {
         List<DocumentStats> documentStatsList;
 
-        Map<String, Object> params = new HashMap<>(4);
+        Map<String, Object> params = HashMap.newHashMap(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, params);
 
@@ -229,7 +230,7 @@ public class XWikiStatsReader
                 + " by sum(pageViews) {1}", nameFilter, sortOrder);
 
             params.put("action", action);
-            params.put("start", period.getStartCode());
+            params.put(START, period.getStartCode());
             params.put("end", period.getEndCode());
 
             Query query = this.queryManager.createQuery(statement, Query.HQL);
@@ -291,7 +292,7 @@ public class XWikiStatsReader
     {
         List<DocumentStats> documentStatsList;
 
-        Map<String, Object> params = new HashMap<>(4);
+        Map<String, Object> params = HashMap.newHashMap(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, params);
 
@@ -303,7 +304,7 @@ public class XWikiStatsReader
                 + " order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             params.put("referer", getHqlValidDomain(domain));
-            params.put("start", period.getStartCode());
+            params.put(START, period.getStartCode());
             params.put("end", period.getEndCode());
 
             Query query = this.queryManager.createQuery(statement, Query.HQL);
@@ -340,7 +341,7 @@ public class XWikiStatsReader
     {
         List<RefererStats> refererList;
 
-        Map<String, Object> params = new HashMap<>(4);
+        Map<String, Object> params = HashMap.newHashMap(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, params);
 
@@ -352,7 +353,7 @@ public class XWikiStatsReader
                 + " group by referer order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             params.put("referer", getHqlValidDomain(domain));
-            params.put("start", period.getStartCode());
+            params.put(START, period.getStartCode());
             params.put("end", period.getEndCode());
 
             Query query = this.queryManager.createQuery(statement, Query.HQL);
@@ -424,18 +425,18 @@ public class XWikiStatsReader
         StringBuilder userListWhere = new StringBuilder();
         try {
             for (DocumentReference user : StatsUtil.getRequestFilteredUsers(context)) {
-                if (userListWhere.length() > 0) {
+                if (!userListWhere.isEmpty()) {
                     userListWhere.append(", ");
                 }
 
                 paramList.add(this.compactwikiEntityReferenceSerializer.serialize(user));
-                userListWhere.append("?" + paramList.size());
+                userListWhere.append('?').append(paramList.size());
             }
         } catch (Exception e) {
-            LOGGER.error("Faild to get filter users list", e);
+            LOGGER.error("Failed to get filter users list", e);
         }
 
-        if (userListWhere.length() > 0) {
+        if (!userListWhere.isEmpty()) {
             query.append(" name NOT IN (");
             query.append(userListWhere);
             query.append(") and ");
@@ -495,7 +496,7 @@ public class XWikiStatsReader
                 Collections.reverse(visiStatList);
             }
         } catch (XWikiException e) {
-            LOGGER.error("Faild to search for vist statistics", e);
+            LOGGER.error("Failed to search for visit statistics", e);
 
             visiStatList = Collections.emptyList();
         }
@@ -566,7 +567,7 @@ public class XWikiStatsReader
             store.loadXWikiCollection(object, context, true);
             return object;
         } catch (XWikiException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to load the monthly statistics of document [{}] for action [{}]", docname, action, e);
             return new DocumentStats();
         }
     }

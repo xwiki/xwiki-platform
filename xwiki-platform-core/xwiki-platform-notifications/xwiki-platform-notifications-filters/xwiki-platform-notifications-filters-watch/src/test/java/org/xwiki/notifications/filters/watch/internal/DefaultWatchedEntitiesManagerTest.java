@@ -19,6 +19,10 @@
  */
 package org.xwiki.notifications.filters.watch.internal;
 
+import java.util.Set;
+
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,10 +37,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
-
-import java.util.Set;
-
-import javax.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anySet;

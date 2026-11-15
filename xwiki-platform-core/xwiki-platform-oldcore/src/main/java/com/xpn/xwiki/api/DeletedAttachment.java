@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -121,16 +122,20 @@ public class DeletedAttachment extends Api
      */
     public Attachment getAttachment()
     {
-        try {
-            XWikiAttachment attachment = this.deletedAttachment.restoreAttachment();
+        if (hasAccess(Right.VIEW, this.deletedAttachment.getAttachmentReference().getDocumentReference())) {
+            try {
+                XWikiAttachment attachment = this.deletedAttachment.restoreAttachment();
 
-            if (attachment != null) {
-                Document doc = this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
+                if (attachment != null) {
+                    Document doc =
+                        this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
 
-                return new Attachment(doc, attachment, this.context);
+                    return new Attachment(doc, attachment, this.context);
+                }
+            } catch (XWikiException ex) {
+                LOGGER.warn("Failed to restore deleted attachment [{}] of document [{}]", getFilename(), getDocName(),
+                    ex);
             }
-        } catch (XWikiException ex) {
-            LOGGER.warn("Failed to parse deleted attachment", ex);
         }
 
         return null;
@@ -194,7 +199,7 @@ public class DeletedAttachment extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOGGER.warn("Exception while checking if entry [" + getId() + "] can be removed from the recycle bin", ex);
+            LOGGER.warn("Failed to check if entry [{}] can be removed from the recycle bin", getId(), ex);
             return false;
         }
     }
@@ -212,7 +217,8 @@ public class DeletedAttachment extends Api
             try {
                 this.context.getWiki().getAttachmentRecycleBinStore().deleteFromRecycleBin(getId(), this.context, true);
             } catch (Exception ex) {
-                LOGGER.warn("Failed to purge deleted attachment", ex);
+                LOGGER.warn("Failed to purge deleted attachment [{}] of document [{}]",
+                    getFilename(), getDocName(), ex);
             }
         } else {
             java.lang.Object[] args = { this.getFilename(), this.getDocName() };

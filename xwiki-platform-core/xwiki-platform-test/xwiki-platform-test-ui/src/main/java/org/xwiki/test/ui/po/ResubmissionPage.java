@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -32,10 +33,10 @@ import org.openqa.selenium.support.FindBy;
  */
 public class ResubmissionPage extends BasePage
 {
-    @FindBy(xpath = "//form//input[@type='submit']")
+    @FindBy(className = "resubmit-yes")
     private WebElement resubmitButton;
 
-    @FindBy(xpath = "//form//a[@class='secondary button']")
+    @FindBy(className = "resubmit-no")
     private WebElement cancelButton;
 
     /**
@@ -44,6 +45,17 @@ public class ResubmissionPage extends BasePage
     public boolean isOnResubmissionPage()
     {
         return getPageURL().contains("xpage=resubmit");
+    }
+
+    /**
+     * @return true if the resubmit template allows to resubmit the request.
+     * @since 18.6.0RC1
+     * @since 17.10.10
+     * @since 18.4.3
+     */
+    public boolean requestCanBeResubmitted()
+    {
+        return getDriver().hasElementWithoutWaiting(By.className("resubmit-form"));
     }
 
     /**

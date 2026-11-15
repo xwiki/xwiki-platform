@@ -22,6 +22,7 @@ package com.xpn.xwiki.store.hibernate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -79,22 +80,11 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     private Logger logger;
 
     /**
-     * Constructor used by {@link com.xpn.xwiki.XWiki} during storage initialization.
-     *
-     * @param context The current context.
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentRecycleBinStore.class) instead.
-     */
-    @Deprecated
-    public HibernateAttachmentRecycleBinStore(XWikiContext context)
-    {
-        super(context.getWiki(), context);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public HibernateAttachmentRecycleBinStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override
@@ -135,13 +125,19 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         final XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
-
+        XWikiAttachment result = null;
         try {
             DeletedAttachment deletedAttachment = getDeletedAttachment(index, context, bTransaction);
-            return deletedAttachment == null ? null : deletedAttachment.restoreAttachment();
+
+            // Ensure that the deleted attachment matches the information provided in the attachment.
+            if (deletedAttachment != null && deletedAttachment.getFilename().equals(attachment.getFilename())
+                && Objects.equals(attachment.getDocId(), deletedAttachment.getDocId())) {
+                result = deletedAttachment.restoreAttachment();
+            }
         } finally {
             restoreExecutionXContext();
         }
+        return result;
     }
 
     @Override

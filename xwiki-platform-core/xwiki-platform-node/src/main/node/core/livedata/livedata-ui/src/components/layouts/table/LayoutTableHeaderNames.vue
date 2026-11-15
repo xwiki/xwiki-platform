@@ -73,6 +73,13 @@
             "
           >
             <span class="property-name">{{ property.name }}</span>
+            <!-- Only shown in edit mode, which is where entries are created. -->
+            <span
+              v-if="logic.isEditMode() && property.mandatory"
+              class="property-mandatory"
+            >
+              {{ $t("livedata.property.mandatory") }}
+            </span>
             <!--
               Sort icon
               Only show the icon for the first-level sort property
@@ -101,8 +108,14 @@
           @keydown.left="keyboardResizeColumn($event, -10)"
           @keydown.right="keyboardResizeColumn($event, 10)"
           @dblclick="resetColumnSize"
-          @keydown.esc="resetColumnSize"
+          @keydown.esc.stop="resetColumnSize"
         ></button>
+      </th>
+    </template>
+
+    <template #footer>
+      <th v-if="logic.isEditMode()">
+        {{ $t("livedata.table.action.header") }}
       </th>
     </template>
   </draggable>
@@ -158,10 +171,12 @@ export default {
       return this.firstSortLevel.property === property.id;
     },
 
-    sort(property) {
-      this.logic.sort(property.id, 0).catch((err) => {
+    async sort(property) {
+      try {
+        await this.logic.sort(property.id, 0);
+      } catch (err) {
         console.warn(err);
-      });
+      }
     },
 
     reorderProperty(e) {
@@ -394,6 +409,13 @@ export default {
   text-overflow: ellipsis;
 }
 
+.layout-table .property-mandatory {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-regular);
+  padding-left: var(--table-cell-padding);
+  white-space: nowrap;
+}
+
 .layout-table .sort-icon {
   color: currentColor;
   opacity: 0;
@@ -412,5 +434,26 @@ export default {
 
 .draggable-container.column-header-names .draggable-item {
   position: relative;
+}
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .layout-table th.draggable-item {
+    /* Overwrite the draggable-item display in order to show the property names, which form the table header, as a
+      column. */
+    display: flex;
+  }
+
+  /* Trim long property names. */
+  .xwiki-livedata .layout-table th.draggable-item .property-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .xwiki-livedata .layout-table .resize-handle {
+    /* The columns cannot be resized in responsive mode. */
+    display: none;
+  }
 }
 </style>

@@ -40,4 +40,14 @@ class AllIT
     class NestedEnforceRequiredRightsIT extends EnforceRequiredRightsIT
     {
     }
+
+    @Nested
+    class NestedEditablePropertyEditConfirmationIT extends EditablePropertyEditConfirmationIT
+    {
+    }
+
+    @Nested
+    class NestedLiveDataXObjectEditConfirmationIT extends LiveDataXObjectEditConfirmationIT
+    {
+    }
 }

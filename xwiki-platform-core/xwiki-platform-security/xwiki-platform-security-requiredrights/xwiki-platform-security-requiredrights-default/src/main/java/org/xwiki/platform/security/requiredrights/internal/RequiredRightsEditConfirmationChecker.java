@@ -22,7 +22,6 @@ package org.xwiki.platform.security.requiredrights.internal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -162,7 +161,7 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
                 it.getEntityReference(),
                 it.getRequiredRights(),
                 render(it.getSummaryMessage()), render(it.getDetailedMessage()
-            ))).collect(Collectors.toList());
+            ))).toList();
     }
 
     private String render(Block detailedMessage)

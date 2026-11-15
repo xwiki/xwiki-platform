@@ -41,7 +41,7 @@ class StartableTransactionRunnableTest
     void alreadyRunTest() throws Exception
     {
         this.testRunnable.start();
-        assertThrows(IllegalStateException.class, () -> this.testRunnable.start()) ;
+        assertThrows(IllegalStateException.class, this.testRunnable::start) ;
     }
 
     @Test
@@ -49,18 +49,20 @@ class StartableTransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRun() throws Exception
             {
                 throw new Exception();
             }
 
+            @Override
             protected void onRollback()
             {
                 itRan();
             }
         } .runIn(this.testRunnable);
 
-        var e = assertThrows(TransactionException.class, () -> this.testRunnable.start()) ;
+        var e = assertThrows(TransactionException.class, this.testRunnable::start) ;
         assertEquals(1, e.exceptionCount(), "Wrong number of exceptions reported");
         assertTrue(hasRun(), "Rollback did not run after exception");
     }
@@ -70,23 +72,26 @@ class StartableTransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRun() throws Exception
             {
                 throw new Exception();
             }
 
+            @Override
             protected void onRollback() throws Exception
             {
                 throw new Exception();
             }
 
+            @Override
             protected void onComplete()
             {
                 itRan();
             }
         } .runIn(this.testRunnable);
 
-        var e = assertThrows(TransactionException.class, () -> this.testRunnable.start()) ;
+        var e = assertThrows(TransactionException.class, this.testRunnable::start) ;
         assertEquals(2, e.exceptionCount(), "Wrong number of exceptions reported");
         assertTrue(e.isNonRecoverable(), "Rollback failed and yet the exception did not warn of possible corruption.");
         assertTrue(hasRun(), "Complete did not run after exception");
@@ -100,13 +105,14 @@ class StartableTransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onComplete() throws Exception
             {
                 throw new Exception();
             }
         } .runIn(this.testRunnable);
 
-        assertThrows(TransactionException.class, () -> this.testRunnable.start());
+        assertThrows(TransactionException.class, this.testRunnable::start);
 
     }
 

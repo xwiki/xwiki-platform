@@ -41,7 +41,7 @@
       </template>
       <template #right>
         <LivedataPagination side="right" />
-        <LivedataDropdownMenu />
+        <LivedataActions />
       </template>
     </LivedataTopbar>
 
@@ -70,12 +70,12 @@
         <tbody>
           <!-- The rows (= the entries) -->
           <!--
-        We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
-        That way even if two entries have the same id, the keys will not be equals.
+        The keys stay the same when the entries are refreshed or reordered, and when the entry of a new row is created.
+        They are made unique in case of inconsistent data, in this case duplicated entry IDs.
         -->
           <LayoutTableRow
             v-for="(entry, idx) in entries"
-            :key="`table-${logic.getEntryId(entry)}-${idx}`"
+            :key="entryKeys[idx]"
             :entry="entry"
             :entry-idx="idx"
           />
@@ -103,8 +103,8 @@ import LayoutTableHeaderFilters from "./LayoutTableHeaderFilters.vue";
 import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
 import LayoutTableNewRow from "./LayoutTableNewRow.vue";
 import LayoutTableRow from "./LayoutTableRow.vue";
+import LivedataActions from "../../LivedataActions.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataTopbar from "../../LivedataTopbar.vue";
@@ -114,9 +114,9 @@ export default {
   name: "layout-table",
 
   components: {
+    LivedataActions,
     LivedataBottombar,
     LivedataTopbar,
-    LivedataDropdownMenu,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
     LayoutTableHeaderNames,
@@ -138,6 +138,9 @@ export default {
     },
     entries() {
       return this.logic.data.data.entries;
+    },
+    entryKeys() {
+      return this.logic.getEntryKeys(this.entries);
     },
     canAddEntry() {
       return this.logic.canAddEntry();
@@ -182,5 +185,26 @@ export default {
   color: var(--text-muted);
   width: 100%;
   padding-bottom: 1em;
+}
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .layout-table .responsive-table > thead {
+    /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use grid display
+      because we have two rows, property names and filters, that we want to display as two equally sized columns. */
+    display: grid;
+    /* We want the property names column to have the same width as the filter column. */
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .xwiki-livedata .layout-table .responsive-table > thead > tr {
+    display: grid;
+    /* Align the property names column with the filter column. */
+    grid-template-rows: subgrid;
+    /* We need to set a span that is at least as large as the number of properties + 1, the extra one being for the
+      entry selector. */
+    grid-row: span calc(var(--livedata-property-count) + 1);
+  }
 }
 </style>

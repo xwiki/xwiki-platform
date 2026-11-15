@@ -50,7 +50,7 @@ public final class StoreFileUtils
     }
 
     /**
-     * Get the stored (optionally versionned) name of a file name assuming it's in an associated unique folder.
+     * Get the stored (optionally versioned) name of a file name assuming it's in an associated unique folder.
      *
      * @param filename the name of the file to save. This will be URL encoded.
      * @param versionName the name of the version of the file. This will also be URL encoded.

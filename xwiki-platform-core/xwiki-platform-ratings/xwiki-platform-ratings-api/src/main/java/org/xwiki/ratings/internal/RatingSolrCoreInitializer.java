@@ -32,7 +32,7 @@ import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 
 /**
- * Solr core initializer for the rating informations.
+ * Solr core initializer for the rating information.
  *
  * @version $Id$
  * @since 12.9RC1
@@ -101,7 +101,7 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
         this.logger.info("Ratings Solr Core schema migrated. Starting migration of already existing ratings.");
         // Step 2: Loop on old ratings and migrate them
 
-        // We explicitely don't retrieve scale from config here since the previous ratings
+        // We explicitly don't retrieve scale from config here since the previous ratings
         // were done with a scale of 5.
         int scaleUpperBound = 5;
         this.solrDocumentMigration120900000

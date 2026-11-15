@@ -116,7 +116,7 @@ class DisplayIconMacroTest
     private XWikiDocument iconDocument;
 
     @BeforeEach
-    public void before(MockitoOldcore oldcore) throws Exception
+    void before(MockitoOldcore oldcore) throws Exception
     {
         this.iconDocument = new XWikiDocument(ICON_DOCUMENT_REFERENCE);
         this.iconDocument.setContentAuthorReference(AUTHOR);

@@ -110,9 +110,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
             this.thread.join();
             this.thread = null;
         } catch (InterruptedException e) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Thread join has been interrupted", e);
-            }
+            LOGGER.warn("Thread join has been interrupted", e);
         }
     }
 
@@ -124,14 +122,10 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
                 register();
             }
         } catch (InterruptedException e) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Statistics storing thread has been interrupted.", e);
-            }
+            LOGGER.warn("Statistics storing thread has been interrupted.", e);
             throw e;
         } catch (StopStatsStoreException e) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.warn("Statistics storing thread received stop order.", e);
-            }
+            LOGGER.warn("Statistics storing thread received stop order.", e);
         }
     }
 

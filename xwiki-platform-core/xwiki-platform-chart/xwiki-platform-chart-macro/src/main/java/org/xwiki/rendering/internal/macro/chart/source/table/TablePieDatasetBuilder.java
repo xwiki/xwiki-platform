@@ -25,7 +25,7 @@ import org.jfree.data.general.Dataset;
 import org.jfree.util.TableOrder;
 
 /**
- * A buider of pie dataset ({@see org.jfree.data.pie.PieDataset}) from a table data source.
+ * A builder of pie dataset ({@see org.jfree.data.pie.PieDataset}) from a table data source.
  *
  * @version $Id$
  * @since 4.2M1

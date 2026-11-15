@@ -14,6 +14,7 @@
     "@xwiki/platform-component-manager-default": "workspace:*"
   },
   "devDependencies": {
+    "@oxc-project/runtime": "catalog:",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",

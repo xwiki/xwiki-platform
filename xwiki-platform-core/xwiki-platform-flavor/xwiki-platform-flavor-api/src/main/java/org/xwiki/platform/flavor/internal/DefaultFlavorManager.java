@@ -103,23 +103,6 @@ public class DefaultFlavorManager implements FlavorManager
         return result;
     }
 
-    private Collection<ExtensionId> getFlavors(String property)
-    {
-        Collection<ExtensionId> flavors = new LinkedHashSet<>();
-
-        // Get flavors from environment extension
-        List<String> ids = getEnvironmentPropertyList(property);
-        if (!ids.isEmpty()) {
-            flavors.addAll(this.converter.convert(ExtensionId.TYPE_LIST, ids));
-        }
-
-        // TODO: Get flavors from configuration
-        // flavors.addAll(configurationSource.getProperty("extension.flavor.known",
-        // Collections.<String>emptyList()));
-
-        return flavors;
-    }
-
     private List<String> getEnvironmentPropertyList(String property)
     {
         // Get flavors from environment extension

@@ -107,11 +107,7 @@ public class QueryContext
 
         public PropertyInfo addProperty(String propname, PPath location)
         {
-            PropertyInfo prop = properties.get(propname);
-            if (prop == null) {
-                prop = new PropertyInfo(propname, this);
-                properties.put(propname, prop);
-            }
+            PropertyInfo prop = properties.computeIfAbsent(propname, name -> new PropertyInfo(propname, this));
             prop.locations.add(location);
             return prop;
         }
@@ -230,5 +226,5 @@ public class QueryContext
         return documents.keySet();
     }
 
-    String DocumentFromName = "Document";
+    String documentFromName = "Document";
 }

@@ -38,11 +38,14 @@ import org.xwiki.query.QueryException;
 import org.xwiki.repository.internal.ExtensionStore;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 @Component
 @Named("repository")
@@ -62,6 +65,9 @@ public class RepositoryScriptService implements ScriptService
 
     @Inject
     private ExtensionStore extensionStore;
+
+    @Inject
+    private AuthorizationManager authorization;
 
     /**
      * Provides access to the current context.
@@ -173,26 +179,40 @@ public class RepositoryScriptService implements ScriptService
     /**
      * @param extensionId the identifier of the extension
      * @param version the version for which to find the object
-     * @return the object holding the extension version metadata
+     * @return the object holding the extension version metadata, or null if none could be found
      * @throws QueryException when failing to get the version object
      * @throws XWikiException when failing to get the version object
      * @since 17.9.0RC1
      */
     public Object getVersionObject(String extensionId, String version) throws QueryException, XWikiException
     {
-        XWikiDocument extensionDocument = this.extensionStore.getExistingExtensionDocumentById(extensionId);
+        DocumentReference extensionDocumentReference =
+            this.extensionStore.getExistingExtensionDocumentReferenceById(extensionId);
 
-        XWikiContext context = this.contextProvider.get();
-        // FIXME: add some checks
-        XWikiDocument extensionVersionDocument =
-            this.extensionStore.getExtensionVersionDocument(extensionDocument, version, context);
-        return new Object(this.extensionStore.getExtensionVersionObject(extensionVersionDocument, version), context);
+        if (extensionDocumentReference == null || !canView(extensionDocumentReference)) {
+            return null;
+        }
+
+        XWikiContext xcontext = this.contextProvider.get();
+        XWikiDocument extensionDocument = xcontext.getWiki().getDocument(extensionDocumentReference, xcontext);
+
+        DocumentReference versionDocumentReference =
+            this.extensionStore.getExtensionVersionDocumentReference(extensionDocument, version, xcontext);
+
+        if (!canView(versionDocumentReference)) {
+            return null;
+        }
+
+        XWikiDocument versionDocument = xcontext.getWiki().getDocument(versionDocumentReference, xcontext);
+        BaseObject extensionVersionObject = this.extensionStore.getExtensionVersionObject(versionDocument, version);
+
+        return extensionVersionObject != null ? new Object(extensionVersionObject, xcontext) : null;
     }
 
     /**
      * @param projectId the identifier of the project
      * @param version the version for which to find the object
-     * @return the object holding the project version metadata
+     * @return the object holding the project version metadata, or null if none could be found
      * @throws QueryException when failing to get the version object
      * @throws XWikiException when failing to get the version object
      * @since 18.5.0RC1
@@ -200,12 +220,40 @@ public class RepositoryScriptService implements ScriptService
      */
     public Object getProjectVersionObject(String projectId, String version) throws QueryException, XWikiException
     {
-        XWikiDocument projectDocument = this.extensionStore.getExistingProjectDocumentById(projectId);
+        DocumentReference projectDocumentReference =
+            this.extensionStore.getExistingProjectDocumentReferenceById(projectId);
 
-        XWikiContext context = this.contextProvider.get();
-        // FIXME: add some checks
-        XWikiDocument projectVersionDocument =
-            this.extensionStore.getProjectVersionDocument(projectDocument, version, context);
-        return new Object(this.extensionStore.getProjectVersionObject(projectVersionDocument, version), context);
+        if (projectDocumentReference == null || !canView(projectDocumentReference)) {
+            return null;
+        }
+
+        XWikiContext xcontext = this.contextProvider.get();
+        XWikiDocument projectDocument = xcontext.getWiki().getDocument(projectDocumentReference, xcontext);
+
+        DocumentReference versionDocumentReference =
+            this.extensionStore.getProjectVersionDocumentReference(projectDocument, version, xcontext);
+
+        if (!canView(versionDocumentReference)) {
+            return null;
+        }
+
+        XWikiDocument versionDocument = xcontext.getWiki().getDocument(versionDocumentReference, xcontext);
+        BaseObject projectVersionObject = this.extensionStore.getProjectVersionObject(versionDocument, version);
+
+        return projectVersionObject != null ? new Object(projectVersionObject, xcontext) : null;
+    }
+
+    /**
+     * A script service is callable with only Script right, which does not imply the right to view every document of
+     * the wiki, so version metadata must not be handed to a script whose author is not allowed to view the document
+     * holding it.
+     *
+     * @param documentReference the reference of the document to read the version metadata from
+     * @return {@code true} if the author of the current script is allowed to view the passed document
+     */
+    private boolean canView(DocumentReference documentReference)
+    {
+        return this.authorization.hasAccess(Right.VIEW, this.contextProvider.get().getAuthorReference(),
+            documentReference);
     }
 }

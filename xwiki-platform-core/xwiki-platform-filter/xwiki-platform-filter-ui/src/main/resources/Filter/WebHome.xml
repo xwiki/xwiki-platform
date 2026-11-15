@@ -125,7 +125,7 @@
   &lt;fieldset&gt;
     &lt;legend&gt;Input&lt;/legend&gt;
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="filter_input_select"&gt;Input type&lt;/label&gt;&lt;/dt&gt;
+      &lt;dt&gt;&lt;label for="filter_input_type"&gt;Input type&lt;/label&gt;&lt;/dt&gt;
       &lt;dd&gt;
         &lt;select name="input" id="filter_input_type"&gt;
           #foreach($type in $services.filter.availableInputStreams)
@@ -148,7 +148,7 @@
   &lt;fieldset&gt;
     &lt;legend&gt;Output&lt;/legend&gt;
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="filter_output_select"&gt;Output type&lt;/label&gt;&lt;/dt&gt;
+      &lt;dt&gt;&lt;label for="filter_output_type"&gt;Output type&lt;/label&gt;&lt;/dt&gt;
       &lt;dd&gt;
         &lt;select name="output" id="filter_output_type"&gt;
           #foreach($type in $services.filter.availableOutputStreams)

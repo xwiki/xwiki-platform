@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 5.0M1
  */
-public class LocalDocumentReferenceTest
+class LocalDocumentReferenceTest
 {
     @Test
-    public void verifyLocalDocumentReferenceProperties()
+    void verifyLocalDocumentReferenceProperties()
     {
         LocalDocumentReference reference = new LocalDocumentReference("space", "page");
         assertEquals("space", reference.getParent().getName());
@@ -45,7 +45,7 @@ public class LocalDocumentReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         LocalDocumentReference reference =
             new LocalDocumentReference("space", "page").replaceParent(new EntityReference("space2", EntityType.SPACE));

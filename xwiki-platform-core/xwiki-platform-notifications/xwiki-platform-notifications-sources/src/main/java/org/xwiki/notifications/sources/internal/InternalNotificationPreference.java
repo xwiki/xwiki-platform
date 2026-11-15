@@ -20,7 +20,7 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -72,7 +72,7 @@ public class InternalNotificationPreference implements NotificationPreference
     @Override
     public Map<NotificationPreferenceProperty, Object> getProperties()
     {
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, descriptor.getEventType());
         return properties;
     }

@@ -101,7 +101,7 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryClass
         xclass.addTextField(FIELD_STATUS, "Status", 30);
         xclass.addTextField(FIELD_CRON, "Cron Expression", 30);
 
-        // This field contains groovy script and is thus of tpye PureText.
+        // This field contains groovy script and is thus of type PureText.
         // TODO: In the future, add the ability to provide wiki markup so that all script languages can be supported
         // and not only Groovy. When this is done, convert this field to "Text".
         xclass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10, TextAreaClass.ContentType.PURE_TEXT);

@@ -52,6 +52,7 @@ public class LegacyDefaultNotificationParametersFactory extends DefaultNotificat
      * @throws NotificationException if error happens
      * @since 12.6
      */
+    @Override
     public void useUserPreferences(NotificationParameters parameters) throws NotificationException
     {
         if (parameters.user != null) {

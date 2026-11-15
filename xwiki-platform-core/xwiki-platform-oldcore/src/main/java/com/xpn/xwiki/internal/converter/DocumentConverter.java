@@ -68,8 +68,8 @@ public class DocumentConverter extends AbstractConverter<Document>
     @Override
     public Document convertToType(Type targetType, Object sourceValue)
     {
-        if (sourceValue instanceof XWikiDocument) {
-            return ((XWikiDocument) sourceValue).newDocument(this.contextProvider.get());
+        if (sourceValue instanceof XWikiDocument document) {
+            return document.newDocument(this.contextProvider.get());
         } else {
             throw new ConversionException(String.format("Unsupported source type [%s]", sourceValue.getClass()));
         }

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +137,7 @@ class LegacyDefaultNotificationParametersFactoryTest
     private List<NotificationFilterPreference> filterPreferenceList;
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         when(this.stringDocumentReferenceResolver.resolve(USER_SERIALIZED_REFERENCE)).thenReturn(USER_REFERENCE);
 
@@ -245,7 +245,7 @@ class LegacyDefaultNotificationParametersFactoryTest
             this.parametersFactory.createNotificationParameters(Collections.emptyMap()));
         verify(wikiDescriptorManager).getCurrentWikiId();
 
-        Map<ParametersKey, String> parametersMap = new HashMap<>();
+        Map<ParametersKey, String> parametersMap = new EnumMap<>(ParametersKey.class);
         parametersMap.put(ParametersKey.FORMAT, "EMAIL");
         parametersMap.put(ParametersKey.USER_ID, USER_SERIALIZED_REFERENCE);
         parametersMap.put(ParametersKey.USE_USER_PREFERENCES, "true");

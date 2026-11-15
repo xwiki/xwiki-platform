@@ -57,12 +57,12 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     private boolean transpose;
 
     /**
-     * Row key set used for validating the absense of duplicate row keys.
+     * Row key set used for validating the absence of duplicate row keys.
      */
     private final Set<String> rowKeySet = new HashSet<>();
 
     /**
-     * Column key set used for validating the absense of duplicate column keys.
+     * Column key set used for validating the absence of duplicate column keys.
      */
     private final Set<String> columnKeySet = new HashSet<>();
 
@@ -123,6 +123,7 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     @Override
     public void setParameters(Map<String, String> parameters)
     {
+        // Nothing to do, this dataset builder needs no extra parameter.
     }
 
     @Override
@@ -140,5 +141,6 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     @Override
     public void setLocaleConfiguration(LocaleConfiguration localeConfiguration)
     {
+        // Nothing to do, this dataset builder is not locale dependent.
     }
 }

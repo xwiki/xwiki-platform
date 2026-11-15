@@ -66,7 +66,8 @@ class DateXarObjectPropertySerializerTest
 
         assertEquals(
             "Failed to parse date [" + string + "] using format [yyyy-MM-dd HH:mm:ss.S]."
-                + " Trying again with format [EEE MMM d HH:mm:ss z yyyy].",
+                + " Trying again with format [EEE MMM d HH:mm:ss z yyyy]."
+                + " Root cause is [ParseException: Unparseable date: \"" + string + "\"].",
             this.logCapture.getLogEvent(0).getFormattedMessage());
     }
 
@@ -78,10 +79,13 @@ class DateXarObjectPropertySerializerTest
 
         assertEquals(
             "Failed to parse date [not date] using format [yyyy-MM-dd HH:mm:ss.S]."
-                + " Trying again with format [EEE MMM d HH:mm:ss z yyyy].",
+                + " Trying again with format [EEE MMM d HH:mm:ss z yyyy]."
+                + " Root cause is [ParseException: Unparseable date: \"not date\"].",
             this.logCapture.getLogEvent(0).getFormattedMessage());
         assertEquals("Failed to parse date [not date] using format [EEE MMM d HH:mm:ss z yyyy]."
-            + " Defaulting to the current date.", this.logCapture.getLogEvent(1).getFormattedMessage());
+            + " Defaulting to the current date."
+            + " Root cause is [ParseException: Unparseable date: \"not date\"].",
+            this.logCapture.getLogEvent(1).getFormattedMessage());
     }
 
     @Test

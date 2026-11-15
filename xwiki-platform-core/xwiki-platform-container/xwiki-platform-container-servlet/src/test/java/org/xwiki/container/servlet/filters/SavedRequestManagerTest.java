@@ -35,7 +35,7 @@ import org.mockito.quality.Strictness;
 import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -88,7 +88,7 @@ class SavedRequestManagerTest
     {
         String srid = SavedRequestManager.saveRequest(this.request);
         assertNotNull(srid);
-        assertFalse("".equals(srid));
+        assertNotEquals("", srid);
     }
 
     @Test

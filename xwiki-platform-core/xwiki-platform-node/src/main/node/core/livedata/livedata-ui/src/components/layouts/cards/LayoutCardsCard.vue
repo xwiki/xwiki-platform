@@ -72,16 +72,38 @@
           <template #handle>
             <XWikiIcon :icon-descriptor="{ name: 'more-vertical' }" />
           </template>
-
-          <!-- Property Name -->
-          <strong class="property-name">{{ property.name }}:</strong>
-          <!-- Property Value -->
-          <span class="value">
-            <LivedataDisplayer :property-id="property.id" :entry="entry" />
-          </span>
+          <!-- Property Container -->
+          <div class="property-container">
+            <!-- Property Name -->
+            <span class="property-name">{{ property.name }}:</span>
+            <!-- Property Value -->
+            <span class="value">
+              <LivedataDisplayer :property-id="property.id" :entry="entry" />
+            </span>
+          </div>
         </XWikiDraggableItem>
       </template>
     </draggable>
+
+    <!-- Entry actions, only available in edit mode. -->
+    <div v-if="logic.isEditMode()" class="card-actions">
+      <button
+        type="button"
+        class="btn btn-default"
+        :title="
+          $t(
+            isEntrySaved
+              ? 'livedata.table.action.delete'
+              : 'livedata.table.action.cancel',
+          )
+        "
+        @click="logic.deleteEntry(entry)"
+      >
+        <XWikiIcon
+          :icon-descriptor="{ name: isEntrySaved ? 'trash' : 'cross' }"
+        />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -141,6 +163,9 @@ export default {
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
     },
+    isEntrySaved() {
+      return this.logic.getEntryId(this.entry) !== undefined;
+    },
   },
 
   methods: {
@@ -148,16 +173,44 @@ export default {
       this.logic.reorderProperty(e.moved.oldIndex, e.moved.newIndex);
     },
   },
+
+  mounted() {
+    // Autofocus the first editable field of a new card.
+    // This makes new entry creation smoother by making it directly editable.
+    if (this.entry?._new) {
+      const tryFocus = (attempt = 0) => {
+        const cell = this.$el.querySelector(".editable")?.closest("[tabindex]");
+        if (cell) {
+          cell.focus();
+        } else if (attempt < 20) {
+          requestAnimationFrame(() => tryFocus(attempt + 1));
+        }
+      };
+      tryFocus();
+    }
+  },
 };
 </script>
 
 <style>
 .layout-cards .card {
   display: inline-block;
-  margin: 1rem;
-  padding: 1rem 2rem;
-  border: 1px solid lightgray;
-  border-radius: 1rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--table-border-color);
+  border-radius: var(--border-radius-base);
+}
+
+.layout-cards .draggable-container {
+  display: flex;
+  flex-flow: column;
+  gap: 2px;
+  padding: 8px;
+}
+
+.layout-cards .sortable-ghost {
+  background-color: var(--panel-bg);
+  border-radius: var(--border-radius-base);
 }
 
 .layout-cards .card-title {
@@ -177,12 +230,13 @@ export default {
   justify-content: flex-start;
   align-items: flex-start;
   transition: height 0.5s;
+  padding: 4px 0;
 }
 
 .layout-cards .handle {
   height: 100%;
   margin-left: -8px;
-  padding: 0px 8px;
+  padding: 0;
   cursor: grab;
   opacity: 0;
 }
@@ -209,11 +263,23 @@ export default {
 
 .layout-cards .property-name {
   margin-right: 0.5em;
+  font-weight: var(--font-weight-semibold);
+}
+
+.layout-cards .attachmentMimeType {
+  text-align: inherit;
 }
 
 .layout-cards .value {
   flex-grow: 1;
   align-self: stretch;
+}
+
+.layout-cards .card-actions {
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
 }
 
 /* for not IE11 */

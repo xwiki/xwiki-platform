@@ -30,7 +30,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
@@ -51,7 +50,8 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -86,7 +86,8 @@ class SendMailRunnableTest
     {
         Provider<XWikiContext> xwikiContextProvider =
             this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        when(xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 
     @Test
@@ -149,7 +150,7 @@ class SendMailRunnableTest
             // "UnknownHostException: xwiki-unknown"
             // "ConnectException: Connection refused"
             // Thus for now I only assert that there's an error set, but not its content.
-            assertTrue(status.getErrorSummary() != null);
+            assertNotNull(status.getErrorSummary());
             errorCount++;
         }
         assertEquals(2, errorCount);

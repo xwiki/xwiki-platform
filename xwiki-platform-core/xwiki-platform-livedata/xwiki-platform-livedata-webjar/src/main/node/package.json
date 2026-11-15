@@ -44,7 +44,6 @@
     "jsdom": "catalog:",
     "lodash-es": "catalog:",
     "npm-run-all2": "catalog:",
-    "sinon": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

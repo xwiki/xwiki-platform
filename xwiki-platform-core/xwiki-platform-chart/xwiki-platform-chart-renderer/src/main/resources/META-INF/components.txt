@@ -1,3 +1,4 @@
+org.xwiki.chart.internal.ChartConfiguration
 org.xwiki.chart.internal.DefaultChartGenerator
 org.xwiki.chart.internal.ColorChartCustomizer
 org.xwiki.chart.internal.VisibilityChartCustomizer

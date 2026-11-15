@@ -48,7 +48,7 @@ public abstract class AbstractLocalEventListener extends AbstractEventListener
      *            registered with this list of events against the {@link ObservationManager}. When an event occurs, for
      *            each matching event in this list, the {@link #onEvent(Event, Object, Object)} method will be called.
      */
-    public AbstractLocalEventListener(String name, List<? extends Event> events)
+    protected AbstractLocalEventListener(String name, List<? extends Event> events)
     {
         super(name, events);
     }
@@ -60,7 +60,7 @@ public abstract class AbstractLocalEventListener extends AbstractEventListener
      *            registered with this list of events against the {@link ObservationManager}. When an event occurs, for
      *            each matching event in this list, the {@link #onEvent(Event, Object, Object)} method will be called.
      */
-    public AbstractLocalEventListener(String name, Event... events)
+    protected AbstractLocalEventListener(String name, Event... events)
     {
         super(name, events);
     }
@@ -73,7 +73,7 @@ public abstract class AbstractLocalEventListener extends AbstractEventListener
      *            {@link ObservationManager}. When an event occurs, for each matching event in this list, the
      *            {@link #onEvent(Event, Object, Object)} method will be called.
      */
-    public AbstractLocalEventListener(String name, Object... values)
+    protected AbstractLocalEventListener(String name, Object... values)
     {
         super(name, values);
     }

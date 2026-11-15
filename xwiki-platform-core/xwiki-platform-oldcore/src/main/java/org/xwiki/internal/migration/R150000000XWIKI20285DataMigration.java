@@ -21,7 +21,6 @@ package org.xwiki.internal.migration;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -96,7 +95,7 @@ public class R150000000XWIKI20285DataMigration extends AbstractDocumentsMigratio
                 // Exclude document that are provided by extensions, because they are fixed using the usual xar upgrade
                 // mechanism.
                 .filter(documentReference -> !this.installedXARs.isExtensionDocument(documentReference))
-                .collect(Collectors.toList());
+                .toList();
         } catch (QueryException e) {
             throw new DataMigrationException(
                 String.format("Failed retrieve the list of all the documents for wiki [%s].", wiki.getName()), e);

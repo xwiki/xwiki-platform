@@ -333,7 +333,6 @@ define("xwiki-annotate-popup", ["xwiki-icon!xwiki-annotate-popup/icons", "xwiki-
     _create() {
       this.popup = document.createElement("div");
       this.popup.id = Constants.POPUP_ID;
-      this.popup.setAttribute("role", "toolbar");
       this.popup.setAttribute("aria-hidden", "true");
 
       this.popupButton = document.createElement("button");

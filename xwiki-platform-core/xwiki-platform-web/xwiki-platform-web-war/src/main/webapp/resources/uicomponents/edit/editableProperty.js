@@ -37,17 +37,17 @@
     #set ($discard = $l10n.put($key, $services.localization.render($key)))
   #end
 #end
-#set ($iconNames = ['pencil', 'cross', 'check'])
-#set ($icons = {})
-#foreach ($iconName in $iconNames)
-  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
-#end
 #[[*/
 // Start JavaScript-only code.
-(function(l10n, icons) {
+(function(l10n) {
   "use strict";
 
-define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation'], function($, xcontext, editConfirmation) {
+define('editableProperty-icons', {
+  icons: ['pencil', 'cross', 'check']
+});
+
+define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation', 'xwiki-icon!editableProperty-icons'],
+    function($, xcontext, editConfirmation, icons) {
   $.fn.editableProperty = function() {
     return this.each(init);
   };
@@ -59,15 +59,15 @@ define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation'], 
     if ($(this).find('.editableProperty-edit').length === 0) {
       var editIcon = $('<a href="#editProperty" class="editableProperty-edit"></a>');
       editIcon.attr('title', l10n.edit);
-      editIcon.html(icons.pencil);
+      editIcon.append(icons.pencil.render());
 
       var cancelIcon = $('<a href="#cancelProperty" class="editableProperty-cancel"></a>');
       cancelIcon.attr('title', l10n.cancel);
-      cancelIcon.hide().html(icons.cross);
+      cancelIcon.hide().append(icons.cross.render());
 
       var saveIcon = $('<a href="#saveProperty" class="editableProperty-save"></a>');
       saveIcon.attr('title', l10n.save);
-      saveIcon.hide().html(icons.check);
+      saveIcon.hide().append(icons.check.render());
 
       // Insert the action icons right after the label because it may be followed by a hint on the next line.
       $(this).find('label').after(editIcon, cancelIcon, saveIcon);
@@ -262,4 +262,4 @@ require(['jquery', 'editableProperty', 'xwiki-events-bridge'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$l10n, $icons]));
+}).apply(']]#', $jsontool.serialize([$l10n]));

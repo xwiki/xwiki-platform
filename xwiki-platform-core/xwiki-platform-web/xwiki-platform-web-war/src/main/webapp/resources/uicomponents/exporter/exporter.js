@@ -26,20 +26,20 @@
 #foreach ($key in $l10nKeys)
   #set ($discard = $l10n.put($key, $services.localization.render($key)))
 #end
-#set ($iconNames = ['check', 'shape_square'])
-#set ($icons = {})
-#foreach ($iconName in $iconNames)
-  #set ($discard = $icons.put($iconName, $services.icon.getMetaData($iconName)))
-#end
 #[[*/
 // Start JavaScript-only code.
-(function(l10n, icons) {
+(function(l10n) {
   "use strict";
+
+define('xwiki-export-tree-icons', {
+  icons: ['check', 'shape_square']
+});
 
 /**
  * Export Tree
  */
-define('xwiki-export-tree', ['jquery', 'xwiki-tree', 'xwiki-entityReference'], function($) {
+define('xwiki-export-tree', ['jquery', 'xwiki-icon!xwiki-export-tree-icons', 'xwiki-tree', 'xwiki-entityReference'],
+    function($, icons) {
   var selectChildNodes = function(tree, parentNode) {
     parentNode = parentNode || tree.get_node($.jstree.root);
     selectNodes(tree, parentNode.children);
@@ -633,4 +633,4 @@ require(['jquery'], function ($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$l10n, $icons]));
+}).apply(']]#', $jsontool.serialize([$l10n]));

@@ -22,7 +22,6 @@
 #set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
 #foreach ($map in [$mimetypeMap, $extensionMap])
   #foreach ($entry in $map.entrySet())
-    #set ($discard = $entry.value.set(0, $services.icon.getMetaData($entry.value.get(0))))
     #set ($translationKey = "core.viewers.attachments.mime.$entry.value.get(1)")
     #set ($discard = $entry.value.set(1, $services.localization.render($translationKey)))
   #end
@@ -32,7 +31,29 @@
 (function (mimeTypeMap, extensionMap) {
   'use strict';
 
-  define('xwiki-attachments-icon', [], function () {
+  // The icon names used by the mime type and file extension maps.
+  const iconNames = [...new Set([mimeTypeMap, extensionMap].flatMap(map => Object.values(map).map(entry => entry[0])))];
+  define('xwiki-attachments-icon-names', {
+    icons: iconNames
+  });
+
+  var getIconName = function (mimeType, fileName) {
+    var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+    if (mimeTypeMap.hasOwnProperty(mimeType)) {
+      return mimeTypeMap[mimeType][0];
+    } else if (extensionMap.hasOwnProperty(extension)) {
+      return extensionMap[extension][0];
+    } else {
+      var mimeTypePrefix = mimeType.substring(0, mimeType.indexOf('/') + 1);
+      if (mimeTypeMap.hasOwnProperty(mimeTypePrefix)) {
+        return mimeTypeMap[mimeTypePrefix][0];
+      } else {
+        return mimeTypeMap['attachment'][0];
+      }
+    }
+  };
+
+  define('xwiki-attachments-icon', ['xwiki-icon!xwiki-attachments-icon-names'], function (icons) {
     var getAttachmentIcon = function (attachment) {
       if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
         var url = attachment.xwikiRelativeUrl;
@@ -69,19 +90,7 @@
     };
 
     var getIcon = function (mimeType, fileName) {
-      var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-      if (mimeTypeMap.hasOwnProperty(mimeType)) {
-        return mimeTypeMap[mimeType][0];
-      } else if (extensionMap.hasOwnProperty(extension)) {
-        return extensionMap[extension][0];
-      } else {
-        var mimeTypePrefix = mimeType.substring(0, mimeType.indexOf('/') + 1);
-        if (mimeTypeMap.hasOwnProperty(mimeTypePrefix)) {
-          return mimeTypeMap[mimeTypePrefix][0];
-        } else {
-          return mimeTypeMap['attachment'][0];
-        }
-      }
+      return icons[getIconName(mimeType, fileName)] || {};
     };
 
     var loadAttachmentIcon = function (attachment) {

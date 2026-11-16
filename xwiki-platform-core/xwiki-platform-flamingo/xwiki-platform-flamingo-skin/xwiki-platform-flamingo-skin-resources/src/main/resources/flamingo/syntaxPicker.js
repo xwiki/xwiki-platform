@@ -49,20 +49,20 @@
     #set ($discard = $l10n.put($key, $services.localization.render($key)))
   #end
 #end
-#set ($iconNames = ['cross'])
-#set ($icons = {})
-#foreach ($iconName in $iconNames)
-  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
-#end
 #[[*/
 // Start JavaScript-only code.
-(function(l10n, icons) {
+(function(l10n) {
   "use strict";
+
+define('xwiki-syntax-picker-icons', {
+  icons: ['cross']
+});
 
 /**
  * The syntax picker.
  */
-require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxConverter) {
+require(['jquery', 'xwiki-syntax-converter', 'xwiki-icon!xwiki-syntax-picker-icons', 'bootstrap'],
+    function($, syntaxConverter, icons) {
   var syntaxPickerSelector = '#xwikidocsyntaxinput2';
 
   $(document).on('change.xwikiDocumentSyntaxPicker', syntaxPickerSelector, function() {
@@ -119,9 +119,7 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">` +
-              icons.cross +
-            `</button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
             <h4 class="modal-title"></h4>
           </div>
           <div class="modal-body"></div>
@@ -141,6 +139,7 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     confirmationModal.data('data').convertSyntax = true;
   }).appendTo('body').modal({show: false});
 
+  confirmationModal.find('.modal-header button.close').append(icons.cross.render());
   confirmationModal.find('.modal-title').text(l10n['web.widgets.syntaxPicker.conversionConfirmation.title']);
   confirmationModal.find('button.dontConvertSyntax').text(l10n.no);
   confirmationModal.find('button.convertSyntax').text(l10n.yes);
@@ -365,4 +364,4 @@ require(['jquery'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$l10n, $icons]));
+}).apply(']]#', $jsontool.serialize([$l10n]));

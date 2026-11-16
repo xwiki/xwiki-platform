@@ -73,6 +73,7 @@ type XWikiWindow = Window & {
   };
   Ajax: { Request: (url: string, options: AjaxRequestOptions) => void };
   require: () => void;
+  define: () => void;
   eval: (source: string) => void;
 };
 
@@ -93,6 +94,7 @@ describe("XWiki.displayDocExtra", () => {
     window.XWiki = { ...(globalThis as unknown as XWikiWindow).XWiki };
     // xwiki.js also uses RequireJS for code that is not under test.
     window.require = () => {};
+    window.define = () => {};
     window.eval(XWIKI_SOURCE);
 
     // Collect the requests instead of sending them, so that the test decides when each pane is loaded and in which

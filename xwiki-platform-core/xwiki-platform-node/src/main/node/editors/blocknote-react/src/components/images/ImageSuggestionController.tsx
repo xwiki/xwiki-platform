@@ -19,7 +19,10 @@
  */
 import { ImageSelector } from "./ImageSelector";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
-import { EditedDocumentContext, ServiceContainerContext } from "../../contexts";
+import {
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
+} from "../../contexts";
 import { useEditor } from "../../hooks";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { toResourceReference } from "../../misc/resourceReference";
@@ -210,17 +213,17 @@ function useImageInsertion(
     [editor, imageEditionHooks],
   );
 
-  const editedDocumentReference = useContext(EditedDocumentContext);
+  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
   const uploadImage = useCallback(async () => {
     const image = await triggerUserImageUpload(
       serviceContainer,
-      editedDocumentReference,
+      sourceDocumentReference,
     );
 
     if (image) {
       insertImage({ url: image.url }, image.reference);
     }
-  }, [serviceContainer, editedDocumentReference, insertImage]);
+  }, [serviceContainer, sourceDocumentReference, insertImage]);
 
   return { insertImage, uploadImage };
 }

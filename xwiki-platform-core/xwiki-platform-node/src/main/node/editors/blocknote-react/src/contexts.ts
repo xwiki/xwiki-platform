@@ -30,8 +30,15 @@ const ServiceContainerContext = createContext<Container | null>(null);
 const MacrosContext = createContext<ContextForMacros | null>(null);
 
 /**
- * The serialized reference of the edited document, when specified. The current document is edited otherwise.
+ * The serialized reference of the source document (holding the edited content), when specified. The current document
+ * is used otherwise.
  */
-const EditedDocumentContext = createContext<string | undefined>(undefined);
+const SourceDocumentReferenceContext = createContext<string | undefined>(
+  undefined,
+);
 
-export { EditedDocumentContext, MacrosContext, ServiceContainerContext };
+export {
+  MacrosContext,
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
+};

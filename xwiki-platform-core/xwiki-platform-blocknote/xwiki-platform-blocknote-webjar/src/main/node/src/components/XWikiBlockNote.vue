@@ -206,7 +206,7 @@ const {
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
-const editedDocumentReference =
+const sourceDocumentReference =
   Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined;
 
 //
@@ -246,7 +246,7 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
       },
       cancel: () => update({ type: "aborted" }),
     },
-    { documentReference: editedDocumentReference },
+    { documentReference: sourceDocumentReference },
   );
 };
 
@@ -260,7 +260,7 @@ const imageInsertion: ImageInsertionOverrideFn = (insert) => {
         insert({ type: "insert", props, reference }),
       cancel: () => insert({ type: "aborted" }),
     },
-    { documentReference: editedDocumentReference },
+    { documentReference: sourceDocumentReference },
   );
 };
 
@@ -273,10 +273,10 @@ const imageEditionHooks: ImageEditionHooks = {
     const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
     if (reference?.type === "attach") {
       metadata!.xwikiReference = {
-        ...(editedDocumentReference
+        ...(sourceDocumentReference
           ? toRelativeAttachmentResourceReference(
               reference,
-              editedDocumentReference,
+              sourceDocumentReference,
             )
           : reference),
         // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
@@ -293,7 +293,7 @@ const imageEditionHooks: ImageEditionHooks = {
 
 const linkEdition = createLinkEditionHooks(
   () => blockNoteDocument,
-  editedDocumentReference,
+  sourceDocumentReference,
 );
 
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
@@ -411,7 +411,7 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
     // The images and the links are saved relative to the edited document, so that they keep working when the edited
     // document is renamed or copied. The pasted and dropped files are attached to it.
     sourceDocumentReference: toCristalEntityReference(
-      editedDocumentReference,
+      sourceDocumentReference,
     ) as DocumentReference | undefined,
     // The syntax of the edited content, which is normally the syntax of the source document. The editor offers only
     // what this syntax supports, so that the edited content can be saved without losing anything.
@@ -468,7 +468,7 @@ async function joinCollaborationSession(): Promise<void> {
       .get<CollaborationManagerProvider>(collaborationManagerProviderName)
       .get(),
     // The collaboration session is identified by the reference and the locale of the edited document.
-    document: getEditedDocument(),
+    document: getSourceDocument(),
     formId: form,
     autoSaveVersionSummary,
   });
@@ -513,10 +513,10 @@ async function translate(
 }
 
 /**
- * @returns the document being edited, which the auto-saver keeps up to date with the versions the other clients
+ * @returns the source document (holding the edited content), which the auto-saver keeps up to date with the versions the other clients
  *   create, so that the next save doesn't run into a merge conflict
  */
-function getEditedDocument(): XWikiDocument {
+function getSourceDocument(): XWikiDocument {
   if (
     Model.serialize(xwikiMeta.documentReference) === documentReference &&
     actualLocale === xwikiMeta.locale
@@ -526,7 +526,7 @@ function getEditedDocument(): XWikiDocument {
     return XWikiDocument.currentDocument(xwikiMeta);
   }
   return new XWikiDocument({
-    documentReference: editedDocumentReference,
+    documentReference: sourceDocumentReference,
     language: actualLocale,
   });
 }

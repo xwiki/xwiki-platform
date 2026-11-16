@@ -19,7 +19,10 @@
  */
 import { insertLink } from "./insertLink";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
-import { EditedDocumentContext, ServiceContainerContext } from "../../contexts";
+import {
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
+} from "../../contexts";
 import { useEditor } from "../../hooks";
 import { triggerUserAttachmentUpload } from "../../misc/fileUpload";
 import { toLinkResourceReference } from "../../misc/linkResourceReference";
@@ -193,7 +196,7 @@ function useLinkInsertion(
     [linkEditionHandler, insert],
   );
 
-  const editedDocumentReference = useContext(EditedDocumentContext);
+  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
 
   // The label of a link to a suggested or uploaded page or attachment is generated from its target (the title of the
   // page, the name of the attachment), which is the label of the suggestion.
@@ -211,16 +214,16 @@ function useLinkInsertion(
                 serviceContainer,
                 link.reference,
                 link.type,
-                editedDocumentReference,
+                sourceDocumentReference,
               ),
       }),
-    [serviceContainer, editedDocumentReference, insert],
+    [serviceContainer, sourceDocumentReference, insert],
   );
 
   const uploadFile = useCallback(async () => {
     const attachment = await triggerUserAttachmentUpload(
       serviceContainer,
-      editedDocumentReference,
+      sourceDocumentReference,
     );
 
     if (attachment) {
@@ -231,7 +234,7 @@ function useLinkInsertion(
         type: LinkType.ATTACHMENT,
       });
     }
-  }, [serviceContainer, editedDocumentReference, insertSuggested]);
+  }, [serviceContainer, sourceDocumentReference, insertSuggested]);
 
   return { insertSuggested, openLinkEditor, uploadFile };
 }

@@ -32,9 +32,9 @@ import {
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import {
-  EditedDocumentContext,
   MacrosContext,
   ServiceContainerContext,
+  SourceDocumentReferenceContext,
 } from "../contexts";
 import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
@@ -151,8 +151,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     }
   }, [requestedCollaboration, name]);
 
-  // The components below take the edited document as a serialized reference.
-  const documentReference = useMemo(
+  // The components below take the source document reference serialized.
+  const serializedSourceDocumentReference = useMemo(
     () =>
       sourceDocumentReference &&
       serviceContainer
@@ -272,7 +272,9 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // Renders the editor instance using a React component.
   return (
     <ServiceContainerContext.Provider value={serviceContainer}>
-      <EditedDocumentContext.Provider value={documentReference}>
+      <SourceDocumentReferenceContext.Provider
+        value={serializedSourceDocumentReference}
+      >
         <MacrosContext.Provider value={macros ? macros.ctx : null}>
           <BlockNoteView
             editor={editor}
@@ -362,7 +364,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             />
           </BlockNoteView>
         </MacrosContext.Provider>
-      </EditedDocumentContext.Provider>
+      </SourceDocumentReferenceContext.Provider>
     </ServiceContainerContext.Provider>
   );
 };

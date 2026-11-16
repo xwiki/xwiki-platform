@@ -20,18 +20,24 @@
 import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import {
+  imageEditorName,
+  imageMetadataHandlerName,
+} from "../../components/images/imageEditor";
+import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { DocumentReference, SpaceReference } from "@xwiki/platform-model-api";
 import { useMemo, useState } from "react";
 // NOTE: `LinkType` is intentionally not imported here (not even type-only): the module also
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
 // the Vite pipeline used to bundle this story) can't parse.
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
-import type { ImageEditionHooks } from "../../components/images/imageEditionHooks";
 import type {
-  ImageInsertionOverrideFn,
-  ImageInsertionResult,
-} from "../../components/images/imageInsertionOverride";
+  ImageEditionData,
+  ImageEditor,
+  ImageMetadataHandler,
+} from "../../components/images/imageEditor";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
@@ -55,9 +61,11 @@ export type ImageSuggestionForTestProps = {
   uploadedImageName?: string;
   // The reference of the edited document (the current document, "Some.Page", is edited when not set).
   documentReference?: string;
-  // When set, the image insertion is overridden, the override returning this result right away (the default image
-  // selector is used otherwise).
-  imageInsertionResult?: ImageInsertionResult;
+  // When set, an image editor is bound, returning the given result right away (undefined when the user cancels). The
+  // image selector of the editor is used otherwise.
+  imageEditor?: { result?: ImageEditionData };
+  // The resource references of the images of the initial content, by block id, as kept by the image metadata handler.
+  imageReferences?: Record<string, ResourceReference>;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
@@ -79,32 +87,58 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   uploadedImageURL,
   uploadedImageName,
   documentReference,
-  imageInsertionResult,
+  imageEditor,
+  imageReferences,
   content,
   syntax,
 }) => {
-  // The images selected by the user, as reported by the image edition hooks.
+  // The images selected by the user, as reported to the image metadata handler.
   const [selectedImages, setSelectedImages] = useState<unknown[]>([]);
-  // Stable, like the overrides of a real integration.
-  const imageInsertion = useMemo<ImageInsertionOverrideFn | undefined>(
-    () => imageInsertionResult && ((insert) => insert(imageInsertionResult)),
-    [],
-  );
+  // The calls to the image editor.
+  const [imageEditorCalls, setImageEditorCalls] = useState<unknown[]>([]);
 
-  // Stable, like the hooks of a real integration, so that the editor doesn't rebuild its menus on each selection.
-  const imageEditionHooks = useMemo<ImageEditionHooks>(
-    () => ({
-      afterUpdate: (block, reference) =>
-        setSelectedImages((images) => [
-          ...images,
-          { blockId: block.id, url: block.props.url, reference },
-        ]),
-    }),
-    [],
-  );
+  // Holds the references of the images, like the store of a real integration.
+  const metadata = useMemo(() => {
+    const store = createBlockMetadataStore();
+    Object.entries(imageReferences ?? {}).forEach(([id, reference]) =>
+      store.set(id, "reference", reference),
+    );
+    return store;
+  }, []);
 
   const serviceContainer = useMemo(() => {
     const container = serviceContainerMock([syntax ?? FULL_SYNTAX]);
+
+    container
+      .bind<ImageMetadataHandler>(imageMetadataHandlerName)
+      .toConstantValue({
+        beforeEdit: (instance, block) => ({
+          ...block.props,
+          reference: instance.metadata.get(block.id)?.reference as
+            | ResourceReference
+            | undefined,
+        }),
+        afterUpdate: (instance, block, reference) => {
+          instance.metadata.set(block.id, "reference", reference);
+          setSelectedImages((images) => [
+            ...images,
+            { blockId: block.id, url: block.props.url, reference },
+          ]);
+        },
+      });
+
+    if (imageEditor) {
+      container.bind<ImageEditor>(imageEditorName).toConstantValue({
+        async insert() {
+          setImageEditorCalls((calls) => [...calls, { action: "insert" }]);
+          return imageEditor.result;
+        },
+        async edit(_instance, image) {
+          setImageEditorCalls((calls) => [...calls, { action: "edit", image }]);
+          return imageEditor.result;
+        },
+      });
+    }
 
     container.rebind("LinkSuggestServiceProvider").toConstantValue(
       linkSuggestServiceUnavailable
@@ -187,9 +221,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
               : // The mocked model reference serializer serializes a page reference as its name.
                 new DocumentReference(documentReference, new SpaceReference()),
           syntax: (syntax ?? FULL_SYNTAX).id,
-          features: {
-            images: { hooks: imageEditionHooks, insertion: imageInsertion },
-          },
+          metadata,
         }}
         content={content ?? []}
         linkEditionHandler={() => {
@@ -198,6 +230,9 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
       />
       <output data-testid="selectedImages">
         {JSON.stringify(selectedImages)}
+      </output>
+      <output data-testid="imageEditorCalls">
+        {JSON.stringify(imageEditorCalls)}
       </output>
     </>
   );

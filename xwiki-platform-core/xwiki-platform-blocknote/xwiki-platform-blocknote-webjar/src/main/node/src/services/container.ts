@@ -20,7 +20,8 @@
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
-import { DefaultImageWizard } from "./image/DefaultImageWizard";
+import { DefaultImageEditor } from "./image/DefaultImageEditor";
+import { DefaultImageMetadataHandler } from "./image/DefaultImageMetadataHandler";
 import { DefaultMacroEditor } from "./macros/DefaultMacroEditor";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
@@ -82,7 +83,8 @@ new LinkTypeUIComponentInit(container);
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);
 
-DefaultImageWizard.bind(container);
+DefaultImageEditor.bind(container);
+DefaultImageMetadataHandler.bind(container);
 DefaultMacroWizard.bind(container);
 DefaultMacroEditor.bind(container);
 

@@ -90,7 +90,6 @@ export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer Block
 // @beta
 export type EditorFeatures = {
     links?: LinkFeatureOptions;
-    images?: ImageFeatureOptions;
     macros?: MacroFeatureOptions | false;
 };
 
@@ -153,39 +152,27 @@ export function extractMacroRawContent(content: InlineContent<DefaultInlineConte
 export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
 
 // @beta
-export type ImageEditionHooks = {
-    afterUpdate?: (block: BlockOfType<"image">, reference?: ResourceReference) => void;
-};
-
-// @beta
-export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;
-
-// @beta
-export type ImageFeatureOptions = {
-    edition?: ImageEditionOverrideFn;
-    insertion?: ImageInsertionOverrideFn;
-    hooks?: ImageEditionHooks;
-};
-
-// @beta
-export type ImageInsertionOverrideFn = (insert: (insertionResult: ImageInsertionResult) => void) => void;
-
-// @beta
-export type ImageInsertionResult = {
-    type: "insert";
-    props: Partial<BlockOfType<"image">["props"]>;
+export type ImageEditionData = Partial<BlockOfType<"image">["props"]> & {
     reference?: ResourceReference;
-} | {
-    type: "aborted";
 };
 
 // @beta
-export type ImageUpdateResult = {
-    type: "update";
-    updatedProps: Partial<BlockOfType<"image">["props"]>;
-} | {
-    type: "aborted";
-};
+export interface ImageEditor {
+    edit(instance: EditorInstance, image: ImageEditionData): Promise<ImageEditionData | undefined>;
+    insert(instance: EditorInstance): Promise<ImageEditionData | undefined>;
+}
+
+// @beta
+export const imageEditorName = "ImageEditor";
+
+// @beta
+export interface ImageMetadataHandler {
+    afterUpdate(instance: EditorInstance, block: BlockOfType<"image">, reference?: ResourceReference): void;
+    beforeEdit(instance: EditorInstance, block: BlockOfType<"image">): ImageEditionData;
+}
+
+// @beta
+export const imageMetadataHandlerName = "ImageMetadataHandler";
 
 // @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;

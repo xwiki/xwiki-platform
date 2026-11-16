@@ -47,8 +47,6 @@ import {
 } from "@blocknote/react";
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
-import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
-import type { ImageEditionHooks } from "./images/imageEditionHooks";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type {
@@ -100,8 +98,6 @@ type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
   linkEditionHandler: LinkEditionHandler;
-  imageEditionOverrideFn?: ImageEditionOverrideFn;
-  imageEditionHooks?: ImageEditionHooks;
   linkEditionHooks?: LinkEditionHooks;
 };
 
@@ -110,8 +106,6 @@ export const CustomFormattingToolbar: React.FC<
 > = ({
   formattingToolbarProps,
   additionalBlockTypes,
-  imageEditionOverrideFn,
-  imageEditionHooks,
   linkEditionHooks,
   linkEditionHandler,
 }) => {
@@ -133,11 +127,7 @@ export const CustomFormattingToolbar: React.FC<
     >
       {/* Display a custom toolbar for specific element types (e.g. images) */}
       {currentBlock.type === "image" ? (
-        <CustomImageToolbar
-          currentBlock={currentBlock}
-          imageEditionOverrideFn={imageEditionOverrideFn}
-          imageEditionHooks={imageEditionHooks}
-        />
+        <CustomImageToolbar currentBlock={currentBlock} />
       ) : (
         // For others, simply show the "normal", default toolbar
         getDefaultFormattingToolbarItems(

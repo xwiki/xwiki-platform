@@ -61,50 +61,6 @@ test("BlockNote's content can be modified", async ({ mount }) => {
   await expect(editorEl).toHaveText("Some basic content");
 });
 
-// eslint-disable-next-line max-statements
-test("Image insertion UI can be overridden", async ({ mount, page }) => {
-  let overrideFnCalledWithUrl: string | null = null;
-
-  const component = await mount(
-    <BlockNoteForTest
-      content={[buildImage(SMALL_IMG_DATA_URL)]}
-      options={{
-        syntax: FULL_SYNTAX,
-        features: {
-          images: {
-            // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
-            edition: (block) => {
-              overrideFnCalledWithUrl = block.props.url;
-            },
-          },
-        },
-      }}
-    />,
-  );
-
-  const editorEl = component.locator(".bn-editor");
-
-  const imgEl = editorEl.locator("img.bn-visual-media");
-  await imgEl.waitFor({ state: "attached" });
-
-  // Trigger the toolbar by selecting the image.
-  await imgEl.click();
-
-  // The toolbar is rendered via FloatingPortal into document.body (outside the component root),
-  // so we must use page.locator instead of component.locator
-  const toolbarEl = page.locator(".bn-toolbar.bn-formatting-toolbar");
-  await toolbarEl.waitFor({ state: "attached" });
-
-  // Trigger the image edition UI
-  const imgEditBtnEl = page.locator(
-    'button[data-test="blocknote.imageToolbar.buttons.edit"]',
-  );
-  await imgEditBtnEl.waitFor({ state: "attached" });
-  await imgEditBtnEl.click();
-
-  expect(overrideFnCalledWithUrl).toBe(SMALL_IMG_DATA_URL);
-});
-
 test("Allowed syntax features should be available", async ({ mount, page }) => {
   const component = await mount(
     <BlockNoteForTest content={[]} options={{ syntax: FULL_SYNTAX }} />,
@@ -568,27 +524,6 @@ function buildCodeBlock(
     children: [],
   };
 }
-
-function buildImage(url: string): BlockOfType<"image"> {
-  return {
-    type: "image",
-    props: {
-      url,
-      backgroundColor: "default",
-      caption: "",
-      name: "",
-      previewWidth: 100,
-      showPreview: true,
-      textAlignment: "left",
-    },
-    children: [],
-    content: undefined,
-    id: Math.random().toString(),
-  };
-}
-
-const SMALL_IMG_DATA_URL =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 const FULL_SYNTAX: SyntaxConfig = {
   id: "default-syntax",

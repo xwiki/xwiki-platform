@@ -146,7 +146,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     appearance: { theme, contentStyles, codeBlockClassName } = {},
     collaboration: requestedCollaboration,
     upload,
-    features: { links, images, macros } = {},
+    features: { links, macros } = {},
   } = options;
   const { t } = useTranslation();
 
@@ -355,11 +355,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             />
 
             {syntax.features.blocks.images.basicImages && (
-              <ImageSuggestionController
-                maxSuggestions={5}
-                imageEditionHooks={images?.hooks}
-                imageInsertionOverrideFn={images?.insertion}
-              />
+              <ImageSuggestionController maxSuggestions={5} />
             )}
 
             {syntax.features.inlineContents.links.basicLinks && (
@@ -377,8 +373,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               formattingToolbar={(props) => (
                 <CustomFormattingToolbar
                   formattingToolbarProps={props}
-                  imageEditionOverrideFn={images?.edition}
-                  imageEditionHooks={images?.hooks}
                   linkEditionHandler={linkEditionHandler}
                   linkEditionHooks={links?.hooks}
                   additionalBlockTypes={filterMap(

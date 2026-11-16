@@ -86,7 +86,6 @@
 
 <script setup lang="ts">
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
-import { toRelativeAttachmentResourceReference } from "../services/blocknote/attachmentResourceReference";
 import { createFileUploader } from "../services/blocknote/createFileUploader";
 import { createLinkEditionHooks } from "../services/blocknote/linkEditionHooks";
 import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
@@ -112,7 +111,6 @@ import {
 import type { Logic } from "../services/Logic";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { FileUploader } from "../services/blocknote/createFileUploader";
-import type { ImageWizard } from "../services/image/ImageWizard";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -123,12 +121,8 @@ import type { HeadlessEditorOptions } from "@xwiki/platform-editors-blocknote-he
 import type {
   BlockType,
   EditorLanguage,
-  ImageEditionHooks,
-  ImageEditionOverrideFn,
-  ImageInsertionOverrideFn,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 import type { Ref } from "vue";
 
@@ -218,71 +212,6 @@ const editorContent = ref();
 const editorOptions = shallowRef<HeadlessEditorOptions>();
 
 const defaultLabel = "Editor";
-
-const imageEdition: ImageEditionOverrideFn = (block, update) => {
-  const imageWizard: ImageWizard = container.get("ImageWizard");
-  // The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so we pass it to the image
-  // wizard and update it on submit, because the user may have selected a different image.
-  const reference = blockNoteDocument?.metadata.get(block.id)
-    ?.xwikiReference as ResourceReference | undefined;
-  imageWizard.edit(
-    { ...block.props, reference },
-    {
-      submit: ({ reference: newReference, ...updatedProps }) => {
-        if (newReference) {
-          blockNoteDocument!.metadata.set(
-            block.id,
-            "xwikiReference",
-            newReference,
-          );
-        }
-        update({ type: "update", updatedProps });
-      },
-      cancel: () => update({ type: "aborted" }),
-    },
-    { documentReference: sourceDocumentReference },
-  );
-};
-
-const imageInsertion: ImageInsertionOverrideFn = (insert) => {
-  const imageWizard: ImageWizard = container.get("ImageWizard");
-  // The image wizard lets the user select the image to insert (among the existing images, or by uploading a new one)
-  // and set its properties. The resource reference of the selected image is stored by the image edition hooks.
-  imageWizard.insert(
-    {
-      submit: ({ reference, ...props }) =>
-        insert({ type: "insert", props, reference }),
-      cancel: () => insert({ type: "aborted" }),
-    },
-    { documentReference: sourceDocumentReference },
-  );
-};
-
-const imageEditionHooks: ImageEditionHooks = {
-  // Runs right after an image is inserted or its source is changed (e.g. from the image suggestions or by uploading
-  // it). The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so that the image is
-  // saved with the reference provided by the server rather than with its URL, relative to the edited document. An image
-  // known only by its URL is saved with that URL, so we drop the reference of the previous image source.
-  afterUpdate: (block, reference) => {
-    blockNoteDocument?.metadata.set(
-      block.id,
-      "xwikiReference",
-      reference?.type === "attach"
-        ? {
-            ...(sourceDocumentReference
-              ? toRelativeAttachmentResourceReference(
-                  reference,
-                  sourceDocumentReference,
-                )
-              : reference),
-            // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
-            // default).
-            typed: false,
-          }
-        : reference,
-    );
-  },
-};
 
 const linkEdition = createLinkEditionHooks(
   () => blockNoteDocument,
@@ -417,11 +346,6 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
         // links, to keep the link type selector short. Existing path and UNC path links are still edited with their
         // own link type.
         excludedTargetTypes: ["path", "unc"],
-      },
-      images: {
-        edition: imageEdition,
-        insertion: imageInsertion,
-        hooks: imageEditionHooks,
       },
     },
   };

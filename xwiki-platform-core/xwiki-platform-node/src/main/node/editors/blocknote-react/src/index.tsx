@@ -84,23 +84,21 @@ export type {
   EditorAppearance,
   EditorFeatures,
   EditorOptions,
-  ImageFeatureOptions,
   LinkFeatureOptions,
   MacroFeatureOptions,
   UploadOptions,
 } from "./editorOptions";
 
-export type {
-  ImageEditionOverrideFn,
-  ImageUpdateResult,
-} from "./components/images/CustomImageToolbar";
-
-export type { ImageEditionHooks } from "./components/images/imageEditionHooks";
+export {
+  imageEditorName,
+  imageMetadataHandlerName,
+} from "./components/images/imageEditor";
 
 export type {
-  ImageInsertionOverrideFn,
-  ImageInsertionResult,
-} from "./components/images/imageInsertionOverride";
+  ImageEditionData,
+  ImageEditor,
+  ImageMetadataHandler,
+} from "./components/images/imageEditor";
 
 export {
   MACRO_NAME_PREFIX,

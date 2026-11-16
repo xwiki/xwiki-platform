@@ -18,9 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { EditorLanguage } from "./blocknote";
-import type { ImageEditionOverrideFn } from "./components/images/CustomImageToolbar";
-import type { ImageEditionHooks } from "./components/images/imageEditionHooks";
-import type { ImageInsertionOverrideFn } from "./components/images/imageInsertionOverride";
 import type { LinkEditionHooks } from "./components/links/linkEditionHooks";
 import type { BlockMetadataStore } from "./misc/blockMetadata";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
@@ -88,29 +85,6 @@ type LinkFeatureOptions = {
 };
 
 /**
- * The options of the image feature.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type ImageFeatureOptions = {
-  /**
-   * Replaces the default image edition UI (i.e. the edition action of the image toolbar).
-   */
-  edition?: ImageEditionOverrideFn;
-
-  /**
-   * Replaces the default image insertion UI (i.e. browsing the images to insert, from the image quick action).
-   */
-  insertion?: ImageInsertionOverrideFn;
-
-  /**
-   * Hooks to intercept the image insertion / edition flow.
-   */
-  hooks?: ImageEditionHooks;
-};
-
-/**
  * The options of the macro feature.
  *
  * @since 18.10.0RC1
@@ -132,7 +106,6 @@ type MacroFeatureOptions = {
  */
 type EditorFeatures = {
   links?: LinkFeatureOptions;
-  images?: ImageFeatureOptions;
 
   /**
    * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
@@ -246,7 +219,6 @@ export type {
   EditorAppearance,
   EditorFeatures,
   EditorOptions,
-  ImageFeatureOptions,
   LinkFeatureOptions,
   MacroFeatureOptions,
   UploadOptions,

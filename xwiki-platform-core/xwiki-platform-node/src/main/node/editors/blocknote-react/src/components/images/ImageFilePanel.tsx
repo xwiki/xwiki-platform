@@ -18,23 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
+import { afterImageUpdate } from "./imageEditor";
+import { EditorInstanceContext } from "../../contexts";
 import { useEditor } from "../../hooks";
 import { Paper } from "@mantine/core";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 import type { BlockOfType } from "../../blocknote";
-import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type ImageFilePanelProps = {
   currentBlock: BlockOfType<"image">;
-  imageEditionHooks?: ImageEditionHooks;
 };
 
 export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
   currentBlock: image,
-  imageEditionHooks,
 }) => {
   const editor = useEditor();
+  const instance = useContext(EditorInstanceContext);
 
   const updateImage = useCallback(
     (url: string, reference?: ResourceReference) => {
@@ -42,10 +42,10 @@ export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
         { id: image.id },
         { props: { url } },
       ) as BlockOfType<"image">;
-      imageEditionHooks?.afterUpdate?.(updatedImage, reference);
+      afterImageUpdate(instance, updatedImage, reference);
       editor.focus();
     },
-    [editor, image, imageEditionHooks],
+    [editor, instance, image],
   );
 
   return (

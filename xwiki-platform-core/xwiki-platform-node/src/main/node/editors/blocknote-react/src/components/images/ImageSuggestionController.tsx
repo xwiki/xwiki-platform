@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
+import { afterImageUpdate, useImageEditing } from "./imageEditor";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
 import {
+  EditorInstanceContext,
   ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../../contexts";
@@ -38,8 +40,6 @@ import { useCallback, useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiFolderImageLine, RiUpload2Line } from "react-icons/ri";
 import type { BlockOfType, EditorType } from "../../blocknote";
-import type { ImageEditionHooks } from "./imageEditionHooks";
-import type { ImageInsertionOverrideFn } from "./imageInsertionOverride";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   LinkSuggestService,
@@ -66,14 +66,10 @@ type InsertImage = (
 
 export type ImageSuggestionControllerProps = {
   maxSuggestions?: number;
-  imageEditionHooks?: ImageEditionHooks;
-  imageInsertionOverrideFn?: ImageInsertionOverrideFn;
 };
 
 export function ImageSuggestionController({
   maxSuggestions,
-  imageEditionHooks,
-  imageInsertionOverrideFn,
 }: ImageSuggestionControllerProps) {
   const serviceContainer = useContext(ServiceContainerContext)!;
 
@@ -89,33 +85,12 @@ export function ImageSuggestionController({
   const { insertImage, uploadImage } = useImageInsertion(
     editor,
     serviceContainer,
-    imageEditionHooks,
   );
 
   const { t } = useTranslation();
 
-  const [selectorPosition, setSelectorPosition] = useState<{
-    from: number;
-    to: number;
-  }>();
-
-  // Lets the user browse the images to insert: with the image insertion override when specified, otherwise with the
-  // full image selector popover, opened where the image suggestion menu was (the menu itself is already closed, and its
-  // query removed, by the time an item is clicked).
-  const openImageSelector = useCallback(() => {
-    if (imageInsertionOverrideFn) {
-      // The image is inserted at the editor's selection, which is kept while the override's UI has the focus.
-      imageInsertionOverrideFn((result) => {
-        if (result.type === "insert") {
-          insertImage(result.props, result.reference);
-        }
-        editor.focus();
-      });
-    } else {
-      const pos = editor.transact((tr) => tr.selection.from);
-      setSelectorPosition({ from: pos, to: pos });
-    }
-  }, [editor, imageInsertionOverrideFn, insertImage]);
+  const { selectorPosition, setSelectorPosition, openImageSelector } =
+    useImageSelector(editor, insertImage);
 
   const searchImages = useMemo(
     () =>
@@ -195,22 +170,48 @@ export function ImageSuggestionController({
 }
 
 /**
- * @returns the functions inserting an image selected by the user, letting the given hooks know about it
+ * @returns the position of the opened image selector, and the function letting the user browse the images to insert:
+ *   with the image editor when bound, otherwise with the full image selector popover, opened where the image suggestion
+ *   menu was (the menu itself is already closed, and its query removed, by the time an item is clicked)
  */
-function useImageInsertion(
-  editor: EditorType,
-  serviceContainer: Container,
-  imageEditionHooks?: ImageEditionHooks,
-) {
+function useImageSelector(editor: EditorType, insertImage: InsertImage) {
+  const imageEditing = useImageEditing();
+
+  const [selectorPosition, setSelectorPosition] = useState<{
+    from: number;
+    to: number;
+  }>();
+
+  const openImageSelector = useCallback(async () => {
+    if (imageEditing) {
+      // The image is inserted at the editor's selection, which is kept while the image editor has the focus.
+      await imageEditing.insert(({ reference, ...props }) =>
+        insertImage(props, reference),
+      );
+      editor.focus();
+    } else {
+      const pos = editor.transact((tr) => tr.selection.from);
+      setSelectorPosition({ from: pos, to: pos });
+    }
+  }, [editor, imageEditing, insertImage]);
+
+  return { selectorPosition, setSelectorPosition, openImageSelector };
+}
+
+/**
+ * @returns the functions inserting an image selected by the user, letting the image metadata handler know about it
+ */
+function useImageInsertion(editor: EditorType, serviceContainer: Container) {
+  const instance = useContext(EditorInstanceContext);
   const insertImage: InsertImage = useCallback(
     (props, reference) => {
       const image = insertOrUpdateBlockForSlashMenu(editor, {
         type: "image",
         props,
       }) as BlockOfType<"image">;
-      imageEditionHooks?.afterUpdate?.(image, reference);
+      afterImageUpdate(instance, image, reference);
     },
-    [editor, imageEditionHooks],
+    [editor, instance],
   );
 
   const sourceDocumentReference = useContext(SourceDocumentReferenceContext);

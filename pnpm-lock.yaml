@@ -349,6 +349,9 @@ importers:
       nx:
         specifier: 'catalog:'
         version: 24.0.6
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.25
 
   xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node:
     dependencies:
@@ -884,9 +887,6 @@ importers:
       npm-package-json-lint:
         specifier: 'catalog:'
         version: 11.0.1(supports-color@8.1.1)
-      publint:
-        specifier: 'catalog:'
-        version: 0.3.25
       vite:
         specifier: 'catalog:'
         version: 8.3.4(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.32))(yaml@2.9.0)

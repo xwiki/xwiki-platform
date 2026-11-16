@@ -130,13 +130,23 @@
             </configuration>
           </execution>
           <execution>
-            <id>pnpm-publint</id>
+            <id>pnpm-publish-check</id>
             <phase>verify</phase>
             <goals>
               <goal>pnpm</goal>
             </goals>
             <configuration>
-              <arguments>run publint</arguments>
+              <workingDirectory>${basedir}/src/main/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-publint-check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
               <workingDirectory>${basedir}/src/main/node</workingDirectory>
               <installDirectory>${basedir}/target</installDirectory>
             </configuration>

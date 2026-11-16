@@ -20,6 +20,7 @@
 package org.xwiki.test.docker.junit5;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -47,11 +48,20 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Marks a test as being a functional UI Test.
+ * <p>
+ * The annotation is inherited, so several test classes can share the same configuration by extending a common
+ * (abstract) base class that holds it. This is useful when each of them must also be runnable on its own, using the
+ * same XWiki instance setup (e.g. to reuse a running XWiki instance between test classes). A test class that declares
+ * its own {@code UITest} doesn't inherit anything from its base class's annotation: the whole configuration is
+ * replaced, not merged. This differs from the {@code UITest} annotations of the nested test classes of a top-level test
+ * class (e.g. {@code AllIT}), which are merged with the one of the top-level test class. The annotation is inherited
+ * since 18.10.0RC1; before that, it has to be declared on each test class.
  *
  * @version $Id$
  * @since 10.6RC1
  */
 @Documented
+@Inherited
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ExtendWith(ValidateConsoleExtension.class)
@@ -202,6 +212,10 @@ public @interface UITest
     int[] sshPorts() default {};
 
     /**
+     * The profiles listed in the {@code xwiki.test.ui.profiles} System property (comma-separated) are added to these
+     * ones (rather than replacing them), so that a build can activate a profile for all tests (for example
+     * {@code clover}) while a test keeps the profiles it needs.
+     *
      * @return the list of Maven profiles to activate when resolving dependencies for the current POM.
      * @since 10.11RC1
      */
@@ -270,7 +284,9 @@ public @interface UITest
     /**
      * @return the list of network aliases to use for the servlet engine Docker container; this is useful when you need
      *         to access the same XWiki instance using different domains, e.g. because you need to login with different
-     *         XWiki users in the same browser instance (but different tabs).
+     *         XWiki users in the same browser instance (but different tabs). The aliases listed in the
+     *         {@code xwiki.test.ui.servletEngineNetworkAliases} System property (comma-separated) are added to these
+     *         ones (rather than replacing them).
      * @since 15.10.12
      * @since 16.4.1
      * @since 16.6.0RC1

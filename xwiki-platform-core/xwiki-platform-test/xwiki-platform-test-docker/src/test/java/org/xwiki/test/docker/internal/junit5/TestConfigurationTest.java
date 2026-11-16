@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.internal.junit5;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.DockerTestException;
@@ -110,6 +112,16 @@ class TestConfigurationTest
     {
     }
 
+    @UITest(profiles = "legacy", servletEngineNetworkAliases = "alias1")
+    class ProfilesAndAliasesAnnotation
+    {
+    }
+
+    @UITest(profiles = { "legacy", "other" }, servletEngineNetworkAliases = "alias2")
+    class OtherProfilesAndAliasesAnnotation
+    {
+    }
+
     @BeforeEach
     void setUp()
     {
@@ -117,6 +129,8 @@ class TestConfigurationTest
         System.clearProperty("xwiki.test.ui.servletEngine");
         System.clearProperty("xwiki.test.ui.verbose");
         System.clearProperty("xwiki.test.ui.databaseTag");
+        System.clearProperty("xwiki.test.ui.profiles");
+        System.clearProperty("xwiki.test.ui.servletEngineNetworkAliases");
     }
 
     @Test
@@ -237,6 +251,58 @@ class TestConfigurationTest
         assertEquals(ServletEngine.JETTY, configuration.getServletEngine());
         assertTrue(configuration.isVerbose());
         assertEquals("otherversion", configuration.getDatabaseTag());
+    }
+
+    @Test
+    void getProfilesAndAliasesWhenInSystemPropertiesAndNotInAnnotation()
+    {
+        System.setProperty("xwiki.test.ui.profiles", "clover, legacy");
+        System.setProperty("xwiki.test.ui.servletEngineNetworkAliases", "alias1");
+
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(EmptyAnnotation.class.getAnnotation(UITest.class));
+        assertEquals(List.of("clover", "legacy"), configuration.getProfiles());
+        assertEquals(List.of("alias1"), configuration.getServletEngineNetworkAliases());
+    }
+
+    @Test
+    void getProfilesAndAliasesWhenInSystemPropertiesAndInAnnotation()
+    {
+        System.setProperty("xwiki.test.ui.profiles", "clover,legacy");
+        System.setProperty("xwiki.test.ui.servletEngineNetworkAliases", "alias2, alias1");
+
+        // Unlike the other options, the System property values are added to the annotation ones instead of replacing
+        // them, so that the test keeps the values it needs.
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration =
+            resolver.resolve(ProfilesAndAliasesAnnotation.class.getAnnotation(UITest.class));
+        assertEquals(List.of("legacy", "clover"), configuration.getProfiles());
+        assertEquals(List.of("alias1", "alias2"), configuration.getServletEngineNetworkAliases());
+    }
+
+    @Test
+    void getProfilesAndAliasesWhenNotInSystemPropertiesNorInAnnotation()
+    {
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(EmptyAnnotation.class.getAnnotation(UITest.class));
+        assertEquals(List.of(), configuration.getProfiles());
+        assertEquals(List.of(), configuration.getServletEngineNetworkAliases());
+    }
+
+    @Test
+    void mergeProfilesAndAliases() throws Exception
+    {
+        System.setProperty("xwiki.test.ui.profiles", "clover");
+
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration =
+            resolver.resolve(ProfilesAndAliasesAnnotation.class.getAnnotation(UITest.class));
+        configuration.merge(resolver.resolve(OtherProfilesAndAliasesAnnotation.class.getAnnotation(UITest.class)));
+        configuration.merge(resolver.resolve(EmptyAnnotation.class.getAnnotation(UITest.class)));
+
+        // Each nested test brings the System property profile: it's only kept once.
+        assertEquals(List.of("legacy", "clover", "other"), configuration.getProfiles());
+        assertEquals(List.of("alias1", "alias2"), configuration.getServletEngineNetworkAliases());
     }
 
     @Test

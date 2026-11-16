@@ -58,9 +58,10 @@
       <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We depend on the legacy version of oldcore since this module uses deprecated APIs that only it provides. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-legacy-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

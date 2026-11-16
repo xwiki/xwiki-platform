@@ -49,7 +49,8 @@ public class ExtensionContextTestConfigurationResolver
 
         TestConfiguration testConfiguration = this.uiTestResolver.resolve(uiTest);
         for (Class<?> nestedTestClass : topLevelTestClass.getDeclaredClasses()) {
-            UITest nestedUITest = getAnnotationFromClassAndParent(nestedTestClass);
+            // UITest is inherited so this returns the annotation declared on the closest superclass, if any.
+            UITest nestedUITest = nestedTestClass.getAnnotation(UITest.class);
             if (nestedUITest != null) {
                 try {
                     testConfiguration.merge(this.uiTestResolver.resolve(nestedUITest));
@@ -59,26 +60,5 @@ public class ExtensionContextTestConfigurationResolver
             }
         }
         return testConfiguration;
-    }
-
-    private UITest getAnnotationFromClassAndParent(Class<?> clazz)
-    {
-        UITest uiTest;
-        Class<?> current = clazz;
-        boolean shouldStop = false;
-        do {
-            uiTest = current.getAnnotation(UITest.class);
-            if (uiTest == null) {
-                // Look in parent
-                if (current.getSuperclass() != null) {
-                    current = current.getSuperclass();
-                } else {
-                    shouldStop = true;
-                }
-            } else {
-                shouldStop = true;
-            }
-        } while (!shouldStop);
-        return uiTest;
     }
 }

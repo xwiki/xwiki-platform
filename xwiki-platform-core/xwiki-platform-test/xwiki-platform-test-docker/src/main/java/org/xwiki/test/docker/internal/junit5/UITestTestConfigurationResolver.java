@@ -361,11 +361,24 @@ public class UITestTestConfigurationResolver
         return newSSHPorts;
     }
 
+    /**
+     * Combine the values from the {@link UITest} annotation with the ones from the System property (a comma-separated
+     * list), the annotation's first and without duplicates. They are combined rather than having the System property
+     * override the annotation, since a test needs its own values (for example the {@code legacy} Maven profile) while
+     * the build may add some for all tests (for example the {@code clover} profile).
+     *
+     * @param values the {@link UITest} annotation parameter values, for example {@code {"legacy"}}
+     * @param systemProperty the name of the System property which might contain comma-separated values, for example
+     *     {@code xwiki.test.ui.profiles}; an unset or empty property adds nothing
+     * @return the combined values, blank ones being ignored and the others trimmed
+     */
     private List<String> resolveCommaSeparatedValues(String[] values, String systemProperty)
     {
-        String[] actualValues = values.length > 0 ? values : System.getProperty(systemProperty, "").split("\\s*,\\s*");
-        return Stream.of(actualValues).filter(StringUtils::isNotBlank)
-            .collect(Collectors.toCollection(() -> new ArrayList<>()));
+        return Stream.concat(Stream.of(values), Stream.of(System.getProperty(systemProperty, "").split(",")))
+            .map(String::trim)
+            .filter(StringUtils::isNotEmpty)
+            .distinct()
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<ServletEngine> resolveForbiddenServletEngines(ServletEngine[] forbiddenServletEngines)

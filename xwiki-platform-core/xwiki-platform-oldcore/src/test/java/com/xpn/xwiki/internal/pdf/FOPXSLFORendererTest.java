@@ -34,6 +34,7 @@ import javax.inject.Provider;
 import org.apache.fop.configuration.Configuration;
 import org.apache.fop.configuration.ConfigurationException;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDResources;
@@ -199,8 +200,12 @@ class FOPXSLFORendererTest
             assertEquals(1, document.getNumberOfPages());
             PDResources resources = document.getPage(0).getResources();
             List<String> fonts = new ArrayList<>();
+            // Read the name from the font dictionary: loading the font with PDResources#getFont would make PDFBox
+            // scan the system fonts to substitute this non-embedded font, and log a warning for each system font it
+            // can't parse (e.g. a color emoji font), which depends on the machine running the test.
             for (COSName fontName : resources.getFontNames()) {
-                fonts.add(resources.getFont(fontName).getName());
+                COSDictionary font = resources.getCOSObject().getCOSDictionary(COSName.FONT).getCOSDictionary(fontName);
+                fonts.add(font.getNameAsString(COSName.BASE_FONT));
             }
             // The text is written with FOP's default font.
             assertEquals(List.of("Helvetica"), fonts);

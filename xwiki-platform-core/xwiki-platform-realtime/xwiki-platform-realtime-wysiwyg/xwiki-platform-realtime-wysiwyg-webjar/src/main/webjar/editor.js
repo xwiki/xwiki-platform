@@ -100,8 +100,12 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      *
      * @param {Range[]} ranges the DOM selection ranges to restore; if not specified, the last saved text selection is
      *   restored
+     * @param {Object} options additional options
+     * @param {boolean} options.preventScroll {@code true} to keep the scroll position if possible, when the selection
+     *   is restored as a result of a change the local user didn't make (e.g. a remote change), {@code false} or
+     *   unspecified to scroll the restored selection into view, if needed
      */
-    restoreSelection(ranges) {
+    restoreSelection(ranges, options) {
       throw new Error('Not implemented!');
     }
 

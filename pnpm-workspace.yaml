@@ -109,12 +109,12 @@ catalog:
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
   "@playwright/test": 1.64.1
-  "@tsconfig/node24": 24.0.5
+  "@tsconfig/node26": 26.0.2
   "@types/jquery": 4.0.1
   "@types/jsdom": 30.0.0
   "@types/lodash-es": 4.17.12
   "@types/mdast": 4.0.4
-  "@types/node": 24.13.6
+  "@types/node": 26.6.6
   "@types/react": 19.3.0
   "@types/react-dom": 19.3.0
   "@types/requirejs": 2.1.37

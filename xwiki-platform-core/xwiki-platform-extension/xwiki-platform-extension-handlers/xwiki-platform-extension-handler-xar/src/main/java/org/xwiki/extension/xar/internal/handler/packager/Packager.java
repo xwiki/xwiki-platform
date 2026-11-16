@@ -480,19 +480,20 @@ public class Packager
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        // The document is reset again from the version saved by another request, if it is saved concurrently.
-        xcontext.getWiki().updateDocument(documentReference, databaseDocument -> {
-            // Override data of database document with extension document. Apply a copy, because the objects and
-            // attachments it holds are moved to the database document, which might not be the one that is saved.
-            databaseDocument.apply(extensionDocument.clone());
-            // Make sure new version will have the right author
-            databaseDocument.setAuthor(this.userResolver.resolve(xcontext.getUserReference()));
-            // Force generating a new version, even if there is no change
-            databaseDocument.setMetaDataDirty(true);
-            databaseDocument.setContentDirty(true);
+        // Get database document, cloned since the stored document can be shared through the document cache
+        XWikiDocument databaseDocument = xcontext.getWiki().getDocument(documentReference, xcontext).clone();
 
-            return true;
-        }, comment, false, true, xcontext);
+        // Override data of database document with extension document
+        databaseDocument.apply(extensionDocument);
+        // Make sure new version will have the right author
+        databaseDocument.setAuthor(this.userResolver.resolve(xcontext.getUserReference()));
+        // Force generating a new version, even if there is no change
+        databaseDocument.setMetaDataDirty(true);
+        databaseDocument.setContentDirty(true);
+
+        // Save. The reset isn't applied again if the document is saved concurrently: the user decided to discard the
+        // changes of the version they saw, not the ones saved since.
+        xcontext.getWiki().saveDocument(databaseDocument, comment, false, true, xcontext);
     }
 
     public List<DocumentReference> getDocumentReferences(Collection<XarEntry> pages, PackageConfiguration configuration)

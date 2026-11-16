@@ -6,7 +6,8 @@
   "meta": {
     "layouts": [
       {"id": "table", "icon": "table"},
-      {"id": "cards", "icon": "th"}
+      {"id": "cards", "icon": "th"},
+      {"id": "list", "icon": "list"}
     ],
 
     "defaultLayout": "table",

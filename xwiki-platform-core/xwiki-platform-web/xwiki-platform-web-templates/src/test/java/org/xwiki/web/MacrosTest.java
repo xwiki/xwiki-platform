@@ -451,6 +451,23 @@ class MacrosTest extends PageTest
     }
 
     @Test
+    void verticalNavigationItemEscapesName() throws Exception
+    {
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        velocityContext.put("item",
+            Map.of("id", "item", "url", "/x?a&b", "name", "<b>a</b>{{/html}}{{info}}x{{/info}}{{html}}"));
+
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "verticalNavigationItem",
+            new StringReader("#verticalNavigationItem($item '*' {})"));
+
+        String output = writer.toString();
+        assertTrue(output.contains("{{html}}<a href=\"/x?a&#38;b\">&#60;b&#62;a&#60;/b&#62;&#123;&#123;/html}}"
+            + "&#123;&#123;info}}x"
+            + "&#123;&#123;/info}}&#123;&#123;html}}</a>{{/html}}"), output);
+    }
+
+    @Test
     void wikiTranslation() throws XWikiVelocityException
     {
         StringWriter writer = new StringWriter();

@@ -51,7 +51,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>
  * The annotation is inherited, so several test classes can share the same configuration by extending a common
  * (abstract) base class that holds it. This is useful when each of them must also be runnable on its own, using the
- * same XWiki instance setup (e.g. to reuse a running XWiki instance between test classes).
+ * same XWiki instance setup (e.g. to reuse a running XWiki instance between test classes). A test class that declares
+ * its own {@code UITest} doesn't inherit anything from its base class's annotation: the whole configuration is
+ * replaced, not merged. This differs from the {@code UITest} annotations of the nested test classes of a top-level test
+ * class (e.g. {@code AllIT}), which are merged with the one of the top-level test class. The annotation is inherited
+ * since 18.10.0RC1; before that, it has to be declared on each test class.
  *
  * @version $Id$
  * @since 10.6RC1

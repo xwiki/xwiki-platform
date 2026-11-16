@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { BLOCKNOTE_SYNTAX } from "../blocknote/syntax";
 import { macroEditorName } from "@xwiki/platform-editors-blocknote-react";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
 import { Container, inject, injectable } from "inversify";
@@ -34,11 +35,6 @@ import type {
  * insert or edit the server-rendered xwikiMacroBlock / xwikiInlineMacro macros.
  */
 type MacroInvocation = MacroBlockInvocation | InlineMacroInvocation;
-
-/**
- * The syntax of the macro parameters and content that are edited in-place, i.e. the syntax of the editor content.
- */
-const INLINE_PARAMETERS_SYNTAX = "blocknote/1.0";
 
 /**
  * Default MacroEditor implementation, using the Macro Wizard: the macro calls are rendered in the syntax of the edited
@@ -128,7 +124,8 @@ export class DefaultMacroEditor implements MacroEditor {
     const { sourceDocumentReference, syntax } = instance.options;
     return {
       inlineParameters,
-      inlineParametersSyntax: INLINE_PARAMETERS_SYNTAX,
+      // The macro parameters and content edited in-place are in the syntax of the editor content.
+      inlineParametersSyntax: BLOCKNOTE_SYNTAX,
       showInlineParameters: true,
       sourceDocumentReference: sourceDocumentReference
         ? toXWikiEntityReference(sourceDocumentReference)

@@ -51,7 +51,7 @@
       v-if="name"
       type="hidden"
       :name="name + '_inputSyntax'"
-      :value="inputSyntax"
+      :value="BLOCKNOTE_SYNTAX"
       :form
       :disabled
     />
@@ -89,6 +89,7 @@ import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { toRelativeAttachmentResourceReference } from "../services/blocknote/attachmentResourceReference";
 import { createFileUploader } from "../services/blocknote/createFileUploader";
 import { createLinkEditionHooks } from "../services/blocknote/linkEditionHooks";
+import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
 import {
   ConnectionStatus,
   collaborationManagerProviderName,
@@ -153,7 +154,6 @@ const {
   form = undefined,
   disabled = false,
   uploadDisabled = false,
-  inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
@@ -175,9 +175,6 @@ const {
   // Prevent the user from attaching files to the edited document, set when the edited content is restricted and the
   // user doesn't have edit right on the source document (e.g. when commenting a page they can't edit).
   uploadDisabled?: boolean;
-
-  // The syntax of the edited content, as expected by the editor.
-  inputSyntax?: string;
 
   // The syntax of the edited content, as expected by the back-end storage.
   outputSyntax?: string;

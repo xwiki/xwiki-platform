@@ -71,6 +71,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.event.UserDeletingDocumentEvent;
+import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
@@ -1618,6 +1619,34 @@ class XWikiTest
         assertEquals("updated content", storedDocument.getContent());
         assertEquals("4.1", storedDocument.getVersion());
         assertEquals(storedDocument.getVersion(), updatedDocument.getVersion());
+    }
+
+    @Test
+    void updateDocumentModifiedByContextUserAfterConcurrentSave() throws Exception
+    {
+        this.oldcore.checkDocumentRevision(true);
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        DocumentReference reference = this.document.getDocumentReference();
+        AtomicInteger attempts = new AtomicInteger();
+        EventListener userListener = mock();
+        when(userListener.getName()).thenReturn("userlistener");
+        when(userListener.getEvents()).thenReturn(List.of(new UserUpdatingDocumentEvent()));
+        this.oldcore.getMocker().<ObservationManager>getInstance(ObservationManager.class).addListener(userListener);
+
+        this.xwiki.updateDocument(reference, doc -> {
+            if (attempts.incrementAndGet() == 1) {
+                saveConcurrently(reference, "concurrent title");
+            }
+            doc.setContent("updated content");
+            return true;
+        }, "update", false, true, xcontext);
+
+        XWikiDocument storedDocument = this.xwiki.getDocument(reference, xcontext);
+        assertEquals("concurrent title", storedDocument.getTitle());
+        assertEquals("updated content", storedDocument.getContent());
+        // The listeners can check (and cancel) each attempt on behalf of the context user, the saved one included.
+        verify(userListener, times(2)).onEvent(any(UserUpdatingDocumentEvent.class), any(XWikiDocument.class),
+            same(xcontext));
     }
 
     @Test

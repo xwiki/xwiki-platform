@@ -20,8 +20,10 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
@@ -44,10 +46,13 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsExtension;
+import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
+import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -208,6 +213,25 @@ class XarExtensionHandlerTest
         }
 
         return (XarInstalledExtension) this.xarExtensionRepository.resolve(extensionId);
+    }
+
+    /**
+     * Answers the questions asked by the job until it finishes, with their default answer.
+     *
+     * @param job the running job
+     * @param beforeAnswer called with each conflict question before answering it
+     */
+    private void answerQuestions(Job job, Consumer<ConflictQuestion> beforeAnswer) throws Exception
+    {
+        while (job.getStatus().getState() != JobStatus.State.FINISHED) {
+            if (job.getStatus().getState() == JobStatus.State.WAITING) {
+                if (job.getStatus().getQuestion() instanceof ConflictQuestion question) {
+                    beforeAnswer.accept(question);
+                }
+                job.getStatus().answered();
+            }
+            Thread.sleep(1);
+        }
     }
 
     private void uninstall(ExtensionId extensionId, String wiki) throws Throwable
@@ -708,6 +732,75 @@ class XarExtensionHandlerTest
             .getDocument(new DocumentReference("wiki", "space1", "modified"), getXWikiContext());
 
         assertFalse(space1modified.isNew(), "Document wiki:space.modified has been removed from the database");
+    }
+
+    @Test
+    void upgradeOnWikiWithSaveWhileAsking() throws Throwable
+    {
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        // Customize the page, so that the upgrade merges it.
+        DocumentReference pageReference = new DocumentReference("wiki", "space", "page");
+        LocalDocumentReference customClass = new LocalDocumentReference("XWiki", "CustomClass");
+        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext()).clone();
+        page.newXObject(customClass, getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(page, getXWikiContext());
+
+        this.oldcore.checkDocumentRevision(true);
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setProperty("user.reference", this.contextUser);
+        installRequest.addExtension(this.localXarExtensiontId2);
+        installRequest.addNamespace("wiki:wiki");
+        installRequest.setInteractive(true);
+        installRequest.setProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_SUCCESS,
+            ConflictQuestion.GlobalAction.ASK);
+        Job installJob = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
+
+        // A user saves the page while the upgrade asks how to merge it.
+        LocalDocumentReference concurrentClass = new LocalDocumentReference("XWiki", "ConcurrentClass");
+        List<ConflictQuestion> pageQuestions = new ArrayList<>();
+        answerQuestions(installJob, question -> {
+            if (question.getCurrentDocument().getDocumentReference().equals(pageReference)) {
+                if (pageQuestions.isEmpty()) {
+                    try {
+                        XWikiDocument concurrentPage =
+                            this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext()).clone();
+                        concurrentPage.newXObject(concurrentClass, getXWikiContext());
+                        this.oldcore.getSpyXWiki().saveDocument(concurrentPage, getXWikiContext());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                pageQuestions.add(question);
+            }
+        });
+
+        assertEquals(List.of(), installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN));
+        // The page is merged again with the version saved by the user, which is asked again.
+        assertEquals(2, pageQuestions.size());
+        page = this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext());
+        assertEquals("content 2", page.getContent());
+        assertNotNull(page.getXObject(customClass));
+        assertNotNull(page.getXObject(concurrentClass));
+    }
+
+    @Test
+    void resetWithContextUser() throws Throwable
+    {
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        DocumentReference pageReference = new DocumentReference("wiki", "space", "page");
+        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext()).clone();
+        page.setContent("modified content");
+        page.setAuthorReference(new DocumentReference("wiki", "XWiki", "OtherUser"));
+        this.oldcore.getSpyXWiki().saveDocument(page, getXWikiContext());
+
+        this.componentManager.<Packager>getInstance(Packager.class)
+            .resetWithContextUser(new DocumentReference(pageReference, Locale.ROOT));
+
+        page = this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext());
+        assertEquals("content", page.getContent());
+        assertEquals(this.contextUser, page.getAuthorReference());
     }
 
     @Test

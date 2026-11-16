@@ -2122,6 +2122,33 @@ public class XWiki implements EventListener
         FailablePredicate<XWikiDocument, XWikiException> update, String comment, boolean isMinorEdit,
         XWikiContext context) throws XWikiException
     {
+        return updateDocument(documentReference, update, comment, isMinorEdit, false, context);
+    }
+
+    /**
+     * Loads the stored document, modifies it and saves it, applying the modification again when the document is saved
+     * concurrently, like {@link #updateDocument(DocumentReference, FailablePredicate, String, boolean, XWikiContext)}.
+     *
+     * @param documentReference the reference of the document to update, with the locale of the translation to update
+     * @param update modifies the given copy of the stored document (a new document if it doesn't exist) and returns
+     *     {@code true} if the document needs to be saved, {@code false} to leave it unchanged; it may be called several
+     *     times, with a newer copy each time
+     * @param comment the comment of the saved version
+     * @param isMinorEdit {@code true} if the saved version is a minor edit
+     * @param modifiedByContextUser {@code true} if the modification is made by the context user, which lets the
+     *     listeners check, and possibly cancel, the save on behalf of that user (see
+     *     {@link #saveDocument(XWikiDocument, String, boolean, boolean, XWikiContext)})
+     * @param context the XWiki context
+     * @return the saved document, or a copy of the stored document if {@code update} returned {@code false}
+     * @throws DocumentRevisionConflictException if the document was still saved concurrently after several attempts
+     * @throws XWikiException if loading, modifying or saving the document failed
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public XWikiDocument updateDocument(DocumentReference documentReference,
+        FailablePredicate<XWikiDocument, XWikiException> update, String comment, boolean isMinorEdit,
+        boolean modifiedByContextUser, XWikiContext context) throws XWikiException
+    {
         for (int attempt = 1;; attempt++) {
             // Copy the document because the stored one can be shared through the document cache.
             XWikiDocument document = getDocument(documentReference, context).clone();
@@ -2130,7 +2157,7 @@ public class XWiki implements EventListener
             }
 
             try {
-                saveDocument(document, comment, isMinorEdit, context);
+                saveDocument(document, comment, isMinorEdit, modifiedByContextUser, context);
                 return document;
             } catch (DocumentRevisionConflictException e) {
                 if (attempt >= UPDATE_DOCUMENT_ATTEMPTS) {

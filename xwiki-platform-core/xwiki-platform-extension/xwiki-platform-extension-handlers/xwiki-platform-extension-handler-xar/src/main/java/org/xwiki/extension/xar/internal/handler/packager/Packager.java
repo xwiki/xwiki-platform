@@ -58,6 +58,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -98,6 +99,12 @@ public class Packager
 
     private static final TranslationMarker LOG_DELETEDDOCUMENT_FAILURE =
         new TranslationMarker("extension.xar.log.delete.document.failure");
+
+    /**
+     * The number of times a document is merged and saved again when it keeps being saved concurrently by other
+     * requests.
+     */
+    private static final int SAVE_ATTEMPTS = 5;
 
     @Inject
     @Named("explicit")
@@ -201,8 +208,6 @@ public class Packager
     private void importDocumentToWiki(String comment, WikiReference wikiReference, InputStream inputStream,
         PackageConfiguration configuration, String name) throws XWikiException, XarException, IOException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
         XWikiDocument nextDocument;
         try {
             nextDocument = getXWikiDocument(inputStream, wikiReference);
@@ -213,8 +218,6 @@ public class Packager
         }
 
         DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
-        XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
-        currentDocument.loadAttachmentsContentSafe(xcontext);
         XWikiDocument previousDocument;
         XarExtensionPlan xarExtensionPlan = configuration.getXarExtensionPlan();
         if (xarExtensionPlan != null) {
@@ -229,7 +232,7 @@ public class Packager
         }
 
         try {
-            this.importer.importDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
+            importDocument(comment, previousDocument, nextDocument, configuration);
 
             if (configuration.isVerbose()) {
                 this.logger.info(LOG_INSTALLDOCUMENT_SUCCESS_END, "Done installing document [{}]",
@@ -239,6 +242,33 @@ public class Packager
             if (configuration.isVerbose()) {
                 this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END, "Failed to install document [{}]",
                     nextDocument.getDocumentReferenceWithLocale(), e);
+            }
+        }
+    }
+
+    private void importDocument(String comment, XWikiDocument previousDocument, XWikiDocument nextDocument,
+        PackageConfiguration configuration) throws Exception
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
+
+        // A user can save the document while it is merged, e.g. while the conflict question waits for an answer. The
+        // merge result is then refused when saving it, because it would overwrite that save, so the document is merged
+        // again with the version saved by the user (asking again in case of conflict).
+        for (int attempt = 1;; attempt++) {
+            XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
+            currentDocument.loadAttachmentsContentSafe(xcontext);
+
+            try {
+                this.importer.importDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
+
+                return;
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt >= SAVE_ATTEMPTS) {
+                    throw e;
+                }
+
+                this.logger.debug("Document [{}] was saved concurrently, merging it again.", reference);
             }
         }
     }
@@ -434,22 +464,7 @@ public class Packager
             XWikiDocument document = getXWikiDocument(documentReference, extension);
 
             if (document != null) {
-                XWikiContext xcontext = this.xcontextProvider.get();
-
-                // Get database document
-                XWikiDocument databaseDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
-
-                // Override data of database document with extension document
-                databaseDocument.apply(document);
-                // Make sure new version will have the right author
-                databaseDocument.setAuthor(this.userResolver.resolve(xcontext.getUserReference()));
-                // Force generating a new version, even if there is no change
-                databaseDocument.setMetaDataDirty(true);
-                databaseDocument.setContentDirty(true);
-
-                // Save
-                xcontext.getWiki().saveDocument(databaseDocument, "Reset document from extension [" + extension + "]",
-                    false, true, xcontext);
+                reset(documentReference, document, "Reset document from extension [" + extension + "]");
             } else {
                 throw new XarExtensionException("Can't find any document with reference [" + documentReference
                     + "] in extension [" + extension.getId() + "]");
@@ -458,6 +473,26 @@ public class Packager
             throw new XarExtensionException(
                 "Can't find any installed extension associated with the document reference [" + reference + "]");
         }
+    }
+
+    private void reset(DocumentReference documentReference, XWikiDocument extensionDocument, String comment)
+        throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        // The document is reset again from the version saved by another request, if it is saved concurrently.
+        xcontext.getWiki().updateDocument(documentReference, databaseDocument -> {
+            // Override data of database document with extension document. Apply a copy, because the objects and
+            // attachments it holds are moved to the database document, which might not be the one that is saved.
+            databaseDocument.apply(extensionDocument.clone());
+            // Make sure new version will have the right author
+            databaseDocument.setAuthor(this.userResolver.resolve(xcontext.getUserReference()));
+            // Force generating a new version, even if there is no change
+            databaseDocument.setMetaDataDirty(true);
+            databaseDocument.setContentDirty(true);
+
+            return true;
+        }, comment, false, true, xcontext);
     }
 
     public List<DocumentReference> getDocumentReferences(Collection<XarEntry> pages, PackageConfiguration configuration)

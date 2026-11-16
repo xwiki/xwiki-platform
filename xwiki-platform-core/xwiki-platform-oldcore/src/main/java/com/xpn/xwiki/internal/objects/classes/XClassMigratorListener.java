@@ -201,17 +201,15 @@ public class XClassMigratorListener extends AbstractEventListener
             // Switch to class wiki to be safer
             context.setWikiId(classReference.getWikiReference().getName());
             for (String documentName : documents) {
+                DocumentReference ref = this.resolver.resolve(documentName, classReference);
                 try {
-                    DocumentReference ref = this.resolver.resolve(documentName, classReference);
-                    XWikiDocument document = wiki.getDocument(ref, context);
-                    if (!document.isNew()) {
-                        // Avoid modifying the cached document
-                        document = document.clone();
-                        migrate(document, propertiesToUpdate, className);
-                    }
+                    // The document can be saved concurrently, e.g. by a user or by an extension upgrade, in which case
+                    // the migration is applied again to the newly saved version instead of overwriting it.
+                    wiki.updateDocument(ref, document -> !document.isNew() && migrate(document, propertiesToUpdate),
+                        "Migrated class [" + className + "]", false, context);
                 } catch (XWikiException e) {
-                    this.logger.error("Failed to get document [{}] to apply the update of class [{}]",
-                            documentName, className, e);
+                    this.logger.error("Failed to migrate document [{}] after update of class [{}]", ref, className,
+                        e);
                 }
             }
         } finally {
@@ -220,22 +218,17 @@ public class XClassMigratorListener extends AbstractEventListener
         }
     }
 
-    void migrate(XWikiDocument document, List<PropertyToUpdate> propertiesToUpdate, String className)
+    /**
+     * @return {@code true} if the document was modified and needs to be saved
+     */
+    private boolean migrate(XWikiDocument document, List<PropertyToUpdate> propertiesToUpdate)
     {
         boolean modified = false;
         for (PropertyToUpdate p : propertiesToUpdate) {
             modified = updateProperty(document, p.newPropertyClass, p.newProperty) || modified;
         }
 
-        if (modified) {
-            XWikiContext context = xcontextProvider.get();
-            try {
-                context.getWiki().saveDocument(document, "Migrated class [" + className + "]", context);
-            } catch (XWikiException e) {
-                this.logger.error("Failed to migrate document [{}] after update of class [{}]",
-                        document.getDocumentReference(), className, e);
-            }
-        }
+        return modified;
     }
 
     private boolean updateProperty(XWikiDocument document, PropertyClass newPropertyClass,

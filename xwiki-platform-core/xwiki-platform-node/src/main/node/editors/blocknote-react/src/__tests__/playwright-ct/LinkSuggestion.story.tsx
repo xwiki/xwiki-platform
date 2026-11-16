@@ -69,7 +69,7 @@ export type LinkSuggestionForTestProps = {
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
-  syntax?: BlockNoteViewWrapperProps["syntax"];
+  syntax?: BlockNoteViewWrapperProps["options"]["syntax"];
 };
 
 /**
@@ -207,19 +207,20 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
   return (
     <>
       <BlockNoteViewWrapper
-        lang="en"
-        label="Some Label"
-        depsContainer={depsContainer}
-        macros={false}
+        options={{
+          lang: "en",
+          label: "Some Label",
+          depsContainer,
+          syntax: syntax ?? FULL_SYNTAX,
+          features: { links: { hooks: linkEditionHooks } },
+        }}
         content={content ?? []}
-        syntax={syntax ?? FULL_SYNTAX}
         linkEditionHandler={({ mode, current, onSubmit }) => {
           setLinkEditorInput(JSON.stringify({ mode, current }));
           if (linkEditorSubmit) {
             onSubmit(linkEditorSubmit);
           }
         }}
-        overrides={{ linkEdition: linkEditionHooks }}
       />
       <output data-testid="insertedLinks">
         {JSON.stringify(insertedLinks)}

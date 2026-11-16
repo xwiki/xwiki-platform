@@ -33,20 +33,7 @@ export function mountBlockNoteHeadless(
     component: Component,
     options?: MountOptions<HooksConfig, Component>,
   ) => Promise<MountResult<Component>>,
-  props: Omit<BlockNoteHeadlessProps, "editorProps"> & {
-    editorProps: Omit<BlockNoteHeadlessProps["editorProps"], "label" | "lang">;
-  },
+  props: BlockNoteHeadlessProps,
 ): Promise<MountResult<typeof BlockNoteHeadlessForTest>> {
-  const cpProps: BlockNoteHeadlessProps = {
-    ...props,
-    editorProps: {
-      ...props.editorProps,
-      label: "Editor",
-      lang: "en",
-    },
-  };
-
-  return mount(BlockNoteHeadlessForTest, {
-    props: cpProps,
-  });
+  return mount(BlockNoteHeadlessForTest, { props });
 }

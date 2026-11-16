@@ -21,39 +21,20 @@
 import CBlockNoteView from "../../vue/c-blocknote-view.vue";
 import { depsContainerMock } from "../depsContainer.mock";
 import { ref, useTemplateRef } from "vue";
-import type { Collaboration } from "@xwiki/platform-collaboration-api";
+import type { HeadlessEditorOptions } from "../../editorOptions";
 import type {
-  BlockNoteViewWrapperProps,
   BlockType,
-  ContextForMacros,
   LinkEditionData,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkContext } from "@xwiki/platform-link-type-api";
-import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 
 type ResourceReference = NonNullable<LinkEditionData["reference"]>;
 
 const props = defineProps<{
-  editorProps: Omit<
-    BlockNoteViewWrapperProps,
-    | "depsContainer"
-    | "content"
-    | "linkEditionHandler"
-    | "macroAstToReactJsxConverter"
-    | "macros"
-  >;
+  // The options that the tests need to set, the others being the same for all the tests.
+  options: Omit<HeadlessEditorOptions, "depsContainer" | "lang" | "label">;
 
-  macros:
-    | {
-        list: MacroWithUnknownParamsType[];
-        ctx: ContextForMacros;
-      }
-    | false;
-
-  editorContent: BlockType[];
-
-  collaboration?: Collaboration;
+  content: BlockType[];
 
   /**
    * The references of the linked resources, indexed by link URL. The editor provides them to the link modal when
@@ -66,10 +47,6 @@ const props = defineProps<{
    * corresponding links, like the XWiki integration does from the link metadata.
    */
   linksWithGeneratedLabel?: string[];
-
-  excludedLinkTargetTypes?: string[];
-
-  linkContext?: LinkContext;
 }>();
 
 defineEmits<{
@@ -104,9 +81,15 @@ const linkEdition: LinkEditionHooks = {
   },
 };
 
-const editorPropsWithLinkEdition = {
-  ...props.editorProps,
-  overrides: { ...props.editorProps.overrides, linkEdition },
+const options: HeadlessEditorOptions = {
+  ...props.options,
+  depsContainer,
+  lang: "en",
+  label: "Editor",
+  features: {
+    ...props.options.features,
+    links: { ...props.options.features?.links, hooks: linkEdition },
+  },
 };
 
 const innerRef = useTemplateRef<InstanceType<typeof CBlockNoteView>>("inner");
@@ -120,13 +103,8 @@ defineExpose({
   <div>
     <CBlockNoteView
       ref="inner"
-      :editor-props="editorPropsWithLinkEdition"
-      :macros
-      :editor-content
-      :collaboration
-      :deps-container="depsContainer"
-      :excluded-link-target-types="excludedLinkTargetTypes"
-      :link-context
+      :options
+      :content
       @instant-change="$emit('instant-change')"
       @debounced-change="(content) => $emit('debounced-change', content)"
     />

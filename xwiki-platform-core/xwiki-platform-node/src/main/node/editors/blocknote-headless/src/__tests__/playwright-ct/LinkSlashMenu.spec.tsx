@@ -22,7 +22,6 @@ import { FULL_SYNTAX } from "./syntax.mock";
 import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
 import { EntityType } from "@xwiki/platform-model-api";
-import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 
 // The Playwright page and locator types, taken from the test fixtures since the component testing package doesn't
@@ -38,15 +37,11 @@ type Locator = ReturnType<Page["locator"]>;
 async function openLinkModalFromSlashMenu(
   mount: Parameters<typeof mountBlockNoteHeadless>[0],
   page: Page,
-  linkContext?: LinkContext,
+  document?: DocumentReference,
 ): Promise<Locator> {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: [],
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
-    linkContext,
+    content: [],
+    options: { syntax: FULL_SYNTAX, document },
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -203,11 +198,9 @@ test("Inserting a link to a section of the current page, leaving the page refere
 }) => {
   // Plain data, since the props are serialized to reach the browser.
   const editorEl = await openLinkModalFromSlashMenu(mount, page, {
-    sourceDocument: {
-      type: EntityType.DOCUMENT,
-      name: "Current",
-    } as unknown as DocumentReference,
-  });
+    type: EntityType.DOCUMENT,
+    name: "Current",
+  } as unknown as DocumentReference);
 
   // The page reference is left empty, as the hint of the field suggests, and only the anchor is set.
   await expect(page.locator(".link-target")).toContainText(

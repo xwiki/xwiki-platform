@@ -72,7 +72,15 @@ export type {
   InlineContentType,
 } from "./blocknote";
 
-export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
+export type {
+  EditorAppearance,
+  EditorFeatures,
+  EditorOptions,
+  ImageFeatureOptions,
+  LinkFeatureOptions,
+  MacroFeatureOptions,
+  UploadOptions,
+} from "./editorOptions";
 
 export type {
   ImageEditionOverrideFn,

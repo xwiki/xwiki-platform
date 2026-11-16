@@ -21,6 +21,7 @@ import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { fillDisplayText, pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
+import { EntityType } from "@xwiki/platform-model-api";
 import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 
@@ -34,11 +35,8 @@ test("Editing the title of a link keeps the rest of the line intact", async ({
   page,
 }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphWithLink("https://xwiki.org"),
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
+    content: buildParagraphWithLink("https://xwiki.org"),
+    options: { syntax: FULL_SYNTAX },
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -64,15 +62,12 @@ test("Editing the target of a link keeps the inline formatting of its text when 
   page,
 }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphWithLink("https://xwiki.org", [
+    content: buildParagraphWithLink("https://xwiki.org", [
       { text: "se", styles: {} },
       { text: "con", styles: { bold: true } },
       { text: "d", styles: {} },
     ]),
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
+    options: { syntax: FULL_SYNTAX },
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -147,11 +142,8 @@ for (const close of ["submit", "cancel"] as const) {
     page,
   }) => {
     const component = await mountBlockNoteHeadless(mount, {
-      editorContent: buildParagraphWithLink("https://xwiki.org"),
-      editorProps: {
-        syntax: FULL_SYNTAX,
-      },
-      macros: false,
+      content: buildParagraphWithLink("https://xwiki.org"),
+      options: { syntax: FULL_SYNTAX },
     });
 
     const editorEl = component.locator(".bn-editor");
@@ -189,11 +181,8 @@ test("Editing the title of a link to an unsupported resource keeps its reference
     parameters: { anchor: "History" },
   };
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphWithLink(url),
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
+    content: buildParagraphWithLink(url),
+    options: { syntax: FULL_SYNTAX },
     linkReferences: { [url]: reference },
   });
 
@@ -235,19 +224,17 @@ test("Editing a page link resolves and saves its reference relative to the docum
     parameters: {},
   };
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphWithLink(url),
-    editorProps: {
+    content: buildParagraphWithLink(url),
+    options: {
       syntax: FULL_SYNTAX,
-    },
-    macros: false,
-    linkReferences: { [url]: reference },
-    // Plain data, since the props are serialized to reach the browser: the mocked model reference services only check
-    // whether the source document is there.
-    linkContext: {
-      sourceDocument: {
+      // Plain data, since the props are serialized to reach the browser: the mocked model reference services only
+      // check whether the edited document is there.
+      document: {
+        type: EntityType.DOCUMENT,
         name: "source",
       } as unknown as DocumentReference,
     },
+    linkReferences: { [url]: reference },
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -286,14 +273,13 @@ test("Editing the title of a path link keeps its reference, even when path links
     parameters: {},
   };
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphWithLink(url),
-    editorProps: {
+    content: buildParagraphWithLink(url),
+    options: {
       syntax: FULL_SYNTAX,
+      // Like the XWiki integration.
+      features: { links: { excludedTargetTypes: ["path", "unc"] } },
     },
-    macros: false,
     linkReferences: { [url]: reference },
-    // Like the XWiki integration.
-    excludedLinkTargetTypes: ["path", "unc"],
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -336,11 +322,10 @@ async function mountLinkWithGeneratedLabel(
   mount: Parameters<typeof mountBlockNoteHeadless>[0],
 ): Promise<Locator> {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphWithLink("https://xwiki.org", [
+    content: buildParagraphWithLink("https://xwiki.org", [
       { text: "https://xwiki.org", styles: {} },
     ]),
-    editorProps: { syntax: FULL_SYNTAX },
-    macros: false,
+    options: { syntax: FULL_SYNTAX },
     linksWithGeneratedLabel: ["https://xwiki.org"],
   });
   const editorEl = component.locator(".bn-editor");

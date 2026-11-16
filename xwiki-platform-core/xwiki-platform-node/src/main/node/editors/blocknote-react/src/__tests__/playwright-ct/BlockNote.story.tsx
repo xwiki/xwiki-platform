@@ -20,29 +20,34 @@
 import { depsContainerMock } from "./depsContainer.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { useMemo } from "react";
-import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
+import type { BlockType } from "../../blocknote";
 import type { LinkEditionHandler } from "../../components/links/linkEdition";
+import type { EditorOptions } from "../../editorOptions";
 
-export type BlockNoteForTestProps = Omit<
-  BlockNoteViewWrapperProps,
-  "lang" | "label" | "depsContainer" | "linkEditionHandler"
-> & { linkEditionHandler?: LinkEditionHandler };
+export type BlockNoteForTestProps = {
+  content: BlockType[];
+  // The options that the tests need to set, the others being the same for all the tests.
+  options: Omit<EditorOptions, "lang" | "label" | "depsContainer">;
+  linkEditionHandler?: LinkEditionHandler;
+};
 
-export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = (props) => {
+export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
+  content,
+  options,
+  linkEditionHandler,
+}) => {
   const depsContainer = useMemo(depsContainerMock, []);
 
   return (
     <BlockNoteViewWrapper
-      lang="en"
-      label="Some Label"
-      depsContainer={depsContainer}
+      options={{ lang: "en", label: "Some Label", depsContainer, ...options }}
+      content={content}
       linkEditionHandler={
-        props.linkEditionHandler ??
+        linkEditionHandler ??
         (() => {
           throw new Error("Link editor should not open for this test");
         })
       }
-      {...props}
     />
   );
 };

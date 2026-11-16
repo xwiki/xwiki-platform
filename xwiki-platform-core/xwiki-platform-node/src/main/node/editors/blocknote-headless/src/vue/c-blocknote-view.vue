@@ -25,7 +25,6 @@ import {
   linkTargetTypeManagerRole,
   unsupportedLinkTargetType,
 } from "@xwiki/platform-link-type-api";
-import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
   computed,
@@ -38,11 +37,11 @@ import {
   toRaw,
   useTemplateRef,
 } from "vue";
-import type { Collaboration } from "@xwiki/platform-collaboration-api";
+import type { HeadlessEditorOptions } from "../editorOptions";
+import type { DocumentService } from "@xwiki/platform-document-api";
 import type {
   BlockNoteViewWrapperProps,
   BlockType,
-  ContextForMacros,
   EditorType,
   LinkEditionData,
   LinkEditionHandlerProps,
@@ -53,58 +52,41 @@ import type {
   LinkTarget,
   LinkTargetTypeManager,
 } from "@xwiki/platform-link-type-api";
-import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 
 type Props = {
-  /** Main properties for the BlockNote editor */
-  editorProps: Omit<
-    BlockNoteViewWrapperProps,
-    | "depsContainer"
-    | "content"
-    | "linkEditionHandler"
-    | "macroAstToReactJsxConverter"
-    | "macros"
-  >;
-
-  /** Set to `false` to disable macros entirely */
-  macros:
-    | {
-        /** Optional list of client-rendered macros; omit it when only the server-rendered macros are used. */
-        list?: MacroWithUnknownParamsType[];
-        ctx: ContextForMacros;
-      }
-    | false;
+  /** The configuration of the editor instance */
+  options: HeadlessEditorOptions;
 
   /** Content to initialize the editor with */
-  editorContent: BlockType[];
-
-  collaboration?: Collaboration;
-
-  /** Container to inject dependencies from */
-  depsContainer: Container;
-
-  /**
-   * The link target types (by type) that the link modal doesn't offer for new links, while still using them to edit
-   * the links they handle. Unknown types are ignored.
-   */
-  excludedLinkTargetTypes?: string[];
-
-  /**
-   * Where the edited links are, e.g. the document holding the edited content: the references of the linked pages and
-   * attachments are resolved and saved relative to it.
-   */
-  linkContext?: LinkContext;
+  content: BlockType[];
 };
 
-const {
-  editorProps,
-  editorContent,
-  macros,
-  collaboration = undefined,
-  depsContainer,
-  excludedLinkTargetTypes = undefined,
-  linkContext = undefined,
-} = defineProps<Props>();
+const { options, content } = defineProps<Props>();
+
+// The collaboration session must be passed as is (raw), most importantly for the Yjs document inside it, otherwise the
+// realtime synchronization fails.
+const { depsContainer, collaboration } = toRaw(options);
+
+/**
+ * @returns the document holding the edited content, as specified by the options, or the current document otherwise
+ */
+function getEditedDocument(): DocumentReference | undefined {
+  return (
+    options.document ??
+    (depsContainer.isBound("DocumentService")
+      ? depsContainer
+          .get<DocumentService>("DocumentService")
+          .getCurrentDocumentReference().value
+      : undefined)
+  );
+}
+
+// Resolved once, so that the editor and the link modal agree on it.
+const editedDocument = getEditedDocument();
+
+// The links are resolved and saved relative to the edited document.
+const linkContext: LinkContext = { sourceDocument: editedDocument };
 
 const editorRef = shallowRef<EditorType | null>(null);
 
@@ -154,17 +136,16 @@ function notifyChanges(): void {
 const notifyChangesDebounced = debounce(notifyChanges, 500);
 
 // Build the properties object for the React BlockNoteView component
-const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
-  ...editorProps,
+const blockNoteProps: Omit<BlockNoteViewWrapperProps, "content"> = {
+  options: {
+    ...options,
+    document: editedDocument,
+    collaboration,
+  },
   onChange: () => {
     emit("instant-change");
     notifyChangesDebounced();
   },
-  blockNoteOptions: editorProps.blockNoteOptions,
-  macros,
-  // We need to pass the raw version of the collaboration session (but most importantly for the yjs document inside it),
-  // otherwise realtime synchronization fails.
-  collaboration: toRaw(collaboration),
   refs: {
     setEditor(editor) {
       editorRef.value = editor;
@@ -177,7 +158,6 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
       );
     },
   },
-  depsContainer,
   linkEditionHandler: (props) => {
     editingLink.value = props;
   },
@@ -263,8 +243,8 @@ onMounted(() => {
   }
 
   mountedBlockNote.value = mountBlockNote(blockNoteContainer.value, {
-    ...initializedEditorProps,
-    content: editorContent,
+    ...blockNoteProps,
+    content,
   });
 });
 
@@ -289,7 +269,7 @@ onUnmounted(() => {
     v-if="currentLinkData"
     :current="currentLinkData"
     :deps-container="depsContainer"
-    :excluded-link-target-types="excludedLinkTargetTypes"
+    :excluded-link-target-types="options.features?.links?.excludedTargetTypes"
     :link-context
     :mode="editingLink?.mode"
     @submit="submitEditedLink"

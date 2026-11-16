@@ -94,6 +94,9 @@ public class WikiCreator
         wikiRequest.setWikiId(wikiId);
         wikiRequest.setPrettyName(wikiId);
         wikiRequest.setAlias(wikiId);
+        // A wiki is expected to have an owner (it's what the wiki creation UI does), which gets the admin right on the
+        // wiki and is the user executing the creation steps. The user creating the wiki is a main wiki user.
+        wikiRequest.setOwnerId("xwiki:XWiki." + credentials.getUserName());
         wikiRequest.setFailOnExist(failOnExist);
         wikiRequest.setInteractive(false);
 

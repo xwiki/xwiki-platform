@@ -42,7 +42,6 @@
       #set ($label = $services.localization.render("$translationPrefix$strategy.key"))
     #end
     <option value="$escapetool.xml($strategy.key)"
-      data-required-columns="$escapetool.xml($stringtool.join($strategy.value, ','))"
-      #if ($strategy.key == "$!displayer.value")selected#end>$escapetool.xml($label)</option>
+      data-required-columns="$escapetool.xml($stringtool.join($strategy.value, ','))">$escapetool.xml($label)</option>
   #end
 </select>

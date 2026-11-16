@@ -20,7 +20,6 @@
 package org.xwiki.records.macro;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
@@ -68,10 +67,11 @@ import org.xwiki.stability.Unstable;
  * <p>
  * The display types are what select the parameter widgets. {@link RecordsDataType} names the XClass picker of the
  * object and class editors, {@link RecordsColumns} names this module's own field picker, {@link RecordsFilters} its
- * filter picker, {@link RecordsSort} its sort picker, {@link RecordsLayouts} its layout radio group,
- * {@link RecordsCreationStrategy} its creation strategy dropdown and {@link RecordsLocation} its location picker; all
- * seven resolve to a template under {@code templates/html_displayer}. Everything else relies on the displayer the
- * Java type already has: a {@link String} renders a text input, a {@code boolean} a checkbox.
+ * filter picker, {@link RecordsSort} its sort picker, {@link RecordsLayouts} its layout radio group and
+ * {@link RecordsCreationStrategy} its creation strategy dropdown; all six resolve to a template under
+ * {@code templates/html_displayer}. Everything else relies on the displayer the Java type already has: a
+ * {@link String} renders a text input, a {@code boolean} a checkbox, a {@link RecordsLocation} this module's location
+ * picker.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -95,7 +95,7 @@ public class RecordsMacroParameters
 
     private String creationStrategy;
 
-    private SpaceReference newEntriesLocation;
+    private RecordsLocation newEntriesLocation;
 
     private String id;
 
@@ -277,7 +277,7 @@ public class RecordsMacroParameters
     /**
      * @return the space new entries are created in, or {@code null} for the space of the page holding the table
      */
-    public SpaceReference getNewEntriesLocation()
+    public RecordsLocation getNewEntriesLocation()
     {
         return this.newEntriesLocation;
     }
@@ -286,13 +286,12 @@ public class RecordsMacroParameters
      * @param newEntriesLocation the space new entries are created in, or {@code null} for the space of the page
      *     holding the table
      */
-    @PropertyDisplayType(RecordsLocation.class)
     @PropertyName("New entries location")
     @PropertyDescription("Where the entries created from the table are put. Leave empty to put them under the page "
         + "holding the table.")
     @PropertyGroup("editing")
     @PropertyOrder(9)
-    public void setNewEntriesLocation(SpaceReference newEntriesLocation)
+    public void setNewEntriesLocation(RecordsLocation newEntriesLocation)
     {
         this.newEntriesLocation = newEntriesLocation;
     }

@@ -54,6 +54,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.records.macro.RecordsLocation;
 import org.xwiki.records.macro.RecordsMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -339,7 +340,7 @@ class RecordsMacroTest
     @Test
     void executeCreatesEntriesInTheLocationTheAuthorPicked() throws Exception
     {
-        SpaceReference location = new SpaceReference("xwiki", "Clients", "Archive");
+        RecordsLocation location = new RecordsLocation(new SpaceReference("xwiki", "Clients", "Archive"));
         when(this.entityReferenceSerializer.serialize(location)).thenReturn("Clients.Archive");
         RecordsMacroParameters parameters = newParameters();
         parameters.setAllowEditMode(true);

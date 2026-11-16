@@ -77,14 +77,12 @@ function findStrategySelect(scope: ParentNode): HTMLSelectElement | null {
  *   every field
  */
 function getDisplayedColumns(scope: ParentNode): string[] | null {
-  const field = scope.querySelector(`[name="${COLUMNS_PARAMETER}"]`);
-  let values: string[] = [];
-  if (field instanceof HTMLSelectElement) {
-    values = Array.from(field.selectedOptions, (option) => option.value);
-  } else if (field instanceof HTMLInputElement) {
-    values = field.value.split(",");
-  }
-  const columns = values.map((value) => value.trim()).filter(Boolean);
+  const field = scope.querySelector<HTMLSelectElement>(
+    `select[name="${COLUMNS_PARAMETER}"]`,
+  );
+  const columns = Array.from(field?.selectedOptions ?? [], (option) =>
+    option.value.trim(),
+  ).filter(Boolean);
   return columns.length > 0 ? columns : null;
 }
 
@@ -121,18 +119,18 @@ function isDisplayedByDefault(column: string): boolean {
  * @param enabled - whether the picker is enabled
  */
 function setLocationEnabled(scope: ParentNode, enabled: boolean): void {
-  scope.querySelectorAll(`[name="${LOCATION_PARAMETER}"]`).forEach((field) => {
+  const fields = scope.querySelectorAll<HTMLSelectElement>(
+    `select[name="${LOCATION_PARAMETER}"]`,
+  );
+  fields.forEach((field) => {
+    // The suggest widget disables the select along with itself.
     if (field.selectize) {
       if (enabled) {
         field.selectize.enable();
       } else {
         field.selectize.disable();
       }
-    }
-    if (
-      field instanceof HTMLInputElement ||
-      field instanceof HTMLSelectElement
-    ) {
+    } else {
       field.disabled = !enabled;
     }
     // The button opening the tree next to the picker.

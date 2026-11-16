@@ -19,19 +19,24 @@
  */
 package org.xwiki.records.macro;
 
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * Marker type selecting the location picker for a macro parameter.
- * <p>
- * The parameter it is declared on stays a {@link org.xwiki.model.reference.SpaceReference}; this type exists only to
- * name the HTML displayer, {@code templates/html_displayer/recordslocation/edit.vm}, which offers a single space
- * rather than the free-text input a space reference otherwise gets.
+ * Space where the entries created from a Records table are put.
  *
  * @version $Id$
  * @since 18.10.0RC1
  */
 @Unstable
-public interface RecordsLocation
+public class RecordsLocation extends SpaceReference
 {
+    /**
+     * @param reference the reference of the space, for example the one of {@code xwiki:Clients.Projects}
+     */
+    public RecordsLocation(EntityReference reference)
+    {
+        super(reference);
+    }
 }

@@ -24,6 +24,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type TomSelect from "tom-select";
 
 /**
+ * The columns the fixture offers.
+ */
+const COLUMNS = ["doc.title", "doc.name", "status"];
+
+/**
  * Builds the creation fields as the macro editor and the displayer templates render them.
  *
  * @param options - the state of the dialog
@@ -32,15 +37,19 @@ import type TomSelect from "tom-select";
 function givenDialog(
   options: {
     editMode?: boolean;
-    columns?: string;
+    columns?: string[];
     strategy?: string;
   } = {},
 ): HTMLFormElement {
   const selected = (value: string) =>
     (options.strategy ?? "") === value ? " selected" : "";
+  const column = (value: string) =>
+    `<option value="${value}"${options.columns?.includes(value) ? " selected" : ""}>${value}</option>`;
   document.body.innerHTML = `
     <form>
-      <input name="properties" value="${options.columns ?? ""}" />
+      <select name="properties" multiple>
+        ${COLUMNS.map(column).join("")}
+      </select>
       <input type="checkbox" name="allowEditMode" value="true"${options.editMode ? " checked" : ""} />
       <input type="hidden" name="allowEditMode" value="false" />
       <select name="creationStrategy">
@@ -49,7 +58,7 @@ function givenDialog(
         <option value="uuid" data-required-columns=""${selected("uuid")}>UUID</option>
       </select>
       <div class="location-picker-compact">
-        <input name="newEntriesLocation" value="" />
+        <select name="newEntriesLocation"></select>
         <button type="button">Browse</button>
       </div>
     </form>`;
@@ -68,9 +77,24 @@ function option(value: string): HTMLOptionElement {
   )!;
 }
 
-function locationInput(): HTMLInputElement {
-  return document.querySelector<HTMLInputElement>(
-    'input[name="newEntriesLocation"]',
+function columnsSelect(): HTMLSelectElement {
+  return document.querySelector<HTMLSelectElement>(
+    'select[name="properties"]',
+  )!;
+}
+
+/**
+ * Picks the given columns, as the enhanced picker does on the underlying select.
+ */
+function pickColumns(...columns: string[]): void {
+  Array.from(columnsSelect().options).forEach((option) => {
+    option.selected = columns.includes(option.value);
+  });
+}
+
+function locationSelect(): HTMLSelectElement {
+  return document.querySelector<HTMLSelectElement>(
+    'select[name="newEntriesLocation"]',
   )!;
 }
 
@@ -121,18 +145,18 @@ describe("updateCreationFields, following the edit mode", () => {
 
     updateCreationFields(scope, false);
     expect(strategySelect().disabled).toBe(false);
-    expect(locationInput().disabled).toBe(true);
+    expect(locationSelect().disabled).toBe(true);
 
     strategySelect().value = "uuid";
     updateCreationFields(scope, false);
-    expect(locationInput().disabled).toBe(false);
+    expect(locationSelect().disabled).toBe(false);
     expect(locationButton().disabled).toBe(false);
   });
 
   it("enables and disables the enhanced location picker through its own API", () => {
     const scope = givenDialog({ editMode: true, strategy: "uuid" });
     const picker = { enable: vi.fn(), disable: vi.fn() };
-    locationInput().selectize = picker as unknown as TomSelect;
+    locationSelect().selectize = picker as unknown as TomSelect;
 
     updateCreationFields(scope, false);
     expect(picker.enable).toHaveBeenCalled();
@@ -143,7 +167,7 @@ describe("updateCreationFields, following the edit mode", () => {
   });
 
   it("does nothing in a dialog without the creation strategy", () => {
-    document.body.innerHTML = `<form><input name="properties" value="status" /></form>`;
+    document.body.innerHTML = `<form><select name="properties" multiple></select></form>`;
 
     expect(() =>
       updateCreationFields(document.querySelector("form")!, true),
@@ -172,7 +196,10 @@ describe("updateCreationFields, following the columns", () => {
   });
 
   it("disables a strategy needing a column the table does not display, and says why below the dropdown", () => {
-    const scope = givenDialog({ editMode: true, columns: "status,doc.name" });
+    const scope = givenDialog({
+      editMode: true,
+      columns: ["status", "doc.name"],
+    });
 
     updateCreationFields(scope, false);
 
@@ -184,33 +211,19 @@ describe("updateCreationFields, following the columns", () => {
   });
 
   it("enables the strategy again once the column is displayed", () => {
-    const scope = givenDialog({ editMode: true, columns: "status" });
+    const scope = givenDialog({ editMode: true, columns: ["status"] });
     updateCreationFields(scope, false);
 
-    document.querySelector<HTMLInputElement>('[name="properties"]')!.value =
-      "doc.title, status";
+    pickColumns("doc.title", "status");
     updateCreationFields(scope, true);
 
     expect(option("title").disabled).toBe(false);
   });
 
-  it("reads the columns of a select, as the enhanced picker keeps them", () => {
-    const scope = givenDialog({ editMode: true });
-    document.querySelector('[name="properties"]')!.outerHTML = `
-      <select name="properties" multiple>
-        <option value="doc.title">Title</option>
-        <option value="status" selected>Status</option>
-      </select>`;
-
-    updateCreationFields(scope, false);
-
-    expect(option("title").disabled).toBe(true);
-  });
-
   it("keeps the saved strategy when the dialog opens, so that reopening it changes nothing", () => {
     const scope = givenDialog({
       editMode: true,
-      columns: "status",
+      columns: ["status"],
       strategy: "title",
     });
 
@@ -230,26 +243,26 @@ describe("updateCreationFields, following the columns", () => {
     updateCreationFields(scope, false);
 
     expect(strategySelect().disabled).toBe(true);
-    expect(locationInput().disabled).toBe(true);
+    expect(locationSelect().disabled).toBe(true);
   });
 
   it("turns creation off when the columns no longer allow the picked strategy", () => {
     const scope = givenDialog({
       editMode: true,
-      columns: "status",
+      columns: ["status"],
       strategy: "title",
     });
 
     updateCreationFields(scope, true);
 
     expect(strategySelect().value).toBe("");
-    expect(locationInput().disabled).toBe(true);
+    expect(locationSelect().disabled).toBe(true);
   });
 });
 
 describe("updateCreationFields, explaining the disabled strategies", () => {
   it("explains each missing column on its own line", () => {
-    const scope = givenDialog({ editMode: true, columns: "doc.name" });
+    const scope = givenDialog({ editMode: true, columns: ["doc.name"] });
     option("title").dataset.requiredColumns = "doc.title,status";
 
     updateCreationFields(scope, true);
@@ -264,16 +277,15 @@ describe("updateCreationFields, explaining the disabled strategies", () => {
   });
 
   it("removes the warning once the column is displayed, and shows none without the edit mode", () => {
-    const scope = givenDialog({ editMode: true, columns: "status" });
+    const scope = givenDialog({ editMode: true, columns: ["status"] });
     updateCreationFields(scope, true);
-    document.querySelector<HTMLInputElement>('[name="properties"]')!.value =
-      "status,doc.title";
+    pickColumns("status", "doc.title");
 
     updateCreationFields(scope, true);
 
     expect(strategySelect().nextElementSibling?.matches(".box")).toBe(false);
 
-    const withoutEditMode = givenDialog({ columns: "status" });
+    const withoutEditMode = givenDialog({ columns: ["status"] });
     updateCreationFields(withoutEditMode, true);
 
     expect(strategySelect().nextElementSibling?.matches(".box")).toBe(false);
@@ -296,7 +308,7 @@ describe("wireCreationFields", () => {
     allowEditMode(false);
 
     expect(strategySelect().disabled).toBe(true);
-    expect(locationInput().disabled).toBe(true);
+    expect(locationSelect().disabled).toBe(true);
     expect(locationButton().disabled).toBe(true);
   });
 
@@ -308,7 +320,7 @@ describe("wireCreationFields", () => {
 
     expect(strategySelect().disabled).toBe(false);
     expect(strategySelect().value).toBe("uuid");
-    expect(locationInput().disabled).toBe(false);
+    expect(locationSelect().disabled).toBe(false);
   });
 
   it("turns creation off when a column the picked strategy needs is removed", () => {
@@ -317,13 +329,10 @@ describe("wireCreationFields", () => {
     strategySelect().value = "title";
     change(strategySelect());
 
-    const columns = document.querySelector<HTMLInputElement>(
-      '[name="properties"]',
-    )!;
-    columns.value = "status";
-    change(columns);
+    pickColumns("status");
+    change(columnsSelect());
 
     expect(strategySelect().value).toBe("");
-    expect(locationInput().disabled).toBe(true);
+    expect(locationSelect().disabled).toBe(true);
   });
 });

@@ -271,13 +271,12 @@ public class EditConflictModal extends BaseModal
     {
         ConflictChoice currentChoice = getCurrentChoice();
         this.submitButton.click();
-        try {
-            this.waitForClosed();
-            if (waitSuccess && currentChoice == ConflictChoice.OVERRIDE) {
-                new EditPage().waitForNotificationSuccessMessage("Saved");
-            }
-        } catch (StaleElementReferenceException e) {
-            // the JS remove the modal so the element might be stale
+        // The reload choice can replace the whole page, so look for the opened modal again on each check instead of
+        // querying the container element, which may then belong to a document that is being unloaded.
+        By openedModal = By.cssSelector("#" + MODAL_ID + ".in");
+        getDriver().waitUntilCondition(driver -> !getDriver().hasElementWithoutWaitingWithoutScrolling(openedModal));
+        if (waitSuccess && currentChoice == ConflictChoice.OVERRIDE) {
+            new EditPage().waitForNotificationSuccessMessage("Saved");
         }
     }
 

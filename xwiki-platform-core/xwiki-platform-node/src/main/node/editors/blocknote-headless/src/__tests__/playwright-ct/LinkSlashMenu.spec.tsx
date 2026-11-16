@@ -37,11 +37,11 @@ type Locator = ReturnType<Page["locator"]>;
 async function openLinkModalFromSlashMenu(
   mount: Parameters<typeof mountBlockNoteHeadless>[0],
   page: Page,
-  document?: DocumentReference,
+  sourceDocumentReference?: DocumentReference,
 ): Promise<Locator> {
   const component = await mountBlockNoteHeadless(mount, {
     content: [],
-    options: { syntax: FULL_SYNTAX, document },
+    options: { syntax: FULL_SYNTAX, sourceDocumentReference },
   });
 
   const editorEl = component.locator(".bn-editor");

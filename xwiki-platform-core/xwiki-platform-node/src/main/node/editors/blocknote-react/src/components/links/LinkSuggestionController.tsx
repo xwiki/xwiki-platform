@@ -19,7 +19,7 @@
  */
 import { insertLink } from "./insertLink";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
-import { DepsContainerContext, EditedDocumentContext } from "../../contexts";
+import { EditedDocumentContext, ServiceContainerContext } from "../../contexts";
 import { useEditor } from "../../hooks";
 import { triggerUserAttachmentUpload } from "../../misc/fileUpload";
 import { toLinkResourceReference } from "../../misc/linkResourceReference";
@@ -87,16 +87,16 @@ export function LinkSuggestionController({
   maxSuggestions,
   pageSuggestionsShare,
 }: LinkSuggestionControllerProps) {
-  const depsContainer = useContext(DepsContainerContext)!;
+  const serviceContainer = useContext(ServiceContainerContext)!;
 
-  const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
+  const linkSuggestService = serviceContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
 
   const editor = useEditor();
   const { insertSuggested, openLinkEditor, uploadFile } = useLinkInsertion(
     editor,
-    depsContainer,
+    serviceContainer,
     linkEditionHandler,
     linkEditionHooks,
   );
@@ -174,7 +174,7 @@ export function LinkSuggestionController({
  */
 function useLinkInsertion(
   editor: EditorType,
-  depsContainer: Container,
+  serviceContainer: Container,
   linkEditionHandler: LinkEditionHandler,
   linkEditionHooks?: LinkEditionHooks,
 ) {
@@ -208,18 +208,18 @@ function useLinkInsertion(
           link.reference === undefined
             ? undefined
             : toLinkResourceReference(
-                depsContainer,
+                serviceContainer,
                 link.reference,
                 link.type,
                 editedDocumentReference,
               ),
       }),
-    [depsContainer, editedDocumentReference, insert],
+    [serviceContainer, editedDocumentReference, insert],
   );
 
   const uploadFile = useCallback(async () => {
     const attachment = await triggerUserAttachmentUpload(
-      depsContainer,
+      serviceContainer,
       editedDocumentReference,
     );
 
@@ -231,7 +231,7 @@ function useLinkInsertion(
         type: LinkType.ATTACHMENT,
       });
     }
-  }, [depsContainer, editedDocumentReference, insertSuggested]);
+  }, [serviceContainer, editedDocumentReference, insertSuggested]);
 
   return { insertSuggested, openLinkEditor, uploadFile };
 }

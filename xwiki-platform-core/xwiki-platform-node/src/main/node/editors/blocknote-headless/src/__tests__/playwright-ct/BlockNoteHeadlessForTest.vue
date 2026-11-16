@@ -19,7 +19,7 @@
 -->
 <script setup lang="ts">
 import CBlockNoteView from "../../vue/c-blocknote-view.vue";
-import { depsContainerMock } from "../depsContainer.mock";
+import { serviceContainerMock } from "../serviceContainer.mock";
 import { ref, useTemplateRef } from "vue";
 import type { HeadlessEditorOptions } from "../../editorOptions";
 import type {
@@ -32,7 +32,7 @@ type ResourceReference = NonNullable<LinkEditionData["reference"]>;
 
 const props = defineProps<{
   // The options that the tests need to set, the others being the same for all the tests.
-  options: Omit<HeadlessEditorOptions, "depsContainer" | "lang" | "label">;
+  options: Omit<HeadlessEditorOptions, "serviceContainer" | "lang" | "label">;
 
   content: BlockType[];
 
@@ -58,7 +58,7 @@ defineEmits<{
 // the Playwright test/Node process: Playwright CT mount() props are
 // serialized across the Node/browser boundary, so a mock full of closures
 // passed as a prop would lose all its behavior once it reaches the browser.
-const depsContainer = depsContainerMock();
+const serviceContainer = serviceContainerMock();
 
 // The reference of the last submitted link, and whether its label is generated, rendered so that the tests can check
 // them.
@@ -83,7 +83,7 @@ const linkEdition: LinkEditionHooks = {
 
 const options: HeadlessEditorOptions = {
   ...props.options,
-  depsContainer,
+  serviceContainer,
   lang: "en",
   label: "Editor",
   features: {

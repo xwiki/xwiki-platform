@@ -55,14 +55,14 @@ type UploadedAttachment = {
 /**
  * Opens the system file picker and uploads the selected file as an attachment of the given page.
  *
- * @param depsContainer - the container providing the upload services
+ * @param serviceContainer - the container providing the upload services
  * @param page - the serialized reference of the page to upload the file to, the current page when not specified
  * @param accept - the file types the file picker offers, e.g. "image/*" (all types when not specified)
  * @returns the uploaded attachment, or `undefined` when the user closes the file picker without selecting a file
  *   (rejected when the upload fails)
  */
 function triggerUserFileUpload(
-  depsContainer: Container,
+  serviceContainer: Container,
   page: string | undefined,
   accept?: string,
 ): Promise<Attachment | undefined> {
@@ -87,9 +87,9 @@ function triggerUserFileUpload(
       }
 
       try {
-        const [uploadedAttachment] = await depsContainer
+        const [uploadedAttachment] = await serviceContainer
           .get<AttachmentsService>("AttachmentsService")
-          .upload(page ?? getCurrentPage(depsContainer), [file]);
+          .upload(page ?? getCurrentPage(serviceContainer), [file]);
         resolve(uploadedAttachment);
       } catch (error) {
         reject(error);
@@ -115,17 +115,17 @@ function triggerUserFileUpload(
  * Meant for UI event handlers, which don't handle the returned promise: an upload failure is logged
  * rather than rejected.
  *
- * @param depsContainer - the container providing the upload services
+ * @param serviceContainer - the container providing the upload services
  * @param page - the serialized reference of the page to upload the image to, the current page when not specified
  * @returns the uploaded image, or `undefined` when the user closes the file picker without selecting an
  *   image or when the upload fails
  */
 function triggerUserImageUpload(
-  depsContainer: Container,
+  serviceContainer: Container,
   page?: string,
 ): Promise<UploadedAttachment | undefined> {
   return triggerUserUpload(
-    depsContainer,
+    serviceContainer,
     page,
     "image/*",
     "Failed to upload the selected image.",
@@ -138,17 +138,17 @@ function triggerUserImageUpload(
  * Meant for UI event handlers, which don't handle the returned promise: an upload failure is logged
  * rather than rejected.
  *
- * @param depsContainer - the container providing the upload services
+ * @param serviceContainer - the container providing the upload services
  * @param page - the serialized reference of the page to upload the file to, the current page when not specified
  * @returns the uploaded attachment, or `undefined` when the user closes the file picker without selecting a file or
  *   when the upload fails
  */
 function triggerUserAttachmentUpload(
-  depsContainer: Container,
+  serviceContainer: Container,
   page?: string,
 ): Promise<UploadedAttachment | undefined> {
   return triggerUserUpload(
-    depsContainer,
+    serviceContainer,
     page,
     undefined,
     "Failed to upload the selected file.",
@@ -156,16 +156,16 @@ function triggerUserAttachmentUpload(
 }
 
 async function triggerUserUpload(
-  depsContainer: Container,
+  serviceContainer: Container,
   page: string | undefined,
   accept: string | undefined,
   failureMessage: string,
 ): Promise<UploadedAttachment | undefined> {
-  const targetPage = page ?? getCurrentPage(depsContainer);
+  const targetPage = page ?? getCurrentPage(serviceContainer);
   let uploadedAttachment;
   try {
     uploadedAttachment = await triggerUserFileUpload(
-      depsContainer,
+      serviceContainer,
       targetPage,
       accept,
     );
@@ -182,7 +182,7 @@ async function triggerUserUpload(
     url: uploadedAttachment.href,
     name: uploadedAttachment.name,
     reference: getAttachmentResourceReference(
-      depsContainer,
+      serviceContainer,
       targetPage,
       uploadedAttachment.name,
     ),
@@ -190,40 +190,42 @@ async function triggerUserUpload(
 }
 
 /**
- * @param depsContainer - the container providing the document service
+ * @param serviceContainer - the container providing the document service
  * @returns the serialized reference of the current page
  */
-function getCurrentPage(depsContainer: Container): string {
+function getCurrentPage(serviceContainer: Container): string {
   return (
-    depsContainer
+    serviceContainer
       .get<DocumentService>("DocumentService")
       .getCurrentDocumentReferenceString().value ?? ""
   );
 }
 
 /**
- * @param depsContainer - the container providing the model reference services
+ * @param serviceContainer - the container providing the model reference services
  * @param page - the serialized reference of the page holding the attachment
  * @param name - the name of the attachment
  * @returns the resource reference of the specified attachment, or `undefined` when it can't be serialized
  */
 function getAttachmentResourceReference(
-  depsContainer: Container,
+  serviceContainer: Container,
   page: string,
   name: string,
 ): ResourceReference | undefined {
-  const pageReference = depsContainer
+  const pageReference = serviceContainer
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
     .get()
     ?.parse(page, { relative: false }) as DocumentReference | undefined;
-  const serializedReference = depsContainer
+  const serializedReference = serviceContainer
     .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
     .get()
     ?.serialize(new AttachmentReference(name, pageReference!));
   return serializedReference === undefined
     ? undefined
     : toResourceReference(
-        depsContainer.get<ResourceReferenceParser>("ResourceReferenceParser"),
+        serviceContainer.get<ResourceReferenceParser>(
+          "ResourceReferenceParser",
+        ),
         serializedReference,
         LinkType.ATTACHMENT,
       );

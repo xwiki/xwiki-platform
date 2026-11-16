@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { useMemo } from "react";
 import type { BlockType } from "../../blocknote";
@@ -27,7 +27,7 @@ import type { EditorOptions } from "../../editorOptions";
 export type BlockNoteForTestProps = {
   content: BlockType[];
   // The options that the tests need to set, the others being the same for all the tests.
-  options: Omit<EditorOptions, "lang" | "label" | "depsContainer">;
+  options: Omit<EditorOptions, "lang" | "label" | "serviceContainer">;
   linkEditionHandler?: LinkEditionHandler;
 };
 
@@ -36,11 +36,16 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   options,
   linkEditionHandler,
 }) => {
-  const depsContainer = useMemo(depsContainerMock, []);
+  const serviceContainer = useMemo(serviceContainerMock, []);
 
   return (
     <BlockNoteViewWrapper
-      options={{ lang: "en", label: "Some Label", depsContainer, ...options }}
+      options={{
+        lang: "en",
+        label: "Some Label",
+        serviceContainer,
+        ...options,
+      }}
       content={content}
       linkEditionHandler={
         linkEditionHandler ??

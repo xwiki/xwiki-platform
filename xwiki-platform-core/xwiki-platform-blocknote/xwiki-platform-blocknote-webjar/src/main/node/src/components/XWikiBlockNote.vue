@@ -403,20 +403,28 @@ onBeforeMount(async () => {
  */
 function createEditorOptions(label: string): HeadlessEditorOptions {
   return {
-    depsContainer: container,
-    // Identifies the edited content within the realtime collaboration session.
+    // The Inversify container used by the editor to get the services and components it needs.
+    serviceContainer: container,
+    // The name of the BlockNote field. It tells apart the BlockNote fields of the same form, and identifies the content
+    // they edit within the realtime collaboration session.
     name,
-    // The images and the links are saved relative to the edited document, like the WYSIWYG editors do, so that they keep
-    // working when the edited document is renamed or copied. The pasted and dropped files are attached to it.
-    document: toCristalEntityReference(editedDocumentReference) as
-      | DocumentReference
-      | undefined,
+    // The images and the links are saved relative to the edited document, so that they keep working when the edited
+    // document is renamed or copied. The pasted and dropped files are attached to it.
+    sourceDocumentReference: toCristalEntityReference(
+      editedDocumentReference,
+    ) as DocumentReference | undefined,
+    // The syntax of the edited content, which is normally the syntax of the source document. The editor offers only
+    // what this syntax supports, so that the edited content can be saved without losing anything.
     syntax: syntax!,
+    // Translate the editor UI (menus, toolbars, placeholders) in the same language as the rest of the page.
     lang: (actualLocale || "en") as EditorLanguage,
+    // The accessible name of the editing area, announced by the screen readers to tell which field is being edited.
     label,
     // Put the caret at the start of the content when the editor is focused on creation.
     autofocus: startupFocus === true || startupFocus === "true",
     appearance: {
+      // BlockNote follows by default the light or dark color scheme preferred by the user (as set in the operating
+      // system or the browser), but the editor UI has to match the XWiki skin, which doesn't follow that preference.
       theme: "light",
       // We want the edited content to be styled using the XWiki skin / color theme as much as possible, in order to
       // have consistency between edit and view modes.
@@ -425,6 +433,8 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
       codeBlockClassName: "box code",
     },
     collaboration: collaboration.value,
+    // Attach to the edited document the files that are pasted or dropped in the content, or uploaded from the file
+    // panel (e.g. of an image block). Note that the upload buttons of the link and image menus don't use this yet.
     upload: uploadFile && { uploadFile },
     features: {
       links: {

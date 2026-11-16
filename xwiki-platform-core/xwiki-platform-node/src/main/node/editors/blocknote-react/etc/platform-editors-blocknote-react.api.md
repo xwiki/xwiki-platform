@@ -103,9 +103,9 @@ export type EditorLink = Link<EditorStyleSchema>;
 
 // @beta
 export type EditorOptions = {
-    depsContainer: Container;
+    serviceContainer: Container;
     name?: string;
-    document?: DocumentReference;
+    sourceDocumentReference?: DocumentReference;
     syntax: SyntaxConfig;
     lang: EditorLanguage;
     label: string;

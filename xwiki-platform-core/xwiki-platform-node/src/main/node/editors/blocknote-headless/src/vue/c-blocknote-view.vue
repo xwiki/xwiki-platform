@@ -64,18 +64,20 @@ type Props = {
 
 const { options, content } = defineProps<Props>();
 
-// The collaboration session must be passed as is (raw), most importantly for the Yjs document inside it, otherwise the
-// realtime synchronization fails.
-const { depsContainer, collaboration } = toRaw(options);
+// The options must be passed as is (raw), most importantly the collaboration session, because the realtime
+// synchronization fails with a proxy of the Yjs document it holds.
+const rawOptions = toRaw(options);
+const { serviceContainer } = rawOptions;
 
 /**
- * @returns the document holding the edited content, as specified by the options, or the current document otherwise
+ * @returns the reference of the document holding the edited content, as specified by the options, or the current
+ *   document otherwise
  */
-function getEditedDocument(): DocumentReference | undefined {
+function getSourceDocumentReference(): DocumentReference | undefined {
   return (
-    options.document ??
-    (depsContainer.isBound("DocumentService")
-      ? depsContainer
+    rawOptions.sourceDocumentReference ??
+    (serviceContainer.isBound("DocumentService")
+      ? serviceContainer
           .get<DocumentService>("DocumentService")
           .getCurrentDocumentReference().value
       : undefined)
@@ -83,10 +85,10 @@ function getEditedDocument(): DocumentReference | undefined {
 }
 
 // Resolved once, so that the editor and the link modal agree on it.
-const editedDocument = getEditedDocument();
+const sourceDocumentReference = getSourceDocumentReference();
 
-// The links are resolved and saved relative to the edited document.
-const linkContext: LinkContext = { sourceDocument: editedDocument };
+// The links are resolved and saved relative to the source document.
+const linkContext: LinkContext = { sourceDocument: sourceDocumentReference };
 
 const editorRef = shallowRef<EditorType | null>(null);
 
@@ -138,9 +140,9 @@ const notifyChangesDebounced = debounce(notifyChanges, 500);
 // Build the properties object for the React BlockNoteView component
 const blockNoteProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   options: {
-    ...options,
-    document: editedDocument,
-    collaboration,
+    ...rawOptions,
+    // Make sure the source document reference is set (with fallback on the current document).
+    sourceDocumentReference,
   },
   onChange: () => {
     emit("instant-change");
@@ -168,7 +170,7 @@ const blockNoteProps: Omit<BlockNoteViewWrapperProps, "content"> = {
  *   registered at that time
  */
 function getLinkTargetTypeManager(): LinkTargetTypeManager {
-  return depsContainer.get<LinkTargetTypeManager>(linkTargetTypeManagerRole);
+  return serviceContainer.get<LinkTargetTypeManager>(linkTargetTypeManagerRole);
 }
 
 const submitEditedLink = ({
@@ -268,7 +270,7 @@ onUnmounted(() => {
   <LinkModal
     v-if="currentLinkData"
     :current="currentLinkData"
-    :deps-container="depsContainer"
+    :deps-container="serviceContainer"
     :excluded-link-target-types="options.features?.links?.excludedTargetTypes"
     :link-context
     :mode="editingLink?.mode"

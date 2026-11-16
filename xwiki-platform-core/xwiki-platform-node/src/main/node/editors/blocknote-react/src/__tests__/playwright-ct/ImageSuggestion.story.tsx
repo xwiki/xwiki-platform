@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { DocumentReference, SpaceReference } from "@xwiki/platform-model-api";
@@ -103,8 +103,8 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     [],
   );
 
-  const depsContainer = useMemo(() => {
-    const container = depsContainerMock();
+  const serviceContainer = useMemo(() => {
+    const container = serviceContainerMock();
 
     container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue(
       linkSuggestServiceUnavailable
@@ -182,8 +182,8 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
         options={{
           lang: "en",
           label: "Some Label",
-          depsContainer,
-          document:
+          serviceContainer,
+          sourceDocumentReference:
             documentReference === undefined
               ? undefined
               : // The mocked model reference serializer serializes a page reference as its name.

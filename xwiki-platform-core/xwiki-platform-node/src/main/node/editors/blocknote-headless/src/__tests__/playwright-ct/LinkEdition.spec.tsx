@@ -229,7 +229,7 @@ test("Editing a page link resolves and saves its reference relative to the docum
       syntax: FULL_SYNTAX,
       // Plain data, since the props are serialized to reach the browser: the mocked model reference services only
       // check whether the edited document is there.
-      document: {
+      sourceDocumentReference: {
         type: EntityType.DOCUMENT,
         name: "source",
       } as unknown as DocumentReference,

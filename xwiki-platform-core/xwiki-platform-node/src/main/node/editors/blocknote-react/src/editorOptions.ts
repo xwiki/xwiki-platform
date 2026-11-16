@@ -37,7 +37,8 @@ import type { Container } from "inversify";
  */
 type EditorAppearance = {
   /**
-   * The display theme of the editor UI (toolbars, menus, ...), light by default.
+   * The display theme of the editor UI (toolbars, menus, ...). It follows the light or dark color scheme preferred by
+   * the user (as set in the operating system or the browser) when not specified.
    */
   theme?: "light" | "dark";
 
@@ -154,12 +155,15 @@ type EditorFeatures = {
  * 1. Options are named after what the editor does, not after the library implementing it: no BlockNote (or Mantine)
  *    types and no options forwarded as is to BlockNote. A BlockNote setting that an integration needs becomes an
  *    option of its own.
- * 2. An option identifying the editor instance, or used by several features, goes at the top level. An option used
- *    by a single feature goes in the options of that feature, under {@link EditorOptions.features}.
- * 3. Services are not passed: the editor takes them from {@link EditorOptions.depsContainer}. Only the options that
+ * 2. An option identifying the editor instance, changing how the editor is created, or used by several features,
+ *    goes at the top level (e.g. {@link EditorOptions.collaboration}, {@link EditorOptions.upload}). An option used by
+ *    a single feature goes in the options of that feature, under {@link EditorOptions.features}. A feature adds
+ *    something to the editor and can be turned off without affecting the other features: it reads only its own
+ *    options.
+ * 3. Services are not passed: the editor takes them from {@link EditorOptions.serviceContainer}. Only the options that
  *    change how a service is used are passed, and only when they can't be derived from the other options.
  * 4. An option that can be derived from another one is not passed (e.g. the references of the links are resolved
- *    relative to {@link EditorOptions.document}).
+ *    relative to {@link EditorOptions.sourceDocumentReference}).
  * 5. Each option is declared once, by the lowest layer using it (e.g. the options of the link modal are declared by
  *    the Vue integration that shows it).
  * 6. Feature options should be JSON-serializable, so that they can come from a server-side configuration.
@@ -169,35 +173,40 @@ type EditorFeatures = {
  */
 type EditorOptions = {
   /**
-   * The container the editor takes the services it needs from.
+   * The Inversify container the editor takes the services and components it needs from.
    */
-  depsContainer: Container;
+  serviceContainer: Container;
 
   /**
-   * The name of the editor instance, usually the name of the form field it is attached to. It identifies the edited
-   * content within the edited document: when editing in realtime, the editor instances with the same name, in the
-   * same collaboration session, edit the same content. Realtime collaboration is disabled without a name.
+   * The name of the editor instance, usually the name of the form field it is attached to. It tells apart the editor
+   * instances editing different contents of the same document (e.g. a form with several BlockNote fields). When
+   * editing in realtime, the editor instances with the same name, in the same collaboration session, edit the same
+   * content. Realtime collaboration is disabled without a name.
    */
   name?: string;
 
   /**
-   * The edited document: the files are uploaded to it, and the references of the linked pages, attachments and images
-   * are relative to it. The current document (as provided by the `DocumentService`) when not specified.
+   * The reference of the document holding the edited content: the files are uploaded to it, and the references of the
+   * linked pages, attachments and images are relative to it, so that they keep working when the document is renamed
+   * or copied. The current document (as provided by the `DocumentService`) when not specified.
    */
-  document?: DocumentReference;
+  sourceDocumentReference?: DocumentReference;
 
   /**
-   * The syntax of the edited content, which determines the editor features that are available.
+   * The syntax of the edited content, which is normally the syntax of the source document. It determines the editor
+   * features that are available, since only what the syntax can represent can be saved.
    */
   syntax: SyntaxConfig;
 
   /**
-   * The language of the editor UI.
+   * The language of the editor UI (menus, toolbars, placeholders), usually the language of the page hosting the
+   * editor.
    */
   lang: EditorLanguage;
 
   /**
-   * The accessible label of the editor.
+   * The accessible name of the editing area (its `aria-label`), announced by the screen readers to tell which content
+   * is being edited.
    */
   label: string;
 
@@ -218,7 +227,8 @@ type EditorOptions = {
   collaboration?: Collaboration;
 
   /**
-   * How the files are uploaded. Uploading is disabled when not specified.
+   * How the files are uploaded: used when files are pasted or dropped in the content, and by the upload tab of the
+   * file panel (e.g. of an image block). Uploading is disabled when not specified.
    */
   upload?: UploadOptions;
 

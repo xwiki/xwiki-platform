@@ -32,9 +32,9 @@ import {
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import {
-  DepsContainerContext,
   EditedDocumentContext,
   MacrosContext,
+  ServiceContainerContext,
 } from "../contexts";
 import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
@@ -120,9 +120,9 @@ const SIDE_MENU_FLOATING_OPTIONS = {
 
 const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   options: {
-    depsContainer,
+    serviceContainer,
     name,
-    document: editedDocument,
+    sourceDocumentReference,
     syntax,
     lang,
     label,
@@ -154,21 +154,21 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // The components below take the edited document as a serialized reference.
   const documentReference = useMemo(
     () =>
-      editedDocument &&
-      depsContainer
+      sourceDocumentReference &&
+      serviceContainer
         .get<ModelReferenceSerializerProvider>(
           "ModelReferenceSerializerProvider",
         )
         .get()
-        ?.serialize(editedDocument),
-    [depsContainer, editedDocument],
+        ?.serialize(sourceDocumentReference),
+    [serviceContainer, sourceDocumentReference],
   );
 
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
     const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
-      depsContainer
+      serviceContainer
         .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
         .get()!,
     );
@@ -271,7 +271,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   // Renders the editor instance using a React component.
   return (
-    <DepsContainerContext.Provider value={depsContainer}>
+    <ServiceContainerContext.Provider value={serviceContainer}>
       <EditedDocumentContext.Provider value={documentReference}>
         <MacrosContext.Provider value={macros ? macros.ctx : null}>
           <BlockNoteView
@@ -363,7 +363,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           </BlockNoteView>
         </MacrosContext.Provider>
       </EditedDocumentContext.Provider>
-    </DepsContainerContext.Provider>
+    </ServiceContainerContext.Provider>
   );
 };
 

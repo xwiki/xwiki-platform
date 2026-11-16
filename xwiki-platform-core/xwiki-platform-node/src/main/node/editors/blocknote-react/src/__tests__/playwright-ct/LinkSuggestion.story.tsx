@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import {
@@ -110,8 +110,8 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
     [],
   );
 
-  const depsContainer = useMemo(() => {
-    const container = depsContainerMock();
+  const serviceContainer = useMemo(() => {
+    const container = serviceContainerMock();
 
     const toLinks = (links: SuggestedLink[] | undefined, type: number) =>
       (links ?? []).map((link, index) => ({
@@ -210,7 +210,7 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
         options={{
           lang: "en",
           label: "Some Label",
-          depsContainer,
+          serviceContainer,
           syntax: syntax ?? FULL_SYNTAX,
           features: { links: { hooks: linkEditionHooks } },
         }}

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { useMemo } from "react";
@@ -39,7 +39,7 @@ export type CollaborationForTestProps = {
 export const CollaborationForTest: React.FC<CollaborationForTestProps> = ({
   editors,
 }) => {
-  const depsContainer = useMemo(depsContainerMock, []);
+  const serviceContainer = useMemo(serviceContainerMock, []);
 
   const collaboration = useMemo(() => {
     const doc = new Doc();
@@ -57,7 +57,7 @@ export const CollaborationForTest: React.FC<CollaborationForTestProps> = ({
         <div key={index} data-testid={`editor-${index}`}>
           <BlockNoteViewWrapper
             options={{
-              depsContainer,
+              serviceContainer,
               name,
               syntax: FULL_SYNTAX,
               lang: "en",

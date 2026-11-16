@@ -28,12 +28,14 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.function.FailablePredicate;
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -64,6 +66,12 @@ public class CommentAddAction extends XWikiAction
 
     /** The name of the space where user profiles are kept. */
     private static final String USER_SPACE_PREFIX = "XWiki.";
+
+    /**
+     * The number of times a comment is added or modified again when the commented document keeps being saved
+     * concurrently.
+     */
+    private static final int SAVE_ATTEMPTS = 5;
 
     @Inject
     private Logger logger;
@@ -103,42 +111,10 @@ public class CommentAddAction extends XWikiAction
         } else if (context.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME) && !checkCaptcha(context)) {
             getCurrentScriptContext().setAttribute("captchaAnswerWrong", Boolean.TRUE, ScriptContext.ENGINE_SCOPE);
         } else {
-            // className = XWiki.XWikiComments
-            String className = baseclass.getName();
-            // Create a new comment object and mark the document as dirty.
-            BaseObject object = doc.newObject(className, context);
-            // TODO The map should be pre-filled with empty strings for all class properties, just like in
-            // ObjectAddAction, so that properties missing from the request are still added to the database.
-            baseclass.fromMap(oform.getObject(className), object);
-            // Comment author checks
-            if (XWikiRightService.GUEST_USER_FULLNAME.equals(context.getUser())) {
-                // Guests should not be allowed to enter names that look like real XWiki user names.
-                String author = ((BaseProperty) object.get(AUTHOR_PROPERTY_NAME)).getValue() + "";
-                author = StringUtils.remove(author, ':');
-                while (author.startsWith(USER_SPACE_PREFIX)) {
-                    author = Strings.CS.removeStart(author, USER_SPACE_PREFIX);
-                }
-                // We need to make sure the author will fit in a String property, this is mostly a protection against
-                // spammers who try to put large texts in this field
-                int limit = xwiki.getStore().getLimitSize(context, StringProperty.class, "value");
-                author = author.substring(0, Math.min(author.length(), limit));
-                object.set(AUTHOR_PROPERTY_NAME, author, context);
-            } else {
-                // A registered user must always post with his name.
-                object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
-            }
-            // We only update the original author of the document to avoid changing the effective one.
-            doc.getAuthors().setOriginalMetadataAuthor(
-                this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
-
-            String comment = localizePlainOrKey("core.comment.addComment");
-
-            // Users with edit right on the commented page can upload files while adding / editing the comment (e.g.
-            // upload an image to be inserted in the comment).
-            handleTemporaryUploadedFiles(doc, context.getRequest());
-
-            // Save the new comment.
-            xwiki.saveDocument(doc, comment, true, true, context);
+            saveCommentedDocument(commentedDocument -> {
+                addComment(commentedDocument, baseclass, oform, context);
+                return true;
+            }, localizePlainOrKey("core.comment.addComment"), context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {
@@ -148,6 +124,82 @@ public class CommentAddAction extends XWikiAction
         String redirect = Utils.getRedirect("edit", context);
         sendRedirect(response, redirect);
         return false;
+    }
+
+    private void addComment(XWikiDocument doc, BaseClass baseclass, ObjectAddForm oform, XWikiContext context)
+        throws XWikiException
+    {
+        XWiki xwiki = context.getWiki();
+        // className = XWiki.XWikiComments
+        String className = baseclass.getName();
+        // Create a new comment object and mark the document as dirty.
+        BaseObject object = doc.newObject(className, context);
+        // TODO The map should be pre-filled with empty strings for all class properties, just like in
+        // ObjectAddAction, so that properties missing from the request are still added to the database.
+        baseclass.fromMap(oform.getObject(className), object);
+        // Comment author checks
+        if (XWikiRightService.GUEST_USER_FULLNAME.equals(context.getUser())) {
+            // Guests should not be allowed to enter names that look like real XWiki user names.
+            String author = ((BaseProperty) object.get(AUTHOR_PROPERTY_NAME)).getValue() + "";
+            author = StringUtils.remove(author, ':');
+            while (author.startsWith(USER_SPACE_PREFIX)) {
+                author = Strings.CS.removeStart(author, USER_SPACE_PREFIX);
+            }
+            // We need to make sure the author will fit in a String property, this is mostly a protection against
+            // spammers who try to put large texts in this field
+            int limit = xwiki.getStore().getLimitSize(context, StringProperty.class, "value");
+            author = author.substring(0, Math.min(author.length(), limit));
+            object.set(AUTHOR_PROPERTY_NAME, author, context);
+        } else {
+            // A registered user must always post with his name.
+            object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
+        }
+        // We only update the original author of the document to avoid changing the effective one.
+        doc.getAuthors().setOriginalMetadataAuthor(
+            this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+
+        // Users with edit right on the commented page can upload files while adding / editing the comment (e.g.
+        // upload an image to be inserted in the comment).
+        handleTemporaryUploadedFiles(doc, context.getRequest());
+    }
+
+    /**
+     * Applies a modification of the comments to the commented document (the context document) and saves it on behalf
+     * of the context user. Comments can be added or modified concurrently: when the document was saved by another
+     * request after it was loaded, the modification is applied again to the newly saved version, which then becomes
+     * the context document (so that the response shows it).
+     *
+     * @param modification modifies the given document, and returns {@code false} if it can't be modified, in which
+     *     case nothing is saved; it may be called several times, with a newer version of the document each time
+     * @param comment the comment of the saved version
+     * @param context the XWiki context
+     * @return {@code false} if the modification returned {@code false}, {@code true} if the document was saved
+     * @throws XWikiException if the document couldn't be modified or saved
+     * @since 18.10.0RC1
+     */
+    protected boolean saveCommentedDocument(FailablePredicate<XWikiDocument, XWikiException> modification,
+        String comment, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument document = context.getDoc();
+        for (int attempt = 1;; attempt++) {
+            if (!modification.test(document)) {
+                return false;
+            }
+
+            try {
+                context.getWiki().saveDocument(document, comment, true, true, context);
+                context.setDoc(document);
+
+                return true;
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt >= SAVE_ATTEMPTS) {
+                    throw e;
+                }
+                this.logger.debug("Document [{}] was saved concurrently, modifying its comments again.",
+                    document.getDocumentReference());
+                document = context.getWiki().getDocument(document.getDocumentReference(), context).clone();
+            }
+        }
     }
 
     @Override

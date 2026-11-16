@@ -114,7 +114,7 @@ public class DocumentMergeImporter
                 nextDocument, mergeConfiguration);
 
         if (documentToSave != null && documentToSave != currentDocument) {
-            saveDocument(documentToSave, comment, configuration);
+            saveDocument(documentToSave, currentDocument, comment, configuration);
         }
     }
 
@@ -127,13 +127,22 @@ public class DocumentMergeImporter
         return null;
     }
 
-    private void saveDocument(XWikiDocument document, String comment, PackageConfiguration configuration)
-        throws Exception
+    /**
+     * @param document the document to save, e.g. the merged document, or the new version of the document
+     * @param mergedDocument the document from the database the merge was computed from, {@code null} if unknown
+     */
+    private void saveDocument(XWikiDocument document, XWikiDocument mergedDocument, String comment,
+        PackageConfiguration configuration) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument currentDocument =
-            xcontext.getWiki().getDocument(document.getDocumentReferenceWithLocale(), xcontext);
+        // Save on top of the database document the merge was computed from, so that the document saved since then
+        // (e.g. while the conflict question waited for an answer) is refused as a revision conflict instead of being
+        // overwritten.
+        XWikiDocument currentDocument = mergedDocument;
+        if (currentDocument == null) {
+            currentDocument = xcontext.getWiki().getDocument(document.getDocumentReferenceWithLocale(), xcontext);
+        }
 
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {
@@ -148,6 +157,10 @@ public class DocumentMergeImporter
                 }
             }
         } else {
+            if (mergedDocument != null && document.getOriginalDocument() == null) {
+                // The document didn't exist when it was merged: saving it fails if it was created since then.
+                document.setOriginalDocument(mergedDocument);
+            }
             currentDocument = document;
         }
 

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.function.FailableSupplier;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.ratings.AverageRating;
@@ -42,6 +43,12 @@ import org.xwiki.ratings.events.UpdatingAverageRatingEvent;
  */
 public abstract class AbstractAverageRatingManager implements AverageRatingManager
 {
+    /**
+     * The number of times an average rating update is attempted before giving up when the stored average rating keeps
+     * being modified concurrently.
+     */
+    private static final int UPDATE_ATTEMPTS = 5;
+
     private RatingsManager ratingsManager;
 
     @Inject
@@ -100,48 +107,96 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         }
     }
 
+    /**
+     * Indicates if the given exception was thrown because the stored average rating was modified concurrently, in which
+     * case the update that failed can be performed again, starting from the newly stored average rating.
+     *
+     * @param exception an exception thrown while updating the stored average rating
+     * @return {@code true} if the update failed because of a concurrent modification of the stored average rating
+     * @since 18.10.0RC1
+     */
+    protected boolean isConcurrentModification(RatingsException exception)
+    {
+        return false;
+    }
+
+    /**
+     * Performs an update of the stored average ratings, and performs it again when it fails because of a concurrent
+     * modification (see {@link #isConcurrentModification(RatingsException)}). The update must read the stored average
+     * ratings itself, so that each attempt starts from the latest stored state instead of overwriting the concurrent
+     * modification.
+     *
+     * @param update reads, modifies and saves the stored average ratings; it may be called several times
+     * @param <T> the type of the result of the update
+     * @return the result of the update
+     * @throws RatingsException if the update failed, or still failed because of concurrent modifications after
+     *     several attempts
+     * @since 18.10.0RC1
+     */
+    protected <T> T retryOnConcurrentModification(FailableSupplier<T, RatingsException> update)
+        throws RatingsException
+    {
+        for (int attempt = 1;; attempt++) {
+            try {
+                return update.get();
+            } catch (RatingsException e) {
+                if (attempt >= UPDATE_ATTEMPTS || !isConcurrentModification(e)) {
+                    throw e;
+                }
+            }
+        }
+    }
+
     @Override
     public AverageRating addVote(EntityReference entityReference, int newVote) throws RatingsException
     {
-        AverageRating averageRating = getAverageRating(entityReference);
-        int oldTotalVote = averageRating.getNbVotes();
-        float oldAverageVote = averageRating.getAverageVote();
-        averageRating.addRating(newVote);
-        return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+        return retryOnConcurrentModification(() -> {
+            AverageRating averageRating = getAverageRating(entityReference);
+            int oldTotalVote = averageRating.getNbVotes();
+            float oldAverageVote = averageRating.getAverageVote();
+            averageRating.addRating(newVote);
+            return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+        });
     }
 
     @Override
     public AverageRating removeVote(EntityReference entityReference, int oldVote) throws RatingsException
     {
-        AverageRating averageRating = getAverageRating(entityReference);
-        int oldTotalVote = averageRating.getNbVotes();
-        float oldAverageVote = averageRating.getAverageVote();
-        averageRating.removeRating(oldVote);
-        return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+        return retryOnConcurrentModification(() -> {
+            AverageRating averageRating = getAverageRating(entityReference);
+            int oldTotalVote = averageRating.getNbVotes();
+            float oldAverageVote = averageRating.getAverageVote();
+            averageRating.removeRating(oldVote);
+            return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+        });
     }
 
     @Override
     public AverageRating updateVote(EntityReference entityReference, int oldVote, int newVote)
         throws RatingsException
     {
-        AverageRating averageRating = getAverageRating(entityReference);
-        int oldTotalVote = averageRating.getNbVotes();
-        float oldAverageVote = averageRating.getAverageVote();
-        averageRating.updateRating(oldVote, newVote);
-        return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+        return retryOnConcurrentModification(() -> {
+            AverageRating averageRating = getAverageRating(entityReference);
+            int oldTotalVote = averageRating.getNbVotes();
+            float oldAverageVote = averageRating.getAverageVote();
+            averageRating.updateRating(oldVote, newVote);
+            return this.updateAverageRating(averageRating, oldAverageVote, oldTotalVote);
+        });
     }
 
     @Override
     public AverageRating resetAverageRating(EntityReference entityReference, float averageVote, int totalVote)
         throws RatingsException
     {
-        AverageRating averageRating = getAverageRating(entityReference);
-        int oldTotalVote = averageRating.getNbVotes();
-        float oldAverageVote = averageRating.getAverageVote();
-        DefaultAverageRating updatedAverageRating = new DefaultAverageRating(averageRating);
-        updatedAverageRating.setAverageVote(averageVote);
-        updatedAverageRating.setTotalVote(totalVote);
-        updatedAverageRating.setUpdatedAt(new Date());
-        return this.updateAverageRating(updatedAverageRating, oldAverageVote, oldTotalVote);
+        return retryOnConcurrentModification(() -> {
+            AverageRating averageRating = getAverageRating(entityReference);
+            int oldTotalVote = averageRating.getNbVotes();
+            float oldAverageVote = averageRating.getAverageVote();
+            DefaultAverageRating updatedAverageRating = new DefaultAverageRating(averageRating);
+            updatedAverageRating.setAverageVote(averageVote);
+            updatedAverageRating.setTotalVote(totalVote);
+            updatedAverageRating.setUpdatedAt(new Date());
+            return this.updateAverageRating(updatedAverageRating, oldAverageVote, oldTotalVote);
+        });
     }
 }

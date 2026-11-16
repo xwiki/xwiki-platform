@@ -31,6 +31,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -46,6 +47,7 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.events.UpdateAverageRatingFailedEvent;
 import org.xwiki.ratings.events.UpdatedAverageRatingEvent;
 import org.xwiki.ratings.events.UpdatingAverageRatingEvent;
+import org.xwiki.store.DocumentRevisionConflictException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -85,6 +87,14 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     private ContextualLocalizationManager contextualLocalizationManager;
 
     @Override
+    protected boolean isConcurrentModification(RatingsException exception)
+    {
+        // The document holding the average rating xobjects refuses to be saved when it isn't based on the stored
+        // revision anymore.
+        return ExceptionUtils.indexOfType(exception, DocumentRevisionConflictException.class) >= 0;
+    }
+
+    @Override
     public AverageRating getAverageRating(EntityReference entityReference) throws RatingsException
     {
         try {
@@ -104,10 +114,14 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     @Override
     public long removeAverageRatings(EntityReference entityReference) throws RatingsException
     {
-        long result = 0;
         // if the reference is a wiki, then everything's already deleted we don't need to do anything here
         // and we avoid trying to load document to avoid errors.
-        if (entityReference.getType() != EntityType.WIKI) {
+        if (entityReference.getType() == EntityType.WIKI) {
+            return 0;
+        }
+
+        return retryOnConcurrentModification(() -> {
+            long result = 0;
             try {
                 DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
                 XWikiDocument actualDoc = (XWikiDocument) documentInstance;
@@ -128,8 +142,8 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
                 throw new RatingsException(String.format(
                     "Error while trying to remove average ratings related to [%s]", entityReference), e);
             }
-        }
-        return result;
+            return result;
+        });
     }
 
     @Override
@@ -146,6 +160,12 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
                 "Impossible to move the average ratings from [" + oldReference + "] to [" + newReference + "].");
         }
 
+        return retryOnConcurrentModification(() -> moveAverageRatingsInDocument(oldReference, newReference));
+    }
+
+    private long moveAverageRatingsInDocument(EntityReference oldReference, EntityReference newReference)
+        throws RatingsException
+    {
         // The list of the average ratings updated during the move.
         List<AverageRating> changedAverageRatings = new ArrayList<>();
 

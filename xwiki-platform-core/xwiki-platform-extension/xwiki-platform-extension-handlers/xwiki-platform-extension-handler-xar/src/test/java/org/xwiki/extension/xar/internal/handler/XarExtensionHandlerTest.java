@@ -99,6 +99,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoRepositoryUtilsExtension.class)
 class XarExtensionHandlerTest
 {
+    private static final DocumentReference PAGE_REFERENCE = new DocumentReference("wiki", "space", "page");
+
+    private static final LocalDocumentReference CUSTOM_CLASS = new LocalDocumentReference("XWiki", "CustomClass");
+
+    private static final LocalDocumentReference CONCURRENT_CLASS =
+        new LocalDocumentReference("XWiki", "ConcurrentClass");
+
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
@@ -734,16 +741,20 @@ class XarExtensionHandlerTest
         assertFalse(space1modified.isNew(), "Document wiki:space.modified has been removed from the database");
     }
 
-    @Test
-    void upgradeOnWikiWithSaveWhileAsking() throws Throwable
+    /**
+     * Upgrades the extension on the wiki, asking how to upgrade the customized page {@code space.page}, and saves the
+     * page while the first question about it waits for an answer.
+     *
+     * @param answer the answer to the questions about the page
+     * @return the questions asked about the page
+     */
+    private List<ConflictQuestion> upgradeWithSaveWhileAsking(ConflictQuestion.GlobalAction answer) throws Throwable
     {
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
         // Customize the page, so that the upgrade merges it.
-        DocumentReference pageReference = new DocumentReference("wiki", "space", "page");
-        LocalDocumentReference customClass = new LocalDocumentReference("XWiki", "CustomClass");
-        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext()).clone();
-        page.newXObject(customClass, getXWikiContext());
+        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext()).clone();
+        page.newXObject(CUSTOM_CLASS, getXWikiContext());
         this.oldcore.getSpyXWiki().saveDocument(page, getXWikiContext());
 
         this.oldcore.checkDocumentRevision(true);
@@ -756,32 +767,53 @@ class XarExtensionHandlerTest
             ConflictQuestion.GlobalAction.ASK);
         Job installJob = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
 
-        // A user saves the page while the upgrade asks how to merge it.
-        LocalDocumentReference concurrentClass = new LocalDocumentReference("XWiki", "ConcurrentClass");
         List<ConflictQuestion> pageQuestions = new ArrayList<>();
         answerQuestions(installJob, question -> {
-            if (question.getCurrentDocument().getDocumentReference().equals(pageReference)) {
+            if (question.getCurrentDocument().getDocumentReference().equals(PAGE_REFERENCE)) {
                 if (pageQuestions.isEmpty()) {
                     try {
                         XWikiDocument concurrentPage =
-                            this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext()).clone();
-                        concurrentPage.newXObject(concurrentClass, getXWikiContext());
+                            this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext()).clone();
+                        concurrentPage.newXObject(CONCURRENT_CLASS, getXWikiContext());
                         this.oldcore.getSpyXWiki().saveDocument(concurrentPage, getXWikiContext());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
+                question.setGlobalAction(answer);
                 pageQuestions.add(question);
             }
         });
 
         assertEquals(List.of(), installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN));
+
+        return pageQuestions;
+    }
+
+    @Test
+    void upgradeOnWikiWithSaveWhileAsking() throws Throwable
+    {
+        List<ConflictQuestion> pageQuestions = upgradeWithSaveWhileAsking(ConflictQuestion.GlobalAction.MERGED);
+
         // The page is merged again with the version saved by the user, which is asked again.
         assertEquals(2, pageQuestions.size());
-        page = this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext());
+        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext());
         assertEquals("content 2", page.getContent());
-        assertNotNull(page.getXObject(customClass));
-        assertNotNull(page.getXObject(concurrentClass));
+        assertNotNull(page.getXObject(CUSTOM_CLASS));
+        assertNotNull(page.getXObject(CONCURRENT_CLASS));
+    }
+
+    @Test
+    void upgradeOnWikiWithSaveWhileAskingAnsweredWithNextVersion() throws Throwable
+    {
+        List<ConflictQuestion> pageQuestions = upgradeWithSaveWhileAsking(ConflictQuestion.GlobalAction.NEXT);
+
+        // Replacing the page with the new version is asked again, with the version saved by the user, which the first
+        // answer didn't take into account.
+        assertEquals(2, pageQuestions.size());
+        assertNotNull(pageQuestions.get(1).getCurrentDocument().getXObject(CONCURRENT_CLASS));
+        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext());
+        assertEquals("content 2", page.getContent());
     }
 
     @Test

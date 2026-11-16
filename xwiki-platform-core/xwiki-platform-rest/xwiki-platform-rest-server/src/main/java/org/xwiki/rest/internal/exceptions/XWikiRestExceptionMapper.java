@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.store.DocumentRevisionConflictException;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -50,6 +51,15 @@ public class XWikiRestExceptionMapper implements ExceptionMapper<XWikiRestExcept
     @Override
     public Response toResponse(XWikiRestException exception)
     {
+        // A document modified concurrently is reported as a conflict, whichever exception it is wrapped in, so that
+        // the client knows it has to get the current version of the document and apply its changes again.
+        DocumentRevisionConflictException conflict =
+            ExceptionUtils.throwableOfType(exception, DocumentRevisionConflictException.class);
+        if (conflict != null) {
+            return Response.status(Status.CONFLICT).entity(conflict.getMessage()).type(MediaType.TEXT_PLAIN_TYPE)
+                .build();
+        }
+
         Throwable cause = exception.getCause();
 
         if (cause instanceof XWikiException xwikiException) {

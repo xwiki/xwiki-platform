@@ -18,22 +18,44 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #set($fullname = $request.get("fullname"))
-#set($obj = $doc.getObject("XWiki.XWikiGroups", "member", $fullname))
-#set($discard = $doc.removeObject($obj))
-
-## add a new empty group object so the group does not disappear
-#if($doc.getObjects("XWiki.XWikiGroups").size() == 0)
-  #set($discard = $doc.newObject("XWiki.XWikiGroups"))
+#if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+## Several requests can remove members from the same group at the same time. The save is refused when another request
+## saved the group after we loaded it, so we load the group again and remove the member again.
+#set ($saved = false)
+#foreach ($attempt in [1..5])
+  #set ($group = $xwiki.getDocument($doc.documentReference))
+  #set ($obj = $group.getObject("XWiki.XWikiGroups", "member", $fullname))
+  #set ($discard = $group.removeObject($obj))
+  ## add a new empty group object so the group does not disappear
+  #set ($addedEmptyGroup = false)
+  #if ($group.getObjects("XWiki.XWikiGroups").size() == 0)
+    #set ($discard = $group.newObject("XWiki.XWikiGroups"))
+    #set ($addedEmptyGroup = true)
+  #end
+  #set ($saveException = $NULL)
+  #try('saveException')
+    #set ($discard = $group.save())
+  #end
+  #if ("$!saveException" == '')
+    #set ($saved = true)
+    #break
+  #elseif (!$services.merge.isDocumentRevisionConflict($saveException))
+    #break
+  #end
+#end
+#if (!$saved)
+  $response.sendError(500, $exceptiontool.getRootCauseMessage($saveException))
+#else
+#if ($addedEmptyGroup)
   added empty group
 #end
-#if ($!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-#set($discard = $doc.save())
 #if($request.ajax)
   ok
 #elseif($request.xredirect)
   $response.sendRedirect($request.xredirect)
 #else
   $response.sendRedirect($doc.getURL('view'))
+#end
 #end
 #else
   notallowed

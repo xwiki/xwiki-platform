@@ -21,6 +21,7 @@ package com.xpn.xwiki;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -50,9 +51,11 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.CancelableEvent;
+import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
@@ -1618,6 +1621,84 @@ class XWikiTest
         assertEquals("updated content", storedDocument.getContent());
         assertEquals("4.1", storedDocument.getVersion());
         assertEquals(storedDocument.getVersion(), updatedDocument.getVersion());
+    }
+
+    /**
+     * Adds a listener that sets the title of the document after each update, and saves it again (or a copy of it).
+     *
+     * @return the errors thrown when the listener saves the document
+     */
+    private List<XWikiException> saveAgainAfterUpdate(DocumentReference reference, boolean saveCopy)
+        throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        List<XWikiException> errors = new ArrayList<>();
+        this.oldcore.getMocker().<ObservationManager>getInstance(ObservationManager.class)
+            .addListener(new AbstractEventListener("saveAgain", new DocumentUpdatedEvent(reference))
+            {
+                @Override
+                public void onEvent(Event event, Object source, Object data)
+                {
+                    XWikiDocument savedDocument = (XWikiDocument) source;
+                    if (saveCopy) {
+                        savedDocument = savedDocument.clone();
+                    }
+                    if (!"listener title".equals(savedDocument.getTitle())) {
+                        savedDocument.setTitle("listener title");
+                        try {
+                            xwiki.saveDocument(savedDocument, "listener", xcontext);
+                        } catch (XWikiException e) {
+                            errors.add(e);
+                        }
+                    }
+                }
+            });
+
+        return errors;
+    }
+
+    @Test
+    void saveDocumentAgainFromUpdatedListener() throws Exception
+    {
+        this.oldcore.checkDocumentRevision(true);
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        DocumentReference reference = this.document.getDocumentReference();
+        List<XWikiException> listenerErrors = saveAgainAfterUpdate(reference, false);
+
+        XWikiDocument savedDocument = this.xwiki.getDocument(reference, xcontext).clone();
+        savedDocument.setContent("updated content");
+        this.xwiki.saveDocument(savedDocument, xcontext);
+
+        assertEquals(List.of(), listenerErrors);
+        XWikiDocument storedDocument = this.xwiki.getDocument(reference, xcontext);
+        assertEquals("listener title", storedDocument.getTitle());
+        assertEquals("updated content", storedDocument.getContent());
+        // The saved instance is based on the version saved by the listener, so it can be saved again.
+        assertEquals(storedDocument.getVersion(), savedDocument.getOriginalDocument().getVersion());
+        savedDocument.setContent("updated again");
+        this.xwiki.saveDocument(savedDocument, xcontext);
+        assertEquals("updated again", this.xwiki.getDocument(reference, xcontext).getContent());
+    }
+
+    @Test
+    void saveDocumentCopyFromUpdatedListener() throws Exception
+    {
+        this.oldcore.checkDocumentRevision(true);
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        DocumentReference reference = this.document.getDocumentReference();
+        List<XWikiException> listenerErrors = saveAgainAfterUpdate(reference, true);
+
+        XWikiDocument savedDocument = this.xwiki.getDocument(reference, xcontext).clone();
+        savedDocument.setContent("updated content");
+        this.xwiki.saveDocument(savedDocument, xcontext);
+
+        assertEquals(List.of(), listenerErrors);
+        XWikiDocument storedDocument = this.xwiki.getDocument(reference, xcontext);
+        assertEquals("listener title", storedDocument.getTitle());
+        assertEquals("updated content", storedDocument.getContent());
+        // The saved instance doesn't have the changes of the copy saved by the listener, so saving it again would
+        // overwrite them.
+        assertThrows(DocumentRevisionConflictException.class, () -> this.xwiki.saveDocument(savedDocument, xcontext));
     }
 
     @Test

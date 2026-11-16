@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -312,6 +313,14 @@ public class XWiki implements EventListener
      * being saved concurrently.
      */
     private static final int UPDATE_DOCUMENT_ATTEMPTS = 5;
+
+    /**
+     * The documents whose save is being notified to the listeners in the current thread: the original document the
+     * listeners see (the version before the save) mapped to the version that was saved. See
+     * {@link #saveDocument(XWikiDocument, String, boolean, boolean, XWikiContext)}.
+     */
+    private final ThreadLocal<Map<XWikiDocument, XWikiDocument>> notifiedSavedVersions =
+        ThreadLocal.withInitial(IdentityHashMap::new);
 
     /** Frequently used Document reference, the class which holds virtual wiki definitions. */
     private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE =
@@ -2175,6 +2184,17 @@ public class XWiki implements EventListener
             boolean metadataDirty = document.isMetaDataDirty();
             boolean contentDirty = document.isContentDirty();
 
+            // A listener notified about the save of a document can save this document again, or a copy of it. Its
+            // original document is then the version before the first save, which the listeners compare with, but the
+            // document is based on the version that was saved.
+            Map<XWikiDocument, XWikiDocument> savedVersions = this.notifiedSavedVersions.get();
+            XWikiDocument notifiedOriginalDocument = document.getOriginalDocument();
+            XWikiDocument savedVersion =
+                notifiedOriginalDocument != null ? savedVersions.get(notifiedOriginalDocument) : null;
+            if (savedVersion != null) {
+                document.setOriginalDocument(savedVersion);
+            }
+
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
@@ -2213,6 +2233,12 @@ public class XWiki implements EventListener
             // back to send notifications.
             XWikiDocument newOriginal = document.getOriginalDocument();
 
+            if (savedVersion != null) {
+                // Further copies saved by the listeners are based on this version.
+                savedVersions.put(notifiedOriginalDocument, newOriginal);
+            }
+            XWikiDocument previousSavedVersion = savedVersions.put(originalDocument, newOriginal);
+
             try {
                 document.setOriginalDocument(originalDocument);
 
@@ -2229,7 +2255,16 @@ public class XWiki implements EventListener
                 LOGGER.error("Failed to send document save notification for document [{}]",
                     getDefaultEntityReferenceSerializer().serialize(document.getDocumentReference()), ex);
             } finally {
-                document.setOriginalDocument(newOriginal);
+                if (previousSavedVersion != null) {
+                    savedVersions.put(originalDocument, previousSavedVersion);
+                } else {
+                    savedVersions.remove(originalDocument);
+                }
+
+                // Unless a listener saved this document again, which already set its new original document.
+                if (document.getOriginalDocument() == originalDocument) {
+                    document.setOriginalDocument(newOriginal);
+                }
             }
         } finally {
             context.setWikiId(currentWiki);

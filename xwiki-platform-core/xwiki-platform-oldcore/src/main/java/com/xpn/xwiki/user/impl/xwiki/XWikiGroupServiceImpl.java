@@ -299,12 +299,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             context.getWiki().getStore().searchDocuments(ALL_GROUPS_WITH_MEMBER_QUERY, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
-            // Avoid modifying the cached document
-            XWikiDocument clonedDocument = groupDocument.clone();
-
-            if (replaceMemberFromGroup(clonedDocument, memberSourceReference, memberTargetReference, context)) {
-                context.getWiki().saveDocument(clonedDocument, context);
-            }
+            // Members can be added or removed concurrently, in which case the member is replaced again in the newly
+            // saved version.
+            context.getWiki().updateDocument(groupDocument.getDocumentReferenceWithLocale(),
+                document -> replaceMemberFromGroup(document, memberSourceReference, memberTargetReference, context), "",
+                false, context);
         }
     }
 
@@ -333,12 +332,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             context.getWiki().getStore().searchDocuments(ALL_GROUPS_WITH_MEMBER_QUERY, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
-            // Avoid modifying the cached document
-            XWikiDocument clonedDocument = groupDocument.clone();
-
-            if (removeUserOrGroupFromGroup(clonedDocument, memberWiki, memberSpace, memberName, context)) {
-                context.getWiki().saveDocument(clonedDocument, context);
-            }
+            // Members can be added or removed concurrently, in which case the member is removed again from the newly
+            // saved version.
+            context.getWiki().updateDocument(groupDocument.getDocumentReferenceWithLocale(),
+                document -> removeUserOrGroupFromGroup(document, memberWiki, memberSpace, memberName, context), "",
+                false, context);
         }
     }
 

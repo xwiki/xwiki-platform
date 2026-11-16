@@ -96,11 +96,41 @@ public class CommentSaveAction extends CommentAddAction
         throw new XWikiException("Failed to find the comment to save.", null);
     }
 
+    /**
+     * @return {@code false} if the comment doesn't exist or the current user isn't allowed to edit it
+     */
+    private boolean editComment(XWikiDocument doc, DocumentReference commentClass, int commentId,
+        XWikiContext context) throws XWikiException
+    {
+        XWikiRequest request = context.getRequest();
+        BaseObject commentObj = doc.getXObject(commentClass, commentId);
+        if (commentObj == null) {
+            return false;
+        }
+
+        // Check if the author is the current user or if the current user has the ADMIN right
+        String commentAuthor = commentObj.getStringValue("author");
+        DocumentReference authorReference = documentReferenceResolver.resolve(commentAuthor);
+        if (!authorReference.equals(context.getUserReference())
+            && !authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), doc.getDocumentReference())) {
+            return false;
+        }
+
+        // Edit the comment
+        commentObj.set(COMMENT_FIELD_NAME,
+            request.getParameter(String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
+
+        // Users with edit right on the commented page can upload files while adding / editing the comment (e.g.
+        // upload an image to be inserted in the comment).
+        handleTemporaryUploadedFiles(doc, request);
+
+        return true;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         // Get the XWiki utilities
-        XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
@@ -115,31 +145,11 @@ public class CommentSaveAction extends CommentAddAction
 
         // Edit comment
         int commentId = getCommentIdFromRequest(request);
-        BaseObject commentObj = doc.getXObject(commentClass, commentId);
-        if (commentObj == null) {
-            return false;
-        }
-
-        // Check if the author is the current user or if the current user has the ADMIN right
-        String commentAuthor = commentObj.getStringValue("author");
-        DocumentReference authorReference = documentReferenceResolver.resolve(commentAuthor);
-        if (!authorReference.equals(context.getUserReference()) && !authorizationManager.hasAccess(Right.ADMIN,
-            context.getUserReference(), context.getDoc().getDocumentReference())) {
-            return false;
-        }
-
-        // Edit the comment
-        commentObj.set(COMMENT_FIELD_NAME,
-            request.getParameter(String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
-
         String comment = this.localizationManager.getTranslationPlain("core.comment.editComment");
-
-        // Users with edit right on the commented page can upload files while adding / editing the comment (e.g.
-        // upload an image to be inserted in the comment).
-        handleTemporaryUploadedFiles(doc, context.getRequest());
-
-        // Save it
-        xwiki.saveDocument(doc, comment, true, true, context);
+        if (!saveCommentedDocument(
+            commentedDocument -> editComment(commentedDocument, commentClass, commentId, context), comment, context)) {
+            return false;
+        }
 
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {

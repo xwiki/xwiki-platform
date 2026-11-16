@@ -39,10 +39,12 @@ describe("createLinkEditionHooks", () => {
    * @returns the URL of a link to Users.Alice whose label is generated, as loaded from the server
    */
   function linkWithGeneratedLabel() {
-    Object.assign(blockNoteDocument.metadata.get("alice", true), {
-      xwikiReference: pageReference("Users.Alice"),
-      xwikiGeneratedLabel: "Alice",
-    });
+    blockNoteDocument.metadata.set(
+      "alice",
+      "xwikiReference",
+      pageReference("Users.Alice"),
+    );
+    blockNoteDocument.metadata.set("alice", "xwikiGeneratedLabel", "Alice");
     return injectLinkId("/xwiki/bin/view/Users/Alice", "alice");
   }
 

@@ -30,44 +30,53 @@ type BlockMetadata = Record<string, unknown>;
 
 /**
  * Holds the {@link BlockMetadata} of the edited content, by id: the block id for a block, the `id` property for an
- * inline macro, or an id of the integration's choosing otherwise (e.g. for a link).
+ * inline macro, or an id of the integration's choosing otherwise (e.g. for a link). The metadata is changed only
+ * through {@link BlockMetadataStore.set}, so that a store can tell what changed (e.g. to synchronize it).
  *
  * @since 18.10.0RC1
  * @beta
  */
 interface BlockMetadataStore {
   /**
-   * Gets the metadata of a block, creating it if there's none.
-   *
-   * @param id - identifies the block (or the link, or the macro call)
-   * @param create - create the metadata when there's none
-   * @returns the metadata of the specified block, which can be modified in place
-   */
-  get(id: string, create: true): BlockMetadata;
-
-  /**
    * Gets the metadata of a block.
    *
    * @param id - identifies the block (or the link, or the macro call)
-   * @param create - whether to create the metadata when there's none
-   * @returns the metadata of the specified block, which can be modified in place, or undefined if there's none and
-   *   it's not created
+   * @returns the metadata of the specified block, or undefined if it has none; it must not be modified, use
+   *   {@link BlockMetadataStore.set} instead
    */
-  get(id: string, create?: boolean): BlockMetadata | undefined;
+  get(id: string): Readonly<BlockMetadata> | undefined;
+
+  /**
+   * Sets an entry of the metadata of a block.
+   *
+   * @param id - identifies the block (or the link, or the macro call)
+   * @param key - the name of the metadata entry
+   * @param value - the value of the metadata entry, or undefined to remove the entry (a block left without metadata
+   *   entries has no metadata)
+   */
+  set(id: string, key: string, value: unknown): void;
 }
 
 class DefaultBlockMetadataStore implements BlockMetadataStore {
   private readonly metadata = new Map<string, BlockMetadata>();
 
-  public get(id: string, create: true): BlockMetadata;
-  public get(id: string, create?: boolean): BlockMetadata | undefined;
-  public get(id: string, create?: boolean): BlockMetadata | undefined {
-    let metadata = this.metadata.get(id);
-    if (!metadata && create) {
-      metadata = {};
-      this.metadata.set(id, metadata);
+  public get(id: string): Readonly<BlockMetadata> | undefined {
+    return this.metadata.get(id);
+  }
+
+  public set(id: string, key: string, value: unknown): void {
+    const metadata = this.metadata.get(id);
+    if (value !== undefined) {
+      this.metadata.set(id, { ...metadata, [key]: value });
+    } else if (metadata && key in metadata) {
+      const rest = { ...metadata };
+      delete rest[key];
+      if (Object.keys(rest).length) {
+        this.metadata.set(id, rest);
+      } else {
+        this.metadata.delete(id);
+      }
     }
-    return metadata;
   }
 }
 
@@ -83,54 +92,5 @@ function createBlockMetadataStore(): BlockMetadataStore {
   return new DefaultBlockMetadataStore();
 }
 
-/**
- * Associates a server-rendered macro output with a macro call. The macro output is kept outside the edited content
- * because it can contain information that only the current user is allowed to view (macros are rendered with the
- * rights of the current user), so it must not be shared with the other users editing the same content in realtime.
- *
- * @param metadata - where to keep the macro output
- * @param id - identifies the macro call: the block id for a block macro, the `id` property for an inline macro or for
- *   a macro nested in the parameters or content of another macro call
- * @param call - the macro call (JSON) that produced the given output
- * @param output - the macro output (an array of BlockNote-shaped nodes)
- *
- * @since 18.10.0RC1
- * @beta
- */
-function setMacroOutput(
-  metadata: BlockMetadataStore,
-  id: string,
-  call: string,
-  output: unknown[],
-): void {
-  Object.assign(metadata.get(id, true), {
-    macroCall: call,
-    macroOutput: output,
-  });
-}
-
-/**
- * Gets the server-rendered output of a macro call, as long as the macro call wasn't modified since it was rendered.
- *
- * @param metadata - where the macro output is kept
- * @param id - identifies the macro call (see {@link setMacroOutput})
- * @param call - the current macro call (JSON)
- * @returns the output of the specified macro call, or undefined if the macro call doesn't have an output or if it was
- *   modified since its output was rendered
- *
- * @since 18.10.0RC1
- * @beta
- */
-function getMacroOutput(
-  metadata: BlockMetadataStore | undefined,
-  id: string,
-  call: string,
-): unknown[] | undefined {
-  const blockMetadata = id ? metadata?.get(id) : undefined;
-  return blockMetadata?.macroCall === call
-    ? (blockMetadata.macroOutput as unknown[])
-    : undefined;
-}
-
-export { createBlockMetadataStore, getMacroOutput, setMacroOutput };
+export { createBlockMetadataStore };
 export type { BlockMetadata, BlockMetadataStore };

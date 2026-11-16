@@ -17,56 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  createBlockMetadataStore,
-  getMacroOutput,
-  setMacroOutput,
-} from "../../misc/blockMetadata";
+import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { describe, expect, test } from "vitest";
 
 describe("createBlockMetadataStore", () => {
-  test("creates the metadata of a block only when asked", () => {
+  test("keeps the metadata entries set for a block", () => {
     const metadata = createBlockMetadataStore();
 
     expect(metadata.get("alice")).toBeUndefined();
 
-    metadata.get("alice", true).xwikiReference = "Some.Page";
+    metadata.set("alice", "xwikiReference", "Some.Page");
+    metadata.set("alice", "xwikiFreestanding", true);
 
-    expect(metadata.get("alice")).toEqual({ xwikiReference: "Some.Page" });
+    expect(metadata.get("alice")).toEqual({
+      xwikiReference: "Some.Page",
+      xwikiFreestanding: true,
+    });
     expect(metadata.get("bob")).toBeUndefined();
   });
-});
 
-describe("getMacroOutput", () => {
-  const call = JSON.stringify({ name: "info", parameters: {} });
-  const output = [{ type: "paragraph", content: "Information" }];
-
-  test("returns the output of an unchanged macro call", () => {
+  test("removes an entry set to undefined, and the metadata of a block left without entries", () => {
     const metadata = createBlockMetadataStore();
-    setMacroOutput(metadata, "m1", call, output);
+    metadata.set("alice", "xwikiReference", "Some.Page");
+    metadata.set("alice", "xwikiFreestanding", true);
 
-    expect(getMacroOutput(metadata, "m1", call)).toBe(output);
+    metadata.set("alice", "xwikiFreestanding", undefined);
+    expect(metadata.get("alice")).toEqual({ xwikiReference: "Some.Page" });
+
+    metadata.set("alice", "xwikiReference", undefined);
+    expect(metadata.get("alice")).toBeUndefined();
+
+    // Removing an entry of a block without metadata doesn't create it.
+    metadata.set("bob", "xwikiReference", undefined);
+    expect(metadata.get("bob")).toBeUndefined();
   });
 
-  test("returns nothing once the macro call is modified, or for an unknown macro call", () => {
+  test("doesn't change the metadata already returned", () => {
     const metadata = createBlockMetadataStore();
-    setMacroOutput(metadata, "m1", call, output);
+    metadata.set("alice", "xwikiReference", "Some.Page");
+    const before = metadata.get("alice");
 
-    expect(getMacroOutput(metadata, "m1", "{}")).toBeUndefined();
-    expect(getMacroOutput(metadata, "m2", call)).toBeUndefined();
-    expect(getMacroOutput(metadata, "", call)).toBeUndefined();
-    expect(getMacroOutput(undefined, "m1", call)).toBeUndefined();
-  });
+    metadata.set("alice", "xwikiReference", "Other.Page");
 
-  test("keeps the other metadata of the macro block", () => {
-    const metadata = createBlockMetadataStore();
-    metadata.get("m1", true).xwikiParameters = { class: "box" };
-    setMacroOutput(metadata, "m1", call, output);
-
-    expect(metadata.get("m1")).toEqual({
-      xwikiParameters: { class: "box" },
-      macroCall: call,
-      macroOutput: output,
-    });
+    expect(before).toEqual({ xwikiReference: "Some.Page" });
+    expect(metadata.get("alice")).toEqual({ xwikiReference: "Other.Page" });
   });
 });

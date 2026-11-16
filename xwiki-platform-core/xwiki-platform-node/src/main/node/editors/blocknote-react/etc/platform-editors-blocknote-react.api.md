@@ -48,8 +48,8 @@ export type BlockMetadata = Record<string, unknown>;
 
 // @beta
 export interface BlockMetadataStore {
-    get(id: string, create: true): BlockMetadata;
-    get(id: string, create?: boolean): BlockMetadata | undefined;
+    get(id: string): Readonly<BlockMetadata> | undefined;
+    set(id: string, key: string, value: unknown): void;
 }
 
 // @beta

@@ -235,8 +235,11 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
     {
       submit: ({ reference: newReference, ...updatedProps }) => {
         if (newReference) {
-          blockNoteDocument!.metadata.get(block.id, true).xwikiReference =
-            newReference;
+          blockNoteDocument!.metadata.set(
+            block.id,
+            "xwikiReference",
+            newReference,
+          );
         }
         update({ type: "update", updatedProps });
       },
@@ -266,24 +269,23 @@ const imageEditionHooks: ImageEditionHooks = {
   // saved with the reference provided by the server rather than with its URL, relative to the edited document. An image
   // known only by its URL is saved with that URL, so we drop the reference of the previous image source.
   afterUpdate: (block, reference) => {
-    const metadata = blockNoteDocument?.metadata.get(block.id, !!reference);
-    if (reference?.type === "attach") {
-      metadata!.xwikiReference = {
-        ...(sourceDocumentReference
-          ? toRelativeAttachmentResourceReference(
-              reference,
-              sourceDocumentReference,
-            )
-          : reference),
-        // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
-        // default).
-        typed: false,
-      };
-    } else if (reference) {
-      metadata!.xwikiReference = reference;
-    } else if (metadata) {
-      delete metadata.xwikiReference;
-    }
+    blockNoteDocument?.metadata.set(
+      block.id,
+      "xwikiReference",
+      reference?.type === "attach"
+        ? {
+            ...(sourceDocumentReference
+              ? toRelativeAttachmentResourceReference(
+                  reference,
+                  sourceDocumentReference,
+                )
+              : reference),
+            // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
+            // default).
+            typed: false,
+          }
+        : reference,
+    );
   },
 };
 

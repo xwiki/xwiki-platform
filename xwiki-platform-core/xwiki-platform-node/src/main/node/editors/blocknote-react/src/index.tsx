@@ -74,11 +74,9 @@ export type {
 
 export type { EditorInstance } from "./editorInstance";
 
-export {
-  createBlockMetadataStore,
-  getMacroOutput,
-  setMacroOutput,
-} from "./misc/blockMetadata";
+export { createBlockMetadataStore } from "./misc/blockMetadata";
+
+export { getMacroOutput, setMacroOutput } from "./blocknote/macroMetadata";
 
 export type { BlockMetadata, BlockMetadataStore } from "./misc/blockMetadata";
 

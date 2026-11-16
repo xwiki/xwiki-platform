@@ -77,23 +77,27 @@ function createLinkEditionHooks(
         return linkData;
       }
       const id = extractLinkId(previous?.url ?? "") ?? uuidv4();
-      const metadata = getBlockNoteDocument()!.metadata.get(id, true);
+      const metadata = getBlockNoteDocument()!.metadata;
       if (linkData.reference) {
         // Preserve what the link editor doesn't edit when the link still points to the same resource, otherwise report
         // the new reference, so that the edited link points to the newly selected resource.
-        metadata.xwikiReference = editedLinkResourceReference(
-          metadata.xwikiReference as ResourceReference | undefined,
-          linkData.reference,
-          sourceDocumentReference,
+        metadata.set(
+          id,
+          "xwikiReference",
+          editedLinkResourceReference(
+            metadata.get(id)?.xwikiReference as ResourceReference | undefined,
+            linkData.reference,
+            sourceDocumentReference,
+          ),
         );
       }
       // A generated label is not saved, so that it's generated again (server-side) from the link target. A label
       // chosen by the user is saved, even when it's the same as the generated one.
-      if (linkData.generatedTitle) {
-        metadata.xwikiGeneratedLabel = linkData.title;
-      } else {
-        delete metadata.xwikiGeneratedLabel;
-      }
+      metadata.set(
+        id,
+        "xwikiGeneratedLabel",
+        linkData.generatedTitle ? linkData.title : undefined,
+      );
       return { ...linkData, url: injectLinkId(stripLinkId(linkData.url), id) };
     },
   };

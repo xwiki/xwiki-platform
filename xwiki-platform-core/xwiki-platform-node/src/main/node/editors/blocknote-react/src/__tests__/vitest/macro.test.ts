@@ -20,12 +20,10 @@
 // @vitest-environment jsdom
 
 import { createBlockNoteSchema } from "../../blocknote";
+import { setMacroOutput } from "../../blocknote/macroMetadata";
 import { MacroOutput } from "../../blocknote/macroOutput";
 import { EditorInstanceContext } from "../../contexts";
-import {
-  createBlockMetadataStore,
-  setMacroOutput,
-} from "../../misc/blockMetadata";
+import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { BlockNoteEditor } from "@blocknote/core";
 import { createElement } from "react";
 import { flushSync } from "react-dom";

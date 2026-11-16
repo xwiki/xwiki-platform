@@ -251,8 +251,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       (key) => key in props,
     ).forEach((key) => {
       block.id = block.id ?? uuidv4();
-      blockNoteDocument.metadata.get(block.id as string, true)[key] =
-        props[key];
+      blockNoteDocument.metadata.set(block.id as string, key, props[key]);
       delete props[key];
     });
   }
@@ -280,7 +279,9 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     });
     if (Object.keys(metadata).length > 0) {
       const id = uuidv4();
-      Object.assign(blockNoteDocument.metadata.get(id, true), metadata);
+      Object.entries(metadata).forEach(([key, value]) =>
+        blockNoteDocument.metadata.set(id, key, value),
+      );
       link.href = injectLinkId(link.href as string, id);
     }
     // The BlockNote link schema doesn't support props so we drop them (the metadata they held is

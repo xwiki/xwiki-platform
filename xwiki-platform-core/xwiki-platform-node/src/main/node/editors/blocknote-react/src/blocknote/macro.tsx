@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import "./macro.css";
+import { getMacroOutput } from "./macroMetadata";
 import { MacroOutput } from "./macroOutput";
 import { invocationToMacroCall, macroCallToInvocation } from "./utils";
 import { EditorInstanceContext, MacrosContext } from "../contexts";
-import { getMacroOutput } from "../misc/blockMetadata";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,

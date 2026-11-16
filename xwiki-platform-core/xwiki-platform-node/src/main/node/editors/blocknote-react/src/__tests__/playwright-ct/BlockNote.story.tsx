@@ -18,11 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { serviceContainerMock } from "./serviceContainer.mock";
+import { setMacroOutput } from "../../blocknote/macroMetadata";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
-import {
-  createBlockMetadataStore,
-  setMacroOutput,
-} from "../../misc/blockMetadata";
+import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { useMemo } from "react";
 import type { BlockType } from "../../blocknote";
 import type { LinkEditionHandler } from "../../components/links/linkEdition";

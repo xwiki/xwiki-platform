@@ -156,8 +156,11 @@ function createFileUploader(
     blockId?: string,
   ): UploadResult {
     if (blockId) {
-      getBlockNoteDocument()!.metadata.get(blockId, true).xwikiReference =
-        attachmentReference(attachment.reference, false);
+      getBlockNoteDocument()!.metadata.set(
+        blockId,
+        "xwikiReference",
+        attachmentReference(attachment.reference, false),
+      );
     }
     // Empty name, otherwise BlockNote saves it as the alt text of the image (||alt="image.gif"), and for a pasted
     // file that is the name the browser made up rather than the attachment we uploaded. XWikiImageBlock displays a
@@ -173,11 +176,15 @@ function createFileUploader(
     label: string,
   ): EditorPartialLink {
     const linkId = uuidv4();
-    const metadata = getBlockNoteDocument()!.metadata.get(linkId, true);
-    metadata.xwikiReference = attachmentReference(attachment.reference, true);
+    const metadata = getBlockNoteDocument()!.metadata;
+    metadata.set(
+      linkId,
+      "xwikiReference",
+      attachmentReference(attachment.reference, true),
+    );
     // Don't add xwikiFreestanding here: it saves the link without its [[ ]], and then it stops being a link
     // the next time the page is edited.
-    metadata.xwikiGeneratedLabel = label;
+    metadata.set(linkId, "xwikiGeneratedLabel", label);
     return {
       type: "link",
       href: injectLinkId(attachment.href, linkId),

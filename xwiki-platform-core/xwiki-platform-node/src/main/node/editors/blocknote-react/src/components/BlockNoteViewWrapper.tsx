@@ -137,7 +137,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
   const {
-    serviceContainer: parentServiceContainer,
     name,
     sourceDocumentReference,
     syntax: syntaxId,
@@ -154,8 +153,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // The editor instance gets its own service container, where the integration can bind what is specific to it, the
   // shared services being provided by the parent container.
   const serviceContainer = useMemo(
-    () => new Container({ parent: parentServiceContainer }),
-    [parentServiceContainer],
+    () => new Container({ parent: options.serviceContainer }),
+    [options.serviceContainer],
   );
 
   // The data about the edited content that isn't part of the content is kept by the integration, when it needs it.

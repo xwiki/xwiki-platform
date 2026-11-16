@@ -248,7 +248,7 @@
       ## Icon Container
       * (% class="admin-category-icon" %)
       (((
-        [[image:${services.rendering.escape($section.iconReference, 'xwiki/2.1')}]]
+        [[image:${services.rendering.escape($section.iconReference, 'xwiki/2.1')}||alt=""]]
       )))
       ## Container for Title and Description
       (% class="admin-category-text-container" %)
@@ -295,7 +295,7 @@
 #foreach ($category in $adminMenu)
     * (% class="admin-category-icon" %)
       (((
-        [[image:${services.rendering.escape($category.iconReference, 'xwiki/2.1')}]]
+        [[image:${services.rendering.escape($category.iconReference, 'xwiki/2.1')}||alt=""]]
       )))
       ## Container for Title and Description
       (% class="admin-category-text-container" %)
@@ -1048,6 +1048,16 @@ require(['jquery'], function($) {
     border-radius: var(--border-radius-base);
     padding: var(--spacing-base);
     list-style: none;
+    /* Needed to make the whole card clickable (see .admin-category-name a::after). */
+    position: relative;
+}
+
+/* Make the whole card (icon included) clickable through the category / section name link, without adding a second
+   link to the same target. */
+.admin-category-name a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 
 .admin-category-text-container {
@@ -1057,7 +1067,7 @@ require(['jquery'], function($) {
 }
 .admin-category-icon {
   flex-shrink: 0;
-  padding: 16px;
+  padding: var(--spacing-xlarge);
   /* TODO: Replace this hardcoded color with a variable once we have one that also ensures the icons visibility on
      dark themes. */
   background-color: #fafafa;

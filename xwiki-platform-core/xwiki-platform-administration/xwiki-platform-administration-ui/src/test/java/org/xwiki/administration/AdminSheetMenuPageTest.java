@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration;
 
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -203,8 +205,10 @@ class AdminSheetMenuPageTest extends PageTest
         // instead of being interpreted as wiki syntax.
         Element icon = result.selectFirst(".admin-category-icon img");
         assertNotNull(icon, "No administration section icon was rendered. Content: " + result.html());
-        assertTrue(icon.attr("alt").endsWith(ICON_ATTACHMENT),
-            "The icon reference should be escaped and kept verbatim. Alt: " + icon.attr("alt"));
+        String src = URLDecoder.decode(icon.attr("src"), StandardCharsets.UTF_8);
+        assertTrue(src.contains(ICON_ATTACHMENT), "The icon reference should be escaped and kept verbatim. Src: " + src);
+        // The icon is decorative (the section name is displayed next to it) so it must have an empty alternative text.
+        assertEquals("", icon.attr("alt"));
     }
 
     private void registerConfigurableSection(String displayInCategory, String displayInSection) throws Exception

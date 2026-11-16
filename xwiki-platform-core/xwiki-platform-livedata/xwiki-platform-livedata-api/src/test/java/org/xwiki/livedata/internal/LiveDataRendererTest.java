@@ -30,6 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataLayoutDescriptor;
+import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -43,7 +45,11 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -124,6 +130,50 @@ class LiveDataRendererTest
             )), block);
 
         verify(this.jsfx).use("uicomponents/widgets/liveData.js", Map.of("forceSkinAction", true));
+    }
+
+    @Test
+    void executeWithCoverProperty() throws Exception
+    {
+        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
+        parameters.setCoverProperty(" poster ");
+        LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
+        liveDataConfig.setMeta(new LiveDataMeta());
+        liveDataConfig.getMeta().setLayouts(
+            List.of(new LiveDataLayoutDescriptor("table"), new LiveDataLayoutDescriptor("cards")));
+        when(this.liveDataRendererConfiguration.getLiveDataConfiguration(ADVANCED_PARAMETERS_EMPTY, parameters))
+            .thenReturn(liveDataConfig);
+        when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
+
+        GroupBlock block = (GroupBlock) this.renderer.execute(parameters, ADVANCED_PARAMETERS_EMPTY, true);
+
+        // The cover is set on the cards layout, and the other layouts are kept.
+        JsonNode layouts = new ObjectMapper().readTree(block.getParameter("data-config")).path("meta").path("layouts");
+        assertEquals(2, layouts.size());
+        assertEquals("table", layouts.get(0).path("id").asText());
+        assertFalse(layouts.get(0).has("coverProperty"));
+        assertEquals("cards", layouts.get(1).path("id").asText());
+        assertEquals("poster", layouts.get(1).path("coverProperty").asText());
+    }
+
+    @Test
+    void executeWithCoverPropertyWithoutCardsLayout() throws Exception
+    {
+        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
+        parameters.setCoverProperty("poster");
+        LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
+        liveDataConfig.setMeta(new LiveDataMeta());
+        liveDataConfig.getMeta().setLayouts(List.of(new LiveDataLayoutDescriptor("table")));
+        when(this.liveDataRendererConfiguration.getLiveDataConfiguration(ADVANCED_PARAMETERS_EMPTY, parameters))
+            .thenReturn(liveDataConfig);
+        when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
+
+        GroupBlock block = (GroupBlock) this.renderer.execute(parameters, ADVANCED_PARAMETERS_EMPTY, true);
+
+        // The cover is ignored when the cards layout is not available.
+        JsonNode layouts = new ObjectMapper().readTree(block.getParameter("data-config")).path("meta").path("layouts");
+        assertEquals(1, layouts.size());
+        assertFalse(layouts.get(0).has("coverProperty"));
     }
 
     @Test

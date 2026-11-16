@@ -22,7 +22,7 @@ import { mount } from "@vue/test-utils";
 import { assertAxe } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
-import { nextTick } from "vue";
+import { nextTick, reactive } from "vue";
 
 /**
  * Vue Component initializer for LiveDataAdvancedPanelProperties component.
@@ -67,6 +67,9 @@ function initWrapper({ provide } = {}) {
             getPropertyDescriptors() {
               return [{ id: "id", name: "Property Name" }];
             },
+            getLayoutDescriptor() {
+              return undefined;
+            },
           },
         },
         provide,
@@ -85,6 +88,9 @@ function initWrapper({ provide } = {}) {
           const map = {
             "livedata.panel.heading.actions.collapse.hint": "Collapse",
             "livedata.panel.heading.actions.close.hint": "Close",
+            "livedata.panel.properties.noCover": "No cover",
+            "livedata.panel.properties.cover": "Cover",
+            "livedata.panel.properties.cover.hint": "Use as the card cover",
           };
           return map[key] || "unexpected key";
         },
@@ -118,5 +124,122 @@ describe("LivedataAdvancedPanelProperties.vue", () => {
     await nextTick();
     expect(wrapper.find("input[type = checkbox]").element.checked).toBe(false);
     await assertAxe(wrapper);
+  });
+
+  it("Doesn't offer the card cover outside of the cards layout", () => {
+    const wrapper = initWrapper({
+      provide: { logic: { currentLayoutId: { value: "table" } } },
+    });
+    expect(wrapper.find(".no-cover").exists()).toBe(false);
+    expect(wrapper.find("input[type = radio]").exists()).toBe(false);
+  });
+
+  describe("Card cover", () => {
+    /**
+     * @returns a properties panel in the cards layout, with two properties, the second one holding an image
+     */
+    function initCardsWrapper() {
+      const cardsDescriptor = reactive({ id: "cards", coverProperty: "" });
+      const visibility = reactive({ title: true, thumbnail: true });
+      const wrapper = initWrapper({
+        provide: {
+          logic: {
+            currentLayoutId: { value: "cards" },
+            data: {
+              id: "ld",
+              query: { properties: ["title", "thumbnail"] },
+              data: {
+                entries: [{ title: "A", thumbnail: '<img src="/a.png">' }],
+              },
+            },
+            getLayoutDescriptor: (layoutId) =>
+              layoutId === "cards" ? cardsDescriptor : undefined,
+            getPropertyDescriptor: (id) => ({ id, visible: visibility[id] }),
+            isPropertyVisible: (id) => visibility[id],
+            setPropertyVisible: (id, visible) => {
+              visibility[id] = visible;
+            },
+            getPropertyDescriptors: () => [
+              { id: "title", name: "Title" },
+              { id: "thumbnail", name: "Thumbnail" },
+            ],
+          },
+        },
+      });
+      return { wrapper, cardsDescriptor };
+    }
+
+    /**
+     * @returns whether each cover radio button is checked: "No cover" first, then the cover of each property
+     */
+    function getCoverChoices(wrapper) {
+      return wrapper
+        .findAll("input[type = radio]")
+        .map((radio) => radio.element.checked);
+    }
+
+    it("Offers no cover and each property as the cover, in a single group", async () => {
+      const { wrapper } = initCardsWrapper();
+      expect(wrapper.find(".no-cover").text()).toBe("No cover");
+      const radios = wrapper.findAll("input[type = radio]");
+      expect(radios).toHaveLength(3);
+      expect(radios.map((radio) => radio.attributes("name"))).toStrictEqual([
+        "ld-card-cover",
+        "ld-card-cover",
+        "ld-card-cover",
+      ]);
+      // No cover by default.
+      expect(getCoverChoices(wrapper)).toStrictEqual([true, false, false]);
+      await assertAxe(wrapper);
+    });
+
+    it("Selects a cover and changes it", async () => {
+      const { wrapper, cardsDescriptor } = initCardsWrapper();
+      await wrapper.findAll(".cover input")[1].setChecked(true);
+      expect(cardsDescriptor.coverProperty).toBe("thumbnail");
+      expect(getCoverChoices(wrapper)).toStrictEqual([false, false, true]);
+
+      await wrapper.findAll(".cover input")[0].setChecked(true);
+      expect(cardsDescriptor.coverProperty).toBe("title");
+      expect(getCoverChoices(wrapper)).toStrictEqual([false, true, false]);
+      await assertAxe(wrapper);
+    });
+
+    it("Removes the configured cover", async () => {
+      const { wrapper, cardsDescriptor } = initCardsWrapper();
+      cardsDescriptor.coverProperty = "thumbnail";
+      await nextTick();
+      expect(getCoverChoices(wrapper)).toStrictEqual([false, false, true]);
+
+      await wrapper.find(".no-cover input").setChecked(true);
+      expect(cardsDescriptor.coverProperty).toBe("");
+      expect(getCoverChoices(wrapper)).toStrictEqual([true, false, false]);
+    });
+
+    it("Disables the cover of the hidden properties", async () => {
+      const { wrapper } = initCardsWrapper();
+      await wrapper.findAll(".visibility input")[1].setChecked(false);
+      const covers = wrapper.findAll(".cover input");
+      expect(covers.map((cover) => cover.element.disabled)).toStrictEqual([
+        false,
+        true,
+      ]);
+      expect(wrapper.findAll(".cover")[1].classes()).toContain("disabled");
+      expect(wrapper.find(".no-cover input").element.disabled).toBe(false);
+      await assertAxe(wrapper);
+    });
+
+    it("Removes the cover when hiding its property", async () => {
+      const { wrapper, cardsDescriptor } = initCardsWrapper();
+      await wrapper.findAll(".cover input")[1].setChecked(true);
+      expect(cardsDescriptor.coverProperty).toBe("thumbnail");
+
+      await wrapper.findAll(".visibility input")[1].setChecked(false);
+      expect(cardsDescriptor.coverProperty).toBe("");
+      expect(getCoverChoices(wrapper)).toStrictEqual([true, false, false]);
+      // Showing the property again doesn't restore the cover.
+      await wrapper.findAll(".visibility input")[1].setChecked(true);
+      expect(getCoverChoices(wrapper)).toStrictEqual([true, false, false]);
+    });
   });
 });

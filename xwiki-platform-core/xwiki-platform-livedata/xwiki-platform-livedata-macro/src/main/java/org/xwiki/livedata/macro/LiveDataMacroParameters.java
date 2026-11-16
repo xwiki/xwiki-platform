@@ -156,4 +156,17 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     {
         super.setDescription(description);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 18.10.0RC1
+     */
+    @Override
+    @PropertyDescription("The property used as the cover of the cards, when the live data is displayed with the cards "
+        + "layout. Its image is displayed at the top of each card, or its text when it doesn't hold an image.")
+    public void setCoverProperty(String coverProperty)
+    {
+        super.setCoverProperty(coverProperty);
+    }
 }

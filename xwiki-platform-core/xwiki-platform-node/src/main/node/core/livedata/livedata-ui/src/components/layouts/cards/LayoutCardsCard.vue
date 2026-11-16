@@ -23,13 +23,25 @@
   It format an entry as a card, with a title that can be specified
   in the `titleProperty` property of its layout descriptor,
   inside the Livedata configuration.
+  When a cover property is selected (in the `coverProperty` property of its
+  layout descriptor), the card starts with a cover displaying its image.
 -->
 <template>
   <div
     class="card"
+    :class="{ 'card-with-cover': !!coverPropertyId }"
     :data-livedata-entry-index="entryIdx"
     :data-livedata-entry-id="logic.getEntryId(entry)"
   >
+    <!-- Card cover -->
+    <LayoutCardsCover
+      v-if="coverPropertyId"
+      :entry="entry"
+      :image="coverImage"
+      :text-property-id="coverTextPropertyId"
+      @image-error="coverImageFailed = true"
+    />
+
     <!-- Card title-->
     <div class="card-title">
       <!-- Entry selector -->
@@ -38,8 +50,14 @@
         v-show="isEntrySelectable"
         :entry="entry"
       />
-      <!-- Title property -->
-      <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
+      <!-- Title property, unless it is already displayed enlarged by the cover -->
+      <h2
+        v-if="
+          !!titlePropertyId &&
+          logic.isPropertyVisible(titlePropertyId) &&
+          !isTitleInCover
+        "
+      >
         <LivedataDisplayer :property-id="titlePropertyId" :entry="entry" />
       </h2>
     </div>
@@ -65,7 +83,8 @@
           class="card-property"
           v-show="
             logic.isPropertyVisible(property.id) &&
-            property.id !== titlePropertyId
+            property.id !== titlePropertyId &&
+            (property.id !== coverPropertyId || logic.isEditMode())
           "
         >
           <!-- Specify the handle to drag properties -->
@@ -108,6 +127,12 @@
 </template>
 
 <script>
+import LayoutCardsCover from "./LayoutCardsCover.vue";
+import {
+  getCoverImage,
+  getCoverPropertyId,
+  getCoverTextPropertyId,
+} from "./cardsLayout.js";
 import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
 import XWikiDraggableItem from "../../utilities/XWikiDraggableItem.vue";
@@ -119,6 +144,7 @@ export default {
 
   components: {
     XWikiIcon,
+    LayoutCardsCover,
     LivedataEntrySelector,
     LivedataDisplayer,
     draggable,
@@ -142,6 +168,13 @@ export default {
     },
   },
 
+  data() {
+    return {
+      // Whether the cover image failed to load, in which case the cover displays some text instead.
+      coverImageFailed: false,
+    };
+  },
+
   computed: {
     data() {
       return this.logic.data;
@@ -156,6 +189,44 @@ export default {
       return this.logic.getLayoutDescriptor("cards").titleProperty;
     },
 
+    // The id of the property displayed as the card cover, undefined when the card doesn't have a cover
+    coverPropertyId() {
+      return getCoverPropertyId(this.logic);
+    },
+
+    // The image held by the cover property, if any
+    coverPropertyImage() {
+      return this.coverPropertyId
+        ? getCoverImage(this.entry[this.coverPropertyId])
+        : undefined;
+    },
+
+    // The image displayed by the cover, undefined when the cover displays some text instead
+    coverImage() {
+      return this.coverImageFailed ? undefined : this.coverPropertyImage;
+    },
+
+    // The id of the property whose text is displayed by the cover when there is no image
+    coverTextPropertyId() {
+      return this.coverPropertyId
+        ? getCoverTextPropertyId(
+            this.logic,
+            this.entry,
+            this.coverPropertyId,
+            this.titlePropertyId,
+          )
+        : undefined;
+    },
+
+    // Whether the title is already displayed enlarged by the cover
+    isTitleInCover() {
+      return (
+        !!this.coverPropertyId &&
+        !this.coverImage &&
+        this.coverTextPropertyId === this.titlePropertyId
+      );
+    },
+
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();
     },
@@ -165,6 +236,13 @@ export default {
     },
     isEntrySaved() {
       return this.logic.getEntryId(this.entry) !== undefined;
+    },
+  },
+
+  watch: {
+    // Try to display the new image when the cover image changes.
+    "coverPropertyImage.src"() {
+      this.coverImageFailed = false;
     },
   },
 
@@ -213,11 +291,16 @@ export default {
   border-radius: var(--border-radius-base);
 }
 
+/*
+  Align the title with the property names: the properties are inside a container with a padding of 8px, and they
+  start after the space of their drag handle (30px, shifted by -8px).
+*/
 .layout-cards .card-title {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  padding: 0 8px 0 30px;
 }
 
 .layout-cards .card-title h2 {

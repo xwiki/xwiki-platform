@@ -29,7 +29,17 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 13.4RC1
  * @since 12.10.9
  */
-@UITest
+@UITest(
+    // The image plugin that resizes the images of the card covers is not registered until the server is restarted, so
+    // we need to make it a core extension.
+    extraJARs = {
+        "org.xwiki.platform:xwiki-platform-image-processing-plugin"
+    },
+    resolveExtraJARs = true,
+    properties = {
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.image.ImagePlugin"
+    }
+)
 class AllIT
 {
     @Nested

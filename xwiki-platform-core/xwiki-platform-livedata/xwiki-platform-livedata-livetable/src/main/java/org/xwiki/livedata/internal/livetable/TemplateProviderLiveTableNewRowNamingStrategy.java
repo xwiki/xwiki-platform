@@ -27,8 +27,6 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
@@ -37,10 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.pagetemplate.TemplateProvider;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -63,10 +58,6 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
      */
     public static final String HINT = "templateProvider";
 
-    private static final String NEW_ROW_LOCATION_PARAMETER = "newRowLocation";
-
-    private static final String CURRENT = "current";
-
     @Inject
     private NewRowTemplateProviderResolver templateProviderResolver;
 
@@ -77,18 +68,8 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
     private EntityReferenceProvider entityReferenceProvider;
 
     @Inject
-    @Named(CURRENT)
-    private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
-
-    @Inject
-    @Named(CURRENT)
+    @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
-
-    @Inject
-    private Logger logger;
 
     @Override
     public DocumentReference generate(Map<String, Object> parameters, Map<String, Object> entryValues)
@@ -107,38 +88,6 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
         return getReference(candidateName, location, terminal);
     }
 
-    @Override
-    public boolean isCreationAllowed(Map<String, Object> parameters)
-    {
-        try {
-            return getLocation(parameters).map(location -> this.authorization.hasAccess(Right.EDIT, location))
-                .orElse(false);
-        } catch (LiveDataException e) {
-            this.logger.warn("Adding entries is disabled because the template provider failed to load: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return false;
-        }
-    }
-
-    @Override
-    public Optional<SpaceReference> getNewEntryLocation(Map<String, Object> parameters)
-    {
-        try {
-            return getLocation(parameters);
-        } catch (LiveDataException e) {
-            this.logger.warn("Failed to find where new entries are created: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    protected SpaceReference getRequiredLocation(Map<String, Object> parameters) throws LiveDataException
-    {
-        return getLocation(parameters)
-            .orElseThrow(() -> new LiveDataException("Missing location for row creation."));
-    }
-
     /**
      * Finds where new entries go: the first space the template provider restricts creation to, or else
      * {@code newRowLocation}, or else the space of the page containing the live data.
@@ -147,7 +96,8 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
      * @return the location of the new entries, or {@link Optional#empty()} when there is none
      * @throws LiveDataException if the template provider cannot be loaded
      */
-    private Optional<SpaceReference> getLocation(Map<String, Object> parameters) throws LiveDataException
+    @Override
+    protected Optional<SpaceReference> getLocation(Map<String, Object> parameters) throws LiveDataException
     {
         Optional<SpaceReference> providerLocation = this.templateProviderResolver.resolve(parameters)
             .flatMap(templateProvider -> templateProvider.getCreationRestrictions().stream().findFirst());
@@ -155,12 +105,12 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
             return providerLocation;
         }
 
-        String location = (String) parameters.get(NEW_ROW_LOCATION_PARAMETER);
-        if (StringUtils.isNotBlank(location)) {
-            return Optional.of(this.currentSpaceReferenceResolver.resolve(location));
+        Optional<SpaceReference> parameterLocation = super.getLocation(parameters);
+        if (parameterLocation.isPresent()) {
+            return parameterLocation;
         }
 
-        String hostDocument = (String) parameters.get(LiveTableRequestHandler.HOST_DOCUMENT);
+        String hostDocument = (String) parameters.get(LiveTableRequestHandler.LIVE_DATA_HOST_DOCUMENT);
         if (StringUtils.isNotBlank(hostDocument)) {
             DocumentReference hostReference = this.currentDocumentReferenceResolver.resolve(hostDocument);
             return Optional.of(hostReference.getLastSpaceReference());

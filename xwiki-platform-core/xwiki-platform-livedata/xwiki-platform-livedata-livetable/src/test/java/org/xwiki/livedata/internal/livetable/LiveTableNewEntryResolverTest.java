@@ -27,13 +27,16 @@ import java.util.Set;
 import jakarta.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.internal.livetable.LiveTableNewEntryResolver.NewEntry;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,6 +68,13 @@ class LiveTableNewEntryResolverTest
 
     @MockComponent
     private NewRowTemplateProviderResolver templateProviderResolver;
+
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        // The naming strategies are looked up in the context component manager.
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
 
     @Test
     void resolve() throws Exception

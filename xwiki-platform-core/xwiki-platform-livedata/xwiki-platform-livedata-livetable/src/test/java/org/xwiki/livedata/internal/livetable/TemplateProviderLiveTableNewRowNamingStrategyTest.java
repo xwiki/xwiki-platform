@@ -78,7 +78,7 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
     private static final SpaceReference HOST_LOCATION = new SpaceReference("wiki", "Apps");
 
     private static final Map<String, Object> PARAMETERS = Map.of("newRowNamingStrategy", "templateProvider",
-        "newRowLocation", LOCATION, "hostDocument", HOST_DOCUMENT);
+        "newRowLocation", LOCATION, "liveDataHostDocument", HOST_DOCUMENT);
 
     @InjectMockComponents
     private TemplateProviderLiveTableNewRowNamingStrategy strategy;
@@ -212,7 +212,7 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
     @Test
     void getNewEntryLocationNextToTheHostDocument() throws Exception
     {
-        Map<String, Object> parameters = Map.of("hostDocument", HOST_DOCUMENT);
+        Map<String, Object> parameters = Map.of("liveDataHostDocument", HOST_DOCUMENT);
         when(this.templateProviderResolver.resolve(parameters)).thenReturn(Optional.empty());
 
         assertEquals(Optional.of(HOST_LOCATION), this.strategy.getNewEntryLocation(parameters));
@@ -257,7 +257,7 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
         when(this.templateProviderResolver.resolve(PARAMETERS)).thenThrow(new LiveDataException("Error"));
 
         assertFalse(this.strategy.isCreationAllowed(PARAMETERS));
-        assertEquals("Adding entries is disabled because the template provider failed to load: "
+        assertEquals("Adding entries is disabled because their location could not be resolved: "
             + "[LiveDataException: Error]", this.logCapture.getMessage(0));
     }
 }

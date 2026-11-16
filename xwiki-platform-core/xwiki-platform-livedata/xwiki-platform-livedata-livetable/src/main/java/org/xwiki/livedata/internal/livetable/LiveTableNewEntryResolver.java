@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +61,8 @@ public class LiveTableNewEntryResolver
     }
 
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private NewRowTemplateProviderResolver templateProviderResolver;
@@ -89,12 +92,13 @@ public class LiveTableNewEntryResolver
         throws LiveDataException
     {
         String namingStrategy = (String) parameters.get("newRowNamingStrategy");
-        if (!this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
+        ComponentManager componentManager = this.componentManagerProvider.get();
+        if (!componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
             throw new LiveDataException(String.format("Unsupported row naming strategy [%s].", namingStrategy));
         }
         try {
             LiveTableNewRowNamingStrategy strategy =
-                this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
+                componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
             checkMandatoryProperties(strategy.getMandatoryProperties(parameters), entryValues);
             return strategy.generate(parameters, entryValues);
         } catch (ComponentLookupException e) {

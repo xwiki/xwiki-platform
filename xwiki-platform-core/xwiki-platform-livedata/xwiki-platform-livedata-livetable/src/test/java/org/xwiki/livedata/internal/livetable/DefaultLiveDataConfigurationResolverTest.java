@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
@@ -46,10 +47,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -115,6 +118,13 @@ class DefaultLiveDataConfigurationResolverTest
     private final LiveDataConfiguration config = new LiveDataConfiguration();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        // The naming strategies are looked up in the context component manager.
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
 
     @BeforeEach
     void configure() throws Exception
@@ -186,19 +196,19 @@ class DefaultLiveDataConfigurationResolverTest
 
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
-        assertEquals("Apps.Home", actualConfig.getQuery().getSource().getParameters().get("hostDocument"));
+        assertEquals("Apps.Home", actualConfig.getQuery().getSource().getParameters().get("liveDataHostDocument"));
     }
 
     @Test
     void hostDocumentIsKeptWhenAlreadyRecorded() throws Exception
     {
         this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "templateProvider");
-        this.config.getQuery().getSource().setParameter("hostDocument", "Apps.Home");
+        this.config.getQuery().getSource().setParameter("liveDataHostDocument", "Apps.Home");
 
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
         // The entries are created by a separate request, whose current document is not the one displaying the data.
-        assertEquals("Apps.Home", actualConfig.getQuery().getSource().getParameters().get("hostDocument"));
+        assertEquals("Apps.Home", actualConfig.getQuery().getSource().getParameters().get("liveDataHostDocument"));
         verifyNoInteractions(this.xcontext);
     }
 
@@ -207,7 +217,7 @@ class DefaultLiveDataConfigurationResolverTest
     {
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
-        assertFalse(actualConfig.getQuery().getSource().getParameters().containsKey("hostDocument"));
+        assertFalse(actualConfig.getQuery().getSource().getParameters().containsKey("liveDataHostDocument"));
         verifyNoInteractions(this.xcontext);
     }
 

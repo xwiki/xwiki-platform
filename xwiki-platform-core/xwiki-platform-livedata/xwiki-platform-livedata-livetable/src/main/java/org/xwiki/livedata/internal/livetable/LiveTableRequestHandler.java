@@ -68,9 +68,10 @@ public class LiveTableRequestHandler
     static final String CONTEXT_DOC = "$doc";
 
     /**
-     * The page containing the Live Data.
+     * The page displaying the Live Data, recorded when the configuration is resolved. For instance, the
+     * {@code templateProvider} naming strategy creates new entries in its space when no other location is given.
      */
-    static final String HOST_DOCUMENT = "hostDocument";
+    static final String LIVE_DATA_HOST_DOCUMENT = "liveDataHostDocument";
 
     private static final Map<String, String> MATCH_TYPE = Map.of(
         "equals", "exact",
@@ -168,7 +169,7 @@ public class LiveTableRequestHandler
         addSourceRequestParameters(query, requestParams);
 
         // Remove internal source parameters.
-        Stream.of(TEMPLATE, RESULT_PAGE, CONTEXT_DOC, HOST_DOCUMENT).forEach(requestParams::remove);
+        Stream.of(TEMPLATE, RESULT_PAGE, CONTEXT_DOC, LIVE_DATA_HOST_DOCUMENT).forEach(requestParams::remove);
 
         // Rename the className parameter.
         String[] className = requestParams.remove("className");

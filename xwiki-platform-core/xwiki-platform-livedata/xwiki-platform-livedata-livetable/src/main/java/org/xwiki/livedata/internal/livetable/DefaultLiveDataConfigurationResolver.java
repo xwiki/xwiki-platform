@@ -88,7 +88,8 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     @Named("compactwiki")
@@ -119,11 +120,12 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
         String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
         setHostDocument(namingStrategy, sourceParams);
+        ComponentManager componentManager = this.componentManagerProvider.get();
         if (namingStrategy != null
-            && this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
+            && componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
             try {
                 LiveTableNewRowNamingStrategy strategy =
-                    this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
+                    componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
                 if (isCreationAllowed(strategy, sourceParams)) {
                     List<String> undescribedProperties =
                         setMandatory(mergedConfig.getMeta(), strategy.getMandatoryProperties(sourceParams));
@@ -167,6 +169,8 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
             return false;
         }
         Optional<SpaceReference> location = strategy.getNewEntryLocation(sourceParams);
+        // Without a known location, we can't check that the user has the required rights beforehand, so the
+        // template's required rights are only checked when the entry is actually created.
         return location.isEmpty() || this.templateProviderResolver.hasRequiredRights(sourceParams, location.get());
     }
 
@@ -178,10 +182,10 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
      */
     private void setHostDocument(String namingStrategy, Map<String, Object> sourceParams)
     {
-        if (namingStrategy != null && !sourceParams.containsKey(LiveTableRequestHandler.HOST_DOCUMENT)) {
+        if (namingStrategy != null && !sourceParams.containsKey(LiveTableRequestHandler.LIVE_DATA_HOST_DOCUMENT)) {
             XWikiDocument hostDocument = this.xcontextProvider.get().getDoc();
             if (hostDocument != null) {
-                sourceParams.put(LiveTableRequestHandler.HOST_DOCUMENT,
+                sourceParams.put(LiveTableRequestHandler.LIVE_DATA_HOST_DOCUMENT,
                     this.stringEntityReferenceSerializer.serialize(hostDocument.getDocumentReference()));
             }
         }

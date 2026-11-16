@@ -117,7 +117,7 @@ class LiveTableRequestHandlerTest
         query.getSource().setParameter("className", "Panels.PanelClass");
         query.getSource().setParameter("$doc", "Path.To.Page");
         // The page displaying the live data is only used to create entries, so the results page doesn't get it.
-        query.getSource().setParameter("hostDocument", "Path.To.Host");
+        query.getSource().setParameter("liveDataHostDocument", "Path.To.Host");
         query.getSource().setParameter("childrenOf", "Test");
         query.getSource().setParameter("queryFilters", "unique");
         query.getSource().setParameter("translationPrefix", "core.restore.batch.");

@@ -41,7 +41,14 @@ import type { Container } from "inversify";
 
 // eslint-disable-next-line max-statements
 export function depsContainerMock(): Container {
-  const container = mock<Container>();
+  const container = mock<Container>(
+    {},
+    {
+      fallbackMockImplementation: (id: unknown) => {
+        throw new Error(`Unexpected service: ${String(id)}`);
+      },
+    },
+  );
 
   container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
     get: () => ({

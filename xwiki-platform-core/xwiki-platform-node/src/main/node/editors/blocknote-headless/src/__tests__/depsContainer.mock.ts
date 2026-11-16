@@ -48,7 +48,14 @@ import type { Container } from "inversify";
 import type { MockProxy } from "vitest-mock-extended";
 
 export function depsContainerMock(): Container {
-  const container = mock<Container>();
+  const container = mock<Container>(
+    {},
+    {
+      fallbackMockImplementation: (id: unknown) => {
+        throw new Error(`Unexpected service: ${String(id)}`);
+      },
+    },
+  );
 
   container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
     get: () => ({

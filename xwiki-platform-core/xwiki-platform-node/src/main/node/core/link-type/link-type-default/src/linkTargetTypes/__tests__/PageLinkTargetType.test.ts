@@ -33,9 +33,7 @@ import type {
   RemoteURLSerializer,
 } from "@xwiki/platform-model-remote-url-api";
 
-const documentRef = {
-  type: EntityType.DOCUMENT,
-} as unknown as DocumentReference;
+const documentRef = mock<DocumentReference>({ type: EntityType.DOCUMENT });
 
 // The link target type resolves its services through the providers each time it uses them, so the mocks can be reset
 // between the tests.
@@ -329,10 +327,10 @@ describe("PageLinkTargetType without the services of the current wiki", () => {
   });
 
   describe("relative to the source document of the link", () => {
-    const sourceDocument = {
+    const sourceDocument = mock<DocumentReference>({
       type: EntityType.DOCUMENT,
       name: "Source",
-    } as unknown as DocumentReference;
+    });
     const context: LinkContext = { sourceDocument };
 
     it("resolves the reference against the source document", () => {

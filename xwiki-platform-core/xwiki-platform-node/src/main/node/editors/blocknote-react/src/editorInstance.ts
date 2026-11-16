@@ -38,21 +38,23 @@ type EditorInstance = {
 
   /**
    * The configuration of the editor instance, e.g. to resolve references relative to its
-   * {@link EditorOptions.sourceDocumentReference}.
+   * {@link EditorOptions.sourceDocumentReference}. It doesn't hold the options that are resolved for the editor
+   * instance, which are exposed by the editor instance itself, so that there's only one place to read them from.
    */
-  options: Readonly<EditorOptions>;
+  options: Readonly<Omit<EditorOptions, "serviceContainer" | "metadata">>;
 
   /**
-   * The data kept about the blocks of the edited content, outside of the content itself. It is the
+   * The data kept about the blocks of the edited content, outside of the content itself: the
    * {@link EditorOptions.metadata} store when specified, and a store created for the editor instance otherwise.
    */
   metadata: BlockMetadataStore;
 
   /**
-   * The container of the editor instance: a child of {@link EditorOptions.serviceContainer}, so it provides the shared
-   * services, where the integration can bind what is specific to the editor instance.
+   * The service container of the editor instance: a child of {@link EditorOptions.serviceContainer} created for the
+   * editor instance, so it provides the shared services, and the integration can bind in it what is specific to the
+   * editor instance. The services acting on the editor instance take what they need from it.
    */
-  container: Container;
+  serviceContainer: Container;
 };
 
 export type { EditorInstance };

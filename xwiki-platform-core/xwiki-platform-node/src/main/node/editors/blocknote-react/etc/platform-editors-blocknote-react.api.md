@@ -106,9 +106,9 @@ export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<inf
 // @beta
 export type EditorInstance = {
     editor: EditorType;
-    options: Readonly<EditorOptions>;
+    options: Readonly<Omit<EditorOptions, "serviceContainer" | "metadata">>;
     metadata: BlockMetadataStore;
-    container: Container;
+    serviceContainer: Container;
 };
 
 // Warning: (ae-forgotten-export) The symbol "_default" needs to be exported by the entry point index.d.ts

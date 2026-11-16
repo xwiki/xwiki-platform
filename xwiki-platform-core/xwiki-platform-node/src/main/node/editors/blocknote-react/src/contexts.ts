@@ -23,7 +23,7 @@ import type { EditorInstance } from "./editorInstance";
 import type { Container } from "inversify";
 
 /**
- * The container of the editor instance (see {@link EditorInstance.container}).
+ * The service container of the editor instance (see {@link EditorInstance.serviceContainer}).
  */
 const ServiceContainerContext = createContext<Container | null>(null);
 

@@ -272,11 +272,23 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       : editorOptions,
   );
 
-  // The editor instance, passed to the services acting on it.
-  const instance: EditorInstance = useMemo(
-    () => ({ editor, options, metadata, container }),
-    [editor, options, metadata, container],
-  );
+  // The editor instance, passed to the services acting on it. The options resolved for the editor instance (the
+  // service container and the metadata store) are exposed only by the editor instance itself.
+  const instance: EditorInstance = useMemo(() => {
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      serviceContainer: _serviceContainer,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      metadata: _metadata,
+      ...instanceOptions
+    } = options;
+    return {
+      editor,
+      options: instanceOptions,
+      metadata,
+      serviceContainer: container,
+    };
+  }, [editor, options, metadata, container]);
 
   // Allow the parent component to access the editor instance.
   useEffect(() => {

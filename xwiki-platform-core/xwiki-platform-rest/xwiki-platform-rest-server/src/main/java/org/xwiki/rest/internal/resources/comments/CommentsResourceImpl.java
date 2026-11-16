@@ -102,14 +102,7 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
 
                 com.xpn.xwiki.api.Object commentObject = addComment(doc, comment);
 
-                try {
-                    doc.save();
-                } catch (DocumentRevisionConflictException e) {
-                    // The document was saved by another request since it was loaded: adding a comment doesn't depend
-                    // on the other changes, so it can be added again to the newly saved version.
-                    if (attempt >= SAVE_ATTEMPTS) {
-                        throw e;
-                    }
+                if (!save(doc, attempt)) {
                     continue;
                 }
 
@@ -121,6 +114,25 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
             }
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
+        }
+    }
+
+    /**
+     * @return {@code false} if the document was saved by another request since it was loaded: adding a comment doesn't
+     *         depend on the other changes, so it can be added again to the newly saved version
+     */
+    private boolean save(Document doc, int attempt) throws XWikiException
+    {
+        try {
+            doc.save();
+
+            return true;
+        } catch (DocumentRevisionConflictException e) {
+            if (attempt >= SAVE_ATTEMPTS) {
+                throw e;
+            }
+
+            return false;
         }
     }
 

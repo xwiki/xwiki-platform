@@ -94,7 +94,8 @@ class UploadActionTest
         xcontext.setResponse(this.response);
         xcontext.setUserReference(new DocumentReference("xwiki", "XWiki", "User"));
         when(this.csrfToken.isTokenValid(any())).thenReturn(true);
-        when(this.response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+        ServletOutputStream outputStream = mock();
+        when(this.response.getOutputStream()).thenReturn(outputStream);
         xcontext.put("ajax", true);
 
         xcontext.put("fileuploadplugin", this.fileUpload);

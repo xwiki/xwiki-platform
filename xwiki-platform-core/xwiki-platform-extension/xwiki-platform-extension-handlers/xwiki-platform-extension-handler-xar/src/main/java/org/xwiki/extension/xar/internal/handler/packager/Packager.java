@@ -206,7 +206,7 @@ public class Packager
     }
 
     private void importDocumentToWiki(String comment, WikiReference wikiReference, InputStream inputStream,
-        PackageConfiguration configuration, String name) throws XWikiException, XarException, IOException
+        PackageConfiguration configuration, String name) throws XarException, IOException
     {
         XWikiDocument nextDocument;
         try {

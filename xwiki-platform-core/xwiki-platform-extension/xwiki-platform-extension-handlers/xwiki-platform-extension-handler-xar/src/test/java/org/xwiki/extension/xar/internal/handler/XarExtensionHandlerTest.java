@@ -78,6 +78,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -223,21 +224,27 @@ class XarExtensionHandlerTest
     }
 
     /**
-     * Answers the questions asked by the job until it finishes, with their default answer.
+     * Installs the requested extensions, answering the questions asked by the install job with their default answer.
      *
-     * @param job the running job
+     * @param installRequest the install request
      * @param beforeAnswer called with each conflict question before answering it
+     * @return the finished install job
      */
-    private void answerQuestions(Job job, Consumer<ConflictQuestion> beforeAnswer) throws Exception
+    private Job installAnsweringQuestions(InstallRequest installRequest, Consumer<ConflictQuestion> beforeAnswer)
+        throws Exception
     {
-        while (job.getStatus().getState() != JobStatus.State.FINISHED) {
-            if (job.getStatus().getState() == JobStatus.State.WAITING) {
-                if (job.getStatus().getQuestion() instanceof ConflictQuestion question) {
-                    beforeAnswer.accept(question);
-                }
-                job.getStatus().answered();
+        Job installJob = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
+        JobStatus status = installJob.getStatus();
+        while (true) {
+            // The question is removed from the status once answered.
+            await().until(() -> status.getQuestion() != null || status.getState() == JobStatus.State.FINISHED);
+            if (status.getState() == JobStatus.State.FINISHED) {
+                return installJob;
             }
-            Thread.sleep(1);
+            if (status.getQuestion() instanceof ConflictQuestion question) {
+                beforeAnswer.accept(question);
+            }
+            status.answered();
         }
     }
 
@@ -765,10 +772,8 @@ class XarExtensionHandlerTest
         installRequest.setInteractive(true);
         installRequest.setProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_SUCCESS,
             ConflictQuestion.GlobalAction.ASK);
-        Job installJob = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
-
         List<ConflictQuestion> pageQuestions = new ArrayList<>();
-        answerQuestions(installJob, question -> {
+        Job installJob = installAnsweringQuestions(installRequest, question -> {
             if (question.getCurrentDocument().getDocumentReference().equals(PAGE_REFERENCE)) {
                 if (pageQuestions.isEmpty()) {
                     try {

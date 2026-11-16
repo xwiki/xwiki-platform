@@ -319,8 +319,7 @@ public class XWiki implements EventListener
      * listeners see (the version before the save) mapped to the version that was saved. See
      * {@link #saveDocument(XWikiDocument, String, boolean, boolean, XWikiContext)}.
      */
-    private final ThreadLocal<Map<XWikiDocument, XWikiDocument>> notifiedSavedVersions =
-        ThreadLocal.withInitial(IdentityHashMap::new);
+    private final ThreadLocal<Map<XWikiDocument, XWikiDocument>> notifiedSavedVersions = new ThreadLocal<>();
 
     /** Frequently used Document reference, the class which holds virtual wiki definitions. */
     private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE =
@@ -2189,8 +2188,8 @@ public class XWiki implements EventListener
             // document is based on the version that was saved.
             Map<XWikiDocument, XWikiDocument> savedVersions = this.notifiedSavedVersions.get();
             XWikiDocument notifiedOriginalDocument = document.getOriginalDocument();
-            XWikiDocument savedVersion =
-                notifiedOriginalDocument != null ? savedVersions.get(notifiedOriginalDocument) : null;
+            XWikiDocument savedVersion = savedVersions != null && notifiedOriginalDocument != null
+                ? savedVersions.get(notifiedOriginalDocument) : null;
             if (savedVersion != null) {
                 document.setOriginalDocument(savedVersion);
             }
@@ -2233,6 +2232,10 @@ public class XWiki implements EventListener
             // back to send notifications.
             XWikiDocument newOriginal = document.getOriginalDocument();
 
+            if (savedVersions == null) {
+                savedVersions = new IdentityHashMap<>();
+                this.notifiedSavedVersions.set(savedVersions);
+            }
             if (savedVersion != null) {
                 // Further copies saved by the listeners are based on this version.
                 savedVersions.put(notifiedOriginalDocument, newOriginal);
@@ -2259,6 +2262,10 @@ public class XWiki implements EventListener
                     savedVersions.put(originalDocument, previousSavedVersion);
                 } else {
                     savedVersions.remove(originalDocument);
+                }
+                // Don't keep the map in threads that are reused (e.g. by the servlet container).
+                if (savedVersions.isEmpty()) {
+                    this.notifiedSavedVersions.remove();
                 }
 
                 // Unless a listener saved this document again, which already set its new original document.

@@ -6,6 +6,16 @@
 #if($index >= 0)
   #set($cssFromLess = $cssFromLess.substring(0, $index))
 #end
+## Get the CSS code of the current Flamingo color theme, resolved the same way as in colorThemeInit.vm
+#set ($colorThemeFullName = "$!request.colorTheme")
+#if ($colorThemeFullName == '')
+  #set ($colorThemeFullName = "$!xwiki.getUserPreference('colorTheme')")
+#end
+#if ($colorThemeFullName == '')
+  #set ($colorThemeFullName = 'ColorThemes.DefaultColorTheme')
+#end
+#set ($colorThemeObj = $xwiki.getDocument($colorThemeFullName).getObject('FlamingoThemesCode.ThemeClass'))
+#set ($colorThemeCss = "$!colorThemeObj.getValue('cssCode')")
 ## Display the CSS
  */
 #template('css/converted.min.css')
@@ -13,3 +23,7 @@
 $!cssFromLess
 /* Start of the custom styles.*/
 #template('custom.css')
+#if ($colorThemeCss != '')
+/* Start of the color theme styles.*/
+$colorThemeCss
+#end

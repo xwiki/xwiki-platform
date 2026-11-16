@@ -66,6 +66,17 @@
         <artifactId>jaxb-maven-plugin</artifactId>
         <configuration>
           <generatePackage>org.xwiki.rest.model.jaxb</generatePackage>
+          <args combine.children="append">
+            <arg>-Xinject-code</arg>
+            <arg>-Xannotate</arg>
+          </args>
+          <plugins combine.children="append">
+            <plugin>
+              <groupId>org.jvnet.jaxb</groupId>
+              <artifactId>jaxb-basics-annotate</artifactId>
+              <version>${jaxb.tools.version}</version>
+            </plugin>
+          </plugins>
         </configuration>
         <executions>
           <execution>

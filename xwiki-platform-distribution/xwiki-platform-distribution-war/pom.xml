@@ -161,6 +161,7 @@
                     <exclude>org.junit.*:*</exclude>
                     <exclude>org.mockito:*</exclude>
                     <exclude>jakarta.servlet:jakarta.servlet-api:*:*:compile</exclude>
+                    <exclude>jakarta.servlet:jakarta.servlet-api:*:*:runtime</exclude>
                   </excludes>
                   <includes>
                     <!-- Allow only JUnit with scope test -->

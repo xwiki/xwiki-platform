@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { FULL_SYNTAX } from "./syntax.mock";
 import {
   AttachmentReference,
   DocumentReference,
@@ -25,6 +26,7 @@ import {
   SpaceReference,
 } from "@xwiki/platform-model-api";
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
+import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { mock } from "vitest-mock-extended";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
@@ -37,11 +39,22 @@ import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 
+/**
+ * @param syntaxes - the syntax configurations registered in the container, the full syntax when not specified
+ * @returns a container mock providing the services the editor needs
+ */
 // eslint-disable-next-line max-statements
-export function serviceContainerMock(): Container {
+export function serviceContainerMock(
+  syntaxes: SyntaxConfig[] = [FULL_SYNTAX],
+): Container {
   const container = mock<Container>();
+
+  container.getAll.mockImplementation((serviceIdentifier) =>
+    serviceIdentifier === SYNTAX_CONFIG_COMPONENT_GROUP_NAME ? syntaxes : [],
+  );
 
   container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
     get: () => ({

@@ -26,7 +26,6 @@ import type { LinkEditionHooks } from "./components/links/linkEditionHooks";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 
 /**
@@ -193,10 +192,12 @@ type EditorOptions = {
   sourceDocumentReference?: DocumentReference;
 
   /**
-   * The syntax of the edited content, which is normally the syntax of the source document. It determines the editor
-   * features that are available, since only what the syntax can represent can be saved.
+   * The id of the syntax of the edited content (e.g. "xwiki/2.1"), which is normally the syntax of the source document.
+   * Its configuration, looked up in the {@link EditorOptions.serviceContainer}, determines the editor features that
+   * are available, since only what the syntax can represent can be saved. The minimal syntax, which disables most
+   * editor features, is used when the syntax has no configuration.
    */
-  syntax: SyntaxConfig;
+  syntax: string;
 
   /**
    * The language of the editor UI (menus, toolbars, placeholders), usually the language of the page hosting the

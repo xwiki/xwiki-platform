@@ -38,6 +38,7 @@ import type {
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 const LINK_TYPE_PAGE = 0; // LinkType.PAGE
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
@@ -69,7 +70,7 @@ export type LinkSuggestionForTestProps = {
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
-  syntax?: BlockNoteViewWrapperProps["options"]["syntax"];
+  syntax?: SyntaxConfig;
 };
 
 /**
@@ -111,7 +112,7 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
   );
 
   const serviceContainer = useMemo(() => {
-    const container = serviceContainerMock();
+    const container = serviceContainerMock([syntax ?? FULL_SYNTAX]);
 
     const toLinks = (links: SuggestedLink[] | undefined, type: number) =>
       (links ?? []).map((link, index) => ({
@@ -211,7 +212,7 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
           lang: "en",
           label: "Some Label",
           serviceContainer,
-          syntax: syntax ?? FULL_SYNTAX,
+          syntax: (syntax ?? FULL_SYNTAX).id,
           features: { links: { hooks: linkEditionHooks } },
         }}
         content={content ?? []}

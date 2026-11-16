@@ -442,9 +442,6 @@ importers:
       '@xwiki/platform-rendering-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/rendering/rendering-api
-      '@xwiki/platform-syntaxes-config':
-        specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/syntaxes-config
       '@xwiki/platform-xwiki-model-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api
@@ -4132,6 +4129,9 @@ importers:
       '@xwiki/platform-macros-api':
         specifier: workspace:*
         version: link:../../core/macros/macros-api
+      '@xwiki/platform-minimal-syntax-config':
+        specifier: workspace:*
+        version: link:../../core/syntaxes/minimal
       '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api

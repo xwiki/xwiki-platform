@@ -23,11 +23,18 @@ import { useMemo } from "react";
 import type { BlockType } from "../../blocknote";
 import type { LinkEditionHandler } from "../../components/links/linkEdition";
 import type { EditorOptions } from "../../editorOptions";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 export type BlockNoteForTestProps = {
   content: BlockType[];
-  // The options that the tests need to set, the others being the same for all the tests.
-  options: Omit<EditorOptions, "lang" | "label" | "serviceContainer">;
+  // The options that the tests need to set, the others being the same for all the tests. The configuration of the
+  // syntax of the edited content is registered in the container, the editor taking only its id.
+  options: Omit<
+    EditorOptions,
+    "lang" | "label" | "serviceContainer" | "syntax"
+  > & {
+    syntax: SyntaxConfig;
+  };
   linkEditionHandler?: LinkEditionHandler;
 };
 
@@ -36,7 +43,11 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   options,
   linkEditionHandler,
 }) => {
-  const serviceContainer = useMemo(serviceContainerMock, []);
+  const serviceContainer = useMemo(
+    () => serviceContainerMock([options.syntax]),
+    // The syntax configuration is registered once, when the container is created.
+    [],
+  );
 
   return (
     <BlockNoteViewWrapper
@@ -45,6 +56,7 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
         label: "Some Label",
         serviceContainer,
         ...options,
+        syntax: options.syntax.id,
       }}
       content={content}
       linkEditionHandler={

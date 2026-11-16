@@ -42,7 +42,6 @@ import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
-import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 
 // @beta
 export type BlockNoteViewWrapperProps = {
@@ -106,7 +105,7 @@ export type EditorOptions = {
     serviceContainer: Container;
     name?: string;
     sourceDocumentReference?: DocumentReference;
-    syntax: SyntaxConfig;
+    syntax: string;
     lang: EditorLanguage;
     label: string;
     autofocus?: boolean;

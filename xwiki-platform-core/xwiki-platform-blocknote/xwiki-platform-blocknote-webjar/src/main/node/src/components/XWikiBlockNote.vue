@@ -96,9 +96,7 @@ import {
 import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
-import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
 import {
@@ -132,7 +130,6 @@ import type {
 } from "@xwiki/platform-editors-blocknote-react";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 import type { Ref } from "vue";
 
@@ -342,29 +339,6 @@ function newFileUploader(eventTarget: EventTarget): FileUploader {
   });
 }
 
-const syntaxes = container.getAll<SyntaxConfig>(
-  SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
-);
-
-let syntax = syntaxes.find((conf) => conf.id === outputSyntax);
-
-if (!syntax) {
-  // Falling back to the minimal syntax disables most editor features (headings, tables, images,
-  // lists, macros, ...). Warn so that a missing / mismatched syntax config doesn't silently cripple
-  // the editor.
-  console.warn(
-    `No syntax configuration registered for '${outputSyntax}', falling back to the minimal ` +
-      "syntax: most editor features will be disabled.",
-  );
-  syntax = syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
-}
-
-if (!syntax) {
-  throw new Error(
-    "Document syntax is not supported, and minimal syntax is not available",
-  );
-}
-
 // This is passed to the BlockNote editor component.
 // Shallow on purpose: a normal ref would hide the refs inside, leaving connectionStatus.value undefined.
 const collaboration = shallowRef<Collaboration | undefined>(undefined);
@@ -415,7 +389,7 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
     ) as DocumentReference | undefined,
     // The syntax of the edited content, which is normally the syntax of the source document. The editor offers only
     // what this syntax supports, so that the edited content can be saved without losing anything.
-    syntax: syntax!,
+    syntax: outputSyntax,
     // Translate the editor UI (menus, toolbars, placeholders) in the same language as the rest of the page.
     lang: (actualLocale || "en") as EditorLanguage,
     // The accessible name of the editing area, announced by the screen readers to tell which field is being edited.

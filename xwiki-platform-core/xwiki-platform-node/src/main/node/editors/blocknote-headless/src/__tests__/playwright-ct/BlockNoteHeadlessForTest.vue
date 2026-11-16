@@ -27,12 +27,17 @@ import type {
   LinkEditionData,
   LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 type ResourceReference = NonNullable<LinkEditionData["reference"]>;
 
 const props = defineProps<{
-  // The options that the tests need to set, the others being the same for all the tests.
-  options: Omit<HeadlessEditorOptions, "serviceContainer" | "lang" | "label">;
+  // The options that the tests need to set, the others being the same for all the tests. The configuration of the
+  // syntax of the edited content is registered in the container, the editor taking only its id.
+  options: Omit<
+    HeadlessEditorOptions,
+    "serviceContainer" | "lang" | "label" | "syntax"
+  > & { syntax: SyntaxConfig };
 
   content: BlockType[];
 
@@ -58,7 +63,7 @@ defineEmits<{
 // the Playwright test/Node process: Playwright CT mount() props are
 // serialized across the Node/browser boundary, so a mock full of closures
 // passed as a prop would lose all its behavior once it reaches the browser.
-const serviceContainer = serviceContainerMock();
+const serviceContainer = serviceContainerMock([props.options.syntax]);
 
 // The reference of the last submitted link, and whether its label is generated, rendered so that the tests can check
 // them.
@@ -83,6 +88,7 @@ const linkEdition: LinkEditionHooks = {
 
 const options: HeadlessEditorOptions = {
   ...props.options,
+  syntax: props.options.syntax.id,
   serviceContainer,
   lang: "en",
   label: "Editor",

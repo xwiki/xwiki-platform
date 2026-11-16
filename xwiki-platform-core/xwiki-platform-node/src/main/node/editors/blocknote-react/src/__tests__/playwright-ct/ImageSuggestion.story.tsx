@@ -32,6 +32,7 @@ import type {
   ImageInsertionResult,
 } from "../../components/images/imageInsertionOverride";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
 
@@ -60,7 +61,7 @@ export type ImageSuggestionForTestProps = {
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
-  syntax?: BlockNoteViewWrapperProps["options"]["syntax"];
+  syntax?: SyntaxConfig;
 };
 
 /**
@@ -104,7 +105,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   );
 
   const serviceContainer = useMemo(() => {
-    const container = serviceContainerMock();
+    const container = serviceContainerMock([syntax ?? FULL_SYNTAX]);
 
     container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue(
       linkSuggestServiceUnavailable
@@ -188,7 +189,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
               ? undefined
               : // The mocked model reference serializer serializes a page reference as its name.
                 new DocumentReference(documentReference, new SpaceReference()),
-          syntax: syntax ?? FULL_SYNTAX,
+          syntax: (syntax ?? FULL_SYNTAX).id,
           features: {
             images: { hooks: imageEditionHooks, insertion: imageInsertion },
           },

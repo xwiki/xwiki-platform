@@ -59,7 +59,7 @@ export const CollaborationForTest: React.FC<CollaborationForTestProps> = ({
             options={{
               serviceContainer,
               name,
-              syntax: FULL_SYNTAX,
+              syntax: FULL_SYNTAX.id,
               lang: "en",
               label: `Editor ${index}`,
               collaboration,

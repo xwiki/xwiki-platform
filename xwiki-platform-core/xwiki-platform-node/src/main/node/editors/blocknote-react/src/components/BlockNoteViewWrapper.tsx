@@ -36,6 +36,7 @@ import {
   ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../contexts";
+import { getSyntaxConfig } from "../misc/syntax";
 import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -123,7 +124,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     serviceContainer,
     name,
     sourceDocumentReference,
-    syntax,
+    syntax: syntaxId,
     lang,
     label,
     autofocus,
@@ -162,6 +163,12 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         .get()
         ?.serialize(sourceDocumentReference),
     [serviceContainer, sourceDocumentReference],
+  );
+
+  // The editor features that are available depend on the syntax of the edited content.
+  const syntax = useMemo(
+    () => getSyntaxConfig(serviceContainer, syntaxId),
+    [serviceContainer, syntaxId],
   );
 
   const builtMacros: BlockNoteConcreteMacro[] = [];

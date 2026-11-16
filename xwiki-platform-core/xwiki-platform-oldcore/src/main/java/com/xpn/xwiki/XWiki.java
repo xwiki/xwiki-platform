@@ -83,6 +83,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
@@ -2170,8 +2171,8 @@ public class XWiki implements EventListener
      * @since 18.4.5
      * @since 18.8.0RC1
      */
-    public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, boolean modifiedByContextUser,
-        XWikiContext context) throws XWikiException
+    public void saveDocument(@NonNull XWikiDocument document, String comment, boolean isMinorEdit,
+        boolean modifiedByContextUser, XWikiContext context) throws XWikiException
     {
         String currentWiki = context.getWikiId();
 
@@ -2186,10 +2187,8 @@ public class XWiki implements EventListener
             // A listener notified about the save of a document can save this document again, or a copy of it. Its
             // original document is then the version before the first save, which the listeners compare with, but the
             // document is based on the version that was saved.
-            Map<XWikiDocument, XWikiDocument> savedVersions = this.notifiedSavedVersions.get();
             XWikiDocument notifiedOriginalDocument = document.getOriginalDocument();
-            XWikiDocument savedVersion = savedVersions != null && notifiedOriginalDocument != null
-                ? savedVersions.get(notifiedOriginalDocument) : null;
+            XWikiDocument savedVersion = getNotifiedSavedVersion(notifiedOriginalDocument);
             if (savedVersion != null) {
                 document.setOriginalDocument(savedVersion);
             }
@@ -2232,10 +2231,7 @@ public class XWiki implements EventListener
             // back to send notifications.
             XWikiDocument newOriginal = document.getOriginalDocument();
 
-            if (savedVersions == null) {
-                savedVersions = new IdentityHashMap<>();
-                this.notifiedSavedVersions.set(savedVersions);
-            }
+            Map<XWikiDocument, XWikiDocument> savedVersions = getOrCreateNotifiedSavedVersions();
             if (savedVersion != null) {
                 // Further copies saved by the listeners are based on this version.
                 savedVersions.put(notifiedOriginalDocument, newOriginal);
@@ -2258,15 +2254,7 @@ public class XWiki implements EventListener
                 LOGGER.error("Failed to send document save notification for document [{}]",
                     getDefaultEntityReferenceSerializer().serialize(document.getDocumentReference()), ex);
             } finally {
-                if (previousSavedVersion != null) {
-                    savedVersions.put(originalDocument, previousSavedVersion);
-                } else {
-                    savedVersions.remove(originalDocument);
-                }
-                // Don't keep the map in threads that are reused (e.g. by the servlet container).
-                if (savedVersions.isEmpty()) {
-                    this.notifiedSavedVersions.remove();
-                }
+                restoreNotifiedSavedVersion(savedVersions, originalDocument, previousSavedVersion);
 
                 // Unless a listener saved this document again, which already set its new original document.
                 if (document.getOriginalDocument() == originalDocument) {
@@ -2275,6 +2263,40 @@ public class XWiki implements EventListener
             }
         } finally {
             context.setWikiId(currentWiki);
+        }
+    }
+
+    private XWikiDocument getNotifiedSavedVersion(XWikiDocument notifiedOriginalDocument)
+    {
+        Map<XWikiDocument, XWikiDocument> savedVersions = this.notifiedSavedVersions.get();
+
+        return savedVersions != null && notifiedOriginalDocument != null
+            ? savedVersions.get(notifiedOriginalDocument) : null;
+    }
+
+    private Map<XWikiDocument, XWikiDocument> getOrCreateNotifiedSavedVersions()
+    {
+        Map<XWikiDocument, XWikiDocument> savedVersions = this.notifiedSavedVersions.get();
+        if (savedVersions == null) {
+            savedVersions = new IdentityHashMap<>();
+            this.notifiedSavedVersions.set(savedVersions);
+        }
+
+        return savedVersions;
+    }
+
+    private void restoreNotifiedSavedVersion(Map<XWikiDocument, XWikiDocument> savedVersions,
+        XWikiDocument originalDocument, XWikiDocument previousSavedVersion)
+    {
+        if (previousSavedVersion != null) {
+            savedVersions.put(originalDocument, previousSavedVersion);
+        } else {
+            savedVersions.remove(originalDocument);
+        }
+
+        // Don't keep the map in threads that are reused (e.g. by the servlet container).
+        if (savedVersions.isEmpty()) {
+            this.notifiedSavedVersions.remove();
         }
     }
 

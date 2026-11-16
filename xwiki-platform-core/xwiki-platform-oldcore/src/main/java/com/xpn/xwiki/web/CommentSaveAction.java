@@ -128,6 +128,9 @@ public class CommentSaveAction extends CommentAddAction
     }
 
     @Override
+    // The context document can't be null. Sonar assumes it can because XWikiContext#getDoc() reads a map, but the
+    // action is always executed on a current document.
+    @SuppressWarnings("javabugs:S2259")
     public boolean action(XWikiContext context) throws XWikiException
     {
         // Get the XWiki utilities

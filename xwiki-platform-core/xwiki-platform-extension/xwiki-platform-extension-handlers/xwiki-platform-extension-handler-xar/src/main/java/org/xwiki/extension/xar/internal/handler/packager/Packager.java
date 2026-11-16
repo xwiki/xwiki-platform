@@ -162,7 +162,7 @@ public class Packager
     }
 
     private void importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, XarException, XWikiException
+        PackageConfiguration configuration) throws IOException, XarException
     {
         try (FileInputStream fis = new FileInputStream(xarFile)) {
             importXARToWiki(comment, fis, wikiReference, configuration);
@@ -170,7 +170,7 @@ public class Packager
     }
 
     private void importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, XarException, XWikiException
+        PackageConfiguration configuration) throws IOException, XarException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(xarInputStream);
 

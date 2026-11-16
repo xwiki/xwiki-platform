@@ -137,7 +137,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
   const {
-    serviceContainer,
+    serviceContainer: parentServiceContainer,
     name,
     sourceDocumentReference,
     syntax: syntaxId,
@@ -151,11 +151,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   } = options;
   const { t } = useTranslation();
 
-  // The editor instance gets its own container, where the integration can bind what is specific to it, the shared
-  // services being provided by the parent container. It is used by the editor in place of the service container.
-  const container = useMemo(
-    () => new Container({ parent: serviceContainer }),
-    [serviceContainer],
+  // The editor instance gets its own service container, where the integration can bind what is specific to it, the
+  // shared services being provided by the parent container.
+  const serviceContainer = useMemo(
+    () => new Container({ parent: parentServiceContainer }),
+    [parentServiceContainer],
   );
 
   // The data about the edited content that isn't part of the content is kept by the integration, when it needs it.
@@ -179,26 +179,26 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   const serializedSourceDocumentReference = useMemo(
     () =>
       sourceDocumentReference &&
-      container
+      serviceContainer
         .get<ModelReferenceSerializerProvider>(
           "ModelReferenceSerializerProvider",
         )
         .get()
         ?.serialize(sourceDocumentReference),
-    [container, sourceDocumentReference],
+    [serviceContainer, sourceDocumentReference],
   );
 
   // The editor features that are available depend on the syntax of the edited content.
   const syntax = useMemo(
-    () => getSyntaxConfig(container, syntaxId),
-    [container, syntaxId],
+    () => getSyntaxConfig(serviceContainer, syntaxId),
+    [serviceContainer, syntaxId],
   );
 
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
     const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
-      container
+      serviceContainer
         .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
         .get()!,
     );
@@ -286,9 +286,9 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       editor,
       options: instanceOptions,
       metadata,
-      serviceContainer: container,
+      serviceContainer,
     };
-  }, [editor, options, metadata, container]);
+  }, [editor, options, metadata, serviceContainer]);
 
   // Allow the parent component to access the editor instance.
   useEffect(() => {
@@ -319,7 +319,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   // Renders the editor instance using a React component.
   return (
-    <ServiceContainerContext.Provider value={container}>
+    <ServiceContainerContext.Provider value={serviceContainer}>
       <EditorInstanceContext.Provider value={instance}>
         <SourceDocumentReferenceContext.Provider
           value={serializedSourceDocumentReference}

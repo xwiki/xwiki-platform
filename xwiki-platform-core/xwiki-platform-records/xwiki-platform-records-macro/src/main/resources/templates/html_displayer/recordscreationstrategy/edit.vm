@@ -45,8 +45,4 @@
       data-required-columns="$escapetool.xml($stringtool.join($strategy.value, ','))"
       #if ($strategy.key == "$!displayer.value")selected#end>$escapetool.xml($label)</option>
   #end
-  ## A strategy that is no longer installed stays selected, so that reopening the dialog does not drop it.
-  #if ("$!displayer.value" != '' && !$strategies.containsKey($displayer.value))
-    <option value="$escapetool.xml($displayer.value)" selected>$escapetool.xml($displayer.value)</option>
-  #end
 </select>

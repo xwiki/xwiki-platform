@@ -23,7 +23,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +40,14 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -204,7 +208,10 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * Tells which strategies entries can be created with, and which properties they need.
      */
     @Inject
-    private RecordsCreationStrategies creationStrategies;
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Used to find the page under which new entries are created when no location is picked.
@@ -617,20 +624,36 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private boolean canCreate(String strategy, Map<String, String> sourceParameters, String properties,
         List<Block> warnings) throws MacroExecutionException
     {
-        Optional<Set<String>> mandatoryProperties =
-            this.creationStrategies.getMandatoryProperties(strategy, new HashMap<>(sourceParameters));
-        if (mandatoryProperties.isEmpty()) {
+        Optional<LiveTableNewRowNamingStrategy> namingStrategy = getNamingStrategy(strategy);
+        if (namingStrategy.isEmpty()) {
             warnings.add(this.messages.warning("warning.creationStrategyUnknown", strategy));
             return false;
         }
+        Set<String> mandatoryProperties =
+            namingStrategy.get().getMandatoryProperties(Collections.unmodifiableMap(sourceParameters));
         Set<String> displayed = Stream.of(properties.split(LIST_SEPARATOR)).map(String::trim)
             .collect(Collectors.toSet());
-        List<String> missing = mandatoryProperties.get().stream().filter(column -> !displayed.contains(column)).sorted()
+        List<String> missing = mandatoryProperties.stream().filter(column -> !displayed.contains(column)).sorted()
             .toList();
         for (String column : missing) {
             warnings.add(this.messages.warning("warning.creationColumnsMissing", strategy, column));
         }
         return missing.isEmpty();
+    }
+
+    /**
+     * @param hint the hint of the strategy the author picked
+     * @return the strategy, or {@link Optional#empty()} when it is not installed or cannot be loaded
+     */
+    private Optional<LiveTableNewRowNamingStrategy> getNamingStrategy(String hint)
+    {
+        try {
+            return this.namingStrategyManager.get(hint);
+        } catch (LiveDataException e) {
+            this.logger.warn("Failed to load the row naming strategy [{}]. Root cause is [{}].", hint,
+                ExceptionUtils.getRootCauseMessage(e));
+            return Optional.empty();
+        }
     }
 
     /**

@@ -26,20 +26,16 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
-import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.livedata.script.LiveDataScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
@@ -75,8 +71,7 @@ public class LiveTableScriptService implements ScriptService
      * Used to list the installed row naming strategies.
      */
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
 
     /**
      * Converts the Live Table configuration into Live Data configuration, also adding the default values.
@@ -115,20 +110,9 @@ public class LiveTableScriptService implements ScriptService
     @Unstable
     public Map<String, Set<String>> getNewRowNamingStrategies()
     {
-        ComponentManager componentManager = this.componentManagerProvider.get();
         Map<String, Set<String>> strategies = new TreeMap<>();
-        for (ComponentDescriptor<LiveTableNewRowNamingStrategy> descriptor : componentManager
-            .getComponentDescriptorList(LiveTableNewRowNamingStrategy.class)) {
-            String hint = descriptor.getRoleHint();
-            try {
-                LiveTableNewRowNamingStrategy strategy =
-                    componentManager.getInstance(LiveTableNewRowNamingStrategy.class, hint);
-                strategies.put(hint, strategy.getMandatoryProperties(Map.of()));
-            } catch (ComponentLookupException e) {
-                this.logger.warn("Failed to load the new row naming strategy [{}]. Root cause is [{}].", hint,
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
+        this.namingStrategyManager.getAll()
+            .forEach((hint, strategy) -> strategies.put(hint, strategy.getMandatoryProperties(Map.of())));
         return strategies;
     }
 }

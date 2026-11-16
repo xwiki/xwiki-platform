@@ -24,23 +24,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.TreeMap;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
-import org.xwiki.test.LogLevel;
-import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -58,9 +52,6 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class LiveTableScriptServiceTest
 {
-    @RegisterExtension
-    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
-
     @InjectMockComponents
     private LiveTableScriptService service;
 
@@ -72,8 +63,7 @@ class LiveTableScriptServiceTest
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
 
     @MockComponent
-    @Named("context")
-    private ComponentManager contextComponentManager;
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
 
     @Test
     void getConfig() throws Exception
@@ -100,35 +90,19 @@ class LiveTableScriptServiceTest
     }
 
     @Test
-    void getNewRowNamingStrategies() throws Exception
+    void getNewRowNamingStrategies()
     {
         LiveTableNewRowNamingStrategy title = mock();
         when(title.getMandatoryProperties(Map.of())).thenReturn(Set.of("doc.title"));
-        givenStrategies("uuid", "broken", "title");
-        when(this.contextComponentManager.getInstance(LiveTableNewRowNamingStrategy.class, "uuid"))
-            .thenReturn(mock(LiveTableNewRowNamingStrategy.class));
-        when(this.contextComponentManager.getInstance(LiveTableNewRowNamingStrategy.class, "broken"))
-            .thenThrow(new ComponentLookupException("broken"));
-        when(this.contextComponentManager.getInstance(LiveTableNewRowNamingStrategy.class, "title")).thenReturn(title);
+        Map<String, LiveTableNewRowNamingStrategy> installed = new TreeMap<>();
+        installed.put("title", title);
+        installed.put("uuid", mock());
+        when(this.namingStrategyManager.getAll()).thenReturn(installed);
 
         Map<String, Set<String>> strategies = this.service.getNewRowNamingStrategies();
 
         assertEquals(List.of("title", "uuid"), List.copyOf(strategies.keySet()));
         assertEquals(Set.of("doc.title"), strategies.get("title"));
         assertEquals(Set.of(), strategies.get("uuid"));
-        assertEquals("Failed to load the new row naming strategy [broken]. Root cause is "
-            + "[ComponentLookupException: broken].", this.logCapture.getMessage(0));
-    }
-
-    private void givenStrategies(String... hints)
-    {
-        List<ComponentDescriptor<LiveTableNewRowNamingStrategy>> descriptors = Stream.of(hints).map(hint -> {
-            DefaultComponentDescriptor<LiveTableNewRowNamingStrategy> descriptor = new DefaultComponentDescriptor<>();
-            descriptor.setRoleType(LiveTableNewRowNamingStrategy.class);
-            descriptor.setRoleHint(hint);
-            return (ComponentDescriptor<LiveTableNewRowNamingStrategy>) descriptor;
-        }).toList();
-        when(this.contextComponentManager.getComponentDescriptorList(LiveTableNewRowNamingStrategy.class))
-            .thenReturn(descriptors);
     }
 }

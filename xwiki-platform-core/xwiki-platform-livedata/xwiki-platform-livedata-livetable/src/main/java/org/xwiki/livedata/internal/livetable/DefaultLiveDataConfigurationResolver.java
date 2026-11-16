@@ -36,8 +36,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -50,6 +48,7 @@ import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -84,7 +83,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
     @Inject
-    private ComponentManager componentManager;
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
 
     @Inject
     @Named("compactwiki")
@@ -107,30 +106,21 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // We only enable the ability to add an entry if there is a naming strategy explicitly set and the current user
         // has the rights to create a page.
         Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
-        String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
-        if (namingStrategy != null
-            && this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
-            try {
-                LiveTableNewRowNamingStrategy strategy =
-                    this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
-                if (strategy.isCreationAllowed(sourceParams)) {
-                    List<String> undescribedProperties =
-                        setMandatory(mergedConfig.getMeta(), strategy.getMandatoryProperties(sourceParams));
-                    if (undescribedProperties.isEmpty()) {
-                        LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
-                        addEntry.setId("addEntry");
-                        strategy.getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
-                            .put("location", this.stringEntityReferenceSerializer.serialize(location)));
-                        mergedConfig.getMeta().getActions().add(addEntry);
-                    } else {
-                        // No entry could be created, since the user has no cell to give those values in.
-                        this.logger.warn("Adding entries is disabled because the mandatory properties {} have no "
-                            + "descriptor in this live data.", undescribedProperties);
-                    }
-                }
-            } catch (ComponentLookupException e) {
-                throw new LiveDataException(
-                    String.format("Failed to load the row naming strategy [%s].", namingStrategy), e);
+        Optional<LiveTableNewRowNamingStrategy> strategy =
+            this.namingStrategyManager.get((String) sourceParams.get("newRowNamingStrategy"));
+        if (strategy.isPresent() && strategy.get().isCreationAllowed(sourceParams)) {
+            List<String> undescribedProperties =
+                setMandatory(mergedConfig.getMeta(), strategy.get().getMandatoryProperties(sourceParams));
+            if (undescribedProperties.isEmpty()) {
+                LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
+                addEntry.setId("addEntry");
+                strategy.get().getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
+                    .put("location", this.stringEntityReferenceSerializer.serialize(location)));
+                mergedConfig.getMeta().getActions().add(addEntry);
+            } else {
+                // No entry could be created, since the user has no cell to give those values in.
+                this.logger.warn("Adding entries is disabled because the mandatory properties {} have no "
+                    + "descriptor in this live data.", undescribedProperties);
             }
         }
 

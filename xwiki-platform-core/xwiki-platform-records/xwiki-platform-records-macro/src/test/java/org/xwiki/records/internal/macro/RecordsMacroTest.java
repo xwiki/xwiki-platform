@@ -30,6 +30,7 @@ import jakarta.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -45,6 +46,8 @@ import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -76,7 +79,9 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -129,6 +134,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class RecordsMacroTest
 {
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     private static final DocumentReference DATA_TYPE =
         new DocumentReference("xwiki", List.of("Clients", "Code"), "ProjectClass");
 
@@ -173,7 +181,13 @@ class RecordsMacroTest
     private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
     @MockComponent
-    private RecordsCreationStrategies creationStrategies;
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Mock
+    private LiveTableNewRowNamingStrategy uuidStrategy;
+
+    @Mock
+    private LiveTableNewRowNamingStrategy titleStrategy;
 
     @MockComponent
     @Named("compactwiki")
@@ -202,9 +216,9 @@ class RecordsMacroTest
         when(this.macroEntityReferenceResolver.resolve("", EntityType.DOCUMENT, macroBlock)).thenReturn(HOST_DOCUMENT);
         when(this.entityReferenceSerializer.serialize(HOST_DOCUMENT.getLastSpaceReference()))
             .thenReturn("Clients.Projects");
-        when(this.creationStrategies.getMandatoryProperties(eq("uuid"), any())).thenReturn(Optional.of(Set.of()));
-        when(this.creationStrategies.getMandatoryProperties(eq("title"), any()))
-            .thenReturn(Optional.of(Set.of("doc.title")));
+        when(this.namingStrategyManager.get("uuid")).thenReturn(Optional.of(this.uuidStrategy));
+        when(this.namingStrategyManager.get("title")).thenReturn(Optional.of(this.titleStrategy));
+        when(this.titleStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title"));
         // Echoes the key and the arguments, which is what the tests assert on.
         when(this.localization.getTranslationPlain(any(String.class), any(Object[].class)))
             .thenAnswer(invocation -> invocation.getArgument(0) + Arrays.toString(
@@ -357,7 +371,7 @@ class RecordsMacroTest
 
         assertEquals(SOURCE_PARAMETERS, capture().getSourceParameters());
         assertEquals(List.of(this.renderedBlock), blocks);
-        verifyNoInteractions(this.creationStrategies);
+        verifyNoInteractions(this.namingStrategyManager);
     }
 
     @Test
@@ -375,10 +389,26 @@ class RecordsMacroTest
     }
 
     @Test
+    void executeDoesNotCreateEntriesWithAStrategyThatCannotBeLoadedAndSaysSo() throws Exception
+    {
+        when(this.namingStrategyManager.get("broken")).thenThrow(new LiveDataException("broken"));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("broken");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true", capture().getSourceParameters());
+        assertEquals(List.of(warning("rendering.macro.records.warning.creationStrategyUnknown[broken]"),
+            this.renderedBlock), blocks);
+        assertEquals("Failed to load the row naming strategy [broken]. Root cause is [LiveDataException: broken].",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
     void executeDoesNotCreateEntriesWhenAColumnTheStrategyNeedsIsNotDisplayedAndSaysSo() throws Exception
     {
-        when(this.creationStrategies.getMandatoryProperties(eq("title"), any()))
-            .thenReturn(Optional.of(Set.of("doc.title", "email", "first_name")));
+        when(this.titleStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title", "email", "first_name"));
         RecordsMacroParameters parameters = newParameters();
         parameters.setProperties("last_name, email");
         parameters.setAllowEditMode(true);
@@ -400,9 +430,9 @@ class RecordsMacroTest
         parameters.setAllowEditMode(true);
         parameters.setCreationStrategy("uuid");
         // Only the source parameters set so far make the strategy need a column the table does not display.
-        when(this.creationStrategies.getMandatoryProperties("uuid", Map.of("className", SERIALIZED_DATA_TYPE,
+        when(this.uuidStrategy.getMandatoryProperties(Map.of("className", SERIALIZED_DATA_TYPE,
             "translationPrefix", "platform.index.", "hasEditMode", "true")))
-            .thenReturn(Optional.of(Set.of("doc.name")));
+            .thenReturn(Set.of("doc.name"));
 
         List<Block> blocks = this.macro.execute(parameters, null, this.context);
 

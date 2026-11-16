@@ -42,6 +42,7 @@ import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -82,7 +83,9 @@ class LiveTableLiveDataEntryStoreTest
     private LiveTableLiveDataResultsRenderer resultsRenderer;
 
     @MockComponent
-    @Named("uuid")
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Mock
     private LiveTableNewRowNamingStrategy namingStrategy;
 
     @MockComponent
@@ -112,9 +115,10 @@ class LiveTableLiveDataEntryStoreTest
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void before()
+    void before() throws Exception
     {
         when(this.liveDataConfigurationProvider.get()).thenReturn(this.liveDataConfiguration);
+        when(this.namingStrategyManager.get("uuid")).thenReturn(Optional.of(this.namingStrategy));
         when(this.liveDataConfiguration.getMeta()).thenReturn(this.liveDataMeta);
         when(this.liveDataMeta.getEntryDescriptor()).thenReturn(this.entryDescriptor);
         when(this.entryDescriptor.getIdProperty()).thenReturn("doc.fullName");

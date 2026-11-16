@@ -112,7 +112,6 @@ import type { Logic } from "../services/Logic";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { FileUploader } from "../services/blocknote/createFileUploader";
 import type { ImageWizard } from "../services/image/ImageWizard";
-import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -126,7 +125,6 @@ import type {
   ImageEditionHooks,
   ImageEditionOverrideFn,
   ImageInsertionOverrideFn,
-  MacroFeatureOptions,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
@@ -428,7 +426,6 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
         insertion: imageInsertion,
         hooks: imageEditionHooks,
       },
-      macros,
     },
   };
 }
@@ -509,46 +506,6 @@ function getSourceDocument(): XWikiDocument {
     language: actualLocale,
   });
 }
-
-// This is passed to the BlockNote editor component. Macros are inserted / edited directly as the server-rendered
-// xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
-// resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
-const macros: MacroFeatureOptions = {
-  ctx: {
-    openParamsEditor: async (invocation, update) => {
-      try {
-        const macroWizard: BlockNoteMacroWizard = container.get(
-          "BlockNoteMacroWizard",
-        );
-        update(
-          await macroWizard.insertOrUpdate(invocation, {
-            syntax: outputSyntax,
-            inlineParametersSyntax: inputSyntax,
-          }),
-        );
-      } catch (error) {
-        if (error) {
-          console.error("Failed to edit the macro", error);
-        }
-      }
-    },
-
-    openInsertionEditor: async (prefill, insert) => {
-      try {
-        const macroWizard: BlockNoteMacroWizard = container.get(
-          "BlockNoteMacroWizard",
-        );
-        insert(
-          await macroWizard.insert(prefill.kind, prefill.params, prefill.body),
-        );
-      } catch (error) {
-        if (error) {
-          console.error("Failed to insert the macro", error);
-        }
-      }
-    },
-  },
-};
 
 //
 // Computed

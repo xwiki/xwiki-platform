@@ -7,7 +7,6 @@
 import { BlockType } from '@xwiki/platform-editors-blocknote-react';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
-import { ContextForMacros } from '@xwiki/platform-editors-blocknote-react';
 import { DefineComponent } from 'vue';
 import { EditorFeatures } from '@xwiki/platform-editors-blocknote-react';
 import { EditorOptions } from '@xwiki/platform-editors-blocknote-react';
@@ -36,8 +35,6 @@ content: BlockType[];
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
 }, any>;
-
-export { ContextForMacros }
 
 export { EditorType }
 

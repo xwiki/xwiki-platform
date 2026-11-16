@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { EditorLanguage } from "./blocknote";
-import type { ContextForMacros } from "./blocknote/utils";
 import type { ImageEditionOverrideFn } from "./components/images/CustomImageToolbar";
 import type { ImageEditionHooks } from "./components/images/imageEditionHooks";
 import type { ImageInsertionOverrideFn } from "./components/images/imageInsertionOverride";
@@ -119,15 +118,10 @@ type ImageFeatureOptions = {
  */
 type MacroFeatureOptions = {
   /**
-   * The client-rendered macros. Optional: an integration that only uses the server-rendered macro blocks (edited and
-   * inserted through {@link MacroFeatureOptions.ctx}) can omit it.
+   * The client-rendered macros, if any. The macros rendered server-side are inserted and edited with the
+   * `MacroEditor` bound in the {@link EditorOptions.serviceContainer}, when there's one.
    */
   list?: MacroWithUnknownParamsType[];
-
-  /**
-   * How the macros are edited and inserted, and where their output comes from.
-   */
-  ctx: ContextForMacros;
 };
 
 /**
@@ -141,8 +135,8 @@ type EditorFeatures = {
   images?: ImageFeatureOptions;
 
   /**
-   * The macros are disabled when this is missing or `false`, since inserting and editing them requires an
-   * integration.
+   * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
+   * insert or edit a macro, even when a `MacroEditor` is bound.
    */
   macros?: MacroFeatureOptions | false;
 };

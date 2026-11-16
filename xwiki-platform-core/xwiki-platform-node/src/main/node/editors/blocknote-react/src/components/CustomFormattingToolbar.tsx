@@ -47,7 +47,6 @@ import {
 } from "@blocknote/react";
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
-import type { ContextForMacros } from "../blocknote/utils";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ImageEditionHooks } from "./images/imageEditionHooks";
 import type { LinkEditionHandler } from "./links/linkEdition";
@@ -100,7 +99,6 @@ const BooleanStyleButton: React.FC<{
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
-  macros: { ctx: ContextForMacros } | false;
   linkEditionHandler: LinkEditionHandler;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
   imageEditionHooks?: ImageEditionHooks;
@@ -115,7 +113,6 @@ export const CustomFormattingToolbar: React.FC<
   imageEditionOverrideFn,
   imageEditionHooks,
   linkEditionHooks,
-  macros,
   linkEditionHandler,
 }) => {
   const Components = useComponentsContext()!;
@@ -145,7 +142,6 @@ export const CustomFormattingToolbar: React.FC<
         // For others, simply show the "normal", default toolbar
         getDefaultFormattingToolbarItems(
           combinedBlockTypeSelectItems,
-          macros,
           linkEditionHandler,
           t,
           linkEditionHooks,
@@ -157,7 +153,6 @@ export const CustomFormattingToolbar: React.FC<
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  macros: { ctx: ContextForMacros } | false,
   linkEditorHandler: LinkEditionHandler,
   t: (key: string) => string,
   linkEditionHooks?: LinkEditionHooks,
@@ -213,24 +208,9 @@ const getDefaultFormattingToolbarItems = (
     />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
-  ].concat(
-    macros
-      ? [
-          <CustomMacroEditButton
-            key={"macroEditButton"}
-            ctxForMacros={macros.ctx}
-          />,
-          // Hide the insert action when no insertion editor is available.
-          ...(macros.ctx.openInsertionEditor
-            ? [
-                <CustomInsertMacroButton
-                  key={"insertMacroButton"}
-                  openEditor={macros.ctx.openInsertionEditor}
-                />,
-              ]
-            : []),
-        ]
-      : [],
-  );
+    // Hidden when no macro editor is available.
+    <CustomMacroEditButton key={"macroEditButton"} />,
+    <CustomInsertMacroButton key={"insertMacroButton"} />,
+  ];
 
 export type { CustomFormattingToolbarProps };

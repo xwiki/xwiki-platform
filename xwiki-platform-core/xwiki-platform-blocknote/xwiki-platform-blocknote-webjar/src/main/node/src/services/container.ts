@@ -21,8 +21,8 @@ import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
+import { DefaultMacroEditor } from "./macros/DefaultMacroEditor";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
-import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
@@ -84,7 +84,7 @@ XWikiBlockNoteProcessor.bind(container);
 
 DefaultImageWizard.bind(container);
 DefaultMacroWizard.bind(container);
-DefaultBlockNoteMacroWizard.bind(container);
+DefaultMacroEditor.bind(container);
 
 MinimalApp.bind(container);
 

@@ -167,62 +167,153 @@ test("Disallowed syntax features should be unavailable", async ({
   expect(menuItemsText).not.toContain("Quote");
 });
 
-// eslint-disable-next-line max-statements
-test("Macros can be inserted", async ({ mount, page }) => {
-  let macroInsertionModalTriggered = false;
-
+test("Macros can be inserted with the macro editor", async ({
+  mount,
+  page,
+}) => {
   const component = await mount(
     <BlockNoteForTest
-      content={[
-        {
-          id: Math.random().toString(),
-          type: "paragraph",
-          children: [],
-          content: [{ type: "text", text: "Yeah", styles: {} }],
-          props: {
-            backgroundColor: "default",
-            textAlignment: "left",
-            textColor: "default",
-          },
-        },
-      ]}
-      options={{
-        syntax: FULL_SYNTAX,
-        features: {
-          macros: {
-            ctx: {
-              openParamsEditor() {
-                throw new Error("Unreachable");
-              },
-
-              openInsertionEditor() {
-                macroInsertionModalTriggered = true;
-              },
-            },
-            list: macros,
-          },
+      content={buildParagraphs(["Yeah"])}
+      options={{ syntax: FULL_SYNTAX, features: { macros: { list: macros } } }}
+      macroEditor={{
+        result: {
+          kind: "block",
+          id: "info",
+          params: { title: "Note" },
+          body: { type: "none" },
         },
       }}
     />,
   );
 
-  const editorEl = component.locator(".bn-editor");
+  // Trigger the formatting toolbar.
+  await component.locator("p.bn-inline-content").dblclick();
+  await page.locator('button[data-test="insertMacro"]').click();
 
-  const paragraph = editorEl.locator(
-    // 'div.bn-block-content[data-content-type="paragraph"]',
-    "p.bn-inline-content",
+  // The macro editor gets the editor instance, and its prefill data.
+  const calls = JSON.parse(
+    await page.locator('output[data-test="macroEditorCalls"]').innerText(),
+  );
+  expect(calls).toEqual([
+    {
+      action: "insert",
+      syntax: FULL_SYNTAX.id,
+      prefill: {
+        kind: "block",
+        id: null,
+        params: null,
+        body: {
+          type: "inlineContents",
+          content: [{ type: "text", text: "Yeah", styles: {} }],
+        },
+      },
+    },
+  ]);
+  // The macro call returned by the macro editor replaces the selected block.
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="info"]'),
+  ).toHaveText("macro:info");
+});
+
+test("Macros are edited with the macro editor", async ({ mount, page }) => {
+  const call = { name: "info", parameters: { title: "Note" } };
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        {
+          id: "macro",
+          type: "xwikiMacroBlock",
+          props: { call: JSON.stringify(call) },
+          children: [],
+        } as unknown as BlockType,
+      ]}
+      options={{ syntax: FULL_SYNTAX }}
+      macroEditor={{
+        result: {
+          kind: "block",
+          id: "warning",
+          params: {},
+          body: { type: "none" },
+        },
+      }}
+    />,
   );
 
-  await paragraph.waitFor({ state: "attached" });
+  await component
+    .locator('.xwiki-macro-block[data-macro-name="info"]')
+    .dblclick();
 
-  // Trigger the formatting toolbar
-  await paragraph.dblclick();
-  const macroInsertBtnEl = page.locator('button[data-test="insertMacro"]');
-  await macroInsertBtnEl.waitFor({ state: "attached" });
+  const calls = JSON.parse(
+    await page.locator('output[data-test="macroEditorCalls"]').innerText(),
+  );
+  expect(calls).toEqual([
+    {
+      action: "edit",
+      syntax: FULL_SYNTAX.id,
+      invocation: {
+        kind: "block",
+        id: "info",
+        params: { title: "Note" },
+        body: { type: "none" },
+      },
+    },
+  ]);
+  // The edited macro call is replaced by the one returned by the macro editor.
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="warning"]'),
+  ).toHaveText("macro:warning");
+});
 
-  expect(macroInsertionModalTriggered).toBe(false);
-  await macroInsertBtnEl.click();
-  expect(macroInsertionModalTriggered).toBe(true);
+test("A canceled macro edition leaves the macro unchanged", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        {
+          id: "macro",
+          type: "xwikiMacroBlock",
+          props: { call: JSON.stringify({ name: "info", parameters: {} }) },
+          children: [],
+        } as unknown as BlockType,
+      ]}
+      options={{ syntax: FULL_SYNTAX }}
+      macroEditor={{}}
+    />,
+  );
+
+  const macro = component.locator('.xwiki-macro-block[data-macro-name="info"]');
+  await macro.dblclick();
+
+  await page.locator('output[data-test="macroEditorCalls"]').waitFor();
+  await expect(macro).toHaveText("macro:info");
+});
+
+test("Macros can't be inserted without a macro editor, or when disabled", async ({
+  mount,
+  page,
+}) => {
+  for (const props of [
+    { options: { syntax: FULL_SYNTAX } },
+    {
+      options: { syntax: FULL_SYNTAX, features: { macros: false as const } },
+      macroEditor: {},
+    },
+  ]) {
+    const component = await mount(
+      <BlockNoteForTest content={buildParagraphs(["Yeah"])} {...props} />,
+    );
+
+    await component.locator("p.bn-inline-content").dblclick();
+    // The formatting toolbar is shown, without the macro insertion action.
+    await page.locator('button[data-test="createLink"]').waitFor();
+    await expect(page.locator('button[data-test="insertMacro"]')).toHaveCount(
+      0,
+    );
+
+    await component.unmount();
+  }
 });
 
 test("Macro blocks show their output from the metadata store", async ({

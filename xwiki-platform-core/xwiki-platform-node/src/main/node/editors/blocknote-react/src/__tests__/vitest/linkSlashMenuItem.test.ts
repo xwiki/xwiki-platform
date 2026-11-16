@@ -51,7 +51,7 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
       syntax: FULL_SYNTAX,
       lang: "en",
       t,
-      openMacroInsertionEditor: undefined,
+      macroEditing: undefined,
     });
 
     return items.find(

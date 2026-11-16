@@ -108,8 +108,11 @@ export {
   extractMacroRawContent,
 } from "./blocknote/utils";
 
+export { macroEditorName } from "./blocknote/macroEditor";
+
+export type { MacroEditor } from "./blocknote/macroEditor";
+
 export type {
-  ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
   MacroCall,

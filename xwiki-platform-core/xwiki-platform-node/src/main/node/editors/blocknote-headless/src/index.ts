@@ -19,10 +19,7 @@
  */
 import BlocknoteEditor from "./vue/c-blocknote-view.vue";
 import { moveCaretTo } from "./vue/caret";
-export type {
-  ContextForMacros,
-  EditorType,
-} from "@xwiki/platform-editors-blocknote-react";
+export type { EditorType } from "@xwiki/platform-editors-blocknote-react";
 export type {
   HeadlessEditorOptions,
   HeadlessLinkFeatureOptions,

@@ -18,10 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import "./macro.css";
+import { useMacroEditing } from "./macroEditor";
 import { getMacroOutput } from "./macroMetadata";
 import { MacroOutput } from "./macroOutput";
 import { invocationToMacroCall, macroCallToInvocation } from "./utils";
-import { EditorInstanceContext, MacrosContext } from "../contexts";
+import { EditorInstanceContext } from "../contexts";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,
@@ -74,17 +75,16 @@ const XWikiMacroBlock = createReactBlockSpec(
   {
     render: ({ block, editor }) => {
       const call = JSON.parse(block.props.call) as MacroCall;
-      const macros = useContext(MacrosContext);
+      const macroEditing = useMacroEditing();
       const output = getOutput(
         useContext(EditorInstanceContext)?.metadata,
         block.id,
         block.props.call,
       );
-      // Double-click opens the macro params editor (when a macro context is available), editing the call in place.
-      const openParamsEditor = macros?.openParamsEditor;
-      const onDoubleClick = openParamsEditor
+      // Double-click opens the macro editor (when available), editing the call in place.
+      const onDoubleClick = macroEditing
         ? () =>
-            openParamsEditor(macroCallToInvocation(call, "block"), (updated) =>
+            macroEditing.edit(macroCallToInvocation(call, "block"), (updated) =>
               editor.updateBlock(block.id, {
                 props: {
                   call: JSON.stringify(invocationToMacroCall(updated)),
@@ -140,25 +140,26 @@ const XWikiInlineMacro = createReactInlineContentSpec(
   {
     render: ({ inlineContent, updateInlineContent }) => {
       const call = JSON.parse(inlineContent.props.call) as MacroCall;
-      const macros = useContext(MacrosContext);
+      const macroEditing = useMacroEditing();
       const output = getOutput(
         useContext(EditorInstanceContext)?.metadata,
         inlineContent.props.id,
         inlineContent.props.call,
       );
-      // Double-click opens the macro params editor (when a macro context is available), editing the call in place.
-      const openParamsEditor = macros?.openParamsEditor;
-      const onDoubleClick = openParamsEditor
+      // Double-click opens the macro editor (when available), editing the call in place.
+      const onDoubleClick = macroEditing
         ? () =>
-            openParamsEditor(macroCallToInvocation(call, "inline"), (updated) =>
-              updateInlineContent({
-                type: "xwikiInlineMacro",
-                props: {
-                  call: JSON.stringify(invocationToMacroCall(updated)),
-                  id: inlineContent.props.id,
-                },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              } as any),
+            macroEditing.edit(
+              macroCallToInvocation(call, "inline"),
+              (updated) =>
+                updateInlineContent({
+                  type: "xwikiInlineMacro",
+                  props: {
+                    call: JSON.stringify(invocationToMacroCall(updated)),
+                    id: inlineContent.props.id,
+                  },
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } as any),
             )
         : undefined;
       if (output.length) {

@@ -30,10 +30,10 @@ import {
   querySuggestionsMenuItems,
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
+import { getMacroEditing } from "../blocknote/macroEditor";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import {
   EditorInstanceContext,
-  MacrosContext,
   ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../contexts";
@@ -204,7 +204,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
     for (const macro of macros.list ?? []) {
       builtMacros.push(
-        adaptMacroForBlockNote(macro, macros.ctx, uniAstToReactJsxConverter),
+        adaptMacroForBlockNote(macro, uniAstToReactJsxConverter),
       );
     }
   }
@@ -323,95 +323,90 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         <SourceDocumentReferenceContext.Provider
           value={serializedSourceDocumentReference}
         >
-          <MacrosContext.Provider value={macros ? macros.ctx : null}>
-            <BlockNoteView
-              editor={editor}
-              theme={theme}
-              // Override some builtin components
-              formattingToolbar={false}
-              linkToolbar={false}
-              filePanel={false}
-              slashMenu={false}
-              sideMenu={false}
-              onChange={(editor) => onChange?.(editor)}
-            >
-              {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
-              <SideMenuController
-                floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS}
-              />
+          <BlockNoteView
+            editor={editor}
+            theme={theme}
+            // Override some builtin components
+            formattingToolbar={false}
+            linkToolbar={false}
+            filePanel={false}
+            slashMenu={false}
+            sideMenu={false}
+            onChange={(editor) => onChange?.(editor)}
+          >
+            {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
+            <SideMenuController
+              floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS}
+            />
 
-              <SuggestionMenuController
-                triggerCharacter={"/"}
-                getItems={async (query) =>
-                  querySuggestionsMenuItems({
-                    editor,
-                    query,
-                    macros: builtMacros,
-                    syntax,
-                    lang,
-                    t,
-                    openMacroInsertionEditor: macros
-                      ? macros.ctx.openInsertionEditor
-                      : undefined,
-                  })
-                }
-              />
+            <SuggestionMenuController
+              triggerCharacter={"/"}
+              getItems={async (query) =>
+                querySuggestionsMenuItems({
+                  editor,
+                  query,
+                  macros: builtMacros,
+                  syntax,
+                  lang,
+                  t,
+                  macroEditing: getMacroEditing(instance),
+                })
+              }
+            />
 
-              {syntax.features.blocks.images.basicImages && (
-                <ImageSuggestionController
-                  maxSuggestions={5}
+            {syntax.features.blocks.images.basicImages && (
+              <ImageSuggestionController
+                maxSuggestions={5}
+                imageEditionHooks={images?.hooks}
+                imageInsertionOverrideFn={images?.insertion}
+              />
+            )}
+
+            {syntax.features.inlineContents.links.basicLinks && (
+              <LinkSuggestionController
+                linkEditionHandler={linkEditionHandler}
+                linkEditionHooks={links?.hooks}
+                maxSuggestions={8}
+                pageSuggestionsShare={5}
+              />
+            )}
+
+            {/* TODO: suggestions menu for inline macros */}
+
+            <FormattingToolbarController
+              formattingToolbar={(props) => (
+                <CustomFormattingToolbar
+                  formattingToolbarProps={props}
+                  imageEditionOverrideFn={images?.edition}
                   imageEditionHooks={images?.hooks}
-                  imageInsertionOverrideFn={images?.insertion}
-                />
-              )}
-
-              {syntax.features.inlineContents.links.basicLinks && (
-                <LinkSuggestionController
                   linkEditionHandler={linkEditionHandler}
                   linkEditionHooks={links?.hooks}
-                  maxSuggestions={8}
-                  pageSuggestionsShare={5}
+                  additionalBlockTypes={filterMap(
+                    builtMacros,
+                    (built) => built.dropdownTransformItem,
+                  )}
                 />
               )}
+            />
 
-              {/* TODO: suggestions menu for inline macros */}
-
-              <FormattingToolbarController
-                formattingToolbar={(props) => (
-                  <CustomFormattingToolbar
-                    formattingToolbarProps={props}
-                    imageEditionOverrideFn={images?.edition}
-                    imageEditionHooks={images?.hooks}
+            <LinkToolbarController
+              linkToolbar={(props) => (
+                <FormattingToolbar>
+                  <CustomLinkToolbar
+                    linkToolbarProps={props}
                     linkEditionHandler={linkEditionHandler}
                     linkEditionHooks={links?.hooks}
-                    additionalBlockTypes={filterMap(
-                      builtMacros,
-                      (built) => built.dropdownTransformItem,
-                    )}
-                    macros={macros ?? false}
                   />
-                )}
-              />
+                </FormattingToolbar>
+              )}
+            />
 
-              <LinkToolbarController
-                linkToolbar={(props) => (
-                  <FormattingToolbar>
-                    <CustomLinkToolbar
-                      linkToolbarProps={props}
-                      linkEditionHandler={linkEditionHandler}
-                      linkEditionHooks={links?.hooks}
-                    />
-                  </FormattingToolbar>
-                )}
-              />
-
-              <FilePanelController
-                filePanel={({ blockId }) => (
-                  <FilePanel blockId={blockId} editor={editor} />
-                )}
-              />
-            </BlockNoteView>
-          </MacrosContext.Provider>
+            <FilePanelController
+              filePanel={({ blockId }) => (
+                <FilePanel blockId={blockId} editor={editor} />
+              )}
+            />
+          </BlockNoteView>
         </SourceDocumentReferenceContext.Provider>
       </EditorInstanceContext.Provider>
     </ServiceContainerContext.Provider>

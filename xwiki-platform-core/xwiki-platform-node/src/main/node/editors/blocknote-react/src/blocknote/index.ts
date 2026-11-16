@@ -48,7 +48,8 @@ import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { createElement } from "react";
 import { RiFileList3Fill, RiLink } from "react-icons/ri";
-import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
+import type { MacroEditing } from "./macroEditor";
+import type { BlockNoteConcreteMacro } from "./utils";
 import type {
   Block,
   InlineContent,
@@ -168,8 +169,8 @@ type SuggestionMenuItemsParams = {
   lang: EditorLanguage;
   /** `t` property from `react-i18n`'s useTranslation() return value */
   t: ReturnType<typeof useTranslation>["t"];
-  /** Macro insertion editor, same as provided to `BlockNoteViewWrapper` */
-  openMacroInsertionEditor?: ContextForMacros["openInsertionEditor"];
+  /** The macro editor of the editor instance, when available */
+  macroEditing?: MacroEditing;
 };
 
 /**
@@ -185,7 +186,7 @@ function querySuggestionsMenuItems({
   syntax,
   lang,
   t,
-  openMacroInsertionEditor,
+  macroEditing,
 }: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
@@ -218,7 +219,7 @@ function querySuggestionsMenuItems({
   // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
   // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).
   const genericMacroItem: DefaultReactSuggestionItem[] =
-    openMacroInsertionEditor && (blocksSupport.macros || inlineSupport.macros)
+    macroEditing && (blocksSupport.macros || inlineSupport.macros)
       ? [
           {
             title: t("blocknote.slashMenu.macro.title"),
@@ -227,7 +228,7 @@ function querySuggestionsMenuItems({
             group: t("blocknote.slashMenu.macro.group"),
             icon: createElement(RiFileList3Fill),
             onItemClick: () =>
-              openMacroInsertionEditor(
+              macroEditing.insert(
                 {
                   kind: "block",
                   id: null,

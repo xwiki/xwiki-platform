@@ -18,11 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { serviceContainerMock } from "./serviceContainer.mock";
+import { macroEditorName } from "../../blocknote/macroEditor";
 import { setMacroOutput } from "../../blocknote/macroMetadata";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { createBlockMetadataStore } from "../../misc/blockMetadata";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { BlockType } from "../../blocknote";
+import type { MacroEditor } from "../../blocknote/macroEditor";
+import type {
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+} from "../../blocknote/utils";
 import type { LinkEditionHandler } from "../../components/links/linkEdition";
 import type { EditorOptions } from "../../editorOptions";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
@@ -41,6 +47,9 @@ export type BlockNoteForTestProps = {
   // The server-rendered output of the macro calls of the content, put in the metadata store of the editor instance
   // (the store itself can't be passed from the test, since only serializable properties can).
   macroOutputs?: { id: string; call: string; output: unknown[] }[];
+  // Binds a macro editor returning the given macro call (or nothing, as when the user cancels). The calls it gets are
+  // rendered, so that the tests can check them.
+  macroEditor?: { result?: MacroBlockInvocation | InlineMacroInvocation };
 };
 
 export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
@@ -48,12 +57,33 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   options,
   linkEditionHandler,
   macroOutputs,
+  macroEditor,
 }) => {
-  const serviceContainer = useMemo(
-    () => serviceContainerMock([options.syntax]),
-    // The syntax configuration is registered once, when the container is created.
-    [],
-  );
+  const [macroEditorCalls, setMacroEditorCalls] = useState<unknown[]>([]);
+
+  const serviceContainer = useMemo(() => {
+    const container = serviceContainerMock([options.syntax]);
+    if (macroEditor) {
+      container.bind<MacroEditor>(macroEditorName).toConstantValue({
+        async insert(instance, prefill) {
+          setMacroEditorCalls((calls) => [
+            ...calls,
+            { action: "insert", syntax: instance.options.syntax, prefill },
+          ]);
+          return macroEditor.result;
+        },
+        async edit(instance, invocation) {
+          setMacroEditorCalls((calls) => [
+            ...calls,
+            { action: "edit", syntax: instance.options.syntax, invocation },
+          ]);
+          return macroEditor.result;
+        },
+      });
+    }
+    return container;
+    // The services are registered once, when the container is created.
+  }, []);
 
   const metadata = useMemo(() => {
     const store = createBlockMetadataStore();
@@ -65,22 +95,31 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   }, []);
 
   return (
-    <BlockNoteViewWrapper
-      options={{
-        lang: "en",
-        label: "Some Label",
-        serviceContainer,
-        metadata,
-        ...options,
-        syntax: options.syntax.id,
-      }}
-      content={content}
-      linkEditionHandler={
-        linkEditionHandler ??
-        (() => {
-          throw new Error("Link editor should not open for this test");
-        })
-      }
-    />
+    <>
+      <BlockNoteViewWrapper
+        options={{
+          lang: "en",
+          label: "Some Label",
+          serviceContainer,
+          metadata,
+          ...options,
+          syntax: options.syntax.id,
+        }}
+        content={content}
+        linkEditionHandler={
+          linkEditionHandler ??
+          (() => {
+            throw new Error("Link editor should not open for this test");
+          })
+        }
+      />
+      {/* Rendered only once the macro editor is called, so that it doesn't change the text of the component checked
+        by the other tests. */}
+      {macroEditorCalls.length > 0 && (
+        <output data-test="macroEditorCalls">
+          {JSON.stringify(macroEditorCalls)}
+        </output>
+      )}
+    </>
   );
 };

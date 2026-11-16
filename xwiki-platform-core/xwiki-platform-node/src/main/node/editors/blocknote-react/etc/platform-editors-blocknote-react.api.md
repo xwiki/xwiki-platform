@@ -75,12 +75,6 @@ export type BlockType = Block<EditorBlockSchema, EditorInlineContentSchema, Edit
 export function buildMacroRawContent(content: string): InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>;
 
 // @beta
-export type ContextForMacros = {
-    openParamsEditor?(invocation: MacroBlockInvocation | InlineMacroInvocation, update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void): void;
-    openInsertionEditor?(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
-};
-
-// @beta
 export function createBlockMetadataStore(): BlockMetadataStore;
 
 // @beta
@@ -265,9 +259,17 @@ export type MacroCall = {
 export type MacroCallParams = Record<string, boolean | number | string>;
 
 // @beta
+export interface MacroEditor {
+    edit(instance: EditorInstance, invocation: MacroBlockInvocation | InlineMacroInvocation): Promise<MacroBlockInvocation | InlineMacroInvocation | undefined>;
+    insert(instance: EditorInstance, prefill: MacroInsertionEditorPrefillData): Promise<MacroBlockInvocation | InlineMacroInvocation | undefined>;
+}
+
+// @beta
+export const macroEditorName = "MacroEditor";
+
+// @beta
 export type MacroFeatureOptions = {
     list?: MacroWithUnknownParamsType[];
-    ctx: ContextForMacros;
 };
 
 // @beta

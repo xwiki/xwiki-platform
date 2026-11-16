@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -42,6 +43,8 @@ import org.xwiki.localization.internal.AbstractTranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -95,6 +98,9 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     /**
      * The cache of bundles by wiki.
      */
@@ -133,11 +139,19 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
         XWikiContext xcontext = this.contextProvider.get();
 
         // Don't do anything when XWiki is not ready
-        return xcontext != null && xcontext.getWiki() != null ? getBundle().getTranslation(key, locale) : null;
+        if (xcontext != null && xcontext.getWiki() != null) {
+            XWikiPreferencesWikiTranslationBundle bundle = getBundle();
+            if (bundle != null) {
+                return bundle.getTranslation(key, locale);
+            }
+        }
+
+        return null;
     }
 
     /**
-     * @return the {@link XWikiPreferencesTranslationBundle} for the current wiki
+     * @return the {@link XWikiPreferencesTranslationBundle} for the current wiki, {@code null} if the current wiki
+     *     does not exist
      */
     private XWikiPreferencesWikiTranslationBundle getBundle()
     {
@@ -148,7 +162,8 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
 
     /**
      * @param wiki the wiki
-     * @return the {@link XWikiPreferencesWikiTranslationBundle} for the provided wiki
+     * @return the {@link XWikiPreferencesWikiTranslationBundle} for the provided wiki, {@code null} if the wiki does
+     *     not exist
      */
     private XWikiPreferencesWikiTranslationBundle getBundle(String wiki)
     {
@@ -169,7 +184,8 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     private synchronized XWikiPreferencesWikiTranslationBundle getBundleSynchronized(String wiki)
     {
         XWikiPreferencesWikiTranslationBundle bundle = this.wikiBundlesCache.get(wiki);
-        if (bundle == null) {
+        // A wiki bundle is never released, so it is only created for an existing wiki.
+        if (bundle == null && wikiExists(wiki)) {
             try {
                 bundle = createWikiBundle(wiki);
                 this.wikiBundlesCache.put(wiki, bundle);
@@ -233,5 +249,16 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
         }
 
         return documentBundle;
+    }
+
+    private boolean wikiExists(String wiki)
+    {
+        try {
+            return this.wikiDescriptorManager.exists(wiki);
+        } catch (WikiManagerException e) {
+            this.logger.warn("Failed to check if wiki [{}] exists. Root cause: [{}]", wiki,
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
+        }
     }
 }

@@ -22,6 +22,7 @@ package org.xwiki.localization.internal;
 import java.io.StringWriter;
 import java.util.Locale;
 
+import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -42,13 +43,19 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import ch.qos.logback.classic.Level;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -75,6 +82,9 @@ class DefaultTranslationsResourceTest
     @MockComponent
     private ModelContext modelContext;
 
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
     private final Locale defaultLocale = Locale.forLanguageTag("es");
 
     @RegisterExtension
@@ -87,10 +97,35 @@ class DefaultTranslationsResourceTest
     private Translation translationKey2;
 
     @BeforeEach
-    void setUp()
+    void setUp() throws Exception
     {
         when(this.localizationContext.getCurrentLocale()).thenReturn(this.defaultLocale);
         when(this.modelContext.getCurrentEntityReference()).thenReturn(CURRENT_ENTITY);
+        when(this.wikiDescriptorManager.exists("mywiki")).thenReturn(true);
+    }
+
+    @Test
+    void getTranslationsWithUnknownWiki()
+    {
+        WebApplicationException exception = assertThrows(WebApplicationException.class,
+            () -> this.defaultTranslationResource.getTranslations("unknownwiki", null, null, singletonList("key1")));
+
+        assertEquals(404, exception.getResponse().getStatus());
+        verify(this.modelContext, never()).setCurrentEntityReference(any());
+        verifyNoInteractions(this.localizationManager);
+    }
+
+    @Test
+    void getTranslationsWhenWikiExistenceCheckFails() throws Exception
+    {
+        when(this.wikiDescriptorManager.exists("brokenwiki")).thenThrow(new WikiManagerException("Store failure"));
+
+        WebApplicationException exception = assertThrows(WebApplicationException.class,
+            () -> this.defaultTranslationResource.getTranslations("brokenwiki", null, null, singletonList("key1")));
+
+        assertEquals(500, exception.getResponse().getStatus());
+        verify(this.modelContext, never()).setCurrentEntityReference(any());
+        verifyNoInteractions(this.localizationManager);
     }
 
     @Test

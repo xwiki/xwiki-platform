@@ -225,6 +225,51 @@ test("Macros can be inserted", async ({ mount, page }) => {
   expect(macroInsertionModalTriggered).toBe(true);
 });
 
+test("Macro blocks show their output from the metadata store", async ({
+  mount,
+}) => {
+  const call = JSON.stringify({ name: "info", parameters: {} });
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        {
+          id: "with-output",
+          type: "xwikiMacroBlock",
+          props: { call },
+          children: [],
+        } as unknown as BlockType,
+        {
+          id: "modified",
+          type: "xwikiMacroBlock",
+          props: { call: JSON.stringify({ name: "warning", parameters: {} }) },
+          children: [],
+        } as unknown as BlockType,
+      ]}
+      options={{ syntax: FULL_SYNTAX }}
+      macroOutputs={[
+        {
+          id: "with-output",
+          call,
+          output: [{ type: "paragraph", content: "Some information" }],
+        },
+        // The output of a macro call that was modified since it was rendered.
+        {
+          id: "modified",
+          call: JSON.stringify({ name: "warning", parameters: { a: "b" } }),
+          output: [{ type: "paragraph", content: "Some warning" }],
+        },
+      ]}
+    />,
+  );
+
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="info"]'),
+  ).toHaveText("Some information");
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="warning"]'),
+  ).toHaveText("macro:warning");
+});
+
 test("Code blocks with supported and unsupported languages", async ({
   mount,
   page,

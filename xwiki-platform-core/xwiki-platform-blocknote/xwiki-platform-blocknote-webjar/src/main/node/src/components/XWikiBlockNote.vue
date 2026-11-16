@@ -228,15 +228,14 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
   const imageWizard: ImageWizard = container.get("ImageWizard");
   // The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so we pass it to the image
   // wizard and update it on submit, because the user may have selected a different image.
-  const reference = blockNoteDocument?.getMetadata(block.id)?.xwikiReference as
-    | ResourceReference
-    | undefined;
+  const reference = blockNoteDocument?.metadata.get(block.id)
+    ?.xwikiReference as ResourceReference | undefined;
   imageWizard.edit(
     { ...block.props, reference },
     {
       submit: ({ reference: newReference, ...updatedProps }) => {
         if (newReference) {
-          blockNoteDocument!.getMetadata(block.id, true)!.xwikiReference =
+          blockNoteDocument!.metadata.get(block.id, true).xwikiReference =
             newReference;
         }
         update({ type: "update", updatedProps });
@@ -267,7 +266,7 @@ const imageEditionHooks: ImageEditionHooks = {
   // saved with the reference provided by the server rather than with its URL, relative to the edited document. An image
   // known only by its URL is saved with that URL, so we drop the reference of the previous image source.
   afterUpdate: (block, reference) => {
-    const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
+    const metadata = blockNoteDocument?.metadata.get(block.id, !!reference);
     if (reference?.type === "attach") {
       metadata!.xwikiReference = {
         ...(sourceDocumentReference
@@ -410,6 +409,10 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
     // Attach to the edited document the files that are pasted or dropped in the content, or uploaded from the file
     // panel (e.g. of an image block). Note that the upload buttons of the link and image menus don't use this yet.
     upload: uploadFile && { uploadFile },
+    // The data that the BlockNote schema can't hold, extracted from the loaded content and put back on save, and the
+    // output of the macros, kept outside the edited content (which is shared with the other users when editing in
+    // realtime) because it was rendered for the current user.
+    metadata: blockNoteDocument!.metadata,
     features: {
       links: {
         hooks: linkEdition,
@@ -510,10 +513,6 @@ function getSourceDocument(): XWikiDocument {
 // resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
 const macros: MacroFeatureOptions = {
   ctx: {
-    // The macro output is kept outside the edited content (which is shared with the other users when editing in
-    // realtime) because it was rendered for the current user.
-    getMacroOutput: (id, call) => blockNoteDocument?.getMacroOutput(id, call),
-
     openParamsEditor: async (invocation, update) => {
       try {
         const macroWizard: BlockNoteMacroWizard = container.get(

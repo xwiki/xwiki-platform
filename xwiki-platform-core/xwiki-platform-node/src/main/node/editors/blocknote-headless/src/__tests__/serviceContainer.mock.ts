@@ -19,11 +19,7 @@
  */
 
 import { FULL_SYNTAX } from "./playwright-ct/syntax.mock";
-import { linkTargetTypeFormRole } from "@xwiki/platform-link-modal-ui";
-import {
-  ComponentInit as LinkTypeComponentInit,
-  linkTargetTypeManagerRole,
-} from "@xwiki/platform-link-type-api";
+import { ComponentInit as LinkTypeComponentInit } from "@xwiki/platform-link-type-api";
 import { ComponentInit as LinkTypeDefaultComponentInit } from "@xwiki/platform-link-type-default";
 import { ComponentInit as LinkTypeUIComponentInit } from "@xwiki/platform-link-type-ui";
 import {
@@ -32,9 +28,9 @@ import {
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
+import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
-import { Container as InversifyContainer } from "inversify";
-import { anyObject, mock } from "vitest-mock-extended";
+import { Container } from "inversify";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceHandlerProvider,
@@ -47,24 +43,25 @@ import type {
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
-import type { Container } from "inversify";
-import type { MockProxy } from "vitest-mock-extended";
 
 /**
  * @param syntaxes - the syntax configurations registered in the container, the full syntax when not specified
- * @returns a container mock providing the services the editor needs
+ * @returns a container providing mocks of the services the editor needs (a real container, because the editor creates
+ *   a child container for each editor instance)
  */
 // eslint-disable-next-line max-statements
 export function serviceContainerMock(
   syntaxes: SyntaxConfig[] = [FULL_SYNTAX],
 ): Container {
-  const container = mock<Container>();
+  const container = new Container();
 
-  container.getAll
-    .calledWith(SYNTAX_CONFIG_COMPONENT_GROUP_NAME, anyObject())
-    .mockReturnValue(syntaxes);
+  for (const syntax of syntaxes) {
+    container
+      .bind<SyntaxConfig>(SYNTAX_CONFIG_COMPONENT_GROUP_NAME)
+      .toConstantValue(syntax);
+  }
 
-  container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
+  container.bind("RemoteURLParserProvider").toConstantValue({
     get: () => ({
       parse() {
         throw new Error("Unreachable");
@@ -72,7 +69,7 @@ export function serviceContainerMock(
     }),
   } satisfies RemoteURLParserProvider);
 
-  container.get.calledWith("RemoteURLSerializerProvider").mockReturnValue({
+  container.bind("RemoteURLSerializerProvider").toConstantValue({
     get: () => ({
       serialize(reference) {
         // The URL of the page returned by the link suggestion service below, for the tests submitting a page link.
@@ -85,7 +82,7 @@ export function serviceContainerMock(
     }),
   } satisfies RemoteURLSerializerProvider);
 
-  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+  container.bind("ModelReferenceParserProvider").toConstantValue({
     get: () => ({
       parse(reference, options) {
         return parseModelReference(reference, options);
@@ -97,7 +94,7 @@ export function serviceContainerMock(
     }),
   } satisfies ModelReferenceParserProvider);
 
-  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
+  container.bind("ModelReferenceSerializerProvider").toConstantValue({
     get: () => ({
       serialize(reference, base) {
         if (!reference) {
@@ -118,7 +115,7 @@ export function serviceContainerMock(
     }),
   } satisfies ModelReferenceSerializerProvider);
 
-  container.get.calledWith("ModelReferenceHandlerProvider").mockReturnValue({
+  container.bind("ModelReferenceHandlerProvider").toConstantValue({
     get: () => ({
       createDocumentReference(name, space) {
         return new DocumentReference(name, space);
@@ -138,7 +135,7 @@ export function serviceContainerMock(
     }),
   } satisfies ModelReferenceHandlerProvider);
 
-  container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue({
+  container.bind("LinkSuggestServiceProvider").toConstantValue({
     get: () => ({
       async getLinks() {
         return [
@@ -163,42 +160,16 @@ export function serviceContainerMock(
     }),
   } satisfies LinkSuggestServiceProvider);
 
-  container.get.calledWith("AttachmentsService").mockReturnValue(null);
-  container.get.calledWith("DocumentService").mockReturnValue(null);
+  container
+    .bind("ResourceReferenceParser")
+    .toConstantValue(new DefaultResourceReferenceParser());
 
-  return withBuiltInLinkTargetTypes(container);
-}
-
-/**
- * The link modal and the editor resolve the link target type manager, and the forms of the link target types, out of
- * the container, so the built-in link target types must be registered the same way the BlockNote webjar registers
- * them in production (see its container.ts). They are registered in a real container, which resolves them with the
- * providers returned by the container mock.
- */
-function withBuiltInLinkTargetTypes(
-  container: MockProxy<Container>,
-): Container {
-  const builtInContainer = new InversifyContainer();
-  for (const provider of [
-    "RemoteURLParserProvider",
-    "RemoteURLSerializerProvider",
-    "ModelReferenceParserProvider",
-    "ModelReferenceSerializerProvider",
-    "ModelReferenceHandlerProvider",
-  ]) {
-    builtInContainer.bind(provider).toConstantValue(container.get(provider));
-  }
-  new LinkTypeComponentInit(builtInContainer);
-  new LinkTypeDefaultComponentInit(builtInContainer);
-  new LinkTypeUIComponentInit(builtInContainer);
-
-  container.get
-    .calledWith(linkTargetTypeManagerRole)
-    .mockReturnValue(builtInContainer.get(linkTargetTypeManagerRole));
-  container.isBound.calledWith(linkTargetTypeFormRole).mockReturnValue(true);
-  container.getAll
-    .calledWith(linkTargetTypeFormRole)
-    .mockReturnValue(builtInContainer.getAll(linkTargetTypeFormRole));
+  // The link modal and the editor resolve the link target type manager, and the forms of the link target types, out of
+  // the container, so the built-in link target types are registered the same way the BlockNote webjar registers them
+  // in production (see its container.ts).
+  new LinkTypeComponentInit(container);
+  new LinkTypeDefaultComponentInit(container);
+  new LinkTypeUIComponentInit(container);
 
   return container;
 }

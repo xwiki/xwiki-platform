@@ -156,7 +156,7 @@ function createFileUploader(
     blockId?: string,
   ): UploadResult {
     if (blockId) {
-      getBlockNoteDocument()!.getMetadata(blockId, true)!.xwikiReference =
+      getBlockNoteDocument()!.metadata.get(blockId, true).xwikiReference =
         attachmentReference(attachment.reference, false);
     }
     // Empty name, otherwise BlockNote saves it as the alt text of the image (||alt="image.gif"), and for a pasted
@@ -173,7 +173,7 @@ function createFileUploader(
     label: string,
   ): EditorPartialLink {
     const linkId = uuidv4();
-    const metadata = getBlockNoteDocument()!.getMetadata(linkId, true)!;
+    const metadata = getBlockNoteDocument()!.metadata.get(linkId, true);
     metadata.xwikiReference = attachmentReference(attachment.reference, true);
     // Don't add xwikiFreestanding here: it saves the link without its [[ ]], and then it stops being a link
     // the next time the page is edited.

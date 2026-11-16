@@ -72,6 +72,16 @@ export type {
   InlineContentType,
 } from "./blocknote";
 
+export type { EditorInstance } from "./editorInstance";
+
+export {
+  createBlockMetadataStore,
+  getMacroOutput,
+  setMacroOutput,
+} from "./misc/blockMetadata";
+
+export type { BlockMetadata, BlockMetadataStore } from "./misc/blockMetadata";
+
 export type {
   EditorAppearance,
   EditorFeatures,

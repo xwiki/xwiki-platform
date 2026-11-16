@@ -106,7 +106,7 @@ describe("createFileUploader", () => {
     it("stores an untyped attachment reference as block metadata", async () => {
       await uploadFile(file("photo.png", "image/png"), blockId);
 
-      expect(blockNoteDocument.getMetadata(blockId)).toEqual({
+      expect(blockNoteDocument.metadata.get(blockId)).toEqual({
         // Untyped, so it is saved as image:photo.png.
         xwikiReference: {
           type: "attach",
@@ -128,7 +128,7 @@ describe("createFileUploader", () => {
       await uploadFile(file("logo@2x.png", "image/png"), blockId);
 
       expect(
-        blockNoteDocument.getMetadata(blockId).xwikiReference.reference,
+        blockNoteDocument.metadata.get(blockId).xwikiReference.reference,
       ).toBe("logo\\@2x.png");
     });
   });
@@ -160,7 +160,7 @@ describe("createFileUploader", () => {
       );
 
       const linkId = extractLinkId(result.content[0].href);
-      expect(blockNoteDocument.getMetadata(linkId)).toEqual({
+      expect(blockNoteDocument.metadata.get(linkId)).toEqual({
         // Typed, otherwise it would be saved as [[report.pdf]], a document link.
         xwikiReference: {
           type: "attach",
@@ -175,7 +175,7 @@ describe("createFileUploader", () => {
     it("doesn't use the block metadata of the replaced block", async () => {
       await uploadFile(file("report.pdf", "application/pdf"), blockId);
 
-      expect(blockNoteDocument.getMetadata(blockId)).toBeUndefined();
+      expect(blockNoteDocument.metadata.get(blockId)).toBeUndefined();
     });
   });
 
@@ -404,7 +404,7 @@ describe("createFileUploader", () => {
         it("leaves no metadata behind", async () => {
           await uploadFile(file("photo.png", "image/png"), "id");
 
-          expect(blockNoteDocument.getMetadata("id")).toBeUndefined();
+          expect(blockNoteDocument.metadata.get("id")).toBeUndefined();
         });
       });
     });

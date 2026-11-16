@@ -77,10 +77,10 @@ export type LinkSuggestionForTestProps = {
  * Renders the editor with a mocked LinkSuggestService feeding the link quick action's suggestions, a scripted link
  * editor and link edition hooks reporting the inserted links.
  *
- * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own
- * `vitest-mock-extended` container: test-prop functions get proxied back to Node when called from the
- * mounted component, which strips any mock methods off objects passed through them, and breaks the synchronous
- * return value that the link edition hooks rely on. Building them here, where the code actually runs in the browser,
+ * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own container of mocked
+ * services: test-prop functions get proxied back to Node when called from the mounted component, which strips any
+ * methods off objects passed through them, and breaks the synchronous return value that the link edition hooks rely
+ * on. Building them here, where the code actually runs in the browser,
  * keeps them intact.
  */
 export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
@@ -128,7 +128,7 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
         url: link.url,
       }));
 
-    container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue(
+    container.rebind("LinkSuggestServiceProvider").toConstantValue(
       linkSuggestServiceUnavailable
         ? { get: () => undefined }
         : ({
@@ -147,10 +147,10 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
     );
 
     // A page reference that the model reference parser of the mocked container understands.
-    container.get.calledWith("DocumentService").mockReturnValue({
+    container.rebind("DocumentService").toConstantValue({
       getCurrentDocumentReferenceString: () => ({ value: "Some.Page" }),
     });
-    container.get.calledWith("AttachmentsService").mockReturnValue({
+    container.rebind("AttachmentsService").toConstantValue({
       async upload() {
         if (!uploadedFileURL) {
           throw new Error("Failed to upload the file");
@@ -183,24 +183,22 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
           )
         : new DocumentReference(reference, new SpaceReference());
     };
-    container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+    container.rebind("ModelReferenceParserProvider").toConstantValue({
       get: () => ({ parse, parseAsync: async (...args) => parse(...args) }),
     } satisfies ModelReferenceParserProvider);
-    container.get
-      .calledWith("ModelReferenceSerializerProvider")
-      .mockReturnValue({
-        get: () => ({
-          serialize(reference, base) {
-            if (reference instanceof AttachmentReference) {
-              // The page is omitted when it's the base page.
-              return reference.document.name === base?.name
-                ? reference.name
-                : `${reference.document.name}@${reference.name}`;
-            }
-            return reference?.name;
-          },
-        }),
-      } satisfies ModelReferenceSerializerProvider);
+    container.rebind("ModelReferenceSerializerProvider").toConstantValue({
+      get: () => ({
+        serialize(reference, base) {
+          if (reference instanceof AttachmentReference) {
+            // The page is omitted when it's the base page.
+            return reference.document.name === base?.name
+              ? reference.name
+              : `${reference.document.name}@${reference.name}`;
+          }
+          return reference?.name;
+        },
+      }),
+    } satisfies ModelReferenceSerializerProvider);
 
     return container;
   }, []);

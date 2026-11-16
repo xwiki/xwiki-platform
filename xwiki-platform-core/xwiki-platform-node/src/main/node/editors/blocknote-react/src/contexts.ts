@@ -19,9 +19,18 @@
  */
 import { createContext } from "react";
 import type { ContextForMacros } from "./blocknote/utils";
+import type { EditorInstance } from "./editorInstance";
 import type { Container } from "inversify";
 
+/**
+ * The container of the editor instance (see {@link EditorInstance.container}).
+ */
 const ServiceContainerContext = createContext<Container | null>(null);
+
+/**
+ * The editor instance, which the components pass to the services they call.
+ */
+const EditorInstanceContext = createContext<EditorInstance | null>(null);
 
 /**
  * The macro context (insert / edit callbacks) made available to the server-rendered macro specs so they can wire
@@ -38,6 +47,7 @@ const SourceDocumentReferenceContext = createContext<string | undefined>(
 );
 
 export {
+  EditorInstanceContext,
   MacrosContext,
   ServiceContainerContext,
   SourceDocumentReferenceContext,

@@ -149,7 +149,7 @@ const blockNoteProps: Omit<BlockNoteViewWrapperProps, "content"> = {
     notifyChangesDebounced();
   },
   refs: {
-    setEditor(editor) {
+    setInstance({ editor }) {
       editorRef.value = editor;
       unsubscribeFromLocalChanges?.();
       // Ask the editor itself which changes are the local user's, rather than watching the shared Yjs document: a

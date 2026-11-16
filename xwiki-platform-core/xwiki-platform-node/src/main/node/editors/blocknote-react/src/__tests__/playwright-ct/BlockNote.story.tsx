@@ -19,6 +19,10 @@
  */
 import { serviceContainerMock } from "./serviceContainer.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import {
+  createBlockMetadataStore,
+  setMacroOutput,
+} from "../../misc/blockMetadata";
 import { useMemo } from "react";
 import type { BlockType } from "../../blocknote";
 import type { LinkEditionHandler } from "../../components/links/linkEdition";
@@ -36,12 +40,16 @@ export type BlockNoteForTestProps = {
     syntax: SyntaxConfig;
   };
   linkEditionHandler?: LinkEditionHandler;
+  // The server-rendered output of the macro calls of the content, put in the metadata store of the editor instance
+  // (the store itself can't be passed from the test, since only serializable properties can).
+  macroOutputs?: { id: string; call: string; output: unknown[] }[];
 };
 
 export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   content,
   options,
   linkEditionHandler,
+  macroOutputs,
 }) => {
   const serviceContainer = useMemo(
     () => serviceContainerMock([options.syntax]),
@@ -49,12 +57,22 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
     [],
   );
 
+  const metadata = useMemo(() => {
+    const store = createBlockMetadataStore();
+    for (const { id, call, output } of macroOutputs ?? []) {
+      setMacroOutput(store, id, call, output);
+    }
+    return store;
+    // The macro outputs are put in the store once, when the editor is created.
+  }, []);
+
   return (
     <BlockNoteViewWrapper
       options={{
         lang: "en",
         label: "Some Label",
         serviceContainer,
+        metadata,
         ...options,
         syntax: options.syntax.id,
       }}

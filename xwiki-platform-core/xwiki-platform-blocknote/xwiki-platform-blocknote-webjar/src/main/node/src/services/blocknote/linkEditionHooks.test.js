@@ -39,7 +39,7 @@ describe("createLinkEditionHooks", () => {
    * @returns the URL of a link to Users.Alice whose label is generated, as loaded from the server
    */
   function linkWithGeneratedLabel() {
-    Object.assign(blockNoteDocument.getMetadata("alice", true), {
+    Object.assign(blockNoteDocument.metadata.get("alice", true), {
       xwikiReference: pageReference("Users.Alice"),
       xwikiGeneratedLabel: "Alice",
     });
@@ -86,7 +86,7 @@ describe("createLinkEditionHooks", () => {
       );
 
       expect(extractLinkId(updated.url)).toBe("alice");
-      expect(blockNoteDocument.getMetadata("alice")).toEqual({
+      expect(blockNoteDocument.metadata.get("alice")).toEqual({
         xwikiReference: pageReference("Users.Bob"),
         xwikiGeneratedLabel: "Bob",
       });
@@ -105,7 +105,7 @@ describe("createLinkEditionHooks", () => {
         previous,
       );
 
-      expect(blockNoteDocument.getMetadata("alice")).toEqual({
+      expect(blockNoteDocument.metadata.get("alice")).toEqual({
         xwikiReference: pageReference("Users.Alice"),
       });
     });
@@ -118,12 +118,12 @@ describe("createLinkEditionHooks", () => {
         reference: pageReference("Users.Alice"),
       });
 
-      expect(blockNoteDocument.getMetadata(extractLinkId(updated.url))).toEqual(
-        {
-          xwikiReference: pageReference("Users.Alice"),
-          xwikiGeneratedLabel: "Alice",
-        },
-      );
+      expect(
+        blockNoteDocument.metadata.get(extractLinkId(updated.url)),
+      ).toEqual({
+        xwikiReference: pageReference("Users.Alice"),
+        xwikiGeneratedLabel: "Alice",
+      });
     });
 
     it("marks the generated label of a link without reference, which then gets an id", () => {
@@ -133,9 +133,9 @@ describe("createLinkEditionHooks", () => {
         url: "https://xwiki.org/",
       });
 
-      expect(blockNoteDocument.getMetadata(extractLinkId(updated.url))).toEqual(
-        { xwikiGeneratedLabel: "https://xwiki.org/" },
-      );
+      expect(
+        blockNoteDocument.metadata.get(extractLinkId(updated.url)),
+      ).toEqual({ xwikiGeneratedLabel: "https://xwiki.org/" });
     });
 
     it("leaves the url of a link without reference and with a label of its own untouched", () => {

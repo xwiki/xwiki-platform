@@ -245,24 +245,6 @@ type ContextForMacros = {
     prefill: MacroInsertionEditorPrefillData,
     insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
   ): void;
-
-  /**
-   * Retrieve the output of a server-rendered macro call (`xwikiMacroBlock` / `xwikiInlineMacro`). The output is not
-   * part of the edited content because it is rendered for the current user (it can contain information that only the
-   * current user is allowed to view) while the edited content can be shared with other users (realtime editing).
-   *
-   * When not provided, or when it doesn't return anything, the macro is displayed as a placeholder.
-   *
-   * @param id - identifies the macro call: the block id for a block macro, the `id` property for an inline macro or
-   *   for a macro nested in the parameters or content of another macro call
-   * @param call - the current macro call (JSON); no output should be returned if the macro call was modified after its
-   *   output was rendered
-   * @returns the macro output (an array of BlockNote-shaped nodes), or undefined if not available
-   *
-   * @since 18.10.0RC1
-   * @beta
-   */
-  getMacroOutput?(id: string, call: string): unknown[] | undefined;
 };
 
 /**

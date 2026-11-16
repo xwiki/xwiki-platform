@@ -67,11 +67,10 @@ export type ImageSuggestionForTestProps = {
 /**
  * Renders the editor with a mocked LinkSuggestService feeding the image quick action's suggestions.
  *
- * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own
- * `vitest-mock-extended` container: test-prop functions get proxied back to Node when called from the
- * mounted component, which strips any mock methods off objects passed through them (see
- * `LinkEdition.story.tsx` for the same constraint). Building the container here, where the code
- * actually runs in the browser, keeps the mock intact.
+ * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own container of mocked
+ * services: test-prop functions get proxied back to Node when called from the mounted component, which strips any
+ * methods off objects passed through them (see `LinkEdition.story.tsx` for the same constraint). Building the
+ * container here, where the code actually runs in the browser, keeps the mocked services intact.
  */
 export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   images,
@@ -107,7 +106,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   const serviceContainer = useMemo(() => {
     const container = serviceContainerMock([syntax ?? FULL_SYNTAX]);
 
-    container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue(
+    container.rebind("LinkSuggestServiceProvider").toConstantValue(
       linkSuggestServiceUnavailable
         ? { get: () => undefined }
         : ({
@@ -131,10 +130,10 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     );
 
     // A page reference that the model reference parser of the mocked container understands.
-    container.get.calledWith("DocumentService").mockReturnValue({
+    container.rebind("DocumentService").toConstantValue({
       getCurrentDocumentReferenceString: () => ({ value: "Some.Page" }),
     });
-    container.get.calledWith("AttachmentsService").mockReturnValue({
+    container.rebind("AttachmentsService").toConstantValue({
       async upload() {
         if (!uploadedImageURL) {
           throw new Error("Failed to upload the file");
@@ -154,25 +153,23 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     });
     // Parses and serializes the page and attachment references like XWiki does, in order to check that the uploaded
     // images are inserted with the reference of the uploaded attachment, on the page it was uploaded to.
-    container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+    container.rebind("ModelReferenceParserProvider").toConstantValue({
       get: () => ({
         parse: (page: string) => ({ name: page }),
         parseAsync: async (page: string) => ({ name: page }),
       }),
     });
-    container.get
-      .calledWith("ModelReferenceSerializerProvider")
-      .mockReturnValue({
-        get: () => ({
-          serialize: (reference: {
-            name: string;
-            document?: { name: string };
-          }) =>
-            reference.document
-              ? `attach:${reference.document.name}@${reference.name}`
-              : reference.name,
-        }),
-      });
+    container.rebind("ModelReferenceSerializerProvider").toConstantValue({
+      get: () => ({
+        serialize: (reference: {
+          name: string;
+          document?: { name: string };
+        }) =>
+          reference.document
+            ? `attach:${reference.document.name}@${reference.name}`
+            : reference.name,
+      }),
+    });
 
     return container;
   }, []);

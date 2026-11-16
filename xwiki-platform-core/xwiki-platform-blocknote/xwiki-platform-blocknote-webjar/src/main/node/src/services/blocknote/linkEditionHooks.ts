@@ -52,7 +52,7 @@ function createLinkEditionHooks(
         // it.
         return linkData;
       }
-      const metadata = getBlockNoteDocument()?.getMetadata(id);
+      const metadata = getBlockNoteDocument()?.metadata.get(id);
       return {
         ...linkData,
         url: stripLinkId(linkData.url),
@@ -77,7 +77,7 @@ function createLinkEditionHooks(
         return linkData;
       }
       const id = extractLinkId(previous?.url ?? "") ?? uuidv4();
-      const metadata = getBlockNoteDocument()!.getMetadata(id, true)!;
+      const metadata = getBlockNoteDocument()!.metadata.get(id, true);
       if (linkData.reference) {
         // Preserve what the link editor doesn't edit when the link still points to the same resource, otherwise report
         // the new reference, so that the edited link points to the newly selected resource.

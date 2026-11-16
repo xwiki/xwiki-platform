@@ -44,13 +44,22 @@ import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
 
 // @beta
+export type BlockMetadata = Record<string, unknown>;
+
+// @beta
+export interface BlockMetadataStore {
+    get(id: string, create: true): BlockMetadata;
+    get(id: string, create?: boolean): BlockMetadata | undefined;
+}
+
+// @beta
 export type BlockNoteViewWrapperProps = {
     options: EditorOptions;
     content: BlockType[];
     linkEditionHandler: LinkEditionHandler;
     onChange?: (editor: EditorType) => void;
     refs?: {
-        setEditor?: (editor: EditorType) => void;
+        setInstance?: (instance: EditorInstance) => void;
     };
 };
 
@@ -69,8 +78,10 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 export type ContextForMacros = {
     openParamsEditor?(invocation: MacroBlockInvocation | InlineMacroInvocation, update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void): void;
     openInsertionEditor?(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
-    getMacroOutput?(id: string, call: string): unknown[] | undefined;
 };
+
+// @beta
+export function createBlockMetadataStore(): BlockMetadataStore;
 
 // @beta
 export type EditorAppearance = {
@@ -92,6 +103,14 @@ export type EditorFeatures = {
 // @beta
 export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<infer _, infer InlineContentSchema, infer __> ? InlineContentSchema : never;
 
+// @beta
+export type EditorInstance = {
+    editor: EditorType;
+    options: Readonly<EditorOptions>;
+    metadata: BlockMetadataStore;
+    container: Container;
+};
+
 // Warning: (ae-forgotten-export) The symbol "_default" needs to be exported by the entry point index.d.ts
 //
 // @beta (undocumented)
@@ -112,6 +131,7 @@ export type EditorOptions = {
     appearance?: EditorAppearance;
     collaboration?: Collaboration;
     upload?: UploadOptions;
+    metadata?: BlockMetadataStore;
     features?: EditorFeatures;
 };
 
@@ -134,6 +154,9 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 
 // @beta
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
+
+// @beta
+export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
 
 // @beta
 export type ImageEditionHooks = {
@@ -259,6 +282,9 @@ export type MacroInsertionEditorPrefillData = {
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
 };
+
+// @beta
+export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
 
 // @beta
 export type UploadOptions = {

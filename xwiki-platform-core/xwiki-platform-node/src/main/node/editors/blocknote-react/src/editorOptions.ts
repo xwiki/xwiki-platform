@@ -23,6 +23,7 @@ import type { ImageEditionOverrideFn } from "./components/images/CustomImageTool
 import type { ImageEditionHooks } from "./components/images/imageEditionHooks";
 import type { ImageInsertionOverrideFn } from "./components/images/imageInsertionOverride";
 import type { LinkEditionHooks } from "./components/links/linkEditionHooks";
+import type { BlockMetadataStore } from "./misc/blockMetadata";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
@@ -232,6 +233,14 @@ type EditorOptions = {
    * file panel (e.g. of an image block). Uploading is disabled when not specified.
    */
   upload?: UploadOptions;
+
+  /**
+   * Where to keep the data about the blocks of the edited content that isn't part of the content (e.g. the output of
+   * the macros, rendered for the current user). An integration specifies it when it fills it before the editor is
+   * created (e.g. with what it extracted while loading the content) or reads it after (e.g. to save the content). A
+   * store is created for the editor instance otherwise.
+   */
+  metadata?: BlockMetadataStore;
 
   /**
    * The options of each editor feature.

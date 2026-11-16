@@ -83,7 +83,7 @@
     #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppConfirmation',
       [$escapetool.xml($appTitle)]))
   #end
-  #set ($cancelURL = $doc.getURL())
+  #set ($escapedCancelURL = $escapetool.xml($doc.getURL()))
   #set ($confirmParams = {
     'appName': $services.model.serialize($appReference, 'local'),
     'resolve': true,
@@ -92,14 +92,14 @@
     'form_token': $services.csrf.token
   })
   #if ("$!request.xredirect" != '')
-    #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelURL)
+    #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$escapedCancelURL)
     ## We don't sanitize those parameters as the sanitation will be handled server side.
     #set ($confirmParams.xredirect = $request.xredirect)
   #end
   #set ($confirmURL = $doc.getURL($xcontext.action, $escapetool.url($confirmParams)))
   {{html}}
   #xwikimessagebox($services.localization.render('core.delete') $confirmationMessage $confirmURL
-    $escapetool.xml($cancelURL) $services.localization.render('yes') $services.localization.render('no'))
+    $escapedCancelURL $services.localization.render('yes') $services.localization.render('no'))
   {{/html}}
 #end
 {{/velocity}}

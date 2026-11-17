@@ -156,8 +156,13 @@ export function depsContainerMock(): Container {
     }),
   } satisfies LinkSuggestServiceProvider);
 
-  container.get.calledWith("AttachmentsService").mockReturnValue(null);
-  container.get.calledWith("DocumentService").mockReturnValue(null);
+  for (const service of [
+    "AttachmentsService",
+    "DocumentService",
+    "ResourceReferenceParser",
+  ]) {
+    container.get.calledWith(service).mockReturnValue(null);
+  }
 
   return withBuiltInLinkTargetTypes(container);
 }

@@ -41,8 +41,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
-import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
-import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
+import org.xwiki.livedata.internal.livetable.LiveTableNewEntryResolver.NewEntry;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -59,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -83,12 +83,6 @@ class LiveTableLiveDataEntryStoreTest
     private LiveTableLiveDataResultsRenderer resultsRenderer;
 
     @MockComponent
-    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
-
-    @Mock
-    private LiveTableNewRowNamingStrategy namingStrategy;
-
-    @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
@@ -98,6 +92,9 @@ class LiveTableLiveDataEntryStoreTest
 
     @MockComponent
     private ModelBridge modelBridge;
+
+    @MockComponent
+    private LiveTableNewEntryResolver newEntryResolver;
 
     @MockComponent
     @Named(LiveTableLiveDataEntryStore.ROLE_HINT)
@@ -115,10 +112,9 @@ class LiveTableLiveDataEntryStoreTest
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void before() throws Exception
+    void before()
     {
         when(this.liveDataConfigurationProvider.get()).thenReturn(this.liveDataConfiguration);
-        when(this.namingStrategyManager.get("uuid")).thenReturn(Optional.of(this.namingStrategy));
         when(this.liveDataConfiguration.getMeta()).thenReturn(this.liveDataMeta);
         when(this.liveDataMeta.getEntryDescriptor()).thenReturn(this.entryDescriptor);
         when(this.entryDescriptor.getIdProperty()).thenReturn("doc.fullName");
@@ -202,45 +198,38 @@ class LiveTableLiveDataEntryStoreTest
     void saveNewEntry() throws Exception
     {
         DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "uuid");
-        when(this.namingStrategy.generate(any(), any())).thenReturn(newReference);
+        Map<String, Object> entry = new HashMap<>();
+        when(this.newEntryResolver.resolve(this.entryStore.getParameters(), entry))
+            .thenReturn(new NewEntry(newReference, null));
         when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.uuid");
 
-        this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
+        assertEquals(Optional.of("NewEntries.uuid"), this.entryStore.save(entry));
+        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true, null);
+    }
+
+    @Test
+    void saveNewEntryFromTemplate() throws Exception
+    {
+        DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "uuid");
+        DocumentReference templateReference = new DocumentReference("xwiki", "Code", "Template");
         Map<String, Object> entry = new HashMap<>();
+        when(this.newEntryResolver.resolve(this.entryStore.getParameters(), entry))
+            .thenReturn(new NewEntry(newReference, templateReference));
+        when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.uuid");
 
         assertEquals(Optional.of("NewEntries.uuid"), this.entryStore.save(entry));
-        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true);
-        // The naming strategy can name the entry after the values it is created with.
-        verify(this.namingStrategy).generate(this.entryStore.getParameters(), entry);
+        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true, templateReference);
     }
 
     @Test
-    void saveNewEntryWithMandatoryProperties() throws Exception
+    void saveNewEntryThatCannotBeCreated() throws Exception
     {
-        DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "My entry");
-        when(this.namingStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title"));
-        when(this.namingStrategy.generate(any(), any())).thenReturn(newReference);
-        when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.My entry");
-
-        this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
         Map<String, Object> entry = new HashMap<>();
-        entry.put("doc.title", "My entry");
-
-        assertEquals(Optional.of("NewEntries.My entry"), this.entryStore.save(entry));
-        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true);
-    }
-
-    @Test
-    void saveNewEntryWithBlankMandatoryProperty()
-    {
-        when(this.namingStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title", "status"));
-
-        this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
-        Map<String, Object> entry = new HashMap<>();
-        entry.put("doc.title", " ");
+        when(this.newEntryResolver.resolve(this.entryStore.getParameters(), entry))
+            .thenThrow(new LiveDataException("Error"));
 
         LiveDataException exception = assertThrows(LiveDataException.class, () -> this.entryStore.save(entry));
-        assertEquals("Cannot create an entry without a value for [doc.title, status].", exception.getMessage());
+        assertEquals("Error", exception.getMessage());
         verifyNoInteractions(this.modelBridge);
     }
 
@@ -425,18 +414,6 @@ class LiveTableLiveDataEntryStoreTest
     }
 
     @Test
-    void saveEntryIdUndefined()
-    {
-        Map<String, Object> entry = new HashMap<>();
-        entry.put("doc.hidden", "true");
-        entry.put("myProperty", asList("1", "0"));
-        this.entryStore.getParameters().put("className", "MyTest.MyClass");
-        LiveDataException liveDataException =
-            assertThrows(LiveDataException.class, () -> this.entryStore.save(entry));
-        assertEquals("Unsupported row naming strategy [null].", liveDataException.getMessage());
-    }
-
-    @Test
     void save() throws Exception
     {
         Map<String, Object> entry = new HashMap<>();
@@ -454,7 +431,8 @@ class LiveTableLiveDataEntryStoreTest
         Optional<Object> save = this.entryStore.save(entry);
 
         assertEquals(Optional.of("MyTest.MyObject"), save);
-        verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference, Map.of(), 0, false);
+        verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference, Map.of(), 0, false,
+            null);
     }
 
     @Test
@@ -479,7 +457,7 @@ class LiveTableLiveDataEntryStoreTest
         this.entryStore.save(entry);
 
         verify(this.modelBridge).updateAll(entry, objectDocumentReference, null,
-            Map.of("customProperty", customClassReference), 0, false);
+            Map.of("customProperty", customClassReference), 0, false, null);
     }
 
     @Test
@@ -513,6 +491,6 @@ class LiveTableLiveDataEntryStoreTest
         this.entryStore.save(entry);
 
         verify(this.modelBridge).updateAll(eq(entry), eq(objectDocumentReference), any(),
-            eq(Map.of("customHTMLProperty", customClassReference)), eq(0), eq(false));
+            eq(Map.of("customHTMLProperty", customClassReference)), eq(0), eq(false), isNull());
     }
 }

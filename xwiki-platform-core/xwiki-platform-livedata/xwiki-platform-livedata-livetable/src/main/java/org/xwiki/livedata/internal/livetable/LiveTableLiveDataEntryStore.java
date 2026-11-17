@@ -22,7 +22,6 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,8 +43,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
-import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
-import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
+import org.xwiki.livedata.internal.livetable.LiveTableNewEntryResolver.NewEntry;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -96,7 +94,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     private ModelBridge modelBridge;
 
     @Inject
-    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+    private LiveTableNewEntryResolver newEntryResolver;
 
     @Inject
     @Named(ROLE_HINT)
@@ -246,15 +244,19 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
 
         DocumentReference documentReference;
         boolean create = false;
+        DocumentReference templateReference = null;
         if (fullName == null) {
-            documentReference = generateNewEntryReference(entry);
+            NewEntry newEntry = this.newEntryResolver.resolve(getParameters(), entry);
+            documentReference = newEntry.reference();
             create = true;
+            templateReference = newEntry.template();
         } else {
             documentReference = this.currentDocumentReferenceResolver.resolve(fullName);
         }
 
         try {
-            this.modelBridge.updateAll(entry, documentReference, classReference, propertyClassReferences, 0, create);
+            this.modelBridge.updateAll(entry, documentReference, classReference, propertyClassReferences, 0, create,
+                templateReference);
         } catch (AccessDeniedException | XWikiException e) {
             throw new LiveDataException(e);
         }
@@ -316,31 +318,5 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     private boolean isDocumentProperty(String property)
     {
         return StringUtils.defaultIfEmpty(property, "").startsWith(DOC_PREFIX);
-    }
-
-    private DocumentReference generateNewEntryReference(Map<String, Object> entry) throws LiveDataException
-    {
-        String namingStrategy = (String) getParameters().get("newRowNamingStrategy");
-        LiveTableNewRowNamingStrategy strategy = this.namingStrategyManager.get(namingStrategy).orElseThrow(
-            () -> new LiveDataException(String.format("Unsupported row naming strategy [%s].", namingStrategy)));
-        checkMandatoryProperties(strategy.getMandatoryProperties(getParameters()), entry);
-        try {
-            return strategy.generate(getParameters(), entry);
-        } catch (XWikiException e) {
-            throw new LiveDataException("An error occurred while generating the new entry reference.", e);
-        }
-    }
-
-    private void checkMandatoryProperties(Set<String> mandatoryProperties, Map<String, Object> entry)
-        throws LiveDataException
-    {
-        List<String> missingProperties = mandatoryProperties.stream()
-            .filter(property -> StringUtils.isBlank(Objects.toString(entry.get(property), null)))
-            .sorted()
-            .toList();
-        if (!missingProperties.isEmpty()) {
-            throw new LiveDataException(
-                String.format("Cannot create an entry without a value for %s.", missingProperties));
-        }
     }
 }

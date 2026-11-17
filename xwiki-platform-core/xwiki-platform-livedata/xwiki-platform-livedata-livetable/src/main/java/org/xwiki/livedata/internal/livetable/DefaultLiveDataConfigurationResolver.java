@@ -51,6 +51,10 @@ import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Adds missing live data configuration values specific to the live table source.
@@ -64,6 +68,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 @Singleton
 public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfigurationResolver
 {
+    private static final String NEW_ROW_LOCATION = "newRowLocation";
+
     /**
      * Used to translate the live data property names using the translation prefix specified by the live date source.
      */
@@ -90,6 +96,12 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
 
     @Inject
+    private NewRowTemplateProviderResolver templateProviderResolver;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
     private Logger logger;
 
     @Override
@@ -106,9 +118,10 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // We only enable the ability to add an entry if there is a naming strategy explicitly set and the current user
         // has the rights to create a page.
         Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
-        Optional<LiveTableNewRowNamingStrategy> strategy =
-            this.namingStrategyManager.get((String) sourceParams.get("newRowNamingStrategy"));
-        if (strategy.isPresent() && strategy.get().isCreationAllowed(sourceParams)) {
+        String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
+        setDefaultNewRowLocation(namingStrategy, sourceParams);
+        Optional<LiveTableNewRowNamingStrategy> strategy = this.namingStrategyManager.get(namingStrategy);
+        if (strategy.isPresent() && isCreationAllowed(strategy.get(), sourceParams)) {
             List<String> undescribedProperties =
                 setMandatory(mergedConfig.getMeta(), strategy.get().getMandatoryProperties(sourceParams));
             if (undescribedProperties.isEmpty()) {
@@ -116,6 +129,9 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
                 addEntry.setId("addEntry");
                 strategy.get().getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
                     .put("location", this.stringEntityReferenceSerializer.serialize(location)));
+                // The rows that have no entry yet are displayed from the template their entry is created from.
+                this.templateProviderResolver.getTemplate(sourceParams).ifPresent(template -> addEntry
+                    .getParameters().put("template", this.stringEntityReferenceSerializer.serialize(template)));
                 mergedConfig.getMeta().getActions().add(addEntry);
             } else {
                 // No entry could be created, since the user has no cell to give those values in.
@@ -126,6 +142,45 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
 
         // Translate using the context locale.
         return translate(mergedConfig, config);
+    }
+
+    /**
+     * Checks whether the current user can create new entries.
+     *
+     * @param strategy the naming strategy of the new entries
+     * @param sourceParams the live data source parameters
+     * @return {@code true} if the current user can create entries
+     * @throws LiveDataException if the template provider cannot be loaded
+     */
+    private boolean isCreationAllowed(LiveTableNewRowNamingStrategy strategy, Map<String, Object> sourceParams)
+        throws LiveDataException
+    {
+        if (!strategy.isCreationAllowed(sourceParams)) {
+            return false;
+        }
+        Optional<SpaceReference> location = strategy.getNewEntryLocation(sourceParams);
+        // Without a known location, we can't check that the user has the required rights beforehand, so the
+        // template's required rights are only checked when the entry is actually created.
+        return location.isEmpty() || this.templateProviderResolver.hasRequiredRights(sourceParams, location.get());
+    }
+
+    /**
+     * Makes the {@code templateProvider} naming strategy create new entries in the space of the page displaying the
+     * Live Data when no {@code newRowLocation} is given, like AppWithinMinutes does.
+     *
+     * @param namingStrategy the naming strategy of the new entries
+     * @param sourceParams the live data source parameters
+     */
+    private void setDefaultNewRowLocation(String namingStrategy, Map<String, Object> sourceParams)
+    {
+        if (TemplateProviderLiveTableNewRowNamingStrategy.HINT.equals(namingStrategy)
+            && StringUtils.isBlank((String) sourceParams.get(NEW_ROW_LOCATION))) {
+            XWikiDocument hostDocument = this.xcontextProvider.get().getDoc();
+            if (hostDocument != null) {
+                sourceParams.put(NEW_ROW_LOCATION, this.stringEntityReferenceSerializer
+                    .serialize(hostDocument.getDocumentReference().getLastSpaceReference()));
+            }
+        }
     }
 
     /**

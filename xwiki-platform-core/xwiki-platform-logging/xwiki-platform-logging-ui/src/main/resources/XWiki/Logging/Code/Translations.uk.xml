@@ -40,4 +40,4 @@
 logging.admin.setLevel.success=Рівень logger "{0}" встановлено на "{1}".
 logging.admin.setLevel.error=Не вдалося встановити рівень журналу: logger "{0}" не існує.
 </content>
-</xwikidoc>
+  </xwikidoc>

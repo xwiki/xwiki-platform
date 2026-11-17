@@ -417,11 +417,11 @@ li.card {
   width: 24%;
 }
 
-.three-cols &gt; li.card {
+.three-cols > li.card {
   width: 32%;
 }
 
-.two-cols &gt; li.card {
+.two-cols > li.card {
   width: 49%;
 }
 
@@ -432,18 +432,18 @@ li.card {
 }
 
 @media (max-width: @screen-md-min) {
-  .card-list &gt; li.card {
+  .card-list > li.card {
     width: 49%;
   }
 }
 
 @media (max-width: @screen-sm-min) {
-  .card-list &gt; li.card {
+  .card-list > li.card {
     width: 100%;
   }
 }
 
-li.card &gt; .well {
+li.card > .well {
   height: 100%;
   margin-bottom: 0px;
 }

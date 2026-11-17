@@ -136,4 +136,4 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[{ca
 *** **##alt##**: A parameter that defines which text should be displayed if the browser is not able to display the image. Since this is a required HTML attribute XWiki will use the file name instead if the ##alt## parameter is not defined. Example: ##alt="img.png"##
 *** **More**: A more in depth explanation on the HTML ##&lt;img&gt;## tag including more attributes can be reviewed [[in the HTML standard&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
 ** **##queryString##**: Allows queries to be passed to the server when creating the download link for the referenced image. Example: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## will fail if the ##width## and ##height## parameters are specified in addition to ##queryString##!**)</content>
-</xwikidoc>
+  </xwikidoc>

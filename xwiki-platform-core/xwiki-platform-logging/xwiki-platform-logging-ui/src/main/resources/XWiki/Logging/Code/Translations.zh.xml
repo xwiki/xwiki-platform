@@ -40,4 +40,4 @@
 logging.admin.setLevel.success=日志记录器"{0}" 级别已设置为 "{1}"。
 logging.admin.setLevel.error=设置日志级别失败：日志记录器 "{0}" 不存在。
 </content>
-</xwikidoc>
+  </xwikidoc>

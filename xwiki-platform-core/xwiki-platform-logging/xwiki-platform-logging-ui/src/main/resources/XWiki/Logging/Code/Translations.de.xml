@@ -40,4 +40,4 @@
 logging.admin.setLevel.success=Die Logger-Stufe "{0}" wurde auf "{1}" gesetzt.
 logging.admin.setLevel.error=Loglevel konnte nicht gesetzt werden: der Logger "{0}" existiert nicht.
 </content>
-</xwikidoc>
+  </xwikidoc>

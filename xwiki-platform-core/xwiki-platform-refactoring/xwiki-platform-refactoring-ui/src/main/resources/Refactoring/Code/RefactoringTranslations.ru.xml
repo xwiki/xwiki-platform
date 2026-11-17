@@ -42,4 +42,4 @@ Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=М�
 Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=Если установлено значение Да, продвинутые пользователи могут выбирать, отправлять ли страницы в корзину или удалять их навсегда при удалении страниц. Если установлено значение Нет, страницы всегда отправляются в корзину, если она активна, в противном случае они всегда удаляются безвозвратно. По умолчанию установлено значение Нет.
 refactoring.configuration.delete.emptySection=В этом разделе настраивать нечего.
 </content>
-</xwikidoc>
+  </xwikidoc>

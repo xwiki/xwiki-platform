@@ -64,4 +64,4 @@ XWiki Syntax 2.0 har generelt vist sig at være ret nyttig og robust, men siden 
 * Mulighed for at vise ikoner, indlejre billeder via Data URI-skemaet, linke til filer med UNC-notation og linke til relative URL'er.
 
 {{info}}Da XWiki Syntax 2.1 bygger på XWiki Syntax 2.0, er al syntaks fra XWiki Syntax 2.0 gyldig, medmindre specifikationen for 2.1 siger noget andet.{{/info}}</content>
-</xwikidoc>
+  </xwikidoc>

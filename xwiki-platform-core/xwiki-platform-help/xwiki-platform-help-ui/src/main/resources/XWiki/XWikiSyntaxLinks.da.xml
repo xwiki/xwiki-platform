@@ -238,4 +238,4 @@ Det fulde format for et link er **##[label&gt;&gt;] (resource) [||parameters]##*
 ** **##queryString##**: En valgfri forespørgselsstreng med parametre, der føjes til linkets måladresse og bruges i den gengivne URL. Eksempel: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## giver måladressen ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: Et valgfrit ankernavn, der peger på et anker i det link, der henvises til. Bemærk, at XWiki automatisk opretter ankre for overskrifter og billeder. Eksempel: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## giver måladressen ##http:~/~/domain.com/path#HTableOfContents##
 ** **##target##**: En valgfri parameter, der gør det muligt at åbne linkets mål i et nyt vindue. Eksempel: ##target="~_blank"##</content>
-</xwikidoc>
+  </xwikidoc>

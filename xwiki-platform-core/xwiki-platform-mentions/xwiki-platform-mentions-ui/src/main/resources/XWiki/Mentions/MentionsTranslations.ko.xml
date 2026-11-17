@@ -58,4 +58,4 @@ XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=사용자 멘션 �
 mentions.tip=WYSIWYG에서 편집할 때 @를 입력한 다음 문자를 입력하기 시작하면 사용자를 언급하라는 제안이 표시됩니다.
 mentions.configuration.heading=멘션 환경설정
 </content>
-</xwikidoc>
+  </xwikidoc>

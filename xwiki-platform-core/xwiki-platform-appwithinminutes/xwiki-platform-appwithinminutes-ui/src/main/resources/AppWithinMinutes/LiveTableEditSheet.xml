@@ -591,14 +591,14 @@ XWiki.LiveTableEditor = Class.create({
     this.columnsInput.parentNode.appendChild(this.deprecationMessage);
     this.deprecationMessage.querySelector('.removeDeprecatedColumns')
       .addEventListener('click', this._onRemoveDeprecatedColumns.bind(this));
-    this.deprecationMessage.querySelector('.keepDeprecatedColumns').addEventListener('click', event =&gt; {
+    this.deprecationMessage.querySelector('.keepDeprecatedColumns').addEventListener('click', event => {
       event.preventDefault();
       this.deprecationMessage.classList.add('hidden');
     });
   },
   _onRemoveDeprecatedColumns : function(event) {
     event.preventDefault();
-    this.list.querySelectorAll('.deprecated').forEach(item =&gt; item.remove());
+    this.list.querySelectorAll('.deprecated').forEach(item => item.remove());
     this.deprecationMessage.classList.add('hidden');
   },
   _onSave : function() {

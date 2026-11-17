@@ -21,15 +21,30 @@ package org.xwiki.search.solr.ui;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryFilter;
+import org.xwiki.query.internal.DefaultQuery;
+import org.xwiki.query.internal.ScriptQuery;
+import org.xwiki.query.script.QueryManagerScriptService;
+import org.xwiki.query.solr.SolrQueryScriptService;
+import org.xwiki.query.solr.internal.SafeSolrQueryValidator;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
@@ -47,6 +62,11 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Page test for {@code Main.SolrSearch}.
@@ -56,7 +76,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ComponentList({
     TemplateMacro.class,
     TestNoScriptMacro.class,
-    AllUserPropertiesResolver.class
+    AllUserPropertiesResolver.class,
+    SolrQueryScriptService.class,
+    SafeSolrQueryValidator.class,
+    DefaultSolrUtils.class
 })
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
@@ -104,8 +127,109 @@ class SolrSearchPageTest extends PageTest
         String unescapedText = "<b>}}}{{noscript}}</b>";
         String escapedText = "&lt;b&gt;}}}{{noscript}}&lt;/b&gt;";
 
-        this.request.put("media", "rss");
         this.request.put("text", unescapedText);
+
+        String rssFeed = getRSSFeed();
+
+        assertTrue(rssFeed.contains("<title>search.rss [[" + escapedText + "]]</title>"));
+        assertTrue(rssFeed.contains("<description>search.rss [[" + escapedText + "]]</description>"));
+    }
+
+    @Test
+    void supportedRequestParameters() throws Exception
+    {
+        List<Query> executedQueries = mockQueryExecution();
+
+        this.request.put("text", "text");
+        this.request.put("f_type", "DOCUMENT");
+        this.request.put("f_property.My$20Space.Été.prop_string", "(value* OR other*)");
+        this.request.put("f_property.My-App.Code.TagClass.tags_string", "tag");
+        this.request.put("f_date", "[NOW-1DAY TO NOW]");
+        this.request.put("f_creationdate", "[2024-01-01T00:00:00.000Z TO NOW/DAY+1DAY}");
+        this.request.put("f_attsize", "{1024 TO *]");
+        this.request.put("sort", "property.My$20Space.Été.prop_sortString");
+        this.request.put("sortOrder", "asc");
+        this.request.put("boost", "title^2 name^1.5 doccontent");
+
+        getRSSFeed();
+
+        assertEquals(1, executedQueries.size());
+        Map<String, Object> parameters = executedQueries.get(0).getNamedParameters();
+        List<?> filterQueries = (List<?>) parameters.get("fq");
+        assertTrue(filterQueries.containsAll(List.of(
+            "{!tag=type}type:(\"DOCUMENT\")",
+            "{!tag=property.My$20Space.Été.prop_string}property.My$20Space.Été.prop_string:((value* OR other*))",
+            "{!tag=property.My-App.Code.TagClass.tags_string}property.My-App.Code.TagClass.tags_string:(\"tag\")",
+            "{!tag=date}date:([NOW-1DAY TO NOW])",
+            "{!tag=creationdate}creationdate:([2024-01-01T00:00:00.000Z TO NOW/DAY+1DAY})",
+            "{!tag=attsize}attsize:({1024 TO *])")),
+            filterQueries.toString());
+        assertEquals("property.My$20Space.Été.prop_sortString asc", parameters.get("sort"));
+        assertEquals("title^2 name^1.5 doccontent", parameters.get("qf"));
+    }
+
+    @Test
+    void unsupportedRequestParametersAreIgnored() throws Exception
+    {
+        List<Query> executedQueries = mockQueryExecution();
+
+        this.request.put("text", "text");
+        this.request.put("f_type", "DOCUMENT");
+        this.request.put("f_some field", "value");
+        this.request.put("f_$other", "value");
+        this.request.put("f__query_", "{!term f=name}value");
+        this.request.put("f_space", "{!lucene TO v=$text}");
+        this.request.put("f_date", "[NOW-1DAY TO NOW] {!tag=date}");
+        this.request.put("f_attsize", "[1 TO 2] OR name:value");
+        this.request.put("f_creationdate", "[\"2024-01-01T00:00:00Z\" TO *]");
+        this.request.put("f_name", "(name:value*)");
+        this.request.put("f_title", "${text}");
+        this.request.put("sort", "sum(1,2)");
+
+        getRSSFeed();
+
+        assertEquals(1, executedQueries.size());
+        Map<String, Object> parameters = executedQueries.get(0).getNamedParameters();
+        List<?> filterQueries = (List<?>) parameters.get("fq");
+        assertTrue(filterQueries.stream().map(Object::toString).noneMatch(filterQuery -> filterQuery.contains("some field")
+            || filterQuery.contains("other") || filterQuery.contains("_query_")), filterQueries.toString());
+        // The unsupported values are used as literal values.
+        assertTrue(filterQueries.containsAll(List.of(
+            "{!tag=date}date:(\"\\[NOW\\-1DAY\\ TO\\ NOW\\]\\ \\{\\!tag=date\\}\")",
+            "{!tag=attsize}attsize:(\"\\[1\\ TO\\ 2\\]\\ \\OR\\ name\\:value\")",
+            "{!tag=creationdate}creationdate:(\"\\[\\\"2024\\-01\\-01T00\\:00\\:00Z\\\"\\ TO\\ \\*\\]\")",
+            "{!tag=name}name:(\"\\(name\\:value\\*\\)\")",
+            "{!tag=title}title:(\"$\\{text\\}\")",
+            "{!tag=space}space:(\"\\{\\!lucene\\ TO\\ v=$text\\}\")")), filterQueries.toString());
+        assertEquals("score desc", parameters.get("sort"));
+    }
+
+    private List<Query> mockQueryExecution() throws Exception
+    {
+        List<Query> executedQueries = new ArrayList<>();
+        QueryExecutor queryExecutor = mock();
+        QueryResponse queryResponse = mock();
+        when(queryResponse.getResults()).thenReturn(new SolrDocumentList());
+        when(queryExecutor.execute(any())).then(invocation -> {
+            executedQueries.add(invocation.getArgument(0));
+            return List.of(queryResponse);
+        });
+
+        QueryManagerScriptService queryManagerScriptService = mock();
+        when(queryManagerScriptService.createQuery(anyString(), eq("solr"))).then(
+            invocation -> new ScriptQuery(new DefaultQuery(invocation.getArgument(0), "solr", queryExecutor),
+                this.componentManager));
+        when(queryManagerScriptService.get("solr"))
+            .thenReturn(this.componentManager.getInstance(ScriptService.class, "query.solr"));
+        this.componentManager.registerComponent(ScriptService.class, "query", queryManagerScriptService);
+        this.componentManager.registerMockComponent(QueryFilter.class, "searchExclusions/solr");
+
+        return executedQueries;
+    }
+
+    private String getRSSFeed() throws Exception
+    {
+        this.request.put("media", "rss");
         this.context.setAction("get");
 
         XWikiDocument solrSearchDocument = loadPage(SOLR_SEARCH_REFERENCE);
@@ -126,8 +250,6 @@ class SolrSearchPageTest extends PageTest
         String rssFeed = solrSearchDocument.displayDocument(Syntax.PLAIN_1_0, this.context);
         assertTrue(StringUtils.isAllBlank(rssFeed));
 
-        rssFeed = out.toString();
-        assertTrue(rssFeed.contains("<title>search.rss [[" + escapedText + "]]</title>"));
-        assertTrue(rssFeed.contains("<description>search.rss [[" + escapedText + "]]</description>"));
+        return out.toString();
     }
 }

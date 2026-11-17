@@ -69,6 +69,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfigurationResolver
 {
+    private static final String NEW_ROW_LOCATION = "newRowLocation";
+
     /**
      * Used to translate the live data property names using the translation prefix specified by the live date source.
      */
@@ -119,7 +121,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // has the rights to create a page.
         Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
         String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
-        setHostDocument(namingStrategy, sourceParams);
+        setDefaultNewRowLocation(namingStrategy, sourceParams);
         ComponentManager componentManager = this.componentManagerProvider.get();
         if (namingStrategy != null
             && componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
@@ -175,18 +177,20 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     }
 
     /**
-     * Records the page containing the Live Data.
+     * Makes the {@code templateProvider} naming strategy create new entries in the space of the page displaying the
+     * Live Data when no {@code newRowLocation} is given, like AppWithinMinutes does.
      *
      * @param namingStrategy the naming strategy of the new entries
      * @param sourceParams the live data source parameters
      */
-    private void setHostDocument(String namingStrategy, Map<String, Object> sourceParams)
+    private void setDefaultNewRowLocation(String namingStrategy, Map<String, Object> sourceParams)
     {
-        if (namingStrategy != null && !sourceParams.containsKey(LiveTableRequestHandler.LIVE_DATA_HOST_DOCUMENT)) {
+        if (TemplateProviderLiveTableNewRowNamingStrategy.HINT.equals(namingStrategy)
+            && StringUtils.isBlank((String) sourceParams.get(NEW_ROW_LOCATION))) {
             XWikiDocument hostDocument = this.xcontextProvider.get().getDoc();
             if (hostDocument != null) {
-                sourceParams.put(LiveTableRequestHandler.LIVE_DATA_HOST_DOCUMENT,
-                    this.stringEntityReferenceSerializer.serialize(hostDocument.getDocumentReference()));
+                sourceParams.put(NEW_ROW_LOCATION, this.stringEntityReferenceSerializer
+                    .serialize(hostDocument.getDocumentReference().getLastSpaceReference()));
             }
         }
     }

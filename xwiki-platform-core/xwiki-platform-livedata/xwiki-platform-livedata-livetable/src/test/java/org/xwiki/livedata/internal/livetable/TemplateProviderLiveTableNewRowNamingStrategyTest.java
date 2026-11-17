@@ -31,11 +31,11 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
+import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.pagetemplate.TemplateProvider;
@@ -51,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -69,16 +70,12 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
 
     private static final String HOME = "Home";
 
-    private static final String HOST_DOCUMENT = "Apps.Home";
-
     private static final SpaceReference PROVIDER_LOCATION = new SpaceReference("wiki", List.of("Apps", "Data"));
 
     private static final SpaceReference PARAMETER_LOCATION = new SpaceReference("wiki", LOCATION);
 
-    private static final SpaceReference HOST_LOCATION = new SpaceReference("wiki", "Apps");
-
-    private static final Map<String, Object> PARAMETERS = Map.of("newRowNamingStrategy", "templateProvider",
-        "newRowLocation", LOCATION, "liveDataHostDocument", HOST_DOCUMENT);
+    private static final Map<String, Object> PARAMETERS =
+        Map.of("newRowNamingStrategy", "templateProvider", "newRowLocation", LOCATION);
 
     @InjectMockComponents
     private TemplateProviderLiveTableNewRowNamingStrategy strategy;
@@ -89,10 +86,6 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
     @MockComponent
     @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
-
-    @MockComponent
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
@@ -121,8 +114,6 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
         // The wiki can be configured with a default page name other than WebHome.
         when(this.entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference(HOME, EntityType.DOCUMENT));
-        when(this.currentDocumentReferenceResolver.resolve(HOST_DOCUMENT))
-            .thenReturn(new DocumentReference("Home", HOST_LOCATION));
 
         this.templateProvider = new TemplateProvider(new DocumentReference("wiki", "Apps", "MovieTemplateProvider"));
         this.templateProvider.setCreationRestrictions(List.of(PROVIDER_LOCATION));
@@ -167,6 +158,22 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
     }
 
     @Test
+    void generateAppliesTheNameStrategyToTheSuffix() throws Exception
+    {
+        this.templateProvider.setTerminal(true);
+        EntityNameValidation nameStrategy = mock(EntityNameValidation.class);
+        when(this.entityNameValidationManager.getEntityReferenceNameStrategy()).thenReturn(nameStrategy);
+        when(this.entityNameValidationConfiguration.useTransformation()).thenReturn(true);
+        // A name strategy replacing the dashes.
+        when(nameStrategy.transform(TITLE)).thenReturn("My_movie");
+        when(nameStrategy.transform("My_movie-1")).thenReturn("My_movie_1");
+        when(this.modelBridge.exists(new DocumentReference("My_movie", PROVIDER_LOCATION))).thenReturn(true);
+
+        assertEquals(new DocumentReference("My_movie_1", PROVIDER_LOCATION),
+            this.strategy.generate(PARAMETERS, Map.of(TITLE_PROPERTY, TITLE)));
+    }
+
+    @Test
     void generateSuffixesANameTakenByATerminalPage() throws Exception
     {
         when(this.modelBridge.exists(new DocumentReference(TITLE, PROVIDER_LOCATION))).thenReturn(true);
@@ -207,15 +214,6 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
         this.templateProvider.setCreationRestrictions(List.of());
 
         assertEquals(Optional.of(PARAMETER_LOCATION), this.strategy.getNewEntryLocation(PARAMETERS));
-    }
-
-    @Test
-    void getNewEntryLocationNextToTheHostDocument() throws Exception
-    {
-        Map<String, Object> parameters = Map.of("liveDataHostDocument", HOST_DOCUMENT);
-        when(this.templateProviderResolver.resolve(parameters)).thenReturn(Optional.empty());
-
-        assertEquals(Optional.of(HOST_LOCATION), this.strategy.getNewEntryLocation(parameters));
     }
 
     @Test

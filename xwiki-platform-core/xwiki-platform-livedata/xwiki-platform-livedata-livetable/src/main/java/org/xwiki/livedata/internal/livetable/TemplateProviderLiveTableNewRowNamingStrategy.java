@@ -26,13 +26,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.pagetemplate.TemplateProvider;
@@ -42,8 +40,8 @@ import com.xpn.xwiki.XWikiException;
 /**
  * {@link LiveTableNewRowNamingStrategy} that names new entries after their title, and creates them where and how a
  * template provider says, like AppWithinMinutes does. New entries go in the first space the template provider
- * restricts creation to, or else in {@code newRowLocation}, or else in the space of the page containing the live
- * data. They are terminal pages or nested pages as the template provider says, and terminal pages without one.
+ * restricts creation to, or else in {@code newRowLocation}, which defaults to the space of the page containing the
+ * live data. They are terminal pages or nested pages as the template provider says, and terminal pages without one.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -67,10 +65,6 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
 
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
     @Override
     public DocumentReference generate(Map<String, Object> parameters, Map<String, Object> entryValues)
         throws LiveDataException, XWikiException
@@ -83,14 +77,14 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
         // The title is what the user typed, so two entries can legitimately want the same name. The extra entries get
         // a suffix rather than a failure.
         for (int suffix = 1; isTaken(candidateName, location); suffix++) {
-            candidateName = String.format("%s-%d", name, suffix);
+            candidateName = getSuffixedName(name, suffix);
         }
         return getReference(candidateName, location, terminal);
     }
 
     /**
      * Finds where new entries go: the first space the template provider restricts creation to, or else
-     * {@code newRowLocation}, or else the space of the page containing the live data.
+     * {@code newRowLocation}.
      *
      * @param parameters the live data source parameters
      * @return the location of the new entries, or {@link Optional#empty()} when there is none
@@ -105,18 +99,7 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
             return providerLocation;
         }
 
-        Optional<SpaceReference> parameterLocation = super.getLocation(parameters);
-        if (parameterLocation.isPresent()) {
-            return parameterLocation;
-        }
-
-        String hostDocument = (String) parameters.get(LiveTableRequestHandler.LIVE_DATA_HOST_DOCUMENT);
-        if (StringUtils.isNotBlank(hostDocument)) {
-            DocumentReference hostReference = this.currentDocumentReferenceResolver.resolve(hostDocument);
-            return Optional.of(hostReference.getLastSpaceReference());
-        }
-
-        return Optional.empty();
+        return super.getLocation(parameters);
     }
 
     // A terminal page and the home page of a space with the same name display the same, so neither form can be used

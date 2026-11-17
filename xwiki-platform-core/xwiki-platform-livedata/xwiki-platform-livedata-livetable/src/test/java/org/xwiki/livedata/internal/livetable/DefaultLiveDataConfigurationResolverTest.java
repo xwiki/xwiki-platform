@@ -187,37 +187,40 @@ class DefaultLiveDataConfigurationResolverTest
     }
 
     @Test
-    void hostDocumentIsRecordedWithANamingStrategy() throws Exception
+    void newRowLocationDefaultsToTheHostSpaceWithTheTemplateProviderStrategy() throws Exception
     {
-        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "templateProvider");
         DocumentReference hostReference = new DocumentReference("xwiki", "Apps", "Home");
         when(this.xcontext.getDoc()).thenReturn(new XWikiDocument(hostReference));
-        when(this.stringEntityReferenceSerializer.serialize(hostReference)).thenReturn("Apps.Home");
+        when(this.stringEntityReferenceSerializer.serialize(hostReference.getLastSpaceReference()))
+            .thenReturn("Apps");
 
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
-        assertEquals("Apps.Home", actualConfig.getQuery().getSource().getParameters().get("liveDataHostDocument"));
+        assertEquals("Apps", actualConfig.getQuery().getSource().getParameters().get("newRowLocation"));
     }
 
     @Test
-    void hostDocumentIsKeptWhenAlreadyRecorded() throws Exception
+    void newRowLocationIsKeptWithTheTemplateProviderStrategy() throws Exception
     {
         this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "templateProvider");
-        this.config.getQuery().getSource().setParameter("liveDataHostDocument", "Apps.Home");
+        this.config.getQuery().getSource().setParameter("newRowLocation", "Movies");
 
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
         // The entries are created by a separate request, whose current document is not the one displaying the data.
-        assertEquals("Apps.Home", actualConfig.getQuery().getSource().getParameters().get("liveDataHostDocument"));
+        assertEquals("Movies", actualConfig.getQuery().getSource().getParameters().get("newRowLocation"));
         verifyNoInteractions(this.xcontext);
     }
 
     @Test
-    void hostDocumentIsNotRecordedWithoutNamingStrategy() throws Exception
+    void newRowLocationHasNoDefaultWithOtherStrategies() throws Exception
     {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+
         LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
 
-        assertFalse(actualConfig.getQuery().getSource().getParameters().containsKey("liveDataHostDocument"));
+        assertFalse(actualConfig.getQuery().getSource().getParameters().containsKey("newRowLocation"));
         verifyNoInteractions(this.xcontext);
     }
 

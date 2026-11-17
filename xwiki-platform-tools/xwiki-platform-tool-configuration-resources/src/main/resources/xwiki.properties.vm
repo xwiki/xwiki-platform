@@ -287,9 +287,9 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Comma-separated list of additional tags that should be allowed by the HTML sanitizer. These tags will be allowed
 #-# in addition to the already extensive built-in list of tags that are considered safe. Use with care to avoid
 #-# introducing security issues. By default, the following tags are allowed:
-#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/99484d48e899a68a1b6e33d457825b776c6fe8c3/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L63-L74
-#-# SVG tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L91-L102
-#-# MathML tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L62-L64
+#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/b2f1edee75f5ee4fe53af7bffee8664392ce39d4/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L76-L86
+#-# SVG tags: https://github.com/xwiki/xwiki-commons/blob/b2f1edee75f5ee4fe53af7bffee8664392ce39d4/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L97-L111
+#-# MathML tags: https://github.com/xwiki/xwiki-commons/blob/b2f1edee75f5ee4fe53af7bffee8664392ce39d4/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L255-L258
 # xml.htmlElementSanitizer.extraAllowedTags =
 
 #-# [Since 14.6RC1]
@@ -297,10 +297,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# be allowed in addition to the already extensive built-in list of attributes that are considered safe. This option
 #-# is useful if your content uses attributes that are invalid in HTML. Use with care to avoid introducing security
 #-# issues. By default, the following attributes are allowed:
-#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/99484d48e899a68a1b6e33d457825b776c6fe8c3/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L76-L91
-#-# SVG attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L66-L89
-#-# MathML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L73-L79
-#-# XML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SecureHTMLElementSanitizer.java#L135
+#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/b2f1edee75f5ee4fe53af7bffee8664392ce39d4/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L90-L103
+#-# SVG attributes: https://github.com/xwiki/xwiki-commons/blob/b2f1edee75f5ee4fe53af7bffee8664392ce39d4/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L71-L95
+#-# MathML attributes: https://github.com/xwiki/xwiki-commons/blob/b2f1edee75f5ee4fe53af7bffee8664392ce39d4/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L266-L272
+#-# XML attributes: https://github.com/xwiki/xwiki-commons/blob/b2f1edee75f5ee4fe53af7bffee8664392ce39d4/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SecureHTMLElementSanitizer.java#L158-L159
 # xml.htmlElementSanitizer.extraAllowedAttributes =
 
 #-# [Since 14.6RC1]
@@ -325,9 +325,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# This property can be set on several lines to declare several attributes (one attribute per line); listing the same
 #-# attribute on several lines does not accumulate, only the last line is kept, so list all elements of an attribute
 #-# in a single value.
-#-# By default, only the "name" attribute is restricted: to mitigate DOM clobbering it is allowed solely on "a" (legacy
-#-# anchors) and "map" (image maps) and forbidden on all other elements. For example, to additionally allow "name" on
-#-# "div" and "section" and to restrict the "headers" attribute to the table cells "th" and "td":
+#-# By default, two attributes are restricted:
+#-# - "name" is allowed solely on "a" (legacy anchors) and "map" (image maps) to mitigate DOM clobbering
+#-# - "for" is allowed solely on "label" and "output", as on other elements like "template" it can be used to patch
+#-#   content into other parts of the page (declarative partial updates)
+#-# For example, to additionally allow "name" on "div" and "section" and to restrict the "headers" attribute to the
+#-# table cells "th" and "td":
 #-#   xml.htmlElementSanitizer.extraElementRestrictedAttributes = name = div section, headers = th td
 # xml.htmlElementSanitizer.extraElementRestrictedAttributes =
 

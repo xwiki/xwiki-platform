@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.NativeQuery;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.store.hibernate.AbstractHibernateAdapter;
@@ -80,7 +81,7 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
                 this.logger.info("Changing the compression of table [{}] with [{}]", tableName, statement);
 
                 // Create the query
-                NativeQuery<?> query = session.createNativeQuery(statement);
+                MutationQuery query = session.createNativeMutationQuery(statement);
 
                 // Execute the query
                 session.getTransaction().begin();
@@ -132,7 +133,7 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
     {
         String schema = getDatabaseFromWikiName();
 
-        NativeQuery<String> query = session.createNativeQuery(getCompressedTablesStatement(schema));
+        NativeQuery<String> query = session.createNativeQuery(getCompressedTablesStatement(schema), String.class);
         if (schema != null) {
             query.setParameter(OWNER_PARAMETER, schema);
         }

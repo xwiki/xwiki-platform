@@ -216,12 +216,12 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
             if (resultSet.next()) {
                 String currentColumnType = resultSet.getString("TYPE_NAME");
 
-                Column column = (Column) property.getColumnIterator().next();
-                String expectedColumnType =
+                Column column = property.getColumns().get(0);
+                String[] expectedColumnTypes =
                     configurationMetadata.getDatabase().getTypeConfiguration().getDdlTypeRegistry()
-                        .getDescriptor(column.getSqlTypeCode(configurationMetadata)).getRawTypeName();
+                        .getDescriptor(column.getSqlTypeCode(configurationMetadata)).getRawTypeNames();
 
-                if (!currentColumnType.equalsIgnoreCase(expectedColumnType)) {
+                if (Arrays.stream(expectedColumnTypes).noneMatch(currentColumnType::equalsIgnoreCase)) {
                     int expectedLenght = HibernateStore.getLength(column);
 
                     int currentColumnSize = resultSet.getInt("COLUMN_SIZE");

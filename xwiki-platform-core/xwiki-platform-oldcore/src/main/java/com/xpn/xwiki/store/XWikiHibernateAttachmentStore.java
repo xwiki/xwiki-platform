@@ -102,9 +102,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     AttachmentVersioningStore store = resolveAttachmentVersioningStore(attachment, context);
 
                     if (exist) {
-                        session.update(content);
+                        session.merge(content);
                     } else {
-                        session.save(content);
+                        session.persist(content);
                     }
 
                     if (attachment.getAttachment_archive() == null) {
@@ -218,7 +218,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             executeRead(inputxcontext, session -> {
                 try {
                     XWikiAttachmentContent content = new XWikiAttachmentContent();
-                    session.load(content, Long.valueOf(attachment.getId()));
+                    // Object typed identifier to call Session#load(Object, Object)
+                    Object id = attachment.getId();
+                    session.load(content, id);
                     // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
                     content.setContentDirty(false);
 
@@ -312,7 +314,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
                 // Delete the three attachment entries
                 try {
-                    session.delete(new XWikiAttachmentContent(attachment));
+                    session.remove(new XWikiAttachmentContent(attachment));
                 } catch (Exception e) {
                     this.logger.warn("Error deleting attachment content [{}] of document [{}]. Root cause is [{}]",
                         attachment.getFilename(), attachment.getDoc().getDocumentReference(),
@@ -323,7 +325,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 store.deleteArchive(attachment, context, false);
 
                 try {
-                    session.delete(attachment);
+                    session.remove(attachment);
                 } catch (Exception e) {
                     this.logger.warn("Error deleting attachment meta data [{}] of document [{}]. Root cause is [{}]",
                         attachment.getFilename(), attachment.getDoc().getDocumentReference(),

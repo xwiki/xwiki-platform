@@ -247,7 +247,7 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
         org.hibernate.query.Query<T> hquery;
 
         if (!query.isNamed()) {
-            hquery = session.createQuery(query.getStatement());
+            hquery = untyped(session.createQuery(query.getStatement(), Object.class));
             populateParameters(hquery, query);
         } else {
             hquery = createNamedHibernateQuery(session, query);
@@ -343,9 +343,19 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
         return HqlQueryUtils.toCompleteStatement(statement);
     }
 
+    /**
+     * The queries are created with an {@link Object} result type, which means any result type: a single selected item
+     * is returned as is and several selected items as an {@code Object[]}.
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> org.hibernate.query.Query<T> untyped(org.hibernate.query.Query<Object> query)
+    {
+        return (org.hibernate.query.Query<T>) query;
+    }
+
     private <T> org.hibernate.query.Query<T> createNamedHibernateQuery(Session session, Query query)
     {
-        org.hibernate.query.Query<T> hQuery = session.getNamedQuery(query.getStatement());
+        org.hibernate.query.Query<T> hQuery = untyped(session.createNamedQuery(query.getStatement(), Object.class));
 
         Query filteredQuery = query;
         if (filteredQuery.getFilters() != null && !filteredQuery.getFilters().isEmpty()) {
@@ -372,13 +382,13 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
                 NamedNativeQueryDefinition<?> definition =
                     this.hibernate.getConfigurationMetadata().getNamedNativeQueryMapping(query.getStatement());
                 if (!StringUtils.isEmpty(definition.getResultSetMappingName())) {
-                    hQuery = session.createNativeQuery(filteredQuery.getStatement(),
-                        definition.getResultSetMappingName());
+                    hQuery = untyped(session.createNativeQuery(filteredQuery.getStatement(),
+                        definition.getResultSetMappingName(), Object.class));
                 } else {
-                    hQuery = session.createSQLQuery(filteredQuery.getStatement());
+                    hQuery = untyped(session.createNativeQuery(filteredQuery.getStatement(), Object.class));
                 }
             } else {
-                hQuery = session.createQuery(filteredQuery.getStatement());
+                hQuery = untyped(session.createQuery(filteredQuery.getStatement(), Object.class));
             }
         }
         populateParameters(hQuery, filteredQuery);

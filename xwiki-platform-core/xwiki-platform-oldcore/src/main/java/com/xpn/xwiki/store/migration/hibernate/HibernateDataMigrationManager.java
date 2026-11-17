@@ -176,8 +176,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
         try {
             getBaseStore().executeWrite(context, session -> {
-                session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
-                session.save(version);
+                session.createMutationQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
+                session.persist(version);
 
                 return null;
             });

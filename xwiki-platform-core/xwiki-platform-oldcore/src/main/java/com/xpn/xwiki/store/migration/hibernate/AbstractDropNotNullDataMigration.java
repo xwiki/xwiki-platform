@@ -56,7 +56,7 @@ public abstract class AbstractDropNotNullDataMigration extends AbstractHibernate
         XWikiHibernateBaseStore store = getStore();
         Metadata metadata = store.getMetadata();
         PersistentClass pClass = metadata.getEntityBinding(this.table.getName());
-        Column column = ((Column) pClass.getProperty(this.property).getColumnIterator().next());
+        Column column = pClass.getProperty(this.property).getColumns().get(0);
         String columnType = column.getSqlType(metadata);
 
         StringBuilder builder = new StringBuilder();

@@ -282,7 +282,8 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
                 XWikiDeletedDocument trashdoc = createXWikiDeletedDocument(doc, deleter, date, contentStore, batchId);
 
                 // Hibernate store.
-                long index = ((Number) session.save(trashdoc)).longValue();
+                session.persist(trashdoc);
+                long index = trashdoc.getId();
 
                 // External store
                 if (contentStore != null) {
@@ -335,7 +336,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         boolean bTransaction) throws XWikiException
     {
         return executeRead(context, session -> {
-            XWikiDeletedDocument deletedDocument = session.get(XWikiDeletedDocument.class, Long.valueOf(index));
+            XWikiDeletedDocument deletedDocument = session.find(XWikiDeletedDocument.class, index);
 
             if (deletedDocument != null && resolve) {
                 deletedDocument = resolveDeletedDocumentContent(deletedDocument, false);
@@ -427,7 +428,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, false, bTransaction);
 
             // Delete metadata
-            session.delete(deletedDocument);
+            session.remove(deletedDocument);
 
             // Delete content
             deleteDeletedDocumentContent(deletedDocument, bTransaction);

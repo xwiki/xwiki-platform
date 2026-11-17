@@ -63,6 +63,13 @@ import org.objectweb.asm.tree.MethodNode;
  * <li>Since a class implementing two unrelated interfaces providing the same default bridge method would fail with an
  * {@link IncompatibleClassChangeError} when it's called, the bridge method is also generated in the sub types
  * inheriting conflicting bridge methods.</li>
+ * <li>A bridge method which only differs from the bridged method by its return type, when the source return type is
+ * not a super type of the target one (enums), is generated as a default method of a separate interface (named after
+ * the bridged type with the {@value #HOLDER_SUFFIX} suffix) that the bridged type implements, at the JVM level only.
+ * The libraries generating implementations (like Mockito) otherwise choose between the two methods based on the order
+ * in which reflection returns them, which changes from one JVM to another, while they consistently prefer the method
+ * declared in the most specific type. The holder interfaces extend the holder interfaces of the super types of their
+ * type, so that their default methods are as specific as if they were declared in the type itself.</li>
  * </ul>
  *
  * @version $Id$
@@ -70,6 +77,8 @@ import org.objectweb.asm.tree.MethodNode;
 final class PackageBridge
 {
     private static final String UTILS = "org/xwiki/store/hibernate/internal/bridge/PackageBridgeUtils";
+
+    private static final String HOLDER_SUFFIX = "$$PackageBridge";
 
     private static final String CONSTRUCTOR = "<init>";
 
@@ -143,6 +152,8 @@ final class PackageBridge
     private final Set<String> twinExceptions = new HashSet<>();
 
     private final List<String> errors = new ArrayList<>();
+
+    private final Map<String, byte[]> holders = new LinkedHashMap<>();
 
     private int bridgeCount;
 
@@ -297,6 +308,46 @@ final class PackageBridge
         return found;
     }
 
+    /**
+     * @return true if the bridge method only differs from the bridged method by a return type which is not a sub type
+     *         of the source one, and must thus be declared in a holder interface
+     */
+    private boolean isHeld(Bridge bridge)
+    {
+        if (bridge.isStatic()) {
+            // Static methods are not inherited from interfaces
+            return false;
+        }
+
+        String sourceDescriptor = bridge.sourceDescriptor();
+        String targetDescriptor = bridge.targetDescriptor();
+        if (!sourceDescriptor.substring(0, sourceDescriptor.indexOf(')'))
+            .equals(targetDescriptor.substring(0, targetDescriptor.indexOf(')')))) {
+            // Different parameters, so different methods for everyone
+            return false;
+        }
+
+        Type returnType = Type.getReturnType(targetDescriptor);
+        Type element = returnType.getSort() == Type.ARRAY ? returnType.getElementType() : returnType;
+
+        return element.getSort() == Type.OBJECT && this.twinEnums.contains(element.getInternalName());
+    }
+
+    private boolean isHeld(String name, String key)
+    {
+        ClassPlan plan = this.plans.get(name);
+        Bridge bridge = plan != null ? plan.bridges.get(key) : null;
+
+        return bridge != null && isHeld(bridge);
+    }
+
+    private boolean hasHolder(String name)
+    {
+        ClassPlan plan = this.plans.get(name);
+
+        return plan != null && plan.bridges.values().stream().anyMatch(this::isHeld);
+    }
+
     private void validate(ClassNode target, ClassNode source)
     {
         for (MethodNode method : source.methods) {
@@ -414,7 +465,14 @@ final class PackageBridge
                         .addAll(entry.getValue());
                 }
             }
-            for (Set<String> providers : result.defaults.values()) {
+            for (Map.Entry<String, Set<String>> entry : result.defaults.entrySet()) {
+                Set<String> providers = entry.getValue();
+                if (providers.size() > 1 && providers.stream().anyMatch(this.sourceClasses::containsKey)
+                    && providers.stream().anyMatch(p -> isHeld(p, entry.getKey()))) {
+                    // The holder interfaces don't extend the source interfaces
+                    this.errors.add("The default method [" + entry.getKey() + "] of " + providers
+                        + " conflicts with a bridge method generated in a holder interface");
+                }
                 providers
                     .removeIf(p -> providers.stream().anyMatch(o -> !o.equals(p) && getSuperTypes(o).contains(p)));
             }
@@ -477,7 +535,7 @@ final class PackageBridge
 
         for (Bridge bridge : declared.values()) {
             if (!bridge.isStatic()) {
-                if (isInterface) {
+                if (isInterface || isHeld(bridge)) {
                     result.defaults.put(bridge.key(), new LinkedHashSet<>(Set.of(node.name)));
                 } else {
                     result.concrete.add(bridge.key());
@@ -548,14 +606,47 @@ final class PackageBridge
         }
 
         boolean isInterface = (target.access & Opcodes.ACC_INTERFACE) != 0;
+        List<Bridge> held = new ArrayList<>();
         for (Bridge bridge : plan.bridges.values()) {
-            target.methods.add(createBridge(target.name, isInterface, bridge));
+            if (isHeld(bridge)) {
+                held.add(bridge);
+            } else {
+                target.methods.add(createBridge(target.name, target.name, isInterface, bridge));
+            }
             ++this.bridgeCount;
         }
         target.methods.addAll(plan.redeclared);
 
+        if (!held.isEmpty()) {
+            hideFromCompiler(target);
+            // Last, so that it does not take precedence over the other super interfaces
+            target.interfaces.add(target.name + HOLDER_SUFFIX);
+            this.holders.put(target.name + HOLDER_SUFFIX, createHolder(target, isInterface, held));
+        }
+
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         target.accept(writer);
+
+        return writer.toByteArray();
+    }
+
+    private byte[] createHolder(ClassNode target, boolean isInterface, List<Bridge> held)
+    {
+        ClassNode holder = new ClassNode();
+        holder.version = Math.max(target.version, Opcodes.V1_8);
+        holder.access = Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT | Opcodes.ACC_SYNTHETIC;
+        holder.name = target.name + HOLDER_SUFFIX;
+        holder.superName = "java/lang/Object";
+        // Extend the holders of the super types to be more specific than them
+        getSuperTypes(target.name).stream().filter(this::hasHolder).sorted()
+            .forEach(superType -> holder.interfaces.add(superType + HOLDER_SUFFIX));
+
+        for (Bridge bridge : held) {
+            holder.methods.add(createBridge(holder.name, target.name, isInterface, bridge));
+        }
+
+        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        holder.accept(writer);
 
         return writer.toByteArray();
     }
@@ -601,7 +692,13 @@ final class PackageBridge
         }
     }
 
-    private MethodNode createBridge(String owner, boolean isInterface, Bridge bridge)
+    /**
+     * @param declaringClass the class in which the bridge method is declared
+     * @param owner the class declaring the bridged method
+     * @param isInterface true if the owner is an interface
+     * @param bridge the bridge method to create
+     */
+    private MethodNode createBridge(String declaringClass, String owner, boolean isInterface, Bridge bridge)
     {
         // The bridge flag is needed for the libraries generating implementations (like Mockito) to understand that
         // it's an alternative of the method with the same name and parameters
@@ -615,6 +712,9 @@ final class PackageBridge
         int slot = 0;
         if (!bridge.isStatic()) {
             method.visitVarInsn(Opcodes.ALOAD, slot++);
+            if (!declaringClass.equals(owner)) {
+                method.visitTypeInsn(Opcodes.CHECKCAST, owner);
+            }
         }
         for (Type argument : Type.getArgumentTypes(bridge.sourceDescriptor())) {
             method.visitVarInsn(argument.getOpcode(Opcodes.ILOAD), slot);
@@ -688,6 +788,15 @@ final class PackageBridge
     private String toTargetDescriptor(String descriptor)
     {
         return descriptor.replace('L' + this.sourcePrefix, 'L' + this.targetPrefix);
+    }
+
+    /**
+     * @return the generated holder interfaces, indexed by internal name (complete once all the classes have been
+     *         bridged)
+     */
+    Map<String, byte[]> getHolders()
+    {
+        return this.holders;
     }
 
     /**

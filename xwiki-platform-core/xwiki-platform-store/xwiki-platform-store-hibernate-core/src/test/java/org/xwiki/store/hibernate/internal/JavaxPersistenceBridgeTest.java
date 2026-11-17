@@ -292,6 +292,66 @@ class JavaxPersistenceBridgeTest
         assertEquals(List.of(), ambiguous);
     }
 
+    /**
+     * The libraries generating implementations (like Mockito) choose between methods with the same name and parameters
+     * based on the most specific return type, and otherwise on the order in which reflection returns them, which
+     * changes from one JVM to another.
+     */
+    @Test
+    void noMethodsOnlyDifferingByUnrelatedReturnTypes() throws IOException, URISyntaxException
+    {
+        Path classes = Path.of(Session.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+        List<String> unrelated = new ArrayList<>();
+        int checked = 0;
+        try (Stream<Path> stream = Files.walk(classes)) {
+            for (Path file : (Iterable<Path>) stream::iterator) {
+                String path = classes.relativize(file).toString();
+                if (path.endsWith(".class") && (path.startsWith("org/hibernate/") || path.startsWith("jakarta/"))) {
+                    Class<?> type = load(path.substring(0, path.length() - 6).replace('/', '.'));
+                    if (type != null) {
+                        unrelated.addAll(getMethodsOnlyDifferingByUnrelatedReturnTypes(type));
+                        ++checked;
+                    }
+                }
+            }
+        }
+
+        assertTrue(checked > 1000, "Only " + checked + " classes checked");
+        assertEquals(List.of(), unrelated);
+    }
+
+    private static List<String> getMethodsOnlyDifferingByUnrelatedReturnTypes(Class<?> type)
+    {
+        Method[] declaredMethods;
+        try {
+            declaredMethods = type.getDeclaredMethods();
+        } catch (LinkageError e) {
+            // Optional dependency missing (in a non public method)
+            return List.of();
+        }
+
+        Map<String, List<Method>> methods = new HashMap<>();
+        for (Method method : declaredMethods) {
+            if (!Modifier.isStatic(method.getModifiers())) {
+                methods.computeIfAbsent(method.getName() + List.of(method.getParameterTypes()),
+                    k -> new ArrayList<>()).add(method);
+            }
+        }
+
+        List<String> unrelated = new ArrayList<>();
+        for (Map.Entry<String, List<Method>> entry : methods.entrySet()) {
+            List<Method> group = entry.getValue();
+            if (group.stream().noneMatch(m -> group.stream()
+                .allMatch(o -> o.getReturnType().isAssignableFrom(m.getReturnType())))) {
+                unrelated.add(type.getName() + '#' + entry.getKey() + ' '
+                    + group.stream().map(m -> m.getReturnType().getName()).toList());
+            }
+        }
+
+        return unrelated;
+    }
+
     private static Class<?> load(String name)
     {
         try {

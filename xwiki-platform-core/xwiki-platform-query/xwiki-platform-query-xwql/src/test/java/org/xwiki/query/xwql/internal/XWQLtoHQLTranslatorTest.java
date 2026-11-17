@@ -107,7 +107,7 @@ class XWQLtoHQLTranslatorTest
             select doc from XWikiDocument as doc , BaseObject as user , StringProperty as user_email1 \
             where ( user_email1.value = 'some' ) and doc.fullName=user.name \
             and user.className='XWiki.XWikiUsers' \
-            and user_email1.id.id=user.id and user_email1.id.name='email'""");
+            and user_email1.id=user.id and user_email1.name='email'""");
     }
 
     @Test
@@ -124,8 +124,8 @@ class XWQLtoHQLTranslatorTest
             """
             select doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_email1 \
             where ( user_email1.value = 'some' ) and doc.fullName=user.name \
-            and user.className='XWiki.XWikiUs\u00E9rs' and user_email1.id.id=user.id \
-            and user_email1.id.name='email'""");
+            and user.className='XWiki.XWikiUs\u00E9rs' and user_email1.id=user.id \
+            and user_email1.name='email'""");
     }
 
     @Test
@@ -135,8 +135,8 @@ class XWQLtoHQLTranslatorTest
             """
             select doc.fullName from XWikiDocument as doc , BaseObject as _o1, StringProperty as _o1_email2 \
             where ( _o1_email2.value = 'some' ) and doc.fullName=_o1.name \
-            and _o1.className='XWiki.XWikiUs\u00E9rs' and _o1_email2.id.id=_o1.id \
-            and _o1_email2.id.name='email'""");
+            and _o1.className='XWiki.XWikiUs\u00E9rs' and _o1_email2.id=_o1.id \
+            and _o1_email2.name='email'""");
     }
 
     @Test
@@ -149,8 +149,8 @@ class XWQLtoHQLTranslatorTest
             StringProperty as _o1_email2, StringProperty as _o1_first_name3 \
             where ( _o1_email2.value = 'some' and _o1_first_name3.value = 'Name' ) \
             and doc.fullName=_o1.name and _o1.className='XWiki.XWikiUsers' \
-            and _o1_email2.id.id=_o1.id and _o1_email2.id.name='email' \
-            and _o1_first_name3.id.id=_o1.id and _o1_first_name3.id.name='first_name'""");
+            and _o1_email2.id=_o1.id and _o1_email2.name='email' \
+            and _o1_first_name3.id=_o1.id and _o1_first_name3.name='first_name'""");
     }
 
     @Test
@@ -163,7 +163,7 @@ class XWQLtoHQLTranslatorTest
             select doc.fullName from XWikiDocument as doc , BaseObject as user , \
             StringProperty as user_firstname1 \
             where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers' \
-            and user_firstname1.id.id=user.id and user_firstname1.id.name='firstname' \
+            and user_firstname1.id=user.id and user_firstname1.name='firstname' \
             order by user_firstname1.value""");
         assertTranslate("order by lower(doc.fullName)",
             "select doc.fullName from XWikiDocument as doc order by lower ( doc.fullName )");
@@ -202,8 +202,8 @@ class XWQLtoHQLTranslatorTest
             from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, \
             StringProperty as obj_property22 \
             WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' \
-            and obj_property11.id.id=obj.id and obj_property11.id.name='property1' \
-            and obj_property22.id.id=obj.id and obj_property22.id.name='property2' \
+            and obj_property11.id=obj.id and obj_property11.name='property1' \
+            and obj_property22.id=obj.id and obj_property22.name='property2' \
             group by obj_property11.value \
             order by count ( obj_property22.value )""");
 
@@ -216,8 +216,8 @@ class XWQLtoHQLTranslatorTest
             from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, \
             StringProperty as obj_property22 \
             WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' \
-            and obj_property11.id.id=obj.id and obj_property11.id.name='property1' \
-            and obj_property22.id.id=obj.id and obj_property22.id.name='property2' \
+            and obj_property11.id=obj.id and obj_property11.name='property1' \
+            and obj_property22.id=obj.id and obj_property22.name='property2' \
             group by obj_property11.value \
             order by sum ( obj_property22.value )""");
 
@@ -230,8 +230,8 @@ class XWQLtoHQLTranslatorTest
             from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, \
             StringProperty as obj_property22 \
             WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' \
-            and obj_property11.id.id=obj.id and obj_property11.id.name='property1' \
-            and obj_property22.id.id=obj.id and obj_property22.id.name='property2' \
+            and obj_property11.id=obj.id and obj_property11.name='property1' \
+            and obj_property22.id=obj.id and obj_property22.name='property2' \
             group by obj_property11.value \
             order by avg ( obj_property22.value )""");
 
@@ -244,8 +244,8 @@ class XWQLtoHQLTranslatorTest
             from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, \
             StringProperty as obj_property22 \
             WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' \
-            and obj_property11.id.id=obj.id and obj_property11.id.name='property1' \
-            and obj_property22.id.id=obj.id and obj_property22.id.name='property2' \
+            and obj_property11.id=obj.id and obj_property11.name='property1' \
+            and obj_property22.id=obj.id and obj_property22.name='property2' \
             group by obj_property11.value \
             order by max ( obj_property22.value )""");
 
@@ -258,8 +258,8 @@ class XWQLtoHQLTranslatorTest
             from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, \
             StringProperty as obj_property22 \
             WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' \
-            and obj_property11.id.id=obj.id and obj_property11.id.name='property1' \
-            and obj_property22.id.id=obj.id and obj_property22.id.name='property2' \
+            and obj_property11.id=obj.id and obj_property11.name='property1' \
+            and obj_property22.id=obj.id and obj_property22.name='property2' \
             group by obj_property11.value \
             order by min ( obj_property22.value )""");
     }
@@ -283,8 +283,8 @@ class XWQLtoHQLTranslatorTest
             DBStringListProperty as a_category1 \
             where ( :cat in elements( a_category1.list ) ) \
             and doc.fullName=a.name and a.className='XWiki.ArticleClass' \
-            and a_category1.id.id=a.id \
-            and a_category1.id.name='category'""");
+            and a_category1.id=a.id \
+            and a_category1.name='category'""");
         // StringListProperty
         assertTranslate("from doc.object('XWiki.Class') as c where c.stringlist like '%some%'",
             """
@@ -293,8 +293,8 @@ class XWQLtoHQLTranslatorTest
             where ( c_stringlist1.textValue like '%some%' ) \
             and doc.fullName=c.name \
             and c.className='XWiki.Class' \
-            and c_stringlist1.id.id=c.id \
-            and c_stringlist1.id.name='stringlist'""");
+            and c_stringlist1.id=c.id \
+            and c_stringlist1.name='stringlist'""");
         // return DBStringListProperty
         assertTranslate(
             "select distinct a.category from Document as doc, doc.object('XWiki.ArticleClass') as a",
@@ -302,8 +302,8 @@ class XWQLtoHQLTranslatorTest
             select distinct a_category1list from XWikiDocument as doc , BaseObject as a , \
             DBStringListProperty as a_category1 join a_category1.list a_category1list \
             where 1=1 and doc.fullName=a.name and a.className='XWiki.ArticleClass' \
-            and a_category1.id.id=a.id \
-            and a_category1.id.name='category'""");
+            and a_category1.id=a.id \
+            and a_category1.name='category'""");
 
         assertTranslate(
             """
@@ -313,8 +313,8 @@ class XWQLtoHQLTranslatorTest
             select a_category1list from XWikiDocument as doc , BaseObject as a , \
             DBStringListProperty as a_category1 join a_category1.list a_category1list \
             where 1=1 and doc.fullName=a.name and a.className='XWiki.ArticleClass' \
-            and a_category1.id.id=a.id \
-            and a_category1.id.name='category' \
+            and a_category1.id=a.id \
+            and a_category1.name='category' \
             group by a_category1list order by a_category1list""");
     }
 
@@ -335,8 +335,8 @@ class XWQLtoHQLTranslatorTest
             StringProperty as c_prop2 \
             where ( cCM1.cmprop = 'some' and c_prop2.value = 1 ) \
             and doc.fullName=c.name and c.id=cCM1.id \
-            and c_prop2.id.id=c.id \
-            and c_prop2.id.name='prop'""");
+            and c_prop2.id=c.id \
+            and c_prop2.name='prop'""");
     }
 
     @Test
@@ -351,7 +351,7 @@ class XWQLtoHQLTranslatorTest
             StringProperty as obj_first_name1 \
             where ( obj_first_name1.value like LOWER ( '%DMIN%' ) ) \
             and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' \
-            and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'""");
+            and obj_first_name1.id=obj.id and obj_first_name1.name='first_name'""");
         assertTranslate(
             """
             SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj \
@@ -361,6 +361,6 @@ class XWQLtoHQLTranslatorTest
             StringProperty as obj_first_name1 \
             where ( obj_first_name1.value like LOWER ( CONCAT ( '%' , 'DMIN%' ) ) ) \
             and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' \
-            and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'""");
+            and obj_first_name1.id=obj.id and obj_first_name1.name='first_name'""");
     }
 }

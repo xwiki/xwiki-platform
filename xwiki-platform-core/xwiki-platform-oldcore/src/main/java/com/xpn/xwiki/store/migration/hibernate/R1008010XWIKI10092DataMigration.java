@@ -136,7 +136,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
                 // The property has a composite id made of the object id and the property name.
                 // We don't set the property name because newProperty() does it.
                 property.setId(objectId);
-                session.save(property);
+                session.persist(property);
             }
         }
     }

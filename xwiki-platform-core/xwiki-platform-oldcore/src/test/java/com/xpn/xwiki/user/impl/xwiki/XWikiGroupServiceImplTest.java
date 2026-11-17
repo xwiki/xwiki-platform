@@ -19,10 +19,8 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +52,7 @@ public class XWikiGroupServiceImplTest
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
-    XWikiGroupServiceImpl groupService;
+    private XWikiGroupServiceImpl groupService;
 
     private XWikiDocument user;
 
@@ -93,15 +91,13 @@ public class XWikiGroupServiceImplTest
     @Test
     public void testListMemberForGroup() throws XWikiException
     {
-        assertEquals(
-            new HashSet<String>(Arrays.asList(this.user.getFullName())),
-            new HashSet<String>(this.groupService.listMemberForGroup(this.group.getFullName(),
-                this.oldcore.getXWikiContext())));
+        assertEquals(Set.of(this.user.getFullName()), Set.copyOf(
+            this.groupService.listMemberForGroup(this.group.getFullName(), this.oldcore.getXWikiContext())));
 
         this.groupObject.setStringValue("member", this.userWithSpaces.getFullName());
         this.oldcore.getSpyXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList(this.userWithSpaces.getFullName())), new HashSet<String>(
+        assertEquals(Set.of(this.userWithSpaces.getFullName()), Set.copyOf(
             this.groupService.listMemberForGroup(this.group.getFullName(), this.oldcore.getXWikiContext())));
     }
 
@@ -110,7 +106,7 @@ public class XWikiGroupServiceImplTest
     {
         Query query = mock(Query.class);
         when(this.oldcore.getQueryManager().createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
-        List<Object> members = Arrays.asList("one", "two", "three");
+        List<Object> members = List.of("one", "two", "three");
         when(query.execute()).thenReturn(members);
 
         assertEquals(members, this.groupService.getAllMatchedMembersNamesForGroup(this.group.getFullName(), "foo", 3,
@@ -129,7 +125,7 @@ public class XWikiGroupServiceImplTest
     {
         Query query = mock(Query.class);
         when(this.oldcore.getQueryManager().createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
-        when(query.execute()).thenReturn(Collections.singletonList(5L));
+        when(query.execute()).thenReturn(List.of(5L));
 
         assertEquals(5, this.groupService.countAllMatchedMembersNamesForGroup(this.group.getFullName(), "foo",
             this.oldcore.getXWikiContext()));

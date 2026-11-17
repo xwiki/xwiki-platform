@@ -22,7 +22,6 @@ package org.xwiki.rest.internal.url;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -71,7 +70,4 @@ public abstract class AbstractParametrizedRestURLGenerator<T> implements Paramet
             throw new XWikiRestException("Failed to generate a proper base URI.", e);
         }
     }
-
-    @Override
-    public abstract URL getURL(T reference) throws XWikiRestException;
 }

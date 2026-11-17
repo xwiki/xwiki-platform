@@ -56,9 +56,8 @@ export const CustomCreateLinkButton: React.FC = () => {
         // submit, whether the user changed it. When the link label differs from the selected text, the selection is
         // replaced with the new label, keeping the formatting shared by the whole selection, like typing over it does.
         const selectedText = editor.getSelectedText();
-        await linkEditing.edit(
-          { mode: "createNew", current: { title: selectedText, url: "" } },
-          (link) => insertLink(instance, link, selectedText),
+        await linkEditing.insert({ title: selectedText }, (link) =>
+          insertLink(instance, link, selectedText),
         );
         editor.focus();
       }}

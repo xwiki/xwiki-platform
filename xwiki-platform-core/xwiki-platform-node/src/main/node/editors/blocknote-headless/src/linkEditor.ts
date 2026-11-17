@@ -28,7 +28,6 @@ import type { HeadlessEditorOptions } from "./editorOptions";
 import type {
   EditorInstance,
   LinkEditionData,
-  LinkEditionRequest,
   LinkEditor,
 } from "@xwiki/platform-editors-blocknote-react";
 import type {
@@ -49,64 +48,71 @@ const vueAppContextName = "VueAppContext";
  * hosting the editor, so that it gets the components (e.g. of the design system) and the plugins of that application.
  */
 const defaultLinkEditor: LinkEditor = {
-  edit(
-    instance: EditorInstance,
-    { current, mode }: LinkEditionRequest,
-  ): Promise<LinkEditionData | undefined> {
-    const { serviceContainer } = instance;
-    const linkTargetTypeManager = serviceContainer.get<LinkTargetTypeManager>(
-      linkTargetTypeManagerRole,
-    );
-    // The links are resolved and saved relative to the source document.
-    const linkContext: LinkContext = {
-      sourceDocument: instance.options.sourceDocumentReference,
-    };
-    const features = instance.options
-      .features as HeadlessEditorOptions["features"];
-
-    return new Promise((resolve) => {
-      const container = document.createElement("div");
-      document.body.appendChild(container);
-      const close = (link?: LinkEditionData) => {
-        render(null, container);
-        container.remove();
-        resolve(link);
-      };
-
-      const vnode = h(LinkModal, {
-        current: {
-          displayText: current.title,
-          generatedDisplayText: current.generatedTitle,
-          target: current.reference
-            ? linkTargetTypeManager.fromReference(
-                current.reference,
-                linkContext,
-              )
-            : linkTargetTypeManager.fromURL(current.url),
-        },
-        depsContainer: serviceContainer,
-        excludedLinkTargetTypes: features?.links?.excludedTargetTypes,
-        linkContext,
-        mode,
-        onSubmit: ({ displayText, generatedDisplayText, target }: LinkData) =>
-          close({
-            title: displayText,
-            generatedTitle: generatedDisplayText,
-            // The URL of a resource that no link target type supports can't be computed client-side, so keep the URL
-            // of the edited link. It's only a preview anyway: the link is saved from its reference.
-            url:
-              target.type === unsupportedLinkTargetType
-                ? current.url
-                : linkTargetTypeManager.toURL(target, linkContext),
-            reference: linkTargetTypeManager.toReference(target, linkContext),
-          }),
-        onCancel: () => close(),
-      });
-      vnode.appContext = serviceContainer.get<AppContext>(vueAppContextName);
-      render(vnode, container);
-    });
-  },
+  insert: (instance, prefill) => showLinkModal(instance, prefill, "createNew"),
+  edit: (instance, link) => showLinkModal(instance, link, "editExisting"),
 };
+
+/**
+ * @param instance - the editor instance where the link is inserted or edited
+ * @param current - the edited link, or the values to prefill the link modal with when creating a new link
+ * @param mode - whether a new link is created, or an existing one is edited
+ * @returns the link submitted by the user, or undefined if the user canceled
+ */
+function showLinkModal(
+  instance: EditorInstance,
+  current: Partial<LinkEditionData>,
+  mode: "createNew" | "editExisting",
+): Promise<LinkEditionData | undefined> {
+  const { serviceContainer } = instance;
+  const linkTargetTypeManager = serviceContainer.get<LinkTargetTypeManager>(
+    linkTargetTypeManagerRole,
+  );
+  // The links are resolved and saved relative to the source document.
+  const linkContext: LinkContext = {
+    sourceDocument: instance.options.sourceDocumentReference,
+  };
+  const features = instance.options
+    .features as HeadlessEditorOptions["features"];
+
+  return new Promise((resolve) => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const close = (link?: LinkEditionData) => {
+      render(null, container);
+      container.remove();
+      resolve(link);
+    };
+
+    const vnode = h(LinkModal, {
+      current: {
+        displayText: current.title ?? "",
+        generatedDisplayText: current.generatedTitle,
+        target: current.reference
+          ? linkTargetTypeManager.fromReference(current.reference, linkContext)
+          : linkTargetTypeManager.fromURL(current.url ?? ""),
+      },
+      depsContainer: serviceContainer,
+      excludedLinkTargetTypes: features?.links?.excludedTargetTypes,
+      linkContext,
+      mode,
+      onSubmit: ({ displayText, generatedDisplayText, target }: LinkData) =>
+        close({
+          title: displayText,
+          generatedTitle: generatedDisplayText,
+          // The URL of a resource that no link target type supports can't be computed client-side, so keep the URL
+          // of the edited link. It's only a preview anyway: the link is saved from its reference.
+          url:
+            target.type === unsupportedLinkTargetType
+              ? (current.url ?? "")
+              : linkTargetTypeManager.toURL(target, linkContext),
+          reference: linkTargetTypeManager.toReference(target, linkContext),
+        }),
+      onCancel: () => close(),
+    });
+    vnode.appContext = serviceContainer.get<AppContext>(vueAppContextName);
+    render(vnode, container);
+  });
+}
 
 /**
  * Binds the services of the Vue integration: the context of the Vue application hosting the editor, and the link

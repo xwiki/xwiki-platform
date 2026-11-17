@@ -197,14 +197,9 @@ export type LinkEditionData = {
 };
 
 // @beta
-export type LinkEditionRequest = {
-    current: LinkEditionData;
-    mode: "createNew" | "editExisting";
-};
-
-// @beta
 export interface LinkEditor {
-    edit(instance: EditorInstance, request: LinkEditionRequest): Promise<LinkEditionData | undefined>;
+    edit(instance: EditorInstance, link: LinkEditionData): Promise<LinkEditionData | undefined>;
+    insert(instance: EditorInstance, prefill: Partial<LinkEditionData>): Promise<LinkEditionData | undefined>;
 }
 
 // @beta

@@ -110,8 +110,12 @@ function bindLinkServices(
 
   if (linkEditor) {
     container.bind<LinkEditor>(linkEditorName).toConstantValue({
-      async edit(_instance, { mode, current }) {
-        linkEditor.onEdit({ mode, current });
+      async insert(_instance, prefill) {
+        linkEditor.onEdit({ action: "insert", prefill });
+        return linkEditor.submit;
+      },
+      async edit(_instance, link) {
+        linkEditor.onEdit({ action: "edit", link });
         return linkEditor.submit;
       },
     });

@@ -180,10 +180,7 @@ function useLinkInsertion(serviceContainer: Container) {
     () =>
       linkEditing &&
       (async () => {
-        await linkEditing.edit(
-          { mode: "createNew", current: { title: "", url: "" } },
-          insert,
-        );
+        await linkEditing.insert({}, insert);
         instance.editor.focus();
       }),
     [instance, linkEditing, insert],

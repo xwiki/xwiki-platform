@@ -124,7 +124,6 @@ export {
 
 export type {
   LinkEditionData,
-  LinkEditionRequest,
   LinkEditor,
   LinkMetadataHandler,
 } from "./components/links/linkEditor";

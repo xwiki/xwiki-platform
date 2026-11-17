@@ -76,25 +76,6 @@ type LinkEditionData = {
 };
 
 /**
- * What the {@link LinkEditor} is asked to edit.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type LinkEditionRequest = {
-  /**
-   * The link to edit, or the values to prefill the link editor with when creating a new link (e.g. the selected text,
-   * as the link label).
-   */
-  current: LinkEditionData;
-
-  /**
-   * Whether a new link is created, or an existing one is edited.
-   */
-  mode: "createNew" | "editExisting";
-};
-
-/**
  * The UI (e.g. a modal) letting the user choose the target and the label of a link. The actions to create and edit
  * links with it are available only when it is bound in the service container (see {@link linkEditorName}).
  *
@@ -103,15 +84,27 @@ type LinkEditionRequest = {
  */
 interface LinkEditor {
   /**
-   * Lets the user create or edit a link.
+   * Lets the user create a new link.
+   *
+   * @param instance - the editor instance where the link is inserted
+   * @param prefill - the values to prefill the link editor with (e.g. the selected text, as the link label)
+   * @returns the link to insert, or undefined if the user canceled
+   */
+  insert(
+    instance: EditorInstance,
+    prefill: Partial<LinkEditionData>,
+  ): Promise<LinkEditionData | undefined>;
+
+  /**
+   * Lets the user edit an existing link.
    *
    * @param instance - the editor instance holding the link
-   * @param request - the link to edit, and whether it's a new link
-   * @returns the link to write into the content, or undefined if the user canceled
+   * @param link - the edited link, as provided by {@link LinkMetadataHandler.beforeEdit}
+   * @returns the updated link, or undefined if the user canceled
    */
   edit(
     instance: EditorInstance,
-    request: LinkEditionRequest,
+    link: LinkEditionData,
   ): Promise<LinkEditionData | undefined>;
 }
 
@@ -156,12 +149,22 @@ interface LinkMetadataHandler {
  */
 type LinkEditing = {
   /**
-   * @param request - the link to edit, and whether it's a new link
+   * @param prefill - the values to prefill the link editor with
+   * @param apply - inserts the link returned by the link editor
+   * @returns a promise resolved once the link editor is closed, whatever the outcome
+   */
+  insert(
+    prefill: Partial<LinkEditionData>,
+    apply: (link: LinkEditionData) => void,
+  ): Promise<void>;
+
+  /**
+   * @param link - the edited link
    * @param apply - writes the link returned by the link editor
    * @returns a promise resolved once the link editor is closed, whatever the outcome
    */
   edit(
-    request: LinkEditionRequest,
+    link: LinkEditionData,
     apply: (link: LinkEditionData) => void,
   ): Promise<void>;
 };
@@ -249,17 +252,39 @@ function getLinkEditing(
   }
   const linkEditor = instance.serviceContainer.get<LinkEditor>(linkEditorName);
   return {
-    edit: async (request, apply) => {
-      try {
-        const link = await linkEditor.edit(instance, request);
-        if (link) {
-          apply(link);
-        }
-      } catch (error) {
-        console.error("Failed to edit the link.", error);
-      }
-    },
+    insert: (prefill, apply) =>
+      run(
+        () => linkEditor.insert(instance, prefill),
+        apply,
+        "Failed to insert the link.",
+      ),
+    edit: (link, apply) =>
+      run(
+        () => linkEditor.edit(instance, link),
+        apply,
+        "Failed to edit the link.",
+      ),
   };
+}
+
+/**
+ * @param showLinkEditor - shows the link editor
+ * @param apply - writes the link returned by the link editor, unless the user canceled
+ * @param errorMessage - the message logged when the link editor fails
+ */
+async function run(
+  showLinkEditor: () => Promise<LinkEditionData | undefined>,
+  apply: (link: LinkEditionData) => void,
+  errorMessage: string,
+): Promise<void> {
+  try {
+    const link = await showLinkEditor();
+    if (link) {
+      apply(link);
+    }
+  } catch (error) {
+    console.error(errorMessage, error);
+  }
 }
 
 /**
@@ -278,10 +303,4 @@ export {
   updateLink,
   useLinkEditing,
 };
-export type {
-  LinkEditing,
-  LinkEditionData,
-  LinkEditionRequest,
-  LinkEditor,
-  LinkMetadataHandler,
-};
+export type { LinkEditing, LinkEditionData, LinkEditor, LinkMetadataHandler };

@@ -62,18 +62,8 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
               url: linkToolbarProps.url,
               title: linkToolbarProps.text,
             };
-            await linkEditing.edit(
-              {
-                current: getEditedLink(instance, previous),
-                mode: "editExisting",
-              },
-              (link) =>
-                updateLink(
-                  instance,
-                  link,
-                  previous,
-                  linkToolbarProps.range.from,
-                ),
+            await linkEditing.edit(getEditedLink(instance, previous), (link) =>
+              updateLink(instance, link, previous, linkToolbarProps.range.from),
             );
             instance.editor.focus();
           }}

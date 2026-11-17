@@ -314,7 +314,7 @@ test("The link editor action opens the link editor, and inserts the link it subm
   // The link editor is opened to create a new link, from scratch.
   expect(
     JSON.parse((await page.getByTestId("linkEditorInput").textContent()) ?? ""),
-  ).toEqual({ mode: "createNew", current: { title: "", url: "" } });
+  ).toEqual({ action: "insert", prefill: {} });
 
   const linkEl = editorEl.locator("a");
   await expect(linkEl).toHaveText("XWiki");

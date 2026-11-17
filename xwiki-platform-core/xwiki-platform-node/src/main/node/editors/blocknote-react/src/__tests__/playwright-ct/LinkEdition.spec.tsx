@@ -124,6 +124,35 @@ test("A canceled link edition leaves the link unchanged", async ({
   ).not.toBeAttached();
 });
 
+test("The create link button opens the link editor prefilled with the selected text", async ({
+  mount,
+  page,
+}) => {
+  const submit = { title: "Second", url: "https://example.org/" };
+  const component = await mount(
+    <BlockNoteWithLinkMetadataHandler
+      content={buildParagraphWithLink()}
+      submit={submit}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await selectFirstWord(editorEl, page);
+  await page.locator('button[data-test="createLink"]').click();
+
+  await expect(page.locator('[data-test="linkEditorInput"]')).toHaveText(
+    JSON.stringify({ title: "First" }),
+  );
+  // The selected text is replaced with the label of the inserted link.
+  await expect(editorEl.locator('a[href="https://example.org/"]')).toHaveText(
+    "Second",
+  );
+  // The new link has no previous version.
+  await expect(page.locator('[data-test="beforeUpdateInput"]')).toHaveText(
+    JSON.stringify({ linkData: submit }),
+  );
+});
+
 test("The links can't be created or edited when there's no link editor", async ({
   mount,
   page,
@@ -169,6 +198,19 @@ async function moveCaretIntoLink(editorEl: Locator, page: Page): Promise<void> {
   await pressKeySettled(page, "Home");
   for (let i = 0; i < 8; i++) {
     await pressKeySettled(page, "ArrowRight");
+  }
+}
+
+/**
+ * Selects "First", the text before the link.
+ */
+async function selectFirstWord(editorEl: Locator, page: Page): Promise<void> {
+  await editorEl
+    .locator("p.bn-inline-content")
+    .click({ position: { x: 5, y: 5 } });
+  await pressKeySettled(page, "Home");
+  for (let i = 0; i < 5; i++) {
+    await pressKeySettled(page, "Shift+ArrowRight");
   }
 }
 

@@ -36,8 +36,8 @@ import type {
  * They are declared here rather than passed as test props because Playwright component test function props are proxied
  * to Node, which breaks the synchronous return value the link metadata handler relies on.
  *
- * The link editor is scripted: opening it immediately submits {@link submit} (or, when it is not set, the link data it
- * was pre-filled with).
+ * The link editor is scripted: opening it immediately submits {@link submit} (or, when it is not set, the edited link
+ * unchanged, or no link when creating one).
  */
 export const BlockNoteWithLinkMetadataHandler: React.FC<{
   content: BlockType[];
@@ -77,9 +77,13 @@ export const BlockNoteWithLinkMetadataHandler: React.FC<{
         bind={(container) => {
           if (!noLinkEditor) {
             container.bind<LinkEditor>(linkEditorName).toConstantValue({
-              async edit(_instance, { current }) {
-                setEditorInput(JSON.stringify(current));
-                return cancel ? undefined : (submit ?? current);
+              async insert(_instance, prefill) {
+                setEditorInput(JSON.stringify(prefill));
+                return cancel ? undefined : submit;
+              },
+              async edit(_instance, link) {
+                setEditorInput(JSON.stringify(link));
+                return cancel ? undefined : (submit ?? link);
               },
             });
           }

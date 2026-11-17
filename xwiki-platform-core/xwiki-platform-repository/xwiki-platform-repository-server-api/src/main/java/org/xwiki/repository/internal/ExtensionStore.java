@@ -78,6 +78,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.NumberProperty;
 
@@ -100,10 +101,21 @@ public class ExtensionStore implements Initializable, Disposable
         new EntityReference(XWikiRepositoryModel.PROP_EXTENSION_ID, EntityType.OBJECT_PROPERTY,
             XWikiRepositoryModel.EXTENSION_OBJECTREFERENCE);
 
-    private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new XObjectPropertyAddedEvent(EXTENSIONID_PROPERTY_REFERENCE),
-            new XObjectPropertyDeletedEvent(EXTENSIONID_PROPERTY_REFERENCE),
-            new XObjectPropertyUpdatedEvent(EXTENSIONID_PROPERTY_REFERENCE));
+    /**
+     * The reference to match property {@link XWikiRepositoryModel#PROP_EXTENSION_ID} of class
+     * {@link XWikiRepositoryModel#PROJECT_CLASSNAME} on whatever wiki.
+     */
+    private static final EntityReference PROJECTID_PROPERTY_REFERENCE =
+        new EntityReference(XWikiRepositoryModel.PROP_EXTENSION_ID, EntityType.OBJECT_PROPERTY,
+            BaseObjectReference.any(XWikiRepositoryModel.PROJECT_CLASSNAME));
+
+    private static final List<Event> EVENTS = Arrays.<Event>asList(
+        new XObjectPropertyAddedEvent(EXTENSIONID_PROPERTY_REFERENCE),
+        new XObjectPropertyDeletedEvent(EXTENSIONID_PROPERTY_REFERENCE),
+        new XObjectPropertyUpdatedEvent(EXTENSIONID_PROPERTY_REFERENCE),
+        new XObjectPropertyAddedEvent(PROJECTID_PROPERTY_REFERENCE),
+        new XObjectPropertyDeletedEvent(PROJECTID_PROPERTY_REFERENCE),
+        new XObjectPropertyUpdatedEvent(PROJECTID_PROPERTY_REFERENCE));
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -126,7 +138,8 @@ public class ExtensionStore implements Initializable, Disposable
     private EntityReferenceSerializer<String> localSerializer;
 
     /**
-     * Link extension id to document reference. The tabe contains null if the id link to no extension.
+     * Link a wiki, a class and an extension or project id to the document holding the object of that class with
+     * that id in that wiki. The table contains null if no such document exist.
      */
     private Cache<DocumentReference[]> documentReferenceCache;
 
@@ -692,7 +705,10 @@ public class ExtensionStore implements Initializable, Disposable
 
     private DocumentReference getExistingDocumentReferenceById(String extensionId, String clazz) throws QueryException
     {
-        DocumentReference[] cachedDocumentReference = this.documentReferenceCache.get(extensionId);
+        // An extension and a project can share the same id, and each wiki has its own pages
+        String cacheKey = this.xcontextProvider.get().getWikiId() + ':' + clazz + ':' + extensionId;
+
+        DocumentReference[] cachedDocumentReference = this.documentReferenceCache.get(cacheKey);
 
         if (cachedDocumentReference == null) {
             Query query = this.queryManager.createQuery(
@@ -711,7 +727,7 @@ public class ExtensionStore implements Initializable, Disposable
                 cachedDocumentReference = new DocumentReference[1];
             }
 
-            this.documentReferenceCache.set(extensionId, cachedDocumentReference);
+            this.documentReferenceCache.set(cacheKey, cachedDocumentReference);
         }
 
         return cachedDocumentReference[0] != null ? cachedDocumentReference[0] : null;

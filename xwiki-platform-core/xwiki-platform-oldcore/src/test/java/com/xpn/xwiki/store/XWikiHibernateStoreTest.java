@@ -31,6 +31,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.Metamodel;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
@@ -89,6 +91,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.inOrder;
@@ -422,20 +425,20 @@ class XWikiHibernateStoreTest
         when(oldClassTypeQuery.uniqueResult()).thenReturn(StringProperty.class.getName());
 
         // The old property must be loaded from the corresponding table.
-        Query oldPropertyQuery = mock(Query.class);
-        when(session.createQuery("select prop from " + StringProperty.class.getName()
-            + " as prop where prop.id = :id and prop.name= :name", BaseProperty.class))
-                .thenReturn(oldPropertyQuery);
-        BaseProperty oldProperty = mock(BaseProperty.class);
-        when(oldPropertyQuery.uniqueResult()).thenReturn(oldProperty);
+        Metamodel metamodel = mock(Metamodel.class);
+        when(session.getMetamodel()).thenReturn(metamodel);
+        EntityType entityType = mock(EntityType.class);
+        when(metamodel.entity(StringProperty.class.getName())).thenReturn(entityType);
+        when(entityType.getJavaType()).thenReturn(StringProperty.class);
+        StringProperty oldProperty = new StringProperty();
+        // A property is its own identifier
+        when(session.find(eq(StringProperty.class), argThat((StringProperty identifier) ->
+            identifier.getId() == propertyId && propertyName.equals(identifier.getName())))).thenReturn(oldProperty);
 
         store.saveXWikiCollection(object, xcontext, false);
 
         verify(oldClassTypeQuery).setParameter("id", propertyId);
         verify(oldClassTypeQuery).setParameter("name", propertyName);
-
-        verify(oldPropertyQuery).setParameter("id", propertyId);
-        verify(oldPropertyQuery).setParameter("name", propertyName);
 
         // Delete the old property value and then save the new one.
         verify(session).remove(oldProperty);

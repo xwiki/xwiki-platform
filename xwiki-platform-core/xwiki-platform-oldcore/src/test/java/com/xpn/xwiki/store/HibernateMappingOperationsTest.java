@@ -261,4 +261,20 @@ class HibernateMappingOperationsTest
 
         assertNull(read(session -> session.find(DeletedAttachment.class, id)));
     }
+
+    @Test
+    void findPropertyFromItsStoredClassType()
+    {
+        write(session -> session.persist(newStringProperty(9, "prop", "found")));
+
+        StringProperty property = read(session -> {
+            // The entity is resolved from the class name stored in XWP_CLASSTYPE
+            Class<?> propertyClass = session.getMetamodel().entity(getStoredClassType(9)).getJavaType();
+
+            // A property is its own identifier
+            return (StringProperty) session.find(propertyClass, newStringProperty(9, "prop", ""));
+        });
+
+        assertEquals("found", property.getValue());
+    }
 }

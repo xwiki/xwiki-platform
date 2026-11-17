@@ -57,6 +57,7 @@ import org.xwiki.security.authorization.cache.internal.DefaultSecurityCache;
 import org.xwiki.security.authorization.cache.internal.DefaultSecurityCacheLoader;
 import org.xwiki.security.authorization.cache.internal.TestCache;
 import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
+import org.xwiki.security.authorization.internal.DefaultAuthorizationManager;
 import org.xwiki.security.authorization.internal.DefaultAuthorizationSettler;
 import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
@@ -1107,7 +1108,7 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             nullValue());
     }
 
-    private final class CustomRightDescription implements RightDescription
+    private class CustomRightDescription implements RightDescription
     {
         @Override
         public String getName()
@@ -1172,6 +1173,61 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             Right otherRegisteredRight = this.authorizationManager.register(new CustomRightDescription());
             assertSame(registeredRight, otherRegisteredRight);
             assertSame(registeredRight, Right.toRight("foo"));
+        } finally {
+            if (registeredRight != null) {
+                registeredRight.unregister();
+            }
+        }
+    }
+
+    @Test
+    void registerWithConflictingDescription() throws AuthorizationException
+    {
+        Right registeredRight = null;
+        try {
+            registeredRight = this.authorizationManager.register(new CustomRightDescription());
+
+            RightDescription conflictingDescription = new CustomRightDescription()
+            {
+                @Override
+                public RuleState getDefaultState()
+                {
+                    return RuleState.ALLOW;
+                }
+            };
+            assertThrows(UnableToRegisterRightException.class,
+                () -> this.authorizationManager.register(conflictingDescription));
+            assertSame(registeredRight, Right.toRight("foo"));
+        } finally {
+            if (registeredRight != null) {
+                registeredRight.unregister();
+            }
+        }
+    }
+
+    @Test
+    void registerWithEmptyImpliedRightsWhenRegisteredWithNull() throws AuthorizationException
+    {
+        Right registeredRight = null;
+        try {
+            registeredRight = this.authorizationManager.register(new CustomRightDescription()
+            {
+                @Override
+                public Set<Right> getImpliedRights()
+                {
+                    return null;
+                }
+            });
+
+            Right otherRegisteredRight = this.authorizationManager.register(new CustomRightDescription()
+            {
+                @Override
+                public Set<Right> getImpliedRights()
+                {
+                    return Collections.emptySet();
+                }
+            });
+            assertSame(registeredRight, otherRegisteredRight);
         } finally {
             if (registeredRight != null) {
                 registeredRight.unregister();

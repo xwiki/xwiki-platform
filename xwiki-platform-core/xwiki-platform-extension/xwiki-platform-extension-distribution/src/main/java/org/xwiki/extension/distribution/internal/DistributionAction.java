@@ -19,10 +19,16 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.icon.IconException;
+import org.xwiki.icon.IconSetManager;
+import org.xwiki.icon.internal.context.IconSetContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,14 +55,29 @@ public class DistributionAction extends XWikiAction
      */
     public static final String DISTRIBUTION_ACTION = "distribution";
 
+    @Inject
+    private DistributionManager distributionManager;
+
+    @Inject
+    private IconSetManager iconSetManager;
+
+    @Inject
+    private IconSetContext iconSetContext;
+
+    @Inject
+    private Logger logger;
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         context.put("action", DISTRIBUTION_ACTION);
 
-        // Make sure DW skip all skins
+        // Make sure DW is not impacted by skins and icon themes: those are stored in wiki pages which might not be
+        // compatible with the running code yet (e.g. pages from an old flavor referring to resources which don't exist
+        // anymore)
         context.put(XWiki.CKEY_SKIN, XWiki.DEFAULT_SKIN);
         context.put(XWiki.CKEY_BASESKIN, "");
+        useDefaultIconSet();
 
         // Disallow template override with xpage parameter.
         if (!DISTRIBUTION_ACTION.equals(Utils.getPage(context.getRequest(), DISTRIBUTION_ACTION))) {
@@ -65,8 +86,7 @@ public class DistributionAction extends XWikiAction
         }
 
         // Make sure the user has the right to access the distribution action
-        DistributionManager distributionManager = Utils.getComponent(DistributionManager.class);
-        if (!distributionManager.canDisplayDistributionWizard()) {
+        if (!this.distributionManager.canDisplayDistributionWizard()) {
             if (context.getUserReference() == null) {
                 context.getWiki().getAuthService().showLogin(context);
                 return false;
@@ -77,6 +97,16 @@ public class DistributionAction extends XWikiAction
         }
 
         return true;
+    }
+
+    private void useDefaultIconSet()
+    {
+        try {
+            this.iconSetContext.setIconSet(this.iconSetManager.getDefaultIconSet());
+        } catch (IconException e) {
+            this.logger.warn("Failed to force the default icon set in the Distribution Wizard: {}",
+                ExceptionUtils.getRootCauseMessage(e));
+        }
     }
 
     @Override

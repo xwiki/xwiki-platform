@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikiDescriptorTarget;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -100,6 +101,8 @@ public class UITestTestConfigurationResolver
 
     private static final String SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY = "xwiki.test.ui.servletEngineNetworkAliases";
 
+    private static final String WIKIDESCRIPTORTARGET_PROPERTY = "xwiki.test.ui.wikiDescriptorTarget";
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      * @return the constructed {@link TestConfiguration} object containing the full test configuration
@@ -121,6 +124,8 @@ public class UITestTestConfigurationResolver
         configuration.setBrowserTag(resolveBrowserTag(uiTestAnnotation.browserTag()));
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
+        configuration.setScreenWidth(uiTestAnnotation.screenWidth());
+        configuration.setScreenHeight(uiTestAnnotation.screenHeight());
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
         configuration.setWCAG(resolveWCAG(uiTestAnnotation.wcag()));
         configuration.setWCAGStopOnError(resolveWCAGStopOnError(uiTestAnnotation.wcagStopOnError()));
@@ -146,6 +151,7 @@ public class UITestTestConfigurationResolver
         configuration.setSolrMode(resolveSolrMode(uiTestAnnotation.solrMode()));
         configuration.setRemoteSolrTag(resolveRemoteSolrTag(uiTestAnnotation.remoteSolrTag()));
         configuration.setXWikiInstances(uiTestAnnotation.xwikiInstances());
+        configuration.setWikiDescriptorTarget(resolveWikiDescriptorTarget(uiTestAnnotation.wikiDescriptorTarget()));
 
         return configuration;
     }
@@ -355,11 +361,24 @@ public class UITestTestConfigurationResolver
         return newSSHPorts;
     }
 
+    /**
+     * Combine the values from the {@link UITest} annotation with the ones from the System property (a comma-separated
+     * list), the annotation's first and without duplicates. They are combined rather than having the System property
+     * override the annotation, since a test needs its own values (for example the {@code legacy} Maven profile) while
+     * the build may add some for all tests (for example the {@code clover} profile).
+     *
+     * @param values the {@link UITest} annotation parameter values, for example {@code {"legacy"}}
+     * @param systemProperty the name of the System property which might contain comma-separated values, for example
+     *     {@code xwiki.test.ui.profiles}; an unset or empty property adds nothing
+     * @return the combined values, blank ones being ignored and the others trimmed
+     */
     private List<String> resolveCommaSeparatedValues(String[] values, String systemProperty)
     {
-        String[] actualValues = values.length > 0 ? values : System.getProperty(systemProperty, "").split("\\s*,\\s*");
-        return Stream.of(actualValues).filter(StringUtils::isNotBlank)
-            .collect(Collectors.toCollection(() -> new ArrayList<>()));
+        return Stream.concat(Stream.of(values), Stream.of(System.getProperty(systemProperty, "").split(",")))
+            .map(String::trim)
+            .filter(StringUtils::isNotEmpty)
+            .distinct()
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<ServletEngine> resolveForbiddenServletEngines(ServletEngine[] forbiddenServletEngines)
@@ -399,5 +418,10 @@ public class UITestTestConfigurationResolver
     private String resolveRemoteSolrTag(String resolveRemoTag)
     {
         return resolve(resolveRemoTag, REMOTESOLRTAG_PROPERTY);
+    }
+
+    private WikiDescriptorTarget resolveWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget)
+    {
+        return resolve(WikiDescriptorTarget.class, wikiDescriptorTarget, WIKIDESCRIPTORTARGET_PROPERTY);
     }
 }

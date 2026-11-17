@@ -106,13 +106,14 @@ export default {
       }
     },
 
-    removeFilter: function () {
+    removeFilter: async function () {
       this.$emit("update:isFiltering", true);
-      // eslint-disable-next-line promise/catch-or-return
-      this.logic.removeFilter(this.propertyId, this.index).finally(() => {
+      try {
+        await this.logic.removeFilter(this.propertyId, this.index);
+      } finally {
         // Whatever the removeFilter promise result, the filtering state is switched to false.
         this.$emit("update:isFiltering", false);
-      });
+      }
     },
 
     // Call applyFilter method, but using a delay

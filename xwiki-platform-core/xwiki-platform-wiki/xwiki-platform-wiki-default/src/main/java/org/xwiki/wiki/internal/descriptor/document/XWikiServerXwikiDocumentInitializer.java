@@ -19,6 +19,7 @@
  */
 package org.xwiki.wiki.internal.descriptor.document;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.inject.Inject;
@@ -109,7 +110,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
                 // Initialize the alias and the protocol with the input URL
                 Request request = this.container.getRequest();
                 if (request instanceof ServletRequest servletRequest) {
-                    URL sourceURL = HttpServletUtils.getSourceBaseURL(servletRequest.getHttpServletRequest());
+                    URL sourceURL = HttpServletUtils.getSourceBaseURL(servletRequest.getRequest());
                     xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER, sourceURL.getHost());
                     if ("https".equals(sourceURL.getProtocol())) {
                         // Explicitly set the secure property if the input is HTTPS
@@ -124,7 +125,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
                 }
 
                 needsUpdate = true;
-            } catch (XWikiException e) {
+            } catch (XWikiException | MalformedURLException e) {
                 this.logger.error("Failed to initialize main wiki descriptor", e);
             }
         }

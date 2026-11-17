@@ -42,7 +42,6 @@ import org.xwiki.container.Container;
 import org.xwiki.container.Session;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
-import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
@@ -103,14 +102,6 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
         throws TemporaryAttachmentException, AttachmentValidationException
     {
         return uploadAttachment(documentReference, part, null);
-    }
-
-    @Override
-    @Deprecated
-    public XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part,
-        String filename) throws TemporaryAttachmentException, AttachmentValidationException
-    {
-        return uploadAttachment(documentReference, JakartaServletBridge.toJakarta(part), filename);
     }
 
     @Override

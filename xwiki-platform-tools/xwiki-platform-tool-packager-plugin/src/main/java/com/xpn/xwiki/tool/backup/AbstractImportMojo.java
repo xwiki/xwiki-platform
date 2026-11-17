@@ -22,11 +22,11 @@ package com.xpn.xwiki.tool.backup;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.xwiki.extension.InstalledExtension;
@@ -103,15 +103,31 @@ public abstract class AbstractImportMojo extends AbstractOldCoreMojo
     protected void installExtension(Artifact artifact, String namespace) throws MojoExecutionException
     {
         // We need to distinguish between extensions installed explicitly and their transitive dependencies.
-        // We have to create our own Set because Maven changes the fields from the dependency Artifacts (e.g. resolves
-        // their version) after they are added to the Set of dependencies and this causes the hash code to change. As a
-        // result the #contains(Artifact) method doesn't work as expected because it uses the new hash code.
-        Set<Artifact> directDependencies = new HashSet<>(this.project.getDependencyArtifacts());
-
         InstalledExtension installedExtension =
-            this.extensionHelper.registerInstalledExtension(artifact, namespace, !directDependencies.contains(artifact),
+            this.extensionHelper.registerInstalledExtension(artifact, namespace,
+                !isDirectDependency(artifact, this.project.getDependencies()),
                 Collections.<String, Object>singletonMap("user.reference", this.installUser));
 
         getLog().info("  ... Registered extension [" + installedExtension + "]");
+    }
+
+    /**
+     * @param artifact the resolved artifact
+     * @param dependencies the dependencies declared by the project
+     * @return {@code true} if the artifact is one of the dependencies declared by the project
+     */
+    static boolean isDirectDependency(Artifact artifact, List<Dependency> dependencies)
+    {
+        for (Dependency dependency : dependencies) {
+            if (dependency.getGroupId().equals(artifact.getGroupId())
+                && dependency.getArtifactId().equals(artifact.getArtifactId())
+                && dependency.getType().equals(artifact.getType())
+                && Objects.toString(dependency.getClassifier(), "")
+                    .equals(Objects.toString(artifact.getClassifier(), ""))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

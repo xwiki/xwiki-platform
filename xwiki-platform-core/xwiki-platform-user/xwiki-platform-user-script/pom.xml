@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-script</artifactId>
   <name>XWiki Platform - User - Script</name>
   <packaging>jar</packaging>
   <description>Script-oriented APIs to manipulate users and groups</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.12</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.52</xwiki.jacoco.instructionRatio>
     <xwiki.extension.name>User Scripting API</xwiki.extension.name>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->

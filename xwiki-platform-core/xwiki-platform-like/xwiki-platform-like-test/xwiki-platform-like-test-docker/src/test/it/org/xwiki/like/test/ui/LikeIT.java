@@ -22,14 +22,16 @@ package org.xwiki.like.test.ui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.like.test.po.LikeButton;
 import org.xwiki.like.test.po.LikersPage;
 import org.xwiki.like.test.po.UserProfileLikedPagesPage;
-import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 
 import static java.util.Arrays.asList;
@@ -151,13 +153,18 @@ class LikeIT
             testUtils.getURL(testReference.getLastSpaceReference()));
         tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
 
-        // Go to the likers of the page and verify the Live Data is accurate.
-        LikersPage likersPage = LikersPage.goToLikers(testReference);
-        LiveDataElement likersLiveData = likersPage.getLiveData();
-        TableLayoutElement likersTableLayout = likersLiveData.getTableLayout();
-        assertEquals(2, likersTableLayout.countRows());
-        likersTableLayout.assertRow("User", "LikeUser1");
-        likersTableLayout.assertRow("User", "LikeUser2");
+        // Go to the likers of the page, through the number of likes displayed next to the Like button and through
+        // the "More actions" menu, and verify that the Live Data is accurate.
+        testUtils.gotoPage(testReference);
+        assertLikers(new LikeButton().clickLikersLink(), USER1, USER2);
+        testUtils.gotoPage(testReference);
+        assertLikers(LikersPage.goToLikersFromMoreActions(), USER1, USER2);
+
+        // Unlike the terminal page.
+        testUtils.gotoPage(subPageReference);
+        likeButton = new LikeButton();
+        likeButton.clickToUnlike();
+        assertEquals(0, likeButton.getLikeNumber());
 
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);
@@ -221,5 +228,64 @@ class LikeIT
         testUtils.gotoPage(testReference);
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
+    }
+
+    @ParameterizedTest
+    @Order(5)
+    @WikisSource(mainWiki = false, extensions = { "org.xwiki.platform:xwiki-platform-like-ui" })
+    void likeUnlikeOnSubwiki(WikiReference wikiReference, TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        DocumentReference pageReference = testReference.replaceParent(testReference.getWikiReference(), wikiReference);
+        DocumentReference terminalPageReference =
+            new DocumentReference("SubPage", pageReference.getLastSpaceReference());
+        testUtils.loginAsSuperAdmin();
+        testUtils.rest().savePage(pageReference, "some content", "Page");
+        testUtils.rest().savePage(terminalPageReference, "some other content", "Terminal Page");
+
+        testUtils.login(USER1, USER1);
+        testUtils.gotoPage(pageReference);
+        LikeButton likeButton = new LikeButton();
+        assertEquals(0, likeButton.getLikeNumber());
+        likeButton.clickToLike();
+        assertEquals(1, likeButton.getLikeNumber());
+        testUtils.gotoPage(terminalPageReference);
+        likeButton = new LikeButton();
+        assertEquals(0, likeButton.getLikeNumber());
+        likeButton.clickToLike();
+        assertEquals(1, likeButton.getLikeNumber());
+
+        testUtils.login(USER2, USER2);
+        testUtils.gotoPage(pageReference);
+        likeButton = new LikeButton();
+        likeButton.clickToLike();
+        assertEquals(2, likeButton.getLikeNumber());
+        assertLikers(likeButton.clickLikersLink(), USER1, USER2);
+
+        // Clicking the button again unlikes the pages.
+        testUtils.login(USER1, USER1);
+        testUtils.gotoPage(pageReference);
+        likeButton = new LikeButton();
+        likeButton.clickToUnlike();
+        assertEquals(1, likeButton.getLikeNumber());
+        testUtils.gotoPage(terminalPageReference);
+        likeButton = new LikeButton();
+        likeButton.clickToUnlike();
+        assertEquals(0, likeButton.getLikeNumber());
+
+        // Check that the values remain after reload.
+        testUtils.gotoPage(pageReference);
+        assertEquals(1, new LikeButton().getLikeNumber());
+        testUtils.gotoPage(terminalPageReference);
+        assertEquals(0, new LikeButton().getLikeNumber());
+    }
+
+    private void assertLikers(LikersPage likersPage, String... users)
+    {
+        TableLayoutElement likersTableLayout = likersPage.getLiveData().getTableLayout();
+        assertEquals(users.length, likersTableLayout.countRows());
+        for (String user : users) {
+            likersTableLayout.assertRow("User", user);
+        }
     }
 }

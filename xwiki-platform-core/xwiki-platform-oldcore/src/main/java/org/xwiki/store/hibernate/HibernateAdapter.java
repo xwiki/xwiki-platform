@@ -98,6 +98,21 @@ public interface HibernateAdapter
     String getTableName(String tableName);
 
     /**
+     * Return the name of a column in the case the database uses to store it, for example to look it up in the
+     * {@link java.sql.DatabaseMetaData}. Unquoted identifiers are stored in upper case by some databases (e.g. HSQLDB,
+     * Oracle) and in lower case by others (e.g. PostgreSQL), whatever the case used in the Hibernate mapping.
+     *
+     * @param columnName the name of the column, as declared in the Hibernate mapping
+     * @return the name of the column in the right case/format
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    default String getColumnName(String columnName)
+    {
+        return columnName;
+    }
+
+    /**
      * @param entity the Hibernate entity for which to extract the configuration
      * @return true if the table should be compressed
      */

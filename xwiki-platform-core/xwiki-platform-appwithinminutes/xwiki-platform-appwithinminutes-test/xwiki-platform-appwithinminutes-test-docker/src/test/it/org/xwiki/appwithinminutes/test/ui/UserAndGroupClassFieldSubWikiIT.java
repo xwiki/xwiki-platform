@@ -38,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -182,14 +183,15 @@ class UserAndGroupClassFieldSubWikiIT
         String className = setup.serializeReference(classReference.getLocalDocumentReference());
         SuggestInputElement entryUserPicker =
             new SuggestInputElement(setup.getDriver().findElement(By.id(className + "_0_" + userProperty)));
-        entryUserPicker.sendKeys(pickedUser).waitForNonTypedSuggestions().selectByValue(USERS_SPACE + '.' + pickedUser);
+        entryUserPicker.sendKeys(pickedUser).selectByValue(USERS_SPACE + '.' + pickedUser);
         SuggestInputElement entryGroupPicker =
             new SuggestInputElement(setup.getDriver().findElement(By.id(className + "_0_" + groupProperty)));
-        entryGroupPicker.sendKeys(pickedGroup).waitForNonTypedSuggestions()
-            .selectByValue(USERS_SPACE + '.' + pickedGroup);
-        entryEditPage.clickSaveAndView();
+        entryGroupPicker.sendKeys(pickedGroup).selectByValue(USERS_SPACE + '.' + pickedGroup);
+        ViewPage entryViewPage = entryEditPage.clickSaveAndView();
 
-        List<WebElement> users = setup.getDriver().findElements(By.className("user"));
+        // Look for the displayed users only in the page content, since the page UI (e.g. the drawer) displays the
+        // current user too.
+        List<WebElement> users = entryViewPage.getContentContainer().findElements(By.className("user"));
         assertEquals(1, users.size());
         assertEquals(pickedUserName, users.get(0).getText());
         assertTrue(setup.getDriver().getPageSource().contains(pickedGroup),

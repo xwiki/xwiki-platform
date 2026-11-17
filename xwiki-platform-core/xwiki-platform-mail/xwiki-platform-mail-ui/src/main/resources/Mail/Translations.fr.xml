@@ -79,5 +79,6 @@ mailSender.admin.resendSuccess=Le courriel a été envoyé avec succès
 mailSender.admin.resendFailure=Impossible de renvoyer le courriel. Cliquez pour plus d'information.
 mailSender.admin.deleteSuccess=Le courriel a été supprimé avec succès
 mailSender.admin.deleteFailure=Erreur lors de la suppression du courriel. Cliquez pour afficher les détails.
+mailSender.admin.invalidCSRF=Clé de sécurité CSRF non valide. Veuillez actualiser la page et essayer à nouveau.
 </content>
 </xwikidoc>

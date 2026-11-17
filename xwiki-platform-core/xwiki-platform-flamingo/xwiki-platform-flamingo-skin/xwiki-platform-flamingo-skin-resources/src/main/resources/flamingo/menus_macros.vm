@@ -241,7 +241,7 @@
     ## pages, because for UI extensions implemented in Java it doesn't make sense.
     #if (!$uix.documentReference || $services.security.authorization.hasAccess('admin', $uix.authorReference,
         $services.wiki.currentWikiDescriptor.reference))
-      $services.rendering.render($uix.execute(), 'html/5.0')
+      $services.uix.render($uix, 'html/5.0')
     #end
   #end
 #end

@@ -25,6 +25,9 @@ i18n.use(initReactI18next).init({
   // This will be overwritten by the App component
   lng: "en",
 
+  // English is the only language with translations, so the other languages fall back to it.
+  fallbackLng: "en",
+
   // The resources object requires languages to be in the form of "{ en: { translation: { ...translation keys... } }"
   // so we transform them automatically here
   resources: Object.fromEntries(

@@ -81,6 +81,8 @@ import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -279,6 +281,26 @@ class XWikiHibernateStoreTest
         verify(query).executeUpdate();
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(true);
+    }
+
+    @Test
+    void loadLock() throws Exception
+    {
+        XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
+        when(this.session.get(XWikiLock.class, 13L)).thenReturn(lock);
+
+        assertSame(lock, this.store.loadLock(13L, this.xcontext, true));
+
+        // The lock is read with a single statement, so that it can't be removed concurrently between checking that it
+        // exists and loading it.
+        verify(this.session, never()).createQuery(any(String.class), any(Class.class));
+        verify(this.session, never()).load(any(Object.class), any());
+    }
+
+    @Test
+    void loadLockWhenThereIsNoLock() throws Exception
+    {
+        assertNull(this.store.loadLock(13L, this.xcontext, true));
     }
 
     @Test

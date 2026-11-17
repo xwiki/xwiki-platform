@@ -905,7 +905,6 @@ public class MockitoOldcore
                     XWikiDocument document = invocation.getArgument(0);
                     String comment = invocation.getArgument(1);
                     boolean minorEdit = invocation.getArgument(2);
-                    boolean modifiedByContextUser = invocation.getArgument(3);
                     XWikiContext xcontext = invocation.getArgument(4);
 
                     boolean isNew = document.isNew();
@@ -959,7 +958,7 @@ public class MockitoOldcore
                 anyXWikiContext());
             doNothing().when(getSpyXWiki()).checkSavingDocument(any(DocumentReference.class), anyXWikiDocument(),
                 any(String.class), anyBoolean(), anyXWikiContext());
-            doAnswer(new Answer<Void>()
+            Answer<Void> deleteDocumentAnswer = new Answer<Void>()
             {
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable
@@ -984,7 +983,11 @@ public class MockitoOldcore
 
                     return null;
                 }
-            }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
+            };
+            doAnswer(deleteDocumentAnswer).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class),
+                anyXWikiContext());
+            doAnswer(deleteDocumentAnswer).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), anyBoolean(),
+                anyBoolean(), anyXWikiContext());
             doNothing().when(getSpyXWiki()).checkDeletingDocument(any(DocumentReference.class), anyXWikiDocument(),
                 anyXWikiContext());
             doAnswer(new Answer<BaseClass>()

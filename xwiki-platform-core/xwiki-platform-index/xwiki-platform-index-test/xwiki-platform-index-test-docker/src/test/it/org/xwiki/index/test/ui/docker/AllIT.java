@@ -44,6 +44,11 @@ public class AllIT
     }
 
     @Nested
+    class NestedDeletedDocsIT extends DeletedDocsIT
+    {
+    }
+
+    @Nested
     class NestedOrphanedPagesIT extends OrphanedPagesIT
     {
     }

@@ -100,29 +100,6 @@ public class User extends Api
     }
 
     /**
-     * Check if the user belongs to a group or not. This method only check direct membership (no recursive checking) in
-     * the current wiki.
-     *
-     * @param groupName The group to check.
-     * @return {@code true} if the user does belong to the specified group, false otherwise or if an exception occurs.
-     */
-    public boolean isUserInGroup(String groupName)
-    {
-        boolean result = false;
-        try {
-            if (this.user == null) {
-                LOGGER.warn("User considered not part of group [{}] since user is null", groupName);
-            } else {
-                result = this.user.isUserInGroup(groupName, getXWikiContext());
-            }
-        } catch (Exception ex) {
-            LOGGER.warn("Unhandled exception while checking if user [{}] belongs to group [{}]",
-                this.user, groupName, ex);
-        }
-        return result;
-    }
-
-    /**
      * <p>
      * See if the user is global (i.e. registered in the main wiki) or local to a virtual wiki.
      * </p>

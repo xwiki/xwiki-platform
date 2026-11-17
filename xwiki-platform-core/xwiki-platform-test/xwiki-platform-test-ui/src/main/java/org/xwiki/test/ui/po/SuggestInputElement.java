@@ -21,6 +21,7 @@ package org.xwiki.test.ui.po;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -135,6 +136,12 @@ public class SuggestInputElement extends BaseElement
     private boolean shouldWaitForRemoteSuggestions;
 
     /**
+     * The text of the input before the keys sent since the last wait for suggestions, used to know whether the
+     * displayed suggestions may not match the typed text anymore.
+     */
+    private String textBeforeTyping;
+
+    /**
      * Checks if the suggest input widget is available on the given element.
      * 
      * @param executor the JavaScript executor used to check if the suggest input widget is available
@@ -235,9 +242,17 @@ public class SuggestInputElement extends BaseElement
     public SuggestInputElement sendKeys(CharSequence... keysToSend)
     {
         if (keysToSend != null) {
+            if (!this.shouldWaitForRemoteSuggestions) {
+                this.textBeforeTyping = getTypedText();
+            }
             maybeInsertReloadMarker();
             getTextInput().sendKeys(keysToSend);
             this.shouldWaitForRemoteSuggestions = true;
+            if (Arrays.stream(keysToSend).anyMatch(key -> key.toString().contains(Keys.ESCAPE))) {
+                // Escape closes the suggestions (and may clear the typed text), so there are no suggestions to wait
+                // for before listing them.
+                this.textBeforeTyping = getTypedText();
+            }
         }
         return this;
     }
@@ -273,7 +288,10 @@ public class SuggestInputElement extends BaseElement
             // causing spurious timeouts.
             getDriver().waitUntilCondition(driver -> Boolean.TRUE.equals(getDriver().executeScript("""
                 const selectize = arguments[0].selectize;
-                return !!selectize && selectize.loadedSearches.hasOwnProperty(selectize.get$('control_input').val());
+                // Same condition as the one used by the widget to show the loading state: suggestions that are not
+                // loaded asynchronously are available right away.
+                return !!selectize && (typeof selectize.settings.load !== 'function'
+                  || selectize.loadedSearches.hasOwnProperty(selectize.get$('control_input').val()));
                 """, this.originalInput)));
         }
         // Wait for the dropdown content to be reloaded. The reload marker inserted before typing is removed when the
@@ -341,33 +359,100 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
+     * Waits until the suggestions have been loaded, whether or not any suggestion actually matched the current input.
+     * Unlike {@link #waitForSuggestions()} and {@link #waitForNonTypedSuggestions()}, this doesn't require any
+     * suggestion to be displayed, so it can be used when the search is expected to return no results.
+     *
+     * @return the current suggest input element
+     * @since 18.9.0RC1
+     */
+    public SuggestInputElement waitForSuggestionsLoaded()
+    {
+        return waitForSuggestionsLoaded(this.shouldWaitForRemoteSuggestions);
+    }
+
+    /**
+     * Waits until the suggestions have been loaded, whether or not any suggestion actually matched the current input.
+     * Unlike {@link #waitForSuggestions(boolean)} and {@link #waitForNonTypedSuggestions(boolean)}, this doesn't
+     * require any suggestion to be displayed, so it can be used when the search is expected to return no results.
+     *
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
+     * @return the current suggest input element
+     * @since 18.9.0RC1
+     */
+    public SuggestInputElement waitForSuggestionsLoaded(boolean remote)
+    {
+        waitForDropdownReload(remote);
+        getDriver().waitUntilCondition(driver -> !isLoading());
+        return this;
+    }
+
+    /**
      * Waits until the suggestions have disappeared.
      *
      * @return the current suggest input element
      */
     public SuggestInputElement waitForSuggestionsClearance()
     {
-        getDriver().waitUntilCondition(driver -> getDriver()
-            .findElementsWithoutWaiting(this.container, By.cssSelector(".ts-wrapper.dropdown-active")).isEmpty());
+        getDriver().waitUntilCondition(driver -> !isDropDownOpened());
         return this;
     }
 
     /**
+     * Waits for the suggestions matching the typed text, if text was typed since the suggestions were last waited for,
+     * so that the callers don't have to.
+     *
+     * @param nonTyped whether to wait for suggestions beyond the option to choose the typed text
+     */
+    private void maybeWaitForSuggestions(boolean nonTyped)
+    {
+        if (this.shouldWaitForRemoteSuggestions && !Objects.equals(this.textBeforeTyping, getTypedText())) {
+            if (nonTyped) {
+                waitForNonTypedSuggestions();
+            } else {
+                waitForSuggestions();
+            }
+        }
+    }
+
+    private String getTypedText()
+    {
+        return StringUtils.defaultString(getTextInput().getDomProperty(ATTRIBUTE_VALUE));
+    }
+
+    /**
+     * Waits for the suggestions matching the text typed since the suggestions were last waited for, if any.
+     *
      * @return a list of all the suggestion elements
      */
     public List<SuggestionElement> getSuggestions()
     {
+        maybeWaitForSuggestions(false);
         return getDriver().findElementsWithoutWaiting(By.cssSelector(".ts-dropdown.active .xwiki-selectize-option"))
             .stream().map(SuggestionElement::new).toList();
     }
 
     /**
-     * Selects an element by clicking on the suggestion with the given position.
+     * @return the values of all the suggestions
+     * @since 18.9.0RC1
+     * @since 18.4.7
+     * @since 17.10.14
+     */
+    public List<String> getSuggestedValues()
+    {
+        return getSuggestions().stream().map(SuggestionElement::getValue).toList();
+    }
+
+    /**
+     * Selects an element by clicking on the suggestion with the given position, after waiting for the suggestions
+     * matching the typed text.
      *
      * @return the current suggest input element
      */
     public SuggestInputElement selectByIndex(int index)
     {
+        maybeWaitForSuggestions(true);
         getDriver().findElement(By.xpath("//*[contains(@class, 'ts-dropdown') and contains(@class, 'active')]"
             + "//*[contains(@class, 'xwiki-selectize-option')][" + (index + 1) + "]")).click();
 
@@ -375,12 +460,14 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
-     * Selects an element by clicking on the suggestion with the given value.
+     * Selects an element by clicking on the suggestion with the given value, after waiting for the suggestions
+     * matching the typed text.
      *
      * @return the current suggest input element
      */
     public SuggestInputElement selectByValue(String value)
     {
+        maybeWaitForSuggestions(true);
         getDriver().findElement(optionByValue(value, null)).click();
 
         return this;
@@ -407,12 +494,14 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
-     * Selects an element by clicking on the suggestion with the given label.
+     * Selects an element by clicking on the suggestion with the given label, after waiting for the suggestions
+     * matching the typed text.
      *
      * @return the current suggest input element
      */
     public SuggestInputElement selectByVisibleText(String text)
     {
+        maybeWaitForSuggestions(true);
         getDriver().findElement(optionByLabel(text, null)).click();
 
         return this;
@@ -429,12 +518,17 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
-     * Selects and creates an element with the input text.
+     * Selects and creates an element with the input text, after waiting for the suggestions matching the typed text.
      *
      * @return the current suggest input element
      */
     public SuggestInputElement selectTypedText()
     {
+        // The widget refreshes the suggestions a while after each typed key, and the option matching the typed text may
+        // already be selected by the refresh done for the text typed so far. We wait for the refresh done for the full
+        // text, otherwise it happens after we pick the option and it opens the suggestions again, over the elements
+        // below the input, once we're done with the input.
+        maybeWaitForSuggestions(false);
         WebElement textInput = getTextInput();
         String typedText = StringUtils.defaultString(textInput.getAttribute(ATTRIBUTE_VALUE));
         getDriver().waitUntilElementsAreVisible(new By[] {
@@ -486,11 +580,25 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement hideSuggestions()
     {
-        if (isDropDownOpened()) {
-            getTextInput().sendKeys(Keys.ESCAPE);
-            waitForSuggestionsClearance();
-        }
+        // Remove the focus rather than press Escape: the widget opens the suggestions again on its own whenever a
+        // suggestion request completes while the text input still has the focus, so Escape leaves the panel free to
+        // re-appear a moment later, either after this method returned or before it had a chance to see it closed.
+        // An unfocused widget both closes the panel and ignores the responses that come back afterwards.
+        getDriver().waitUntilCondition(driver -> {
+            getDriver().executeScript("arguments[0].blur()", getTextInput());
+            return !isDropDownOpened();
+        });
         return this;
+    }
+
+    /**
+     * @return {@code true} if the text input of this suggest input has the keyboard focus, {@code false} otherwise
+     * @since 18.4.8
+     * @since 18.9.0RC1
+     */
+    public boolean hasFocus()
+    {
+        return getTextInput().equals(getDriver().switchTo().activeElement());
     }
 
     /**

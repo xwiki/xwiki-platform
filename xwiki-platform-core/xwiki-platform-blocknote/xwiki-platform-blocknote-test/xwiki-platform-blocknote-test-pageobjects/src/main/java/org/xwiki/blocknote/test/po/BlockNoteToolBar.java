@@ -35,6 +35,8 @@ import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
  */
 public class BlockNoteToolBar extends BaseElement
 {
+    private static final String CREATE_LINK = "createLink";
+
     private WebElement container;
 
     /**
@@ -125,7 +127,7 @@ public class BlockNoteToolBar extends BaseElement
      */
     public BlockNoteLinkModal createLink()
     {
-        clickButton("createLink");
+        clickButton(CREATE_LINK);
         return new BlockNoteLinkModal();
     }
 
@@ -137,7 +139,7 @@ public class BlockNoteToolBar extends BaseElement
      */
     public boolean hasCreateLinkButton()
     {
-        return hasButton("createLink");
+        return hasButton(CREATE_LINK);
     }
 
     /**

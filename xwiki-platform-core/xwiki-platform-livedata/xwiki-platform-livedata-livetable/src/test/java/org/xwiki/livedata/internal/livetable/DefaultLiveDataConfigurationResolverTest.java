@@ -22,13 +22,17 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -37,19 +41,29 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,6 +74,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultLiveDataConfigurationResolverTest
 {
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @InjectMockComponents
     private DefaultLiveDataConfigurationResolver resolver;
 
@@ -78,8 +95,23 @@ class DefaultLiveDataConfigurationResolverTest
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
     @MockComponent
-    @Named("uuid")
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
+
+    @MockComponent
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Mock
     private LiveTableNewRowNamingStrategy namingStrategy;
+
+    @MockComponent
+    private NewRowTemplateProviderResolver templateProviderResolver;
+
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Mock
+    private XWikiContext xcontext;
 
     private final LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
 
@@ -88,9 +120,13 @@ class DefaultLiveDataConfigurationResolverTest
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void configure()
+    void configure() throws Exception
     {
+        when(this.templateProviderResolver.hasRequiredRights(any(), any())).thenReturn(true);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+
         when(this.propertyStoreProvider.get()).thenReturn((LiveDataPropertyDescriptorStore) this.propertyStore);
+        when(this.namingStrategyManager.get("uuid")).thenReturn(Optional.of(this.namingStrategy));
 
         this.defaultConfig.initialize();
         when(this.defaultConfigProvider.get()).thenReturn(this.defaultConfig);
@@ -109,6 +145,150 @@ class DefaultLiveDataConfigurationResolverTest
 
         assertTrue(actualConfig.getMeta().getActions().stream()
             .anyMatch(action -> "addEntry".equals(action.getId())));
+    }
+
+    @Test
+    void addEntryExposesTheLocationOfTheNewEntries() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        SpaceReference location = new SpaceReference("xwiki", "NewRows");
+        when(this.namingStrategy.getNewEntryLocation(any())).thenReturn(Optional.of(location));
+        when(this.stringEntityReferenceSerializer.serialize(location)).thenReturn("NewRows");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        // The client displays a row that has no entry yet in the context of the location it will end up in.
+        LiveDataActionDescriptor addEntry = actualConfig.getMeta().getActions().stream()
+            .filter(action -> "addEntry".equals(action.getId())).findFirst().orElseThrow();
+        assertEquals("NewRows", addEntry.getParameters().get("location"));
+    }
+
+    @Test
+    void addEntryExposesTheTemplateOfTheNewEntries() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        DocumentReference template = new DocumentReference("xwiki", "Code", "Template");
+        when(this.templateProviderResolver.getTemplate(any())).thenReturn(Optional.of(template));
+        when(this.stringEntityReferenceSerializer.serialize(template)).thenReturn("Code.Template");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        LiveDataActionDescriptor addEntry = actualConfig.getMeta().getActions().stream()
+            .filter(action -> "addEntry".equals(action.getId())).findFirst().orElseThrow();
+        assertEquals("Code.Template", addEntry.getParameters().get("template"));
+    }
+
+    @Test
+    void newRowLocationDefaultsToTheHostSpaceWithTheTemplateProviderStrategy() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "templateProvider");
+        DocumentReference hostReference = new DocumentReference("xwiki", "Apps", "Home");
+        when(this.xcontext.getDoc()).thenReturn(new XWikiDocument(hostReference));
+        when(this.stringEntityReferenceSerializer.serialize(hostReference.getLastSpaceReference()))
+            .thenReturn("Apps");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        assertEquals("Apps", actualConfig.getQuery().getSource().getParameters().get("newRowLocation"));
+    }
+
+    @Test
+    void newRowLocationIsKeptWithTheTemplateProviderStrategy() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "templateProvider");
+        this.config.getQuery().getSource().setParameter("newRowLocation", "Movies");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        // The entries are created by a separate request, whose current document is not the one displaying the data.
+        assertEquals("Movies", actualConfig.getQuery().getSource().getParameters().get("newRowLocation"));
+        verifyNoInteractions(this.xcontext);
+    }
+
+    @Test
+    void newRowLocationHasNoDefaultWithOtherStrategies() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        assertFalse(actualConfig.getQuery().getSource().getParameters().containsKey("newRowLocation"));
+        verifyNoInteractions(this.xcontext);
+    }
+
+    @Test
+    void addEntryWithoutTheRequiredRightsOfTheTemplate() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        SpaceReference location = new SpaceReference("xwiki", "NewRows");
+        when(this.namingStrategy.getNewEntryLocation(any())).thenReturn(Optional.of(location));
+        when(this.templateProviderResolver.hasRequiredRights(any(), any())).thenReturn(false);
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        // Like the create page, a template is not offered where the user lacks the rights it enforces.
+        assertFalse(actualConfig.getMeta().getActions().stream()
+            .anyMatch(action -> "addEntry".equals(action.getId())));
+    }
+
+    @Test
+    void addEntryWithoutLocation() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        when(this.namingStrategy.getNewEntryLocation(any())).thenReturn(Optional.empty());
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        LiveDataActionDescriptor addEntry = actualConfig.getMeta().getActions().stream()
+            .filter(action -> "addEntry".equals(action.getId())).findFirst().orElseThrow();
+        assertFalse(addEntry.getParameters().containsKey("location"));
+    }
+
+    private static LiveDataPropertyDescriptor getPropertyDescriptor(LiveDataConfiguration config, String propertyId)
+    {
+        return config.getMeta().getPropertyDescriptors().stream()
+            .filter(descriptor -> propertyId.equals(descriptor.getId()))
+            .findFirst()
+            .orElseThrow();
+    }
+
+    @Test
+    void addEntryMarksTheMandatoryProperties() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        when(this.namingStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title"));
+        LiveDataPropertyDescriptor titleDescriptor = new LiveDataPropertyDescriptor();
+        titleDescriptor.setId("doc.title");
+        LiveDataPropertyDescriptor statusDescriptor = new LiveDataPropertyDescriptor();
+        statusDescriptor.setId("status");
+        this.config.getMeta().getPropertyDescriptors().addAll(List.of(titleDescriptor, statusDescriptor));
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        // The client waits for the mandatory properties to hold a value before it creates the entry.
+        assertEquals(Boolean.TRUE, getPropertyDescriptor(actualConfig, "doc.title").isMandatory());
+        assertNull(getPropertyDescriptor(actualConfig, "status").isMandatory());
+    }
+
+    @Test
+    void addEntryWithMandatoryPropertyWithoutDescriptor() throws Exception
+    {
+        this.config.getQuery().getSource().setParameter("newRowNamingStrategy", "uuid");
+        when(this.namingStrategy.isCreationAllowed(any())).thenReturn(true);
+        when(this.namingStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title"));
+
+        LiveDataConfiguration actualConfig = this.resolver.resolve(this.config);
+
+        // The user could never give that value, so no entry could ever be created.
+        assertFalse(actualConfig.getMeta().getActions().stream()
+            .anyMatch(action -> "addEntry".equals(action.getId())));
+        assertEquals("Adding entries is disabled because the mandatory properties [doc.title] have no descriptor in "
+            + "this live data.", this.logCapture.getMessage(0));
     }
 
     @Test

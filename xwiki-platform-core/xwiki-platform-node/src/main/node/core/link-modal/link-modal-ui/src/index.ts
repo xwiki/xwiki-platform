@@ -19,6 +19,8 @@
  */
 
 import { default as _LinkModal } from "./vue/LinkModal.vue";
+import { default as _PlainTextLinkTargetField } from "./vue/PlainTextLinkTargetField.vue";
+import { default as _SearchBox } from "./vue/SearchBox.vue";
 
 /**
  * Link modal UI component
@@ -26,19 +28,30 @@ import { default as _LinkModal } from "./vue/LinkModal.vue";
  * @since 18.5.0RC1
  * @beta
  */
-export const LinkModal = _LinkModal;
+const LinkModal = _LinkModal;
 
-export type {
-  LinkAttachmentConfig,
-  LinkData,
-  LinkEmailConfig,
-  LinkPageConfig,
-  LinkTarget,
-  LinkUrlConfig,
-} from "./data/linkType";
+/**
+ * Generic search/typeahead input, used by link target types backed by a suggestion service (e.g., the built-in
+ * "page" and "attachment" types). Re-exported so that other link target types can reuse it.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+const SearchBox = _SearchBox;
 
-export {
-  linkTargetToResourceReference,
-  parseLinkTarget,
-  resourceReferenceToLinkTarget,
-} from "./convert";
+/**
+ * Target field of the link target types designated by a plain text location (see `PlainTextLinkTargetConfig`), with
+ * props for the label, the `data-test` attribute and the type of its location field. The link modal also uses it for
+ * the link target types registered without a form. Re-exported so that the target field of such a link target type
+ * can customize its location field.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+const PlainTextLinkTargetField = _PlainTextLinkTargetField;
+
+export { LinkModal, PlainTextLinkTargetField, SearchBox };
+
+export type { SearchBoxItem, SearchBoxSource } from "./vue/SearchBox.vue";
+export { linkTargetTypeFormRole } from "./linkTargetTypeForm";
+export type { LinkTargetTypeForm } from "./linkTargetTypeForm";

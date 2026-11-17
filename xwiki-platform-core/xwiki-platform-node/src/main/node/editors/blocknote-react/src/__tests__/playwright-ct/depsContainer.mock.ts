@@ -28,6 +28,7 @@ import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { mock } from "vitest-mock-extended";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
+  ModelReferenceHandlerProvider,
   ModelReferenceParser,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
@@ -38,8 +39,16 @@ import type {
 } from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
 
+// eslint-disable-next-line max-statements
 export function depsContainerMock(): Container {
-  const container = mock<Container>();
+  const container = mock<Container>(
+    {},
+    {
+      fallbackMockImplementation: (id: unknown) => {
+        throw new Error(`Unexpected service: ${String(id)}`);
+      },
+    },
+  );
 
   container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
     get: () => ({
@@ -51,7 +60,11 @@ export function depsContainerMock(): Container {
 
   container.get.calledWith("RemoteURLSerializerProvider").mockReturnValue({
     get: () => ({
-      serialize() {
+      serialize(reference) {
+        if (reference?.type === EntityType.ATTACHMENT) {
+          return "some attachment url";
+        }
+
         throw new Error("Unreachable");
       },
     }),
@@ -68,6 +81,23 @@ export function depsContainerMock(): Container {
       },
     }),
   } satisfies ModelReferenceParserProvider);
+
+  container.get.calledWith("ModelReferenceHandlerProvider").mockReturnValue({
+    get: () => ({
+      createDocumentReference() {
+        throw new Error("Unreachable");
+      },
+      getTitle() {
+        throw new Error("Unreachable");
+      },
+      getParentDocumentReference() {
+        throw new Error("Unreachable");
+      },
+      getParentSpaceReference() {
+        throw new Error("Unreachable");
+      },
+    }),
+  } satisfies ModelReferenceHandlerProvider);
 
   container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
     get: () => ({
@@ -137,7 +167,8 @@ const parseModelReference: ModelReferenceParser["parse"] = (
 
   if (
     reference === "some attachment reference" &&
-    (!opts?.type || opts?.type === EntityType.ATTACHMENT)
+    // Like an actual entity reference, it doesn't hold the type of the entity.
+    opts?.type === EntityType.ATTACHMENT
   ) {
     return new AttachmentReference(
       "some attachment",

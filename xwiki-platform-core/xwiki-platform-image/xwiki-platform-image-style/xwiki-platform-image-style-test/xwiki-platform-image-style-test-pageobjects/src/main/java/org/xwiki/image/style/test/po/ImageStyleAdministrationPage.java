@@ -23,6 +23,7 @@ import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
@@ -71,7 +72,8 @@ public class ImageStyleAdministrationPage extends ViewPage
                 + "[Image.Style.Code.ConfigurationClass] object, which means that object or its class was not visible "
                 + "to the server while rendering the section.\n"
                 + "Section rendered by the server:\n" + getDefaultImageStyleFormMarkup() + '\n'
-                + "Configuration document as served by REST:\n" + getConfigurationDocumentFromRest());
+                + "Configuration document as served by REST:\n" + getConfigurationDocumentFromRest() + '\n'
+                + "Configuration class as served by REST:\n" + getConfigurationClassFromRest());
         }
     }
 
@@ -90,17 +92,39 @@ public class ImageStyleAdministrationPage extends ViewPage
     }
 
     /**
-     * @return the REST representation of the configuration document, objects included. REST does not read the document
-     *     through the same code path as the rendering of the section, so comparing the two tells whether the object is
-     *     missing from the database or only invisible to the request that rendered the section
+     * @return the REST representation of the configuration document, objects included
      */
     private String getConfigurationDocumentFromRest()
     {
         TestUtils testUtils = getUtil();
-        String uri = String.format("%s/wikis/%s/spaces/Image/spaces/Style/spaces/Code/pages/Configuration/objects",
-            testUtils.rest().getBaseURL(), testUtils.getCurrentWiki());
+        return getFromRest(String.format(
+            "%s/wikis/%s/spaces/Image/spaces/Style/spaces/Code/pages/Configuration/objects",
+            testUtils.rest().getBaseURL(), testUtils.getCurrentWiki()));
+    }
+
+    /**
+     * @return the REST representation of the configuration class, properties included. The section renders the same
+     *     way whether the object is missing from the document or the class is missing its properties, so dumping the
+     *     class next to the document tells the two apart: an object listed by the previous dump together with a class
+     *     listed here without {@code defaultStyle} means the class document was read as if it were empty
+     */
+    private String getConfigurationClassFromRest()
+    {
+        TestUtils testUtils = getUtil();
+        return getFromRest(String.format("%s/wikis/%s/classes/Image.Style.Code.ConfigurationClass",
+            testUtils.rest().getBaseURL(), testUtils.getCurrentWiki()));
+    }
+
+    /**
+     * @param uri the REST URI to read
+     * @return the body returned by that URI, or a description of why it could not be read. REST does not read the
+     *     document through the same code path as the rendering of the section, so comparing the two tells whether the
+     *     data is missing from the database or only invisible to the request that rendered the section
+     */
+    private String getFromRest(String uri)
+    {
         try {
-            return testUtils.rest().executeGet(URI.create(uri)).getResponseBodyAsString();
+            return EntityUtils.toString(getUtil().rest().executeGet(URI.create(uri)).getEntity());
         } catch (Exception e) {
             return String.format("[%s] could not be read: %s", uri, ExceptionUtils.getRootCauseMessage(e));
         }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -54,7 +56,7 @@ class CreatePageAndSpaceIT
 
     @Test
     @Order(1)
-    void createSpaceAndPage(TestUtils setup, TestReference reference)
+    void createSpaceAndPage(TestUtils setup, TestReference reference) throws Exception
     {
         // Test 1:  Test Space creation when on an existing page (i.e. the space creation UI will open to ask for the
         //          space name.
@@ -117,6 +119,23 @@ class CreatePageAndSpaceIT
         // Save the page to verify it can be saved with a non-ascii name
         ViewPage savedPage = editPage.clickSaveAndView();
         assertEquals(newPageName, savedPage.getMetaDataValue("page"));
+        assertEquals(spaceName, savedPage.getMetaDataValue("space"));
+
+        // Test 4:  Test page creation from a terminal page: since a terminal page cannot have children, the proposed
+        //          location is the space of the terminal page, so the new page is created as its sibling.
+
+        String siblingPageName = reference.getName() + "Sibling";
+        DocumentReference siblingPageReference =
+            new DocumentReference("xwiki", List.of(spaceName, siblingPageName), "WebHome");
+        setup.rest().delete(siblingPageReference);
+
+        cpp = savedPage.createPage();
+        DocumentPicker documentPicker = cpp.getDocumentPicker();
+        documentPicker.toggleLocationAdvancedEdit();
+        assertEquals(spaceName, documentPicker.getParent());
+        savedPage = cpp.createPage(siblingPageName, null, null, false).clickSaveAndView();
+        assertEquals(setup.serializeReference(siblingPageReference), savedPage.getMetaDataValue("reference"));
+        assertFalse(setup.pageExists(List.of(spaceName, newPageName, siblingPageName), "WebHome"));
     }
 
     /**

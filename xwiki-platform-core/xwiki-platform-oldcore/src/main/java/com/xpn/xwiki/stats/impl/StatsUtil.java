@@ -177,11 +177,6 @@ public final class StatsUtil
     private static String[] cookieDomains;
 
     /**
-     * The expiration date of the cookie.
-     */
-    private static Date cookieExpirationDate;
-
-    /**
      * The type of the period.
      *
      * @version $Id$
@@ -265,9 +260,8 @@ public final class StatsUtil
         // Let's init the expirationDate for the cookie
         Calendar cal = Calendar.getInstance();
         cal.set(2030, 0, 0);
-        cookieExpirationDate = cal.getTime();
 
-        return cookieExpirationDate;
+        return cal.getTime();
     }
 
     /**

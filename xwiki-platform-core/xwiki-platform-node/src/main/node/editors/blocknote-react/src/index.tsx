@@ -64,6 +64,7 @@ export type {
   EditorInlineContentSchema,
   EditorLanguage,
   EditorLink,
+  EditorPartialLink,
   EditorSchema,
   EditorStyleSchema,
   EditorStyledText,
@@ -77,6 +78,13 @@ export type {
   ImageEditionOverrideFn,
   ImageUpdateResult,
 } from "./components/images/CustomImageToolbar";
+
+export type { ImageEditionHooks } from "./components/images/imageEditionHooks";
+
+export type {
+  ImageInsertionOverrideFn,
+  ImageInsertionResult,
+} from "./components/images/imageInsertionOverride";
 
 export {
   MACRO_NAME_PREFIX,

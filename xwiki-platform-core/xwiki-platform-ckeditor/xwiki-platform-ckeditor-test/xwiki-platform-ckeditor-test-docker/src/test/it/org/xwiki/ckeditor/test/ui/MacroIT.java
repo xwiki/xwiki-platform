@@ -19,6 +19,10 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,11 +30,17 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.CKEditorConfigurationPane;
+import org.xwiki.flamingo.skin.test.po.CompactLocationPickerElement;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.MessageBoxElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
@@ -38,6 +48,8 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests how rendering macros are integrated in CKEditor.
@@ -116,8 +128,6 @@ class MacroIT extends AbstractCKEditorIT
             Inline {{box}}<param></param>{{/box}}.
             {{/box}}""");
 
-        this.textArea.waitUntilContentContains("Inline");
-
         ViewPage viewPage = editPage.clickSaveAndView();
         assertThat(viewPage.getContent(), containsString("<param></param>"));
     }
@@ -130,13 +140,15 @@ class MacroIT extends AbstractCKEditorIT
         setSource("before\n\n{{id name='test'/}}\n\nafter");
         assertEquals("before\nmacro:id\nafter", this.textArea.getText());
 
+        // The macro name is displayed next to the move handle, but only while the macro is hovered.
+        assertNull(this.textArea.getMacroNameNextToMoveHandle(0));
+        this.textArea.hoverMacro(0);
+        assertEquals("id", this.textArea.getMacroNameNextToMoveHandle(0));
+
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
-        this.textArea.waitUntilWidgetSelected();
-        this.textArea.sendKeys(Keys.ENTER);
-        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        MacroDialogEditModal macroEditModal = this.textArea.editSelectedMacro();
         assertEquals("test", macroEditModal.getMacroParameter("name"));
         macroEditModal.setMacroParameter("name", "foo").clickSubmit();
-        this.textArea.waitForContentRefresh();
 
         assertEquals("before\nmacro:id\nafter", this.textArea.getText());
         assertSourceEquals("before\n\n{{id name=\"foo\"/}}\n\nafter");
@@ -187,8 +199,6 @@ class MacroIT extends AbstractCKEditorIT
 
             //three//""").clickSubmit();
 
-        this.textArea.waitForContentRefresh();
-
         // Modify again the tile parameter and the macro content inline.
         this.textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
         this.textArea.sendKeys("Final");
@@ -208,5 +218,192 @@ class MacroIT extends AbstractCKEditorIT
             {{/info}}
 
             after""");
+    }
+
+    @Test
+    @Order(5)
+    void insertInfoBoxFromInsertMenu(TestUtils setup, TestReference testReference)
+    {
+        WYSIWYGEditPage editPage = edit(setup, testReference, true);
+
+        // The Info Box is inserted directly, with a default message, and the caret is placed at the start of it.
+        this.editor.getToolBar().insertInfoBox();
+        assertThat(this.textArea.getText(), containsString("Type your information message here."));
+        this.textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        this.textArea.sendKeys("This is an info macro!");
+        assertThat(this.textArea.getText(), containsString("This is an info macro!"));
+
+        // The editor keeps an empty paragraph after the inserted macro, so that the user can type after it.
+        assertSourceEquals("{{info}}\nThis is an info macro!\n{{/info}}\n\n ", true);
+
+        List<MessageBoxElement> messageBoxes = editPage.clickSaveAndView().getMessageBoxes();
+        assertEquals(1, messageBoxes.size());
+        MessageBoxElement infoBox = messageBoxes.get(0);
+        assertEquals(MessageBoxElement.Type.INFO, infoBox.getType());
+        assertEquals("This is an info macro!", infoBox.getText());
+    }
+
+    @Test
+    @Order(6)
+    void inlineEditMacroInsertedFromOtherMacros(TestUtils setup, TestReference testReference)
+    {
+        WYSIWYGEditPage editPage = edit(setup, testReference, true);
+        this.textArea.sendKeys("before", Keys.ENTER);
+
+        MacroDialogEditModal macroEditModal =
+            this.editor.getToolBar().insertOtherMacro().filterByText("Info Message", 1).clickSelect();
+        macroEditModal.setMacroParameter("title", "This is a title!");
+        macroEditModal.setMacroContent("This is an info macro!");
+        macroEditModal.clickSubmit();
+        assertThat(this.textArea.getText(), containsString("This is an info macro!"));
+
+        // Edit the title parameter and then the macro content in-line, moving the caret from the paragraph placed
+        // before the macro.
+        this.textArea.sendKeys(Keys.PAGE_UP, Keys.UP, Keys.DOWN, Keys.END, " More title.", Keys.DOWN, Keys.END,
+            " More content.");
+
+        // Format the last word of the macro content.
+        this.textArea.sendKeys(Keys.LEFT, Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.LEFT));
+        this.editor.getToolBar().bold().italic().underline();
+
+        assertSourceEquals("""
+            before
+
+            {{info title="This is a title! More title."}}
+            This is an info macro! More __//**content**//__.
+            {{/info}}""");
+
+        List<MessageBoxElement> messageBoxes = editPage.clickSaveAndView().getMessageBoxes();
+        assertEquals(1, messageBoxes.size());
+        MessageBoxElement infoBox = messageBoxes.get(0);
+        assertEquals(MessageBoxElement.Type.INFO, infoBox.getType());
+        assertEquals("This is a title! More title.\nThis is an info macro! More content.", infoBox.getText());
+        assertTrue(infoBox.isBold("content"));
+        assertTrue(infoBox.isItalic("content"));
+        assertTrue(infoBox.isUnderlined("content"));
+    }
+
+    @Test
+    @Order(7)
+    void insertDisplayMacroFromOtherMacros(TestUtils setup, TestReference testReference) throws Exception
+    {
+        LocalDocumentReference displayedReference =
+            new LocalDocumentReference("Displayed", testReference.getLastSpaceReference());
+        setup.createPage(displayedReference, "Displayed page content", "Displayed page title");
+        // The page picker of the macro reference parameter uses the search to get its suggestions.
+        waitForSolrIndexing(setup);
+
+        WYSIWYGEditPage editPage = edit(setup, testReference, true);
+
+        MacroDialogEditModal macroEditModal =
+            this.editor.getToolBar().insertOtherMacro().filterByText("Display other pages", 1).clickSelect();
+        // Submitting without the required reference keeps the modal open and gives the focus to the reference picker.
+        macroEditModal.clickSubmit(false);
+        SuggestInputElement referencePicker = macroEditModal.getMacroParameterSuggestInput("reference");
+        assertTrue(referencePicker.hasFocus());
+
+        referencePicker.sendKeys("Displayed").selectByIndex(0);
+        macroEditModal.clickSubmit();
+        assertThat(this.textArea.getText(), containsString("Displayed page content"));
+
+        assertSourceEquals(
+            String.format("{{display reference=\"%s\"/}}", setup.serializeLocalReference(displayedReference)));
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertEquals("Displayed page content", viewPage.getContent());
+    }
+
+    /**
+     * Verify that a macro parameter whose type has a dedicated picker (e.g. a list of space references) is edited with
+     * that picker rather than with a plain text input, and that its value is properly loaded and saved. See
+     * XWIKI-23834: Add pickers for the notification macro.
+     */
+    @Test
+    @Order(8)
+    void editTypedParametersWithPickers(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // One parameter per type that has a picker, in order to check that each type selects the expected displayer
+        // template.
+        Map<String, String> parameterTypes = new LinkedHashMap<>();
+        parameterTypes.put("wikis", "java.util.List<org.xwiki.model.reference.WikiReference>");
+        parameterTypes.put("spaces", "java.util.List<org.xwiki.model.reference.SpaceReference>");
+        parameterTypes.put("pages", "java.util.List<org.xwiki.model.reference.DocumentReference>");
+        parameterTypes.put("users", "java.util.List<org.xwiki.user.UserReference>");
+        parameterTypes.put("tags", "java.util.List<org.xwiki.tag.Tag>");
+
+        // Only a user with script rights can define a wiki macro.
+        setup.loginAsSuperAdmin();
+        String macroId = "typedParameters";
+        DocumentReference macroReference =
+            new DocumentReference("TypedParametersMacro", testReference.getLastSpaceReference());
+        setup.deletePage(macroReference);
+        setup.createPage(macroReference, "", "Typed Parameters Macro");
+        setup.addObject(macroReference, "XWiki.WikiMacroClass",
+            "id", macroId,
+            "name", "Typed Parameters",
+            "description", "One parameter per type that has a picker.",
+            "contentType", "No content",
+            "visibility", "Current Wiki",
+            "code", "{{velocity}}ok{{/velocity}}");
+        for (Map.Entry<String, String> parameterType : parameterTypes.entrySet()) {
+            setup.addObject(macroReference, "XWiki.WikiMacroParameterClass",
+                "name", parameterType.getKey(),
+                "type", parameterType.getValue());
+        }
+        // The space, page, tag and user we're going to select with the pickers.
+        SpaceReference targetSpace = new SpaceReference("Target", testReference.getLastSpaceReference());
+        String targetSpaceValue = setup.serializeLocalReference(targetSpace);
+        setup.createPage(new DocumentReference("WebHome", targetSpace), "", "Target Space");
+        DocumentReference targetPage = new DocumentReference("TargetPage", testReference.getLastSpaceReference());
+        String targetPageValue = setup.serializeLocalReference(targetPage);
+        setup.createPage(targetPage, "", "Target Page");
+        String targetTag = "MacroITPickerTag";
+        setup.addObject(targetPage, "XWiki.TagClass", "tags", targetTag);
+        String targetUser = "MacroITPickerUser";
+        setup.deletePage(new DocumentReference("xwiki", "XWiki", targetUser));
+        setup.rest().createUser(new XWikiCredentials(targetUser, targetUser));
+
+        loginStandardUser(setup);
+        edit(setup, testReference, true);
+        setSource(String.format(
+            "before\n\n{{%s spaces=\"Main\" pages=\"Main.WebHome\" users=\"XWiki.alice\"/}}\n\nafter", macroId));
+
+        this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
+        MacroDialogEditModal macroEditModal = this.textArea.editSelectedMacro();
+
+        // Every typed parameter is edited with a picker. Note that looking up the picker already asserts that the
+        // suggestion widget has been applied to the parameter field.
+        for (String parameterName : parameterTypes.keySet()) {
+            macroEditModal.getMacroParameterSuggestInput(parameterName);
+        }
+        // The spaces are edited with the compact location picker, which also allows browsing for them in a tree.
+        assertEquals("Browse for locations", CompactLocationPickerElement.get("spaces").getBrowseLabel());
+
+        // The values of the macro call are loaded in the pickers.
+        assertEquals(List.of("Main"), macroEditModal.getMacroParameterSuggestInput("spaces").getValues());
+        assertEquals(List.of("Main.WebHome"), macroEditModal.getMacroParameterSuggestInput("pages").getValues());
+        assertEquals(List.of("XWiki.alice"), macroEditModal.getMacroParameterSuggestInput("users").getValues());
+        assertEquals(List.of(), macroEditModal.getMacroParameterSuggestInput("tags").getValues());
+
+        // Select a wiki, an additional space, an additional page, a tag and an additional user with their pickers and
+        // check that they end up in the macro call, so that the save round-trip is verified for every picker.
+        macroEditModal.getMacroParameterSuggestInput("wikis").sendKeys("xwiki").waitForNonTypedSuggestions()
+            .selectByValue("xwiki");
+        macroEditModal.getMacroParameterSuggestInput("spaces").sendKeys("Target Space").waitForNonTypedSuggestions()
+            .selectByValue(targetSpaceValue);
+        macroEditModal.getMacroParameterSuggestInput("pages").sendKeys("Target Page").waitForNonTypedSuggestions()
+            .selectByValue(targetPageValue);
+        // The tags are suggested from part of their name.
+        macroEditModal.getMacroParameterSuggestInput("tags").sendKeys("PickerT").waitForNonTypedSuggestions()
+            .selectByValue(targetTag);
+        macroEditModal.getMacroParameterSuggestInput("users").sendKeys(targetUser).waitForNonTypedSuggestions()
+            .selectByValue("XWiki." + targetUser);
+        macroEditModal.clickSubmit();
+
+        assertSourceContains("wikis=\"xwiki\"");
+        assertSourceContains(String.format("spaces=\"Main,%s\"", targetSpaceValue));
+        assertSourceContains(String.format("pages=\"Main.WebHome,%s\"", targetPageValue));
+        assertSourceContains(String.format("tags=\"%s\"", targetTag));
+        assertSourceContains(String.format("users=\"XWiki.alice,XWiki.%s\"", targetUser));
     }
 }

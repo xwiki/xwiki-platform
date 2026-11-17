@@ -47,14 +47,6 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected transient List<String> list;
 
     /**
-     * @deprecated This was never used, since it is not the right place to handle separators. They are
-     *             defined in {@link ListClass} and that is where they are now handled through
-     *             {@link ListClass#toFormString(BaseProperty)}.
-     */
-    @Deprecated(since = "7.0M2")
-    private String formStringSeparator = ListClass.DEFAULT_SEPARATOR;
-
-    /**
      * This is the actual list. It will be used during serialization/deserialization.
      */
     private List<String> actualList = new ArrayList<>();
@@ -65,28 +57,6 @@ public class ListProperty extends BaseProperty implements Cloneable
     public ListProperty()
     {
         this.list = new NotifyList(this.actualList, this);
-    }
-
-    /**
-     * @deprecated This was never used, since it is not the right place to handle separators. They are
-     *             defined in {@link ListClass} and that is where they are now handled through
-     *             {@link ListClass#toFormString(BaseProperty)}.
-     */
-    @Deprecated(since = "7.0M2")
-    public String getFormStringSeparator()
-    {
-        return this.formStringSeparator;
-    }
-
-    /**
-     * @deprecated This was never used, since it is not the right place to handle separators. They are
-     *             defined in {@link ListClass} and that is where they are now handled through
-     *             {@link ListClass#toFormString(BaseProperty)}.
-     */
-    @Deprecated(since = "7.0M2")
-    public void setFormStringSeparator(String formStringSeparator)
-    {
-        this.formStringSeparator = formStringSeparator;
     }
 
     @Override
@@ -117,16 +87,6 @@ public class ListProperty extends BaseProperty implements Cloneable
         // Always use the default separator because this is the value that is stored in the database (for non-relational
         // lists).
         return ListClass.getStringFromList(this.getList(), ListClass.DEFAULT_SEPARATOR);
-    }
-
-    /**
-     * @deprecated This method is here for a long time but it does not seem to have ever been used and it
-     *             does not bring any value compared to the existing {@link #toFormString()} method.
-     */
-    @Deprecated(since = "7.0M2")
-    public String toSingleFormString()
-    {
-        return super.toFormString();
     }
 
     @Override

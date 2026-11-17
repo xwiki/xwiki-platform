@@ -49,7 +49,7 @@ Les groupes peuvent être utilisés pour insérer un autre document  directement
 |(((
 {{{|=Titre 1|=Titre 2|=Titre 3
 |Cellule 1|(((
-= Document ancré
+== Document ancré
 
 Un paragraphe ancré.
 
@@ -64,7 +64,7 @@ Le paragraphe suivant dans le document de haut niveau}}}
 |=Titre 1|=Titre 2|=Titre 3
 |Cellule 1|(((
 {{html}}
-&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Document ancré&lt;/span&gt;&lt;/h1&gt;
+&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Document ancré&lt;/span&gt;&lt;/h2&gt;
 {{/html}}
 
 Un paragraphe ancré.

@@ -180,7 +180,7 @@
   &lt;div id="var-$varName" class="type-image"&gt;
   {{/html}}
 
-  {{attachmentSelector classname="FlamingoThemesCode.ThemeClass" property="$varName" savemode="form" displayImage="true" width="120" filter="png,jpg,gif,svg" defaultValue=""/}}
+  {{attachmentSelector classname="FlamingoThemesCode.ThemeClass" property="$varName" savemode="form" displayImage="true" width="120" filter="png,jpg,jpeg,gif,svg,webp,avif,jxl" defaultValue=""/}}
 
   {{html clean="false"}}
   &lt;/div&gt;

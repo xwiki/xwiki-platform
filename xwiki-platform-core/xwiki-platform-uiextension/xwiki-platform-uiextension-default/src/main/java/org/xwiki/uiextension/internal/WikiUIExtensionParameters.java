@@ -21,32 +21,34 @@ package org.xwiki.uiextension.internal;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.uiextension.internal.parameters.UIXParameterValue;
+import org.xwiki.uiextension.internal.parameters.UIXParameterValueFactory;
+import org.xwiki.uiextension.internal.parameters.VelocityParameterSession;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityContext;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -66,54 +68,59 @@ public class WikiUIExtensionParameters
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiUIExtensionParameters.class);
 
-    private String id;
+    /**
+     * The parameter values, prepared once so that values without Velocity are never evaluated and that values with
+     * Velocity are compiled only once.
+     */
+    private final Map<String, UIXParameterValue> values;
 
     /**
-     * @see #WikiUIExtensionParameters(String, String, ComponentManager)
+     * The not evaluated parameter values, returned when no value contains any script or when the author of the UI
+     * extension isn't allowed to execute scripts.
      */
-    private Properties parameters;
+    private final Map<String, String> rawValues;
+
+    private final boolean allStatic;
+
+    private final boolean anyVelocity;
 
     /**
      * Parameters are evaluated through the velocity engine, to improve performance this variable is used as a cache,
      * it's emptied for each new request (because of the dynamic vars like: language, user, etc), or if the context
      * database has changed.
+     * <p>
+     * All the cache data is held by a single immutable object so that concurrent requests can't mix the evaluated
+     * parameters of one request with the context of another one. The execution context is only weakly referenced to
+     * avoid keeping it in memory after the request. This object is only ever replaced as a whole, never modified,
+     * so volatile is exactly what is needed to publish it safely.
      */
-    private Map<String, String> evaluatedParameters;
+    @SuppressWarnings("java:S3077")
+    private volatile EvaluatedParameters evaluatedParameters;
 
-    /**
-     * HashCode of the previous execution context during the last parameters evaluation.
-     */
-    private int previousContextId;
+    private final VelocityManager velocityManager;
 
-    /**
-     * Context database during the last parameters evaluation.
-     */
-    private String previousWiki;
+    private final ModelContext modelContext;
 
-    /**
-     * @see #WikiUIExtensionParameters(String, String, ComponentManager)
-     */
-    private VelocityManager velocityManager;
+    private final LoggerConfiguration loggerConfiguration;
 
-    /**
-     * Model context.
-     */
-    private ModelContext modelContext;
+    private final Execution execution;
 
-    private LoggerConfiguration loggerConfiguration;
-
-    /**
-     * The execution context.
-     */
-    private Execution execution;
-
-    private AuthorExecutor authorExecutor;
+    private final AuthorExecutor authorExecutor;
 
     private final DocumentReference documentReference;
 
     private final DocumentReference authorReference;
 
     private final DocumentAuthorizationManager authorizationManager;
+
+    private record EvaluatedParameters(WeakReference<ExecutionContext> executionContext, String wiki,
+        Map<String, String> values)
+    {
+        boolean isValid(ExecutionContext currentExecutionContext, String currentWiki)
+        {
+            return this.executionContext.get() == currentExecutionContext && Objects.equals(this.wiki, currentWiki);
+        }
+    }
 
     /**
      * Default constructor.
@@ -125,12 +132,10 @@ public class WikiUIExtensionParameters
     public WikiUIExtensionParameters(BaseObject baseObject, ComponentManager cm)
         throws WikiComponentException
     {
-        this.id = baseObject.getStringValue(ID_PROPERTY);
-        this.parameters = parseParameters(baseObject.getStringValue(PARAMETERS_PROPERTY));
-
         this.documentReference = baseObject.getDocumentReference();
         this.authorReference = baseObject.getOwnerDocument().getAuthorReference();
 
+        UIXParameterValueFactory valueFactory;
         try {
             this.execution = cm.getInstance(Execution.class);
             this.velocityManager = cm.getInstance(VelocityManager.class);
@@ -138,10 +143,29 @@ public class WikiUIExtensionParameters
             this.loggerConfiguration = cm.getInstance(LoggerConfiguration.class);
             this.authorExecutor = cm.getInstance(AuthorExecutor.class);
             this.authorizationManager = cm.getInstance(DocumentAuthorizationManager.class);
+            valueFactory = cm.getInstance(UIXParameterValueFactory.class);
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(
                 "Failed to get an instance for a component role required by Wiki Components.", e);
         }
+
+        String id = baseObject.getStringValue(ID_PROPERTY);
+        Properties parameters = parseParameters(baseObject.getStringValue(PARAMETERS_PROPERTY));
+
+        Map<String, UIXParameterValue> parameterValues = new HashMap<>();
+        Map<String, String> parameterRawValues = new HashMap<>();
+        for (String key : parameters.stringPropertyNames()) {
+            if (StringUtils.isNotBlank(key)) {
+                String rawValue = parameters.getProperty(key);
+                parameterValues.put(key, valueFactory.create(id + ':' + key, rawValue));
+                parameterRawValues.put(key, rawValue);
+            }
+        }
+
+        this.values = Collections.unmodifiableMap(parameterValues);
+        this.rawValues = Collections.unmodifiableMap(parameterRawValues);
+        this.allStatic = this.values.values().stream().allMatch(UIXParameterValue::isStatic);
+        this.anyVelocity = this.values.values().stream().anyMatch(UIXParameterValue::requiresVelocity);
     }
 
     /**
@@ -166,66 +190,89 @@ public class WikiUIExtensionParameters
     }
 
     /**
-     * @return the parameters, after their values have been evaluated by the XWiki Velocity Engine.
+     * @return the parameters, after their values have been evaluated by the XWiki Velocity Engine
      */
     public Map<String, String> get()
     {
-        Map<String, String> result;
+        // Values without any script are the same for everybody, there is nothing to evaluate or to cache.
+        if (this.allStatic) {
+            return this.rawValues;
+        }
 
         // Even though the parameters are dynamic, we cache a rendered version of them in order to improve performance.
         // This cache has a short lifespan, it gets discarded for each new request, or if the database has been switched
         // during a request.
-        int currentContextId = this.execution.getContext().hashCode();
-        String currentWiki = modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
-        if (currentContextId == this.previousContextId
-                && currentWiki.equals(previousWiki) && this.evaluatedParameters != null)
-        {
-            result = this.evaluatedParameters;
-        } else {
-            result = this.parameters.stringPropertyNames().stream()
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.toMap(Function.identity(), this.parameters::getProperty));
-
-            if (!this.parameters.isEmpty()
-                && this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, this.authorReference,
-                this.documentReference))
-            {
-                try {
-                    this.authorExecutor.call(() -> {
-                        VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
-                        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
-
-                        result.replaceAll((propertyKey, propertyValue) -> {
-                            StringWriter writer = new StringWriter();
-                            try {
-                                String namespace = this.id + ':' + propertyKey;
-                                velocityEngine.evaluate(
-                                    new XWikiVelocityContext(velocityContext,
-                                        this.loggerConfiguration.isDeprecatedLogEnabled()),
-                                    writer, namespace, propertyValue);
-                                return writer.toString();
-                            } catch (XWikiVelocityException e) {
-                                LOGGER.warn("Failed to evaluate UI extension data value, key [{}], value [{}]. "
-                                    + "Reason: [{}]", propertyKey, propertyValue,
-                                    ExceptionUtils.getRootCauseMessage(e));
-                            }
-
-                            return propertyValue;
-                        });
-
-                        return null;
-                    }, this.authorReference, this.documentReference);
-                } catch (Exception ex) {
-                    LOGGER.warn("Failed to get velocity engine. Reason: [{}]",
-                        ExceptionUtils.getRootCauseMessage(ex));
-                }
-            }
-
-            this.evaluatedParameters = result;
-            this.previousContextId = currentContextId;
-            this.previousWiki = currentWiki;
+        ExecutionContext currentExecutionContext = this.execution.getContext();
+        String currentWiki = getCurrentWiki();
+        EvaluatedParameters cached = this.evaluatedParameters;
+        if (cached != null && cached.isValid(currentExecutionContext, currentWiki)) {
+            return cached.values();
         }
 
+        Map<String, String> result;
+        if (this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, this.authorReference,
+            this.documentReference))
+        {
+            result = evaluate();
+        } else {
+            result = this.rawValues;
+        }
+
+        this.evaluatedParameters =
+            new EvaluatedParameters(new WeakReference<>(currentExecutionContext), currentWiki, result);
+
         return result;
+    }
+
+    /**
+     * @return the name of the current wiki, or {@code null} when there is none (e.g. no XWiki context is
+     *     initialized for the current thread), in which case the evaluated parameters are cached for "no wiki"
+     */
+    private String getCurrentWiki()
+    {
+        EntityReference currentReference = this.modelContext.getCurrentEntityReference();
+        EntityReference wikiReference =
+            currentReference != null ? currentReference.extractReference(EntityType.WIKI) : null;
+
+        return wikiReference != null ? wikiReference.getName() : null;
+    }
+
+    private Map<String, String> evaluate()
+    {
+        if (!this.anyVelocity) {
+            // Shortcut values don't depend on the author of the UI extension, so they don't need the author executor.
+            return evaluate(null);
+        }
+
+        try {
+            Map<String, String> result = this.authorExecutor.call(() -> evaluate(new VelocityParameterSession(
+                this.velocityManager.getVelocityEngine(), this.velocityManager.getVelocityContext(),
+                this.loggerConfiguration.isDeprecatedLogEnabled())), this.authorReference, this.documentReference);
+
+            return Objects.requireNonNullElse(result, this.rawValues);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to get velocity engine. Reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
+
+            return this.rawValues;
+        }
+    }
+
+    private Map<String, String> evaluate(VelocityParameterSession session)
+    {
+        Map<String, String> result = new HashMap<>();
+
+        this.values.forEach((key, value) -> {
+            String evaluatedValue;
+            try {
+                evaluatedValue = value.evaluate(session);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to evaluate UI extension data value, key [{}], value [{}]. Reason: [{}]", key,
+                    value.raw(), ExceptionUtils.getRootCauseMessage(e));
+                evaluatedValue = value.raw();
+            }
+            result.put(key, evaluatedValue);
+        });
+
+        return Collections.unmodifiableMap(result);
     }
 }

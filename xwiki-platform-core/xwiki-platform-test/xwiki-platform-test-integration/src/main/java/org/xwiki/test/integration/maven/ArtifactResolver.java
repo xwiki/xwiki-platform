@@ -24,8 +24,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -34,6 +36,10 @@ import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
@@ -104,7 +110,10 @@ public class ArtifactResolver
             new ArtifactRequest(artifact, this.repositoryResolver.getRepositories(), null);
         ArtifactResult artifactResult = this.repositoryResolver.getSystem().resolveArtifact(
             this.repositoryResolver.getSession(), artifactRequest);
-        if (!artifactResult.getExceptions().isEmpty()) {
+        // Don't fail on the mere presence of exceptions: they are also recorded for the repositories which did not
+        // provide the artifact (e.g. the ones excluded by the Maven Resolver remote repository filters) even when
+        // another repository did.
+        if (!artifactResult.isResolved()) {
             sendError(artifact, artifactResult.getExceptions());
         }
         return artifactResult;
@@ -119,6 +128,12 @@ public class ArtifactResolver
      */
     public Collection<ArtifactResult> getArtifactDependencies(Artifact artifact, List<Artifact> dependentArtifacts)
         throws Exception
+    {
+        return getArtifactDependencies(artifact, dependentArtifacts, Collections.emptyList());
+    }
+
+    private Collection<ArtifactResult> getArtifactDependencies(Artifact artifact, List<Artifact> dependentArtifacts,
+        Collection<Exclusion> dependentArtifactsExclusions) throws Exception
     {
         // If in cache, serve from the cache for increased performances
         String cacheKey = computeCacheKey(artifact, dependentArtifacts);
@@ -136,17 +151,8 @@ public class ArtifactResolver
                 new ExclusionsDependencyFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
                     "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
 
-            CollectRequest collectRequest = new CollectRequest()
-                .setRoot(new Dependency(artifact, null))
-                .setRepositories(this.repositoryResolver.getRepositories());
-
-            if (dependentArtifacts != null && !dependentArtifacts.isEmpty()) {
-                for (Artifact dependentArtifact : dependentArtifacts) {
-                    // Note: we use a "runtime" scope so that the dependent artifact is included in the result (we
-                    // filter on scopes and keep "compile" and "runtime" artifacts).
-                    collectRequest.addDependency(new Dependency(dependentArtifact, "runtime"));
-                }
-            }
+            CollectRequest collectRequest =
+                createCollectRequest(artifact, dependentArtifacts, dependentArtifactsExclusions);
 
             long t1 = System.currentTimeMillis();
             CollectResult collectResult = this.repositoryResolver.getSystem().collectDependencies(
@@ -273,7 +279,58 @@ public class ArtifactResolver
         // Add specified extra artifacts
         dependentArtifacts.addAll(extraArtifacts);
 
-        return getArtifactDependencies(rootDistributionArtifact, dependentArtifacts);
+        // The dependent artifacts are resolved next to the dependencies of the root distribution artifact, and are
+        // thus not affected by the exclusions that it declares on its dependencies. Apply these exclusions to them too
+        // so that they don't bring back what the root distribution artifact excludes. For example, the legacy
+        // distribution WAR dependencies exclude the JARs that they replace with their legacy version (e.g.
+        // xwiki-platform-oldcore, replaced by xwiki-platform-legacy-oldcore), and the WAR would otherwise contain both.
+        return getArtifactDependencies(rootDistributionArtifact, dependentArtifacts,
+            getDependencyExclusions(rootDistributionArtifact));
+    }
+
+    private CollectRequest createCollectRequest(Artifact artifact, List<Artifact> dependentArtifacts,
+        Collection<Exclusion> dependentArtifactsExclusions)
+    {
+        CollectRequest collectRequest = new CollectRequest()
+            .setRoot(new Dependency(artifact, null))
+            .setRepositories(this.repositoryResolver.getRepositories());
+
+        if (dependentArtifacts != null) {
+            for (Artifact dependentArtifact : dependentArtifacts) {
+                if (!isExcluded(dependentArtifact, dependentArtifactsExclusions)) {
+                    // Note: we use a "runtime" scope so that the dependent artifact is included in the result (we
+                    // filter on scopes and keep "compile" and "runtime" artifacts).
+                    collectRequest.addDependency(
+                        new Dependency(dependentArtifact, "runtime", false, dependentArtifactsExclusions));
+                }
+            }
+        }
+
+        return collectRequest;
+    }
+
+    private Collection<Exclusion> getDependencyExclusions(Artifact artifact) throws ArtifactDescriptorException
+    {
+        ArtifactDescriptorRequest request =
+            new ArtifactDescriptorRequest(artifact, this.repositoryResolver.getRepositories(), null);
+        ArtifactDescriptorResult result = this.repositoryResolver.getSystem().readArtifactDescriptor(
+            this.repositoryResolver.getSession(), request);
+        Set<Exclusion> exclusions = new LinkedHashSet<>();
+        for (Dependency dependency : result.getDependencies()) {
+            exclusions.addAll(dependency.getExclusions());
+        }
+        return exclusions;
+    }
+
+    private boolean isExcluded(Artifact artifact, Collection<Exclusion> exclusions)
+    {
+        return exclusions.stream().anyMatch(exclusion -> matches(exclusion.getGroupId(), artifact.getGroupId())
+            && matches(exclusion.getArtifactId(), artifact.getArtifactId()));
+    }
+
+    private boolean matches(String pattern, String value)
+    {
+        return "*".equals(pattern) || pattern.equals(value);
     }
 
     private void sendError(Artifact artifact, Collection<Exception> exceptions) throws Exception

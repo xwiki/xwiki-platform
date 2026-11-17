@@ -197,7 +197,10 @@
     #set ($discard = $macro.importLinesSet.removeAll($entry.value))
     #set ($discard = $macro.importStrings.addAll($macro.importLinesSet))
   #end
-  #set ($macro.importStrings = $stringtool.join($macro.importStrings, $escapetool.n))
+  ## Join with a space rather than a line break because the result is also sent as a response header (see
+  ## #sendRequiredSkinExtensions) and line breaks are forbidden in header values (browsers reject the whole response
+  ## over HTTP/2).
+  #set ($macro.importStrings = $stringtool.join($macro.importStrings, ' '))
   #set ($return = $NULL)
   #setVariable("$return" $macro.importStrings)
 #end

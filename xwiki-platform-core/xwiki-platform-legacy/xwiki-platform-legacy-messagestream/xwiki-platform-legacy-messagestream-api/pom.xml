@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-messagestream</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-messagestream-api</artifactId>
   <name>XWiki Platform - Message Stream - API</name>
@@ -58,9 +58,10 @@
       <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We depend on the legacy version of oldcore since this module uses deprecated APIs that only it provides. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-legacy-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

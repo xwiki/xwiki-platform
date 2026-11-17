@@ -183,6 +183,8 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
      * while the page is still reloading.
      *
      * @param imageName the expected avatar image file name (for example {@code avatar.png})
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.6.0RC1
      */
     public void waitUntilAvatarImageName(String imageName)

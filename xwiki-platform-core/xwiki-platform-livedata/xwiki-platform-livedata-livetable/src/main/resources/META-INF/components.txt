@@ -1,5 +1,6 @@
 org.xwiki.livedata.internal.livetable.DefaultLiveDataConfigurationProvider
 org.xwiki.livedata.internal.livetable.DefaultLiveDataConfigurationResolver
+org.xwiki.livedata.internal.livetable.DefaultLiveTableNewRowNamingStrategyManager
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataConfigurationResolver
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataEntryStore
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataPropertyStore
@@ -9,5 +10,9 @@ org.xwiki.livedata.internal.livetable.LiveTableResultsURLDocumentReferenceResolv
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataResultsRenderer
 org.xwiki.livedata.internal.livetable.PropertyTypeSupplier
 org.xwiki.livedata.internal.livetable.UUIDLiveTableNewRowNamingStrategy
+org.xwiki.livedata.internal.livetable.TitleLiveTableNewRowNamingStrategy
 org.xwiki.livedata.script.livetable.LiveTableScriptService
 org.xwiki.livedata.internal.livetable.ModelBridge
+org.xwiki.livedata.internal.livetable.TemplateProviderLiveTableNewRowNamingStrategy
+org.xwiki.livedata.internal.livetable.NewRowTemplateProviderResolver
+org.xwiki.livedata.internal.livetable.LiveTableNewEntryResolver

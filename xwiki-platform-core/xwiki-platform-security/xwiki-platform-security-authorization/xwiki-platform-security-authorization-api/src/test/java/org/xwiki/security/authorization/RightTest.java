@@ -29,7 +29,6 @@ import org.xwiki.model.EntityType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link Right}.
@@ -115,12 +114,5 @@ class RightTest
         Right myRight = new Right(new FooRight(), Collections.singleton(Right.VIEW));
         assertSame(Right.toRight("foo"), myRight);
         assertEquals(Collections.singleton(myRight), Right.VIEW.getImpliedRights());
-    }
-
-    @Test
-    void like()
-    {
-        Right myRight = new Right(new FooRight());
-        assertTrue(myRight.like(new FooRight()));
     }
 }

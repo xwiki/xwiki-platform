@@ -27,18 +27,25 @@ test("Options should appear", async ({ mount }) => {
     "Some great initial value",
   );
 
+  // The options match the initial value, which is the only search performed at the opening.
   await expect(
     component.locator(
       ".mantine-Popover-dropdown .mantine-Combobox-option:nth-child(1)",
     ),
-  ).toHaveText("Suggestion title: Some great suggestion title starting with ");
+  ).toHaveText(
+    "Suggestion title: Some great suggestion title starting with Some great initial value",
+  );
 
   await expect(
     component.locator(
       ".mantine-Popover-dropdown .mantine-Combobox-option:nth-child(2)",
     ),
   ).toHaveText(
-    "Suggestion title: Another great suggestion title starting with ",
+    "Suggestion title: Another great suggestion title starting with Some great initial value",
+  );
+
+  await expect(component.locator('[data-test="searchedQueries"]')).toHaveText(
+    JSON.stringify(["Some great initial value"]),
   );
 });
 
@@ -93,15 +100,45 @@ test("Options should be selectable", async ({ mount }) => {
   await component.locator("input").press("ArrowDown");
   await component.locator("input").press("Enter");
 
-  expect(selected).toBe("https://picsum.photos/150");
+  expect(selected).toBe("https://example.com/images/150");
   expect(submitted).toBeNull();
 
   await component.locator("input").clear();
   await component.locator("input").fill("https://perdu.com");
   await component.locator("input").press("Enter");
 
-  expect(selected).toBe("https://picsum.photos/150");
+  expect(selected).toBe("https://example.com/images/150");
   expect(submitted).toBe("https://perdu.com");
+});
+
+test("A typed entity reference is submitted with the entity type of the search box", async ({
+  mount,
+}) => {
+  let submitted = null;
+
+  const component = await mount(
+    <SearchBoxForTest
+      onSubmit={(url, reference) => {
+        submitted = { url, reference };
+      }}
+    />,
+  );
+
+  // The entity reference doesn't say it designates an attachment: the search box does (see SearchBoxForTest).
+  await component.locator("input").fill("some attachment reference");
+  await component.locator("input").press("Enter");
+
+  await expect
+    .poll(() => submitted)
+    .toEqual({
+      url: "some attachment url",
+      reference: {
+        type: "attach",
+        typed: true,
+        reference: "some attachment reference",
+        parameters: {},
+      },
+    });
 });
 
 // eslint-disable-next-line max-statements
@@ -131,6 +168,6 @@ test("Options should be navigable", async ({ mount }) => {
   await component.locator("input").press("ArrowDown");
   await component.locator("input").press("Enter");
 
-  expect(selected).toBe("https://picsum.photos/300");
+  expect(selected).toBe("https://example.com/images/300");
   expect(submitted).toBeNull();
 });

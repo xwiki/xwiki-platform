@@ -19,8 +19,6 @@
  */
 package org.xwiki.container;
 
-import java.io.IOException;
-
 /**
  * Decorator for the {@link Response} interface adding the capacity for components using this interface to send
  * redirects.
@@ -32,12 +30,4 @@ import java.io.IOException;
 @Deprecated(since = "17.0.0RC1")
 public interface RedirectResponse extends Response
 {
-    /**
-     * Sends a temporary redirect response to the client using the specified redirect location URL.
-     *
-     * @param location the redirect URL
-     * @throws IOException if an error happens
-     */
-    @Override
-    void sendRedirect(String location) throws IOException;
 }

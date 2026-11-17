@@ -24,6 +24,12 @@
 
 <configuration>
 
+  <!-- The java.util.logging logs are redirected to SLF4J by XWiki: propagate the levels configured below to the
+       java.util.logging loggers so that they don't produce logs for disabled levels -->
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <!-- Direct log messages to stdout -->
     <Target>System.out</Target>

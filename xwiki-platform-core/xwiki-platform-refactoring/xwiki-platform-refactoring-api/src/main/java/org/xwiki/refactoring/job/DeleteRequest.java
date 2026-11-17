@@ -51,13 +51,6 @@ public class DeleteRequest extends EntityRequest
     public static final String UPDATE_LINKS = "updateLinks";
 
     /**
-     * @see #isUpdateLinksOnFarm()
-     * @deprecated not taken into account anymore
-     */
-    @Deprecated(since = "14.8RC1")
-    public static final String UPDATE_LINKS_ON_FARM = "updateLinksOnFarm";
-
-    /**
      * @see #isAutoRedirect()
      */
     public static final String AUTO_REDIRECT = "autoRedirect";
@@ -139,34 +132,6 @@ public class DeleteRequest extends EntityRequest
     public void setUpdateLinks(boolean updateLinks)
     {
         setProperty(UPDATE_LINKS, updateLinks);
-    }
-
-    /**
-     * @return {@code true} if the job should update the links that target the old entity reference (before the delete)
-     *         from anywhere on the farm, {@code false} if the job should update only the links from the wiki where the
-     *         entity was located before the delete
-     * @deprecated not taken into account anymore
-     */
-    @Deprecated(since = "14.8RC1")
-    public boolean isUpdateLinksOnFarm()
-    {
-        return true;
-    }
-
-    /**
-     * Sets whether the job should update the links that target the old entity reference (before the delete) from
-     * anywhere on the farm, or only from the wiki where the entity was located before the delete.
-     * <p>
-     * Note that this parameter has no effect if {@link #isUpdateLinks()} is {@code false}.
-     *
-     * @param updateLinksOnFarm {@code true} to update the links from anywhere on the farm, {@code false} to update only
-     *            the links from the wiki where the entity is located
-     * @deprecated not taken into account anymore
-     */
-    @Deprecated(since = "14.8RC1")
-    public void setUpdateLinksOnFarm(boolean updateLinksOnFarm)
-    {
-        // Ignored
     }
 
     /**

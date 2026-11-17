@@ -87,10 +87,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #set($author = $services.localization.render('core.viewers.comments.add.guestName.default'))
 #end
 ##
-#set($xredirect = $!escapetool.xml($request.get("xredirect")))
-#if("$!xredirect" == '')
-  #set($xredirect = "$doc.getURL('view')?$request.getQueryString()")
-#end
+#set($xredirectFallbackURL = "$doc.getURL('view')?$!request.getQueryString()")
+#getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $xredirectFallbackURL, $xredirect)
 ##
 #if("$!offerGuestsCaptcha" == '')
   #set($offerGuestsCaptcha = $xwiki.getSpacePreferenceAsInt('guest_comment_requires_captcha', 0) == 1)
@@ -336,13 +334,24 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
+          <button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">
+              $services.icon.renderHTML('cross')
+          </button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.permalink')</div>
         </div>
         <div class="modal-body">
           <div class="input-group">
             <div class="input-group-addon">$services.icon.renderHTML('link')</div>
             <input type="text" class="form-control" title="$services.localization.render('core.viewers.comments.permalink')"/>
+            <span class="input-group-btn">
+              <button type="button" id="permalink-copy-button" class="btn btn-default"
+                title="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copyButton'))"
+                data-copied-message="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copied'))"
+                data-copy-failed-message="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copyFailed'))">
+                $services.icon.renderHTML('paste')
+              </button>
+            </span>
           </div>
         </div>
         <div class="modal-footer">
@@ -363,7 +372,10 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
+          <button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('core.modal.close'))">
+              $services.icon.renderHTML('cross')
+          </button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.delete')</div>
         </div>
         <div class="modal-body">

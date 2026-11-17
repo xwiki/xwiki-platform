@@ -28,9 +28,10 @@
  */
 const LINK_ID_PARAM = "__xwikiLinkId";
 
-// Sentinel base used to parse relative hrefs with the URL constructor. Stripped back off before the
-// result is returned.
-const RELATIVE_BASE = "http://relative.base/";
+// Sentinel base used to parse relative hrefs with the URL constructor, as if they were found in a document at this URL.
+// It's stripped back off before the result is returned, so that a relative href stays relative to the same location:
+// the document (e.g. "#section", "?key=value"), its directory (e.g. "page") or the server root (e.g. "/path").
+const RELATIVE_BASE = "http://relative.base/__directory__/__document__";
 
 /**
  * Parses the given href with the URL constructor, falling back to a sentinel base for relative
@@ -51,9 +52,22 @@ function serializeHref(url: URL, relative: boolean): string {
   if (!relative) {
     return url.toString();
   }
-  const base = RELATIVE_BASE.replace(/\/$/, "");
-  const full = url.toString();
-  return full.startsWith(base) ? full.slice(base.length) : full;
+  const base = new URL(RELATIVE_BASE);
+  const suffix = url.search + url.hash;
+  if (url.pathname === base.pathname) {
+    // Relative to the document itself, e.g. "#section" or "?key=value".
+    return suffix;
+  }
+  const directory = base.pathname.substring(
+    0,
+    base.pathname.lastIndexOf("/") + 1,
+  );
+  if (url.pathname.startsWith(directory)) {
+    // Relative to the directory of the document, e.g. "page".
+    return url.pathname.substring(directory.length) + suffix;
+  }
+  // Relative to the server root, e.g. "/path".
+  return url.pathname + suffix;
 }
 
 /**

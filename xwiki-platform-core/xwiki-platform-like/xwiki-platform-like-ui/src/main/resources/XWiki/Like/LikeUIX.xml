@@ -195,9 +195,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
        likersLink.text(getLikersLinkText(data.counter));
        likersLink.attr('title', l10n.get('likers.link.title', data.counter));
        $('#is-liked').val('true');
-       new XWiki.widgets.Notification(l10n.get('newlike.success'), 'done');
+       XWiki.widgets.Notification.show(l10n.get('newlike.success'), 'done');
      }).catch(() =&gt; {
-       new XWiki.widgets.Notification(l10n.get('newlike.error'), 'error');
+       XWiki.widgets.Notification.show(l10n.get('newlike.error'), 'error');
      });
   };
 
@@ -217,9 +217,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       likersLink.text(getLikersLinkText(data.counter));
       likersLink.attr('title', l10n.get('likers.link.title', data.counter));
       $('#is-liked').val('false');
-      new XWiki.widgets.Notification(l10n.get('unlike.success'), 'done');
+      XWiki.widgets.Notification.show(l10n.get('unlike.success'), 'done');
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification(l10n.get('unlike.error'), 'error');
+      XWiki.widgets.Notification.show(l10n.get('unlike.error'), 'error');
     });
   };
   $('.like-button').on('click', likeClick);
@@ -359,16 +359,27 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
     vertical-align: top;
     padding: 0;
     margin: 0;
-    outline: none;
 
-    &amp;:active, &amp;:focus, &amp;:active:focus {
+    /* Hide the focus ring after a mouse click but keep it for keyboard navigation. */
+    &amp;:focus:not(:focus-visible) {
       outline: none;
+    }
+
+    /* Draw the focus ring around the highlighted area instead of over the icon. */
+    &amp;:focus-visible {
+      outline-offset: 0.2em;
+    }
+
+    /* Keep Bootstrap's pressed state from repainting the button when the pointer leaves it. */
+    &amp;:active, &amp;:active:focus {
+      background-color: transparent;
+      box-shadow: none;
     }
 
     &amp;.btn-primary {
       color: @link-color;
 
-      &amp;:hover {
+      &amp;:hover, &amp;:focus-visible {
         color: @text-color;
         background-color: mix(@xwiki-page-content-bg, @text-color, 89%);
         box-shadow: 0 0 0 0.2em mix(@xwiki-page-content-bg, @text-color, 89%);
@@ -378,7 +389,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
     &amp;.btn-default {
       color: @text-color;
 
-      &amp;:hover {
+      &amp;:hover, &amp;:focus-visible {
         color: @link-color;
         background-color: mix(@xwiki-page-content-bg, @link-color, 89%);
         box-shadow: 0 0 0 0.2em mix(@xwiki-page-content-bg, @link-color, 89%);

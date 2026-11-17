@@ -54,6 +54,23 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     private static final By USE_VALIDATION_SELECT =
         By.id("XWiki.EntityNameValidation.ConfigurationClass_0_useValidation");
 
+    private static final By SLUG_LOWERCASE_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_slug.lowercase");
+
+    private static final By SLUG_DOTS_BETWEEN_DIGITS_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_slug.dotsBetweenDigits");
+
+    private static final By SLUG_FORBIDDEN_WORDS_TEXTAREA =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_slug.forbiddenWords");
+
+    /**
+     * Creates a page object for the Name Strategies administration section, which must be the current page.
+     */
+    public NameStrategiesAdministrationSectionPage()
+    {
+        super(SECTION_ID);
+    }
+
     /**
      * Open the Name Strategies administration section.
      *
@@ -63,11 +80,6 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     {
         AdministrationSectionPage.gotoPage(SECTION_ID);
         return new NameStrategiesAdministrationSectionPage();
-    }
-
-    public NameStrategiesAdministrationSectionPage()
-    {
-        super(SECTION_ID);
     }
 
     /**
@@ -116,6 +128,57 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     }
 
     /**
+     * Enable or disable the conversion to lowercase done by the Kebab-case (Slug) strategy. The Kebab-case options are
+     * only displayed once that strategy is selected, see {@link #selectStrategy(String)}. This only changes the
+     * selected value in the form; call {@link #save()} to persist it.
+     *
+     * @param enabled {@code true} to convert names to lowercase, {@code false} otherwise
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void setSlugConvertToLowercase(boolean enabled)
+    {
+        selectSlugOption(SLUG_LOWERCASE_SELECT, enabled);
+    }
+
+    /**
+     * Allow or forbid, in the Kebab-case (Slug) strategy, the dots placed between digits (e.g. in versions). The
+     * Kebab-case options are only displayed once that strategy is selected, see {@link #selectStrategy(String)}. This
+     * only changes the selected value in the form; call {@link #save()} to persist it.
+     *
+     * @param allowed {@code true} to keep the dots placed between digits, {@code false} to replace them
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void setSlugAllowDots(boolean allowed)
+    {
+        selectSlugOption(SLUG_DOTS_BETWEEN_DIGITS_SELECT, allowed);
+    }
+
+    /**
+     * Set the words that the Kebab-case (Slug) strategy removes from names. The Kebab-case options are only displayed
+     * once that strategy is selected, see {@link #selectStrategy(String)}. This only changes the value in the form;
+     * call {@link #save()} to persist it.
+     *
+     * @param forbiddenWords the comma-separated list of forbidden words
+     * @since 18.4.7
+     * @since 18.9.0RC1
+     */
+    public void setSlugForbiddenWords(String forbiddenWords)
+    {
+        getDriver().waitUntilElementIsVisible(SLUG_FORBIDDEN_WORDS_TEXTAREA);
+        WebElement textarea = getDriver().findElement(SLUG_FORBIDDEN_WORDS_TEXTAREA);
+        textarea.clear();
+        textarea.sendKeys(forbiddenWords);
+    }
+
+    private void selectSlugOption(By locator, boolean enabled)
+    {
+        getDriver().waitUntilElementIsVisible(locator);
+        new Select(getDriver().findElement(locator)).selectByValue(enabled ? "1" : "0");
+    }
+
+    /**
      * Save the configuration. This persists the selected strategy and its configuration (which is necessary, for the
      * Slug strategy, so that its configuration properties are initialized before the strategy is tested).
      */
@@ -129,13 +192,13 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     }
 
     /**
-     * Enter a name in the "test selected strategy" field, then wait until the asynchronously computed result matches the
-     * expected transformed name and verify the validity.
+     * Enter a name in the "test selected strategy" field, then wait until the asynchronously computed result matches
+     * the expected transformed name and verify the validity.
      * <p>
-     * The name is set and an {@code input} event is dispatched on every polling iteration, which makes the method robust
-     * against (a) the asynchronous loading of the section's JavaScript (the {@code input} handler that triggers the test
-     * might not be bound yet on the first attempt) and (b) out-of-order responses (all the requests carry the same name,
-     * so the displayed result converges to the expected one).
+     * The name is set and an {@code input} event is dispatched on every polling iteration, which makes the method
+     * robust against (a) the asynchronous loading of the section's JavaScript (the {@code input} handler that triggers
+     * the test might not be bound yet on the first attempt) and (b) out-of-order responses (all the requests carry the
+     * same name, so the displayed result converges to the expected one).
      *
      * @param name the name to test against the selected strategy
      * @param expectedValid the expected validity of the tested name
@@ -149,12 +212,17 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
                 "arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input'));", input, name);
             return expectedTransformedName.equals(getTransformedName());
         });
-        if (isTestedNameValid() != expectedValid) {
+        boolean valid = isTestedNameValid();
+        if (valid != expectedValid) {
             throw new AssertionError(String.format(
                 "The name [%s] was expected to be [%s] but was [%s] (transformed name [%s])", name,
-                expectedValid ? "valid" : "invalid", isTestedNameValid() ? "valid" : "invalid",
-                expectedTransformedName));
+                toValidityLabel(expectedValid), toValidityLabel(valid), expectedTransformedName));
         }
+    }
+
+    private static String toValidityLabel(boolean valid)
+    {
+        return valid ? "valid" : "invalid";
     }
 
     /**

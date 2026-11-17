@@ -116,7 +116,7 @@ define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation'], 
     return loadEditor(editableProperty).catch(error => {
       // Don't report an error notification when the user simply dismissed the edit confirmation.
       if (!editConfirmation.isConfirmationDismissed(error)) {
-        new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
+        XWiki.widgets.Notification.show(l10n['web.editableProperty.editFailed'], 'error');
       }
       return Promise.reject(error);
     }).finally(() => {
@@ -241,7 +241,7 @@ define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation'], 
       // Allow others to enhance the viewer.
       $(document).trigger('xwiki:dom:updated', {'elements': viewer.toArray()});
     }).catch(() => {
-      new XWiki.widgets.Notification(l10n['web.editableProperty.viewFailed'], 'error');
+      XWiki.widgets.Notification.show(l10n['web.editableProperty.viewFailed'], 'error');
       return Promise.reject();
     });
   };

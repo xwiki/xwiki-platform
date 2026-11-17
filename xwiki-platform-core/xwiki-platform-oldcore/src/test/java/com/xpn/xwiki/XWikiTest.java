@@ -35,6 +35,8 @@ import javax.servlet.http.Cookie;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
@@ -66,6 +68,7 @@ import org.xwiki.user.UserProperties;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.event.UserDeletingDocumentEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
@@ -544,6 +547,85 @@ class XWikiTest
     }
 
     @Test
+    void deleteDocumentByContextUserSendsUserDeletingDocumentEvent() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Alice");
+        xcontext.setUserReference(userReference);
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+
+        this.xwiki.deleteDocument(this.document, false, true, xcontext);
+
+        ArgumentCaptor<UserDeletingDocumentEvent> eventCaptor =
+            ArgumentCaptor.forClass(UserDeletingDocumentEvent.class);
+        verify(mockListener).onEvent(eventCaptor.capture(), any(XWikiDocument.class), same(xcontext));
+        assertEquals(userReference, eventCaptor.getValue().getUserReference());
+        verify(this.oldcore.getMockStore()).deleteXWikiDoc(this.document, xcontext);
+    }
+
+    @Test
+    void deleteDocumentByContextUserWhenCanceled() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+        doAnswer(invocation -> {
+            invocation.<CancelableEvent>getArgument(0).cancel("denied");
+            return null;
+        }).when(mockListener).onEvent(any(), any(), any());
+
+        XWikiException exception = assertThrows(XWikiException.class,
+            () -> this.xwiki.deleteDocument(this.document, false, true, xcontext));
+        assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, exception.getCode());
+
+        verify(this.oldcore.getMockStore(), never()).deleteXWikiDoc(any(), any());
+        assertTrue(this.xwiki.exists(this.document.getDocumentReference(), xcontext));
+    }
+
+    @Test
+    void deleteDocumentBySystemDoesNotSendUserDeletingDocumentEvent() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+
+        this.xwiki.deleteDocument(this.document, false, xcontext);
+
+        verify(mockListener, never()).onEvent(any(), any(), any());
+        verify(this.oldcore.getMockStore()).deleteXWikiDoc(this.document, xcontext);
+    }
+
+    @Test
+    void deleteAllDocumentsByContextUser() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        XWikiDocument translation = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+        this.xwiki.saveDocument(translation, xcontext);
+
+        EventListener mockListener = addUserDeletingDocumentListener();
+
+        this.xwiki.deleteAllDocuments(this.document, false, true, xcontext);
+
+        // One event for the translation and one for the default document
+        verify(mockListener, times(2)).onEvent(any(UserDeletingDocumentEvent.class), any(XWikiDocument.class),
+            same(xcontext));
+        assertFalse(this.xwiki.exists(this.document.getDocumentReference(), xcontext));
+    }
+
+    private EventListener addUserDeletingDocumentListener() throws Exception
+    {
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("userdeletinglistener");
+        when(mockListener.getEvents()).thenReturn(List.of(new UserDeletingDocumentEvent()));
+
+        this.oldcore.getMocker().<ObservationManager>getInstance(ObservationManager.class).addListener(mockListener);
+
+        return mockListener;
+    }
+
+    @Test
     void languageSelection()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
@@ -688,6 +770,43 @@ class XWikiTest
         this.xwiki.saveDocument(testUser, context);
 
         assertEquals(-1, this.xwiki.validateUser(false, this.oldcore.getXWikiContext()));
+    }
+
+    /**
+     * Check that a user cannot be validated with an empty validation key, since validating a user empties the stored
+     * validation key.
+     *
+     * @throws Exception when any exception occurs inside XWiki
+     */
+    @Test
+    void validateUserWithEmptyValidationKey() throws Exception
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        context.setLanguage("en");
+
+        // Prepare the request
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(request.getParameter("xwikiname")).thenReturn("TestUser");
+        when(request.getParameter("validkey")).thenReturn("plaintextkey");
+        context.setRequest(request);
+
+        // Prepare the user profile
+        XWikiDocument testUser =
+            new XWikiDocument(new DocumentReference(context.getWikiId(), "XWiki", "TestUser"));
+        BaseObject userObject = (BaseObject) this.xwiki.getUserClass(context).newObject(context);
+        userObject.setPasswordValue("validkey", "plaintextkey");
+        testUser.addObject("XWiki.XWikiUsers", userObject);
+        this.xwiki.saveDocument(testUser, context);
+
+        // The first validation succeeds and empties the stored validation key.
+        assertEquals(0, this.xwiki.validateUser(false, context));
+        assertEquals("",
+            this.xwiki.getDocument(testUser, context).getObject("XWiki.XWikiUsers").getStringValue("validkey"));
+
+        // An empty validation key must not match the emptied stored one.
+        when(request.getParameter("validkey")).thenReturn("");
+
+        assertEquals(-1, this.xwiki.validateUser(false, context));
     }
 
     /**
@@ -1126,8 +1245,8 @@ class XWikiTest
         when(listener.getName()).thenReturn("removeattachmentlistener");
         when(listener.getEvents()).thenReturn(Arrays.asList(new DocumentCreatingEvent(targetReference)));
         doAnswer(invocationOnMock -> {
-            XWikiDocument document = invocationOnMock.getArgument(1);
-            document.removeAttachment(document.getAttachment("file.txt"));
+            XWikiDocument targetDocument = invocationOnMock.getArgument(1);
+            targetDocument.removeAttachment(targetDocument.getAttachment("file.txt"));
 
             return null;
         }).when(listener).onEvent(any(), any(), any());
@@ -1251,11 +1370,11 @@ class XWikiTest
 
     private void saveDocument(DocumentReference reference, Locale locale, String content) throws XWikiException
     {
-        XWikiDocument document = new XWikiDocument(reference, locale);
-        document.setSyntax(Syntax.PLAIN_1_0);
-        document.setContent(content);
+        XWikiDocument newDocument = new XWikiDocument(reference, locale);
+        newDocument.setSyntax(Syntax.PLAIN_1_0);
+        newDocument.setContent(content);
 
-        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(newDocument, this.oldcore.getXWikiContext());
     }
 
     /**
@@ -1287,9 +1406,9 @@ class XWikiTest
         when(listener.getName()).thenReturn("modifyinglistener");
         when(listener.getEvents()).thenReturn(Arrays.asList(new DocumentCreatingEvent(targetReference)));
         doAnswer(invocationOnMock -> {
-            XWikiDocument document = invocationOnMock.getArgument(1);
-            document.setContent("modified by listener");
-            document.removeXObjects(new LocalDocumentReference("Some", "Class"));
+            XWikiDocument targetDocument = invocationOnMock.getArgument(1);
+            targetDocument.setContent("modified by listener");
+            targetDocument.removeXObjects(new LocalDocumentReference("Some", "Class"));
 
             return null;
         }).when(listener).onEvent(any(), any(), any());
@@ -1384,6 +1503,65 @@ class XWikiTest
             this.xwiki.getDocument(reference4, this.oldcore.getXWikiContext()).getParent());
         assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"),
             this.xwiki.getDocument(reference5, this.oldcore.getXWikiContext()).getParentReference());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "superadmin", "SuperAdmin", "XWikiGuest", "xwikiguest", "XWIKIGUEST" })
+    void createUserWithReservedName(String userName) throws Exception
+    {
+        setRegistrationRequest(userName);
+
+        assertEquals(-8, this.xwiki.createUser(false, "edit", this.oldcore.getXWikiContext()));
+        assertTrue(this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", userName),
+            this.oldcore.getXWikiContext()).isNew());
+    }
+
+    @Test
+    void createUser() throws Exception
+    {
+        setRegistrationRequest("Alice");
+
+        assertEquals(1, this.xwiki.createUser(false, "edit", this.oldcore.getXWikiContext()));
+
+        XWikiDocument userDocument = this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "Alice"),
+            this.oldcore.getXWikiContext());
+        assertFalse(userDocument.isNew());
+        BaseObject rightObject =
+            userDocument.getXObject(new LocalDocumentReference("XWiki", "XWikiRights"), 0);
+        assertEquals("XWiki.Alice", rightObject.getLargeStringValue("users"));
+        assertEquals("edit", rightObject.getStringValue("levels"));
+        assertEquals(1, rightObject.getIntValue("allow"));
+    }
+
+    private void setRegistrationRequest(String userName)
+    {
+        String password = "password";
+        Map<String, String[]> parameters = Map.of(
+            "xwikiname", new String[] { userName },
+            "register_password", new String[] { password },
+            "register2_password", new String[] { password },
+            "register_email", new String[] { "user@example.org" });
+        this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub(null, parameters));
+    }
+
+    @Test
+    void getWikiOwner() throws Exception
+    {
+        XWikiDocument descriptor =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "XWikiServerSubwiki"),
+                this.oldcore.getXWikiContext());
+        BaseObject descriptorObject = descriptor.newXObject(new LocalDocumentReference("XWiki", "XWikiServerClass"),
+            this.oldcore.getXWikiContext());
+        descriptorObject.setStringValue("owner", "XWiki.Owner");
+        this.xwiki.saveDocument(descriptor, this.oldcore.getXWikiContext());
+
+        assertEquals("xwiki:XWiki.Owner", this.xwiki.getWikiOwner("subwiki", this.oldcore.getXWikiContext()));
+
+        // An empty owner means no owner, not a user with an empty name.
+        descriptorObject.setStringValue("owner", "");
+        this.xwiki.saveDocument(descriptor, this.oldcore.getXWikiContext());
+
+        assertNull(this.xwiki.getWikiOwner("subwiki", this.oldcore.getXWikiContext()));
     }
 
     @Test

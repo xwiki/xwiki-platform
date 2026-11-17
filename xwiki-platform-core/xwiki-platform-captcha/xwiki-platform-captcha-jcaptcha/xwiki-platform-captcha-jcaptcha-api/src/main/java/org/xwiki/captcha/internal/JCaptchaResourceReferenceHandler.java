@@ -28,14 +28,16 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
@@ -85,8 +87,8 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
         throws ResourceReferenceHandlerException
     {
         try {
-            HttpServletRequest request = ((ServletRequest) this.container.getRequest()).getHttpServletRequest();
-            HttpServletResponse response = ((ServletResponse) this.container.getResponse()).getHttpServletResponse();
+            HttpServletRequest request = ((ServletRequest) this.container.getRequest()).getRequest();
+            HttpServletResponse response = ((ServletResponse) this.container.getResponse()).getResponse();
 
             JCaptchaResourceReference jCaptchaResourceReference = (JCaptchaResourceReference) reference;
 
@@ -110,12 +112,12 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
             }
             switch (type) {
                 case TYPE_IMAGE:
-                    ImageToJpegHelper.flushNewCaptchaToResponse(request, response, null,
-                        (ImageCaptchaService) captchaService, id, locale);
+                    ImageToJpegHelper.flushNewCaptchaToResponse(JakartaServletBridge.toJavax(request),
+                        JakartaServletBridge.toJavax(response), null, (ImageCaptchaService) captchaService, id, locale);
                     break;
                 case TYPE_SOUND:
-                    SoundToWavHelper.flushNewCaptchaToResponse(request, response, null,
-                        (SoundCaptchaService) captchaService, id, locale);
+                    SoundToWavHelper.flushNewCaptchaToResponse(JakartaServletBridge.toJavax(request),
+                        JakartaServletBridge.toJavax(response), null, (SoundCaptchaService) captchaService, id, locale);
                     break;
                 case TYPE_TEXT:
                     response.setContentType("text/plain");

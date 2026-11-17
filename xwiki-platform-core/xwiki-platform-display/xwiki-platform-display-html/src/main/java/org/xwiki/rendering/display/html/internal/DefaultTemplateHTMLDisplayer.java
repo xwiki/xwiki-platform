@@ -21,12 +21,15 @@ package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -64,6 +67,16 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
      * Template extension (velocity).
      */
     public static final String TEMPLATE_EXTENSION = ".vm";
+
+    /**
+     * Opens the type arguments of a parameterized type name.
+     */
+    private static final String OPEN_GENERIC = "<";
+
+    /**
+     * Closes the type arguments of a parameterized type name.
+     */
+    private static final String CLOSE_GENERIC = ">";
 
     @Inject
     protected TemplateManager templateManager;
@@ -127,7 +140,12 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
      * <li>html_displayer/[mode].vm
      * <li>html_displayer/default.vm
      * </ul>
-     * Please note that the following special characters: &gt;, &lt;, ? and spaces will be replaced by "." in the path.
+     * For a type that is not a plain class, [type] is first the fully qualified type name and then a short name where
+     * every class the type is made of is reduced to its simple name. For instance
+     * {@code java.util.List<org.xwiki.rendering.block.Block>} is looked up as
+     * {@code java.util.list(org.xwiki.rendering.block.block)} and then as {@code list(block)}.
+     * Please note that in those paths &lt; and &gt; are replaced by parentheses, ? is replaced by "_" and spaces are
+     * removed.
      *
      * @return the template name used to make the rendering
      */
@@ -155,7 +173,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
 
     private String cleanPath(String path)
     {
-        return path.replace("<", "(").replace(">", ")").replace("?", "_").replace(" ", "");
+        return path.replace(OPEN_GENERIC, "(").replace(CLOSE_GENERIC, ")").replace("?", "_").replace(" ", "");
     }
 
     private List<String> getTemplatePaths(Type type, String mode)
@@ -184,8 +202,39 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
                 typeNames.add("enum");
             }
         } else if (type != null) {
+            // The fully qualified name is looked up first so that a template can always target one precise type, even
+            // when several types share the same short name.
             typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
+            String shortTypeName = getShortTypeName(type).toLowerCase();
+            if (!typeNames.contains(shortTypeName)) {
+                typeNames.add(shortTypeName);
+            }
         }
         return typeNames;
+    }
+
+    /**
+     * Names a type the way {@link ReflectionUtils#serializeType(Type)} does, but with every class it is made of
+     * reduced to its simple name. The shortening is applied at every level of a parameterized type, so that a name is
+     * either fully qualified or fully shortened, never a mix of both.
+     *
+     * @param type the type to name
+     * @return the short name of the type
+     */
+    private String getShortTypeName(Type type)
+    {
+        String shortTypeName;
+        if (type instanceof Class<?> aClass) {
+            shortTypeName = aClass.getSimpleName();
+        } else if (type instanceof ParameterizedType parameterizedType) {
+            shortTypeName = Arrays.stream(parameterizedType.getActualTypeArguments())
+                .map(this::getShortTypeName)
+                .collect(Collectors.joining(", ",
+                    getShortTypeName(parameterizedType.getRawType()) + OPEN_GENERIC, CLOSE_GENERIC));
+        } else {
+            // A type that is neither a class nor a parameterized type, such as a wildcard, has no shorter form.
+            shortTypeName = ReflectionUtils.serializeType(type);
+        }
+        return shortTypeName;
     }
 }

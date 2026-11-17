@@ -72,6 +72,8 @@ public interface ObjectsResource
      * @param pageName the name of the page to add the object to, for example {@code WebHome}
      * @param minorRevision when {@code true}, saves the change as a minor version; when {@code null} (the default) or
      *  {@code false}, saves it as a normal (major) version
+     * @param comment (since 18.10.0RC1) the comment of the page version created by the change, shown in the page
+     *  history; when {@code null} (the default) the version has an empty comment
      * @param object the object to add; its {@code className} must be set to the XClass reference of the object to
      *  create (for example {@code XWiki.XWikiUsers}), and its number is assigned automatically
      * @return a response with status {@code 201} whose {@code Location} header points to the created object and whose
@@ -84,6 +86,7 @@ public interface ObjectsResource
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("minorRevision") Boolean minorRevision,
+            @QueryParam("comment") String comment,
             Object object
     ) throws XWikiRestException;
 }

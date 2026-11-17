@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various helpers around the Solr API.
@@ -287,6 +288,27 @@ public interface SolrUtils
     default String toCompleteFilterQueryString(Object fieldValue, Type valueType)
     {
         return toFilterQueryString(fieldValue, valueType);
+    }
+
+    /**
+     * Serialize the value into a quoted phrase usable in a Solr query, e.g., {@code "My\ \"Space\""}. On a string
+     * field, the phrase matches the exact value. On a text field, it matches the analyzed terms of the value in the
+     * same order, unlike {@link #toCompleteFilterQueryString(Object)} which matches any of them with the default
+     * operator.
+     *
+     * @param fieldValue the value of a field
+     * @return the quoted value, or {@code null} if the passed value is {@code null}
+     * @since 18.10.0RC1
+     * @since 18.4.9
+     * @since 17.10.16
+     * @since 16.10.20
+     */
+    @Unstable
+    default String toPhraseQueryString(Object fieldValue)
+    {
+        String value = toFilterQueryString(fieldValue);
+        // Solr removes all the escaping inside a phrase.
+        return value != null ? '"' + value + '"' : null;
     }
 
     /**

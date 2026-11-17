@@ -58,7 +58,7 @@ public class WCAGContext
      * Failing rules will fail the test suite on violation, non failing rules will only return a warning if violated.
      * Those rules are identified by ID, and a full list of ids can be found here:
      * <a href="https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md#deprecated-rules">...</a>
-     * Only rules for validating up to WCAG level AA 2.1 are specified here.
+     * Only rules for validating up to WCAG level AA 2.2 are specified here.
      * Rules not defined here will keep their default behavior and not fail the test-suite on violation. See
      * <a href="https://design.xwiki.org/xwiki/bin/view/Proposal/WCAG21validationinbuild#HSeparatingfailsandwarnings">
      *     for more information on how to use and update this list.
@@ -109,7 +109,11 @@ public class WCAGContext
             entry("input-image-alt", true),
             // Set to true once the build doesn't fail this rule anymore
             entry("label", false),
-            entry("link-in-text-block", true),
+            // axe-core 4.14.0 counts the text of elements hidden with display: none as text surrounding a link,
+            // which reports false positives on the breadcrumb links followed by a hidden tree description.
+            // Set back to true once axe-core is upgraded to a version including
+            // https://github.com/dequelabs/axe-core/pull/5444 .
+            entry("link-in-text-block", false),
             entry("link-name", true),
             entry("list", true),
             entry("listitem", true),
@@ -135,7 +139,8 @@ public class WCAGContext
             entry("avoid-inline-spacing", true),
 
             // WCAG 2.2 Level A & AA Rules
-            entry("target-size", true)
+            // Set to true once the build doesn't fail this rule anymore
+            entry("target-size", false)
     );
 
     /**
@@ -143,7 +148,8 @@ public class WCAGContext
      * All rules with at least one of those tags will be validated.
      */
     // Note: this list needs to be in sync with the vitest configuration in @xwiki/platform-test-accessibility
-    private static final List<String> VALIDATE_TAGS = Arrays.asList("wcag2a", "wcag2aa", "wcag21a", "wcag21aa");
+    private static final List<String> VALIDATE_TAGS = Arrays.asList("wcag2a", "wcag2aa", "wcag21a", "wcag21aa",
+        "wcag22aa");
 
     /**
      * Rules to disable during axe-core validation.

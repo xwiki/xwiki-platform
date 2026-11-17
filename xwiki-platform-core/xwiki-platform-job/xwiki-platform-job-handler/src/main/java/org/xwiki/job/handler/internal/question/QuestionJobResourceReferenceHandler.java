@@ -29,7 +29,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
@@ -117,7 +118,7 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
 
         // POST request means answer
         if (request instanceof ServletRequest servletRequest) {
-            HttpServletRequest httpRequest = servletRequest.getHttpServletRequest();
+            HttpServletRequest httpRequest = servletRequest.getRequest();
 
             if ("POST".equals(httpRequest.getMethod())) {
                 String token = httpRequest.getParameter("form_token");

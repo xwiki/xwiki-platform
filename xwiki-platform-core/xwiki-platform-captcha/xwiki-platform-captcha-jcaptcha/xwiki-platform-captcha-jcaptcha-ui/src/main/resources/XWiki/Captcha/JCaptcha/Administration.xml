@@ -113,7 +113,7 @@
             &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" class="customActivator" #if ($isCustom)checked="checked"#end /&gt;
             $escapetool.xml($services.localization.render('captcha.jcaptcha.engine.custom'))
           &lt;/label&gt;
-          &lt;input type="text" class="customEngine" #if ($isCustom)checked="checked" value="$escapetool.xml($currentEngine)"#end /&gt;
+          &lt;input type="text" class="customEngine" aria-label="$escapetool.xml($services.localization.render('captcha.jcaptcha.engine.custom.input'))" #if ($isCustom)value="$escapetool.xml($currentEngine)"#end /&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/dd&gt;

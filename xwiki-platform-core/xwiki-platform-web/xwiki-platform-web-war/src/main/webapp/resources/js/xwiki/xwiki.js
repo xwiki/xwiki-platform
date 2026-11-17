@@ -199,6 +199,13 @@ Object.extend(XWiki, {
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
+     // Remember which pane was requested last. Since the panes are loaded asynchronously and their responses can
+     // arrive in any order, a pane must only be displayed if it's still the one requested last, otherwise a pane
+     // that is slow to load steals the display from a pane requested after it. This happens for instance when the
+     // first pane, which is loaded automatically when the page is loaded, is still loading when the user clicks on
+     // another pane.
+     window.lastRequestedDocExtra = extraID;
+
      // Use Ajax.Request to display the requested pane (extraID) : comments, attachments, etc.
      // On complete :
      //   1. Call dhtmlSwitch()
@@ -289,22 +296,30 @@ Object.extend(XWiki, {
 
                       $("docextrapanes").className="";
 
+                      // The content is in the pane, so it must not be fetched again, even when the pane is not
+                      // displayed below because another pane has been requested in the meantime. Note that the pane
+                      // keeps its "hidden" class in that case, and that dhtmlSwitch() is what drops it.
+                      $(extraID + "pane").removeClassName("empty");
+
                       // Let other know new content has been loaded
                       document.fire("xwiki:docextra:loaded", {
                         "id" : extraID,
                         "element": $(extraID + "pane")
                       });
 
-                      // switch tab
-                      dhtmlSwitch(extraID);
+                      // Switch tab, but only if this pane is still the one requested last, so that a pane that is
+                      // slow to load doesn't replace a pane the user has requested after it.
+                      if (window.lastRequestedDocExtra === extraID) {
+                        dhtmlSwitch(extraID);
 
-                      if (scrollToAnchor) {
-                        // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
-                        // prevents the anchor 'jump' after a click event but enable it
-                        // when the user is arriving from a direct /Space/Page#Section URL
-                        $(extraID + 'anchor').id = extraID;
-                        location.href='#' + extraID;
-                        $(extraID).id = extraID + 'anchor';
+                        if (scrollToAnchor) {
+                          // Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
+                          // prevents the anchor 'jump' after a click event but enable it
+                          // when the user is arriving from a direct /Space/Page#Section URL
+                          $(extraID + 'anchor').id = extraID;
+                          location.href='#' + extraID;
+                          $(extraID).id = extraID + 'anchor';
+                        }
                       }
                     }
                 });
@@ -316,24 +331,6 @@ Object.extend(XWiki, {
             $(extraID).id = extraID + 'anchor';
         }
      }
-  },
-
-  /**
-   * Add click listeners on all rendering error messages to let the user read the detailed error description.
-   * If a content is passed, add click listener for errors reported in this content (useful for AJAX requests response)
-   * Otherwise make all the document's body errors expandable.
-   */
-  makeRenderingErrorsExpandable: function(content) {
-    $(content || 'body').select(".xwikirenderingerror").each(function(error) {
-        var description = error.next(".xwikirenderingerrordescription");
-        if(description.innerHTML !== "" && description.hasClassName("xwikirenderingerrordescription")) {
-            error.style.cursor="pointer";
-            error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
-            Event.observe(error, "click", function(event){
-                   event.element().closest(".xwikirenderingerror").next(".xwikirenderingerrordescription").toggleClassName("hidden");
-            });
-        }
-    });
   },
 
   /**
@@ -358,7 +355,7 @@ Object.extend(XWiki, {
               // starting with "_"
               var values = anchor.getAttribute("rel").split(" ");
               for (var j = 0; j < values.length; j++) {
-                  if (values[j].charAt(0) == "_") {
+                  if (values[j].startsWith("_")) {
                       anchor.target = values[j].substring(1);
                       break;
                   } else if (values[j] == "external") {
@@ -484,10 +481,10 @@ Object.extend(XWiki, {
         var ca = document.cookie.split(';');
         for(var i=0;i < ca.length;i++) {
             var c = ca[i];
-            while (c.charAt(0)==' ') {
+            while (c.startsWith(' ')) {
                 c = c.substring(1,c.length);
             }
-            if (c.indexOf(nameEQ) == 0) {
+            if (c.startsWith(nameEQ)) {
                 return decodeURIComponent(c.substring(nameEQ.length,c.length));
             }
         }
@@ -561,7 +558,6 @@ Object.extend(XWiki, {
   _addBehaviour: function(container) {
     container = container || $('body');
 
-    this.makeRenderingErrorsExpandable(container);
     this.fixLinksTargetAttribute(container);
     this.insertSectionEditLinks(container);
     this.registerPanelToggle(container);
@@ -877,7 +873,7 @@ window.shortcut = new Object({
      * The opt parameter should be a map of optional parameters used while registering the shortcut.
      * <ul>
      *     <li>target: A DOM element in which the shortcut should be listened (defaults to the whole document)</li>
-     *     <li>disable_in_input: If true, the shortcut will not be listened when an input
+     *     <li>disable_in_input: If true, the shortcut will not be listened when an input, select
      *     or textarea field is selected (default: false)</li>
      *     <li>type: The type (shortcut.type) that should be used (default: SIMPLE)</li>
      * </ul>
@@ -1020,12 +1016,17 @@ window.shortcut = new Object({
 
             if (group === this._listeners.disabled_in_inputs) {
                 // Disable the created listener when focus goes on an input, a textarea field, an editable element or on
-                // the CodeMirror div (syntax highlighting).
+                // the CodeMirror div (syntax highlighting), but also on a select (drop-down list) because typing in a
+                // select selects the option that starts with the typed letters.
+                const editableSelector = 'input, select, textarea, [contenteditable=true], .CodeMirror-code';
                 jQuery(document)
-                    .on('focus', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea, [contenteditable=true], .CodeMirror-code',
-                        function() { newListener.listen(); });
+                    .on('focus', editableSelector, function() { newListener.stop_listening(); })
+                    .on('blur', editableSelector, function() { newListener.listen(); });
+                // The listener is created asynchronously, after Keypress JS is loaded, so the focus may already be in
+                // an editable element (e.g. one with the autofocus attribute) and the focus event above was missed.
+                if (document.activeElement?.matches(editableSelector)) {
+                    newListener.stop_listening();
+                }
             }
 
             group[target] = newListener;
@@ -1854,10 +1855,16 @@ require(['jquery'], ($) => {
 });
 
 require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
+    // Used to give a unique id to each rendering error and to its description, so that they can reference each
+    // other.
+    let renderingErrorCounter = 0;
+
     function init(rootElement) {
         if (XWiki.docsyntax !== "xwiki/1.0" && XWiki.contextaction === "view" && XWiki.hasEdit) {
-            $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a').on('click', loadCreateModal);
+            $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a')
+                .off('click.xwikiCreateModal').on('click.xwikiCreateModal', loadCreateModal);
         }
+        _makeRenderingErrorsExpandable(rootElement);
     }
 
     function loadCreateModal(event) {
@@ -1888,6 +1895,51 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
         }).fail(function (data) {
             notification.replace(new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}));
         })
+    }
+
+    /**
+     * Add click listeners on all rendering error messages to let the user read the detailed error description.
+     * If a content is passed, add click listener for errors reported in this content (useful for AJAX requests response)
+     * Otherwise make all the document's body errors expandable.
+     */
+    function _makeRenderingErrorsExpandable(content) {
+        const readTechnicalInformation =
+            "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
+        // Skip the errors that are already expandable, since this initialization is executed again whenever the DOM is
+        // updated, possibly on a part of the DOM that has already been initialized.
+        $(content || 'body').find('.xwikirenderingerror:not([aria-controls])').each(function () {
+            const error = $(this);
+            const description = error.next('.xwikirenderingerrordescription');
+            // Only the errors that come with a description can be expanded.
+            if (!description.html()) {
+                return;
+            }
+            const descriptionId = 'xwikirenderingerrordescription-' + renderingErrorCounter;
+            description.attr('id', descriptionId);
+            error.attr({
+                'id': 'xwikirenderingerror-' + renderingErrorCounter,
+                'role': 'button',
+                // A div is not focusable on its own, unlike a real button.
+                'tabindex': 0,
+                'aria-controls': descriptionId,
+                'aria-expanded': false,
+                'title': readTechnicalInformation
+            });
+            renderingErrorCounter++;
+            error.on('click', function () {
+                // Toggle both the visibility of the description and the expanded state of the button.
+                description.toggleClass('hidden');
+                error.attr('aria-expanded', !description.hasClass('hidden'));
+            });
+            error.on('keydown', function (event) {
+                // A div with a button role is not activated by the keyboard on its own, unlike a real button.
+                if (event.key === 'Enter' || event.key === ' ') {
+                    // Prevent the page from scrolling down when the space key is pressed.
+                    event.preventDefault();
+                    error.trigger('click');
+                }
+            });
+        });
     }
 
     $(document).on('xwiki:dom:updated', (event, data) => {

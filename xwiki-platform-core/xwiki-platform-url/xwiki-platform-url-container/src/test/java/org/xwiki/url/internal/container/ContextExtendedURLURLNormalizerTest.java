@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
-import javax.servlet.ServletContext;
+
+import jakarta.servlet.ServletContext;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
@@ -115,7 +116,7 @@ class ContextExtendedURLURLNormalizerTest
     void normalizeWhenNoConfigurationPropertyButEnvironment()
     {
         ServletContext sc = mock(ServletContext.class);
-        when(this.environment.getServletContext()).thenReturn(sc);
+        when(this.environment.getJakartaServletContext()).thenReturn(sc);
         when(sc.getContextPath()).thenReturn("/xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
@@ -126,7 +127,7 @@ class ContextExtendedURLURLNormalizerTest
     void normalizeWhenNoConfigurationPropertyButEnvironmentWithMultiLevelContextPath()
     {
         ServletContext sc = mock(ServletContext.class);
-        when(this.environment.getServletContext()).thenReturn(sc);
+        when(this.environment.getJakartaServletContext()).thenReturn(sc);
         when(sc.getContextPath()).thenReturn("/l1/l2/xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
@@ -137,7 +138,7 @@ class ContextExtendedURLURLNormalizerTest
     void normalizeWhenNoConfigurationPropertyButEnvironmentWithRootContext()
     {
         ServletContext sc = mock(ServletContext.class);
-        when(this.environment.getServletContext()).thenReturn(sc);
+        when(this.environment.getJakartaServletContext()).thenReturn(sc);
         when(sc.getContextPath()).thenReturn("");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));

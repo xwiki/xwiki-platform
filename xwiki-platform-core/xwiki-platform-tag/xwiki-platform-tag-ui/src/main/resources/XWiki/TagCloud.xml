@@ -43,7 +43,8 @@
 ## @param tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 ##
 #if($tagCloudSpace &amp;&amp; "$!tagCloudSpace" != "")
-  {{tagcloud space="$tagCloudSpace"/}}
+  ## Escape the characters that would end the quoted macro parameter value.
+  {{tagcloud space="$tagCloudSpace.replaceAll('([~"])', '~$1')"/}}
 #else
   {{tagcloud/}}
 #end
@@ -455,18 +456,22 @@ ol.tagCloud .ultraPopular {
       <async_cached>0</async_cached>
     </property>
     <property>
-      <async_context/>
+      <async_context>
+        <value>locale</value>
+        <value>user</value>
+        <value>wiki</value>
+      </async_context>
     </property>
     <property>
-      <async_enabled>0</async_enabled>
+      <async_enabled>1</async_enabled>
     </property>
     <property>
       <code>{{velocity}}
 ##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
-#set ($tagCloudSpace = $xcontext.macro.params.get('space'))
-#set ($tagCloudSpaces = $xcontext.macro.params.get('spaces'))
-#set ($limit = $xcontext.macro.params.get('limit'))
+#set ($tagCloudSpace = $wikimacro.parameters.get('space'))
+#set ($tagCloudSpaces = $wikimacro.parameters.get('spaces'))
+#set ($limit = $wikimacro.parameters.get('limit'))
 #if ("$!limit" != '' &amp;&amp; $limit &lt; 0)
   #set ($limit = 0)
 #end
@@ -567,7 +572,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #if("$!tagCloudSpace" == "")
     $services.localization.render('xe.tag.notags')
   #else
-    $services.localization.render('xe.tag.notagsforspace', ["$tagCloudSpace"])
+    $escapetool.xml($services.localization.render('xe.tag.notagsforspace', ["$tagCloudSpace"]))
   #end
   &lt;/p&gt;
 #end

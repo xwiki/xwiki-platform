@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-edit</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-edit-default</artifactId>
   <name>XWiki Platform - Edit - Default</name>
   <packaging>jar</packaging>
   <description>Provides the default implementation for the edit module APIs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -52,6 +52,21 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-component-wiki</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- We analyze the rights required by the editors defined in wiki pages. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

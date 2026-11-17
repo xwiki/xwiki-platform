@@ -131,7 +131,7 @@ define('xwiki-attachment-picker',
         return this.solrSearch.search(query, isGlobal).then(this.cb)
           .catch((error) => {
             console.log(error);
-            new XWiki.widgets.Notification(translations.get('solrSearch.query.errorMessage'), 'error');
+            XWiki.widgets.Notification.show(translations.get('solrSearch.query.errorMessage'), 'error');
           }).finally(() => {
             this.resultsBlock.removeClass(loadingClass);
           });

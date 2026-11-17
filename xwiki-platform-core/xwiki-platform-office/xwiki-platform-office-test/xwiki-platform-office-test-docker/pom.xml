@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office-test</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-test-docker</artifactId>
   <properties>
@@ -54,6 +54,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- Used to test the import of office files and the insertion of the office macro from CKEditor. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
@@ -102,6 +109,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

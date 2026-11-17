@@ -42,19 +42,16 @@ public class LogCaptureValidator
     private static final String NL = "\n";
 
     /**
-     * For now, we only check for Velocity deprecations. In the future we should put back validations for:
-     * <ul>
-     *     <li>ERROR</li>
-     *     <li>WARN</li>
-     *     <li>JavaScript errors</li>
-     * </ul>
-     * See <a href=" https://forum.xwiki.org/t/remove-log-validation-for-functional-tests/6026">this forum thread</a>
-     * for why these checks were removed.
-     * Also note that we've kept some global excludes below belonging to these removed checks for the future. We also
-     * kept specific checks in the functional tests for the same reason. In the future we'll need to assess is the
-     * strategy can work (i.e. not be swamped by false positives).
+     * The content making a log entry fail the validation (unless it's excluded or expected): errors, Velocity
+     * deprecations and the Tomcat resource cache warning. Other warnings and JavaScript errors are not validated, see
+     * <a href="https://forum.xwiki.org/t/remove-log-validation-for-functional-tests/6026">this forum thread</a> and
+     * <a href="https://forum.xwiki.org/t/enable-back-failing-the-build-on-error-logs-in-the-ci/18999">this one</a>.
+     * Some global excludes below are about warnings, and are kept for when warnings are validated.
      */
     private static final List<String> SEARCH_STRINGS = Arrays.asList(
+        // Any error logged by XWiki, the other containers (database, Solr, browser...) or the test framework, as a
+        // simple substring match.
+        "ERROR",
         "Deprecated usage of",
         // Tomcat emits this WARN when its resource cache (cacheMaxSize in the WAR's META-INF/context.xml) is too small
         // to hold all XWiki static resources. Fail the build so we raise cacheMaxSize.
@@ -178,7 +175,14 @@ public class LogCaptureValidator
             + "In case of a need to debug this call was triggered for right [like]."),
 
         // See https://jira.xwiki.org/browse/XWIKI-22043
-        new Line("org.xwiki.script.internal.safe.ScriptSafeProvider")
+        new Line("org.xwiki.script.internal.safe.ScriptSafeProvider"),
+
+        // Logged at error level by Jersey when writing a REST response fails after it was committed, which is what
+        // happens when the client (e.g. the browser moving to another page) closes the connection before receiving
+        // the whole response. Its stack trace ends with a broken pipe (an expected line), but the entry can be split
+        // when other output is printed in the middle of the stack trace, so exclude it by its first line.
+        // See https://github.com/eclipse-ee4j/jersey/issues/4420
+        new Line("An I/O error has occurred while writing a response message entity to the container output stream.")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

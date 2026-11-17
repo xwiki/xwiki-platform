@@ -28,9 +28,13 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
           case 200:
             // Replace the element by the asynchronous result. Note that the X-XWIKI-HTML-HEAD and X-XWIKI-HTML-SCRIPTS
             // custom HTTP response headers that contain the required stylesheets and JavaScript files are handled
-            // automatically by xwiki.js
-            element.replaceWith(xhr.responseText);
-            $(document).trigger('xwiki:dom:updated', {elements: element.toArray()});
+            // automatically by xwiki.js, so the inline scripts of the result are dropped.
+            // The result is parsed before being inserted so that the DOM update event can target the inserted
+            // elements, which its listeners initialize (the placeholder is detached from the page at this point).
+            // $.parseHTML is used because $() parses the given string as HTML only when it starts with '<'.
+            const newElements = $($.parseHTML(xhr.responseText, document, false));
+            element.replaceWith(newElements);
+            $(document).trigger('xwiki:dom:updated', {elements: newElements.filter('*').toArray()});
             break;
 
           case 202:

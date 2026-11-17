@@ -68,6 +68,13 @@
     <filter-class>org.xwiki.container.servlet.filters.internal.SafeRedirectFilter</filter-class>
   </filter>
 
+  <!-- Filter which inject a response wrapper in charge of replacing the line breaks in header values by spaces, since
+       they are forbidden and make browsers reject the whole response over HTTP/2. -->
+  <filter>
+    <filter-name>SafeHeaderValueFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SafeHeaderValueFilter</filter-class>
+  </filter>
+
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -185,6 +192,11 @@
 
   <filter-mapping>
     <filter-name>SafeRedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SafeHeaderValueFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 

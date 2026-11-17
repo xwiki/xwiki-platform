@@ -28,6 +28,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.ServletRequest;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -121,7 +122,9 @@ public class DefaultRequestParameterConverter extends AbstractRequestParameterCo
             try {
                 request.setParameter(parameterName, convert(content, inputSyntax.get(), outputSyntax.get()));
             } catch (Exception e) {
-                this.logger.error(e.getLocalizedMessage(), e);
+                this.logger.warn("Failed to convert the [{}] request parameter. Root cause is [{}].", parameterName,
+                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full stack trace for the conversion failure:", e);
                 conversionResult.getErrors().put(parameterName, e);
             }
             // If the conversion fails the output contains the value before the conversion.

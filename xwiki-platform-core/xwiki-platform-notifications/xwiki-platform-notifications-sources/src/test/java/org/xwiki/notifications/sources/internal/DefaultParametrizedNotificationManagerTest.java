@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -48,6 +51,7 @@ import org.xwiki.user.group.GroupManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
@@ -152,6 +156,21 @@ class DefaultParametrizedNotificationManagerTest
 
         // Verify
         assertEquals(0, results.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, -1 })
+    void getEventsWhenExpectedCountIsNotPositive(int expectedCount)
+    {
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = this.userReference;
+        parameters.expectedCount = expectedCount;
+
+        List<CompositeEvent> results = assertTimeoutPreemptively(Duration.ofSeconds(10),
+            () -> this.defaultParametrizedNotificationManager.getEvents(parameters));
+
+        assertTrue(results.isEmpty());
+        verifyNoInteractions(this.eventSearcher);
     }
 
     @Test

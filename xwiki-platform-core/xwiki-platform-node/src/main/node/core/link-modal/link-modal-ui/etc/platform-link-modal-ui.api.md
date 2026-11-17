@@ -4,88 +4,112 @@
 
 ```ts
 
-import { AttachmentReference } from '@xwiki/platform-model-api';
+import { Component } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
 import { DefineComponent } from 'vue';
-import { DocumentReference } from '@xwiki/platform-model-api';
-import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
-import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
+import { LinkContext } from '@xwiki/platform-link-type-api';
+import { LinkData } from '@xwiki/platform-link-type-api';
+import { PlainTextLinkTargetConfig } from '@xwiki/platform-link-type-api';
 import { PublicProps } from 'vue';
-import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
-import { ResourceReference } from '@xwiki/platform-rendering-api';
-
-// @beta
-export type LinkAttachmentConfig = {
-    ref: AttachmentReference | null;
-    queryString?: string;
-};
-
-// @beta
-export type LinkData = {
-    displayText: string;
-    newTab?: boolean;
-    target: LinkTarget;
-};
-
-// @beta
-export type LinkEmailConfig = {
-    address: string;
-    messageSubject?: string;
-    messageBody?: string;
-};
+import { ShallowUnwrapRef } from 'vue';
+import { TextFieldProps } from '@xwiki/platform-dsapi';
+import { VNode } from 'vue';
 
 // @beta
 export const LinkModal: DefineComponent<    {
 current: LinkData;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
+mode?: "createNew" | "editExisting";
+linkContext?: LinkContext;
 }, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 submit: (args_0: LinkData) => any;
 cancel: () => any;
 }, string, PublicProps, Readonly<{
 current: LinkData;
 depsContainer: Container;
+excludedLinkTargetTypes?: string[];
+mode?: "createNew" | "editExisting";
+linkContext?: LinkContext;
 }> & Readonly<{
 onSubmit?: ((args_0: LinkData) => any) | undefined;
 onCancel?: (() => any) | undefined;
-}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
+}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
 
 // @beta
-export type LinkPageConfig = {
-    ref: DocumentReference | null;
-    queryString?: string;
-    anchor?: string;
+export interface LinkTargetTypeForm {
+    optionFields?(): Component;
+    targetField(): Component;
+    readonly type: string;
+}
+
+// @beta
+export const linkTargetTypeFormRole = "LinkTargetTypeForm";
+
+// @beta
+export const PlainTextLinkTargetField: DefineComponent<    {
+modelValue: PlainTextLinkTargetConfig;
+} & {
+fieldLabel: string;
+inputType?: TextFieldProps["type"];
+autofocus?: boolean;
+}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
+"update:modelValue": (value: PlainTextLinkTargetConfig) => any;
+}, string, PublicProps, Readonly<{
+modelValue: PlainTextLinkTargetConfig;
+} & {
+fieldLabel: string;
+inputType?: TextFieldProps["type"];
+autofocus?: boolean;
+}> & Readonly<{
+"onUpdate:modelValue"?: ((value: PlainTextLinkTargetConfig) => any) | undefined;
+}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
+
+// @beta
+export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_setup>>["props"], __VLS_ctx?: {
+    slots: Readonly<{
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
+    }> & {
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
+    };
+    attrs: any;
+    emit: (evt: "select", value: T | null) => void;
+}, __VLS_expose?: NonNullable<Awaited<typeof __VLS_setup>>["expose"], __VLS_setup?: Promise<{
+    props: {
+        readonly onSelect?: ((value: T | null) => any) | undefined;
+        label: string;
+        initialValue: string | null;
+        placeholder?: string | undefined;
+        help?: string | undefined;
+        autofocus?: boolean | undefined;
+        required?: boolean | undefined;
+        getSuggestions: SearchBoxSource<T, U>;
+        parseQuery?: ((query: string) => T | null) | undefined;
+    } & PublicProps;
+    expose(exposed: ShallowUnwrapRef<    {}>): void;
+    attrs: any;
+    slots: Readonly<{
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
+    }> & {
+        renderSuggestion(suggestion: SearchBoxItem<T, U>): unknown;
+    };
+    emit: (evt: "select", value: T | null) => void;
+}>) => VNode & {
+    __ctx?: Awaited<typeof __VLS_setup>;
 };
 
 // @beta
-export type LinkTarget = {
-    type: "page";
-    config: LinkPageConfig;
-} | {
-    type: "attachment";
-    config: LinkAttachmentConfig;
-} | {
-    type: "url";
-    config: LinkUrlConfig;
-} | {
-    type: "email";
-    config: LinkEmailConfig;
+export type SearchBoxItem<T, U> = {
+    value: T;
+    renderingData: U;
+    key: string;
+    equivalentQuery: string;
 };
 
 // @beta
-export function linkTargetToResourceReference(target: LinkTarget, modelReferenceSerializer: ModelReferenceSerializer): ResourceReference | undefined;
-
-// @beta
-export type LinkUrlConfig = {
-    url: string;
-};
-
-// @beta
-export function parseLinkTarget(url: string, remoteURLParser: RemoteURLParser): LinkTarget;
-
-// @beta
-export function resourceReferenceToLinkTarget(reference: ResourceReference, modelReferenceParser: ModelReferenceParser): LinkTarget | undefined;
+export type SearchBoxSource<T, U> = (query: string) => Promise<SearchBoxItem<T, U>[] | false>;
 
 // (No @packageDocumentation comment for this package)
 

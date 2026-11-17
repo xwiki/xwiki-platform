@@ -112,28 +112,28 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     }
     /** Add a reset listener that resets the number of file fields to 1. */
     resetOnCancel() {
-      this.form.first().on('reset', this.onReset);
-      this.form.find('.cancel').on('click', this.onReset);
+      this.form.first().on('reset', (e) => this.onReset(e));
+      this.form.find('.cancel').on('click', (e) => this.onReset(e));
     }
     /** Creates and inserts a new file input field. */
     addField(event) {
       let fileInput = $("<input type='file' class='uploadFileInput'/>");
-      fileInput.attr('name' , "filepath_" + this.counter);
+      fileInput.attr('name' , "filepath_" + viewers.Attachments.counter);
       fileInput.attr('size' , this.inputSize);
       // For the moment, specifying a different name is not used anymore.
       let filenameInput = $("<input type='hidden'/>");
-      filenameInput.attr('name' , "filename_" + this.counter);
+      filenameInput.attr('name' , "filename_" + viewers.Attachments.counter);
       let removeButton = this.createRemoveButton();
       let containerDiv = $("<div class='fileupload-field'></div>");
       containerDiv.append([filenameInput, fileInput, removeButton]);
       this.addDiv.after(containerDiv);
       // Remove the focus border from the button
       event.target.blur();
-      this.counter++;
+      viewers.Attachments.counter++;
     }
     /** Remove a file field when pressing the corresponding "Remove" button. */
     removeField(event) {
-      event.target.up("div").remove();
+      $(event.target).closest("div").remove();
     }
     /** Create a remove button that triggers {@link #removeField} when clicked. */
     createRemoveButton() {
@@ -159,30 +159,29 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     /** Form reset listener. It resets the number of file fields to just one. */
     onReset(event) {
       if (event) {
-        event.stop();
+        event.preventDefault();
+        event.stopPropagation();
       }
-      this.form.find("input[type='file']").each(function(item) {
-        item.up().remove();
+      this.form.find("input[type='file']").each(function(index, item) {
+        $(item).parent().remove();
       });
-      this.counter = 1;
+      viewers.Attachments.counter = 1;
       this.addField(event);
     }
     /**
      * Registers a listener that watches for the insertion of the Attachments tab and triggers the form enhancement.
      */
     addTabLoadListener() {
-      let listener = function(event) {
-        if (event.memo.id === 'Attachments') {
+      $(document).on("xwiki:docextra:loaded", (event, data) => {
+        if (data?.id === 'Attachments') {
           this.prepareForm();
         }
-      }.bindAsEventListener(this);
-      document.observe("xwiki:docextra:loaded", listener);
+      });
     }
   };
   
   // When the document is loaded, trigger the attachment form enhancements.
-  (XWiki.domIsLoaded && new viewers.Attachments())
-  || document.observe("xwiki:dom:loaded", function() { new viewers.Attachments(); });
+  $(() => new viewers.Attachments());
 /**
  * Delete attachments from AttachmentsTab.
  */
@@ -204,7 +203,8 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
       url : button.prop('href'),
       beforeSend : function() {
         button.prop('disabled', true);
-        notification = new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.inProgress'], 'inprogress');
+        notification = XWiki.widgets.Notification.show(l10n['core.viewers.attachments.delete.inProgress'],
+          'inprogress');
       },
       success : function() {
         liveData.updateEntries().then(() => {
@@ -212,12 +212,12 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
             updateCount(liveData.data.data.count);
           }
         });
-        notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.done'], 'done'));
+        notification.replace(XWiki.widgets.Notification.show(l10n['core.viewers.attachments.delete.done'], 'done'));
       },
       error: function() {
         // The button is enabled in case of error.
         button.prop('disabled', false);
-        notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.failed'], 'error'));
+        notification.replace(XWiki.widgets.Notification.show(l10n['core.viewers.attachments.delete.failed'], 'error'));
       }
     })
   });

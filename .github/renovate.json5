@@ -21,31 +21,12 @@
   // The settings the XWiki repositories share. See https://github.com/xwiki/.github
   "extends": ["github>xwiki/.github//renovate/default.json5"],
 
-  // Added to the rules of the preset, which already disables the commons dependencies.
+  // Added to the rules of the preset, which already disables the commons, rendering and platform dependencies.
   "packageRules": [
     // Add the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
     {
       "matchDatasources": ["maven"],
       "registryUrls": ["https://repo1.maven.org/maven2/", "https://nexus.xwiki.org/nexus/content/repositories/public/"]
-    },
-
-    // There is no point trying to find updates for rendering, platform and enterprise dependencies
-    {
-      "matchPackagePrefixes": ["org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
-      "enabled": false
-    },
-
-    // Automatically assign npm packages to @manuelleduc
-    {
-      "matchDatasources": ["npm"],
-      "assignees": ["manuelleduc"]
-    },
-
-    // Wait for released packages to be 1 day old before proposing them. This aligns with pnpm's default while staying
-    // package manager independent. See https://docs.renovatebot.com/configuration-options/#minimumreleaseage
-    {
-      "matchDatasources": ["npm"],
-      "minimumReleaseAge": "1 day"
     },
 
     // Automatically assign webjars packages to @mflorea
@@ -60,6 +41,22 @@
       "matchDatasources": ["maven"],
       "matchPackageNames": ["!org.webjars*"],
       "assignees": ["tmortagne"]
+    },
+
+    ////////
+    // NPM
+    ////////
+
+    // Wait for released packages to be 1 day old before proposing them. This aligns with pnpm's default while staying
+    // package manager independent. See https://docs.renovatebot.com/configuration-options/#minimumreleaseage
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "1 day"
+    },
+    // Automatically assign npm packages to @manuelleduc
+    {
+      "matchDatasources": ["npm"],
+      "assignees": ["manuelleduc"]
     },
     // Group React dependencies together
     {

@@ -49,7 +49,8 @@ public interface PDFExportConfiguration
 
     /**
      * @return the Docker image used to create the Docker container running the headless Chrome web browser; defaults to
-     *         "{@code femtopixel/google-chrome-headless:latest}"
+     *         "{@code femtopixel/google-chrome-headless}" with a fixed Chrome version (rather than {@code latest}),
+     *         known to work with the current XWiki version
      */
     String getChromeDockerImage();
 

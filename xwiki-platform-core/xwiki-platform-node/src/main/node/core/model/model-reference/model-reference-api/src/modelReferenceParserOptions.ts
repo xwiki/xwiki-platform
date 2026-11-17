@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { EntityType } from "@xwiki/platform-model-api";
+import type { EntityReference } from "@xwiki/platform-model-api";
 
 /**
  * @since 18.0.0RC1
@@ -34,4 +35,14 @@ export type ModelReferenceParserOptions = {
    * The default value is true.
    */
   relative?: boolean;
+  /**
+   * The reference to resolve a relative reference against: the entities missing from the parsed reference (e.g. the
+   * wiki and the space of a page reference made of the page name only) are taken from it. Typically the document that
+   * holds the parsed reference (e.g. the document holding a link). Implementations that don't support relative
+   * references ignore it.
+   *
+   * @since 18.10.0RC1
+   * @beta
+   */
+  base?: EntityReference;
 };

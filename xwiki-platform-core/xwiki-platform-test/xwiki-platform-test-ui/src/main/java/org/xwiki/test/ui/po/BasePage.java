@@ -66,16 +66,18 @@ public class BasePage extends BaseElement
     private static final int WCAG_ANALYZE_ATTEMPTS = 3;
 
     /**
+     * Message fragments identifying a JavaScript error raised because axe-core was not present in the frame when the
+     * analysis probed it. Browsers word it differently: Chrome reports the failing property read on the axe object
+     * ({@code runPartial} is the axe entry point the analysis calls), while Firefox reports the missing binding itself.
+     */
+    private static final List<String> AXE_NOT_READY_ERRORS =
+        List.of("runPartial", "window.axe", "axe is not defined", "axe is undefined");
+
+    /**
      * Used for sending keyboard shortcuts to.
      */
     @FindBy(id = "xwikimaincontainer")
     private WebElement mainContainerDiv;
-
-    /**
-     * The top floating content menu bar.
-     */
-    @FindBy(id = "contentmenu")
-    private WebElement contentMenuBar;
 
     @FindBy(xpath = "//li[@id='tmCreate']/a[contains(@class, 'btn')]")
     private WebElement tmCreate;
@@ -86,9 +88,6 @@ public class BasePage extends BaseElement
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchDocumentLink;
 
-    @FindBy(id = "tmPage")
-    private WebElement pageMenu;
-
     @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
     private WebElement registerLink;
 
@@ -97,9 +96,6 @@ public class BasePage extends BaseElement
 
     @FindBy(xpath = "//a[@id='tmUser']")
     private WebElement userLink;
-
-    @FindBy(xpath = "//li[contains(@class, 'navbar-avatar')]//img[contains(@class, 'avatar')]")
-    private WebElement userAvatarImage;
 
     @FindBy(id = "document-title")
     private WebElement documentTitle;
@@ -338,16 +334,6 @@ public class BasePage extends BaseElement
     public void clickMoreActionsSubMenuEntry(String id)
     {
         clickSubMenuEntryFromMenu(By.xpath("//li[@id='tmMoreActions']/button"), id);
-    }
-
-    /**
-     * @since 7.3M2
-     * @deprecated use {@link #clickMoreActionsSubMenuEntry(String)} instead which has a better name
-     */
-    @Deprecated
-    public void clickAdminActionsSubMenuEntry(String id)
-    {
-        clickMoreActionsSubMenuEntry(id);
     }
 
     /**
@@ -755,7 +741,7 @@ public class BasePage extends BaseElement
             try {
                 return axeBuilder.analyze(driver);
             } catch (JavascriptException e) {
-                if (e.getMessage() == null || !e.getMessage().contains("window.axe")) {
+                if (!isAxeNotReadyError(e)) {
                     throw e;
                 }
                 lastError = e;
@@ -763,6 +749,12 @@ public class BasePage extends BaseElement
             }
         }
         throw lastError;
+    }
+
+    static boolean isAxeNotReadyError(JavascriptException error)
+    {
+        String message = error.getMessage();
+        return message != null && AXE_NOT_READY_ERRORS.stream().anyMatch(message::contains);
     }
 
     /**

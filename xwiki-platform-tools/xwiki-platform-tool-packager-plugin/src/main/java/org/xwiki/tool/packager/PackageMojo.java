@@ -141,7 +141,7 @@ public class PackageMojo extends AbstractOldCoreMojo
     private Map<String, String> contextPathMapping;
 
     /**
-     * Indicate of the package mojo is used for tests. Among other things it means it's then possible to skip it using
+     * Indicate if the package mojo is used for tests. Among other things it means it's then possible to skip it using
      * skipTests system property.
      *
      * @since 6.0M2
@@ -273,9 +273,12 @@ public class PackageMojo extends AbstractOldCoreMojo
     private boolean isSkipTests()
     {
         if (this.test) {
-            String property = System.getProperty("skipTests");
+            String property = System.getProperty("skipITs");
+            if (property != null) {
+                return Boolean.parseBoolean(property);
+            }
 
-            return Boolean.parseBoolean(property);
+            return Boolean.parseBoolean(System.getProperty("skipTests"));
         } else {
             return false;
         }

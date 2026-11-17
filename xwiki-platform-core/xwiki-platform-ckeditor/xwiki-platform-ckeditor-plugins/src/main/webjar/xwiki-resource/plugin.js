@@ -167,6 +167,12 @@
             if (resourceTypeConfig.allowEmptyReference !== true) {
               return this.getDialog().getParentEditor().localization.get('xwiki-resource.notSpecified',
                 this.getLabelElement().getText());
+            } else if (resourceTypeConfig.mustBeSelected && resourceReference.notSelected &&
+                !hasResourceParameters(resourceReference)) {
+              // An empty reference targets the current entity (e.g. the current page), which is what the user wants
+              // when they select it explicitly or when the link has an anchor or a query string (e.g.
+              // [[label>>||anchor=Section]]), but not when they simply left the field empty.
+              return this.getDialog().getParentEditor().localization.get('xwiki-resource.selectValue');
             }
           } else if (resourceReference.notSelected && resourceTypeConfig.mustBeSelected) {
             return this.validateInput(resourceReference);
@@ -235,6 +241,51 @@
           $(this.getResourcePickerInput().$).val(serializedResourceReference).trigger('selectResource', {
             reference: resourceReference
           });
+        },
+        /**
+         * Preselect the resource that would be created from the given text (e.g. the text selected in the rich text
+         * area), so that the user doesn't end up with an empty resource reference when they validate the dialog
+         * without touching this field. The resource is computed on the server, following the configured page name
+         * strategy, so the preselection is asynchronous and it is applied only if the user doesn't interact with the
+         * resource picker in the meantime. Does nothing if the resource type doesn't support creating new resources
+         * from free text.
+         *
+         * @param label the free text to compute the new resource from; it is not interpreted as a resource reference
+         * @return a promise resolved when the preselection is done
+         */
+        preselectNewResource: async function(label) {
+          const suggester = $resource.suggesters[this.resourceTypes[0]];
+          if (!label || typeof suggester?.suggestNew !== 'function') {
+            return;
+          }
+          const dialog = this.getDialog();
+          // Prevent the dialog from being submitted before we know the resource reference.
+          dialog.setState(CKEDITOR.DIALOG_STATE_BUSY);
+          try {
+            const stateBeforeRequest = this.getPickerState();
+            const resource = await suggester.suggestNew(label, this.getBase());
+            // Don't overwrite the user's choice: they may have selected a resource, typed a resource reference or
+            // changed the resource type while we were waiting for the server response.
+            if (resource && this.getPickerState() === stateBeforeRequest) {
+              this.setValue(resource.reference);
+            }
+          } finally {
+            dialog.setState(CKEDITOR.DIALOG_STATE_IDLE);
+          }
+        },
+        /**
+         * @return the part of the resource picker state that the user can change, used to detect whether the user
+         *   interacted with the resource picker while an asynchronous operation was in progress
+         */
+        getPickerState: function() {
+          return [
+            // The selected resource.
+            this.getResourcePickerInput().getValue(),
+            // The text typed in the resource reference input.
+            this.getResourceReferenceInput().getValue(),
+            // The selected resource type.
+            this.getElement().findOne('button.resourceType').getValue()
+          ].join('\n');
         },
         getBase: function () {
           var currentInstance = CKEDITOR.currentInstance;
@@ -372,6 +423,11 @@
       // Hide the element. We show the resource picker instead.
       element.hidden = true;
     }
+  };
+
+  var hasResourceParameters = function(resourceReference) {
+    // Note that only the parameters with a non-empty value are collected, see the resource picker's getValue().
+    return Object.keys(resourceReference.parameters || {}).length > 0;
   };
 
   var parseQueryString = function(queryString) {

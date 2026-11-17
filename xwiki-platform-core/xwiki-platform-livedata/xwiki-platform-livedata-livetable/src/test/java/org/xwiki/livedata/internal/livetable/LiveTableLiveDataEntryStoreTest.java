@@ -21,6 +21,7 @@ package org.xwiki.livedata.internal.livetable;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -40,7 +41,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
-import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.internal.livetable.LiveTableNewEntryResolver.NewEntry;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -57,7 +58,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -80,10 +83,6 @@ class LiveTableLiveDataEntryStoreTest
     private LiveTableLiveDataResultsRenderer resultsRenderer;
 
     @MockComponent
-    @Named("uuid")
-    private LiveTableNewRowNamingStrategy namingStrategy;
-
-    @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
@@ -93,6 +92,9 @@ class LiveTableLiveDataEntryStoreTest
 
     @MockComponent
     private ModelBridge modelBridge;
+
+    @MockComponent
+    private LiveTableNewEntryResolver newEntryResolver;
 
     @MockComponent
     @Named(LiveTableLiveDataEntryStore.ROLE_HINT)
@@ -149,17 +151,124 @@ class LiveTableLiveDataEntryStoreTest
     }
 
     @Test
+    void getWithProperties() throws Exception
+    {
+        Map<String, Object> row = new HashMap<>();
+        row.put("doc_fullName", "MySpace.MyEntry");
+        row.put("status", "done");
+
+        Map<String, Object> liveTableResults = new HashMap<>();
+        liveTableResults.put("totalrows", 1);
+        liveTableResults.put("rows", Collections.singletonList(row));
+
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), any()))
+            .thenReturn(this.objectMapper.writeValueAsString(liveTableResults));
+
+        Map<String, Object> expectedEntry = new HashMap<>();
+        expectedEntry.put("doc.fullName", "MySpace.MyEntry");
+        expectedEntry.put("status", "done");
+        assertEquals(Optional.of(expectedEntry), this.entryStore.get("testEntry", List.of("status", "doc.title")));
+
+        // The requested properties are queried in addition to the id property.
+        ArgumentCaptor<LiveDataQuery> queryCaptor = ArgumentCaptor.forClass(LiveDataQuery.class);
+        verify(this.resultsRenderer).getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), queryCaptor.capture());
+        LiveDataQuery query = queryCaptor.getValue();
+        assertEquals(asList("doc.fullName", "status", "doc.title"), query.getProperties());
+        assertEquals(1, query.getLimit());
+        assertEquals(1, query.getFilters().size());
+        assertEquals("doc.fullName", query.getFilters().get(0).getProperty());
+        assertEquals("testEntry", query.getFilters().get(0).getConstraints().get(0).getValue());
+    }
+
+    @Test
+    void getWithEmptyAndDuplicatedProperties() throws Exception
+    {
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), any()))
+            .thenReturn("{\"totalrows\":0,\"rows\":[]}");
+
+        assertEquals(Optional.empty(),
+            this.entryStore.get("testEntry", asList("status", "", "doc.fullName", "status", null)));
+
+        ArgumentCaptor<LiveDataQuery> queryCaptor = ArgumentCaptor.forClass(LiveDataQuery.class);
+        verify(this.resultsRenderer).getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), queryCaptor.capture());
+        assertEquals(asList("doc.fullName", "status"), queryCaptor.getValue().getProperties());
+    }
+
+    @Test
     void saveNewEntry() throws Exception
     {
         DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "uuid");
-        when(this.namingStrategy.generate(any())).thenReturn(newReference);
+        Map<String, Object> entry = new HashMap<>();
+        when(this.newEntryResolver.resolve(this.entryStore.getParameters(), entry))
+            .thenReturn(new NewEntry(newReference, null));
         when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.uuid");
 
-        this.entryStore.getParameters().put("newRowNamingStrategy", "uuid");
+        assertEquals(Optional.of("NewEntries.uuid"), this.entryStore.save(entry));
+        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true, null);
+    }
+
+    @Test
+    void saveNewEntryFromTemplate() throws Exception
+    {
+        DocumentReference newReference = new DocumentReference("xwiki", "NewEntries", "uuid");
+        DocumentReference templateReference = new DocumentReference("xwiki", "Code", "Template");
         Map<String, Object> entry = new HashMap<>();
+        when(this.newEntryResolver.resolve(this.entryStore.getParameters(), entry))
+            .thenReturn(new NewEntry(newReference, templateReference));
+        when(this.stringEntityReferenceSerializer.serialize(newReference)).thenReturn("NewEntries.uuid");
 
         assertEquals(Optional.of("NewEntries.uuid"), this.entryStore.save(entry));
-        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true);
+        verify(this.modelBridge).updateAll(entry, newReference, null, Map.of(), 0, true, templateReference);
+    }
+
+    @Test
+    void saveNewEntryThatCannotBeCreated() throws Exception
+    {
+        Map<String, Object> entry = new HashMap<>();
+        when(this.newEntryResolver.resolve(this.entryStore.getParameters(), entry))
+            .thenThrow(new LiveDataException("Error"));
+
+        LiveDataException exception = assertThrows(LiveDataException.class, () -> this.entryStore.save(entry));
+        assertEquals("Error", exception.getMessage());
+        verifyNoInteractions(this.modelBridge);
+    }
+
+    @Test
+    void remove() throws Exception
+    {
+        Map<String, Object> row = new HashMap<>();
+        row.put("doc_fullName", "MySpace.MyEntry");
+        row.put("status", "done");
+
+        Map<String, Object> liveTableResults = new HashMap<>();
+        liveTableResults.put("totalrows", 1);
+        liveTableResults.put("rows", Collections.singletonList(row));
+
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), any()))
+            .thenReturn(this.objectMapper.writeValueAsString(liveTableResults));
+        DocumentReference entryReference = new DocumentReference("xwiki", "MySpace", "MyEntry");
+        when(this.currentDocumentReferenceResolver.resolve("MySpace.MyEntry")).thenReturn(entryReference);
+
+        Map<String, Object> expectedEntry = new HashMap<>();
+        expectedEntry.put("doc.fullName", "MySpace.MyEntry");
+        expectedEntry.put("status", "done");
+
+        assertEquals(Optional.of(expectedEntry), this.entryStore.remove("MySpace.MyEntry"));
+        verify(this.modelBridge).delete(entryReference);
+    }
+
+    @Test
+    void removeUnknownEntry() throws Exception
+    {
+        Map<String, Object> liveTableResults = new HashMap<>();
+        liveTableResults.put("totalrows", 0);
+        liveTableResults.put("rows", Collections.emptyList());
+
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), any()))
+            .thenReturn(this.objectMapper.writeValueAsString(liveTableResults));
+
+        assertEquals(Optional.empty(), this.entryStore.remove("MySpace.MyEntry"));
+        verifyNoInteractions(this.modelBridge);
     }
 
     @Test
@@ -305,18 +414,6 @@ class LiveTableLiveDataEntryStoreTest
     }
 
     @Test
-    void saveEntryIdUndefined()
-    {
-        Map<String, Object> entry = new HashMap<>();
-        entry.put("doc.hidden", "true");
-        entry.put("myProperty", asList("1", "0"));
-        this.entryStore.getParameters().put("className", "MyTest.MyClass");
-        LiveDataException liveDataException =
-            assertThrows(LiveDataException.class, () -> this.entryStore.save(entry));
-        assertEquals("Unsupported row naming strategy [null].", liveDataException.getMessage());
-    }
-
-    @Test
     void save() throws Exception
     {
         Map<String, Object> entry = new HashMap<>();
@@ -334,7 +431,8 @@ class LiveTableLiveDataEntryStoreTest
         Optional<Object> save = this.entryStore.save(entry);
 
         assertEquals(Optional.of("MyTest.MyObject"), save);
-        verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference, Map.of(), 0, false);
+        verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference, Map.of(), 0, false,
+            null);
     }
 
     @Test
@@ -359,7 +457,7 @@ class LiveTableLiveDataEntryStoreTest
         this.entryStore.save(entry);
 
         verify(this.modelBridge).updateAll(entry, objectDocumentReference, null,
-            Map.of("customProperty", customClassReference), 0, false);
+            Map.of("customProperty", customClassReference), 0, false, null);
     }
 
     @Test
@@ -393,6 +491,6 @@ class LiveTableLiveDataEntryStoreTest
         this.entryStore.save(entry);
 
         verify(this.modelBridge).updateAll(eq(entry), eq(objectDocumentReference), any(),
-            eq(Map.of("customHTMLProperty", customClassReference)), eq(0), eq(false));
+            eq(Map.of("customHTMLProperty", customClassReference)), eq(0), eq(false), isNull());
     }
 }

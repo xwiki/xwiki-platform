@@ -4,10 +4,13 @@
 
 ```ts
 
+import { Block } from '@xwiki/platform-uniast-api';
+import { InlineContent } from '@xwiki/platform-uniast-api';
+
 // @beta
 export interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
     infos: MacroInfos<Parameters>;
-    render(params: GetConcreteMacroParametersType<Parameters>, rawBody: string | null): MacroBlock[];
+    render(params: GetConcreteMacroParametersType<Parameters>, rawBody: string | null): Block[];
     renderAs: "block";
 }
 
@@ -30,7 +33,7 @@ export type GetConcreteMacroParameterType<T extends MacroParameterType> = (T["ty
 // @beta
 export interface InlineMacro<Parameters extends Record<string, MacroParameterType>> {
     infos: MacroInfos<Parameters>;
-    render(params: GetConcreteMacroParametersType<Parameters>, rawBody: string | null): MacroInlineContent[];
+    render(params: GetConcreteMacroParametersType<Parameters>, rawBody: string | null): InlineContent[];
     renderAs: "inline";
 }
 
@@ -38,68 +41,7 @@ export interface InlineMacro<Parameters extends Record<string, MacroParameterTyp
 export type Macro<Parameters extends Record<string, MacroParameterType>> = BlockMacro<Parameters> | InlineMacro<Parameters>;
 
 // @beta
-export type MacroAlignment = "left" | "center" | "right" | "justify";
-
-// @beta
-export type MacroBlock = {
-    type: "paragraph";
-    styles: MacroBlockStyles;
-    content: MacroInlineContent[];
-} | {
-    type: "heading";
-    level: 1 | 2 | 3 | 4 | 5 | 6;
-    content: MacroInlineContent[];
-    styles: MacroBlockStyles;
-} | {
-    type: "list";
-    numbered?: boolean;
-    items: MacroListItem[];
-    styles: MacroBlockStyles;
-} | {
-    type: "quote";
-    content: MacroBlock[];
-    styles: MacroBlockStyles;
-} | {
-    type: "code";
-    language?: string;
-    content: string;
-} | {
-    type: "table";
-    columns: MacroTableColumn[];
-    rows: MacroTableCell[][];
-    styles: MacroBlockStyles;
-} | ({
-    type: "image";
-} & MacroImage) | {
-    type: "macroBlock";
-    name: string;
-    params: Record<string, boolean | number | string>;
-} | {
-    type: "rawHtml";
-    html: string;
-} | {
-    type: "macroBlockEditableArea";
-    styles: MacroBlockStyles;
-};
-
-// @beta
-export type MacroBlockStyles = {
-    cssClasses?: string[];
-    textColor?: string;
-    backgroundColor?: string;
-    textAlignment?: MacroAlignment;
-};
-
-// @beta
 export type MacroClassWithUnknownParamsType = new (...args: any[]) => MacroWithUnknownParamsType;
-
-// @beta
-export type MacroImage = {
-    target: MacroLinkTarget;
-    alt?: string;
-    widthPx?: number;
-    heightPx?: number;
-};
 
 // @beta
 export interface MacroInfos<Parameters extends Record<string, MacroParameterType>> {
@@ -115,46 +57,6 @@ export interface MacroInfos<Parameters extends Record<string, MacroParameterType
 }
 
 // @beta
-export type MacroInlineContent = ({
-    type: "text";
-} & MacroText) | ({
-    type: "link";
-} & MacroLink) | {
-    type: "rawHtml";
-    html: string;
-} | {
-    type: "inlineMacro";
-    name: string;
-    params: Record<string, boolean | number | string>;
-} | {
-    type: "inlineMacroEditableArea";
-};
-
-// @beta
-export type MacroLink = {
-    target: MacroLinkTarget;
-    content: Exclude<MacroInlineContent, {
-        type: "link";
-    }>[];
-};
-
-// @beta
-export type MacroLinkTarget = {
-    type: "internal";
-    rawReference: string;
-} | {
-    type: "external";
-    url: string;
-};
-
-// @beta
-export type MacroListItem = {
-    checked?: boolean;
-    content: MacroInlineContent[];
-    styles: MacroBlockStyles;
-};
-
-// @beta
 export type MacroParameterType = ({
     type: "boolean";
 } | {
@@ -163,40 +65,6 @@ export type MacroParameterType = ({
     type: "string";
 }) & {
     optional?: true;
-};
-
-// @beta
-export type MacroTableCell = {
-    content: MacroInlineContent[];
-    styles: MacroBlockStyles;
-    rowSpan?: number;
-    colSpan?: number;
-};
-
-// @beta
-export type MacroTableColumn = {
-    headerCell?: {
-        content: MacroInlineContent[];
-        styles: MacroBlockStyles;
-    };
-    widthPx?: number;
-};
-
-// @beta
-export type MacroText = {
-    content: string;
-    styles: MacroTextStyles;
-};
-
-// @beta
-export type MacroTextStyles = {
-    bold?: boolean;
-    italic?: boolean;
-    strikethrough?: boolean;
-    underline?: boolean;
-    code?: boolean;
-    textColor?: string;
-    backgroundColor?: string;
 };
 
 // @beta

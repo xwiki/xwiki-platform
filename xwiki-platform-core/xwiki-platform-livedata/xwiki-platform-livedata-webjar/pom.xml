@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -118,35 +118,4 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
-            <id>copy-less-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>
-                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}
-              </outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${basedir}/src/main/node/src</directory>
-                  <includes>
-                    <include>variables.less</include>
-                    <include>reactive.less</include>
-                  </includes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

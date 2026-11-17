@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -572,19 +571,6 @@ public class Utils
             newValues[oldValues.length] = value;
         }
         map.put(name, newValues);
-    }
-
-    /**
-     * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
-     *
-     * @param value the text to escape, may be null
-     * @return a new escaped <code>String</code>, <code>null</code> if null input
-     * @deprecated use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
-     */
-    @Deprecated(since = "2.7")
-    public static String formEncode(String value)
-    {
-        return XMLUtils.escape(value);
     }
 
     public static String SQLFilter(String text)

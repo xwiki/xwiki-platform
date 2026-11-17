@@ -23,7 +23,7 @@ define('link-protection-translations', {
     'url.api.followLinkConfirmationText'
   ]
 });
-require(['jquery', 'xwiki-l10n!link-protection-translations', 'xwiki-events-bridge'], function ($, l10n) {
+require(['jquery', 'xwiki-l10n!link-protection-translations'], function ($, l10n) {
 
   function protectLinks () {
     let configuration = null;
@@ -98,5 +98,8 @@ require(['jquery', 'xwiki-l10n!link-protection-translations', 'xwiki-events-brid
     return false;
   }
 
-  (XWiki.domIsLoaded && protectLinks()) || document.observe('xwiki:dom:loaded', protectLinks);
+  // Unlike most initialization code, we don't need to listen to 'xwiki:dom:updated' because the click listener is
+  // delegated to the document, so it also covers the links injected later. Calling protectLinks again would register
+  // the click listener multiple times, asking the user for confirmation multiple times.
+  $(protectLinks);
 });

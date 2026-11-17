@@ -284,7 +284,7 @@ class XWikiAttachmentTest
     }
 
     @Test
-    void applyMimeType() throws Exception
+    void applyMimeType()
     {
         XWikiAttachment attachment = new XWikiAttachment();
         attachment.setMimeType("text/plain");

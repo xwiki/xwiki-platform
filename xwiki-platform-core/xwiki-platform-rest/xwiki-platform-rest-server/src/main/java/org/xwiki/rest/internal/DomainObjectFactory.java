@@ -36,9 +36,7 @@ import org.xwiki.rest.model.jaxb.JobLog;
 import org.xwiki.rest.model.jaxb.JobProgress;
 import org.xwiki.rest.model.jaxb.JobStatus;
 import org.xwiki.rest.model.jaxb.Link;
-import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
-import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Space;
@@ -52,11 +50,9 @@ import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
 import org.xwiki.rest.resources.pages.PageVersionResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * This class contains utility methods for building representations using model objects.
@@ -266,31 +262,6 @@ public final class DomainObjectFactory
         comment.getLinks().add(pageLink);
 
         return comment;
-    }
-
-    /**
-     * @deprecated use
-     *             {@link ModelFactory#toRestObjectSummary(ObjectFactory, URI, XWikiContext, Document, BaseObject, boolean, XWiki, Boolean)}
-     *             instead
-     */
-    @Deprecated(since = "7.3M1")
-    public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
-        Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames)
-        throws XWikiException
-    {
-        return getModelFactory().toRestObjectSummary(baseUri, doc, xwikiObject, useVersion, withPrettyNames);
-    }
-
-    /**
-     * @deprecated use
-     *             {@link ModelFactory#toRestObject(URI, XWikiContext, Document, BaseObject, boolean, XWiki, Boolean, Boolean)}
-     *             instead
-     */
-    @Deprecated(since = "7.3M1")
-    public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext, Document doc,
-        BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
-    {
-        return getModelFactory().toRestObject(baseUri, doc, xwikiObject, useVersion, withPrettyNames);
     }
 
     /**

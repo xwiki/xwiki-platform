@@ -105,18 +105,18 @@ class PageClassFieldIT
         pagePicker.click().waitForSuggestions();
 
         List<SuggestionElement> suggestions =
-            pagePicker.sendKeys(SPACE_NAME, " pag").waitForSuggestions().getSuggestions();
+            pagePicker.sendKeys(SPACE_NAME, " pag").getSuggestions();
         assertEquals(2, suggestions.size());
         assertEquals(SPACE_NAME + " Page 1", suggestions.get(0).getLabel());
         assertEquals(SPACE_NAME, suggestions.get(0).getHint());
         assertEquals(SPACE_NAME + " Page 2", suggestions.get(1).getLabel());
         assertEquals(SPACE_NAME, suggestions.get(1).getHint());
 
-        suggestions = pagePicker.sendKeys(" 1").waitForSuggestions().getSuggestions();
+        suggestions = pagePicker.sendKeys(" 1").getSuggestions();
         assertEquals(1, suggestions.size());
         assertEquals(SPACE_NAME + " Page 1", suggestions.get(0).getLabel());
 
-        suggestions = pagePicker.clear().sendKeys(SPACE_NAME).waitForSuggestions().getSuggestions();
+        suggestions = pagePicker.clear().sendKeys(SPACE_NAME).getSuggestions();
         assertEquals(3, suggestions.size());
         assertEquals(SPACE_NAME + " Page 1", suggestions.get(0).getLabel());
         assertEquals(SPACE_NAME, suggestions.get(0).getHint());

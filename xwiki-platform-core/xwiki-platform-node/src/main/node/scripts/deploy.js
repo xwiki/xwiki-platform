@@ -23,6 +23,8 @@
 import fs from 'fs';
 import {execSync} from 'child_process';
 import path from 'path';
+import {computeDistTag, needsPublishedVersions} from './lib/tags.js';
+import {readPublishedVersions} from './lib/registry.js';
 
 // Allow skipping the npm publication process. This is useful the case where the maven
 // release failed after the npm publication process passed successfully as we want to
@@ -31,10 +33,15 @@ if (process.env.SKIP_NPM_PUBLICATION === "true") {
   process.exit(0);
 }
 
+// Print the publication command instead of running it, to review what a release would do. The
+// registry is still read, so that the printed dist-tag is the one a real publication would use.
+const dryRun = process.env.DEPLOY_DRY_RUN === "true";
+
 /**
  * Script to conditionally publish npm packages based on version type (SNAPSHOT vs release)
  * Step 1: Updates all package.json files with the same timestamp
- * Step 2: Uses pnpm -r publish to publish all packages
+ * Step 2: Computes the dist-tag of the version, see computeDistTag()
+ * Step 3: Uses pnpm -r publish to publish all packages under that dist-tag
  * Usage: node publish-package.js <snapshot-registry> <release-registry> [base-directory]
  */
 
@@ -80,12 +87,14 @@ function findPackageJsonFiles(dir, fileList = []) {
  * @param {string} packageJsonPath - Path to package.json
  * @param {Object} packageJson - Parsed package.json content
  * @param {string} timestamp - Timestamp to replace SNAPSHOT with
- * @returns {Object} - {success, originalVersion, newVersion, packageName, isSnapshot}
+ * @returns {Object} - {success, originalVersion, newVersion, packageName, isSnapshot, isPrivate}
  */
 function updatePackageVersion(packageJsonPath, packageJson, timestamp) {
   const originalVersion = packageJson.version;
   const packageName = packageJson.name;
   const isSnapshot = originalVersion.includes('SNAPSHOT');
+  // A private package is never sent to a registry by "pnpm publish".
+  const isPrivate = packageJson.private === true;
 
   if (isSnapshot) {
     // Replace SNAPSHOT with timestamp
@@ -94,12 +103,12 @@ function updatePackageVersion(packageJsonPath, packageJson, timestamp) {
 
     try {
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-      return { success: true, originalVersion, newVersion, packageName, isSnapshot: true };
+      return { success: true, originalVersion, newVersion, packageName, isSnapshot: true, isPrivate };
     } catch (error) {
       return { success: false };
     }
   } else {
-    return { success: true, originalVersion, newVersion: originalVersion, packageName, isSnapshot: false };
+    return { success: true, originalVersion, newVersion: originalVersion, packageName, isSnapshot: false, isPrivate };
   }
 }
 
@@ -172,17 +181,43 @@ if (failedUpdates.length > 0) {
   process.exit(1);
 }
 
+// The packages "pnpm publish" sends to the registry.
+const publishedPackages = updates
+  .filter(({isPrivate, packageName}) => !isPrivate && packageName)
+  .map(({packageName, originalVersion}) => ({name: packageName, originalVersion}));
+
+const declaredVersions = [...new Set(publishedPackages.map(({originalVersion}) => originalVersion))];
+if (declaredVersions.length !== 1) {
+  console.error(`Expected a single version to publish but found: ${declaredVersions.join(', ')}`);
+  restoreVersions(updates);
+  process.exit(1);
+}
+// The dist-tag is computed from the version declared in the package.json files rather than from the
+// published one, because a SNAPSHOT version has already been replaced by a timestamp at this point.
+const declaredVersion = declaredVersions[0];
+
+let distTag;
 try {
-  if (isSnapshotMode) {
-    execSync(
-      `pnpm -r publish --registry ${snapshotRegistry} --tag snapshot --no-git-checks`,
-      { stdio: 'inherit', cwd: baseDirectory }
-    );
+  const existingVersions = needsPublishedVersions(declaredVersion)
+    ? await readPublishedVersions(publishedPackages.map(({name}) => name), {registry: releaseRegistry})
+    : [];
+  distTag = computeDistTag(declaredVersion, existingVersions);
+  console.log(`Publishing ${declaredVersion} under the "${distTag}" dist-tag`);
+} catch (error) {
+  console.error('Error while computing the dist-tag', error.message);
+  restoreVersions(updates);
+  process.exit(1);
+}
+
+try {
+  const registry = isSnapshotMode ? snapshotRegistry : releaseRegistry;
+  const access = isSnapshotMode ? '' : ' --access public';
+  const command = `pnpm -r publish --registry ${registry}${access} --tag ${distTag} --no-git-checks`;
+
+  if (dryRun) {
+    console.log(`[dry run] ${command}`);
   } else {
-    execSync(
-      `pnpm -r publish --registry ${releaseRegistry} --access public --no-git-checks`,
-      { stdio: 'inherit', cwd: baseDirectory }
-    );
+    execSync(command, { stdio: 'inherit', cwd: baseDirectory });
   }
 } catch (error) {
   console.error('Error during publication', error.message);
@@ -193,4 +228,3 @@ try {
     restoreVersions(updates);
   }
 }
-

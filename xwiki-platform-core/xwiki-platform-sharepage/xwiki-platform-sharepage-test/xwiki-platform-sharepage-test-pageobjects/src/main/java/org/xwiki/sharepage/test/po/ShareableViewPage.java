@@ -31,6 +31,8 @@ public class ShareableViewPage extends ViewPage
 {
     /**
      * Click the Share by Email submenu in the More Actions menu.
+     *
+     * @return the dialog used to share the page by email
      */
     public ShareDialog clickShareByEmail()
     {

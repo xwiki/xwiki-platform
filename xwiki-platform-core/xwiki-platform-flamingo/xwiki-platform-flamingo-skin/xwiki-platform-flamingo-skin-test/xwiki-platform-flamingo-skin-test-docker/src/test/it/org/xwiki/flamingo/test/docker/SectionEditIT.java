@@ -62,6 +62,8 @@ public class SectionEditIT
     @AfterEach
     public void after(TestUtils testUtils) throws Exception
     {
+        // Some tests log in as another user.
+        testUtils.loginAsSuperAdmin();
         for (DocumentReference createdPage : this.createdPages) {
             testUtils.rest().delete(createdPage);
         }
@@ -220,5 +222,31 @@ public class SectionEditIT
             // Restore language settings.
             setLanguageSettings(setup, false, "en", "en");
         }
+    }
+
+    /**
+     * Verify that a user whose default editor is the Text editor edits a section directly in the wiki editor, and
+     * that saving the modified section keeps the other sections.
+     */
+    @Test
+    @Order(4)
+    public void sectionEditWithTextEditorPreference(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String userName = "SectionEditTextEditorUser";
+        setup.createUser(userName, userName, null, "editor", "Text");
+        this.createdPages.add(new DocumentReference("xwiki", "XWiki", userName));
+        setup.rest().savePage(testReference,
+            "= Section1 =\nContent1\n\n= Section2 =\nContent2\n\n= Section3 =\nContent3", "Text editor sections");
+        this.createdPages.add(testReference);
+
+        setup.login(userName, userName);
+        ViewPage viewPage = setup.gotoPage(testReference);
+        WikiEditPage wikiEditPage = viewPage.editSectionInWikiEditor(2);
+        assertEquals("= Section2 =\n\nContent2", wikiEditPage.getContent());
+
+        wikiEditPage.setContent("= Section2 =\n\nModified content2");
+        viewPage = wikiEditPage.clickSaveAndView();
+        assertEquals("= Section1 =\n\nContent1\n\n= Section2 =\n\nModified content2\n\n= Section3 =\n\nContent3",
+            WikiEditPage.gotoPage(testReference).getContent());
     }
 }

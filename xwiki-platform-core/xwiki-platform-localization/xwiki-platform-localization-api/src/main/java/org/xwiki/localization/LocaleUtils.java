@@ -139,7 +139,11 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
      */
     public static boolean isValid(Locale locale)
     {
-        if (locale != null) {
+        // Locales with a script (e.g. "zh__#Hans") or extensions (e.g. "ja_JP_#u-ca-japanese") are not supported:
+        // their String representation is not one XWiki can store and parse back to the same locale, and they mostly
+        // duplicate a plain language/country locale. Commons Lang accepts their String representation since 3.21.0
+        // so it has to be checked explicitly.
+        if (locale != null && locale.getScript().isEmpty() && !locale.hasExtensions()) {
             try {
                 // Make sure we can parse the locale String representation
                 LocaleUtils.toLocale(locale.toString());

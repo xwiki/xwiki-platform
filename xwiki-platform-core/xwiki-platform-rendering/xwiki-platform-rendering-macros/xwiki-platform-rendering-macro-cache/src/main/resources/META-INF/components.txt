@@ -1,2 +1,3 @@
+org.xwiki.rendering.internal.macro.cache.CacheEntryKeyGenerator
 org.xwiki.rendering.internal.macro.cache.CacheMacro
 org.xwiki.rendering.internal.macro.cache.CacheMacroRequiredRightsAnalyzer

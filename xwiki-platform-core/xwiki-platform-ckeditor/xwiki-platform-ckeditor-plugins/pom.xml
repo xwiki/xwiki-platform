@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -87,7 +87,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>fuse.js</artifactId>
-      <version>7.4.1</version>
+      <version>7.5.0</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -99,6 +99,78 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Don't lint src/test/node: the JavaScript unit tests are linted with ESLint (see below), and their Node
+          dependencies must not be linted at all. -->
+        <groupId>org.xwiki.contrib</groupId>
+        <artifactId>jshint-maven-plugin</artifactId>
+        <configuration>
+          <directories>
+            <directory>src/main</directory>
+            <directory>src/test/javascript</directory>
+          </directories>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Run the JavaScript unit tests, located in src/test/node. The JavaScript code is not built with Node, so
+          contrary to the webjar-node packaging, only the tests and the linter are executed. -->
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <configuration>
+          <workingDirectory>${basedir}/src/test/node</workingDirectory>
+          <installDirectory>${basedir}/target</installDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-node-and-pnpm</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>install-node-and-pnpm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+              <pnpmVersion>${pnpm.version}</pnpmVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-install</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+              <environmentVariables>
+                <CI>true</CI>
+              </environmentVariables>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run test:unit</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-lint</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run lint</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
     <profile>
       <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)

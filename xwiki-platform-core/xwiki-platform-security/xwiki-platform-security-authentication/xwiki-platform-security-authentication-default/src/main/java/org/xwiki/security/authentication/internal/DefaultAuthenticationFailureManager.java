@@ -21,12 +21,10 @@ package org.xwiki.security.authentication.internal;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -95,15 +93,17 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     @Inject
     private Logger logger;
 
-    private String[] failureStrategyNames;
+    /**
+     * The failure strategies of each wiki, indexed by wiki id. Each wiki has its own configuration, and a snapshot is
+     * replaced as a whole, never modified, since this component is shared by all the requests of all the wikis.
+     */
+    private final Map<String, FailureStrategies> failureStrategies = new ConcurrentHashMap<>();
 
-    private List<AuthenticationFailureStrategy> failureStrategyList;
-
-    private Map<String, AuthFailureRecord> authFailures = new HashMap<>();
+    private final Map<String, AuthFailureRecord> authFailures = new ConcurrentHashMap<>();
 
     private Cache<Instant> sessionFailures;
 
-    private Map<DocumentReference, String> userAndAssociatedUsernames = new HashMap<>();
+    private final Map<DocumentReference, String> userAndAssociatedUsernames = new ConcurrentHashMap<>();
 
     /**
      * Default constructor.
@@ -131,27 +131,37 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         this.sessionFailures.dispose();
     }
 
-    private void buildStrategyList()
+    private List<AuthenticationFailureStrategy> buildStrategyList(List<String> failureStrategyNames)
     {
-        this.failureStrategyList = new LinkedList<>();
-        for (String failureStrategyName : this.failureStrategyNames) {
+        List<AuthenticationFailureStrategy> strategies = new ArrayList<>(failureStrategyNames.size());
+        for (String failureStrategyName : failureStrategyNames) {
             try {
-                this.failureStrategyList
+                strategies
                     .add(this.componentManager.getInstance(AuthenticationFailureStrategy.class, failureStrategyName));
             } catch (ComponentLookupException e) {
-                logger.error("Error while getting authentication failure strategy [{}].", failureStrategyName, e);
+                this.logger.error("Error while getting authentication failure strategy [{}].", failureStrategyName,
+                    e);
             }
         }
+
+        return List.copyOf(strategies);
     }
 
     private List<AuthenticationFailureStrategy> getFailureStrategyList()
     {
-        if (!Arrays.equals(configuration.getFailureStrategies(), this.failureStrategyNames)) {
-            this.failureStrategyNames = this.configuration.getFailureStrategies();
-            buildStrategyList();
+        List<String> names = List.of(this.configuration.getFailureStrategies());
+        XWikiContext context = this.contextProvider.get();
+        String wikiId = StringUtils.defaultString(context != null ? context.getWikiId() : null);
+
+        FailureStrategies strategies = this.failureStrategies.get(wikiId);
+        if (strategies == null || !strategies.names().equals(names)) {
+            // Concurrent requests may build the same strategies more than once, which is harmless: each request
+            // builds its own list and only publishes it once complete.
+            strategies = new FailureStrategies(names, buildStrategyList(names));
+            this.failureStrategies.put(wikiId, strategies);
         }
 
-        return this.failureStrategyList;
+        return strategies.strategies();
     }
 
     private boolean isAuthenticationSecurityEnabled()
@@ -196,21 +206,23 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         }
 
         // If the map already contains the login, we increment the counter of auth failures, else we create a record.
-        if (authFailures.containsKey(username)) {
-            authFailures.get(username).incrementAttemptOrReset();
+        AuthFailureRecord newRecord = new AuthFailureRecord();
+        AuthFailureRecord failureRecord = this.authFailures.putIfAbsent(username, newRecord);
+        if (failureRecord != null) {
+            failureRecord.incrementAttemptOrReset();
         } else {
-            authFailures.put(username, new AuthFailureRecord());
+            failureRecord = newRecord;
             DocumentReference userReference = findUser(username);
             if (userReference != null) {
-                userAndAssociatedUsernames.put(userReference, username);
+                this.userAndAssociatedUsernames.put(userReference, username);
             }
         }
 
         if (isSessionAlreadyFailing(request)) {
-            authFailures.get(username).setThresholdReached();
+            failureRecord.setThresholdReached();
         }
 
-        boolean isThresholdReached = authFailures.get(username).isThresholdReached();
+        boolean isThresholdReached = failureRecord.isThresholdReached();
 
         // The threshold is reached: we need to notify the strategies and the listeners.
         if (isThresholdReached) {
@@ -219,7 +231,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             }
             // We store the current session ID with the date when we won't consider the session as attacking
             // right now the default value is to consider it as an attacker for 1 day.
-            this.sessionFailures.set(request.getSession().getId(), new Date().toInstant().plus(1, ChronoUnit.DAYS));
+            this.sessionFailures.set(request.getSession().getId(), Instant.now().plus(1, ChronoUnit.DAYS));
             observationManager.notify(AUTHENTICATION_FAILURE_LIMIT_REACHED_EVENT, username);
         }
 
@@ -229,8 +241,9 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     @Override
     public void resetAuthenticationFailureCounter(DocumentReference user)
     {
-        if (this.userAndAssociatedUsernames.containsKey(user)) {
-            authFailures.remove(this.userAndAssociatedUsernames.get(user));
+        String username = this.userAndAssociatedUsernames.get(user);
+        if (username != null) {
+            this.authFailures.remove(username);
         }
     }
 
@@ -242,13 +255,14 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
     private boolean isThresholdReached(String username)
     {
-        return this.authFailures.containsKey(username) && this.authFailures.get(username).isThresholdReached();
+        AuthFailureRecord failureRecord = this.authFailures.get(username);
+        return failureRecord != null && failureRecord.isThresholdReached();
     }
 
     private boolean isSessionAlreadyFailing(HttpServletRequest request)
     {
         Instant limitDateOfAttackingSession = this.sessionFailures.get(request.getSession().getId());
-        return limitDateOfAttackingSession != null && new Date().toInstant().isBefore(limitDateOfAttackingSession);
+        return limitDateOfAttackingSession != null && Instant.now().isBefore(limitDateOfAttackingSession);
     }
 
     @Override
@@ -350,6 +364,16 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     }
 
     /**
+     * The failure strategies configured in a wiki.
+     *
+     * @param names the configured names of the strategies
+     * @param strategies the strategies matching the names that could be found
+     */
+    private record FailureStrategies(List<String> names, List<AuthenticationFailureStrategy> strategies)
+    {
+    }
+
+    /**
      * This class aims at storing the authentication failure record information about a login. It only stores the first
      * failing date and the number of failing attempts since then. Those two are reset if another failure happens
      * outside of the given time window. (See {@link AuthenticationConfiguration#getTimeWindow()})
@@ -362,21 +386,21 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
         AuthFailureRecord()
         {
-            this.firstFailingDate = new Date().getTime();
+            this.firstFailingDate = System.currentTimeMillis();
             this.nbAttempts = 1;
         }
 
-        void incrementAttemptOrReset()
+        synchronized void incrementAttemptOrReset()
         {
             // If the threshold is already reached, we have to wait until it's reset, so each new failure is the new
             // beginning of the time window.
             if (isThresholdReached()) {
-                this.firstFailingDate = new Date().getTime();
+                this.firstFailingDate = System.currentTimeMillis();
                 this.nbAttempts++;
 
                 // If the threshold not reached yet and we're out of the time window, we can reset the data.
-            } else if (firstFailingDate + getMaxTime() < new Date().getTime()) {
-                this.firstFailingDate = new Date().getTime();
+            } else if (firstFailingDate + getMaxTime() < System.currentTimeMillis()) {
+                this.firstFailingDate = System.currentTimeMillis();
                 this.nbAttempts = 1;
 
                 // Else the threshold not reached but we are in the time window: we increment the number of attempts.
@@ -385,12 +409,12 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             }
         }
 
-        void setThresholdReached()
+        synchronized void setThresholdReached()
         {
             this.nbAttempts = getMaxNbAttempts();
         }
 
-        boolean isThresholdReached()
+        synchronized boolean isThresholdReached()
         {
             return this.nbAttempts >= getMaxNbAttempts();
         }

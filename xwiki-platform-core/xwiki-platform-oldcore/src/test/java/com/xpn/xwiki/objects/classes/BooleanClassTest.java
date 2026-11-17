@@ -154,4 +154,91 @@ class BooleanClassTest
         metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Dunno", out.toString());
     }
+
+    /**
+     * Builds a Boolean property whose display values contain characters that need to be escaped in the generated
+     * HTML.
+     *
+     * @param object the object receiving the property instance, set to the "true" value
+     * @return the Boolean meta-property to display
+     */
+    private BooleanClass setUpDisplayValuesNeedingEscaping(BaseObject object)
+    {
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_0")).thenReturn("No <b>& {{macro}}");
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_1")).thenReturn("Yes '\"<em>");
+        when(this.contextualLocalizationManager.getTranslationPlain("yesno_2")).thenReturn("None <img/>");
+
+        DocumentReference classReference =
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Some", "Class");
+        when(this.entityReferenceSerializer.serialize(classReference)).thenReturn("Some.Class");
+
+        BooleanClass metaProperty = new BooleanClass();
+        BaseClass cls = new BaseClass();
+        cls.setDocumentReference(classReference);
+        metaProperty.setObject(cls);
+
+        IntegerProperty prop = new IntegerProperty();
+        prop.setValue(1);
+        object.safeput("prop", prop);
+
+        return metaProperty;
+    }
+
+    @Test
+    void displayViewEscapesDisplayValue()
+    {
+        BaseObject object = new BaseObject();
+        BooleanClass metaProperty = setUpDisplayValuesNeedingEscaping(object);
+
+        StringBuffer buffer = new StringBuffer();
+        metaProperty.displayView(buffer, "prop", "", object, this.oldcore.getXWikiContext());
+
+        assertEquals("Yes '\"&#60;em>", buffer.toString());
+    }
+
+    @Test
+    void displayRadioEditEscapesValues()
+    {
+        BaseObject object = new BaseObject();
+        BooleanClass metaProperty = setUpDisplayValuesNeedingEscaping(object);
+
+        // The prefix is built by XWikiDocument#display from the reference of the XClass document. Unlike the property
+        // name, which is restricted to valid XML element names, the name of that document isn't restricted.
+        StringBuffer buffer = new StringBuffer();
+        metaProperty.displayRadioEdit(buffer, "prop", "Some.My{{macro}}Class_0_", object,
+            this.oldcore.getXWikiContext());
+
+        String escapedPrefix = "Some.My&#123;&#123;macro}}Class_0_prop";
+        assertEquals("<div><label for='" + escapedPrefix + "_none'>"
+            + "<input id='" + escapedPrefix + "_none' value='' name='" + escapedPrefix + "' type='radio'/>"
+            + "None &#60;img/&#62;</label></div>"
+            + "<div><label for='" + escapedPrefix + "'>"
+            + "<input id='" + escapedPrefix + "' checked='checked' value='1' name='" + escapedPrefix
+            + "' type='radio'/>"
+            + "Yes &#39;&#34;&#60;em&#62;</label></div>"
+            + "<div><label for='" + escapedPrefix + "_false'>"
+            + "<input id='" + escapedPrefix + "_false' value='0' name='" + escapedPrefix + "' type='radio'/>"
+            + "No &#60;b&#62;&#38; &#123;&#123;macro}}</label></div>", buffer.toString());
+    }
+
+    @Test
+    void displaySelectEditEscapesValues()
+    {
+        BaseObject object = new BaseObject();
+        BooleanClass metaProperty = setUpDisplayValuesNeedingEscaping(object);
+
+        StringBuffer buffer = new StringBuffer();
+        metaProperty.displaySelectEdit(buffer, "prop", "Some.My{{macro}}Class_0_", object,
+            this.oldcore.getXWikiContext());
+
+        String escapedPrefix = "Some.My&#123;&#123;macro}}Class_0_prop";
+        assertEquals("<select size='1' id='" + escapedPrefix
+            + "' aria-label='core.model.xclass.editClassProperty.textAlternative' name='" + escapedPrefix + "'>"
+            + "<option value='' label='---'>---</option>"
+            + "<option selected='selected' value='1' label='Yes &#39;&#34;&#60;em&#62;'>"
+            + "Yes &#39;&#34;&#60;em&#62;</option>"
+            + "<option value='0' label='No &#60;b&#62;&#38; &#123;&#123;macro}}'>"
+            + "No &#60;b&#62;&#38; &#123;&#123;macro}}</option>"
+            + "</select>", buffer.toString());
+    }
 }

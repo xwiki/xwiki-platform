@@ -1,0 +1,75 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+import { translations } from "../translations";
+import { PlainTextLinkTargetField } from "@xwiki/platform-link-modal-ui";
+import { completeURL } from "@xwiki/platform-link-type-default";
+import { defineComponent, h } from "vue";
+import { useI18n } from "vue-i18n";
+import type {
+  LinkContext,
+  PlainTextLinkTargetConfig,
+} from "@xwiki/platform-link-type-api";
+import type { Container } from "inversify";
+import type { PropType } from "vue";
+
+/**
+ * The target field of the URL link target type: the plain text target field of the link modal, as a URL field.
+ */
+const URLLinkTargetField = defineComponent({
+  props: {
+    // Declared although unused, so that it doesn't fall through as an attribute of the location field.
+    depsContainer: { type: Object as PropType<Container>, required: true },
+    modelValue: {
+      type: Object as PropType<PlainTextLinkTargetConfig>,
+      required: true,
+    },
+    autofocus: Boolean,
+    // Declared although unused, like the container.
+    linkContext: Object as PropType<LinkContext>,
+  },
+  emits: ["update:modelValue"],
+  setup(props, { emit }) {
+    const { t } = useI18n({ messages: translations });
+    return () =>
+      h(PlainTextLinkTargetField, {
+        modelValue: props.modelValue,
+        "onUpdate:modelValue": (config: PlainTextLinkTargetConfig) =>
+          emit("update:modelValue", config),
+        autofocus: props.autofocus,
+        fieldLabel: t("link-type.target-types.url.url"),
+        // The attributes and listeners below fall through to the location field.
+        placeholder: t("link-type.target-types.url.url.placeholder"),
+        "data-test": "linkUrl",
+        // A text field rather than a URL one, which would only accept absolute URLs, i.e. with their scheme, while the
+        // URL can be completed (e.g. "www.example.org") or relative (e.g. "/xwiki/bin/view/Main/"). The input mode
+        // still offers a keyboard suited to URLs.
+        inputmode: "url",
+        // Show the completed URL once the user leaves the field, so that they see what is inserted.
+        onChange: () => {
+          const location = completeURL(props.modelValue.location);
+          if (location !== props.modelValue.location) {
+            emit("update:modelValue", { ...props.modelValue, location });
+          }
+        },
+      });
+  },
+});
+
+export { URLLinkTargetField };

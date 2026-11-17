@@ -97,4 +97,13 @@ export default {
 .layout-table .column-filters th.entry-selector {
   width: 0;
 }
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .layout-table .column-filters th {
+    /* Overwrite the filters width so they don't overflow the table. */
+    width: 100%;
+    border-top: none;
+  }
+}
 </style>

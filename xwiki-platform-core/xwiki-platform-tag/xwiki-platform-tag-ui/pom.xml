@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tag</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tag-ui</artifactId>
   <name>XWiki Platform - Tag - UI</name>
@@ -34,6 +34,10 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tag Application</xwiki.extension.name>
+    <!-- Indicate to the XWiki Extension Manager that this extension contributes a Macro component -->
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/tagcloud
+    </xwiki.extension.components>
   </properties>
   <dependencies>
     <dependency>

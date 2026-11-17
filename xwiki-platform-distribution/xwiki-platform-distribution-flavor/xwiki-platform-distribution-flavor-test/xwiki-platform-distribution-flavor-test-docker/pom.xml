@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-docker</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Docker</name>
@@ -54,6 +54,15 @@
       xwiki-platform-component-script, and the Clover JAR when the clover profile is active).
   -->
   <dependencies>
+    <!-- The Extension Security UI isn't part of the standard flavor. It's installed so that ExtensionSecurityScanIT can
+         scan the extensions of the standard flavor for security issues. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-security-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -64,6 +73,36 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model-validation-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tour-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-security-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-application-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

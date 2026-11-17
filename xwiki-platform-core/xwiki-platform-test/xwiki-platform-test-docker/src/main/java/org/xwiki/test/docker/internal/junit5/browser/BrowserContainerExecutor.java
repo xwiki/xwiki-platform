@@ -45,16 +45,6 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContain
  */
 public class BrowserContainerExecutor extends AbstractContainerExecutor
 {
-    /**
-     * Width resolution to be used by the browser container.
-     */
-    private static final String DEFAULT_WIDTH_RESOLUTION = "1280";
-
-    /**
-     * Height resolution to be used by the browser container.
-     */
-    private static final String DEFAULT_HEIGHT_RESOLUTION = "960";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserContainerExecutor.class);
 
     private TestConfiguration testConfiguration;
@@ -87,8 +77,9 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             // for the larger use case and also we use a relatively large resolution to display the maximum number of
             // elements on screen and reduce the risk of false positives in tests that could be due to elements not
             // visible or missing elements (on small screens we don't display all elements).
-            .withEnv("SCREEN_WIDTH", DEFAULT_WIDTH_RESOLUTION)
-            .withEnv("SCREEN_HEIGHT", DEFAULT_HEIGHT_RESOLUTION)
+            // A test that needs more room, e.g. to avoid scrolling, can ask for a larger screen.
+            .withEnv("SCREEN_WIDTH", String.valueOf(this.testConfiguration.getScreenWidth()))
+            .withEnv("SCREEN_HEIGHT", String.valueOf(this.testConfiguration.getScreenHeight()))
             // TODO: The default session timeout is 300 seconds (i.e. 5mn). We think this is what could cause the
             // "Unable to find session with ID" error message we see sometimes on the CI. We think that it's possible
             // that a session timeout of 300s means that the whole test suite of a docker test module must take less

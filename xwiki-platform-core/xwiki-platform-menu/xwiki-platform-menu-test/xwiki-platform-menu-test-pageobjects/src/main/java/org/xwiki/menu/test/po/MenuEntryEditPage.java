@@ -38,12 +38,18 @@ public class MenuEntryEditPage extends EntryEditPage
     @FindBy(id = "XWiki.UIExtensionClass_0_scope")
     private WebElement scopeSelectElement;
 
+    /**
+     * @param value the label of the menu location (extension point) to select
+     */
     public void setLocation(String value)
     {
         Select select = new Select(this.extensionPointIdSelectElement);
         select.selectByVisibleText(value);
     }
 
+    /**
+     * @param value the label of the menu visibility (scope) to select
+     */
     public void setVisibility(String value)
     {
         Select select = new Select(this.scopeSelectElement);

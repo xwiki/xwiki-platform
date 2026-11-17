@@ -57,9 +57,12 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -98,6 +101,16 @@ class R180100000XWIKI23827DataMigrationTest
         when(executionContext.getProperty("xwikicontext")).thenReturn(this.context);
         this.wiki = mock(XWiki.class);
         when(this.context.getWiki()).thenReturn(this.wiki);
+    }
+
+    @Test
+    void shouldExecute()
+    {
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(171013000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171014000)));
+        assertFalse(this.dataMigration.shouldExecute(new XWikiDBVersion(171015000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180000000)));
+        assertTrue(this.dataMigration.shouldExecute(new XWikiDBVersion(180002000)));
     }
 
     @Test
@@ -166,9 +179,9 @@ class R180100000XWIKI23827DataMigrationTest
             3
         );
 
-        String objectIdsQuery = "select obj.id "
-            + "from BaseObject as obj "
-            + "where obj.className = :className "
+        String objectIdsQuery = "select distinct obj.id "
+            + "from BaseObject as obj, StringProperty as prop "
+            + "where obj.className = :className and prop.id.id = obj.id and prop.id.name in (:propNames) "
             + "order by obj.id";
         Query classObjectIdQuery = mock(Query.class);
         OngoingStubbing<Query> queryOngoingStubbing =
@@ -188,7 +201,14 @@ class R180100000XWIKI23827DataMigrationTest
             when(xclass.getFieldList()).thenReturn(propertyLists.get(i));
 
             Query boundClassObjectIdQuery = mock(Query.class);
-            when(classObjectIdQuery.bindValue("className", className)).thenReturn(boundClassObjectIdQuery);
+            Query classNameBoundQuery = mock(Query.class);
+            when(classObjectIdQuery.bindValue("className", className)).thenReturn(classNameBoundQuery);
+            List<String> passwordPropertyNames = propertyLists.get(i).stream()
+                .filter(PasswordClass.class::isInstance)
+                .map(field -> ((PasswordClass) field).getName())
+                .toList();
+            when(classNameBoundQuery.bindValue("propNames", passwordPropertyNames))
+                .thenReturn(boundClassObjectIdQuery);
             List<Long> objectIdQueryResult = new ArrayList<>();
             for (int j = 0; j < resultsNumbers.get(i); j++) {
                 objectIdQueryResult.add(Long.valueOf(j));

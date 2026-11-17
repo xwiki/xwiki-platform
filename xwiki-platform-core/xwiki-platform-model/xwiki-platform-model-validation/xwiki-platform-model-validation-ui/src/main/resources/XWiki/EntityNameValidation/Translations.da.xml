@@ -1,0 +1,82 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.6" reference="XWiki.EntityNameValidation.Translations" locale="da">
+  <web>XWiki.EntityNameValidation</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.EntityNameValidation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>entitynamevalidation.currentStrategy.label=Aktuel navnestrategi
+entitynamevalidation.currentStrategy.hint=Navnestrategien bruges, når sider oprettes, omdøbes eller gemmes.
+entitynamevalidation.useTransformation.label=Omdan navne automatisk
+entitynamevalidation.useTransformation.hint=Når det er slået til, bruges navnestrategien til automatisk at tilpasse navnet, hvor det er muligt.
+entitynamevalidation.useValidation.label=Valider navne, før de gemmes
+entitynamevalidation.useValidation.hint=Når det er slået til, validerer navnestrategien navnet, før det gemmes. Brug funktionen med forsigtighed, da den kan forhindre, at nogle eksisterende sider kan gemmes.
+entitynamevalidation.slug.configuration=Konfiguration af kebab-case-strategien
+entitynamevalidation.replacementCharacter.configuration=Konfiguration af strategien med erstatningstegn
+entitynamevalidation.testStrategy.label=Test den valgte strategi
+entitynamevalidation.testStrategy.hint=Gør det muligt at kontrollere, hvordan den valgte navnestrategi opfører sig
+entitynamevalidation.testStrategy.placeholder=Skriv navnet på en side her for at teste det
+entitynamevalidation.testStrategy.validName=Er navnet gyldigt med den valgte strategi?
+entitynamevalidation.testStrategy.transformedName=Navnet efter omdannelse med den valgte strategi:
+entitynamevalidation.slug.lowercase.label=Konvertering til små bogstaver
+entitynamevalidation.slug.lowercase.hint=Når det er slået til, konverteres sidenavne til små bogstaver.
+entitynamevalidation.slug.dotsBetweenDigits.label=Tillad punktummer
+entitynamevalidation.slug.dotsBetweenDigits.hint=Når det er slået til, kan punktummer bruges mellem cifre (fx i versionsnumre)
+entitynamevalidation.slug.forbiddenWords.label=Forbudte ord
+entitynamevalidation.slug.forbiddenWords.hint=Kommasepareret liste over ord, der er forbudt i sidenavne. Brug kun alfanumeriske værdier.
+entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=Forbudte tegn
+entitynamevalidation.replacementCharacter.livetable.replacementCharacter=Erstatningstegn
+entitynamevalidation.replacementCharacter.livetable._actions=Handlinger
+entitynamevalidation.replacementCharacter.add=Tilføj nyt tegn
+entitynamevalidation.replacementCharacter.addNewCharacter=Tilføj et nyt tegn, der skal forbydes eller erstattes
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.label=Nyt forbudt tegn
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.hint=Tegnet bliver forbudt i sidenavne
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.placeholder=Skriv det nye forbudte tegn her
+entitynamevalidation.replacementCharacter.newReplacementCharacter.label=Nyt erstatningstegn
+entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=Tegnet erstatter det forbudte tegn i sidenavne. Hvis feltet er tomt, fjernes det forbudte tegn fra sidenavne.
+entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=Skriv det nye erstatningstegn her, eller lad feltet stå tomt
+entitynamevalidation.replacementCharacter.create.inProgress=Tilføjer det nye forbudte tegn...
+entitynamevalidation.replacementCharacter.create.done=Det nye forbudte tegn er tilføjet.
+entitynamevalidation.replacementCharacter.create.failed=Det nye forbudte tegn kunne ikke tilføjes.
+entitynamevalidation.replacementCharacter.removeCharacter=Sletning af et forbudt tegn
+entitynamevalidation.replacementCharacter.removeCharacter.warning=Er du sikker på, at du vil slette dette forbudte tegn?
+entitynamevalidation.replacementCharacter.removeCharacter.remove=Slet
+entitynamevalidation.replacementCharacter.remove.inProgress=Sletter det forbudte tegn...
+entitynamevalidation.replacementCharacter.remove.done=Det forbudte tegn er slettet.
+entitynamevalidation.replacementCharacter.remove.failed=Det forbudte tegn kunne ikke slettes.
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Intet
+entitynamevalidation.admin.heading=Navnestrategier
+admin.namestrategies=Navnestrategier
+</content>
+</xwikidoc>

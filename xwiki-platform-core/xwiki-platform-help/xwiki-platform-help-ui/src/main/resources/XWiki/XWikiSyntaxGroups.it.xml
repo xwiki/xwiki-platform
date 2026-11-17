@@ -49,7 +49,7 @@ Si possono usare i Gruppi per inserire direttamete un altro documento nel docume
 |((({{{
 |=Titolo 1|=Titolo 2|=Titolo 3
 |Cella Uno|(((
-= Documento incluso =
+== Documento incluso ==
 
 Alcuni paragrafi inclusi.
 
@@ -63,7 +63,7 @@ Paragrafo successivo nel documento di livello superiore
 }}})))|(((
 |=Titolo 1|=Titolo 2|=Titolo 3
 |Cella Uno|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Documento incluso&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Documento incluso&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Alcuni paragrafi inclusi.
 

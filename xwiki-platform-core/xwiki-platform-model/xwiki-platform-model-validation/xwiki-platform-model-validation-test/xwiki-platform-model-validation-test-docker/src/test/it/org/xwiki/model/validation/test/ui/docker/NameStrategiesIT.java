@@ -19,11 +19,25 @@
  */
 package org.xwiki.model.validation.test.ui.docker;
 
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.validation.test.po.NameStrategiesAdministrationSectionPage;
+import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CreatePagePage;
+import org.xwiki.test.ui.po.DocumentPicker;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.EditPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate the "test selected strategy" field of the Name Strategies administration section: entering a name there must
@@ -36,10 +50,26 @@ import org.xwiki.test.ui.TestUtils;
 @UITest
 class NameStrategiesIT
 {
+    private static final String SLUG_STRATEGY = "SlugEntityNameValidation";
+
+    private static final List<String> CONFIGURATION_SPACES = List.of("XWiki", "EntityNameValidation");
+
+    private static final String CONFIGURATION_CLASS = "XWiki.EntityNameValidation.ConfigurationClass";
+
     @BeforeAll
     void beforeAll(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+    }
+
+    @AfterEach
+    void afterEach(TestUtils setup)
+    {
+        // The name strategy configuration applies to every page created afterwards on the shared XWiki instance:
+        // restore the default options (the Kebab-case ones are disabled or empty, the names are transformed but not
+        // validated).
+        setup.updateObject(CONFIGURATION_SPACES, "Configuration", CONFIGURATION_CLASS, 0, "useTransformation", "1",
+            "useValidation", "0", "slug.lowercase", "0", "slug.dotsBetweenDigits", "0", "slug.forbiddenWords", "");
     }
 
     /**
@@ -49,6 +79,7 @@ class NameStrategiesIT
      * {@code SlugEntityNameValidationTest}.
      */
     @Test
+    @Order(1)
     void testSelectedStrategy()
     {
         NameStrategiesAdministrationSectionPage section = NameStrategiesAdministrationSectionPage.gotoPage();
@@ -66,5 +97,51 @@ class NameStrategiesIT
 
         // A name with accents and special characters: it is reported as invalid and transformed into a valid slug.
         section.assertTestResult("test âccents/and.special%characters", false, "test-accents-and-special-characters");
+    }
+
+    /**
+     * Configure the Kebab-case strategy with all its options (conversion to lowercase, dots allowed between digits and
+     * a forbidden word) and the automatic transformation, then create a page whose title contains accents, spaces,
+     * special characters, dots and the forbidden word: the page name must be transformed according to these options
+     * while the title is kept as typed.
+     */
+    @Test
+    @Order(2)
+    void kebabCaseStrategy(TestUtils setup, TestReference reference) throws Exception
+    {
+        SpaceReference spaceReference = reference.getLastSpaceReference();
+        setup.deleteSpace(spaceReference);
+
+        NameStrategiesAdministrationSectionPage section = NameStrategiesAdministrationSectionPage.gotoPage();
+        section.selectStrategy(SLUG_STRATEGY);
+        section.setTransformNameAutomatically(true);
+        section.setValidateNames(false);
+        section.setSlugConvertToLowercase(true);
+        section.setSlugAllowDots(true);
+        section.setSlugForbiddenWords("Forbidden");
+        section.save();
+
+        // The accents are removed, the dot between the digits 8 and 9 is kept, the other dots, the spaces and the
+        // special characters are replaced by a single dash, the name is lowercased and the forbidden word is removed
+        // (whatever its case).
+        String title = "T\\é£\"  s.t8.9e.Forbidden d";
+        String expectedName = "t-e-s-t8.9e-d";
+
+        // Open the create form from a page of the test space so that the location fields are editable and default to
+        // that space.
+        CreatePagePage createPage =
+            setup.createPage(new DocumentReference("WebHome", spaceReference), "", "Parent").createPage();
+        DocumentPicker picker = createPage.getDocumentPicker();
+        // Reveal the advanced location fields to check the page name derived from the title.
+        picker.toggleLocationAdvancedEdit();
+        picker.setTitle(title);
+        picker.waitForName(expectedName);
+        createPage.setTerminalPage(true);
+        createPage.clickCreate();
+
+        ViewPage savedPage = new EditPage().clickSaveAndView();
+        assertEquals(expectedName, savedPage.getMetaDataValue("page"));
+        assertEquals(title, savedPage.getDocumentTitle());
+        assertTrue(setup.rest().exists(new DocumentReference(expectedName, spaceReference)));
     }
 }

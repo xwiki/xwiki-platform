@@ -72,6 +72,8 @@ public class PageTypePicker extends XWikiSelectWidget
      * @return the value of the option currently selected by default in the picker: a template provider's local
      *         reference when a recommended template is pre-selected based on the current location, or {@code blank}
      *         when the blank page option is selected by default; {@code null} if no option is selected
+     * @since 17.10.14
+     * @since 18.4.7
      * @since 18.7.0RC1
      */
     public String getSelectedTemplate()

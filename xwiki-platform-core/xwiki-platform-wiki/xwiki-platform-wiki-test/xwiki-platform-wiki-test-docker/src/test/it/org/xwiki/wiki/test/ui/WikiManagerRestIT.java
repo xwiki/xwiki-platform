@@ -21,8 +21,8 @@ package org.xwiki.wiki.test.ui;
 
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.syntax.Syntax;
@@ -64,15 +64,15 @@ class WikiManagerRestIT
         wiki.setId(WIKI_ID);
         wiki.setName("test");
         wiki.setName("Some description");
-        PostMethod postMethod = setup.rest().executePost(WikiManagerREST.class, wiki);
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, postMethod.getStatusCode());
+        CloseableHttpResponse response = setup.rest().executePost(WikiManagerREST.class, wiki);
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getCode());
 
         // Need admin right to create a wiki
         setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
-        postMethod = setup.rest().executePost(WikiManagerREST.class, wiki);
-        assertEquals(HttpStatus.SC_CREATED, postMethod.getStatusCode());
+        response = setup.rest().executePost(WikiManagerREST.class, wiki);
+        assertEquals(HttpStatus.SC_CREATED, response.getCode());
 
-        try (InputStream stream = postMethod.getResponseBodyAsStream()) {
+        try (InputStream stream = response.getEntity().getContent()) {
             wiki = setup.rest().toResource(stream);
         }
         assertEquals(WIKI_ID, wiki.getId());

@@ -293,7 +293,7 @@ var PreviousUIForm = Class.create({
       },
       onFailure: function() {
         this.form.enable();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
+        XWiki.widgets.Notification.show("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
       }.bind(this)
     });
   },
@@ -328,7 +328,9 @@ var PreviousUIForm = Class.create({
       // Remove the previous UI extension display.
       this.form.next().remove();
       // Display the default UI extension.
-      for (var next = this.form.next(); next; next = next.show().next()) {};
+      for (var next = this.form.next(); next; next = next.show().next()) {
+        // Intentionally empty: the loop body is the show() call in the update expression above.
+      }
       // Refresh the display of the recommended UI extension so that we get the upgrade button.
       var recommendedUIExtension = this.recommendedUI.down('.extension-item');
       recommendedUIExtension?._extensionBehaviour.refresh({hideExtensionDetails: true});

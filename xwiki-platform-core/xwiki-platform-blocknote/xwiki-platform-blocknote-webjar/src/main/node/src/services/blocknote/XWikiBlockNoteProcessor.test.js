@@ -264,41 +264,142 @@ describe("XWikiBlockNoteProcessor", () => {
       ];
     }
 
-    it("stringifies the call and output of a block macro on load", () => {
+    // A block macro whose content holds a nested macro call, with its own output (the content is editable in-place).
+    function blockMacroWithNestedMacro() {
+      return {
+        id: "m2",
+        type: "xwikiMacroBlock",
+        props: {
+          call: {
+            name: "info",
+            parameters: {},
+            content: [
+              {
+                type: "xwikiMacroBlock",
+                props: {
+                  call: { name: "velocity", parameters: {}, content: "$x" },
+                  output: [{ type: "paragraph", content: "secret" }],
+                },
+              },
+            ],
+          },
+          output: [{ type: "xwikiEditable" }],
+        },
+        children: [],
+      };
+    }
+
+    it("moves the output of a block macro to the document metadata on load", () => {
       const macro = blockMacro();
       const document = processor.load(JSON.stringify([macro]));
       const loaded = document.content[0];
       expect(loaded.props.call).toBe(JSON.stringify(macro.props.call));
-      expect(loaded.props.output).toBe(JSON.stringify(macro.props.output));
+      expect(loaded.props).not.toHaveProperty("output");
+      expect(document.getMacroOutput("m1", loaded.props.call)).toEqual(
+        macro.props.output,
+      );
+      // The output corresponds to a specific macro call.
+      expect(document.getMacroOutput("m1", "{}")).toBeUndefined();
     });
 
-    it("stringifies the call and output of an inline macro on load", () => {
+    it("binds the output of a block macro without id to a generated block id", () => {
+      const macro = blockMacro();
+      delete macro.id;
+      const document = processor.load(JSON.stringify([macro]));
+      const loaded = document.content[0];
+      expect(loaded.id).toBeTruthy();
+      expect(document.getMacroOutput(loaded.id, loaded.props.call)).toEqual(
+        macro.props.output,
+      );
+    });
+
+    it("moves the output of an inline macro to the document metadata on load", () => {
       const doc = documentWithInlineMacro();
       const inlineMacro = doc[0].content[1];
       const document = processor.load(JSON.stringify(doc));
       const loaded = document.content[0].content[1];
       expect(loaded.props.call).toBe(JSON.stringify(inlineMacro.props.call));
-      expect(loaded.props.output).toBe(
-        JSON.stringify(inlineMacro.props.output),
-      );
+      expect(loaded.props).not.toHaveProperty("output");
+      expect(
+        document.getMacroOutput(loaded.props.id, loaded.props.call),
+      ).toEqual(inlineMacro.props.output);
     });
 
-    it("restores the call and output objects of a block macro on save round-trip", () => {
+    it("moves the output of a macro nested in the macro content to the document metadata on load", () => {
+      const macro = blockMacroWithNestedMacro();
+      const document = processor.load(JSON.stringify([macro]));
+      // The macro output must not be part of the edited content (it can be shared with other users).
+      expect(JSON.stringify(document.content)).not.toContain("secret");
+      const call = JSON.parse(document.content[0].props.call);
+      const nestedMacro = call.content[0];
+      expect(nestedMacro.props).not.toHaveProperty("output");
+      expect(
+        document.getMacroOutput(
+          nestedMacro.props.id,
+          JSON.stringify(nestedMacro.props.call),
+        ),
+      ).toEqual([{ type: "paragraph", content: "secret" }]);
+    });
+
+    it("restores the call object of a block macro on save round-trip, without the output", () => {
       const macro = blockMacro();
       const document = processor.load(JSON.stringify([macro]));
       const saved = JSON.parse(processor.save(document));
-      expect(saved[0].props.call).toEqual(macro.props.call);
-      expect(saved[0].props.output).toEqual(macro.props.output);
+      expect(saved[0].props).toEqual({ call: macro.props.call });
     });
 
-    it("restores the call and output objects of an inline macro on save round-trip", () => {
+    it("restores the call object of an inline macro on save round-trip, without the output and the id", () => {
       const doc = documentWithInlineMacro();
       const inlineMacro = doc[0].content[1];
       const document = processor.load(JSON.stringify(doc));
       const saved = JSON.parse(processor.save(document));
-      const savedMacro = saved[0].content[1];
-      expect(savedMacro.props.call).toEqual(inlineMacro.props.call);
-      expect(savedMacro.props.output).toEqual(inlineMacro.props.output);
+      expect(saved[0].content[1].props).toEqual({
+        call: inlineMacro.props.call,
+      });
+    });
+
+    it("removes the id of the macros nested in the macro content on save", () => {
+      const macro = blockMacroWithNestedMacro();
+      const document = processor.load(JSON.stringify([macro]));
+      const saved = JSON.parse(processor.save(document));
+      expect(saved[0].props.call.content[0].props).toEqual({
+        call: { name: "velocity", parameters: {}, content: "$x" },
+      });
+    });
+  });
+
+  describe("code block", () => {
+    function codeBlock(props) {
+      return {
+        id: "c1",
+        type: "codeBlock",
+        props,
+        content: [{ type: "text", text: "test", styles: {} }],
+        children: [],
+      };
+    }
+
+    it("backs up the verbatim and new line flags on load and restores them on save", () => {
+      const props = {
+        language: "java",
+        xwikiLeadingNewLine: false,
+        xwikiTrailingNewLine: false,
+        xwikiVerbatim: true,
+      };
+      const document = processor.load(JSON.stringify([codeBlock(props)]));
+      // The BlockNote code block schema doesn't support these props.
+      expect(document.content[0].props).toEqual({ language: "java" });
+
+      const saved = JSON.parse(processor.save(document));
+      expect(saved[0].props).toEqual(props);
+    });
+
+    it("doesn't add the verbatim and new line flags on save when they are missing", () => {
+      const document = processor.load(
+        JSON.stringify([codeBlock({ language: "text" })]),
+      );
+      const saved = JSON.parse(processor.save(document));
+      expect(saved[0].props).toEqual({});
     });
   });
 });

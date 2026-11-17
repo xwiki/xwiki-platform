@@ -66,30 +66,34 @@ if (!XWiki.widgets.ModalPopup) {
 /**
  * "Jump to page" behavior. Allows the users to jump to any other page by pressing a shortcut, entering a page name, and
  * pressing enter. It also enables a Suggest behavior on the document name selector, for easier selection.
+ *
+ * Note that this class can be extended using Prototype.js' Class.create(XWiki.widgets.JumpToPage, {...}), which is why
+ * the initialization code is in the initialize method (Prototype.js calls only the initialize method when creating an
+ * instance of a subclass).
  */
-widgets.JumpToPage = Class.create(widgets.ModalPopup, {
-  /** The template of the XWiki URL. (deprecated) */
-  urlTemplate : new XWiki.Document('__document__', '__space__').getURL('__action__'),
+class JumpToPage extends widgets.ModalPopup {
   /** Constructor. Registers the key listener that pops up the dialog. */
-  initialize : function($super) {
+  initialize() {
     // Build the modal popup's content
-    var content = new Element("div");
-    this.input = new Element("input", {
-      "type" : "text",
-      "id" : "jmp_target",
-      "title" : l10n.inputTooltip
+    const content = document.createElement("div");
+    this.input = document.createElement("input");
+    Object.assign(this.input, {
+      type: "text",
+      id: "jmp_target",
+      title: l10n.inputTooltip,
+      placeholder: l10n.inputTooltip
     });
-    this.input.placeholder = this.input.title;
     content.appendChild(this.input);
     this.viewButton = this.createButton("button", l10n.viewLabel, l10n.viewTooltip, "jmp_view");
     this.editButton = this.createButton("button", l10n.editLabel, l10n.editTooltip, "jmp_edit", "secondary");
-    var buttonContainer = new Element("div", {"class" : "buttons"});
+    const buttonContainer = document.createElement("div");
+    buttonContainer.className = "buttons";
     buttonContainer.appendChild(this.viewButton);
     buttonContainer.appendChild(this.editButton);
     content.appendChild(buttonContainer);
 
     // Initialize the popup
-    $super(
+    super.initialize(
       content,
       {
         "show" : {
@@ -116,23 +120,23 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     // Allow the default close event ('Escape' key) to propagate so that the page picker can catch it and clear the list
     // of suggestions.
     this.shortcuts['close'].options = { 'propagate' : true };
-  },
+  }
+
   /**
    * Callback called when the UI was fully retrieved and inserted. Adds listeners to the buttons, enables the suggest,
    * and forwards the call to the {@link #showDialog} method.
    */
-  createDialog : function($super, event) {
+  createDialog(event) {
     // Register the event listeners executed when clicking on the action buttons.
-    Event.observe(this.viewButton, 'click', this.openDocument.bindAsEventListener(this, "view"));
-    Event.observe(this.editButton, 'click', this.openDocument.bindAsEventListener(this, "edit"));
-    $super(event);
+    this.viewButton.addEventListener('click', event => this.openDocument(event, "view"));
+    this.editButton.addEventListener('click', event => this.openDocument(event, "edit"));
+    super.createDialog(event);
     // Add a CSS class to the container in order to better control the styles for the Jump to Page modal.
-    this.input.up('.xdialog-modal-container').addClassName('jump-dialog-container');
+    this.input.closest('.xdialog-modal-container').classList.add('jump-dialog-container');
     // Initialize the page picker.
-    var self = this;
-    require(['jquery', 'xwiki-suggestPages'], function($) {
-      var enableActionButtons = function(enable) {
-        var actionButtons = $(self.viewButton).add(self.editButton).find('input');
+    require(['jquery', 'xwiki-suggestPages'], $ => {
+      const enableActionButtons = enable => {
+        const actionButtons = $(this.viewButton).add(this.editButton).find('input');
         if (enable === false) {
           // Disable the action buttons right away.
           actionButtons.prop('disabled', true);
@@ -144,28 +148,29 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
           }, 0);
         }
       };
-      var updateActionButtons = function(event) {
-        enableActionButtons($(self.input).val() !== '');
+      const updateActionButtons = () => {
+        enableActionButtons($(this.input).val() !== '');
       };
-      $(self.input).on('change', updateActionButtons).suggestPages({maxItems: 1});
+      $(this.input).on('change', updateActionButtons).suggestPages({maxItems: 1});
       // Disable the action buttons while the dropdown list of suggestions is open in order to prevent the form from
       // being submitted when a page is selected using the Enter key. We have to do this hack because the page picker
       // doesn't stop the propagation of the Enter key event when the dropdown is opened, as it does with the Esc key.
-      self.input.selectize.on('dropdown_open', enableActionButtons.bind(null, false));
+      this.input.selectize.on('dropdown_open', enableActionButtons.bind(null, false));
       // Update the state of the action buttons after the dropdown is closed (either because a page was selected or
       // because the user pressed the Esc key). The state depends on whether the picker has a selected value.
-      self.input.selectize.on('dropdown_close', updateActionButtons);
+      this.input.selectize.on('dropdown_close', updateActionButtons);
       // We have to focus the page picker here because #showDialog() is not called when the dialog is displayed for the
       // first time as you would expect...
-      self.input.selectize.focus();
+      this.input.selectize.focus();
       // Synchronize the action buttons state with the text input state.
       updateActionButtons();
     });
-  },
+  }
+
   /** Called when the dialog is displayed. Enables the key listeners and gives focus to the (cleared) input. */
-  showDialog : function($super) {
+  showDialog() {
     // Display the dialog
-    $super();
+    super.showDialog();
     // Check if the page picker is available.
     if (this.input.selectize) {
       // Clear the previously selected page and focus the page picker.
@@ -177,31 +182,44 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       // Focus the input field
       this.input.focus();
     }
-  },
+  }
+
   /**
    * Open the selected document in the specified mode.
    *
    * @param {Event} event The event that triggered this action. Either a keyboard shortcut or a button click.
    * @param {String} mode The mode that the document should be opened in. One of "view" or "edit".
    */
-  openDocument : function(event, mode) {
+  openDocument(event, mode) {
     // Don't do anything if the corresponding action button is disabled (usually when no value is selected).
-    if (!this[(mode || 'view') + 'Button'].down('input').disabled) {
-      Event.stop(event);
-      var reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT,
+    if (!this[(mode || 'view') + 'Button'].querySelector('input').disabled) {
+      event?.preventDefault();
+      event?.stopPropagation();
+      const reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT,
         XWiki.currentDocument.documentReference);
       window.location = new XWiki.Document(reference).getURL(mode);
     }
   }
-});
+}
+
+/** The template of the XWiki URL. (deprecated) */
+JumpToPage.prototype.urlTemplate = new XWiki.Document('__document__', '__space__').getURL('__action__');
+
+/** Required by Prototype.js' Class.create(), which registers each new subclass on its parent class. */
+JumpToPage.subclasses = [];
+
+widgets.JumpToPage = JumpToPage;
 
 function init() {
   return new widgets.JumpToPage();
 }
 
 // When the document is loaded, enable the keyboard listener that triggers the dialog.
-(XWiki.domIsLoaded && init())
-|| document.observe("xwiki:dom:loaded", init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 } // if the parent widget is defined
 

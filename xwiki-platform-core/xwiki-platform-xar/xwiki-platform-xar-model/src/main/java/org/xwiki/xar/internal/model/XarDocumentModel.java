@@ -79,7 +79,11 @@ public class XarDocumentModel
 
     /**
      * The current version.
-     * 
+     * <p>
+     * When adding a new version, also raise {@code HIGHEST_KNOWN_FORMAT_VERSION} in
+     * {@code org.xwiki.tool.xar.internal.XWikiDocument} (xwiki-commons XAR Maven plugin), and backport it along with
+     * this change: {@code xar:verify} fails pages declaring a version higher than it.
+     *
      * @since 9.0RC1
      */
     public static final String VERSION_CURRENT = VERSION_17;

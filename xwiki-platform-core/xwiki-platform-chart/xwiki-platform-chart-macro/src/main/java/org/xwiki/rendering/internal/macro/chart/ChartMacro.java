@@ -30,11 +30,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -89,6 +91,12 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     private ChartImageWriter imageWriter;
 
     /**
+     * Used to get the current document, which holds the data of charts that don't specify another document.
+     */
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public ChartMacro()
@@ -109,9 +117,9 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
         throws MacroExecutionException
     {
         // Generate the chart image in a temporary location.
-        generateChart(macroParams, content, context);
+        ImageId imageId = generateChart(macroParams, content, context);
 
-        String imageLocation = this.imageWriter.getURL(new ImageId(macroParams));
+        String imageLocation = this.imageWriter.getURL(imageId);
         String title = macroParams.getTitle();
         ResourceReference reference = new ResourceReference(imageLocation, ResourceType.URL);
         ImageBlock imageBlock = new ImageBlock(new ResourceReference(imageLocation, ResourceType.URL), true);
@@ -136,9 +144,10 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      * @param parameters the macro parameters
      * @param content the macro content
      * @param context the macro transformation context, used for example to find out the current document reference
+     * @return the id of the generated chart image
      * @throws MacroExecutionException if an error occurs while generating / saving the chart image
      */
-    private void generateChart(ChartMacroParameters parameters, String content, MacroTransformationContext context)
+    private ImageId generateChart(ChartMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         String source = computeSource(parameters.getSource(), content);
@@ -155,9 +164,18 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 
         dataSource.buildDataset(content, sourceParameters, context);
 
+        // The image reveals the charted data, so it must be owned by the document holding that data.
+        DocumentReference dataDocumentReference = dataSource.getDocumentReference();
+        if (dataDocumentReference == null) {
+            dataDocumentReference = this.documentAccessBridge.getCurrentDocumentReference();
+        }
+        if (dataDocumentReference == null) {
+            throw new MacroExecutionException("Failed to determine the document holding the chart data");
+        }
+
         try {
-            this.imageWriter.writeImage(new ImageId(parameters),
-                this.chartGenerator.generate(dataSource.getChartModel(), sourceParameters));
+            return this.imageWriter.writeImage(
+                this.chartGenerator.generate(dataSource.getChartModel(), sourceParameters), dataDocumentReference);
         } catch (ChartGeneratorException e) {
             throw new MacroExecutionException("Error while rendering chart", e);
         }

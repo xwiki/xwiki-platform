@@ -42,7 +42,11 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.model.reference.PageAttachmentReferenceResolver;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
@@ -66,6 +70,9 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -90,7 +97,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -197,6 +206,16 @@ class DefaultOfficeResourceViewerTest
 
     @MockComponent
     private URLSecurityManager urlSecurityManager;
+
+    @MockComponent
+    private ContextualAuthorizationManager contextualAuthorization;
+
+    @MockComponent
+    @Named("current")
+    private PageAttachmentReferenceResolver<String> pageAttachmentReferenceResolver;
+
+    @MockComponent
+    private AttachmentReferenceResolver<EntityReference> attachmentConverter;
 
     @XWikiTempDir
     private File tempDir;
@@ -566,5 +585,48 @@ class DefaultOfficeResourceViewerTest
         when(expectedXDOM.getBlocks(any(), any())).thenReturn(Collections.emptyList());
         XDOM xdom = this.officeResourceViewer.createView(resourceReference, parameters);
         assertSame(expectedXDOM, xdom);
+    }
+
+    /**
+     * No view is built when the current user has no view right on the attachment, and neither the cache nor the
+     * attachment is accessed in that case.
+     */
+    @Test
+    void viewOfficeAttachmentWithoutViewRight() throws Exception
+    {
+        AccessDeniedException expectedException = new AccessDeniedException(Right.VIEW, null, ATTACHMENT_REFERENCE);
+        doThrow(expectedException).when(this.contextualAuthorization).checkAccess(Right.VIEW, ATTACHMENT_REFERENCE);
+
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+            () -> this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS));
+
+        assertSame(expectedException, exception);
+        verify(this.attachmentCache, never()).get(any());
+        verify(this.documentAccessBridge, never()).getAttachmentContent(any());
+    }
+
+    /**
+     * Same as {@link #viewOfficeAttachmentWithoutViewRight()} but going through the page attachment reference type.
+     */
+    @Test
+    void viewPageAttachmentWithoutViewRight() throws Exception
+    {
+        PageAttachmentReference pageAttachmentReference =
+            new PageAttachmentReference(ATTACHEMENT_NAME, new PageReference("xwiki", "Main", "Test"));
+        ResourceReference resourceReference =
+            new ResourceReference(STRING_ATTACHMENT_REFERENCE, ResourceType.PAGE_ATTACHMENT);
+        when(this.pageAttachmentReferenceResolver.resolve(STRING_ATTACHMENT_REFERENCE))
+            .thenReturn(pageAttachmentReference);
+        when(this.attachmentConverter.resolve(pageAttachmentReference)).thenReturn(ATTACHMENT_REFERENCE);
+
+        AccessDeniedException expectedException = new AccessDeniedException(Right.VIEW, null, ATTACHMENT_REFERENCE);
+        doThrow(expectedException).when(this.contextualAuthorization).checkAccess(Right.VIEW, ATTACHMENT_REFERENCE);
+
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+            () -> this.officeResourceViewer.createView(resourceReference, DEFAULT_VIEW_PARAMETERS));
+
+        assertSame(expectedException, exception);
+        verify(this.attachmentCache, never()).get(any());
+        verify(this.documentAccessBridge, never()).getAttachmentContent(any());
     }
 }

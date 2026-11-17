@@ -113,7 +113,7 @@ public class XWikiTrunkNode extends TrunkNode
             } catch (DecoderException e) {
                 // Probably the archive was created before introducing this encoding (1.2M1/M2).
                 result = super.getAuthor();
-                if (!result.matches("^(\\w|\\d|\\.)++$")) {
+                if (!result.matches("^[\\w.]++$")) {
                     // It's safer to use an empty author than to use an invalid value.
                     result = "";
                 }

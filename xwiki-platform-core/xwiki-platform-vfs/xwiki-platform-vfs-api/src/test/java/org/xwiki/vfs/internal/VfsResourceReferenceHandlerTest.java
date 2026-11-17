@@ -174,6 +174,9 @@ class VfsResourceReferenceHandlerTest
         this.handler.handle(this.reference, mock(ResourceReferenceHandlerChain.class));
 
         assertEquals("success!", this.baos.toString());
+
+        verify(this.response).setContentType("text/plain");
+        verify(this.response).setHeader("X-Content-Type-Options", "nosniff");
     }
 
     @Test

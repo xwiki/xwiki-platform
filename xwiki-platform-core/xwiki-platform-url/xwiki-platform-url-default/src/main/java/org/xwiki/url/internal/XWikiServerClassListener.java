@@ -19,22 +19,16 @@
  */
 package org.xwiki.url.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.url.URLSecurityManager;
 
-import com.xpn.xwiki.internal.event.XObjectAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Listener for changes on XWikiServerClass xobjects to ensure the {@link URLSecurityManager} cache is invalidated
@@ -54,14 +48,7 @@ public class XWikiServerClassListener extends AbstractEventListener
      */
     public static final String NAME = "org.xwiki.url.internal.XWikiServerClassListener";
 
-    private static final LocalDocumentReference XWIKISERVER_CLASS =
-        new LocalDocumentReference("XWiki", "XWikiServerClass");
-
-    private static final List<Event> EVENTS = Arrays.asList(
-        new XObjectAddedEvent(XWIKISERVER_CLASS),
-        new XObjectDeletedEvent(XWIKISERVER_CLASS),
-        new XObjectUpdatedEvent(XWIKISERVER_CLASS)
-    );
+    private static final String XWIKISERVER_CLASS = "XWiki.XWikiServerClass";
 
     @Inject
     private URLSecurityManager securityManager;
@@ -71,7 +58,7 @@ public class XWikiServerClassListener extends AbstractEventListener
      */
     public XWikiServerClassListener()
     {
-        super(NAME, EVENTS);
+        super(NAME, BaseObjectReference.anyEvents(XWIKISERVER_CLASS));
     }
 
     @Override

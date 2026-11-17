@@ -339,6 +339,16 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
   /* Bootstrap Switch draws the focus glow with a hardcoded light blue that doesn't follow the color theme and no
     longer matches the border color set above. */
   box-shadow: 0 0 8px var(--brand-primary);
+}
+
+/* Bootstrap Switch fades the indeterminate state to half opacity, like the disabled and read-only states, which makes
+  the ON / OFF texts fall under the WCAG 1.4.3 contrast requirement and suggests that the switch can't be used. An
+  indeterminate switch is still enabled and already stands out by showing its handle halfway between ON and OFF, so
+  keep it fully opaque. */
+.bootstrap-switch.bootstrap-switch-indeterminate .bootstrap-switch-handle-on,
+.bootstrap-switch.bootstrap-switch-indeterminate .bootstrap-switch-handle-off,
+.bootstrap-switch.bootstrap-switch-indeterminate .bootstrap-switch-label {
+  opacity: 1;
 }</code>
     </property>
     <property>

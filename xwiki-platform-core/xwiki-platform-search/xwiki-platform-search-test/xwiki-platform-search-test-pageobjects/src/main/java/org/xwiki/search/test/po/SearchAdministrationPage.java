@@ -52,6 +52,14 @@ public class SearchAdministrationPage extends AdministrationSectionPage
     private WebElement queueSizeField;
 
     /**
+     * Default constructor.
+     */
+    public SearchAdministrationPage()
+    {
+        super(SECTION_ID, true);
+    }
+
+    /**
      * Open the search administration section.
      *
      * @return the search administration section
@@ -60,14 +68,6 @@ public class SearchAdministrationPage extends AdministrationSectionPage
     {
         AdministrationSectionPage.gotoPage(SECTION_ID);
         return new SearchAdministrationPage();
-    }
-
-    /**
-     * Default constructor.
-     */
-    public SearchAdministrationPage()
-    {
-        super(SECTION_ID, true);
     }
 
     /**

@@ -63,6 +63,22 @@ public class BaseModal extends BaseElement
         return this.container.isDisplayed();
     }
 
+    /**
+     * Waits until the modal is displayed. This is useful when the modal is shown asynchronously, for example after a
+     * request to the server, as in this case the modal isn't displayed immediately after the action that triggers it.
+     *
+     * @return this modal
+     * @since 16.10.19
+     * @since 17.10.14
+     * @since 18.4.6
+     * @since 18.8.0RC1
+     */
+    public BaseModal waitUntilDisplayed()
+    {
+        getDriver().waitUntilCondition(driver -> isDisplayed());
+        return this;
+    }
+
     public void close()
     {
         this.container.findElement(By.cssSelector(".modal-header .close")).click();

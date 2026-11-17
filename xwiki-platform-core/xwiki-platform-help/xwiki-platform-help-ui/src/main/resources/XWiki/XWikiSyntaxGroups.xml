@@ -129,7 +129,7 @@ Groups can be used to insert another document inline directly into the current d
 |((({{{
 |=Header 1|=Header 2|=Header 3
 |Cell One|(((
-= Embedded document =
+== Embedded document ==
 
 Some embedded paragraph.
 
@@ -143,7 +143,7 @@ Next paragraph in the top-level document
 }}})))|(((
 |=Header 1|=Header 2|=Header 3
 |Cell One|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Some embedded paragraph.
 

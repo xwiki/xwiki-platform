@@ -328,21 +328,6 @@ public class XWikiAttachment implements Cloneable
      * @param context current XWikiContext
      * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
-     * @since 2.3M2
-     * @deprecated use {@link #getContentLongSize(XWikiContext)} instead
-     */
-    @Deprecated(since = "9.0RC1")
-    public int getContentSize(XWikiContext context) throws XWikiException
-    {
-        long longSize = getContentLongSize(context);
-
-        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
-    }
-
-    /**
-     * @param context current XWikiContext
-     * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
-     * @throws XWikiException
      * @since 9.0RC1
      */
     public long getContentLongSize(XWikiContext context) throws XWikiException

@@ -56,6 +56,7 @@ import org.xwiki.test.ui.po.diff.EntityDiff;
 import org.xwiki.test.ui.po.diff.RawChanges;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ClassPropertyEditPane;
+import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -87,6 +88,8 @@ class VersionIT
 
     private static final String CONTENT2 = "Second version of Content";
 
+    private static final String CONTENT3 = "Third version of Content";
+
     @BeforeEach
     void beforeEach(TestUtils testUtils)
     {
@@ -106,10 +109,6 @@ class VersionIT
         WikiEditPage wikiEditPage = vp.editWiki();
         wikiEditPage.setContent(CONTENT2);
         wikiEditPage.clickSaveAndView();
-
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
 
         // Verify that we can rollback to the first version
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
@@ -148,10 +147,6 @@ class VersionIT
         WikiEditPage wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent(CONTENT2);
         wikiEditPage.clickSaveAndView();
-
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
 
         // Verify and delete the latest version.
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
@@ -292,19 +287,11 @@ class VersionIT
 
         assertEquals(CONTENT2, vp.getContent());
 
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
-
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
         vp = historyTab.viewVersion("1.1");
 
         // In the preview the Velocity macro should be forbidden.
         assertThat(vp.getContent(), startsWith("Failed to execute the [velocity] macro."));
-
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
 
         historyTab = vp.openHistoryDocExtraPane();
         vp = historyTab.rollbackToVersion("1.1");
@@ -337,9 +324,6 @@ class VersionIT
 
         // View the page
         ViewPage vp = setup.gotoPage(testReference);
-        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
-        // view mode) is fixed.
-        vp.waitForDocExtraPaneActive("Comments");
 
         // Verify and delete the latest version.
         HistoryPane historyTab = vp.openHistoryDocExtraPane();
@@ -462,62 +446,65 @@ class VersionIT
         String latestVersionBeforeChanges = historyPane.getCurrentVersion();
         int numberOfVersions = historyPane.getNumberOfVersions();
 
-        // We just create a new major version in the history
-        setup.gotoPage(xwikiPreferences, "edit", "editor=wiki");
-        WikiEditPage wikiEditPage = new WikiEditPage();
-        wikiEditPage.clickSaveAndView();
-
-        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
-        historyPane = new HistoryPane();
-        // Version where we start our changes
-        String startChangesVersion = historyPane.getCurrentVersion();
-
-        String currentMajor = startChangesVersion.split("\\.")[0];
-
-        setup.setGlobalRights("", deleteVersionTestUser, "programming", true);
-        currentMajor = String.valueOf(Integer.parseInt(currentMajor) + 1);
-
-        // We don't use setRights twice as it would create another object and we want to edit the existing one.
-        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
-        ObjectEditPage objectEditPage = new ObjectEditPage();
-        List<ObjectEditPane> rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
-        ObjectEditPane rightObject = rightObjects.get(rightObjects.size() - 1);
-        rightObject.displayObject();
-        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
-        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
-        assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
-
-        rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
-        // We want a minor version.
-        objectEditPage.clickSaveAndContinue();
-
-        // We don't use the Cancel button to leave the edit mode because it takes us to the "view" mode which, depending
-        // on whether the XWiki.XWikiPreferences page has an XWiki.XWikiPreferences object or not, can be redirected to
-        // the "admin" mode (by the XWiki preferences sheet), which locks back the XWiki.XWikiPreferences page. We want
-        // to switch the user next, which doesn't remove the lock (see XWIKI-22430: Logging out does not unlock pages
-        // that were being edited), so we leave the edit mode by going to a page that doesn't add the edit lock back.
-        setup.gotoPage(xwikiPreferences.getLastSpaceReference());
-
-        setup.login(deleteVersionTestUser, deleteVersionTestUser);
-
-        // first check that the right is properly denied in the objects
-        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
-        objectEditPage = new ObjectEditPage();
-        rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
-        rightObject = rightObjects.get(rightObjects.size() - 1);
-        rightObject.displayObject();
-        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
-        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
-        assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
-
-        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
-        historyPane = new HistoryPane();
-        historyPane = historyPane.showMinorEdits();
-        assertEquals(numberOfVersions + 3, historyPane.getNumberOfVersions());
-        assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
-        assertTrue(historyPane.hasVersion(currentMajor + ".1"));
-
         try {
+            // We just create a new major version in the history
+            setup.gotoPage(xwikiPreferences, "edit", "editor=wiki");
+            WikiEditPage wikiEditPage = new WikiEditPage();
+            wikiEditPage.clickSaveAndView();
+
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            // Version where we start our changes
+            String startChangesVersion = historyPane.getCurrentVersion();
+
+            String currentMajor = startChangesVersion.split("\\.")[0];
+
+            setup.setGlobalRights("", deleteVersionTestUser, "programming", true);
+            currentMajor = String.valueOf(Integer.parseInt(currentMajor) + 1);
+
+            // We don't use setRights twice as it would create another object and we want to edit the existing one.
+            setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+            ObjectEditPage objectEditPage = new ObjectEditPage();
+            List<ObjectEditPane> rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+            ObjectEditPane rightObject = rightObjects.get(rightObjects.size() - 1);
+            rightObject.displayObject();
+            assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+            assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+            assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+            rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
+            // We want a minor version.
+            objectEditPage.clickSaveAndContinue();
+
+            // We don't use the Cancel button to leave the edit mode because it takes us to the "view" mode which,
+            // depending on whether the XWiki.XWikiPreferences page has an XWiki.XWikiPreferences object or not, can be
+            // redirected to the "admin" mode (by the XWiki preferences sheet), which locks back the
+            // XWiki.XWikiPreferences page. We want to switch the user next, which doesn't remove the lock (see
+            // XWIKI-22430: Logging out does not unlock pages that were being edited), so we leave the edit mode by
+            // going to a page that doesn't add the edit lock back.
+            setup.gotoPage(xwikiPreferences.getLastSpaceReference());
+
+            setup.login(deleteVersionTestUser, deleteVersionTestUser);
+
+            // first check that the right is properly denied in the objects
+            setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+            // The user is warned that editing XWiki.XWikiPreferences requires the programming right, which is denied.
+            new ForceEditLockPage().clickForceEdit();
+            objectEditPage = new ObjectEditPage();
+            rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+            rightObject = rightObjects.get(rightObjects.size() - 1);
+            rightObject.displayObject();
+            assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+            assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+            assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            historyPane = historyPane.showMinorEdits();
+            assertEquals(numberOfVersions + 3, historyPane.getNumberOfVersions());
+            assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
+            assertTrue(historyPane.hasVersion(currentMajor + ".1"));
+
             historyPane = historyPane.deleteVersion(historyPane.getCurrentVersion());
             historyPane = historyPane.showMinorEdits();
             assertEquals(numberOfVersions + 2, historyPane.getNumberOfVersions());
@@ -537,6 +524,7 @@ class VersionIT
             // "admin" mode which locks back the page. Instead, we go to a page that doesn't add the edit lock back.
             setup.gotoPage(xwikiPreferences.getLastSpaceReference());
         } finally {
+            releaseLock(setup, xwikiPreferences);
             // Put back the page in the state it was before our changes
             setup.loginAsSuperAdmin();
             setup.gotoPage(xwikiPreferences, "view", "viewer=history");
@@ -544,6 +532,19 @@ class VersionIT
             historyPane = historyPane.showMinorEdits();
             historyPane.rollbackToVersion(latestVersionBeforeChanges);
         }
+    }
+
+    /**
+     * Releases the edit lock that the current user may hold on the given page. Opening the editor locks the page even
+     * when only the edit confirmation is displayed, and a lock left behind by a failing test makes the following tests
+     * fail on a page "currently locked by" this user.
+     */
+    private void releaseLock(TestUtils setup, DocumentReference reference)
+    {
+        // The cancel action removes the lock held by the current user. Redirect to a page that doesn't lock the page
+        // back, unlike the "admin" mode to which the XWiki preferences sheet redirects the "view" mode.
+        setup.gotoPage(reference, "cancel",
+            Map.of("xredirect", setup.getURL(reference.getLastSpaceReference(), "view", "")));
     }
 
     /**
@@ -573,62 +574,65 @@ class VersionIT
         String latestVersionBeforeChanges = historyPane.getCurrentVersion();
         int numberOfVersions = historyPane.getNumberOfVersions();
 
-        // We just create a new major version in the history
-        setup.gotoPage(xwikiPreferences, "edit", "editor=wiki");
-        WikiEditPage wikiEditPage = new WikiEditPage();
-        wikiEditPage.clickSaveAndView();
-
-        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
-        historyPane = new HistoryPane();
-        // Version where we start our changes
-        String startChangesVersion = historyPane.getCurrentVersion();
-
-        String currentMajor = startChangesVersion.split("\\.")[0];
-
-        setup.setGlobalRights("", deleteVersionTestUser, "programming", true);
-        currentMajor = String.valueOf(Integer.parseInt(currentMajor) + 1);
-
-        // We don't use setRights twice as it would create another object and we want to edit the existing one.
-        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
-        ObjectEditPage objectEditPage = new ObjectEditPage();
-        List<ObjectEditPane> rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
-        ObjectEditPane rightObject = rightObjects.get(rightObjects.size() - 1);
-        rightObject.displayObject();
-        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
-        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
-        assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
-
-        rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
-        // We want a minor version.
-        objectEditPage.clickSaveAndContinue();
-
-        // We don't use the Cancel button to leave the edit mode because it takes us to the "view" mode which, depending
-        // on whether the XWiki.XWikiPreferences page has an XWiki.XWikiPreferences object or not, can be redirected to
-        // the "admin" mode (by the XWiki preferences sheet), which locks back the XWiki.XWikiPreferences page. We want
-        // to switch the user next, which doesn't remove the lock (see XWIKI-22430: Logging out does not unlock pages
-        // that were being edited), so we leave the edit mode by going to a page that doesn't add the edit lock back.
-        setup.gotoPage(xwikiPreferences.getLastSpaceReference());
-
-        setup.login(deleteVersionTestUser, deleteVersionTestUser);
-
-        // first check that the right is properly denied in the objects
-        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
-        objectEditPage = new ObjectEditPage();
-        rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
-        rightObject = rightObjects.get(rightObjects.size() - 1);
-        rightObject.displayObject();
-        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
-        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
-        assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
-
-        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
-        historyPane = new HistoryPane();
-        historyPane = historyPane.showMinorEdits();
-        assertEquals(numberOfVersions + 3, historyPane.getNumberOfVersions());
-        assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
-        assertTrue(historyPane.hasVersion(currentMajor + ".1"));
-
         try {
+            // We just create a new major version in the history
+            setup.gotoPage(xwikiPreferences, "edit", "editor=wiki");
+            WikiEditPage wikiEditPage = new WikiEditPage();
+            wikiEditPage.clickSaveAndView();
+
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            // Version where we start our changes
+            String startChangesVersion = historyPane.getCurrentVersion();
+
+            String currentMajor = startChangesVersion.split("\\.")[0];
+
+            setup.setGlobalRights("", deleteVersionTestUser, "programming", true);
+            currentMajor = String.valueOf(Integer.parseInt(currentMajor) + 1);
+
+            // We don't use setRights twice as it would create another object and we want to edit the existing one.
+            setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+            ObjectEditPage objectEditPage = new ObjectEditPage();
+            List<ObjectEditPane> rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+            ObjectEditPane rightObject = rightObjects.get(rightObjects.size() - 1);
+            rightObject.displayObject();
+            assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+            assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+            assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+            rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
+            // We want a minor version.
+            objectEditPage.clickSaveAndContinue();
+
+            // We don't use the Cancel button to leave the edit mode because it takes us to the "view" mode which,
+            // depending on whether the XWiki.XWikiPreferences page has an XWiki.XWikiPreferences object or not, can be
+            // redirected to the "admin" mode (by the XWiki preferences sheet), which locks back the
+            // XWiki.XWikiPreferences page. We want to switch the user next, which doesn't remove the lock (see
+            // XWIKI-22430: Logging out does not unlock pages that were being edited), so we leave the edit mode by
+            // going to a page that doesn't add the edit lock back.
+            setup.gotoPage(xwikiPreferences.getLastSpaceReference());
+
+            setup.login(deleteVersionTestUser, deleteVersionTestUser);
+
+            // first check that the right is properly denied in the objects
+            setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+            // The user is warned that editing XWiki.XWikiPreferences requires the programming right, which is denied.
+            new ForceEditLockPage().clickForceEdit();
+            objectEditPage = new ObjectEditPage();
+            rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+            rightObject = rightObjects.get(rightObjects.size() - 1);
+            rightObject.displayObject();
+            assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+            assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+            assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            historyPane = historyPane.showMinorEdits();
+            assertEquals(numberOfVersions + 3, historyPane.getNumberOfVersions());
+            assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
+            assertTrue(historyPane.hasVersion(currentMajor + ".1"));
+
             historyPane.deleteVersion(historyPane.getCurrentVersion());
 
             setup.gotoPage(xwikiPreferences, "view", "viewer=history");
@@ -675,6 +679,7 @@ class VersionIT
             // "admin" mode which locks back the page. Instead, we go to a page that doesn't add the edit lock back.
             setup.gotoPage(xwikiPreferences.getLastSpaceReference());
         } finally {
+            releaseLock(setup, xwikiPreferences);
             // Put back the page in the state it was before our changes
             setup.loginAsSuperAdmin();
             setup.gotoPage(xwikiPreferences, "view", "viewer=history");
@@ -1426,5 +1431,58 @@ class VersionIT
         // We shouldn't have any occurrence of the password field
         assertFalse(xmlViewerContent.contains("<mypass>foobar</mypass>"),
             "Current source is: " + xmlViewerContent);
+    }
+
+    /**
+     * Verify that resetting the history of a document drops all its versions but one, holding the current content of
+     * the document, and that resetting an already reset history works too.
+     */
+    @Test
+    @Order(13)
+    void resetVersions(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.rest().delete(testReference);
+
+        // Create a page with 3 versions.
+        setup.rest().savePage(testReference, CONTENT1, TITLE);
+        setup.rest().savePage(testReference, CONTENT2, TITLE);
+        setup.rest().savePage(testReference, CONTENT3, TITLE);
+
+        HistoryPane historyTab = openHistoryTab(setup, testReference);
+        assertEquals(3, historyTab.getNumberOfVersions());
+        assertEquals("3.1", historyTab.getCurrentVersion());
+
+        // Put the wiki in the state it is in whenever the page being reset is not one that was just edited: no longer
+        // in the document cache. The reset then has to load the document and its history itself, in the very
+        // transaction that resets them, and that is the case it fails in. This is the common case on a real wiki,
+        // since the cache holds a limited number of documents and the history hangs off the cached document through a
+        // soft reference that the JVM drops as soon as memory gets tight. A page that was just created, on the other
+        // hand, is still cached with a history loaded by an earlier transaction, and resetting it takes another path
+        // which works even when this one is broken.
+        setup.executeWikiPlain("{{velocity}}$xwiki.flushCache(){{/velocity}}", Syntax.XWIKI_2_1);
+
+        // Reset the history. This is the URL behind the "yes" button of the reset confirmation page.
+        setup.gotoPage(testReference, "reset", "confirm=1");
+
+        // The history now holds a single version: the one the document was at.
+        historyTab = openHistoryTab(setup, testReference);
+        assertEquals("3.1", historyTab.getCurrentVersion());
+        assertFalse(historyTab.hasVersion("2.1"));
+        assertFalse(historyTab.hasVersion("1.1"));
+
+        // The document itself is left untouched.
+        Page page = (Page) setup.rest().get(testReference);
+        assertEquals("3.1", page.getVersion());
+        assertEquals(CONTENT3, page.getContent());
+
+        // Resetting a history that already holds a single version works too.
+        setup.gotoPage(testReference, "reset", "confirm=1");
+        historyTab = openHistoryTab(setup, testReference);
+        assertEquals("3.1", historyTab.getCurrentVersion());
+    }
+
+    private HistoryPane openHistoryTab(TestUtils setup, TestReference testReference)
+    {
+        return setup.gotoPage(testReference).openHistoryDocExtraPane();
     }
 }

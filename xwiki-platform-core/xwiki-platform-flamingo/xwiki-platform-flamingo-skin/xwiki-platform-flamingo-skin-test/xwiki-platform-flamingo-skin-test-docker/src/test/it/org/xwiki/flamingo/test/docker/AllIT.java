@@ -173,6 +173,16 @@ public class AllIT
     }
 
     @Nested
+    class NestedSpacePickerIT extends SpacePickerIT
+    {
+    }
+
+    @Nested
+    class NestedCompactLocationPickerIT extends CompactLocationPickerIT
+    {
+    }
+
+    @Nested
     class NestedCompareIT extends CompareIT
     {
     }
@@ -234,6 +244,11 @@ public class AllIT
 
     @Nested
     class NestedViewPageIT extends ViewPageIT
+    {
+    }
+
+    @Nested
+    class NestedHibernateStoreAPIIT extends HibernateStoreAPIIT
     {
     }
 }

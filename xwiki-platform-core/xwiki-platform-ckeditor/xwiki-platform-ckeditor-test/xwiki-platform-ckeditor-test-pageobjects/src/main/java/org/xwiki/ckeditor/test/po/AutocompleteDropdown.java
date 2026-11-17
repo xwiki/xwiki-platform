@@ -26,7 +26,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -36,7 +35,6 @@ import org.xwiki.test.ui.po.BaseElement;
  * @since 15.5.1
  * @since 15.6RC1
  */
-@Unstable
 public class AutocompleteDropdown extends BaseElement
 {
     /**

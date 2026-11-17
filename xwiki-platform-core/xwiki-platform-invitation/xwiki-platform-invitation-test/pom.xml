@@ -25,12 +25,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-invitation</artifactId>
-    <version>18.8.0-SNAPSHOT</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-invitation-test</artifactId>
   <name>XWiki Platform - Invitation - Test</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Invitation - Test</description>
+  <properties>
+    <!-- Test code and page objects are not public APIs, so don't run backward-compatibility checks on them.
+         See https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HCodeThatIsNotAPI -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <modules>
     <module>xwiki-platform-invitation-test-pageobject</module>
   </modules>

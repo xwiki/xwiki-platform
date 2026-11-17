@@ -1,7 +1,5 @@
-#template('colorThemeInit.vm')
-
 #informationcontent ul.xlist {
-  margin: 0 !important;
+  margin: 0;
 }
 
 #informationcontent dl {
@@ -9,7 +7,7 @@
 }
 
 #informationcontent a[data-locale=""] {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
 }
 
 .reference-group {
@@ -22,6 +20,6 @@
 }
 
 #reference-value {
-  background-color: $theme.pageContentBackgroundColor;
+  background-color: var(--xwiki-page-content-bg);
   text-overflow: ellipsis;
 }

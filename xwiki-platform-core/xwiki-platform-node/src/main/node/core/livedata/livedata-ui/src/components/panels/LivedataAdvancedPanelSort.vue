@@ -192,10 +192,12 @@ export default {
       this.$refs.selectPropertiesNone.selected = true;
     },
     // Event handler called when sort entries are dragged and dropped
-    reorderSorts(e) {
-      this.logic
-        .reorderSort(e.moved.element.property, e.moved.newIndex)
-        .catch((err) => console.warn(err));
+    async reorderSorts(e) {
+      try {
+        this.logic.reorderSort(e.moved.element.property, e.moved.newIndex);
+      } catch (err) {
+        console.warn(err);
+      }
     },
   },
 };
@@ -237,5 +239,13 @@ export default {
 
 .livedata-advanced-panel-sort .add-sort-select {
   margin-top: 1rem;
+}
+
+/* Responsive mode. Should be @screen-xs-max, but CSS variables cannot be used in media queries, see XWIKI-23315. */
+@media screen and (max-width: 767px) {
+  .xwiki-livedata .livedata-advanced-panel-sort .delete-sort {
+    /* Always show the delete icon on small screens because we cannot rely on hover. */
+    visibility: visible;
+  }
 }
 </style>

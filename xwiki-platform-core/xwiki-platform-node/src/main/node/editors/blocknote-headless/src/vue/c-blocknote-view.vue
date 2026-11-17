@@ -130,6 +130,8 @@ const notifyChangesDebounced = debounce(notifyChanges, 500);
 const blockNoteProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   options: {
     ...rawOptions,
+    // Pass the child service container created above, holding the Vue services bound for this editor instance,
+    // instead of the one received in the options.
     serviceContainer,
     // Make sure the source document reference is set (with fallback on the current document).
     sourceDocumentReference,

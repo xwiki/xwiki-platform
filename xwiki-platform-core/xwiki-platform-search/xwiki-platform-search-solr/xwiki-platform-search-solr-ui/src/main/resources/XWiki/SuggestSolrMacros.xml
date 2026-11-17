@@ -46,9 +46,17 @@
  *   key=value2
  *#
 #macro (parseSearchSuggestParameters $queryString $params)
-  #set ($return = {})
   ## Each line sets a query parameter.
-  #foreach ($line in $queryString.split('\r?\n'))
+  #parseSearchSuggestParameterList($queryString.split('\r?\n') $params)
+#end
+
+#**
+ * Same as #parseSearchSuggestParameters but the parameters are given as a list of 'key=value' strings instead of a
+ * string with one parameter per line, so that the parameter values can contain line breaks.
+ *#
+#macro (parseSearchSuggestParameterList $paramList $params)
+  #set ($return = {})
+  #foreach ($line in $paramList)
     #set ($separatorPosition = $line.indexOf('='))
     #if ($separatorPosition &lt; 0)
       ## For backward compatibility, if the parameter name is omitted then we consider it to be the actual search query.
@@ -130,7 +138,15 @@
 #end
 
 #macro (createSearchSuggestQuery $queryString $input $query)
-  #parseSearchSuggestParameters($queryString $params)
+  #createSearchSuggestQueryFromParameterList($queryString.split('\r?\n') $input $query)
+#end
+
+#**
+ * Same as #createSearchSuggestQuery but the parameters are given as a list of 'key=value' strings, see
+ * #parseSearchSuggestParameterList.
+ *#
+#macro (createSearchSuggestQueryFromParameterList $paramList $input $query)
+  #parseSearchSuggestParameterList($paramList $params)
   #setDefaultSearchSuggestParameters($params)
   #set ($queryStatement = $params.remove('q').replace('__INPUT__', $input))
   #set ($return = $services.query.createQuery($queryStatement, 'solr'))
@@ -143,6 +159,8 @@
 
 #macro (getSearchSuggestResults $results)
   #createSearchSuggestQuery($request.query $request.input $query)
+  ## The query statement and parameters come from the request.
+  #set ($discard = $query.addFilter('untrustedParameters/solr'))
   #getAndValidateQueryLimitFromRequest('nb', 3, $limit)
   #set ($discard = $query.setLimit($limit))
   #set ($macro.results = $query.execute()[0].results)

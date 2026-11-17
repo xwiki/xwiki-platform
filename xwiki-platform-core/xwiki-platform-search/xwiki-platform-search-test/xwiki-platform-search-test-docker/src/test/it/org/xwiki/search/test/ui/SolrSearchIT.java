@@ -25,12 +25,14 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.search.test.po.SolrSearchPage;
 import org.xwiki.search.test.po.SolrSearchResult;
@@ -43,6 +45,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -181,5 +184,51 @@ class SolrSearchIT
         // Depending on the servlet engine the error might be in the title or in the page body.
         assertThat(pageSource, matchesRegex(EXPECTED_ERROR_CODE));
         assertThat(pageSource, containsString(formattedExpectedError));
+    }
+
+    /**
+     * Verifies that the search suggest service ignores the parameters that it doesn't support.
+     */
+    @Test
+    void suggestServiceParameters(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String matchedWord = "pomegranate";
+        SpaceReference space = testReference.getLastSpaceReference();
+        setup.rest().savePage(new DocumentReference("Apple", space), matchedWord, "Apple");
+        setup.rest().savePage(new DocumentReference("Banana", space), matchedWord + " " + matchedWord, "Banana");
+
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+
+        String query = String.join("\n", "fq=type:DOCUMENT", "qf=doccontent");
+        String results = getSuggestResults(setup, query, matchedWord);
+        assertThat(results, containsString("Apple"));
+        assertThat(results, containsString("Banana"));
+        assertThat(results, containsString("score"));
+
+        // Boost queries change the scores, unless they use unsupported query syntax.
+        assertNotEquals(results, getSuggestResults(setup, query + "\nbq=name:Apple^100", matchedWord));
+        assertEquals(results, getSuggestResults(setup, query + "\nbq=_val_:\"100\"", matchedWord));
+
+        // Special query syntax in the input is matched as plain text.
+        String specialSyntaxResults = getSuggestResults(setup, query, "{!" + matchedWord);
+        assertThat(specialSyntaxResults, containsString("Apple"));
+        assertThat(specialSyntaxResults, containsString("Banana"));
+    }
+
+    private String getSuggestResults(TestUtils setup, String query, String input) throws Exception
+    {
+        // The base URL of the test utilities is the one used by the browser, use the one used by the REST client.
+        String baseURL = Strings.CS.removeEnd(setup.rest().getBaseURL(), "rest");
+        return setup.getString(baseURL, "bin/get/XWiki/SuggestSolrService", Map.of("outputSyntax", "plain",
+            "media", "json", "query", encodeCurlyBraces(query), "input", encodeCurlyBraces(input)));
+    }
+
+    private String encodeCurlyBraces(String value)
+    {
+        // The URI builder used to build the request URL treats curly braces as template variables, so encode them.
+        return value.replace("{", "%7B").replace("}", "%7D");
     }
 }

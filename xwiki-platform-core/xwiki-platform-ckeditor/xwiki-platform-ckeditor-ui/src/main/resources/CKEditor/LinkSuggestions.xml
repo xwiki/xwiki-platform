@@ -144,10 +144,9 @@
     'fq=type:DOCUMENT',
     'qf=title^6 name^4 doccontent^2 doccontentraw',
     'fl=type wiki spaces name score',
-    "bq=author:""$services.model.serialize($xcontext.userReference, 'default')""",
-    "bq=creator:""$services.model.serialize($xcontext.userReference, 'default')""",
     'bf=recip(ms(NOW,date),3.16e-11,1,1)'
   ])
+  #addUserBoostQueries(['author', 'creator'] $params)
   #executeSolrQuery($input $params $limit $results)
 #end
 
@@ -156,16 +155,24 @@
     'fq=type:ATTACHMENT',
     'qf=filename^4 attcontent',
     'fl=type wiki spaces name filename score',
-    "bq=attauthor:""$services.model.serialize($xcontext.userReference, 'default')""",
-    "bq=space_exact:""$services.model.serialize($doc.documentReference.parent, 'local')""",
+    "bq=space_exact:$services.query.solr.quote($services.model.serialize($doc.documentReference.parent, 'local'))",
     'bf=recip(ms(NOW,attdate_sort),3.16e-11,1,1)'
   ])
+  #addUserBoostQueries(['attauthor'] $params)
   #executeSolrQuery($input $params $limit $results)
 #end
 
+#macro (addUserBoostQueries $fields $params)
+  #if ($xcontext.userReference)
+    #set ($userReference = $services.model.serialize($xcontext.userReference, 'default'))
+    #foreach ($field in $fields)
+      #set ($discard = $params.add("bq=${field}:$services.query.solr.quote($userReference)"))
+    #end
+  #end
+#end
+
 #macro (executeSolrQuery $text $params $limit $results)
-  #set ($paramsAsString = $stringtool.join($params, $util.newline))
-  #createSearchSuggestQuery($paramsAsString $text $query)
+  #createSearchSuggestQueryFromParameterList($params $text $query)
   #set ($discard = $query.setLimit($limit))
   #set ($discard = $results.addAll($query.execute()[0].results))
 #end

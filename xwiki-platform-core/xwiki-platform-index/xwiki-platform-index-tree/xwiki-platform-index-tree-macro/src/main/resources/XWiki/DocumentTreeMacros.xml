@@ -1170,8 +1170,7 @@
     'fl=wiki spaces name'
   ])
   #addCommonDocTreeSolrParams($params)
-  #set ($params = $stringtool.join($params, $util.newline))
-  #createSearchSuggestQuery($params $text $query)
+  #createSearchSuggestQueryFromParameterList($params $text $query)
   #set ($discard = $query.setLimit($limit))
   #set ($documentReferences = [])
   #foreach ($result in $query.execute()[0].results)
@@ -1245,8 +1244,7 @@
     'fl=type wiki spaces name filename'
   ])
   #addCommonDocTreeSolrParams($params)
-  #set ($params = $stringtool.join($params, $util.newline))
-  #createSearchSuggestQuery($params $text $query)
+  #createSearchSuggestQueryFromParameterList($params $text $query)
   #set ($discard = $query.setLimit($limit))
   #set ($attachmentReferences = [])
   #foreach ($result in $query.execute()[0].results)
@@ -1314,7 +1312,7 @@
 #macro (addWikiLocationSolrParams $rootReference $params)
   #set ($wikiReference = $rootReference.extractReference('WIKI'))
   #if ($wikiReference)
-    #set ($discard = $params.add("fq=wiki:$wikiReference.name"))
+    #set ($discard = $params.add("fq=wiki:$services.query.solr.quote($wikiReference.name)"))
   #end
 #end
 
@@ -1334,7 +1332,7 @@
     #if ($exactMatch)
       #set ($spaceField = 'space_exact')
     #end
-    #set ($discard = $params.add("fq=$spaceField:""$localSpaceReference"""))
+    #set ($discard = $params.add("fq=$spaceField:$services.query.solr.quote($localSpaceReference)"))
   #end
 #end
 
@@ -1358,7 +1356,7 @@
     &amp;&amp; $documentReference &amp;&amp; $documentReference.name != $defaultDocumentName))
   #addSpaceLocationSolrParams($rootReference $params $macro.exactMatch)
   #if ($documentReference &amp;&amp; $macro.exactMatch)
-    #set ($discard = $params.add("fq=name_exact:""$documentReference.name"""))
+    #set ($discard = $params.add("fq=name_exact:$services.query.solr.quote($documentReference.name)"))
   #end
 #end
 

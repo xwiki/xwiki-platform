@@ -21,9 +21,9 @@ package org.xwiki.query.solr.internal;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,20 +33,17 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.slf4j.Logger;
+import org.apache.solr.common.params.CommonParams;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.SecureQuery;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrInstance;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -76,13 +73,36 @@ public class SolrQueryExecutor implements QueryExecutor
     private static final String PARAM_SUPPORTED_LOCALES = "xwiki.supportedLocales";
 
     /**
-     * Logging framework.
+     * The request handlers that can be selected using the {@code qt} parameter: the search request handlers of the
+     * search core.
      */
-    @Inject
-    protected Logger logger;
+    private static final List<String> ALLOWED_REQUEST_HANDLERS = List.of("/select", "/query", "/spell");
 
-    @Inject
-    protected AuthorizationManager authorization;
+    /**
+     * The parameter that controls whether Solr expands the macros in the parameter values.
+     */
+    private static final String EXPAND_MACROS = "expandMacros";
+
+    /**
+     * The separator between the prefix of the parameters of a nested query and their names.
+     */
+    private static final char PARAMETER_PREFIX_SEPARATOR = '.';
+
+    private static final String NESTED_FIELD_LIST_SUFFIX = PARAMETER_PREFIX_SEPARATOR + CommonParams.FL;
+
+    private static final String NESTED_REQUEST_HANDLER_SUFFIX = PARAMETER_PREFIX_SEPARATOR + CommonParams.QT;
+
+    /**
+     * The name of the parameters of the JSON request API, which Solr merges into the other parameters (e.g., the
+     * fields of the JSON request are added to the field list), also when prefixed for a nested query.
+     */
+    private static final String JSON = "json";
+
+    /**
+     * The parameters of the JSON request API that are supported: they only control how the response is serialized or
+     * which facets are computed.
+     */
+    private static final List<String> SUPPORTED_JSON_PARAMETERS = List.of("json.nl", "json.wrf", "json.facet");
 
     /**
      * Provider for the {@link SolrInstance} that allows communication with the Solr server.
@@ -97,15 +117,19 @@ public class SolrQueryExecutor implements QueryExecutor
     private Provider<XWikiContext> xcontextProvider;
 
     /**
-     * Used to extract a {@link DocumentReference} from a {@link SolrDocument}.
+     * Used to remove the documents that the users to check aren't allowed to view from the responses.
      */
     @Inject
-    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+    private Provider<SolrResponseRightsFilter> responseRightsFilterProvider;
 
     @Inject
     private JobProgressManager progress;
 
+    @Inject
+    private SafeSolrQueryValidator validator;
+
     @Override
+    @SuppressWarnings("unchecked")
     public <T> List<T> execute(Query query) throws QueryException
     {
         this.progress.startStep(query, "query.solr.progress.execute", "Execute Solr query [{}]", query);
@@ -114,7 +138,7 @@ public class SolrQueryExecutor implements QueryExecutor
         try {
             this.progress.startStep(query, "query.solr.progress.execute.prepare", "Prepare");
 
-            SolrQuery solrQuery = createSolrQuery(query);
+            SolrQuery solrQuery = createSolrQuery(filterQuery(query));
 
             this.progress.startStep(query, "query.solr.progress.execute.execute", "Execute");
 
@@ -128,13 +152,12 @@ public class SolrQueryExecutor implements QueryExecutor
             // information (facets, highlighting, maxScore, etc.) is still relevant.
             // A better way would be using a PostFilter as described in this article:
             // http://java.dzone.com/articles/custom-security-filtering-solr
-            // Basically, we would be asking
             List<DocumentReference> usersToCheck = new ArrayList<>(2);
-            if (query instanceof SecureQuery) {
-                if (((SecureQuery) query).isCurrentUserChecked()) {
+            if (query instanceof SecureQuery secureQuery) {
+                if (secureQuery.isCurrentUserChecked()) {
                     usersToCheck.add(xcontextProvider.get().getUserReference());
                 }
-                if (((SecureQuery) query).isCurrentAuthorChecked()) {
+                if (secureQuery.isCurrentAuthorChecked()) {
                     usersToCheck.add(xcontextProvider.get().getAuthorReference());
                 }
             } else {
@@ -142,10 +165,10 @@ public class SolrQueryExecutor implements QueryExecutor
                 usersToCheck.add(xcontextProvider.get().getAuthorReference());
             }
             if (!usersToCheck.isEmpty()) {
-                filterResponse(response, usersToCheck);
+                this.responseRightsFilterProvider.get().filter(response, usersToCheck);
             }
 
-            return (List<T>) Arrays.asList(response);
+            return (List<T>) List.of(response);
         } catch (Exception e) {
             throw new QueryException("Exception while executing query", query, e);
         } finally {
@@ -154,12 +177,32 @@ public class SolrQueryExecutor implements QueryExecutor
         }
     }
 
-    private SolrQuery createSolrQuery(Query query)
+    /**
+     * Applies the query filter that restricts the parameters of the queries whose statement or parameters come from
+     * untrusted input ({@link SolrUntrustedParametersQueryFilter}). The other query filters are not applied to Solr
+     * queries.
+     */
+    private Query filterQuery(Query query)
+    {
+        Query filteredQuery = query;
+        List<QueryFilter> filters = query.getFilters();
+        if (filters != null) {
+            for (QueryFilter filter : filters) {
+                if (filter instanceof SolrUntrustedParametersQueryFilter) {
+                    filteredQuery = filter.filterQuery(filteredQuery);
+                }
+            }
+        }
+        return filteredQuery;
+    }
+
+    private SolrQuery createSolrQuery(Query query) throws QueryException
     {
         SolrQuery solrQuery = new SolrQuery(query.getStatement());
 
-        // Overwrite offset and limit only if the query object explicitly says so, otherwise use whatever the query
-        // statement says or the defaults.
+        // Overwrite offset and limit only if the query object explicitly says so, otherwise use whatever the named
+        // parameters say or the defaults. This is done before setting the named parameters so that the "start" and
+        // "rows" parameters take precedence over the offset and limit of the query object.
         if (query.getOffset() > 0) {
             solrQuery.setStart(query.getOffset());
         }
@@ -172,13 +215,31 @@ public class SolrQueryExecutor implements QueryExecutor
         for (Entry<String, Object> entry : query.getNamedParameters().entrySet()) {
             Object value = entry.getValue();
 
-            if (value instanceof Iterable) {
-                solrQuery.set(entry.getKey(), toStringArray((Iterable) value));
+            if (value instanceof Iterable iterable) {
+                solrQuery.set(entry.getKey(), toStringArray(iterable));
             } else if (value != null && value.getClass().isArray()) {
                 solrQuery.set(entry.getKey(), toStringArray(value));
             } else {
                 solrQuery.set(entry.getKey(), String.valueOf(value));
             }
+        }
+
+        checkRequestHandlers(solrQuery, query);
+        checkJSONParameters(solrQuery, query);
+        checkFieldLists(solrQuery, query);
+
+        // Solr replaces the ${name} and ${name:default} macros in the parameter values with the values of other
+        // parameters, after the values have been validated or escaped (e.g., a quoted value is no longer a phrase if
+        // it contains ${q}). Expand macros only when the query asks for it explicitly.
+        if (solrQuery.get(EXPAND_MACROS) == null) {
+            solrQuery.set(EXPAND_MACROS, false);
+        }
+
+        // The sections of the response that are keyed by document id (e.g., highlighting) are filtered based on the
+        // ids of the documents that are kept in the results, so make sure the id is returned. Solr merges the values
+        // of the field list parameter.
+        if (solrQuery.getParams(CommonParams.FL) != null) {
+            solrQuery.add(CommonParams.FL, FieldUtils.ID);
         }
 
         // Make sure the list of supported locales is set so the names of the fields that are indexed in multiple
@@ -191,6 +252,63 @@ public class SolrQueryExecutor implements QueryExecutor
         }
 
         return solrQuery;
+    }
+
+    /**
+     * The query executor only supports search request handlers, also for the nested queries (e.g., {@code x.qt} for
+     * {@code fl=x:[subquery]}).
+     */
+    private void checkRequestHandlers(SolrQuery solrQuery, Query query) throws QueryException
+    {
+        for (String name : solrQuery.getParameterNames()) {
+            if (CommonParams.QT.equals(name) || name.endsWith(NESTED_REQUEST_HANDLER_SUFFIX)) {
+                for (String requestHandler : solrQuery.getParams(name)) {
+                    if (!ALLOWED_REQUEST_HANDLERS.contains(requestHandler)) {
+                        throw new QueryException(
+                            String.format("Unsupported request handler [%s], only %s are supported", requestHandler,
+                                ALLOWED_REQUEST_HANDLERS),
+                            query, null);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Solr merges the parameters of the JSON request API into the other parameters without the checks done here, so
+     * only the parameters that don't affect the documents of the response are supported.
+     */
+    private void checkJSONParameters(SolrQuery solrQuery, Query query) throws QueryException
+    {
+        for (String name : solrQuery.getParameterNames()) {
+            List<String> segments = List.of(StringUtils.split(name, PARAMETER_PREFIX_SEPARATOR));
+            int jsonIndex = segments.indexOf(JSON);
+            if (jsonIndex >= 0 && !SUPPORTED_JSON_PARAMETERS
+                .contains(StringUtils.join(segments.subList(jsonIndex, segments.size()), PARAMETER_PREFIX_SEPARATOR))) {
+                throw new QueryException(String.format("Unsupported parameter [%s], of the JSON request parameters "
+                    + "only %s are supported", name, SUPPORTED_JSON_PARAMETERS), query, null);
+            }
+        }
+    }
+
+    /**
+     * The response filter decides which documents to keep based on the values of some of their fields, so the field
+     * lists must not replace these values. This includes the field lists of the nested queries, e.g., {@code x.fl} for
+     * {@code fl=x:[subquery]}.
+     */
+    private void checkFieldLists(SolrQuery solrQuery, Query query) throws QueryException
+    {
+        for (String name : solrQuery.getParameterNames()) {
+            if (CommonParams.FL.equals(name) || name.endsWith(NESTED_FIELD_LIST_SUFFIX)) {
+                for (String fieldList : solrQuery.getParams(name)) {
+                    if (!this.validator.isFieldListKeepingFields(fieldList, SolrResponseRightsFilter.CHECKED_FIELDS)) {
+                        throw new QueryException(String.format(
+                            "Unsupported field list [%s]: the fields %s can only be returned with their own values",
+                            fieldList, new TreeSet<>(SolrResponseRightsFilter.CHECKED_FIELDS)), query, null);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -218,60 +336,10 @@ public class SolrQueryExecutor implements QueryExecutor
      */
     private String[] toStringArray(Iterable iterable)
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         for (Object obj : iterable) {
             args.add(String.valueOf(obj));
         }
         return args.toArray(new String[args.size()]);
-    }
-
-    /**
-     * Filter out results from the response that the current user does not have access to view.
-     * 
-     * @param response the Solr response to filter
-     */
-    protected void filterResponse(QueryResponse response, List<DocumentReference> usersToCheck)
-    {
-        SolrDocumentList results = response.getResults();
-        long numResults = results.size();
-
-        results.removeIf(result -> {
-            boolean keep = false;
-            try {
-                DocumentReference resultDocumentReference = this.solrDocumentReferenceResolver.resolve(result);
-
-                keep = isAllowed(resultDocumentReference, usersToCheck);
-            } catch (Exception e) {
-                // Don't take any risk of including a result for which we cannot determine the document reference and
-                // thus cannot determine if the given users have access to it or not.
-                this.logger.warn("Removing bad result: {}", result, e);
-            }
-
-            // FIXME: We should update maxScore as well when removing the top scored item. How do we do that?
-            // Sorting based on score might be a not so expensive option.
-
-            // FIXME: What about highlighting, facets and all the other data inside the QueryResponse?
-
-            return !keep;
-        });
-
-        long numFilteredResults = numResults - results.size();
-
-        // Update the number of results, excluding the filtered ones.
-        // Lower bound guard for the total number of results.
-        long numFound = Math.max(0, response.getResults().getNumFound() - numFilteredResults);
-
-        results.setNumFound(numFound);
-    }
-
-    protected boolean isAllowed(DocumentReference resultDocumentReference, List<DocumentReference> usersToCheck)
-    {
-        for (DocumentReference user : usersToCheck) {
-            if (!this.authorization.hasAccess(Right.VIEW, user, resultDocumentReference)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

@@ -1,1 +1,5 @@
 org.xwiki.query.solr.internal.SolrQueryExecutor
+org.xwiki.query.solr.internal.SolrResponseRightsFilter
+org.xwiki.query.solr.internal.SafeSolrQueryValidator
+org.xwiki.query.solr.internal.SolrUntrustedParametersQueryFilter
+org.xwiki.query.solr.SolrQueryScriptService

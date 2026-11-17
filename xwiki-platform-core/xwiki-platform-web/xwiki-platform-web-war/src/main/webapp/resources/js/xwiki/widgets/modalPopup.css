@@ -29,10 +29,8 @@
   border: 1px solid var(--xwiki-border-color);
   background-color: var(--panel-bg);
   border-radius: 10px;
-}
-.xdialog-box {
   max-height: 100%; /* Needed because of position: fixed */
-  overflow: auto; 
+  overflow: auto;
   width: auto;
 }
 @media (min-width: 768px) { /* Should be: @screen-sm-min */

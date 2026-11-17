@@ -21,7 +21,7 @@ var offsetxpoint=-60; //Customize x offset of tooltip
 var offsetypoint=20; //Customize y offset of tooltip
 var enabletip=false;
 var tipobj=document.getElementById("dhtmltooltip");
-var tippedNode = undefined;
+var tippedNode;
 
 function showtip(node, txt, w, align){
   document.addEventListener("mousemove", positionTip);

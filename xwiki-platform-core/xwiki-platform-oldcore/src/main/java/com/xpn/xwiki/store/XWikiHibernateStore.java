@@ -133,6 +133,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private static final String DOC_ID = "docId";
     private static final String SELECT_DISTINCT_DOC_FULLNAME = "select distinct doc.fullName";
 
+    private static final String NO_SESSION_MESSAGE = "No Hibernate session is available";
+
     @Inject
     private Logger logger;
 
@@ -1551,6 +1553,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             try {
                 Session session = getSession(context);
+                if (session == null) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT, NO_SESSION_MESSAGE);
+                }
 
                 if (!alreadyLoaded) {
                     try {
@@ -1820,6 +1826,30 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         });
     }
 
+    /**
+     * Load a property from the table corresponding to its type.
+     *
+     * @param session the session to use
+     * @param classType the name of the class of the property, as stored in the database
+     * @param id the identifier of the object holding the property
+     * @param name the name of the property
+     * @return the property, or {@code null} if it does not exist
+     * @throws ReflectiveOperationException when failing to create the property used as identifier
+     */
+    private BaseProperty findProperty(Session session, String classType, long id, String name)
+        throws ReflectiveOperationException
+    {
+        // Resolving the entity fails if the class type is not a mapped entity
+        Class<?> propertyClass = session.getMetamodel().entity(classType).getJavaType();
+
+        // A property is its own identifier
+        BaseProperty identifier = (BaseProperty) propertyClass.getDeclaredConstructor().newInstance();
+        identifier.setId(id);
+        identifier.setName(name);
+
+        return (BaseProperty) session.find(propertyClass, identifier);
+    }
+
     private void saveXWikiPropertyInternal(final PropertyInterface property, final XWikiContext context,
         final boolean runInOwnTransaction) throws XWikiException
     {
@@ -1856,12 +1886,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     // property or delete a clone of the new property; loading the old property from the BaseProperty
                     // table
                     // doesn't work either).
-                    Query<BaseProperty> propQuery = session.createQuery(
-                        "select prop from " + oldClassType + " as prop where prop.id = :id and prop.name= :name",
-                        BaseProperty.class);
-                    propQuery.setParameter("id", property.getId());
-                    propQuery.setParameter("name", property.getName());
-                    session.remove(propQuery.uniqueResult());
+                    session.remove(findProperty(session, oldClassType, property.getId(), property.getName()));
                     session.persist(property);
                 }
 

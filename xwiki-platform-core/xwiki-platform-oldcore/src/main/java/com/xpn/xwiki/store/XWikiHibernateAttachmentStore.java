@@ -311,6 +311,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
             try {
                 Session session = getSession(context);
+                if (session == null) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT,
+                        "No Hibernate session is available");
+                }
 
                 // Delete the three attachment entries
                 try {

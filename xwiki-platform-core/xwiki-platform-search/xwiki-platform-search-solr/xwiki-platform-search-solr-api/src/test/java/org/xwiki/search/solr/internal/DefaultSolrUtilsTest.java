@@ -20,14 +20,20 @@
 package org.xwiki.search.solr.internal;
 
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DefaultSolrUtils}.
@@ -50,6 +56,29 @@ class DefaultSolrUtilsTest
     void toCompleteFilterQueryString()
     {
         assertEquals("\"\"", this.utils.toCompleteFilterQueryString(""));
+    }
+
+    @Test
+    void toPhraseQueryString()
+    {
+        assertEquals("\"My\\ \\\"Space\\\"\\ \\{\\!term\\}\\ a\\\\b\"",
+            this.utils.toPhraseQueryString("My \"Space\" {!term} a\\b"));
+        assertEquals("\"$\\{q\\}\"", this.utils.toPhraseQueryString("${q}"));
+        assertEquals("\"\"", this.utils.toPhraseQueryString(""));
+        assertEquals("\"42\"", this.utils.toPhraseQueryString(42));
+        assertEquals("\"1970-01-01T00:00:00Z\"", this.utils.toPhraseQueryString(new Date(0)));
+        assertNull(this.utils.toPhraseQueryString(null));
+    }
+
+    @Test
+    void defaultToPhraseQueryString()
+    {
+        SolrUtils solrUtils = mock();
+        when(solrUtils.toPhraseQueryString(any())).thenCallRealMethod();
+        when(solrUtils.toFilterQueryString("My Space")).thenReturn("My\\ Space");
+
+        assertEquals("\"My\\ Space\"", solrUtils.toPhraseQueryString("My Space"));
+        assertNull(solrUtils.toPhraseQueryString(null));
     }
 
     @Test

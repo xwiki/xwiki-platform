@@ -38,6 +38,7 @@ type Option = { value: string; label: string };
 type Settings = {
   options?: Option[];
   maxItems?: number;
+  create?: boolean;
   loadSelected?: (text: string, callback: (options: Option[]) => void) => void;
 };
 type EnhancedInput = HTMLInputElement & { selectize: TomSelect };
@@ -83,53 +84,103 @@ describe("xwiki-selectize", () => {
     document.body.innerHTML = "";
   });
 
-  it("selects the initial value when the options are empty", async () => {
-    const tomSelect = enhance("DISCLOSED", {
-      options: [],
-      loadSelected: (text, callback) =>
-        callback([{ value: text, label: text.toLowerCase() }]),
-    });
-    await waitForSelectedValues();
+  describe("text input", () => {
+    it("selects the initial value when the options are empty", async () => {
+      const tomSelect = enhance("DISCLOSED", {
+        options: [],
+        loadSelected: (text, callback) =>
+          callback([{ value: text, label: text.toLowerCase() }]),
+      });
+      await waitForSelectedValues();
 
-    expect(tomSelect.items).toEqual(["DISCLOSED"]);
-    expect(tomSelect.getItem("DISCLOSED")?.textContent).toBe("disclosed");
+      expect(tomSelect.items).toEqual(["DISCLOSED"]);
+      expect(tomSelect.getItem("DISCLOSED")?.textContent).toBe("disclosed");
+    });
+
+    it("selects the initial value when it is not among the options", () => {
+      const tomSelect = enhance("DISCLOSED", {
+        options: [{ value: "DRAFT", label: "draft" }],
+      });
+
+      expect(tomSelect.items).toEqual(["DISCLOSED"]);
+      expect(Object.keys(tomSelect.options).sort()).toEqual([
+        "DISCLOSED",
+        "DRAFT",
+      ]);
+    });
+
+    it("keeps the label of the initial values that are among the options", () => {
+      const tomSelect = enhance("DRAFT,DISCLOSED", {
+        options: [{ value: "DRAFT", label: "draft" }],
+      });
+
+      expect(tomSelect.items).toEqual(["DRAFT", "DISCLOSED"]);
+      expect(tomSelect.getItem("DRAFT")?.textContent).toBe("draft");
+    });
+
+    it("keeps the order of the options", () => {
+      const tomSelect = enhance("DISCLOSED", {
+        options: [
+          { value: "DRAFT", label: "draft" },
+          { value: "DISCLOSED", label: "disclosed" },
+        ],
+        maxItems: 1,
+      });
+      tomSelect.refreshOptions();
+
+      const options = tomSelect.dropdown_content.querySelectorAll(".option");
+      expect([...options].map((option) => option.textContent)).toEqual([
+        "draft",
+        "disclosed",
+      ]);
+    });
+
+    it("doesn't split the initial value when multiple selection is disabled", () => {
+      const tomSelect = enhance("Smith, John", { options: [], maxItems: 1 });
+
+      expect(tomSelect.items).toEqual(["Smith, John"]);
+      expect(tomSelect.getValue()).toBe("Smith, John");
+    });
+
+    it("selects the empty value when the initial value is only the delimiter", () => {
+      const tomSelect = enhance(",", { options: [], maxItems: 1 });
+
+      expect(tomSelect.items).toEqual([""]);
+    });
+
+    it("selects an initial value missing from the options when creating options is disabled", () => {
+      const tomSelect = enhance("DISCLOSED", {
+        options: [{ value: "DRAFT", label: "draft" }],
+        create: false,
+      });
+
+      expect(tomSelect.items).toEqual(["DISCLOSED"]);
+    });
+
+    it("selects a value set from outside when creating options is disabled", () => {
+      const tomSelect = enhance("", { options: [], create: false });
+      jquery("input").val("DISCLOSED").trigger("change");
+
+      expect(tomSelect.items).toEqual(["DISCLOSED"]);
+    });
   });
 
-  it("selects the initial value when it is not among the options", () => {
-    const tomSelect = enhance("DISCLOSED", {
-      options: [{ value: "DRAFT", label: "draft" }],
+  describe("select", () => {
+    it("keeps all the selected values of a multiple select", () => {
+      document.body.innerHTML = `<select multiple>
+        <option value="DRAFT" selected>draft</option>
+        <option value="DISCLOSED" selected>disclosed</option>
+      </select>`;
+      const select = document.querySelector("select") as HTMLSelectElement & {
+        selectize: TomSelect;
+      };
+      (
+        jquery(select) as unknown as {
+          xwikiSelectize: (settings: Settings) => void;
+        }
+      ).xwikiSelectize({});
+
+      expect(select.selectize.items).toEqual(["DRAFT", "DISCLOSED"]);
     });
-
-    expect(tomSelect.items).toEqual(["DISCLOSED"]);
-    expect(Object.keys(tomSelect.options).sort()).toEqual([
-      "DISCLOSED",
-      "DRAFT",
-    ]);
-  });
-
-  it("keeps the label of the initial values that are among the options", () => {
-    const tomSelect = enhance("DRAFT,DISCLOSED", {
-      options: [{ value: "DRAFT", label: "draft" }],
-    });
-
-    expect(tomSelect.items).toEqual(["DRAFT", "DISCLOSED"]);
-    expect(tomSelect.getItem("DRAFT")?.textContent).toBe("draft");
-  });
-
-  it("keeps the order of the options", () => {
-    const tomSelect = enhance("DISCLOSED", {
-      options: [
-        { value: "DRAFT", label: "draft" },
-        { value: "DISCLOSED", label: "disclosed" },
-      ],
-      maxItems: 1,
-    });
-    tomSelect.refreshOptions();
-
-    const options = tomSelect.dropdown_content.querySelectorAll(".option");
-    expect([...options].map((option) => option.textContent)).toEqual([
-      "draft",
-      "disclosed",
-    ]);
   });
 });

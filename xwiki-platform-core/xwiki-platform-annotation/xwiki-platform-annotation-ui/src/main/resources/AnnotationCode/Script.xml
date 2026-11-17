@@ -1962,7 +1962,8 @@ define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], functio
   };
 });
 
-require(['jquery', 'xwiki-text-offset-updater', 'xwiki-annotate-popup', 'xwiki-events-bridge'], function($, offsetUpdater, AnnotatePopup) {
+require(['jquery', 'xwiki-text-offset-updater',
+         'xwiki-annotate-popup', 'xwiki-events-bridge'], function($, offsetUpdater, AnnotatePopup) {
   $(function() {
     // Load the annotations only in view mode, if the document content is displayed
     // (the document content is not displayed when viewer=history for instance).

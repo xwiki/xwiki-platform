@@ -1068,7 +1068,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Insert a nested error box.
         firstTextArea.sendKeys("inside", Keys.ENTER);
-        firstTextArea.insertMacro("/err", "Error Box");
+        firstTextArea.insertMacro("/err", "Error Message");
 
         // Replace the default error message.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));

@@ -19,7 +19,6 @@
  */
 import { insertLink, useLinkEditing } from "./linkEditor";
 import { EditorInstanceContext } from "../../contexts";
-import { useEditor } from "../../hooks";
 import { selectionHasInlineContent } from "../../selection";
 import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
@@ -27,7 +26,6 @@ import { useContext } from "react";
 import { RiLink } from "react-icons/ri";
 
 export const CustomCreateLinkButton: React.FC = () => {
-  const editor = useEditor();
   const instance = useContext(EditorInstanceContext)!;
   const linkEditing = useLinkEditing();
   const Components = useComponentsContext()!;
@@ -36,7 +34,7 @@ export const CustomCreateLinkButton: React.FC = () => {
   // Links are inline content, so they can only wrap editable inline content. Hide the button when the
   // selection has no such content (e.g. a block-level macro or other content-less block is selected),
   // mirroring BlockNote's default Create Link button. Hidden also when there's no link editor.
-  if (!linkEditing || !selectionHasInlineContent(editor)) {
+  if (!linkEditing || !selectionHasInlineContent(instance.editor)) {
     return null;
   }
 
@@ -55,11 +53,11 @@ export const CustomCreateLinkButton: React.FC = () => {
         // The display text is pre-filled with the text selected when the link editor is opened, which also tells, on
         // submit, whether the user changed it. When the link label differs from the selected text, the selection is
         // replaced with the new label, keeping the formatting shared by the whole selection, like typing over it does.
-        const selectedText = editor.getSelectedText();
+        const selectedText = instance.editor.getSelectedText();
         await linkEditing.insert({ title: selectedText }, (link) =>
           insertLink(instance, link, selectedText),
         );
-        editor.focus();
+        instance.editor.focus();
       }}
     />
   );

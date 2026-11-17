@@ -25,7 +25,6 @@ import {
   ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../../contexts";
-import { useEditor } from "../../hooks";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { toResourceReference } from "../../misc/resourceReference";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
@@ -38,7 +37,7 @@ import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiFolderImageLine, RiUpload2Line } from "react-icons/ri";
-import type { BlockOfType, EditorType } from "../../blocknote";
+import type { BlockOfType } from "../../blocknote";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   LinkSuggestService,
@@ -80,14 +79,13 @@ export function ImageSuggestionController({
     "ResourceReferenceParser",
   );
 
-  const editor = useEditor();
   const { insertSelectedImage, uploadImage } =
     useImageInsertion(serviceContainer);
 
   const { t } = useTranslation();
 
   const { selectorPosition, setSelectorPosition, openImageSelector } =
-    useImageSelector(editor, insertSelectedImage);
+    useImageSelector(insertSelectedImage);
 
   const searchImages = useMemo(
     () =>
@@ -171,10 +169,8 @@ export function ImageSuggestionController({
  *   with the image editor when bound, otherwise with the full image selector popover, opened where the image suggestion
  *   menu was (the menu itself is already closed, and its query removed, by the time an item is clicked)
  */
-function useImageSelector(
-  editor: EditorType,
-  insertSelectedImage: InsertImage,
-) {
+function useImageSelector(insertSelectedImage: InsertImage) {
+  const instance = useContext(EditorInstanceContext)!;
   const imageEditing = useImageEditing();
 
   const [selectorPosition, setSelectorPosition] = useState<{
@@ -188,12 +184,12 @@ function useImageSelector(
       await imageEditing.insert(({ reference, ...props }) =>
         insertSelectedImage(props, reference),
       );
-      editor.focus();
+      instance.editor.focus();
     } else {
-      const pos = editor.transact((tr) => tr.selection.from);
+      const pos = instance.editor.transact((tr) => tr.selection.from);
       setSelectorPosition({ from: pos, to: pos });
     }
-  }, [editor, imageEditing, insertSelectedImage]);
+  }, [instance, imageEditing, insertSelectedImage]);
 
   return { selectorPosition, setSelectorPosition, openImageSelector };
 }

@@ -20,7 +20,6 @@
 import { ImageSelector } from "./ImageSelector";
 import { updateImage } from "./imageEditor";
 import { EditorInstanceContext } from "../../contexts";
-import { useEditor } from "../../hooks";
 import { Paper } from "@mantine/core";
 import { useCallback, useContext } from "react";
 import type { BlockOfType } from "../../blocknote";
@@ -33,15 +32,14 @@ export type ImageFilePanelProps = {
 export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
   currentBlock: image,
 }) => {
-  const editor = useEditor();
   const instance = useContext(EditorInstanceContext)!;
 
   const replaceImage = useCallback(
     (url: string, reference?: ResourceReference) => {
       updateImage(instance, image, { url }, reference);
-      editor.focus();
+      instance.editor.focus();
     },
-    [editor, instance, image],
+    [instance, image],
   );
 
   return (

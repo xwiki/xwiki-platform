@@ -51,7 +51,7 @@ Grupper kan bruges til at indsætte et andet dokument direkte i det aktuelle dok
 |((({{{
 |=Overskrift 1|=Overskrift 2|=Overskrift 3
 |Celle et|(((
-= Indlejret dokument =
+== Indlejret dokument ==
 
 Et indlejret afsnit.
 
@@ -65,7 +65,7 @@ Næste afsnit i dokumentet på øverste niveau
 }}})))|(((
 |=Overskrift 1|=Overskrift 2|=Overskrift 3
 |Celle et|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Indlejret dokument&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Indlejret dokument&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Et indlejret afsnit.
 

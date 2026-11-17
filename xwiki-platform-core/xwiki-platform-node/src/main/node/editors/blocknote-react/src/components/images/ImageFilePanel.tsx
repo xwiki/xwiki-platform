@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
-import { afterImageUpdate } from "./imageEditor";
+import { updateImage } from "./imageEditor";
 import { EditorInstanceContext } from "../../contexts";
 import { useEditor } from "../../hooks";
 import { Paper } from "@mantine/core";
@@ -34,15 +34,11 @@ export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
   currentBlock: image,
 }) => {
   const editor = useEditor();
-  const instance = useContext(EditorInstanceContext);
+  const instance = useContext(EditorInstanceContext)!;
 
-  const updateImage = useCallback(
+  const replaceImage = useCallback(
     (url: string, reference?: ResourceReference) => {
-      const updatedImage = editor.updateBlock(
-        { id: image.id },
-        { props: { url } },
-      ) as BlockOfType<"image">;
-      afterImageUpdate(instance, updatedImage, reference);
+      updateImage(instance, image, { url }, reference);
       editor.focus();
     },
     [editor, instance, image],
@@ -54,7 +50,7 @@ export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
     <Paper shadow="md" p="sm">
       <ImageSelector
         currentSelection={image.props.url}
-        onSelected={updateImage}
+        onSelected={replaceImage}
       />
     </Paper>
   );

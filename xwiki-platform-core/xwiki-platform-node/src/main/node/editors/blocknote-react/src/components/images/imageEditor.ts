@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { EditorInstanceContext } from "../../contexts";
+import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { useContext } from "react";
 import type { BlockOfType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
@@ -120,8 +121,8 @@ interface ImageMetadataHandler {
 }
 
 /**
- * The image editor of an editor instance, as used by the editor UI: the image returned by the image editor is
- * written into the content, the image metadata handler is notified, and the failures are logged.
+ * The image editor of an editor instance, as used by the editor UI: the image returned by the image editor is applied,
+ * and the failures are logged. The caller decides where the image is written (e.g. as an image block).
  */
 type ImageEditing = {
   /**
@@ -131,10 +132,14 @@ type ImageEditing = {
   insert(apply: (image: ImageEditionData) => void): Promise<void>;
 
   /**
-   * @param block - the image block to edit, which is updated with the image returned by the image editor
+   * @param image - the image to edit
+   * @param apply - updates the edited image with the one returned by the image editor
    * @returns a promise resolved once the image editor is closed, whatever the outcome
    */
-  edit(block: BlockOfType<"image">): Promise<void>;
+  edit(
+    image: ImageEditionData,
+    apply: (image: ImageEditionData) => void,
+  ): Promise<void>;
 };
 
 /**
@@ -142,9 +147,9 @@ type ImageEditing = {
  * @returns the image metadata handler bound in the service container of the given editor instance, if any
  */
 function getImageMetadataHandler(
-  instance: EditorInstance | null,
+  instance: EditorInstance,
 ): ImageMetadataHandler | undefined {
-  return instance?.serviceContainer.isBound(imageMetadataHandlerName)
+  return instance.serviceContainer.isBound(imageMetadataHandlerName)
     ? instance.serviceContainer.get<ImageMetadataHandler>(
         imageMetadataHandlerName,
       )
@@ -152,21 +157,57 @@ function getImageMetadataHandler(
 }
 
 /**
- * Lets the image metadata handler of the given editor instance, if any, know that an image was written into the
- * content.
+ * Inserts an image block at the selection of the given editor instance, and lets its image metadata handler know.
  *
- * @param instance - the editor instance holding the image
- * @param block - the image block, as written into the content
+ * @param instance - the editor instance where the image is inserted
+ * @param props - the properties of the image block to insert
  * @param reference - the resource reference of the image, when known
  */
-function afterImageUpdate(
-  instance: EditorInstance | null,
-  block: BlockOfType<"image">,
+function insertImage(
+  instance: EditorInstance,
+  props: Partial<BlockOfType<"image">["props"]>,
   reference?: ResourceReference,
 ): void {
-  if (instance) {
-    getImageMetadataHandler(instance)?.afterUpdate(instance, block, reference);
-  }
+  const block = insertOrUpdateBlockForSlashMenu(instance.editor, {
+    type: "image",
+    props,
+  }) as BlockOfType<"image">;
+  getImageMetadataHandler(instance)?.afterUpdate(instance, block, reference);
+}
+
+/**
+ * Updates an image block of the given editor instance, and lets its image metadata handler know.
+ *
+ * @param instance - the editor instance holding the image
+ * @param block - the image block to update
+ * @param props - the image block properties to update
+ * @param reference - the resource reference of the new image, when known
+ */
+function updateImage(
+  instance: EditorInstance,
+  block: BlockOfType<"image">,
+  props: Partial<BlockOfType<"image">["props"]>,
+  reference?: ResourceReference,
+): void {
+  const updated = instance.editor.updateBlock(block, {
+    props,
+  }) as BlockOfType<"image">;
+  getImageMetadataHandler(instance)?.afterUpdate(instance, updated, reference);
+}
+
+/**
+ * @param instance - the editor instance holding the image
+ * @param block - the image block to edit
+ * @returns the image to edit with the image editor, as provided by the image metadata handler, when bound
+ */
+function getEditedImage(
+  instance: EditorInstance,
+  block: BlockOfType<"image">,
+): ImageEditionData {
+  return (
+    getImageMetadataHandler(instance)?.beforeEdit(instance, block) ??
+    block.props
+  );
 }
 
 /**
@@ -189,20 +230,10 @@ function getImageEditing(
         apply,
         "Failed to insert the image.",
       ),
-    edit: (block) =>
+    edit: (image, apply) =>
       run(
-        () =>
-          imageEditor.edit(
-            instance,
-            getImageMetadataHandler(instance)?.beforeEdit(instance, block) ??
-              block.props,
-          ),
-        ({ reference, ...props }) => {
-          const updated = instance.editor.updateBlock(block, {
-            props,
-          }) as BlockOfType<"image">;
-          afterImageUpdate(instance, updated, reference);
-        },
+        () => imageEditor.edit(instance, image),
+        apply,
         "Failed to edit the image.",
       ),
   };
@@ -231,10 +262,12 @@ function useImageEditing(): ImageEditing | undefined {
 }
 
 export {
-  afterImageUpdate,
+  getEditedImage,
   getImageEditing,
   imageEditorName,
   imageMetadataHandlerName,
+  insertImage,
+  updateImage,
   useImageEditing,
 };
 export type {

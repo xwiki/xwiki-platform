@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
-import { afterImageUpdate, useImageEditing } from "./imageEditor";
+import { insertImage, useImageEditing } from "./imageEditor";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
 import {
   EditorInstanceContext,
@@ -28,7 +28,6 @@ import {
 import { useEditor } from "../../hooks";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { toResourceReference } from "../../misc/resourceReference";
-import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
 import {
@@ -82,15 +81,13 @@ export function ImageSuggestionController({
   );
 
   const editor = useEditor();
-  const { insertImage, uploadImage } = useImageInsertion(
-    editor,
-    serviceContainer,
-  );
+  const { insertSelectedImage, uploadImage } =
+    useImageInsertion(serviceContainer);
 
   const { t } = useTranslation();
 
   const { selectorPosition, setSelectorPosition, openImageSelector } =
-    useImageSelector(editor, insertImage);
+    useImageSelector(editor, insertSelectedImage);
 
   const searchImages = useMemo(
     () =>
@@ -99,7 +96,7 @@ export function ImageSuggestionController({
           query,
           linkSuggestService,
           resourceReferenceParser,
-          insertImage,
+          insertSelectedImage,
           t,
         );
 
@@ -159,7 +156,7 @@ export function ImageSuggestionController({
         <Paper shadow="md" p="sm">
           <ImageSelector
             onSelected={(url, reference) => {
-              insertImage({ url }, reference);
+              insertSelectedImage({ url }, reference);
               setSelectorPosition(undefined);
             }}
           />
@@ -174,7 +171,10 @@ export function ImageSuggestionController({
  *   with the image editor when bound, otherwise with the full image selector popover, opened where the image suggestion
  *   menu was (the menu itself is already closed, and its query removed, by the time an item is clicked)
  */
-function useImageSelector(editor: EditorType, insertImage: InsertImage) {
+function useImageSelector(
+  editor: EditorType,
+  insertSelectedImage: InsertImage,
+) {
   const imageEditing = useImageEditing();
 
   const [selectorPosition, setSelectorPosition] = useState<{
@@ -186,14 +186,14 @@ function useImageSelector(editor: EditorType, insertImage: InsertImage) {
     if (imageEditing) {
       // The image is inserted at the editor's selection, which is kept while the image editor has the focus.
       await imageEditing.insert(({ reference, ...props }) =>
-        insertImage(props, reference),
+        insertSelectedImage(props, reference),
       );
       editor.focus();
     } else {
       const pos = editor.transact((tr) => tr.selection.from);
       setSelectorPosition({ from: pos, to: pos });
     }
-  }, [editor, imageEditing, insertImage]);
+  }, [editor, imageEditing, insertSelectedImage]);
 
   return { selectorPosition, setSelectorPosition, openImageSelector };
 }
@@ -201,17 +201,11 @@ function useImageSelector(editor: EditorType, insertImage: InsertImage) {
 /**
  * @returns the functions inserting an image selected by the user, letting the image metadata handler know about it
  */
-function useImageInsertion(editor: EditorType, serviceContainer: Container) {
-  const instance = useContext(EditorInstanceContext);
-  const insertImage: InsertImage = useCallback(
-    (props, reference) => {
-      const image = insertOrUpdateBlockForSlashMenu(editor, {
-        type: "image",
-        props,
-      }) as BlockOfType<"image">;
-      afterImageUpdate(instance, image, reference);
-    },
-    [editor, instance],
+function useImageInsertion(serviceContainer: Container) {
+  const instance = useContext(EditorInstanceContext)!;
+  const insertSelectedImage: InsertImage = useCallback(
+    (props, reference) => insertImage(instance, props, reference),
+    [instance],
   );
 
   const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
@@ -222,18 +216,18 @@ function useImageInsertion(editor: EditorType, serviceContainer: Container) {
     );
 
     if (image) {
-      insertImage({ url: image.url }, image.reference);
+      insertSelectedImage({ url: image.url }, image.reference);
     }
-  }, [serviceContainer, sourceDocumentReference, insertImage]);
+  }, [serviceContainer, sourceDocumentReference, insertSelectedImage]);
 
-  return { insertImage, uploadImage };
+  return { insertSelectedImage, uploadImage };
 }
 
 async function fetchImageSuggestions(
   query: string,
   linkSuggestService: LinkSuggestService | undefined,
   resourceReferenceParser: ResourceReferenceParser,
-  insertImage: InsertImage,
+  insertSelectedImage: InsertImage,
   t: ReturnType<typeof useTranslation>["t"],
 ): Promise<DefaultReactSuggestionItem[]> {
   if (!linkSuggestService) {
@@ -274,7 +268,7 @@ async function fetchImageSuggestions(
         />
       ),
       onItemClick() {
-        insertImage(
+        insertSelectedImage(
           { url: link.url },
           toResourceReference(
             resourceReferenceParser,

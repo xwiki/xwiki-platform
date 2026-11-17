@@ -18,9 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageFilePanel } from "./ImageFilePanel";
-import { useImageEditing } from "./imageEditor";
+import { getEditedImage, updateImage, useImageEditing } from "./imageEditor";
+import { EditorInstanceContext } from "../../contexts";
 import { useComponentsContext, usePortalElement } from "@blocknote/react";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
 import type { BlockOfType } from "../../blocknote";
@@ -35,6 +36,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   const Components = useComponentsContext()!;
   const portalElement = usePortalElement();
   const { t } = useTranslation();
+  const instance = useContext(EditorInstanceContext)!;
   const imageEditing = useImageEditing();
 
   const [showImageEditor, setShowImageEditor] = useState(false);
@@ -42,11 +44,15 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   // The image is edited with the image editor when bound, and with the image selector of the editor otherwise.
   const openEditor = useCallback(() => {
     if (imageEditing) {
-      void imageEditing.edit(currentBlock);
+      void imageEditing.edit(
+        getEditedImage(instance, currentBlock),
+        ({ reference, ...props }) =>
+          updateImage(instance, currentBlock, props, reference),
+      );
     } else {
       setShowImageEditor(true);
     }
-  }, [imageEditing, currentBlock]);
+  }, [instance, imageEditing, currentBlock]);
 
   return (
     <>

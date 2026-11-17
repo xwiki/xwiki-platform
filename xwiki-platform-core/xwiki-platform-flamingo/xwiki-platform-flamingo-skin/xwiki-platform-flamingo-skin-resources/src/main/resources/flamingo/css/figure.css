@@ -24,6 +24,7 @@ figure img {
 }
 
 figcaption {
+  /* The design system declares this line height on the root element, but its stylesheet is not loaded with the skin, so the value is repeated here. It matches the Bootstrap base line height. */
   --cr-line-height-normal: 1.42857143;
   font-size: var(--figure-caption-font-size);
   color: var(--figure-caption-color);

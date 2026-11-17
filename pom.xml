@@ -55,6 +55,11 @@
     <!-- xwiki-platform is directly released on the configured distributionManagement -->
     <releaseProfiles>release</releaseProfiles>
 
+    <!-- Every webjar-node module embeds an SBOM of the npm packages it bundles (the webjar-node lifecycle generates
+         it), so a release of a webjar-node module without it, or depending on one without it, must fail rather than
+         publish an SBOM missing these packages. It also applies to the extensions inheriting this POM. -->
+    <xwiki.sbom.failOnMissingEmbeddedSBOM>true</xwiki.sbom.failOnMissingEmbeddedSBOM>
+
     <!-- Dependencies versions -->
     <batik.version>1.20</batik.version>
     <tika.version>4.2.0</tika.version>
@@ -64,10 +69,10 @@
     <jetty.server.version>12.1.15</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.20.Final</netty.version>
+    <netty.version>4.2.21.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.159.0</metaeffekt.version>
+    <metaeffekt.version>0.160.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.11.0</solr.version>
     <lucene.version>9.12.3</lucene.version>
@@ -587,7 +592,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop</artifactId>
-        <version>2.3</version>
+        <version>2.12</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -1192,7 +1197,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.4.18</version>
+        <version>11.4.20</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>

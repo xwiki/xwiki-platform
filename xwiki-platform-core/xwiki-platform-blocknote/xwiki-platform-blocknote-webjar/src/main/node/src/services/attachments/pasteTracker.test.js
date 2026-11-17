@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { trackPaste } from "./pasteTracker";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("trackPaste", () => {
   let tracker;
@@ -40,6 +40,36 @@ describe("trackPaste", () => {
     expect(tracker.isPaste()).toBe(true);
 
     dispatch("drop");
+    expect(tracker.isPaste()).toBe(false);
+  });
+
+  it("offers a transfer carrying files, and stops the event when it is taken over", () => {
+    const files = [new File(["content"], "notes.txt")];
+    const takeOver = vi.fn(() => true);
+    tracker = trackPaste(document, takeOver);
+
+    const event = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: { files } });
+    Object.assign(event, { clientX: 12, clientY: 34 });
+    document.dispatchEvent(event);
+
+    expect(takeOver).toHaveBeenCalledWith({
+      paste: false,
+      files,
+      coordinates: { left: 12, top: 34 },
+    });
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("lets through a transfer nobody takes over, and one without files", () => {
+    const files = [new File(["content"], "notes.txt")];
+    tracker = trackPaste(document, () => false);
+
+    const ignored = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(ignored, "dataTransfer", { value: { files } });
+    document.dispatchEvent(ignored);
+
+    expect(ignored.defaultPrevented).toBe(false);
     expect(tracker.isPaste()).toBe(false);
   });
 

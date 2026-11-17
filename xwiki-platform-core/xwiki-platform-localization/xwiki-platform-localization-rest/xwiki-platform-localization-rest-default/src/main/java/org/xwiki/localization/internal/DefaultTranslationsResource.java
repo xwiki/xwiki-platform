@@ -26,6 +26,8 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
@@ -40,6 +42,8 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Default implementation of {@link TranslationsResource}.
@@ -62,11 +66,16 @@ public class DefaultTranslationsResource implements TranslationsResource, XWikiR
     private ModelContext modelContext;
 
     @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
     private Logger logger;
 
     @Override
     public Translations getTranslations(String wikiId, String localeString, String prefix, List<String> keys)
     {
+        checkWikiExists(wikiId);
+
         // Save the current entity reference. It will be restored on the method is finished.
         EntityReference oldEntityReference = this.modelContext.getCurrentEntityReference();
         try {
@@ -122,5 +131,19 @@ public class DefaultTranslationsResource implements TranslationsResource, XWikiR
         translation.setKey(key);
         translation.setRawSource(rawSource);
         return translation;
+    }
+
+    private void checkWikiExists(String wikiId)
+    {
+        boolean exists;
+        try {
+            exists = this.wikiDescriptorManager.exists(wikiId);
+        } catch (WikiManagerException e) {
+            throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+        }
+
+        if (!exists) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
     }
 }

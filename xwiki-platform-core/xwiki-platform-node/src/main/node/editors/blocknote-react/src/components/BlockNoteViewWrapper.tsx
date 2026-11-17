@@ -23,6 +23,7 @@ import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
 import { FilePanel } from "./files/FilePanel";
 import { ImageSuggestionController } from "./images/ImageSuggestionController";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
+import { LinkSuggestionController } from "./links/LinkSuggestionController";
 import {
   createBlockNoteSchema,
   createDictionary,
@@ -421,8 +422,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
                   syntax,
                   lang,
                   t,
-                  linkEditionHandler,
-                  linkEditionHooks: overrides?.linkEdition,
                   openMacroInsertionEditor: macros
                     ? macros.ctx.openInsertionEditor
                     : undefined,
@@ -435,6 +434,15 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
                 maxSuggestions={5}
                 imageEditionHooks={overrides?.imageEditionHooks}
                 imageInsertionOverrideFn={overrides?.imageInsertion}
+              />
+            )}
+
+            {syntax.features.inlineContents.links.basicLinks && (
+              <LinkSuggestionController
+                linkEditionHandler={linkEditionHandler}
+                linkEditionHooks={overrides?.linkEdition}
+                maxSuggestions={8}
+                pageSuggestionsShare={5}
               />
             )}
 

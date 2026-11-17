@@ -36,8 +36,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -50,6 +48,7 @@ import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -90,8 +89,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
 
     @Inject
     @Named("compactwiki")
@@ -122,33 +120,23 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
         String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
         setDefaultNewRowLocation(namingStrategy, sourceParams);
-        ComponentManager componentManager = this.componentManagerProvider.get();
-        if (namingStrategy != null
-            && componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
-            try {
-                LiveTableNewRowNamingStrategy strategy =
-                    componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
-                if (isCreationAllowed(strategy, sourceParams)) {
-                    List<String> undescribedProperties =
-                        setMandatory(mergedConfig.getMeta(), strategy.getMandatoryProperties(sourceParams));
-                    if (undescribedProperties.isEmpty()) {
-                        LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
-                        addEntry.setId("addEntry");
-                        strategy.getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
-                            .put("location", this.stringEntityReferenceSerializer.serialize(location)));
-                        // The rows that have no entry yet are displayed from the template their entry is created from.
-                        this.templateProviderResolver.getTemplate(sourceParams).ifPresent(template -> addEntry
-                            .getParameters().put("template", this.stringEntityReferenceSerializer.serialize(template)));
-                        mergedConfig.getMeta().getActions().add(addEntry);
-                    } else {
-                        // No entry could be created, since the user has no cell to give those values in.
-                        this.logger.warn("Adding entries is disabled because the mandatory properties {} have no "
-                            + "descriptor in this live data.", undescribedProperties);
-                    }
-                }
-            } catch (ComponentLookupException e) {
-                throw new LiveDataException(
-                    String.format("Failed to load the row naming strategy [%s].", namingStrategy), e);
+        Optional<LiveTableNewRowNamingStrategy> strategy = this.namingStrategyManager.get(namingStrategy);
+        if (strategy.isPresent() && isCreationAllowed(strategy.get(), sourceParams)) {
+            List<String> undescribedProperties =
+                setMandatory(mergedConfig.getMeta(), strategy.get().getMandatoryProperties(sourceParams));
+            if (undescribedProperties.isEmpty()) {
+                LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
+                addEntry.setId("addEntry");
+                strategy.get().getNewEntryLocation(sourceParams).ifPresent(location -> addEntry.getParameters()
+                    .put("location", this.stringEntityReferenceSerializer.serialize(location)));
+                // The rows that have no entry yet are displayed from the template their entry is created from.
+                this.templateProviderResolver.getTemplate(sourceParams).ifPresent(template -> addEntry
+                    .getParameters().put("template", this.stringEntityReferenceSerializer.serialize(template)));
+                mergedConfig.getMeta().getActions().add(addEntry);
+            } else {
+                // No entry could be created, since the user has no cell to give those values in.
+                this.logger.warn("Adding entries is disabled because the mandatory properties {} have no "
+                    + "descriptor in this live data.", undescribedProperties);
             }
         }
 

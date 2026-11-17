@@ -158,6 +158,11 @@
               <artifactId>xwiki-platform-security-authentication-default</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-pagetemplate-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
 
             <!-- Since we're building XWiki Standard, we need to add the Event Stream Store as a dependency,
                  which has its own mapping and migrators. -->

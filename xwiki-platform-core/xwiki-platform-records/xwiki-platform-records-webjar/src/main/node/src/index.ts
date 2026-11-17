@@ -40,6 +40,10 @@ import {
   setMessages,
   translate,
 } from "./common/translations";
+import {
+  updateCreationFields,
+  wireCreationFields,
+} from "./editing/creationFields";
 import { filterSuggestions } from "./filters/filterSuggestions";
 import { sortSuggestions } from "./sort/sortSuggestions";
 import { loadById } from "@xwiki/platform-xwiki-utils";
@@ -47,7 +51,8 @@ import type { Suggester, Suggestions } from "./common/suggester";
 import type { Messages } from "./common/translations";
 
 /**
- * Wires the Records macro dialog: the field picker, and the two behaviours that depend on the data type.
+ * Wires the Records macro dialog: the field picker, the two behaviours that depend on the data type, and the creation
+ * fields that depend on the edit mode and the columns.
  *
  * jQuery and the suggest widget are loaded through RequireJS rather than imported, so that they stay the single
  * instances the rest of the page already uses and nothing is bundled twice.
@@ -91,22 +96,24 @@ async function warnIfDataTypeMissing(
   dataTypeInput: HTMLInputElement | HTMLSelectElement,
 ): Promise<void> {
   const dataType = dataTypeInput.value;
-  let descriptors;
-  try {
-    descriptors = await loadDescriptors(picker, XWiki.contextPath, fetchJson);
-  } catch {
-    // The pickers make the same request and report its failure themselves.
-    return;
+  if (dataType !== "") {
+    let descriptors;
+    try {
+      descriptors = await loadDescriptors(picker, XWiki.contextPath, fetchJson);
+    } catch {
+      // The pickers make the same request and report its failure themselves.
+      return;
+    }
+    // The author may have picked another data type while the request was running.
+    if (hasDataTypeFields(descriptors) || dataTypeInput.value !== dataType) {
+      return;
+    }
+    showMessage(
+      dataTypeInput.selectize?.wrapper ?? dataTypeInput,
+      "warning",
+      translate("picker.dataTypeMissing", findDataTypeLabel(dataTypeInput)),
+    );
   }
-  // The author may have picked another data type while the request was running.
-  if (hasDataTypeFields(descriptors) || dataTypeInput.value !== dataType) {
-    return;
-  }
-  showMessage(
-    dataTypeInput.selectize?.wrapper ?? dataTypeInput,
-    "warning",
-    translate("picker.dataTypeMissing", findDataTypeLabel(dataTypeInput)),
-  );
 }
 
 /**
@@ -158,6 +165,9 @@ function wire($: JQueryStatic, picker: Element): void {
   const dataTypeInput = findDataTypeInput(scope);
 
   enhancePickers($, picker, scope);
+  wireCreationFields(scope, (field, handler) => {
+    $(field).on("change", handler);
+  });
 
   // The tabs are all derived from the data type, so there is nothing to show until one is picked.
   setTabsVisible(scope, dataTypeInput !== null && dataTypeInput.value !== "");
@@ -165,9 +175,7 @@ function wire($: JQueryStatic, picker: Element): void {
     return;
   }
 
-  if (dataTypeInput.value !== "") {
-    void warnIfDataTypeMissing(picker, dataTypeInput);
-  }
+  void warnIfDataTypeMissing(picker, dataTypeInput);
 
   let previous = dataTypeInput.value;
   $(dataTypeInput).on("change", () => {
@@ -180,11 +188,23 @@ function wire($: JQueryStatic, picker: Element): void {
       revert(dataTypeInput, previous);
       return;
     }
-    resetDerivedParameters(scope);
-    clearMessages(scope);
-    setTabsVisible(scope, current !== "");
+    applyDataType(scope, current);
     previous = current;
   });
+}
+
+/**
+ * Brings a dialog in line with the data type the author just picked.
+ *
+ * @param scope - the dialog's form
+ * @param dataType - the data type picked, empty when the author cleared it
+ */
+function applyDataType(scope: ParentNode, dataType: string): void {
+  resetDerivedParameters(scope);
+  clearMessages(scope);
+  // The columns were reset silently, which the creation fields have to follow.
+  updateCreationFields(scope, true);
+  setTabsVisible(scope, dataType !== "");
 }
 
 /**

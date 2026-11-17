@@ -20,6 +20,7 @@
 // @vitest-environment jsdom
 
 import {
+  triggerUserAttachmentUpload,
   triggerUserFileUpload,
   triggerUserImageUpload,
 } from "../../misc/fileUpload";
@@ -37,7 +38,9 @@ import type {
 } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
 import type {
+  ModelReferenceParser,
   ModelReferenceParserProvider,
+  ModelReferenceSerializer,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
 import type { Container } from "inversify";
@@ -71,7 +74,14 @@ function buildContainer(
     serializeReferences?: boolean;
   } = {},
 ): { container: Container; attachmentsService: AttachmentsService } {
-  const container = mock<Container>();
+  const container = mock<Container>(
+    {},
+    {
+      fallbackMockImplementation: (id: unknown) => {
+        throw new Error(`Unexpected service: ${String(id)}`);
+      },
+    },
+  );
 
   const attachmentsService = mock<AttachmentsService>();
   if (options.failUpload) {
@@ -94,26 +104,34 @@ function mockReferenceServices(
   container: ReturnType<typeof mock<Container>>,
   serializeReferences: boolean,
 ) {
-  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
-    get: () => ({
-      parse: (page: string) =>
-        new DocumentReference(page, new SpaceReference()),
+  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue(
+    mock<ModelReferenceParserProvider>({
+      get: () =>
+        mock<ModelReferenceParser>({
+          parse: (page: string) =>
+            new DocumentReference(page, new SpaceReference()),
+        }),
     }),
-  } as unknown as ModelReferenceParserProvider);
-  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
-    get: () => ({
-      serialize: (reference: AttachmentReference) =>
-        serializeReferences
-          ? `${reference.document.name}@${reference.name}`
-          : undefined,
+  );
+  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue(
+    mock<ModelReferenceSerializerProvider>({
+      get: () =>
+        mock<ModelReferenceSerializer>({
+          serialize: (reference: AttachmentReference) =>
+            serializeReferences
+              ? `${reference.document.name}@${reference.name}`
+              : undefined,
+        }),
     }),
-  } as unknown as ModelReferenceSerializerProvider);
+  );
   container.get
     .calledWith("ResourceReferenceParser")
     .mockReturnValue(new DefaultResourceReferenceParser());
-  container.get.calledWith("DocumentService").mockReturnValue({
-    getCurrentDocumentReferenceString: () => ({ value: CURRENT_PAGE }),
-  } as unknown as DocumentService);
+  container.get.calledWith("DocumentService").mockReturnValue(
+    mock<DocumentService>({
+      getCurrentDocumentReferenceString: () => ({ value: CURRENT_PAGE }),
+    }),
+  );
 }
 
 function buildFile(): File {
@@ -228,6 +246,7 @@ describe("triggerUserImageUpload", () => {
     // by default.
     await expect(promise).resolves.toEqual({
       url: "https://example.org/attachments/uploaded.png",
+      name: "uploaded.png",
       reference: {
         type: "attach",
         typed: false,
@@ -261,6 +280,7 @@ describe("triggerUserImageUpload", () => {
 
     await expect(promise).resolves.toEqual({
       url: "https://example.org/attachments/uploaded.png",
+      name: "uploaded.png",
       reference: undefined,
     });
   });
@@ -290,6 +310,53 @@ describe("triggerUserImageUpload", () => {
     await expect(promise).resolves.toBeUndefined();
     expect(consoleError).toHaveBeenCalledWith(
       "Failed to upload the selected image.",
+      expect.objectContaining({ message: "Upload failed" }),
+    );
+  });
+});
+
+describe("triggerUserAttachmentUpload", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("offers all file types and resolves with the uploaded attachment's URL, name and resource reference", async () => {
+    const { container, attachmentsService } = buildContainer();
+    const promise = triggerUserAttachmentUpload(container, EDITED_PAGE);
+
+    const input = getHiddenFileInput();
+    expect(input.accept).toBe("");
+    const file = selectFile(input);
+
+    // The name is the one of the uploaded attachment, rather than the one of the selected file, since it's the one
+    // that a link to the attachment gets as generated label.
+    await expect(promise).resolves.toEqual({
+      url: "https://example.org/attachments/uploaded.png",
+      name: "uploaded.png",
+      reference: {
+        type: "attach",
+        typed: false,
+        reference: "Edited.Page@uploaded.png",
+        parameters: {},
+      },
+    });
+    expect(attachmentsService.upload).toHaveBeenCalledWith(EDITED_PAGE, [file]);
+  });
+
+  test("logs the error and resolves with undefined when the upload fails", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const promise = triggerUserAttachmentUpload(
+      buildContainer({ failUpload: true }).container,
+      EDITED_PAGE,
+    );
+
+    selectFile(getHiddenFileInput());
+
+    await expect(promise).resolves.toBeUndefined();
+    expect(consoleError).toHaveBeenCalledWith(
+      "Failed to upload the selected file.",
       expect.objectContaining({ message: "Upload failed" }),
     );
   });

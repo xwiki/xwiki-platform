@@ -25,6 +25,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.internal.wiki.WikiOwnerUpdater;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
@@ -109,21 +111,18 @@ public final class RightsManagerListener implements EventListener
             XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
             XWikiContext context = (XWikiContext) data;
 
-            String userOrGroupWiki = document.getDatabase();
-            String userOrGroupSpace = document.getSpace();
-            String userOrGroupName = document.getName();
-
             if (document.getObject("XWiki.XWikiUsers") != null) {
                 try {
-                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
+                    cleanDeletedUserOrGroup(document, true, context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("Failed to clean the rights of deleted user [{}]", userOrGroupName, e);
+                    LOGGER.warn("Failed to clean the rights of deleted user [{}]", document.getDocumentReference(), e);
                 }
             } else if (document.getObject("XWiki.XWikiGroups") != null) {
                 try {
-                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
+                    cleanDeletedUserOrGroup(document, false, context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("Failed to clean the rights of deleted group [{}]", userOrGroupName, e);
+                    LOGGER.warn("Failed to clean the rights of deleted group [{}]", document.getDocumentReference(),
+                        e);
                 }
             }
         }
@@ -154,28 +153,54 @@ public final class RightsManagerListener implements EventListener
     }
 
     /**
-     * Remove the reference to the provided user or group in all groups and rights, in all wikis.
+     * Remove the reference to the provided user or group in all wiki owners, groups and rights, in all wikis. A
+     * failure in a wiki is logged, and the other wikis are still cleaned.
      *
-     * @param userOrGroupWiki the wiki name of the group or user.
-     * @param userOrGroupSpace the space name of the group or user.
-     * @param userOrGroupName the name of the group or user.
+     * @param userOrGroupDocument the document of the deleted user or group
      * @param user indicate if it is a user or a group.
      * @param context the XWiki context.
-     * @throws XWikiException error when browsing groups or rights.
+     * @throws XWikiException error when getting the wikis.
      */
-    private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
-        boolean user, XWikiContext context) throws XWikiException
+    private void cleanDeletedUserOrGroup(XWikiDocument userOrGroupDocument, boolean user, XWikiContext context)
+        throws XWikiException
     {
+        DocumentReference userOrGroupReference = userOrGroupDocument.getDocumentReference();
+
+        Utils.getComponent(WikiOwnerUpdater.class).replaceOwner(userOrGroupReference, null);
+
+        String userOrGroupSpace = userOrGroupDocument.getSpace();
+
         List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
 
         String database = context.getWikiId();
         try {
             for (String wikiName : wikiList) {
                 context.setWikiId(wikiName);
-                cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
+                cleanDeletedUserOrGroupInWiki(userOrGroupReference, userOrGroupSpace, user, context);
             }
         } finally {
             context.setWikiId(database);
+        }
+    }
+
+    /**
+     * Remove the provided user or group from the rights and groups of the current wiki, logging a failure so that the
+     * other wikis are still cleaned.
+     *
+     * @param userOrGroupReference the reference of the deleted user or group
+     * @param userOrGroupSpace the space of the deleted user or group
+     * @param user {@code true} for a user, {@code false} for a group
+     * @param context the XWiki context
+     */
+    private void cleanDeletedUserOrGroupInWiki(DocumentReference userOrGroupReference, String userOrGroupSpace,
+        boolean user, XWikiContext context)
+    {
+        try {
+            cleanDeletedUserOrGroupInLocalWiki(userOrGroupReference.getWikiReference().getName(), userOrGroupSpace,
+                userOrGroupReference.getName(), user, context);
+        } catch (XWikiException e) {
+            LOGGER.warn("Failed to clean the rights and groups of [{}] in the wiki [{}]", userOrGroupReference,
+                context.getWikiId(), e);
         }
     }
 }

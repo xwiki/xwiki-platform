@@ -34,7 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
@@ -42,17 +41,16 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.LogLevel;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,7 +99,9 @@ class DefaultLiveDataConfigurationResolverTest
     private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
 
     @MockComponent
-    @Named("uuid")
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Mock
     private LiveTableNewRowNamingStrategy namingStrategy;
 
     @MockComponent
@@ -119,13 +119,6 @@ class DefaultLiveDataConfigurationResolverTest
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeComponent
-    void beforeComponent(MockitoComponentManager componentManager) throws Exception
-    {
-        // The naming strategies are looked up in the context component manager.
-        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
-    }
-
     @BeforeEach
     void configure() throws Exception
     {
@@ -133,6 +126,7 @@ class DefaultLiveDataConfigurationResolverTest
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
 
         when(this.propertyStoreProvider.get()).thenReturn((LiveDataPropertyDescriptorStore) this.propertyStore);
+        when(this.namingStrategyManager.get("uuid")).thenReturn(Optional.of(this.namingStrategy));
 
         this.defaultConfig.initialize();
         when(this.defaultConfigProvider.get()).thenReturn(this.defaultConfig);

@@ -25,14 +25,19 @@ import java.util.Set;
 
 import jakarta.inject.Named;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.SpaceResourceReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -61,6 +66,14 @@ class RecordsMacroRefactoringTest
 
     private static final DocumentReference MOVED_PAGE = new DocumentReference("wiki", "Shelf", "WebHome");
 
+    private static final String LOCATION_VALUE = "Books.Archive";
+
+    private static final SpaceReference LOCATION = new SpaceReference("wiki", "Books", "Archive");
+
+    private static final DocumentReference LOCATION_HOME = new DocumentReference("WebHome", LOCATION);
+
+    private static final SpaceReference MOVED_LOCATION = new SpaceReference("wiki", "Books", "Old");
+
     @InjectMockComponents
     private RecordsMacroRefactoring refactoring;
 
@@ -71,6 +84,16 @@ class RecordsMacroRefactoringTest
     @MockComponent
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @MockComponent
+    private EntityReferenceProvider entityReferenceProvider;
+
+    @BeforeEach
+    void beforeEach()
+    {
+        when(this.entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
+    }
 
     @Test
     void replaceReferenceWhenTheObjectTypeMoves()
@@ -162,6 +185,72 @@ class RecordsMacroRefactoringTest
     }
 
     @Test
+    void replaceReferenceWhenTheLocationSpaceIsRenamed()
+    {
+        MacroBlock macroBlock = macroBlock("newEntriesLocation", LOCATION_VALUE);
+        resolveSpace(macroBlock, LOCATION_VALUE, PAGE, LOCATION);
+        when(this.compactWikiEntityReferenceSerializer.serialize(MOVED_LOCATION, PAGE.getWikiReference()))
+            .thenReturn("Books.Old");
+
+        Optional<MacroBlock> result = this.refactoring.replaceReference(macroBlock, PAGE, LOCATION_HOME,
+            new DocumentReference("WebHome", MOVED_LOCATION), false);
+
+        assertEquals("Books.Old", result.orElseThrow().getParameter("newEntriesLocation"));
+    }
+
+    @Test
+    void replaceReferenceKeepsThePartialObjectTypeAndLocationOfAPageMovedToAnotherWiki()
+    {
+        // A space value names every space, so only its wiki is completed from the page holding the macro.
+        MacroBlock macroBlock =
+            new MacroBlock(RecordsMacro.ID, Map.of("class", "BookClass", "newEntriesLocation", "Archive"), true);
+        DocumentReference otherWikiPage = new DocumentReference("other", "Shelf", "WebHome");
+        SpaceReference archive = new SpaceReference("wiki", "Archive");
+        resolve(macroBlock, "BookClass", PAGE, CLASS);
+        resolve(macroBlock, "BookClass", otherWikiPage, new DocumentReference("other", "Shelf", "BookClass"));
+        resolveSpace(macroBlock, "Archive", PAGE, archive);
+        resolveSpace(macroBlock, "Archive", otherWikiPage, new SpaceReference("other", "Archive"));
+        when(this.compactWikiEntityReferenceSerializer.serialize(CLASS, otherWikiPage.getWikiReference()))
+            .thenReturn("wiki:Books.BookClass");
+        when(this.compactWikiEntityReferenceSerializer.serialize(archive, otherWikiPage.getWikiReference()))
+            .thenReturn("wiki:Archive");
+
+        MacroBlock result = this.refactoring.replaceReference(macroBlock, otherWikiPage, PAGE, otherWikiPage, true,
+            Map.of(PAGE, otherWikiPage)).orElseThrow();
+
+        assertEquals("wiki:Books.BookClass", result.getParameter("class"));
+        assertEquals("wiki:Archive", result.getParameter("newEntriesLocation"));
+    }
+
+    @Test
+    void replaceReferenceFollowsALocationMovedWithThePage()
+    {
+        MacroBlock macroBlock = macroBlock("newEntriesLocation", "Archive");
+        SpaceReference archive = new SpaceReference("wiki", "Archive");
+        resolveSpace(macroBlock, "Archive", PAGE, archive);
+        resolveSpace(macroBlock, "Archive", MOVED_PAGE, archive);
+        SpaceReference movedArchive = new SpaceReference("wiki", "Library", "Archive");
+        when(this.compactWikiEntityReferenceSerializer.serialize(movedArchive, MOVED_PAGE.getWikiReference()))
+            .thenReturn("Library.Archive");
+
+        Optional<MacroBlock> result = this.refactoring.replaceReference(macroBlock, MOVED_PAGE, PAGE, MOVED_PAGE, true,
+            Map.of(PAGE, MOVED_PAGE, new DocumentReference("WebHome", archive),
+                new DocumentReference("WebHome", movedArchive)));
+
+        assertEquals("Library.Archive", result.orElseThrow().getParameter("newEntriesLocation"));
+    }
+
+    @Test
+    void replaceReferenceKeepsTheLocationWhenItsHomeBecomesARegularPage()
+    {
+        MacroBlock macroBlock = macroBlock("newEntriesLocation", LOCATION_VALUE);
+        resolveSpace(macroBlock, LOCATION_VALUE, PAGE, LOCATION);
+
+        assertEquals(Optional.empty(), this.refactoring.replaceReference(macroBlock, PAGE, LOCATION_HOME,
+            new DocumentReference("wiki", "Books", "Archive"), false));
+    }
+
+    @Test
     void replaceAttachmentReference()
     {
         assertEquals(Optional.empty(), this.refactoring.replaceReference(macroBlock("class", CLASS_VALUE), PAGE,
@@ -174,6 +263,10 @@ class RecordsMacroRefactoringTest
         assertEquals(Set.of(new DocumentResourceReference(CLASS_VALUE)),
             this.refactoring.extractReferences(macroBlock("class", CLASS_VALUE)));
         assertEquals(Set.of(), this.refactoring.extractReferences(macroBlock("id", "books")));
+        MacroBlock macroBlock = new MacroBlock(RecordsMacro.ID,
+            Map.of("class", CLASS_VALUE, "newEntriesLocation", LOCATION_VALUE), true);
+        assertEquals(Set.of(new DocumentResourceReference(CLASS_VALUE), new SpaceResourceReference(LOCATION_VALUE)),
+            this.refactoring.extractReferences(macroBlock));
     }
 
     private MacroBlock macroBlock(String parameterName, String value)
@@ -184,6 +277,12 @@ class RecordsMacroRefactoringTest
     private void resolve(MacroBlock macroBlock, String value, DocumentReference base, DocumentReference result)
     {
         when(this.macroEntityReferenceResolver.resolve(eq(value), eq(EntityType.DOCUMENT), same(macroBlock),
+            eq(base))).thenReturn(result);
+    }
+
+    private void resolveSpace(MacroBlock macroBlock, String value, DocumentReference base, SpaceReference result)
+    {
+        when(this.macroEntityReferenceResolver.resolve(eq(value), eq(EntityType.SPACE), same(macroBlock),
             eq(base))).thenReturn(result);
     }
 }

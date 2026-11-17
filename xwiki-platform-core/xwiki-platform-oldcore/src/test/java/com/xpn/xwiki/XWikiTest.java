@@ -1545,6 +1545,26 @@ class XWikiTest
     }
 
     @Test
+    void getWikiOwner() throws Exception
+    {
+        XWikiDocument descriptor =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "XWikiServerSubwiki"),
+                this.oldcore.getXWikiContext());
+        BaseObject descriptorObject = descriptor.newXObject(new LocalDocumentReference("XWiki", "XWikiServerClass"),
+            this.oldcore.getXWikiContext());
+        descriptorObject.setStringValue("owner", "XWiki.Owner");
+        this.xwiki.saveDocument(descriptor, this.oldcore.getXWikiContext());
+
+        assertEquals("xwiki:XWiki.Owner", this.xwiki.getWikiOwner("subwiki", this.oldcore.getXWikiContext()));
+
+        // An empty owner means no owner, not a user with an empty name.
+        descriptorObject.setStringValue("owner", "");
+        this.xwiki.saveDocument(descriptor, this.oldcore.getXWikiContext());
+
+        assertNull(this.xwiki.getWikiOwner("subwiki", this.oldcore.getXWikiContext()));
+    }
+
+    @Test
     void formatDate()
     {
         Date date = new Date(1718887539000L);

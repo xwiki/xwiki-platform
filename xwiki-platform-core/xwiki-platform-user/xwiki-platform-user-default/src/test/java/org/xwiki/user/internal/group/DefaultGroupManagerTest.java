@@ -25,10 +25,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.internal.MapCache;
@@ -55,6 +58,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isContextWiki;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -63,7 +67,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -156,7 +161,7 @@ class DefaultGroupManagerTest
     {
         this.wikis.add(wiki);
         try {
-            when(this.groupService.getAllGroupsReferencesForMember(same(user), anyInt(), anyInt(), isContextWiki(wiki)))
+            when(this.groupService.getAllGroupsReferencesForMember(eq(user), anyInt(), anyInt(), isContextWiki(wiki)))
                 .thenReturn(groups);
         } catch (XWikiException e) {
             // Cannot happen
@@ -313,6 +318,133 @@ class DefaultGroupManagerTest
         this.oldcore.getXWikiContext().setWikiId("wiki");
         assertGetGroups(allDirect, GLOBAL_USER_1, WikiTarget.ENTITY_AND_CURRENT, false);
         assertGetGroups(all, GLOBAL_USER_1, WikiTarget.ENTITY_AND_CURRENT, true);
+    }
+
+    @Test
+    void isMember() throws GroupException
+    {
+        mockGroups("xwiki", GLOBAL_USER_1, List.of(GLOBAL_GROUP_1));
+        mockGroups("xwiki", GLOBAL_GROUP_1, List.of(GLOBAL_GROUP_2));
+
+        assertTrue(this.manager.isMember(GLOBAL_USER_1, GLOBAL_GROUP_1, false));
+        assertTrue(this.manager.isMember(GLOBAL_USER_1, GLOBAL_GROUP_1, true));
+        assertFalse(this.manager.isMember(GLOBAL_USER_1, GLOBAL_GROUP_2, false));
+        assertTrue(this.manager.isMember(GLOBAL_USER_1, GLOBAL_GROUP_2, true));
+        // A group is not a member of itself.
+        assertFalse(this.manager.isMember(GLOBAL_GROUP_1, GLOBAL_GROUP_1, true));
+        // A group is not a member of the groups it contains.
+        assertFalse(this.manager.isMember(GLOBAL_GROUP_2, GLOBAL_GROUP_1, true));
+    }
+
+    @Test
+    void isMemberStopsWhenGroupFound() throws Exception
+    {
+        DocumentReference group3 = new DocumentReference("xwiki", "XWiki", "group3");
+        mockGroups("xwiki", GLOBAL_USER_1, List.of(GLOBAL_GROUP_1));
+        mockGroups("xwiki", GLOBAL_GROUP_1, List.of(GLOBAL_GROUP_2));
+        mockGroups("xwiki", GLOBAL_GROUP_2, List.of(group3));
+
+        assertTrue(this.manager.isMember(GLOBAL_USER_1, GLOBAL_GROUP_2, true));
+
+        // The groups of the group which was found are not needed.
+        verify(this.groupService, never()).getAllGroupsReferencesForMember(eq(GLOBAL_GROUP_2), anyInt(), anyInt(),
+            any());
+    }
+
+    @Test
+    void isMemberUsesCachedGroupsOfMember() throws Exception
+    {
+        // Only the cached groups of the member can tell that it's a member of the group.
+        this.componentManager.<MemberGroupsCache>getInstance(MemberGroupsCache.class)
+            .getCacheEntry(GLOBAL_USER_1, new TreeSet<>(List.of("xwiki")), true).setAll(List.of(GLOBAL_GROUP_2));
+
+        assertTrue(this.manager.isMember(GLOBAL_USER_1, GLOBAL_GROUP_2, true));
+        verify(this.groupService, never()).getAllGroupsReferencesForMember(any(), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void isMemberCachesGroupsOfMemberWhenNotMember() throws Exception
+    {
+        mockGroups("xwiki", GLOBAL_USER_1, List.of(GLOBAL_GROUP_1));
+        mockGroups("xwiki", GLOBAL_GROUP_1, List.of(GLOBAL_GROUP_2));
+
+        assertFalse(this.manager.isMember(GLOBAL_USER_1, new DocumentReference("xwiki", "XWiki", "group3"), true));
+
+        // All the groups of the member were visited, so they are cached for the next checks.
+        assertEquals(Set.of(GLOBAL_GROUP_1, GLOBAL_GROUP_2),
+            new HashSet<>(this.componentManager.<MemberGroupsCache>getInstance(MemberGroupsCache.class)
+                .getCacheEntry(GLOBAL_USER_1, new TreeSet<>(List.of("xwiki")), false).getAll()));
+    }
+
+    @Test
+    void isMemberWhenGroupListsItself() throws GroupException
+    {
+        mockGroups("xwiki", GLOBAL_GROUP_1, List.of(GLOBAL_GROUP_1));
+
+        assertFalse(this.manager.isMember(GLOBAL_GROUP_1, GLOBAL_GROUP_1, false));
+        assertFalse(this.manager.isMember(GLOBAL_GROUP_1, GLOBAL_GROUP_1, true));
+    }
+
+    @Test
+    void isMemberIgnoresLocale() throws GroupException
+    {
+        mockGroups("xwiki", GLOBAL_USER_1, List.of(GLOBAL_GROUP_1));
+
+        assertTrue(this.manager.isMember(new DocumentReference(GLOBAL_USER_1, Locale.FRENCH),
+            new DocumentReference(GLOBAL_GROUP_1, Locale.FRENCH), false));
+    }
+
+    @Test
+    @Timeout(value = 10, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    void isMemberWhenCrossReference() throws GroupException
+    {
+        mockGroups("xwiki", GLOBAL_USER_1, List.of(GLOBAL_GROUP_1));
+        mockGroups("xwiki", GLOBAL_GROUP_1, List.of(GLOBAL_GROUP_2));
+        mockGroups("xwiki", GLOBAL_GROUP_2, List.of(GLOBAL_GROUP_1));
+
+        assertTrue(this.manager.isMember(GLOBAL_USER_1, GLOBAL_GROUP_2, true));
+        assertTrue(this.manager.isMember(GLOBAL_GROUP_1, GLOBAL_GROUP_2, true));
+        assertTrue(this.manager.isMember(GLOBAL_GROUP_2, GLOBAL_GROUP_1, true));
+        assertFalse(this.manager.isMember(GLOBAL_GROUP_1, GLOBAL_GROUP_1, true));
+        // Would never end without the protection against cross references.
+        assertFalse(this.manager.isMember(GLOBAL_USER_1, new DocumentReference("xwiki", "XWiki", "group3"), true));
+    }
+
+    @Test
+    void isMemberWhenGroupInAnotherWiki() throws GroupException
+    {
+        // The global user is a member of a subwiki group only through a global group.
+        mockGroups("xwiki", GLOBAL_USER_1, List.of(GLOBAL_GROUP_1));
+        mockGroups("wiki", GLOBAL_GROUP_1, List.of(WIKI_GROUP_1));
+
+        assertFalse(this.manager.isMember(GLOBAL_USER_1, WIKI_GROUP_1, false));
+        assertTrue(this.manager.isMember(GLOBAL_USER_1, WIKI_GROUP_1, true));
+        assertTrue(this.manager.isMember(GLOBAL_GROUP_1, WIKI_GROUP_1, false));
+    }
+
+    @Test
+    void isMemberWhenThroughGroupOfThirdWiki() throws GroupException
+    {
+        DocumentReference otherWikiGroup = new DocumentReference("otherwiki", "XWiki", "group");
+        mockGroups(otherWikiGroup.getWikiReference(), List.of("XWiki.group"));
+
+        // The global user is a member of a subwiki group only through a group of a third wiki, which is not searched.
+        mockGroups("otherwiki", GLOBAL_USER_1, List.of(otherWikiGroup));
+        mockGroups("wiki", otherWikiGroup, List.of(WIKI_GROUP_1));
+        mockMembers(WIKI_GROUP_1, List.of(otherWikiGroup));
+        mockMembers(otherWikiGroup, List.of(GLOBAL_USER_1));
+
+        assertTrue(this.manager.getMembers(WIKI_GROUP_1, true).contains(GLOBAL_USER_1));
+        assertFalse(this.manager.isMember(GLOBAL_USER_1, WIKI_GROUP_1, true));
+    }
+
+    @Test
+    void isMemberWithGuestOrNoGroup() throws GroupException
+    {
+        mockGroups("xwiki", GLOBAL_USER_1, List.of(GLOBAL_GROUP_1));
+
+        assertFalse(this.manager.isMember(null, GLOBAL_GROUP_1, true));
+        assertFalse(this.manager.isMember(GLOBAL_USER_1, null, true));
     }
 
     @Test

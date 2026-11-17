@@ -31,6 +31,7 @@ import { MacroBlockInvocation as MacroBlockInvocation_2 } from '@xwiki/platform-
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
+import { PartialLink } from '@blocknote/core';
 import { PropSchema } from '@blocknote/core';
 import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactInlineContentImplementation } from '@blocknote/react';
@@ -107,6 +108,9 @@ export type EditorLanguage = keyof typeof locales & keyof typeof _default;
 
 // @beta
 export type EditorLink = Link<EditorStyleSchema>;
+
+// @beta
+export type EditorPartialLink = PartialLink<EditorStyleSchema>;
 
 // Warning: (ae-forgotten-export) The symbol "createBlockNoteSchema" needs to be exported by the entry point index.d.ts
 //

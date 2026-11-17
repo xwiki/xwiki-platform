@@ -26,16 +26,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiException;
@@ -61,8 +58,7 @@ public class LiveTableNewEntryResolver
     }
 
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
 
     @Inject
     private NewRowTemplateProviderResolver templateProviderResolver;
@@ -92,18 +88,11 @@ public class LiveTableNewEntryResolver
         throws LiveDataException
     {
         String namingStrategy = (String) parameters.get("newRowNamingStrategy");
-        ComponentManager componentManager = this.componentManagerProvider.get();
-        if (!componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
-            throw new LiveDataException(String.format("Unsupported row naming strategy [%s].", namingStrategy));
-        }
+        LiveTableNewRowNamingStrategy strategy = this.namingStrategyManager.get(namingStrategy).orElseThrow(
+            () -> new LiveDataException(String.format("Unsupported row naming strategy [%s].", namingStrategy)));
+        checkMandatoryProperties(strategy.getMandatoryProperties(parameters), entryValues);
         try {
-            LiveTableNewRowNamingStrategy strategy =
-                componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
-            checkMandatoryProperties(strategy.getMandatoryProperties(parameters), entryValues);
             return strategy.generate(parameters, entryValues);
-        } catch (ComponentLookupException e) {
-            throw new LiveDataException(
-                String.format("Failed to instantiate the row naming strategy [%s].", namingStrategy), e);
         } catch (XWikiException e) {
             throw new LiveDataException("An error occurred while generating the new entry reference.", e);
         }

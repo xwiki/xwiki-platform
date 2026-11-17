@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { insertLink } from "./insertLink";
 import { useEditor } from "../../hooks";
 import { selectionHasInlineContent } from "../../selection";
 import { formatKeyboardShortcut } from "@blocknote/core";
@@ -39,21 +40,11 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
   const Components = useComponentsContext()!;
   const dict = useDictionary();
 
-  const insertLink = useCallback(
-    (linkData: LinkEditionData, selectedText: string) => {
-      // Let the integration intercept the link (including the reference of the linked resource)
-      // before it is written into the content (e.g. to store that reference aside). Throwing from
-      // the hook cancels the insertion.
-      const { url, title } =
-        linkEditionHooks?.beforeUpdate?.(linkData) ?? linkData;
-      // Link the selection in place, without replacing it (which would strip the inline formatting
-      // it doesn't share), unless the link label differs from the selected text, i.e. the user
-      // changed the display text (or emptied it, to have the label generated from the target): the
-      // selection is then replaced with the new label, keeping the formatting shared by the whole
-      // selection, like typing over it does.
-      editor.createLink(url, title === selectedText ? undefined : title);
-      editor.focus();
-    },
+  const insertSelectionLink = useCallback(
+    // When the link label differs from the selected text, the selection is replaced with the new label, keeping the
+    // formatting shared by the whole selection, like typing over it does.
+    (linkData: LinkEditionData, selectedText: string) =>
+      insertLink(editor, linkData, linkEditionHooks, selectedText),
     [editor, linkEditionHooks],
   );
 
@@ -82,7 +73,7 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
         linkEditionHandler({
           mode: "createNew",
           current: { title: selectedText, url: "" },
-          onSubmit: (linkData) => insertLink(linkData, selectedText),
+          onSubmit: (linkData) => insertSelectionLink(linkData, selectedText),
         });
       }}
     />

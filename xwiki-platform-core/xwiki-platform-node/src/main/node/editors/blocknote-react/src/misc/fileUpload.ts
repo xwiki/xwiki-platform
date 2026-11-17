@@ -37,12 +37,17 @@ import type {
 import type { Container } from "inversify";
 
 /**
- * An image uploaded by the user, ready to be inserted into the content.
+ * A file uploaded by the user, ready to be inserted into the content (e.g. as an image) or linked from it.
  */
-type UploadedImage = {
+type UploadedAttachment = {
   url: string;
   /**
-   * The resource reference of the uploaded image, when its attachment reference can be serialized.
+   * The name of the attachment, which can differ from the name of the uploaded file (e.g. when an attachment with the
+   * same name already exists).
+   */
+  name: string;
+  /**
+   * The resource reference of the uploaded attachment, when its attachment reference can be serialized.
    */
   reference?: ResourceReference;
 };
@@ -115,20 +120,57 @@ function triggerUserFileUpload(
  * @returns the uploaded image, or `undefined` when the user closes the file picker without selecting an
  *   image or when the upload fails
  */
-async function triggerUserImageUpload(
+function triggerUserImageUpload(
   depsContainer: Container,
   page?: string,
-): Promise<UploadedImage | undefined> {
+): Promise<UploadedAttachment | undefined> {
+  return triggerUserUpload(
+    depsContainer,
+    page,
+    "image/*",
+    "Failed to upload the selected image.",
+  );
+}
+
+/**
+ * Opens the system file picker and uploads the selected file, whatever its type, as an attachment of the given page.
+ *
+ * Meant for UI event handlers, which don't handle the returned promise: an upload failure is logged
+ * rather than rejected.
+ *
+ * @param depsContainer - the container providing the upload services
+ * @param page - the serialized reference of the page to upload the file to, the current page when not specified
+ * @returns the uploaded attachment, or `undefined` when the user closes the file picker without selecting a file or
+ *   when the upload fails
+ */
+function triggerUserAttachmentUpload(
+  depsContainer: Container,
+  page?: string,
+): Promise<UploadedAttachment | undefined> {
+  return triggerUserUpload(
+    depsContainer,
+    page,
+    undefined,
+    "Failed to upload the selected file.",
+  );
+}
+
+async function triggerUserUpload(
+  depsContainer: Container,
+  page: string | undefined,
+  accept: string | undefined,
+  failureMessage: string,
+): Promise<UploadedAttachment | undefined> {
   const targetPage = page ?? getCurrentPage(depsContainer);
   let uploadedAttachment;
   try {
     uploadedAttachment = await triggerUserFileUpload(
       depsContainer,
       targetPage,
-      "image/*",
+      accept,
     );
   } catch (error) {
-    console.error("Failed to upload the selected image.", error);
+    console.error(failureMessage, error);
     return undefined;
   }
 
@@ -138,6 +180,7 @@ async function triggerUserImageUpload(
 
   return {
     url: uploadedAttachment.href,
+    name: uploadedAttachment.name,
     reference: getAttachmentResourceReference(
       depsContainer,
       targetPage,
@@ -186,5 +229,10 @@ function getAttachmentResourceReference(
       );
 }
 
-export { triggerUserFileUpload, triggerUserImageUpload };
-export type { UploadedImage };
+export {
+  getCurrentPage,
+  triggerUserAttachmentUpload,
+  triggerUserFileUpload,
+  triggerUserImageUpload,
+};
+export type { UploadedAttachment };

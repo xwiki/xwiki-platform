@@ -464,6 +464,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       ## a CSRF attacker from reading it.
       $response.setContentType('application/json')
       $jsontool.serialize({'errorType': 'CSRF', 'newToken': $services.csrf.getToken()})
+    #elseif (!$services.security.authorization.hasAccess('edit', $doc.documentReference))
+      ## Adding or previewing a field is part of editing the class, so it requires edit right on the class document,
+      ## whatever the action used to render this sheet.
+      $response.setStatus(403)
+      $response.setContentType('text/plain')
+      $escapetool.xml($services.localization.render('notallowed'))
     #elseif ("$!request.field" != '')
       #displayNewField()
     #else

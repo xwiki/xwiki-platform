@@ -131,8 +131,17 @@ function getContent(): BlockType[] {
   return editorRef.value!.document;
 }
 
+/**
+ * @returns the editor instance, for the integrations that act on the edited content themselves, or nothing before
+ *   the editor is mounted
+ */
+function getEditor(): EditorType | undefined {
+  return editorRef.value ?? undefined;
+}
+
 defineExpose({
   getContent,
+  getEditor,
 });
 
 /**

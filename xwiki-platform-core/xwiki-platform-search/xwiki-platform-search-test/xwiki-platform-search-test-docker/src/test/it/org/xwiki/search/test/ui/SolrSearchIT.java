@@ -55,6 +55,7 @@ import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -410,5 +411,49 @@ class SolrSearchIT
             containsInAnyOrder(attachmentWord + "-nested.txt", attachmentWord + "-terminal.txt"));
         assertThat(quickSearchResults.stream().map(QuickSearchResult::getHighlights).toList(),
             everyItem(equalTo(List.of(attachmentWord))));
+    }
+
+    /**
+     * Verifies that the search suggest service ignores the parameters that it doesn't support.
+     */
+    @Test
+    @Order(8)
+    void suggestServiceParameters(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String matchedWord = "pomegranate";
+        SpaceReference space = testReference.getLastSpaceReference();
+        setup.rest().savePage(new DocumentReference("Apple", space), matchedWord, "Apple");
+        setup.rest().savePage(new DocumentReference("Banana", space), matchedWord + " " + matchedWord, "Banana");
+
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        String query = String.join("\n", "fq=type:DOCUMENT", "qf=doccontent");
+        String results = getSuggestResults(setup, query, matchedWord);
+        assertThat(results, containsString("Apple"));
+        assertThat(results, containsString("Banana"));
+        assertThat(results, containsString("score"));
+
+        // Boost queries change the scores, unless they use unsupported query syntax.
+        assertNotEquals(results, getSuggestResults(setup, query + "\nbq=name:Apple^100", matchedWord));
+        assertEquals(results, getSuggestResults(setup, query + "\nbq=_val_:\"100\"", matchedWord));
+
+        // Special query syntax in the input is matched as plain text.
+        String specialSyntaxResults = getSuggestResults(setup, query, "{!" + matchedWord);
+        assertThat(specialSyntaxResults, containsString("Apple"));
+        assertThat(specialSyntaxResults, containsString("Banana"));
+    }
+
+    private String getSuggestResults(TestUtils setup, String query, String input) throws Exception
+    {
+        return setup.getString("/bin/get/XWiki/SuggestSolrService", Map.of("outputSyntax", "plain", "media", "json",
+            "query", encodeCurlyBraces(query), "input", encodeCurlyBraces(input)));
+    }
+
+    private String encodeCurlyBraces(String value)
+    {
+        // The URI builder used to build the request URL treats curly braces as template variables, so encode them.
+        return value.replace("{", "%7B").replace("}", "%7D");
     }
 }

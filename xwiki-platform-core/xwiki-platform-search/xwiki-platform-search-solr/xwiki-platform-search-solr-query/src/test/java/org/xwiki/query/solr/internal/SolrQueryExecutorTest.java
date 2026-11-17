@@ -19,6 +19,7 @@
  */
 package org.xwiki.query.solr.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,10 +30,13 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.SolrParams;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.query.internal.DefaultQueryExecutorManager;
@@ -55,10 +59,14 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -67,10 +75,21 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-@ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class, ContextComponentManagerProvider.class})
+@ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class, ContextComponentManagerProvider.class,
+    SolrResponseRightsFilter.class, SafeSolrQueryValidator.class})
 @ReferenceComponentList
 class SolrQueryExecutorTest
 {
+    private static final String ROWS = "rows";
+
+    private static final String START = "start";
+
+    private static final String QT = "qt";
+
+    private static final String FL = "fl";
+
+    private static final String EXPAND_MACROS = "expandMacros";
+
     private static final String ITERABLE_PARAM_NAME = "multiParam";
 
     private static final String[] ITERABLE_PARAM_EXPECTED = { "value1", "value2" };
@@ -275,8 +294,188 @@ class SolrQueryExecutorTest
         assertEquals(0, results.getNumFound());
 
         // One warning for Alice in the previous execution, two for Alice and Bob in this one.
-        assertEquals("Removing bad result: SolrDocument{}", this.logCapture.getMessage(0));
-        assertEquals("Removing bad result: SolrDocument{}", this.logCapture.getMessage(1));
-        assertEquals("Removing bad result: SolrDocument{}", this.logCapture.getMessage(2));
+        assertEquals("Removing bad result: [SolrDocument{}]", this.logCapture.getMessage(0));
+        assertEquals("Removing bad result: [SolrDocument{}]", this.logCapture.getMessage(1));
+        assertEquals("Removing bad result: [SolrDocument{}]", this.logCapture.getMessage(2));
+    }
+
+    @Test
+    void namedParametersTakePrecedenceOverLimitAndOffset() throws Exception
+    {
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(new SolrDocumentList());
+        List<SolrQuery> executedQueries = new ArrayList<>();
+        when(this.solrInstance.query(any(SolrQuery.class))).then(invocation -> {
+            executedQueries.add(((SolrQuery) invocation.getArgument(0)).getCopy());
+            return response;
+        });
+
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.setLimit(10);
+        query.setOffset(20);
+
+        // Without named parameters, the limit and offset are used.
+        this.solrQueryExecutor.execute(query);
+
+        query.bindValue(ROWS, 5000);
+        query.bindValue(START, 100);
+        this.solrQueryExecutor.execute(query);
+
+        assertEquals(2, executedQueries.size());
+        assertEquals("10", executedQueries.get(0).get(ROWS));
+        assertEquals("20", executedQueries.get(0).get(START));
+        assertEquals("5000", executedQueries.get(1).get(ROWS));
+        assertEquals("100", executedQueries.get(1).get(START));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "/update", "/admin/cores", "/terms", "select" })
+    void unsupportedRequestHandler(String requestHandler) throws Exception
+    {
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.bindValue(QT, requestHandler);
+
+        QueryException exception = assertThrows(QueryException.class, () -> this.solrQueryExecutor.execute(query));
+
+        assertEquals(String.format(
+            "Unsupported request handler [%s], only [/select, /query, /spell] are supported. Named query = [*:*]", requestHandler),
+            exception.getCause().getMessage());
+        verify(this.solrInstance, never()).query(any(SolrParams.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "/select", "/query", "/spell" })
+    void supportedRequestHandler(String requestHandler) throws Exception
+    {
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(new SolrDocumentList());
+        when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(response);
+
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.bindValue(QT, requestHandler);
+
+        assertEquals(List.of(response), this.solrQueryExecutor.execute(query));
+    }
+
+    @Test
+    void idAddedToFieldList() throws Exception
+    {
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(new SolrDocumentList());
+        List<SolrQuery> executedQueries = new ArrayList<>();
+        when(this.solrInstance.query(any(SolrQuery.class))).then(invocation -> {
+            executedQueries.add(((SolrQuery) invocation.getArgument(0)).getCopy());
+            return response;
+        });
+
+        // Without field list, Solr returns the default fields, which include the id.
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        this.solrQueryExecutor.execute(query);
+
+        query.bindValue(FL, "wiki spaces name");
+        this.solrQueryExecutor.execute(query);
+
+        assertEquals(2, executedQueries.size());
+        assertNull(executedQueries.get(0).getParams(FL));
+        assertArrayEquals(new String[] { "wiki spaces name", "id" },
+            executedQueries.get(1).getParams(FL));
+    }
+
+    @Test
+    void macroExpansionOnlyWhenRequested() throws Exception
+    {
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(new SolrDocumentList());
+        List<SolrQuery> executedQueries = new ArrayList<>();
+        when(this.solrInstance.query(any(SolrQuery.class))).then(invocation -> {
+            executedQueries.add(((SolrQuery) invocation.getArgument(0)).getCopy());
+            return response;
+        });
+
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.bindValue("fq", "space_exact:\"${q}\"");
+        this.solrQueryExecutor.execute(query);
+
+        query.bindValue(EXPAND_MACROS, true);
+        this.solrQueryExecutor.execute(query);
+
+        assertEquals(2, executedQueries.size());
+        assertEquals("false", executedQueries.get(0).get(EXPAND_MACROS));
+        assertEquals("true", executedQueries.get(1).get(EXPAND_MACROS));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "fl", "x.fl" })
+    void fieldListOverridingCheckedFields(String parameter) throws Exception
+    {
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.bindValue(parameter, List.of("title_", "name:[value v=Page]"));
+
+        QueryException exception = assertThrows(QueryException.class, () -> this.solrQueryExecutor.execute(query));
+
+        assertEquals("Unsupported field list [name:[value v=Page]]: the fields [class, doclocale, filename, id, name, "
+            + "number, propertyname, spaces, type, wiki] can only be returned with their own values. "
+            + "Named query = [*:*]", exception.getCause().getMessage());
+        verify(this.solrInstance, never()).query(any(SolrParams.class));
+    }
+
+    @Test
+    void fieldListKeepingCheckedFields() throws Exception
+    {
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(new SolrDocumentList());
+        when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(response);
+
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        // Each field list is checked separately, like Solr parses them.
+        query.bindValue(FL, List.of("wiki spaces:spaces name,title:title_", "[explain],count:sum(1,2)"));
+        query.bindValue("hl.fl", "doccontent_*");
+
+        assertEquals(List.of(response), this.solrQueryExecutor.execute(query));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "x.qt", "x.y.qt" })
+    void unsupportedNestedRequestHandler(String parameter) throws Exception
+    {
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.bindValue(FL, List.of("id", "x:[subquery]"));
+        query.bindValue(parameter, List.of("/select", "/admin/cores"));
+
+        QueryException exception = assertThrows(QueryException.class, () -> this.solrQueryExecutor.execute(query));
+
+        assertEquals("Unsupported request handler [/admin/cores], only [/select, /query, /spell] are supported. "
+            + "Named query = [*:*]", exception.getCause().getMessage());
+        verify(this.solrInstance, never()).query(any(SolrParams.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "json", "json.fields", "json.queries", "json.params", "x.json", "x.json.fields",
+        "json.facet.x" })
+    void unsupportedJSONParameter(String parameter) throws Exception
+    {
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.bindValue(parameter, "{\"fields\":[\"name:[value v=Page]\"]}");
+
+        QueryException exception = assertThrows(QueryException.class, () -> this.solrQueryExecutor.execute(query));
+
+        assertEquals(String.format("Unsupported parameter [%s], of the JSON request parameters only "
+            + "[json.nl, json.wrf, json.facet] are supported. Named query = [*:*]", parameter),
+            exception.getCause().getMessage());
+        verify(this.solrInstance, never()).query(any(SolrParams.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "json.nl", "json.wrf", "json.facet", "x.json.facet", "jsonp", "myjson.x" })
+    void supportedJSONParameter(String parameter) throws Exception
+    {
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(new SolrDocumentList());
+        when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(response);
+
+        DefaultQuery query = new DefaultQuery("*:*", null);
+        query.bindValue(parameter, "value");
+
+        assertEquals(List.of(response), this.solrQueryExecutor.execute(query));
     }
 }

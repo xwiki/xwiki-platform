@@ -20,7 +20,9 @@
 package org.xwiki.search.solr.internal.rest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,9 +34,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.SecureQuery;
+import org.xwiki.query.solr.internal.SafeSolrQueryValidator;
 import org.xwiki.query.solr.internal.SolrQueryExecutor;
 import org.xwiki.rest.internal.resources.search.AbstractSearchSource;
 import org.xwiki.rest.model.jaxb.SearchResult;
+import org.xwiki.search.solr.SolrUtils;
 
 /**
  * @version $Id$
@@ -47,6 +51,12 @@ public class SOLRSearchSource extends AbstractSearchSource
 {
     @Inject
     protected QueryManager queryManager;
+
+    @Inject
+    private SolrUtils solrUtils;
+
+    @Inject
+    private SafeSolrQueryValidator safeQueryValidator;
 
     @Inject
     private SearchResultConverter searchResultConverter;
@@ -87,21 +97,10 @@ public class SOLRSearchSource extends AbstractSearchSource
 
         // Wikis
         if (StringUtils.isNotBlank(wikis)) {
-            String[] strings = StringUtils.split(wikis, ',');
-            if (strings.length == 1) {
-                fq.add("{!tag=wiki}wiki:(\"" + strings[0] + "\")");
-            } else if (strings.length > 1) {
-                StringBuilder builder = new StringBuilder();
-                for (String str : strings) {
-                    if (!builder.isEmpty()) {
-                        builder.append(" OR ");
-                    }
-                    builder.append('\'');
-                    builder.append(str);
-                    builder.append('\'');
-                }
-                fq.add("{!tag=wiki}wiki:(" + builder + ")");
-            }
+            String wikiFilter = Arrays.stream(StringUtils.split(wikis, ','))
+                .map(this.solrUtils::toCompleteFilterQueryString)
+                .collect(Collectors.joining(" OR "));
+            fq.add("{!tag=wiki}wiki:(" + wikiFilter + ")");
         } else {
             query.setWiki(defaultWikiName);
         }
@@ -117,7 +116,8 @@ public class SOLRSearchSource extends AbstractSearchSource
                 + "author_display^0.08 creator_display^0.08 " + "comment^0.016 attauthor_display^0.016 space^0.016");
 
         // Order
-        if (!StringUtils.isBlank(orderField)) {
+        // Only plain field names are supported.
+        if (!StringUtils.isBlank(orderField) && this.safeQueryValidator.isSafeSortField(orderField)) {
             if ("desc".equals(order)) {
                 query.bindValue("sort", orderField + " desc");
             } else {

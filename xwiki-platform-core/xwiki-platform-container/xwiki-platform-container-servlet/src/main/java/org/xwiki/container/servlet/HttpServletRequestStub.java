@@ -545,6 +545,17 @@ public class HttpServletRequestStub implements HttpServletRequest
         return false;
     }
 
+    /**
+     * @return {@code false}
+     * @deprecated this method was removed from the Servlet specification and is only kept for backward
+     *             compatibility, use {@link #isRequestedSessionIdFromURL()} instead
+     */
+    @Deprecated
+    public boolean isRequestedSessionIdFromUrl()
+    {
+        return false;
+    }
+
     @Override
     public Object getAttribute(String s)
     {
@@ -705,6 +716,18 @@ public class HttpServletRequestStub implements HttpServletRequest
 
     @Override
     public RequestDispatcher getRequestDispatcher(String s)
+    {
+        return null;
+    }
+
+    /**
+     * @param s the virtual path
+     * @return {@code null}
+     * @deprecated this method was removed from the Servlet specification and is only kept for backward
+     *             compatibility, use {@link jakarta.servlet.ServletContext#getRealPath(String)} instead
+     */
+    @Deprecated
+    public String getRealPath(String s)
     {
         return null;
     }

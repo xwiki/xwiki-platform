@@ -21,7 +21,6 @@ import { insertLink, useLinkEditing } from "./linkEditor";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
 import {
   EditorInstanceContext,
-  ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../../contexts";
 import { triggerUserAttachmentUpload } from "../../misc/fileUpload";
@@ -47,7 +46,6 @@ import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
-import type { Container } from "inversify";
 
 /**
  * Inserts a link selected by the user.
@@ -82,14 +80,13 @@ export function LinkSuggestionController({
   maxSuggestions,
   pageSuggestionsShare,
 }: LinkSuggestionControllerProps) {
-  const serviceContainer = useContext(ServiceContainerContext)!;
+  const { serviceContainer } = useContext(EditorInstanceContext)!;
 
   const linkSuggestService = serviceContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
 
-  const { insertSuggested, openLinkEditor, uploadFile } =
-    useLinkInsertion(serviceContainer);
+  const { insertSuggested, openLinkEditor, uploadFile } = useLinkInsertion();
 
   const { t } = useTranslation();
 
@@ -167,8 +164,9 @@ export function LinkSuggestionController({
  *   directly; the link is inserted at the editor's selection, where the link suggestion menu was (the menu itself is
  *   already closed, and its query removed, by the time an item is clicked)
  */
-function useLinkInsertion(serviceContainer: Container) {
+function useLinkInsertion() {
   const instance = useContext(EditorInstanceContext)!;
+  const { serviceContainer } = instance;
   const linkEditing = useLinkEditing();
 
   const insert: InsertLink = useCallback(

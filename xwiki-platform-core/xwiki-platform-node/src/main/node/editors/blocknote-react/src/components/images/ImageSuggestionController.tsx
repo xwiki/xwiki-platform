@@ -22,7 +22,6 @@ import { insertImage, useImageEditing } from "./imageEditor";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
 import {
   EditorInstanceContext,
-  ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../../contexts";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
@@ -47,7 +46,6 @@ import type {
   ResourceReference,
   ResourceReferenceParser,
 } from "@xwiki/platform-rendering-api";
-import type { Container } from "inversify";
 
 import "./ImageSuggestionController.css";
 
@@ -69,7 +67,7 @@ export type ImageSuggestionControllerProps = {
 export function ImageSuggestionController({
   maxSuggestions,
 }: ImageSuggestionControllerProps) {
-  const serviceContainer = useContext(ServiceContainerContext)!;
+  const { serviceContainer } = useContext(EditorInstanceContext)!;
 
   const linkSuggestService = serviceContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
@@ -79,8 +77,7 @@ export function ImageSuggestionController({
     "ResourceReferenceParser",
   );
 
-  const { insertSelectedImage, uploadImage } =
-    useImageInsertion(serviceContainer);
+  const { insertSelectedImage, uploadImage } = useImageInsertion();
 
   const { t } = useTranslation();
 
@@ -197,8 +194,9 @@ function useImageSelector(insertSelectedImage: InsertImage) {
 /**
  * @returns the functions inserting an image selected by the user, letting the image metadata handler know about it
  */
-function useImageInsertion(serviceContainer: Container) {
+function useImageInsertion() {
   const instance = useContext(EditorInstanceContext)!;
+  const { serviceContainer } = instance;
   const insertSelectedImage: InsertImage = useCallback(
     (props, reference) => insertImage(instance, props, reference),
     [instance],

@@ -34,7 +34,6 @@ import { getMacroEditing } from "../blocknote/macroEditor";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import {
   EditorInstanceContext,
-  ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../contexts";
 import { createBlockMetadataStore } from "../misc/blockMetadata";
@@ -308,84 +307,80 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   // Renders the editor instance using a React component.
   return (
-    <ServiceContainerContext.Provider value={serviceContainer}>
-      <EditorInstanceContext.Provider value={instance}>
-        <SourceDocumentReferenceContext.Provider
-          value={serializedSourceDocumentReference}
+    <EditorInstanceContext.Provider value={instance}>
+      <SourceDocumentReferenceContext.Provider
+        value={serializedSourceDocumentReference}
+      >
+        <BlockNoteView
+          editor={editor}
+          theme={theme}
+          // Override some builtin components
+          formattingToolbar={false}
+          linkToolbar={false}
+          filePanel={false}
+          slashMenu={false}
+          sideMenu={false}
+          onChange={(editor) => onChange?.(editor)}
         >
-          <BlockNoteView
-            editor={editor}
-            theme={theme}
-            // Override some builtin components
-            formattingToolbar={false}
-            linkToolbar={false}
-            filePanel={false}
-            slashMenu={false}
-            sideMenu={false}
-            onChange={(editor) => onChange?.(editor)}
-          >
-            {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
-            <SideMenuController
-              floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS}
+          {/* BlockNote's default side menu, only centered differently (the default one is disabled above). */}
+          <SideMenuController floatingUIOptions={SIDE_MENU_FLOATING_OPTIONS} />
+
+          <SuggestionMenuController
+            triggerCharacter={"/"}
+            getItems={async (query) =>
+              querySuggestionsMenuItems({
+                editor,
+                query,
+                macros: builtMacros,
+                syntax,
+                lang,
+                t,
+                macroEditing: getMacroEditing(instance),
+              })
+            }
+          />
+
+          {syntax.features.blocks.images.basicImages && (
+            <ImageSuggestionController maxSuggestions={5} />
+          )}
+
+          {syntax.features.inlineContents.links.basicLinks && (
+            <LinkSuggestionController
+              maxSuggestions={8}
+              pageSuggestionsShare={5}
             />
+          )}
 
-            <SuggestionMenuController
-              triggerCharacter={"/"}
-              getItems={async (query) =>
-                querySuggestionsMenuItems({
-                  editor,
-                  query,
-                  macros: builtMacros,
-                  syntax,
-                  lang,
-                  t,
-                  macroEditing: getMacroEditing(instance),
-                })
-              }
-            />
+          {/* TODO: suggestions menu for inline macros */}
 
-            {syntax.features.blocks.images.basicImages && (
-              <ImageSuggestionController maxSuggestions={5} />
-            )}
-
-            {syntax.features.inlineContents.links.basicLinks && (
-              <LinkSuggestionController
-                maxSuggestions={8}
-                pageSuggestionsShare={5}
+          <FormattingToolbarController
+            formattingToolbar={(props) => (
+              <CustomFormattingToolbar
+                formattingToolbarProps={props}
+                additionalBlockTypes={filterMap(
+                  builtMacros,
+                  (built) => built.dropdownTransformItem,
+                )}
               />
             )}
+          />
 
-            {/* TODO: suggestions menu for inline macros */}
+          <LinkToolbarController
+            linkToolbar={(props) => (
+              <FormattingToolbar>
+                <CustomLinkToolbar linkToolbarProps={props} />
+              </FormattingToolbar>
+            )}
+          />
 
-            <FormattingToolbarController
-              formattingToolbar={(props) => (
-                <CustomFormattingToolbar
-                  formattingToolbarProps={props}
-                  additionalBlockTypes={filterMap(
-                    builtMacros,
-                    (built) => built.dropdownTransformItem,
-                  )}
-                />
-              )}
-            />
-
-            <LinkToolbarController
-              linkToolbar={(props) => (
-                <FormattingToolbar>
-                  <CustomLinkToolbar linkToolbarProps={props} />
-                </FormattingToolbar>
-              )}
-            />
-
-            <FilePanelController
-              filePanel={({ blockId }) => (
-                <FilePanel blockId={blockId} editor={editor} />
-              )}
-            />
-          </BlockNoteView>
-        </SourceDocumentReferenceContext.Provider>
-      </EditorInstanceContext.Provider>
-    </ServiceContainerContext.Provider>
+          <FilePanelController
+            filePanel={({ blockId }) => (
+              <FilePanel blockId={blockId} editor={editor} />
+            )}
+          />
+        </BlockNoteView>
+      </SourceDocumentReferenceContext.Provider>
+    </EditorInstanceContext.Provider>
   );
 };
 

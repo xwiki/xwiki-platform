@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import {
-  ServiceContainerContext,
+  EditorInstanceContext,
   SourceDocumentReferenceContext,
 } from "../../contexts";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
@@ -64,7 +64,7 @@ export function ImageSelector({
   currentSelection,
   onSelected,
 }: ImageSelectorProps) {
-  const serviceContainer = useContext(ServiceContainerContext)!;
+  const { serviceContainer } = useContext(EditorInstanceContext)!;
 
   const remoteURLParser = serviceContainer
     .get<RemoteURLParserProvider>("RemoteURLParserProvider")

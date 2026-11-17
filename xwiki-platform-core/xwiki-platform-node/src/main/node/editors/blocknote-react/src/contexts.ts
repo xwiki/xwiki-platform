@@ -19,12 +19,6 @@
  */
 import { createContext } from "react";
 import type { EditorInstance } from "./editorInstance";
-import type { Container } from "inversify";
-
-/**
- * The service container of the editor instance (see {@link EditorInstance.serviceContainer}).
- */
-const ServiceContainerContext = createContext<Container | null>(null);
 
 /**
  * The editor instance, which the components pass to the services they call.
@@ -39,8 +33,4 @@ const SourceDocumentReferenceContext = createContext<string | undefined>(
   undefined,
 );
 
-export {
-  EditorInstanceContext,
-  ServiceContainerContext,
-  SourceDocumentReferenceContext,
-};
+export { EditorInstanceContext, SourceDocumentReferenceContext };

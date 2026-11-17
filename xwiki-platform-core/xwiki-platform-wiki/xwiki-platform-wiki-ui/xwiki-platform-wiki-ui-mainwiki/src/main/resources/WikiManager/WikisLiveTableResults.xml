@@ -65,7 +65,7 @@
 ## Restrict to templates only
 #if("$!request.onlyTemplates" == '1')
   #set($from = "${from}, BaseObject objTemplate, IntegerProperty propTemplate")
-  #set($extra = "${extra} AND doc.fullName = objTemplate.name AND objTemplate.className='WikiManager.WikiTemplateClass' AND objTemplate.id = propTemplate.id AND propTemplate.name='iswikitemplate' AND propTemplate.value='1'")
+  #set($extra = "${extra} AND doc.fullName = objTemplate.name AND objTemplate.className='WikiManager.WikiTemplateClass' AND objTemplate.id = propTemplate.id AND propTemplate.name='iswikitemplate' AND propTemplate.value=1")
 #end
 #set($columns = [])
 #foreach($c in $request.collist.split(","))

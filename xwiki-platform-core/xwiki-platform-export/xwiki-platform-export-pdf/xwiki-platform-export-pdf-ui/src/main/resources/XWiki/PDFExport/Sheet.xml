@@ -683,22 +683,45 @@ define('paged-polyfill-patched', [
   }
 
   /**
-   * The CSS parser used by Paged.js doesn't support the range syntax of media queries, such as "(width &lt;= 767px)",
-   * and Paged.js fails to generate the print layout when a style sheet uses it. As a workaround, we rewrite the width
-   * and height comparisons to the legacy syntax, such as "(max-width: 767px)", before the style sheet is parsed.
+   * The CSS parser used by Paged.js doesn't support some media query syntaxes, such as the range syntax
+   * "(width &lt;= 767px)", and keeps the media condition unparsed. Paged.js then fails to process the style sheet and
+   * the print layout is not generated. We remove these media rules, which Paged.js would remove anyway in most cases,
+   * because it keeps only the media rules that target print.
    * TODO: Remove this code when https://github.com/pagedjs/pagedjs/issues/344 is fixed.
    */
-  class FixMediaQueryRangeSyntax extends Paged.Handler {
-    constructor(chunker, polisher, caller) {
-      super(chunker, polisher, caller);
+  class DropUnparsedMediaRules extends Paged.Handler {
+    beforeTreeWalk(ast) {
+      this.removeUnparsedMediaRules(ast.children);
     }
 
-    beforeTreeParse(text, sheet) {
-      sheet.text = text
-        .replace(/\(\s*(width|height)\s*&lt;=\s*/g, '(max-$1: ')
-        .replace(/\(\s*(width|height)\s*&gt;=\s*/g, '(min-$1: ');
+    removeUnparsedMediaRules(list) {
+      list?.forEach((node, item) =&gt; {
+        if (node.type === 'Atrule' &amp;&amp; node.name.toLowerCase() === 'media'
+            &amp;&amp; node.prelude?.type !== 'AtrulePrelude') {
+          console.warn(`Ignoring unsupported media rule: @media ${node.prelude?.value}`);
+          list.remove(item);
+        } else if (node.type === 'Atrule') {
+          // Media rules can be nested in other at-rules, such as @supports or @layer.
+          this.removeUnparsedMediaRules(node.block?.children);
+        }
+      });
     }
   }
+
+  /**
+   * As a safety net for what DropUnparsedMediaRules doesn't catch, we skip a style sheet that Paged.js fails to
+   * process, instead of failing the whole export. This also covers the imported style sheets, because
+   * convertViaSheet calls itself for each @import.
+   */
+  const originalConvertViaSheet = Paged.Polisher.prototype.convertViaSheet;
+  Paged.Polisher.prototype.convertViaSheet = async function(cssStr, href) {
+    try {
+      return await originalConvertViaSheet.call(this, cssStr, href);
+    } catch (e) {
+      console.warn(`Skipping style sheet [${href}] because Paged.js failed to process it.`, e);
+      return '';
+    }
+  };
 
   /**
    * Logs the time spent to layout each print page, useful for debugging PDF export timeouts.
@@ -722,7 +745,7 @@ define('paged-polyfill-patched', [
     FixFloatingImages,
     FixTableLayout,
     FixMaxChars,
-    FixMediaQueryRangeSyntax,
+    DropUnparsedMediaRules,
     LoggingHandler
   ];
   // The following handlers are more opionated, so we provide a way to disable them.

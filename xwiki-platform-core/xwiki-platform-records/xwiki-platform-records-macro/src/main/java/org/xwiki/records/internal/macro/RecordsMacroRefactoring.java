@@ -19,6 +19,7 @@
  */
 package org.xwiki.records.internal.macro;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -33,16 +34,19 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.SpaceResourceReference;
 import org.xwiki.rendering.macro.MacroRefactoring;
 
 /**
- * Keeps the {@code class} parameter of the Records macro pointing to its object type when pages are moved or renamed,
- * and declares that object type as a reference of the page holding the macro.
+ * Keeps the {@code class} and {@code newEntriesLocation} parameters of the Records macro pointing to their object type
+ * and space when pages are moved or renamed, and declares them as references of the page holding the macro.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -54,6 +58,14 @@ public class RecordsMacroRefactoring implements MacroRefactoring
 {
     private static final String CLASS_PARAMETER = "class";
 
+    private static final String LOCATION_PARAMETER = "newEntriesLocation";
+
+    /**
+     * The parameters holding a reference, with the type of what they point to.
+     */
+    private static final Map<String, EntityType> REFERENCE_PARAMETERS =
+        Map.of(CLASS_PARAMETER, EntityType.DOCUMENT, LOCATION_PARAMETER, EntityType.SPACE);
+
     @Inject
     @Named("macro")
     private EntityReferenceResolver<String> macroEntityReferenceResolver;
@@ -61,6 +73,12 @@ public class RecordsMacroRefactoring implements MacroRefactoring
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    /**
+     * Gives the name of the home page of a space.
+     */
+    @Inject
+    private EntityReferenceProvider entityReferenceProvider;
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
@@ -75,37 +93,37 @@ public class RecordsMacroRefactoring implements MacroRefactoring
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
         Map<EntityReference, EntityReference> updatedEntities)
     {
-        Optional<String> parameterName = findClassParameter(macroBlock);
-        if (parameterName.isEmpty()) {
-            return Optional.empty();
+        // The page the values are resolved against once the move is done.
+        DocumentReference base = relative ? targetReference : currentDocumentReference;
+        MacroBlock newMacroBlock = null;
+        for (Map.Entry<String, EntityType> parameter : REFERENCE_PARAMETERS.entrySet()) {
+            Optional<String> name = findParameter(macroBlock, parameter.getKey());
+            if (name.isEmpty()) {
+                continue;
+            }
+            String value = macroBlock.getParameter(name.get());
+            EntityType type = parameter.getValue();
+            DocumentReference reference = resolve(value, type, macroBlock, base);
+            EntityReference expectedReference;
+            if (relative) {
+                // The page holding the macro moved from the source to the target. A value that does not name every
+                // part of the reference is completed from that page, so it can point elsewhere once the page has
+                // moved. What it points to may also be moved by the same job.
+                EntityReference previousReference = resolve(value, type, macroBlock, sourceReference);
+                expectedReference = updatedEntities.getOrDefault(previousReference, previousReference);
+            } else {
+                // The source page moved, and the current page holds the macro: only what the value points to moving
+                // matters.
+                expectedReference = reference.equals(sourceReference) ? targetReference : reference;
+            }
+            Optional<String> newValue = reference.equals(expectedReference) ? Optional.empty()
+                : serialize(new DocumentReference(expectedReference), type, base);
+            if (newValue.isPresent()) {
+                newMacroBlock = newMacroBlock == null ? (MacroBlock) macroBlock.clone() : newMacroBlock;
+                newMacroBlock.setParameter(name.get(), newValue.get());
+            }
         }
-        String value = macroBlock.getParameter(parameterName.get());
-
-        DocumentReference base;
-        EntityReference classReference;
-        EntityReference expectedClassReference;
-        if (relative) {
-            // The page holding the macro moved from the source to the target. A value that does not name every part
-            // of the object type is completed from that page, so it can point elsewhere once the page has moved. The
-            // object type may also be moved by the same job.
-            base = targetReference;
-            classReference = resolve(value, macroBlock, targetReference);
-            EntityReference previousClassReference = resolve(value, macroBlock, sourceReference);
-            expectedClassReference = updatedEntities.getOrDefault(previousClassReference, previousClassReference);
-        } else {
-            // The source page moved, and the current page holds the macro: only the object type itself moving matters.
-            base = currentDocumentReference;
-            classReference = resolve(value, macroBlock, currentDocumentReference);
-            expectedClassReference = classReference.equals(sourceReference) ? targetReference : classReference;
-        }
-
-        if (classReference.equals(expectedClassReference)) {
-            return Optional.empty();
-        }
-        MacroBlock newMacroBlock = (MacroBlock) macroBlock.clone();
-        newMacroBlock.setParameter(parameterName.get(), this.compactWikiEntityReferenceSerializer
-            .serialize(expectedClassReference, base.getWikiReference()));
-        return Optional.of(newMacroBlock);
+        return Optional.ofNullable(newMacroBlock);
     }
 
     @Override
@@ -119,27 +137,56 @@ public class RecordsMacroRefactoring implements MacroRefactoring
     @Override
     public Set<ResourceReference> extractReferences(MacroBlock macroBlock)
     {
-        return findClassParameter(macroBlock)
-            .<Set<ResourceReference>>map(name -> Set.of(new DocumentResourceReference(macroBlock.getParameter(name))))
-            .orElse(Set.of());
+        Set<ResourceReference> references = new HashSet<>();
+        REFERENCE_PARAMETERS.forEach((parameterName, type) -> findParameter(macroBlock, parameterName)
+            .map(macroBlock::getParameter).ifPresent(value -> references.add(type == EntityType.SPACE
+                ? new SpaceResourceReference(value) : new DocumentResourceReference(value))));
+        return references;
     }
 
     /**
      * @param macroBlock the Records macro call
-     * @return the name the call gives to the {@code class} parameter, which macro parameters accept in any case, if
-     *     the call sets it to a non blank value
+     * @param parameterName the name of a parameter
+     * @return the name the call gives to the parameter, which macro parameters accept in any case, if the call sets
+     *     it to a non blank value
      */
-    private Optional<String> findClassParameter(MacroBlock macroBlock)
+    private Optional<String> findParameter(MacroBlock macroBlock, String parameterName)
     {
         return macroBlock.getParameters().entrySet().stream()
-            .filter(parameter -> CLASS_PARAMETER.equalsIgnoreCase(parameter.getKey())
+            .filter(parameter -> parameterName.equalsIgnoreCase(parameter.getKey())
                 && StringUtils.isNotBlank(parameter.getValue()))
             .map(Map.Entry::getKey).findFirst();
     }
 
-    private EntityReference resolve(String value, MacroBlock macroBlock, DocumentReference base)
+    /**
+     * @return the page the value points to, which for a space is its home page, to compare it with the moved pages
+     */
+    private DocumentReference resolve(String value, EntityType type, MacroBlock macroBlock, DocumentReference base)
     {
-        return new DocumentReference(
-            this.macroEntityReferenceResolver.resolve(value, EntityType.DOCUMENT, macroBlock, base));
+        EntityReference reference = this.macroEntityReferenceResolver.resolve(value, type, macroBlock, base);
+        if (type == EntityType.SPACE) {
+            return new DocumentReference(getHomeName(), new SpaceReference(reference));
+        }
+        return new DocumentReference(reference);
+    }
+
+    /**
+     * @return the value of the reference, or nothing for a space whose home page became a regular page
+     */
+    private Optional<String> serialize(DocumentReference reference, EntityType type, DocumentReference base)
+    {
+        EntityReference serialized = reference;
+        if (type == EntityType.SPACE) {
+            if (!reference.getName().equals(getHomeName())) {
+                return Optional.empty();
+            }
+            serialized = reference.getLastSpaceReference();
+        }
+        return Optional.of(this.compactWikiEntityReferenceSerializer.serialize(serialized, base.getWikiReference()));
+    }
+
+    private String getHomeName()
+    {
+        return this.entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
     }
 }

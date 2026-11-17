@@ -41,6 +41,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.WithParameters;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -94,7 +95,9 @@ class DefaultLiveDataConfigurationResolverTest
     private EntityReferenceSerializer<String> stringEntityReferenceSerializer;
 
     @MockComponent
-    @Named("uuid")
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Mock
     private LiveTableNewRowNamingStrategy namingStrategy;
 
     private final LiveDataConfiguration defaultConfig = new LiveDataConfiguration();
@@ -104,9 +107,10 @@ class DefaultLiveDataConfigurationResolverTest
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void configure()
+    void configure() throws Exception
     {
         when(this.propertyStoreProvider.get()).thenReturn((LiveDataPropertyDescriptorStore) this.propertyStore);
+        when(this.namingStrategyManager.get("uuid")).thenReturn(Optional.of(this.namingStrategy));
 
         this.defaultConfig.initialize();
         when(this.defaultConfigProvider.get()).thenReturn(this.defaultConfig);

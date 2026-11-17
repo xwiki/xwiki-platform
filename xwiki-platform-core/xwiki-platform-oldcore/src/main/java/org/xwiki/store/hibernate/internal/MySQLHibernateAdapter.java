@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.NativeQuery;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.store.hibernate.AbstractHibernateAdapter;
@@ -77,7 +78,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
             String statement = getAlterRowFormatString(tableName, compressed, rowFormats, session);
             if (statement != null) {
                 // Create the query
-                NativeQuery<?> query = session.createNativeQuery(statement);
+                MutationQuery query = session.createNativeMutationQuery(statement);
 
                 // Execute the query
                 this.logger.info("Changing the table row type (currently [{}]) with [{}]", rowFormats.get(tableName),
@@ -140,7 +141,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     {
         String currentDatabase = getDatabaseFromWikiName();
         NativeQuery<Object[]> query = session.createNativeQuery("SELECT DISTINCT NAME, ROW_FORMAT FROM "
-            + getInformationShemaInnoDBTables() + " WHERE LOWER(NAME) LIKE '" + currentDatabase.toLowerCase() + "/%'");
+            + getInformationShemaInnoDBTables() + " WHERE LOWER(NAME) LIKE '" + currentDatabase.toLowerCase() + "/%'",
+            Object[].class);
 
         List<Object[]> results = query.list();
 

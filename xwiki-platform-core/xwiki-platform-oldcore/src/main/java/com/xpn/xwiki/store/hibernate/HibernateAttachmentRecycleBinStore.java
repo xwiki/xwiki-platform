@@ -105,7 +105,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                         createDeletedAttachment(attachment, deleter, date, contentStore);
 
                     // Hibernate store.
-                    long index = ((Number) session.save(trashAttachment)).longValue();
+                    session.persist(trashAttachment);
+                    long index = trashAttachment.getId();
 
                     // External store
                     if (contentStore != null) {
@@ -151,7 +152,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         throws XWikiException
     {
         return executeRead(context, session -> {
-            DeletedAttachment deletedAttachment = session.get(DeletedAttachment.class, Long.valueOf(index));
+            DeletedAttachment deletedAttachment = session.find(DeletedAttachment.class, index);
 
             if (deletedAttachment != null && resolve) {
                 deletedAttachment = resolveDeletedAttachmentContent(deletedAttachment, false, false);
@@ -243,7 +244,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                     DeletedAttachment deletedDocument = loadDeletedAttachment(index, context, false);
 
                     try {
-                        session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=:id")
+                        session
+                            .createMutationQuery("delete from " + DeletedAttachment.class.getName() + " where id=:id")
                             .setParameter("id", index).executeUpdate();
                     } catch (Exception ex) {
                         // Invalid ID?

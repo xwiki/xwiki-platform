@@ -93,6 +93,12 @@ public final class HibernatePatcher
 
     private final List<PackageBridge> bridges = new ArrayList<>();
 
+    /**
+     * The interfaces holding the binary only methods which can't be declared in the patched class, indexed by the
+     * internal name of the patched class.
+     */
+    private final Map<String, ClassNode> binaryOnlyHolders = new HashMap<>();
+
     private final Remapper relocator = new Remapper(Opcodes.ASM9)
     {
         @Override
@@ -320,6 +326,12 @@ public final class HibernatePatcher
         if (classMixins != null) {
             bytes = merge(bytes, name, classMixins);
         }
+        ClassNode holder = this.binaryOnlyHolders.remove(name);
+        if (holder != null) {
+            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+            holder.accept(writer);
+            write(holder.name + CLASS_EXTENSION, writer.toByteArray());
+        }
 
         for (PackageBridge bridge : this.bridges) {
             if (bridge.accept(name)) {
@@ -341,6 +353,21 @@ public final class HibernatePatcher
 
         for (String signature : this.interfaces.get(name)) {
             addInterface(target, signature);
+        }
+
+        ClassNode holder = this.binaryOnlyHolders.get(name);
+        if (holder != null) {
+            // Only at the JVM level: make sure the generic signature, used by the Java compiler, does not include it
+            if (target.signature == null) {
+                StringBuilder builder = new StringBuilder();
+                builder.append('L').append(target.superName).append(';');
+                for (String interfaceName : target.interfaces) {
+                    builder.append('L').append(interfaceName).append(';');
+                }
+                target.signature = builder.toString();
+            }
+            // Last, so that it does not take precedence over the other super interfaces
+            target.interfaces.add(holder.name);
         }
 
         this.patched.add(name);
@@ -373,12 +400,23 @@ public final class HibernatePatcher
             AnnotationNode binaryOnly = getAnnotation(method.invisibleAnnotations, BINARY_ONLY_DESCRIPTOR);
             if (binaryOnly != null) {
                 method.invisibleAnnotations.remove(binaryOnly);
-                method.name = (String) getAnnotationValues(binaryOnly, "value").get(0);
-                // Make sure javac ignores the method. The bridge flag is needed for libraries generating
-                // implementations (like Mockito) to understand that it's an alternative of the method with the same
-                // name and parameters, and it's fine for javac to read it since it uses visible types.
-                method.access |= Opcodes.ACC_SYNTHETIC | Opcodes.ACC_BRIDGE;
+                String binaryName = (String) getAnnotationValues(binaryOnly, "value").get(0);
                 method.signature = null;
+                if (hasUnrelatedOverload(target, binaryName, method.desc)) {
+                    // The libraries generating implementations (like Mockito) choose between methods with the same
+                    // name and parameters based on the most specific return type, and otherwise on the order in which
+                    // reflection returns them (which changes from one JVM to another), while they consistently prefer
+                    // the method declared in the most specific type. So the method keeps its name (and is hidden from
+                    // javac) and is exposed with the binary name by a default method of a super interface.
+                    method.access |= Opcodes.ACC_SYNTHETIC;
+                    addBinaryOnlyHolderMethod(target, binaryName, method);
+                } else {
+                    method.name = binaryName;
+                    // Make sure javac ignores the method. The bridge flag is needed for libraries generating
+                    // implementations (like Mockito) to understand that it's an alternative of the method with the
+                    // same name and parameters, and it's fine for javac to read it since it uses visible types.
+                    method.access |= Opcodes.ACC_SYNTHETIC | Opcodes.ACC_BRIDGE;
+                }
             }
 
             for (MethodNode existing : target.methods) {
@@ -397,6 +435,56 @@ public final class HibernatePatcher
                 target.innerClasses.add(innerClass);
             }
         }
+    }
+
+    /**
+     * @return true if the class declares a method with the same name and parameters but a return type which is not
+     *         related to the passed one (one of them is a primitive)
+     */
+    private static boolean hasUnrelatedOverload(ClassNode target, String name, String descriptor)
+    {
+        String parameters = descriptor.substring(0, descriptor.indexOf(')') + 1);
+        Type returnType = Type.getReturnType(descriptor);
+
+        return target.methods.stream().anyMatch(m -> m.name.equals(name) && m.desc.startsWith(parameters)
+            && !m.desc.equals(descriptor)
+            && (isPrimitive(Type.getReturnType(m.desc)) || isPrimitive(returnType)));
+    }
+
+    private static boolean isPrimitive(Type type)
+    {
+        return type.getSort() != Type.OBJECT && type.getSort() != Type.ARRAY;
+    }
+
+    private void addBinaryOnlyHolderMethod(ClassNode target, String binaryName, MethodNode method)
+    {
+        boolean isInterface = (target.access & Opcodes.ACC_INTERFACE) != 0;
+        ClassNode holder = this.binaryOnlyHolders.computeIfAbsent(target.name, k -> {
+            ClassNode node = new ClassNode();
+            node.version = Math.max(target.version, Opcodes.V1_8);
+            node.access = Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT | Opcodes.ACC_SYNTHETIC;
+            node.name = target.name + "$$BinaryOnly";
+            node.superName = "java/lang/Object";
+
+            return node;
+        });
+
+        MethodNode delegate =
+            new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, binaryName, method.desc, null, null);
+        delegate.visitCode();
+        delegate.visitVarInsn(Opcodes.ALOAD, 0);
+        delegate.visitTypeInsn(Opcodes.CHECKCAST, target.name);
+        int slot = 1;
+        for (Type argument : Type.getArgumentTypes(method.desc)) {
+            delegate.visitVarInsn(argument.getOpcode(Opcodes.ILOAD), slot);
+            slot += argument.getSize();
+        }
+        delegate.visitMethodInsn(isInterface ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL, target.name,
+            method.name, method.desc, isInterface);
+        delegate.visitInsn(Type.getReturnType(method.desc).getOpcode(Opcodes.IRETURN));
+        delegate.visitMaxs(0, 0);
+        delegate.visitEnd();
+        holder.methods.add(delegate);
     }
 
     private static void toInstanceMethod(ClassNode target, ClassNode mixin, MethodNode method)
@@ -502,6 +590,9 @@ public final class HibernatePatcher
         }
 
         for (PackageBridge bridge : this.bridges) {
+            for (Map.Entry<String, byte[]> holder : bridge.getHolders().entrySet()) {
+                write(holder.getKey() + CLASS_EXTENSION, holder.getValue());
+            }
             if (!bridge.getErrors().isEmpty()) {
                 throw new IllegalStateException(
                     "Failed to bridge some methods:\n" + String.join("\n", bridge.getErrors()));

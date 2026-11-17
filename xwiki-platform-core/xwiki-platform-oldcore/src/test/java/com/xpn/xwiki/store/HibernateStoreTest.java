@@ -116,6 +116,19 @@ class HibernateStoreTest
     }
 
     @Test
+    void getDatabaseProductNameWhenNoSessionFactoryAndStandardSetting() throws Exception
+    {
+        Field field = ReflectionUtils.getField(this.store.getClass(), "configuration");
+        field.setAccessible(true);
+        Configuration storeConfiguration = (Configuration) field.get(this.store);
+        Properties properties = new Properties();
+        properties.setProperty("jakarta.persistence.jdbc.url", "jdbc:postgresql://localhost/xwiki");
+        storeConfiguration.addProperties(properties);
+
+        assertEquals(DatabaseProduct.POSTGRESQL, this.store.getDatabaseProductName());
+    }
+
+    @Test
     void getConfiguredColumnNameUsesTheCaseOfTheDatabase()
     {
         HibernateAdapter adapter = mock(HibernateAdapter.class);

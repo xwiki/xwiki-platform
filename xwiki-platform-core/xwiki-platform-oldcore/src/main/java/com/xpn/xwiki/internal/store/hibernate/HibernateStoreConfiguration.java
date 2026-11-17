@@ -27,6 +27,8 @@ import java.net.URL;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.MappingException;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.jaxb.hbm.spi.JaxbHbmHibernateMapping;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
 import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.cfg.Configuration;
 
@@ -99,8 +101,11 @@ public class HibernateStoreConfiguration extends Configuration
      */
     public void copy(MetadataSources metadataSource)
     {
-        for (Binding<?> binding : this.metadataSources.getXmlBindings()) {
-            metadataSource.addXmlBinding(binding);
+        for (Binding<JaxbHbmHibernateMapping> binding : this.metadataSources.getHbmXmlBindings()) {
+            metadataSource.addHbmXmlBinding(binding);
+        }
+        for (Binding<JaxbEntityMappingsImpl> binding : this.metadataSources.getMappingXmlBindings()) {
+            metadataSource.addMappingXmlBinding(binding);
         }
     }
 }

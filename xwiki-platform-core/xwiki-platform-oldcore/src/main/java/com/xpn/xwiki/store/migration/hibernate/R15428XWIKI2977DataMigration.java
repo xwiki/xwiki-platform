@@ -80,7 +80,7 @@ public class R15428XWIKI2977DataMigration extends AbstractHibernateDataMigration
                         lst2.add(o);
                     }
                     for (BaseObject o : lst2) {
-                        session.update(o);
+                        session.merge(o);
                     }
                 }
                 return null;

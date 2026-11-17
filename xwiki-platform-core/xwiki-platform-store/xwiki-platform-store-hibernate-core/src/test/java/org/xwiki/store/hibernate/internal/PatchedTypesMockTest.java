@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -35,17 +38,20 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.query.QueryProducer;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Make sure the methods added to the Hibernate and Jakarta Persistence types don't prevent mocking them (which is
@@ -78,6 +84,28 @@ class PatchedTypesMockTest
         }
 
         assertEquals(List.of(), notImplemented);
+    }
+
+    @Test
+    void stubMethodsReturningAnEnum()
+    {
+        Dialect dialect = mock(Dialect.class);
+        when(dialect.getNativeValueGenerationStrategy()).thenReturn(GenerationType.SEQUENCE);
+        assertEquals(GenerationType.SEQUENCE, dialect.getNativeValueGenerationStrategy());
+
+        Query<?> query = mock(Query.class);
+        when(query.getFlushMode()).thenReturn(FlushModeType.COMMIT);
+        when(query.getLockMode()).thenReturn(LockModeType.PESSIMISTIC_WRITE);
+        assertEquals(FlushModeType.COMMIT, query.getFlushMode());
+        assertEquals(LockModeType.PESSIMISTIC_WRITE, query.getLockMode());
+
+        EntityManager entityManager = mock(EntityManager.class);
+        when(entityManager.getFlushMode()).thenReturn(FlushModeType.AUTO);
+        assertEquals(FlushModeType.AUTO, entityManager.getFlushMode());
+
+        Session session = mock(Session.class);
+        when(session.getFlushMode()).thenReturn(FlushModeType.COMMIT);
+        assertEquals(FlushModeType.COMMIT, session.getFlushMode());
     }
 
     private static Object[] defaultValues(Class<?>[] types)

@@ -30,6 +30,7 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
 import org.hibernate.Session;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
@@ -55,6 +56,7 @@ import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -162,6 +164,19 @@ class VersioningStoreQueryFactoryTest
         verify(this.session).createQuery("delete from " + XWikiRCSNodeInfo.class.getName()
             + " where id.docId=:docId");
         verify(this.queryAny).setParameter("docId", 42L);
+    }
+
+    @Test
+    void createDeleteArchiveQuery()
+    {
+        MutationQuery mutationQuery = mock(MutationQuery.class);
+        when(this.session.createMutationQuery(anyString())).thenReturn(mutationQuery);
+        when(mutationQuery.setParameter(anyString(), any())).thenReturn(mutationQuery);
+
+        assertSame(mutationQuery, VersioningStoreQueryFactory.createDeleteArchiveQuery(this.session, 42L));
+        verify(this.session)
+            .createMutationQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id.docId=:docId");
+        verify(mutationQuery).setParameter("docId", 42L);
     }
 
     @Test

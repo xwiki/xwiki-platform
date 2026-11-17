@@ -486,6 +486,17 @@
       <artifactId>jetty-io</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Used to wrap Hibernate queries, which can't be represented by a java.lang.reflect.Proxy -->
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+    </dependency>
+    <!-- Needed to test the Hibernate operations used by the store on a real database -->
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Used in to prioritize MandatoryDocumentInitializers -->
     <dependency>

@@ -22,10 +22,22 @@ package com.xpn.xwiki.internal.store.hibernate.legacy;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
+import org.hibernate.HibernateException;
 import org.hibernate.query.spi.QueryImplementor;
+
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.dynamic.scaffold.MethodGraph;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
+
+import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
+import static net.bytebuddy.matcher.ElementMatchers.isEquals;
+import static net.bytebuddy.matcher.ElementMatchers.isHashCode;
+import static net.bytebuddy.matcher.ElementMatchers.isToString;
+import static net.bytebuddy.matcher.ElementMatchers.not;
 
 /**
  * Wrap a QueryImplementor to convert the positional parameters from legacy 0-based Hibernate parameters to 1-based JPA
@@ -45,7 +57,30 @@ public final class LegacyQueryImplementor<R> implements InvocationHandler
     private static final Set<String> NOT_POSITION_METHODS = Set.of("setFirstResult", "setMaxResults",
         "setFetchSize", "setTimeout", "setHibernateFirstResult", "setHibernateMaxResults");
 
+    private static final String HANDLER_FIELD = "handler";
+
     private final QueryImplementor<R> delegate;
+
+    /**
+     * The class of the wrapping queries, generated the first time it's needed.
+     */
+    private static final class ProxyClass
+    {
+        private static final Class<?> CLASS = new ByteBuddy()
+            // The Hibernate types contain methods which only differ by their return type (the bridge methods using
+            // the javax.persistence types), which are different methods for the JVM: each of them must be
+            // implemented, and they can't be represented by a java.lang.reflect.Proxy
+            .with(MethodGraph.Compiler.Default.forJVMHierarchy()).subclass(Object.class)
+            .implement(QueryImplementor.class).defineField(HANDLER_FIELD, InvocationHandler.class, Modifier.PUBLIC)
+            .method(not(isDeclaredBy(Object.class)).or(isEquals()).or(isHashCode()).or(isToString()))
+            .intercept(InvocationHandlerAdapter.toField(HANDLER_FIELD)).make()
+            .load(QueryImplementor.class.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
+
+        private ProxyClass()
+        {
+            // Holder
+        }
+    }
 
     private LegacyQueryImplementor(QueryImplementor<R> delegate)
     {
@@ -61,8 +96,14 @@ public final class LegacyQueryImplementor<R> implements InvocationHandler
     @SuppressWarnings("unchecked")
     public static <R> QueryImplementor<R> wrap(QueryImplementor<R> delegate)
     {
-        return (QueryImplementor<R>) Proxy.newProxyInstance(QueryImplementor.class.getClassLoader(),
-            new Class<?>[] {QueryImplementor.class}, new LegacyQueryImplementor<>(delegate));
+        try {
+            Object proxy = ProxyClass.CLASS.getDeclaredConstructor().newInstance();
+            ProxyClass.CLASS.getField(HANDLER_FIELD).set(proxy, new LegacyQueryImplementor<>(delegate));
+
+            return (QueryImplementor<R>) proxy;
+        } catch (ReflectiveOperationException e) {
+            throw new HibernateException("Failed to wrap the query", e);
+        }
     }
 
     private static boolean isPositionMethod(Method method)

@@ -37,6 +37,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -785,10 +787,15 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             } else if (memberReference.getWikiReference().getName().equals(context.getWikiId())
                 || ("XWiki".equals(memberReference.getLastSpaceReference().getName())
                     && memberReference.getName().equals(XWikiRightService.GUEST_USER))) {
+                String shortName = this.localWikiEntityReferenceSerializer.serialize(memberReference);
+                // A member stored as a page name alone is resolved in the XWiki space.
+                SpaceReference spaceReference = memberReference.getLastSpaceReference();
+                boolean inSystemSpace = XWiki.SYSTEM_SPACE.equals(spaceReference.getName())
+                    && spaceReference.getParent() instanceof WikiReference;
                 query = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
                     .bindValue("username", this.entityReferenceSerializer.serialize(memberReference))
-                    .bindValue("shortname", this.localWikiEntityReferenceSerializer.serialize(memberReference))
-                    .bindValue("veryshortname", memberReference.getName());
+                    .bindValue("shortname", shortName)
+                    .bindValue("veryshortname", inSystemSpace ? memberReference.getName() : shortName);
             } else {
                 query = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUserInOtherWiki")
                     .bindValue("prefixedmembername", this.entityReferenceSerializer.serialize(memberReference));

@@ -38,7 +38,9 @@ import type {
 } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
 import type {
+  ModelReferenceParser,
   ModelReferenceParserProvider,
+  ModelReferenceSerializer,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
 import type { Container } from "inversify";
@@ -72,7 +74,14 @@ function buildContainer(
     serializeReferences?: boolean;
   } = {},
 ): { container: Container; attachmentsService: AttachmentsService } {
-  const container = mock<Container>();
+  const container = mock<Container>(
+    {},
+    {
+      fallbackMockImplementation: (id: unknown) => {
+        throw new Error(`Unexpected service: ${String(id)}`);
+      },
+    },
+  );
 
   const attachmentsService = mock<AttachmentsService>();
   if (options.failUpload) {
@@ -95,26 +104,34 @@ function mockReferenceServices(
   container: ReturnType<typeof mock<Container>>,
   serializeReferences: boolean,
 ) {
-  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
-    get: () => ({
-      parse: (page: string) =>
-        new DocumentReference(page, new SpaceReference()),
+  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue(
+    mock<ModelReferenceParserProvider>({
+      get: () =>
+        mock<ModelReferenceParser>({
+          parse: (page: string) =>
+            new DocumentReference(page, new SpaceReference()),
+        }),
     }),
-  } as unknown as ModelReferenceParserProvider);
-  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
-    get: () => ({
-      serialize: (reference: AttachmentReference) =>
-        serializeReferences
-          ? `${reference.document.name}@${reference.name}`
-          : undefined,
+  );
+  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue(
+    mock<ModelReferenceSerializerProvider>({
+      get: () =>
+        mock<ModelReferenceSerializer>({
+          serialize: (reference: AttachmentReference) =>
+            serializeReferences
+              ? `${reference.document.name}@${reference.name}`
+              : undefined,
+        }),
     }),
-  } as unknown as ModelReferenceSerializerProvider);
+  );
   container.get
     .calledWith("ResourceReferenceParser")
     .mockReturnValue(new DefaultResourceReferenceParser());
-  container.get.calledWith("DocumentService").mockReturnValue({
-    getCurrentDocumentReferenceString: () => ({ value: CURRENT_PAGE }),
-  } as unknown as DocumentService);
+  container.get.calledWith("DocumentService").mockReturnValue(
+    mock<DocumentService>({
+      getCurrentDocumentReferenceString: () => ({ value: CURRENT_PAGE }),
+    }),
+  );
 }
 
 function buildFile(): File {

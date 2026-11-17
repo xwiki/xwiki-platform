@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { EditorLanguage } from "./blocknote";
-import type { LinkEditionHooks } from "./components/links/linkEditionHooks";
 import type { BlockMetadataStore } from "./misc/blockMetadata";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
@@ -72,19 +71,6 @@ type UploadOptions = {
 };
 
 /**
- * The options of the link feature.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type LinkFeatureOptions = {
-  /**
-   * Hooks to intercept the link creation / edition flow.
-   */
-  hooks?: LinkEditionHooks;
-};
-
-/**
  * The options of the macro feature.
  *
  * @since 18.10.0RC1
@@ -105,8 +91,6 @@ type MacroFeatureOptions = {
  * @beta
  */
 type EditorFeatures = {
-  links?: LinkFeatureOptions;
-
   /**
    * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
    * insert or edit a macro, even when a `MacroEditor` is bound.
@@ -219,7 +203,6 @@ export type {
   EditorAppearance,
   EditorFeatures,
   EditorOptions,
-  LinkFeatureOptions,
   MacroFeatureOptions,
   UploadOptions,
 };

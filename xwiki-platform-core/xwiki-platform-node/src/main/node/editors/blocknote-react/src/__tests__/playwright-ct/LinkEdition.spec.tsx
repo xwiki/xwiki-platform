@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { BlockNoteWithLinkEditionHooks } from "./LinkEdition.story";
+import { BlockNoteWithLinkMetadataHandler } from "./LinkEdition.story";
 import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockType } from "../../blocknote";
@@ -32,7 +32,7 @@ test("beforeEdit transforms the link data used to pre-fill the link editor", asy
   page,
 }) => {
   const component = await mount(
-    <BlockNoteWithLinkEditionHooks
+    <BlockNoteWithLinkMetadataHandler
       content={buildParagraphWithLink()}
       beforeEditTitle="prefilled title"
     />,
@@ -62,7 +62,7 @@ test("beforeUpdate receives the submitted link data and the previous one, as sto
   };
 
   const component = await mount(
-    <BlockNoteWithLinkEditionHooks
+    <BlockNoteWithLinkMetadataHandler
       content={buildParagraphWithLink()}
       beforeEditTitle="prefilled title"
       submit={submit}
@@ -87,7 +87,7 @@ test("beforeUpdate can rewrite the url written into the content", async ({
   page,
 }) => {
   const component = await mount(
-    <BlockNoteWithLinkEditionHooks
+    <BlockNoteWithLinkMetadataHandler
       content={buildParagraphWithLink()}
       submit={{ title: "second", url: "https://example.org/" }}
       beforeUpdateUrl="https://rewritten.example/"
@@ -103,13 +103,60 @@ test("beforeUpdate can rewrite the url written into the content", async ({
   ).toHaveText("second");
 });
 
+test("A canceled link edition leaves the link unchanged", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteWithLinkMetadataHandler
+      content={buildParagraphWithLink()}
+      cancel
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editLink(editorEl, page);
+
+  await expect(page.locator('[data-test="linkEditorInput"]')).toBeAttached();
+  await expect(editorEl.locator(`a[href="${LINK_URL}"]`)).toHaveText("second");
+  await expect(
+    page.locator('[data-test="beforeUpdateInput"]'),
+  ).not.toBeAttached();
+});
+
+test("The links can't be created or edited when there's no link editor", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteWithLinkMetadataHandler
+      content={buildParagraphWithLink()}
+      noLinkEditor
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await moveCaretIntoLink(editorEl, page);
+  // The link toolbar is shown, without the edit action.
+  await expect(page.locator('button[data-test="openLink"]')).toBeVisible();
+  await expect(page.locator('button[data-test="editLink"]')).not.toBeAttached();
+
+  // The formatting toolbar is shown for the selected text, without the create link action.
+  await pressKeySettled(page, "Home");
+  await pressKeySettled(page, "Shift+End");
+  await expect(page.locator('button[data-test="subscript"]')).toBeVisible();
+  await expect(
+    page.locator('button[data-test="createLink"]'),
+  ).not.toBeAttached();
+});
+
 /**
- * Moves the caret inside the link to trigger the link toolbar, then opens the link editor. The toolbar also opens
+ * Moves the caret inside the link to trigger the link toolbar. The toolbar also opens
  * when the link is hovered, but not with a single synthetic mouse move: the editor only records the hovered link
  * when the pointer enters it, and the toolbar starts listening for pointer events on the link on the render that
  * follows, so it never sees that move.
  */
-async function editLink(editorEl: Locator, page: Page): Promise<void> {
+async function moveCaretIntoLink(editorEl: Locator, page: Page): Promise<void> {
   const linkEl = editorEl.locator(`a[href="${LINK_URL}"]`);
   await linkEl.waitFor({ state: "attached" });
 
@@ -123,7 +170,13 @@ async function editLink(editorEl: Locator, page: Page): Promise<void> {
   for (let i = 0; i < 8; i++) {
     await pressKeySettled(page, "ArrowRight");
   }
+}
 
+/**
+ * Opens the link editor on the link, from the link toolbar.
+ */
+async function editLink(editorEl: Locator, page: Page): Promise<void> {
+  await moveCaretIntoLink(editorEl, page);
   const editLinkButtonEl = page.locator('button[data-test="editLink"]');
   await editLinkButtonEl.waitFor({ state: "attached" });
   await editLinkButtonEl.click();

@@ -20,12 +20,13 @@
 <script setup lang="ts">
 import CBlockNoteView from "../../vue/c-blocknote-view.vue";
 import { serviceContainerMock } from "../serviceContainer.mock";
+import { linkMetadataHandlerName } from "@xwiki/platform-editors-blocknote-react";
 import { ref, useTemplateRef } from "vue";
 import type { HeadlessEditorOptions } from "../../editorOptions";
 import type {
   BlockType,
   LinkEditionData,
-  LinkEditionHooks,
+  LinkMetadataHandler,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
@@ -70,21 +71,23 @@ const serviceContainer = serviceContainerMock([props.options.syntax]);
 const lastSubmittedLinkReference = ref<ResourceReference>();
 const lastSubmittedLinkGeneratedTitle = ref<boolean>();
 
-const linkEdition: LinkEditionHooks = {
-  beforeEdit: (linkData) => {
-    const reference = props.linkReferences?.[linkData.url];
-    return {
-      ...linkData,
-      ...(reference ? { reference } : {}),
-      generatedTitle: props.linksWithGeneratedLabel?.includes(linkData.url),
-    };
-  },
-  beforeUpdate: (linkData) => {
-    lastSubmittedLinkReference.value = linkData.reference;
-    lastSubmittedLinkGeneratedTitle.value = !!linkData.generatedTitle;
-    return linkData;
-  },
-};
+serviceContainer
+  .bind<LinkMetadataHandler>(linkMetadataHandlerName)
+  .toConstantValue({
+    beforeEdit: (_instance, linkData) => {
+      const reference = props.linkReferences?.[linkData.url];
+      return {
+        ...linkData,
+        ...(reference ? { reference } : {}),
+        generatedTitle: props.linksWithGeneratedLabel?.includes(linkData.url),
+      };
+    },
+    beforeUpdate: (_instance, linkData) => {
+      lastSubmittedLinkReference.value = linkData.reference;
+      lastSubmittedLinkGeneratedTitle.value = !!linkData.generatedTitle;
+      return linkData;
+    },
+  });
 
 const options: HeadlessEditorOptions = {
   ...props.options,
@@ -92,10 +95,6 @@ const options: HeadlessEditorOptions = {
   serviceContainer,
   lang: "en",
   label: "Editor",
-  features: {
-    ...props.options.features,
-    links: { ...props.options.features?.links, hooks: linkEdition },
-  },
 };
 
 const innerRef = useTemplateRef<InstanceType<typeof CBlockNoteView>>("inner");

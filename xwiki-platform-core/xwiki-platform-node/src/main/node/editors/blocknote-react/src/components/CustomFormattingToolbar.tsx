@@ -47,8 +47,6 @@ import {
 } from "@blocknote/react";
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
-import type { LinkEditionHandler } from "./links/linkEdition";
-import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
@@ -97,18 +95,11 @@ const BooleanStyleButton: React.FC<{
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
-  linkEditionHandler: LinkEditionHandler;
-  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomFormattingToolbar: React.FC<
   CustomFormattingToolbarProps
-> = ({
-  formattingToolbarProps,
-  additionalBlockTypes,
-  linkEditionHooks,
-  linkEditionHandler,
-}) => {
+> = ({ formattingToolbarProps, additionalBlockTypes }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
 
@@ -130,12 +121,7 @@ export const CustomFormattingToolbar: React.FC<
         <CustomImageToolbar currentBlock={currentBlock} />
       ) : (
         // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(
-          combinedBlockTypeSelectItems,
-          linkEditionHandler,
-          t,
-          linkEditionHooks,
-        )
+        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, t)
       )}
     </Components.FormattingToolbar.Root>
   );
@@ -143,9 +129,7 @@ export const CustomFormattingToolbar: React.FC<
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  linkEditorHandler: LinkEditionHandler,
   t: (key: string) => string,
-  linkEditionHooks?: LinkEditionHooks,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -189,13 +173,9 @@ const getDefaultFormattingToolbarItems = (
     <ColorStyleButton key={"colorStyleButton"} />,
     <NestBlockButton key={"nestBlockButton"} />,
     <UnnestBlockButton key={"unnestBlockButton"} />,
-    // This button has the exact same appearance as the default creation link button
-    // But brings a custom popover to support XWiki references
-    <CustomCreateLinkButton
-      key={"createLinkButton"}
-      linkEditionHandler={linkEditorHandler}
-      linkEditionHooks={linkEditionHooks}
-    />,
+    // This button has the exact same appearance as the default creation link button, but opens the link editor (and
+    // is hidden when there's none).
+    <CustomCreateLinkButton key={"createLinkButton"} />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
     // Hidden when no macro editor is available.

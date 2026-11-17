@@ -56,7 +56,6 @@ export interface BlockMetadataStore {
 export type BlockNoteViewWrapperProps = {
     options: EditorOptions;
     content: BlockType[];
-    linkEditionHandler: LinkEditionHandler;
     onChange?: (editor: EditorType) => void;
     refs?: {
         setInstance?: (instance: EditorInstance) => void;
@@ -89,7 +88,6 @@ export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer Block
 
 // @beta
 export type EditorFeatures = {
-    links?: LinkFeatureOptions;
     macros?: MacroFeatureOptions | false;
 };
 
@@ -199,25 +197,27 @@ export type LinkEditionData = {
 };
 
 // @beta
-export type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
-
-// @beta
-export type LinkEditionHandlerProps = {
+export type LinkEditionRequest = {
     current: LinkEditionData;
-    onSubmit: (link: LinkEditionData) => void;
     mode: "createNew" | "editExisting";
 };
 
 // @beta
-export type LinkEditionHooks = {
-    beforeEdit?: (linkData: LinkEditionData) => LinkEditionData | void;
-    beforeUpdate?: (linkData: LinkEditionData, previous?: LinkEditionData) => LinkEditionData | void;
-};
+export interface LinkEditor {
+    edit(instance: EditorInstance, request: LinkEditionRequest): Promise<LinkEditionData | undefined>;
+}
 
 // @beta
-export type LinkFeatureOptions = {
-    hooks?: LinkEditionHooks;
-};
+export const linkEditorName = "LinkEditor";
+
+// @beta
+export interface LinkMetadataHandler {
+    beforeEdit(instance: EditorInstance, link: LinkEditionData): LinkEditionData;
+    beforeUpdate(instance: EditorInstance, link: LinkEditionData, previous?: LinkEditionData): LinkEditionData;
+}
+
+// @beta
+export const linkMetadataHandlerName = "LinkMetadataHandler";
 
 // @beta
 export const MACRO_NAME_PREFIX = "Macro_";

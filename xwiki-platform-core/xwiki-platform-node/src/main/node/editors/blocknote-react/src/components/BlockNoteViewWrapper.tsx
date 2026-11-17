@@ -62,7 +62,6 @@ import type { BlockType, EditorSchema, EditorType } from "../blocknote";
 import type { BlockNoteConcreteMacro } from "../blocknote/utils";
 import type { EditorInstance } from "../editorInstance";
 import type { EditorOptions } from "../editorOptions";
-import type { LinkEditionHandler } from "./links/linkEdition";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { ModelReferenceSerializerProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
@@ -86,14 +85,6 @@ type BlockNoteViewWrapperProps = {
    * If realtime is enabled, this content may be replaced by the other users' own editor content
    */
   content: BlockType[];
-
-  /**
-   * Intercept link edition mechanism (i.e. inserting or editing a link)
-   *
-   * @since 18.4.0RC1
-   * @beta
-   */
-  linkEditionHandler: LinkEditionHandler;
 
   /**
    * Run a function when the document's content change
@@ -131,7 +122,6 @@ const SIDE_MENU_FLOATING_OPTIONS = {
 const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   options,
   content,
-  linkEditionHandler,
   onChange,
   refs: { setInstance } = {},
   // eslint-disable-next-line max-statements
@@ -146,7 +136,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     appearance: { theme, contentStyles, codeBlockClassName } = {},
     collaboration: requestedCollaboration,
     upload,
-    features: { links, macros } = {},
+    features: { macros } = {},
   } = options;
   const { t } = useTranslation();
 
@@ -360,8 +350,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
             {syntax.features.inlineContents.links.basicLinks && (
               <LinkSuggestionController
-                linkEditionHandler={linkEditionHandler}
-                linkEditionHooks={links?.hooks}
                 maxSuggestions={8}
                 pageSuggestionsShare={5}
               />
@@ -373,8 +361,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               formattingToolbar={(props) => (
                 <CustomFormattingToolbar
                   formattingToolbarProps={props}
-                  linkEditionHandler={linkEditionHandler}
-                  linkEditionHooks={links?.hooks}
                   additionalBlockTypes={filterMap(
                     builtMacros,
                     (built) => built.dropdownTransformItem,
@@ -386,11 +372,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             <LinkToolbarController
               linkToolbar={(props) => (
                 <FormattingToolbar>
-                  <CustomLinkToolbar
-                    linkToolbarProps={props}
-                    linkEditionHandler={linkEditionHandler}
-                    linkEditionHooks={links?.hooks}
-                  />
+                  <CustomLinkToolbar linkToolbarProps={props} />
                 </FormattingToolbar>
               )}
             />

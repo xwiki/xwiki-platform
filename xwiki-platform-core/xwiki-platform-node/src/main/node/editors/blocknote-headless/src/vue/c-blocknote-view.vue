@@ -19,16 +19,12 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
+import { bindVueServices } from "../linkEditor";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
-import { LinkModal } from "@xwiki/platform-link-modal-ui";
-import {
-  linkTargetTypeManagerRole,
-  unsupportedLinkTargetType,
-} from "@xwiki/platform-link-type-api";
+import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
-  computed,
-  nextTick,
+  getCurrentInstance,
   onBeforeUnmount,
   onMounted,
   onUnmounted,
@@ -43,15 +39,7 @@ import type {
   BlockNoteViewWrapperProps,
   BlockType,
   EditorType,
-  LinkEditionData,
-  LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
-import type {
-  LinkContext,
-  LinkData,
-  LinkTarget,
-  LinkTargetTypeManager,
-} from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 
 type Props = {
@@ -67,7 +55,11 @@ const { options, content } = defineProps<Props>();
 // The options must be passed as is (raw), most importantly the collaboration session, because the realtime
 // synchronization fails with a proxy of the Yjs document it holds.
 const rawOptions = toRaw(options);
-const { serviceContainer } = rawOptions;
+
+// The services of the Vue integration (e.g. the link editor showing the link modal) are bound in a child of the given
+// service container, so that they are specific to this editor instance, and bound before the editor is created.
+const serviceContainer = new Container({ parent: rawOptions.serviceContainer });
+bindVueServices(serviceContainer, getCurrentInstance()!.appContext);
 
 /**
  * @returns the reference of the document holding the edited content, as specified by the options, or the current
@@ -84,11 +76,8 @@ function getSourceDocumentReference(): DocumentReference | undefined {
   );
 }
 
-// Resolved once, so that the editor and the link modal agree on it.
+// Resolved once, so that the editor and the link editor agree on it.
 const sourceDocumentReference = getSourceDocumentReference();
-
-// The links are resolved and saved relative to the source document.
-const linkContext: LinkContext = { sourceDocument: sourceDocumentReference };
 
 const editorRef = shallowRef<EditorType | null>(null);
 
@@ -141,6 +130,7 @@ const notifyChangesDebounced = debounce(notifyChanges, 500);
 const blockNoteProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   options: {
     ...rawOptions,
+    serviceContainer,
     // Make sure the source document reference is set (with fallback on the current document).
     sourceDocumentReference,
   },
@@ -160,84 +150,15 @@ const blockNoteProps: Omit<BlockNoteViewWrapperProps, "content"> = {
       );
     },
   },
-  linkEditionHandler: (props) => {
-    editingLink.value = props;
-  },
 };
 
 /**
  * @returns the link target type manager, resolved each time it's needed, so that it uses the link target types
  *   registered at that time
  */
-function getLinkTargetTypeManager(): LinkTargetTypeManager {
-  return serviceContainer.get<LinkTargetTypeManager>(linkTargetTypeManagerRole);
-}
-
-const submitEditedLink = ({
-  displayText,
-  generatedDisplayText,
-  target,
-}: LinkData) => {
-  const linkTargetTypeManager = getLinkTargetTypeManager();
-  // The URL of a resource that no link target type supports can't be computed client-side, so keep the URL of the
-  // edited link. It's only a preview anyway: the link is saved from its reference.
-  const url =
-    target.type === unsupportedLinkTargetType
-      ? (editingLink.value?.current.url ?? "")
-      : linkTargetTypeManager.toURL(target, linkContext);
-  const reference = linkTargetTypeManager.toReference(target, linkContext);
-
-  editingLink.value?.onSubmit({
-    title: displayText,
-    generatedTitle: generatedDisplayText,
-    url,
-    reference,
-  });
-
-  closeLinkModal();
-};
-
-/**
- * Close the link modal and focus back the edited content, so that keyboard users can keep typing where they were.
- * The content is focused only once the modal is removed: a modal dialog keeps the focus while it's shown (e.g. the
- * Bootstrap one moves it back inside as soon as it leaves).
- */
-async function closeLinkModal(): Promise<void> {
-  editingLink.value = null;
-  await nextTick();
-  editorRef.value?.focus();
-}
-
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
 
 const mountedBlockNote = ref<{ unmount: () => void }>();
-
-const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
-
-/**
- * The reference of the linked resource is the authoritative link target (the URL is only a rendering
- * of it), so build the target to configure in the link modal from that reference when the
- * integration provides one, even when no link target type supports it (the reference is then edited as
- * is), and fall back on reverse-engineering the URL otherwise.
- */
-function currentLinkTarget(current: LinkEditionData): LinkTarget {
-  const linkTargetTypeManager = getLinkTargetTypeManager();
-  return current.reference
-    ? linkTargetTypeManager.fromReference(current.reference, linkContext)
-    : linkTargetTypeManager.fromURL(current.url);
-}
-
-const currentLinkData = computed<LinkData | null>(() => {
-  if (!editingLink.value) {
-    return null;
-  }
-
-  return {
-    displayText: editingLink.value.current.title,
-    generatedDisplayText: editingLink.value.current.generatedTitle,
-    target: currentLinkTarget(editingLink.value.current),
-  };
-});
 
 onMounted(() => {
   if (!blockNoteContainer.value) {
@@ -266,17 +187,6 @@ onUnmounted(() => {
 
 <template>
   <div ref="blocknote-container" />
-
-  <LinkModal
-    v-if="currentLinkData"
-    :current="currentLinkData"
-    :deps-container="serviceContainer"
-    :excluded-link-target-types="options.features?.links?.excludedTargetTypes"
-    :link-context
-    :mode="editingLink?.mode"
-    @submit="submitEditedLink"
-    @cancel="closeLinkModal"
-  />
 </template>
 
 <style scoped>

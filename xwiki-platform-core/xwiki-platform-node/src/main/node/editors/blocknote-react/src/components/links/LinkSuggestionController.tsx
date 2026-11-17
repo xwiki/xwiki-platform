@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { insertLink } from "./insertLink";
+import { insertLink, useLinkEditing } from "./linkEditor";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
 import {
+  EditorInstanceContext,
   ServiceContainerContext,
   SourceDocumentReferenceContext,
 } from "../../contexts";
-import { useEditor } from "../../hooks";
 import { triggerUserAttachmentUpload } from "../../misc/fileUpload";
 import { toLinkResourceReference } from "../../misc/linkResourceReference";
 import { SuggestionMenuController } from "@blocknote/react";
@@ -40,9 +40,7 @@ import {
   RiLink,
   RiUpload2Line,
 } from "react-icons/ri";
-import type { EditorType } from "../../blocknote";
-import type { LinkEditionData, LinkEditionHandler } from "./linkEdition";
-import type { LinkEditionHooks } from "./linkEditionHooks";
+import type { LinkEditionData } from "./linkEditor";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   Link,
@@ -67,10 +65,6 @@ type SuggestedLink = Pick<Link, "label" | "url" | "type"> & {
 };
 
 export type LinkSuggestionControllerProps = {
-  /** Opens the link editor, for the links that the suggestions don't cover. */
-  linkEditionHandler: LinkEditionHandler;
-  /** Intercepts the inserted links. */
-  linkEditionHooks?: LinkEditionHooks;
   /** The maximum number of suggestions shown, pages and attachments together. */
   maxSuggestions: number;
   /**
@@ -82,11 +76,9 @@ export type LinkSuggestionControllerProps = {
 
 /**
  * Suggests the pages and attachments to link to, as the user types after the link suggestion trigger, in addition to
- * uploading a file to link to and opening the link editor for any other link.
+ * uploading a file to link to and opening the link editor (when bound) for any other link.
  */
 export function LinkSuggestionController({
-  linkEditionHandler,
-  linkEditionHooks,
   maxSuggestions,
   pageSuggestionsShare,
 }: LinkSuggestionControllerProps) {
@@ -96,13 +88,8 @@ export function LinkSuggestionController({
     "LinkSuggestServiceProvider",
   ).get!();
 
-  const editor = useEditor();
-  const { insertSuggested, openLinkEditor, uploadFile } = useLinkInsertion(
-    editor,
-    serviceContainer,
-    linkEditionHandler,
-    linkEditionHooks,
-  );
+  const { insertSuggested, openLinkEditor, uploadFile } =
+    useLinkInsertion(serviceContainer);
 
   const { t } = useTranslation();
 
@@ -120,11 +107,16 @@ export function LinkSuggestionController({
         );
 
         const actions: DefaultReactSuggestionItem[] = [
-          {
-            title: t("blocknote.linkSuggestion.linkTo"),
-            icon: <RiLink size={18} />,
-            onItemClick: openLinkEditor,
-          },
+          // Offered only when there's a link editor.
+          ...(openLinkEditor
+            ? [
+                {
+                  title: t("blocknote.linkSuggestion.linkTo"),
+                  icon: <RiLink size={18} />,
+                  onItemClick: openLinkEditor,
+                },
+              ]
+            : []),
           {
             title: t("blocknote.linkSuggestion.upload"),
             icon: <RiUpload2Line size={18} />,
@@ -175,25 +167,26 @@ export function LinkSuggestionController({
  *   directly; the link is inserted at the editor's selection, where the link suggestion menu was (the menu itself is
  *   already closed, and its query removed, by the time an item is clicked)
  */
-function useLinkInsertion(
-  editor: EditorType,
-  serviceContainer: Container,
-  linkEditionHandler: LinkEditionHandler,
-  linkEditionHooks?: LinkEditionHooks,
-) {
+function useLinkInsertion(serviceContainer: Container) {
+  const instance = useContext(EditorInstanceContext)!;
+  const linkEditing = useLinkEditing();
+
   const insert: InsertLink = useCallback(
-    (linkData) => insertLink(editor, linkData, linkEditionHooks),
-    [editor, linkEditionHooks],
+    (linkData) => insertLink(instance, linkData),
+    [instance],
   );
 
-  const openLinkEditor = useCallback(
+  const openLinkEditor = useMemo(
     () =>
-      linkEditionHandler({
-        mode: "createNew",
-        current: { title: "", url: "" },
-        onSubmit: insert,
+      linkEditing &&
+      (async () => {
+        await linkEditing.edit(
+          { mode: "createNew", current: { title: "", url: "" } },
+          insert,
+        );
+        instance.editor.focus();
       }),
-    [linkEditionHandler, insert],
+    [instance, linkEditing, insert],
   );
 
   const sourceDocumentReference = useContext(SourceDocumentReferenceContext);

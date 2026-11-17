@@ -263,7 +263,7 @@ test("Macros can't be inserted without a macro editor, or when disabled", async 
 
     await component.locator("p.bn-inline-content").dblclick();
     // The formatting toolbar is shown, without the macro insertion action.
-    await page.locator('button[data-test="createLink"]').waitFor();
+    await page.locator('button[data-test="subscript"]').waitFor();
     await expect(page.locator('button[data-test="insertMacro"]')).toHaveCount(
       0,
     );

@@ -84,7 +84,6 @@ export type {
   EditorAppearance,
   EditorFeatures,
   EditorOptions,
-  LinkFeatureOptions,
   MacroFeatureOptions,
   UploadOptions,
 } from "./editorOptions";
@@ -118,10 +117,14 @@ export type {
   MacroInsertionEditorPrefillData,
 } from "./blocknote/utils";
 
+export {
+  linkEditorName,
+  linkMetadataHandlerName,
+} from "./components/links/linkEditor";
+
 export type {
   LinkEditionData,
-  LinkEditionHandler,
-  LinkEditionHandlerProps,
-} from "./components/links/linkEdition";
-
-export type { LinkEditionHooks } from "./components/links/linkEditionHooks";
+  LinkEditionRequest,
+  LinkEditor,
+  LinkMetadataHandler,
+} from "./components/links/linkEditor";

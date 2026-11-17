@@ -45,7 +45,7 @@ async function openLinkQuickAction(page: Page, editorEl: Locator) {
 }
 
 /**
- * @returns the links received by the link edition hooks before being inserted
+ * @returns the links received by the link metadata handler before being inserted
  */
 async function getInsertedLinks(page: Page) {
   return JSON.parse(
@@ -322,6 +322,37 @@ test("The link editor action opens the link editor, and inserts the link it subm
   expect(await getInsertedLinks(page)).toEqual([
     { title: "XWiki", url: "https://xwiki.org" },
   ]);
+});
+
+test("Canceling the link editor inserts nothing", async ({ mount, page }) => {
+  const component = await mount(<LinkSuggestionForTest />);
+
+  const editorEl = component.locator(".bn-editor");
+  await openLinkQuickAction(page, editorEl);
+  await page.locator(".bn-suggestion-menu-item", { hasText: LINK_TO }).click();
+
+  await expect(page.getByTestId("linkEditorInput")).not.toBeEmpty();
+  await expect(page.locator(".bn-suggestion-menu")).not.toBeAttached();
+  await expect(editorEl.locator("a")).toHaveCount(0);
+  expect(await getInsertedLinks(page)).toEqual([]);
+});
+
+test("The link quick action doesn't offer the link editor when there's none", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <LinkSuggestionForTest linkSuggestServiceUnavailable={true} noLinkEditor />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("/link");
+  await page.keyboard.press("Enter");
+
+  // Only the upload action is offered.
+  const items = page.locator(".bn-suggestion-menu-item");
+  await expect(items).toHaveText([UPLOAD]);
 });
 
 test("The upload action uploads a file of any type and inserts a link to it, with a label generated from its name", async ({

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
+import { DefaultLinkMetadataHandler } from "./blocknote/DefaultLinkMetadataHandler";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultImageEditor } from "./image/DefaultImageEditor";
@@ -85,6 +86,7 @@ XWikiBlockNoteProcessor.bind(container);
 
 DefaultImageEditor.bind(container);
 DefaultImageMetadataHandler.bind(container);
+DefaultLinkMetadataHandler.bind(container);
 DefaultMacroWizard.bind(container);
 DefaultMacroEditor.bind(container);
 

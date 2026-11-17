@@ -17,41 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { insertLink } from "./insertLink";
+import { insertLink, useLinkEditing } from "./linkEditor";
+import { EditorInstanceContext } from "../../contexts";
 import { useEditor } from "../../hooks";
 import { selectionHasInlineContent } from "../../selection";
 import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
-import { useCallback } from "react";
+import { useContext } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkEditionData, LinkEditionHandler } from "./linkEdition";
-import type { LinkEditionHooks } from "./linkEditionHooks";
 
-export type CustomCreateLinkButtonProps = {
-  linkEditionHandler: LinkEditionHandler;
-  linkEditionHooks?: LinkEditionHooks;
-};
-
-export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
-  linkEditionHandler,
-  linkEditionHooks,
-}) => {
+export const CustomCreateLinkButton: React.FC = () => {
   const editor = useEditor();
+  const instance = useContext(EditorInstanceContext)!;
+  const linkEditing = useLinkEditing();
   const Components = useComponentsContext()!;
   const dict = useDictionary();
 
-  const insertSelectionLink = useCallback(
-    // When the link label differs from the selected text, the selection is replaced with the new label, keeping the
-    // formatting shared by the whole selection, like typing over it does.
-    (linkData: LinkEditionData, selectedText: string) =>
-      insertLink(editor, linkData, linkEditionHooks, selectedText),
-    [editor, linkEditionHooks],
-  );
-
   // Links are inline content, so they can only wrap editable inline content. Hide the button when the
   // selection has no such content (e.g. a block-level macro or other content-less block is selected),
-  // mirroring BlockNote's default Create Link button.
-  if (!selectionHasInlineContent(editor)) {
+  // mirroring BlockNote's default Create Link button. Hidden also when there's no link editor.
+  if (!linkEditing || !selectionHasInlineContent(editor)) {
     return null;
   }
 
@@ -66,15 +51,16 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
         dict.generic.ctrl_shortcut,
       )}
       icon={<RiLink />}
-      onClick={() => {
-        // The display text is pre-filled with the text selected when the link modal is opened, which
-        // also tells, on submit, whether the user changed it.
+      onClick={async () => {
+        // The display text is pre-filled with the text selected when the link editor is opened, which also tells, on
+        // submit, whether the user changed it. When the link label differs from the selected text, the selection is
+        // replaced with the new label, keeping the formatting shared by the whole selection, like typing over it does.
         const selectedText = editor.getSelectedText();
-        linkEditionHandler({
-          mode: "createNew",
-          current: { title: selectedText, url: "" },
-          onSubmit: (linkData) => insertSelectionLink(linkData, selectedText),
-        });
+        await linkEditing.edit(
+          { mode: "createNew", current: { title: selectedText, url: "" } },
+          (link) => insertLink(instance, link, selectedText),
+        );
+        editor.focus();
       }}
     />
   );

@@ -224,9 +224,6 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
           metadata,
         }}
         content={content ?? []}
-        linkEditionHandler={() => {
-          throw new Error("Link editor should not open for this test");
-        }}
       />
       <output data-testid="selectedImages">
         {JSON.stringify(selectedImages)}

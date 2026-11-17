@@ -11,7 +11,6 @@ import { DefineComponent } from 'vue';
 import { EditorFeatures } from '@xwiki/platform-editors-blocknote-react';
 import { EditorOptions } from '@xwiki/platform-editors-blocknote-react';
 import { EditorType } from '@xwiki/platform-editors-blocknote-react';
-import { LinkFeatureOptions } from '@xwiki/platform-editors-blocknote-react';
 import { PublicProps } from 'vue';
 
 // @beta (undocumented)
@@ -34,19 +33,19 @@ content: BlockType[];
 "onLocal-instant-change"?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
-}, any>;
+}, HTMLDivElement>;
 
 export { EditorType }
 
 // @beta
 export type HeadlessEditorOptions = Omit<EditorOptions, "features"> & {
-    features?: Omit<EditorFeatures, "links"> & {
+    features?: EditorFeatures & {
         links?: HeadlessLinkFeatureOptions;
     };
 };
 
 // @beta
-export type HeadlessLinkFeatureOptions = LinkFeatureOptions & {
+export type HeadlessLinkFeatureOptions = {
     excludedTargetTypes?: string[];
 };
 

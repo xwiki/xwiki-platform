@@ -29,9 +29,9 @@ import type {
   InlineMacroInvocation,
   MacroBlockInvocation,
 } from "../../blocknote/utils";
-import type { LinkEditionHandler } from "../../components/links/linkEdition";
 import type { EditorOptions } from "../../editorOptions";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { Container } from "inversify";
 
 export type BlockNoteForTestProps = {
   content: BlockType[];
@@ -43,7 +43,9 @@ export type BlockNoteForTestProps = {
   > & {
     syntax: SyntaxConfig;
   };
-  linkEditionHandler?: LinkEditionHandler;
+  // Binds the services that the test needs in the service container. Only for the stories wrapping this one, since a
+  // function passed from the test runs outside of the browser.
+  bind?: (container: Container) => void;
   // The server-rendered output of the macro calls of the content, put in the metadata store of the editor instance
   // (the store itself can't be passed from the test, since only serializable properties can).
   macroOutputs?: { id: string; call: string; output: unknown[] }[];
@@ -55,7 +57,7 @@ export type BlockNoteForTestProps = {
 export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   content,
   options,
-  linkEditionHandler,
+  bind,
   macroOutputs,
   macroEditor,
 }) => {
@@ -63,6 +65,7 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
 
   const serviceContainer = useMemo(() => {
     const container = serviceContainerMock([options.syntax]);
+    bind?.(container);
     if (macroEditor) {
       container.bind<MacroEditor>(macroEditorName).toConstantValue({
         async insert(instance, prefill) {
@@ -106,12 +109,6 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
           syntax: options.syntax.id,
         }}
         content={content}
-        linkEditionHandler={
-          linkEditionHandler ??
-          (() => {
-            throw new Error("Link editor should not open for this test");
-          })
-        }
       />
       {/* Rendered only once the macro editor is called, so that it doesn't change the text of the component checked
         by the other tests. */}

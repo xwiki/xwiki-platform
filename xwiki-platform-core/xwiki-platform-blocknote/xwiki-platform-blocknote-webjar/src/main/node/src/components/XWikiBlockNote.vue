@@ -87,7 +87,6 @@
 <script setup lang="ts">
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { createFileUploader } from "../services/blocknote/createFileUploader";
-import { createLinkEditionHooks } from "../services/blocknote/linkEditionHooks";
 import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
 import {
   ConnectionStatus,
@@ -213,11 +212,6 @@ const editorOptions = shallowRef<HeadlessEditorOptions>();
 
 const defaultLabel = "Editor";
 
-const linkEdition = createLinkEditionHooks(
-  () => blockNoteDocument,
-  sourceDocumentReference,
-);
-
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
 const temporaryAttachments: Ref<Set<string>> = ref(new Set<string>());
 
@@ -341,7 +335,6 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
     metadata: blockNoteDocument!.metadata,
     features: {
       links: {
-        hooks: linkEdition,
         // Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new
         // links, to keep the link type selector short. Existing path and UNC path links are still edited with their
         // own link type.

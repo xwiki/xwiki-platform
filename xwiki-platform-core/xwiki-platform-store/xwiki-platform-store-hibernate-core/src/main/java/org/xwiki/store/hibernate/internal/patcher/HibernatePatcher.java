@@ -114,14 +114,14 @@ public final class HibernatePatcher
             if (value instanceof String string) {
                 // Path form (resources)
                 String relocated = relocate(string);
-                if (relocated != string) {
+                if (!relocated.equals(string)) {
                     return relocated;
                 }
 
                 // Dotted form (class names, resource bundle names, etc.)
                 String path = string.replace('.', '/');
                 relocated = relocate(path);
-                if (relocated != path) {
+                if (!relocated.equals(path)) {
                     return relocated.replace('/', '.');
                 }
             }
@@ -572,7 +572,10 @@ public final class HibernatePatcher
 
     private void write(String name, byte[] content) throws IOException
     {
-        Path file = this.classes.resolve(name);
+        Path file = this.classes.resolve(name).normalize();
+        if (!file.startsWith(this.classes.normalize())) {
+            throw new IOException(String.format("The entry [%s] is outside of the classes directory", name));
+        }
         Files.createDirectories(file.getParent());
         Files.write(file, content);
     }

@@ -140,6 +140,11 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     public Map<String, String> getRowFormats(Session session)
     {
         String currentDatabase = getDatabaseFromWikiName();
+        if (currentDatabase == null) {
+            // No current wiki, so no database to inspect
+            return Map.of();
+        }
+
         NativeQuery<Object[]> query = session.createNativeQuery("SELECT DISTINCT NAME, ROW_FORMAT FROM "
             + getInformationShemaInnoDBTables() + " WHERE LOWER(NAME) LIKE '" + currentDatabase.toLowerCase() + "/%'",
             Object[].class);

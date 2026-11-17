@@ -93,7 +93,7 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
             shouldPrint = true;
         } else {
             EntityReference defaultReference = resolveDefaultReference(currentReference.getType(), parameters);
-            if (defaultReference == null || !equal(defaultReference, currentReference)) {
+            if (defaultReference == null || !isEqual(defaultReference, currentReference)) {
                 shouldPrint = true;
             }
         }
@@ -118,7 +118,7 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         super.serializeEntityReference(reference, representation, isLastReference);
     }
 
-    protected boolean equal(EntityReference defaultReference, EntityReference currentReference)
+    protected boolean isEqual(EntityReference defaultReference, EntityReference currentReference)
     {
         EntityReference defaultReferenceIt = defaultReference;
         EntityReference currentReferenceIt = currentReference;

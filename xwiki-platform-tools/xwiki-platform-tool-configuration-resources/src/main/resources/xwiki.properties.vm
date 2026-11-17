@@ -287,9 +287,9 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Comma-separated list of additional tags that should be allowed by the HTML sanitizer. These tags will be allowed
 #-# in addition to the already extensive built-in list of tags that are considered safe. Use with care to avoid
 #-# introducing security issues. By default, the following tags are allowed:
-#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/a1fee94faa056845b3367ad92dae4b50f5a12524/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L76-L86
-#-# SVG tags: https://github.com/xwiki/xwiki-commons/blob/a1fee94faa056845b3367ad92dae4b50f5a12524/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L97-L111
-#-# MathML tags: https://github.com/xwiki/xwiki-commons/blob/a1fee94faa056845b3367ad92dae4b50f5a12524/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L255-L258
+#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/f03af50387bcbed086c16437980a4736ad96f71a/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L76-L86
+#-# SVG tags: https://github.com/xwiki/xwiki-commons/blob/f03af50387bcbed086c16437980a4736ad96f71a/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L100-L115
+#-# MathML tags: https://github.com/xwiki/xwiki-commons/blob/f03af50387bcbed086c16437980a4736ad96f71a/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L257-L260
 # xml.htmlElementSanitizer.extraAllowedTags =
 
 #-# [Since 14.6RC1]
@@ -297,10 +297,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# be allowed in addition to the already extensive built-in list of attributes that are considered safe. This option
 #-# is useful if your content uses attributes that are invalid in HTML. Use with care to avoid introducing security
 #-# issues. By default, the following attributes are allowed:
-#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/a1fee94faa056845b3367ad92dae4b50f5a12524/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L90-L103
-#-# SVG attributes: https://github.com/xwiki/xwiki-commons/blob/a1fee94faa056845b3367ad92dae4b50f5a12524/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L71-L95
-#-# MathML attributes: https://github.com/xwiki/xwiki-commons/blob/a1fee94faa056845b3367ad92dae4b50f5a12524/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L266-L272
-#-# XML attributes: https://github.com/xwiki/xwiki-commons/blob/a1fee94faa056845b3367ad92dae4b50f5a12524/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SecureHTMLElementSanitizer.java#L158-L159
+#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/f03af50387bcbed086c16437980a4736ad96f71a/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L92-L105
+#-# SVG attributes: https://github.com/xwiki/xwiki-commons/blob/f03af50387bcbed086c16437980a4736ad96f71a/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L72-L98
+#-# MathML attributes: https://github.com/xwiki/xwiki-commons/blob/f03af50387bcbed086c16437980a4736ad96f71a/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L268-L274
+#-# XML attributes: https://github.com/xwiki/xwiki-commons/blob/f03af50387bcbed086c16437980a4736ad96f71a/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SecureHTMLElementSanitizer.java#L158-L159
 # xml.htmlElementSanitizer.extraAllowedAttributes =
 
 #-# [Since 14.6RC1]
@@ -342,8 +342,8 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 14.6RC1]
 #-# If unknown protocols are disallowed (see above), the (Java) regular expression URIs are matched against.
-#-# The default values is ^(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):
-# xml.htmlElementSanitizer.allowedUriRegexp = ^(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):
+#-# The default values is ^(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):
+# xml.htmlElementSanitizer.allowedUriRegexp = ^(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):
 
 #-# [Since 14.6RC1]
 #-# Comma-separated list of additional tags on which data-URIs should be allowed in "src", "xlink:href" or "href".

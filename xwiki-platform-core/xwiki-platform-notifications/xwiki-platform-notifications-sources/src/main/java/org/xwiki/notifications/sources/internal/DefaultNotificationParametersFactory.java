@@ -488,9 +488,13 @@ public class DefaultNotificationParametersFactory
 
     /**
      * Splits the value of a parameter holding a list on the commas that are not inside double quotes, the way the macro
-     * editor writes it. A backslash escapes the next character inside double quotes. Unlike the conversion of a
-     * collection macro parameter, the values aren't split on whitespaces, so that a value holding a whitespace can be
-     * given without quotes.
+     * editor writes it. A backslash escapes the next character inside double quotes.
+     * <p>
+     * The collection converter used for the macro parameters isn't used here because it also splits the values on
+     * whitespaces. These parameters are also given unquoted, by notifications macro calls saved in existing pages, by
+     * the RSS feed URLs readers are subscribed to and by the clients of the REST API, so a value like {@code My Space}
+     * would become the two values {@code My} and {@code Space}, and the notifications filtered on it would no longer be
+     * displayed. Single quotes aren't read either, so that an unquoted name holding an apostrophe stays whole.
      *
      * @param value the value of the parameter
      * @return the values it holds, trimmed, empty values excluded

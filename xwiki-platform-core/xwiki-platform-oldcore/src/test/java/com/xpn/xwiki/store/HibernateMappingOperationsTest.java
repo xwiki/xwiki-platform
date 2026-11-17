@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store;
 
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
@@ -78,6 +80,15 @@ class HibernateMappingOperationsTest
     private static <T> T read(Function<Session, T> operation)
     {
         return sessionFactory.fromSession(operation);
+    }
+
+    private static long persistDeletedAttachment()
+    {
+        DeletedAttachment deletedAttachment =
+            new DeletedAttachment(1, "Space.Page", "file.txt", "hibernate", "XWiki.Alice", new Date(), null);
+        write(session -> session.persist(deletedAttachment));
+
+        return deletedAttachment.getId();
     }
 
     private static StringProperty newStringProperty(long id, String name, String value)
@@ -226,5 +237,28 @@ class HibernateMappingOperationsTest
             .list());
         assertEquals(1, nativeRows.size());
         assertArrayEquals(new Object[] {"prop", StringProperty.class.getName()}, (Object[]) nativeRows.get(0));
+    }
+
+    @Test
+    void removeImmutableEntity()
+    {
+        long id = persistDeletedAttachment();
+
+        // The documents and attachments in the recycle bin are immutable, but can still be removed
+        write(session -> session.remove(session.find(DeletedAttachment.class, id)));
+
+        assertNull(read(session -> session.find(DeletedAttachment.class, id)));
+    }
+
+    @Test
+    void deleteQueryOnImmutableEntity()
+    {
+        long id = persistDeletedAttachment();
+
+        // Only the update queries on an immutable entity are rejected by default, not the delete ones
+        write(session -> session.createMutationQuery("delete from DeletedAttachment where id = :id")
+            .setParameter("id", id).executeUpdate());
+
+        assertNull(read(session -> session.find(DeletedAttachment.class, id)));
     }
 }

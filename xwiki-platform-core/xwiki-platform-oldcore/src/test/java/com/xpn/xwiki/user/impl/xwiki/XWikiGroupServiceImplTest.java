@@ -135,4 +135,62 @@ class XWikiGroupServiceImplTest
         verify(query).bindValue("groupclassname", "XWiki.XWikiGroups");
         verify(query).bindValue("matchfield", "%foo%");
     }
+
+    @Test
+    void getAllGroupsReferencesForMemberInXWikiSpace() throws Exception
+    {
+        Query query = mockGroupsForMemberQuery();
+
+        this.groupService.getAllGroupsReferencesForMember(new DocumentReference("wiki", "XWiki", "Admin"), 0, 0,
+            this.oldcore.getXWikiContext());
+
+        verify(query).bindValue("username", "wiki:XWiki.Admin");
+        verify(query).bindValue("shortname", "XWiki.Admin");
+        verify(query).bindValue("veryshortname", "Admin");
+    }
+
+    @Test
+    void getAllGroupsReferencesForMemberOutsideXWikiSpace() throws Exception
+    {
+        Query query = mockGroupsForMemberQuery();
+
+        this.groupService.getAllGroupsReferencesForMember(new DocumentReference("wiki", "Sandbox", "Admin"), 0, 0,
+            this.oldcore.getXWikiContext());
+
+        verify(query).bindValue("shortname", "Sandbox.Admin");
+        verify(query).bindValue("veryshortname", "Sandbox.Admin");
+    }
+
+    @Test
+    void getAllGroupsReferencesForMemberInNestedXWikiSpace() throws Exception
+    {
+        Query query = mockGroupsForMemberQuery();
+
+        this.groupService.getAllGroupsReferencesForMember(
+            new DocumentReference("wiki", List.of("Sandbox", "XWiki"), "Admin"), 0, 0,
+            this.oldcore.getXWikiContext());
+
+        verify(query).bindValue("veryshortname", "Sandbox.XWiki.Admin");
+    }
+
+    @Test
+    void getAllGroupsReferencesForMemberWithDotInName() throws Exception
+    {
+        Query query = mockGroupsForMemberQuery();
+
+        this.groupService.getAllGroupsReferencesForMember(new DocumentReference("wiki", "Sandbox", "XWiki.Admin"), 0,
+            0, this.oldcore.getXWikiContext());
+
+        verify(query).bindValue("shortname", "Sandbox.XWiki\\.Admin");
+        verify(query).bindValue("veryshortname", "Sandbox.XWiki\\.Admin");
+    }
+
+    private Query mockGroupsForMemberQuery() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.oldcore.getQueryManager().getNamedQuery("listGroupsForUser")).thenReturn(query);
+        when(query.bindValue(anyString(), any())).thenReturn(query);
+        when(query.execute()).thenReturn(List.of());
+        return query;
+    }
 }

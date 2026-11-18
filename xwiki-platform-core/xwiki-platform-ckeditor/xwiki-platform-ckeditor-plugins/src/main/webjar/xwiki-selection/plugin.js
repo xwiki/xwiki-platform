@@ -196,6 +196,17 @@
       }, 1000);
     },
 
+    /**
+     * Keeps the current selection while the editing area doesn't have the focus, and restores it when the editing area
+     * gets the focus back. This is needed before showing a modal when the editing area is in the same document as the
+     * modal (in-line editor), because the modal takes the document selection.
+     */
+    cacheSelection: function(editor) {
+      if (this.isEditingAreaFocused(editor)) {
+        editor._.cachedSelectionRanges = this.getSelection(editor);
+      }
+    },
+
     isEditingAreaFocused: function(editor) {
       // We check if the editing area contains the active element instead of relying on the focus state because the
       // focus is lost when the user switches to a different browser tab or a different window, but the JavaScript code
@@ -352,6 +363,11 @@
       // the widget or the nested editable, otherwise the caret gets hidden and the user can't get it back without using
       // the mouse.
       editor.widgets?.on('checkWidgets', event => {
+        // The editing area may not have the focus, e.g. when a remote change is applied while a modal is open, in which
+        // case we must not take the focus.
+        if (!CKEDITOR.plugins.xwikiSelection.isEditingAreaFocused(editor)) {
+          return;
+        }
         const selection = editor.getSelection();
         if (selection?.isCollapsed()) {
           const container = selection.getStartElement();

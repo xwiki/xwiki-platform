@@ -139,6 +139,10 @@ define('xwiki-ckeditor', [
   // Load the translations for our custom CKEditor plugins.
   new XWiki.Document('Translations', 'CKEditor').getURL('jsx', 'language=' + encodeURIComponent(XWiki.locale))
 ], function($, ckeditor, xwikiMeta) {
+  // CKEditor creates an editor for each element marked as editable when the page is loaded, unless we disable it. Our
+  // editors make the edited content editable, possibly before the page is loaded.
+  ckeditor.disableAutoInline = true;
+
   // We have to pass the plugin that makes the request (the initiator) because the expected response can be different
   // (e.g. between the filebrowser and filetools plugins).
   var getUploadURL = function(document, initiator) {
@@ -200,8 +204,27 @@ define('xwiki-ckeditor', [
 
   var oldInline = ckeditor.inline;
   ckeditor.inline = function(element, config) {
-    // Take into account the configuration options specified on the target element.
-    return oldInline.call(this, element, ckeditor.tools.extend(getConfig(element), config, true));
+    // CKEditor shows the value of a text area as is in the page until the editor is loaded, without filtering it, and
+    // this value can be wiki syntax (e.g. restored by the browser in Source mode) which must not be parsed as HTML.
+    var textArea = ckeditor.dom.element.get(element);
+    textArea = textArea?.is('textarea') ? textArea.$ : null;
+    var value = textArea?.value;
+    if (textArea) {
+      textArea.value = '';
+    }
+    try {
+      // Take into account the configuration options specified on the target element.
+      var editor = oldInline.call(this, element, ckeditor.tools.extend(getConfig(element), config, true));
+    } finally {
+      if (textArea) {
+        textArea.value = value;
+      }
+    }
+    if (textArea &amp;&amp; editor) {
+      // The editor filters the data it is given when it loads.
+      editor.setData(value, null, true);
+    }
+    return editor;
   };
 
   //
@@ -254,7 +277,8 @@ define('xwiki-ckeditor', [
   // RequireJS uses one or the other.
   ckeditor.on('instanceReady', ({editor}) =&gt; {
     if (editor.mode === 'wysiwyg' &amp;&amp; editor.document.$ !== document) {
-      // This editor instance is using a separate DOM document for editing which means it's a standalone editor.
+      // This editor instance is using a separate DOM document for editing which means it's a classic (iframe-based)
+      // editor.
       const initialHead = editor.document.$.head;
       const originalAppendChild = initialHead.appendChild;
       initialHead.appendChild = function() {
@@ -283,6 +307,107 @@ define('xwiki-ckeditor', [
           return originalInsertBefore.apply(initialHead, arguments);
         }
       };
+    }
+  });
+
+  function startAvoidingCKAndSaveBarOverlap(editor) {
+    // CKEDITOR-470 - CKEditor's toolbar may overlap with XWiki's save bar.
+    // This function is a workaround that checks if they overlap when the page
+    // is scrolled and when the CKEditor's toolbar's CSS style is changed
+    // Ideally, we would cooperate with CKEditor's code to position its toolbar,
+    // but the toolbar position is not customizable.
+    //
+    // The CKEditor toolbar (the floatSpace variable) is positioned by this code:
+    // https://github.com/ckeditor/ckeditor4/blob/19a386c4691a99d37b43e876e5f5a7ce092c6016/plugins/floatingspace/plugin.js#L100
+    //
+    // This happens when the editor gains focus, when some text is typed (the
+    // editor's content changes), when the window is scrolled or when the window
+    // is resized.
+    // See https://github.com/ckeditor/ckeditor4/blob/19a386c4691a99d37b43e876e5f5a7ce092c6016/plugins/floatingspace/plugin.js#L310
+
+    function avoidCKAndSaveBarOverlap() {
+      // This callback will be called when the page is scrolled or when the
+      // CKEditor's toolbar position is changed.
+
+      const ckBRC = ckFloatingToolbar.getBoundingClientRect();
+      const saveBRC = saveBar.getBoundingClientRect();
+      // Compare with the save bar position without the room we left for the toolbar, otherwise the collision would
+      // disappear as soon as we leave the room, and we would remove it.
+      const collision = ckBRC.top + ckBRC.height &gt; saveBRC.top - roomForToolbar;
+      if (saveBar.classList.contains("sticky-buttons-fixed")) {
+          // If XWiki's save bar is sticky, it should not have our custom
+          // margin-top.
+          removeRoomForToolbar();
+
+          if (collision) {
+            // If there is a collision, CKEditor decided to place the toolbar at
+            // the bottom. This is the chosen position if:
+            // - the height of the CKEditor toolbar is not greater than the top of
+            //   the editor relative to the viewport, and
+            // - the height of the CKEditor toolbar is not greater than the
+            //   difference between the bottom of the editor relative to the
+            //   viewport and its height
+            // We put the CKEditor toolbar at the top of the viewport.
+            // Note that CKEditor will try to revert this on the events
+            // previously listed but we will force the position back again
+            // immediately thanks to the mutation observer. This does not
+            // trigger an event that makes CKEditor position the toolbar once
+            // again, so we are not racing with it.
+
+            ckFloatingToolbar.style.position = "fixed";
+            ckFloatingToolbar.style.top = "0px";
+          }
+      } else {
+        // If the XWiki's save bar is not sticky, we add a margin-top
+        // corresponding to the CKEditor toolbar's height if there is a
+        // collision, and we revert to the initial margin-top if there is no
+        // collision.
+        if (collision) {
+          if (!roomForToolbar) {
+            roomForToolbar = ckBRC.height;
+            saveBar.style.marginTop = (parseInt(getComputedStyle(saveBar).getPropertyValue('margin-top')) +
+              roomForToolbar) + 'px';
+          }
+        } else {
+          removeRoomForToolbar();
+        }
+      }
+    }
+
+    let roomForToolbar = 0;
+    function removeRoomForToolbar() {
+      if (roomForToolbar) {
+        saveBar.style.marginTop = '';
+        roomForToolbar = 0;
+      }
+    }
+
+    const ckFloatingToolbar = document.getElementById('cke_' + editor.name);
+    // The save bar of the in-place edit mode, or of the standalone edit mode.
+    const saveBar = document.getElementsByClassName('inplace-editing-buttons')[0] ||
+      document.getElementsByClassName('bottombuttons')[0];
+    // The toolbar of the other editors (e.g. of a form field) is not floating.
+    if (ckFloatingToolbar?.classList.contains('cke_float') &amp;&amp; saveBar) {
+      window.addEventListener("scroll", avoidCKAndSaveBarOverlap);
+      const mutationObserver = new MutationObserver(avoidCKAndSaveBarOverlap);
+      mutationObserver.observe(ckFloatingToolbar, {
+        attributes: true,
+        attributeFilter: ['style']
+      });
+
+      return function stopAvoidingCKAndSaveBarOverlap() {
+        window.removeEventListener("scroll", avoidCKAndSaveBarOverlap);
+        mutationObserver.disconnect();
+        removeRoomForToolbar();
+      };
+    }
+
+    return null;
+  }
+  ckeditor.on('instanceReady', ({editor}) =&gt; {
+    const stopAvoidingCKAndSaveBarOverlap = startAvoidingCKAndSaveBarOverlap(editor);
+    if (stopAvoidingCKAndSaveBarOverlap) {
+      editor.once('destroy', stopAvoidingCKAndSaveBarOverlap);
     }
   });
 
@@ -407,10 +532,203 @@ define('xwiki-ckeditor', [
     });
   };
 
+  // Sets the height of the editing area, padding included (its height style doesn't include the padding).
+  var setEditingAreaHeight = function(editor, height) {
+    var style = window.getComputedStyle(editor.container.$);
+    var padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    editor.container.setStyle('height', Math.max(0, height - padding) + 'px');
+  };
+
+  // The floating tool bar of the main field is shown above the edited content while editing. While it's shown, leave
+  // room for it, so that it doesn't cover what's above (e.g. the page title), and scroll the page by the same amount,
+  // so that the edited content doesn't move (what's above goes out of view instead).
+  var leaveRoomForToolBar = function(editor) {
+    var toolBar = document.getElementById('cke_' + editor.name);
+    if (!toolBar) {
+      return;
+    }
+    // Set on the parent of the text area, so that it applies to all editing modes (WYSIWYG, Source).
+    var parent = editor.element.getParent().$;
+    var room = 0;
+    var setRoom = function(height) {
+      if (height !== room) {
+        parent.style.setProperty('--ckeditor-toolbar-height', height + 'px');
+        window.scrollBy(0, height - room);
+        room = height;
+      }
+    };
+    // Measure the hidden tool bar where it's going to be shown, since its buttons wrap. Priority 1 runs this before the
+    // floatingspace plugin shows it.
+    editor.on('focus', function() {
+      if (toolBar.style.display === 'none') {
+        $(toolBar).css({display: '', visibility: 'hidden', left: $(editor.container.$).offset().left + 'px'});
+        var height = toolBar.offsetHeight;
+        $(toolBar).css({display: 'none', visibility: '', left: ''});
+        setRoom(height);
+      }
+    }, null, null, 1);
+    var resizeObserver = new ResizeObserver(function() {
+      setRoom(toolBar.offsetHeight);
+    });
+    resizeObserver.observe(toolBar);
+    editor.once('destroy', function() {
+      resizeObserver.disconnect();
+    });
+  };
+
+  // The main field (e.g. the page content) takes all the available height, without making the page scroll, so that the
+  // user can click anywhere below the content to edit it.
+  var fillAvailableHeight = function(editor) {
+    // Set on the parent of the text area, so that it applies to all editing modes (WYSIWYG, Source).
+    var parent = editor.element.getParent().$;
+    var update = function() {
+      var editingArea = editor.container.$;
+      var toolBarRoom = parseFloat(window.getComputedStyle(editingArea).marginTop) || 0;
+      // The scroll height of the root element is never less than the viewport height, so use the height of the page
+      // content, including what overflows the body, rounded up to avoid a scroll bar.
+      var pageHeight = Math.ceil(Math.max(document.documentElement.getBoundingClientRect().height,
+        document.body.scrollHeight));
+      // The current minimum height is part of the editing area height, so we don't need to remove it first (which would
+      // make the page jump).
+      var minHeight = Math.floor(editingArea.offsetHeight + document.documentElement.clientHeight - pageHeight +
+        toolBarRoom);
+      parent.style.setProperty('--ckeditor-main-field-min-height', Math.max(0, minHeight) + 'px');
+    };
+    update();
+    var namespace = 'resize.ckeditorFill_' + editor.name;
+    $(window).on(namespace, update);
+    editor.on('modeReady', update);
+    editor.once('destroy', function() {
+      $(window).off(namespace);
+    });
+  };
+
+  // The edited content is inside the form, so the form fields that macros output in it (e.g. Live Data filters) would
+  // be submitted with the form. A disabled field set disables all the form fields it contains.
+  var disableFormFieldsInContentOnSubmit = function(editor, editingArea) {
+    var textArea = editor.element.$;
+    var fieldSet = document.createElement('fieldset');
+    fieldSet.className = 'ckeditor-content';
+    var wrap = function(element) {
+      element.before(fieldSet);
+      fieldSet.append(element);
+    };
+    wrap(editingArea[0]);
+    // The WYSIWYG editing area is put back where the other modes (e.g. Source) were shown.
+    editor.on('contentDom', function() {
+      if (editor.container.$.parentNode !== fieldSet) {
+        wrap(editor.container.$);
+      }
+    });
+    // The other modes have no such form fields, so show them outside the field set, which keeps the hidden WYSIWYG
+    // editing area. Priority 20 runs this after the WYSIWYG editing area is replaced, when leaving the WYSIWYG mode.
+    editor.on('beforeModeUnload', function() {
+      if (editor.mode === 'wysiwyg') {
+        fieldSet.after(editor.container.$);
+      }
+    }, null, null, 20);
+    var disableFormFields = function(event, data) {
+      // Some code fires these events without the form (e.g. when switching editors), or on the whole document.
+      var form = data?.form || $(event.target).closest('form')[0];
+      if (!form || form === textArea.form) {
+        fieldSet.disabled = true;
+        // The form data is collected right after these events, whether the form is submitted or not.
+        setTimeout(function() {
+          fieldSet.disabled = false;
+        }, 0);
+      }
+    };
+    var events = 'xwiki:actions:beforeSave xwiki:actions:beforePreview';
+    $(document).on(events, disableFormFields);
+    // The buttons in the edited content (e.g. output by macros) would submit the whole form, i.e. save the page.
+    var preventSubmitFromContent = function(event) {
+      if (event.target === textArea.form &amp;&amp; fieldSet.contains(event.submitter)) {
+        event.preventDefault();
+      }
+    };
+    textArea.form?.addEventListener('submit', preventSubmitFromContent);
+    editor.once('destroy', function() {
+      $(document).off(events, disableFormFields);
+      textArea.form?.removeEventListener('submit', preventSubmitFromContent);
+      // CKEditor removes the editing area but not the field set we added around it.
+      fieldSet.remove();
+    });
+  };
+
   var createEditor = function(ckeditor, textArea, instanceConfig) {
     var deferred = $.Deferred();
-    var editor = ckeditor.replace(textArea, instanceConfig);
-    editor.once('instanceReady', deferred.resolve.bind(deferred, editor));
+    var config = {};
+    var isMainField = $(textArea).is('.ckeditor-main-field, .ckeditor-main-field *');
+    if (isMainField) {
+      // Main field (e.g. page content): floating tool bar.
+      config.resize_enabled = false;
+      // Dock the tool bar a bit above the edited content, so that it doesn't cover the drag handle of a widget on the
+      // first line (shown above the widget).
+      config.floatSpaceDockedOffsetY = 15;
+    } else {
+      // Other fields (e.g. comments, object properties): fixed tool bar and bottom bar.
+      var field = $(textArea).parent('.ckeditor-field');
+      if (!field.length) {
+        field = $(textArea).wrap('&lt;div class="ckeditor-field"&gt;&lt;/div&gt;').parent();
+        // Show as many lines of text as the text area (whose height is given by its number of rows).
+        field.css('--ckeditor-field-height', textArea.rows + 'lh');
+      }
+      // The sharedspace plugin hides the tool bar it adds to a container that a previous editor of the field (e.g.
+      // before a syntax change) already used, so we use new containers.
+      field.children('.ckeditor-field-top, .ckeditor-field-bottom').remove();
+      field.prepend('&lt;div class="ckeditor-field-top"&gt;&lt;/div&gt;');
+      field.append('&lt;div class="ckeditor-field-bottom"&gt;&lt;/div&gt;');
+      config.sharedSpaces = {
+        top: field.children('.ckeditor-field-top')[0],
+        bottom: field.children('.ckeditor-field-bottom')[0]
+      };
+    }
+    var editor = ckeditor.inline(textArea, $.extend(config, instanceConfig));
+    var editingArea = $(textArea).next('.cke_textarea_inline');
+    if (isMainField) {
+      // The skin styles the content edited in a form (e.g. its links) like the content in view mode.
+      editingArea.addClass('xwiki-content');
+    }
+    disableFormFieldsInContentOnSubmit(editor, editingArea);
+    if (config.resize_enabled !== false) {
+      // The default implementation only resizes the iframe of the classic editor.
+      editor.resize = function(width, height) {
+        setEditingAreaHeight(editor, height);
+        editor.fire('resize', {outerHeight: height, contentsHeight: height});
+      };
+      // The resize plugin keeps the element it gets the first time, but the editing area changes with the editing mode,
+      // so give it the size of the current one.
+      editor.getResizable = function() {
+        return {$: {
+          get offsetWidth() {
+            return editor.container.$.offsetWidth;
+          },
+          get offsetHeight() {
+            return editor.container.$.offsetHeight;
+          }
+        }};
+      };
+      // Keep the height of the editing area, which the user can resize, when switching between WYSIWYG and Source.
+      var editingAreaHeight;
+      editor.on('beforeModeUnload', function() {
+        // The full-screen height is not the one the user chose.
+        if (editor.getCommand('maximize')?.state !== CKEDITOR.TRISTATE_ON) {
+          editingAreaHeight = editor.container.$.offsetHeight;
+        }
+      });
+      editor.on('modeReady', function() {
+        if (editingAreaHeight) {
+          setEditingAreaHeight(editor, editingAreaHeight);
+        }
+      });
+    }
+    editor.once('instanceReady', function() {
+      if (isMainField) {
+        leaveRoomForToolBar(editor);
+        fillAvailableHeight(editor);
+      }
+      deferred.resolve(editor);
+    });
     editor.once('reload', function(event) {
       event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, textArea));
     });
@@ -571,25 +889,109 @@ body .modal {
   z-index: 10050;
 }
 
-/**
- * Standalone edit mode: display the document title as a text input (while preserving the heading styles) in order to
- * emphasize that the title can be changed. The in-place edit mode keeps the borderless title in order to avoid text
- * flickering when entering or leaving the edit mode.
- */
-#editMeta #document-title h1.editable {
-  /* The title input is aligned with the edited content, like the other form fields. */
-  margin-left: 0;
+/* The div that CKEditor adds next to the text area, to edit its content. */
+.cke_textarea_inline {
+  outline: 0;
+}
 
-  &amp; &gt; input[name="title"] {
-    border: 1px solid @input-border;
-    border-radius: @input-border-radius;
-    .box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075));
-    .form-control-focus();
+/* The field set added around the editing area, only to disable the form fields it contains, has no layout. */
+fieldset.ckeditor-content {
+  display: contents;
+}
+
+/* The page content has no border, so the save bar below it has its own full border. */
+main &gt; div:has(#xwikieditcontent .cke_textarea_inline)
+    ~ .bottom-editor &gt; .sticky-buttons:not(.sticky-buttons-fixed) {
+  border-top: @border-width solid @input-border;
+  border-radius: @border-radius-base;
+  margin-top: @line-height-computed;
+}
+
+/* In all editing modes, the main field (e.g. the page content) leaves room for its floating tool bar and takes all the
+  available height, both computed by the loader. */
+.cke_textarea_inline,
+.cke_contents.fake {
+  margin-top: ~"var(--ckeditor-toolbar-height, 0)";
+  min-height: ~"var(--ckeditor-main-field-min-height, 0)";
+}
+
+/* Keep the margins of the first and last children (e.g. a heading) inside the edited content, so that they don't merge
+  with the room left for the tool bar, and so that the edited content starts where the user caret indicators expect. */
+.cke_textarea_inline {
+  display: flow-root;
+}
+
+/* In full-screen mode the parent of the edited content is maximized (see the xwiki-realtime plugin), so the edited
+  content fills it, below the tool bar. */
+.cke_editable_active &gt; .ckeditor-content &gt; .cke_textarea_inline {
+  box-sizing: border-box;
+  margin-top: 0;
+  min-height: 100%;
+}
+
+/* The fields other than the main one (e.g. comments, object properties) have the border of a form field, around their
+  tool bar, content and bottom bar. */
+.ckeditor-field {
+  border: @border-width solid @input-border;
+  border-radius: @input-border-radius;
+  .box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075));
+
+  /* Same as .form-control-focus(), which applies only to :focus. */
+  &amp;:focus-within {
+    @color-rgba: rgba(red(@input-border-focus), green(@input-border-focus), blue(@input-border-focus), .6);
+    border-color: @input-border-focus;
+    outline: 0;
+    .box-shadow(~"inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px @{color-rgba}");
+  }
+
+  /* The height of the text area content, computed by the loader. */
+  &amp; &gt; .ckeditor-content &gt; .cke_textarea_inline,
+  &amp; &gt; .cke_contents {
+    box-sizing: content-box;
+    height: ~"var(--ckeditor-field-height)";
+    margin-top: 0;
+    min-height: 3em;
+    overflow-y: auto;
+  }
+
+  &amp; &gt; .ckeditor-content &gt; .cke_textarea_inline {
+    padding: @padding-base-vertical @padding-base-horizontal;
+  }
+
+  /* The field has the border. */
+  .cke_chrome {
+    border: 0 none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .cke_top {
+    border-radius: @input-border-radius @input-border-radius 0 0;
+  }
+
+  .cke_bottom {
+    border-radius: 0 0 @input-border-radius @input-border-radius;
+  }
+
+  /* In full-screen mode the field fills the space between the tool bar and the form action buttons. */
+  &amp;.cke_editable_active {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+
+    &amp; &gt; .ckeditor-content &gt; .cke_textarea_inline,
+    &amp; &gt; .cke_contents {
+      flex: 1;
+      /* Overwrite the height set when the field is resized. */
+      height: auto !important;
+    }
   }
 }
 
 /**
- * Full-screen styles (for the standalone / classic editor).
+ * Full-screen styles
  */
 
 .fullScreenEditLinkContainer {
@@ -597,6 +999,7 @@ body .modal {
   display: none;
 }
 
+/* The form buttons that the classic (iframe-based) editor moves inside it in full-screen mode. */
 .cke_maximized .buttons {
   background-color: @well-bg;
   padding: .5em;
@@ -946,15 +1349,6 @@ ul.cke_autocomplete_panel {
   border-bottom-left-radius: @border-radius-base;
 }
 
-/* The standalone WYSIWYG edit mode shows the form action toolbar right below the CKEditor instance used to edit the
-  document content. We make the bottom border rounded on the form action toolbar instead. */
-#xwikieditcontent &gt; .cke_chrome,
-#xwikieditcontent &gt; .cke_chrome &gt; .cke_inner,
-#xwikieditcontent &gt; .cke_chrome &gt; .cke_inner &gt; .cke_bottom {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
 a.cke_button,
 a.cke_combo_button {
   border-radius: @border-radius-small;
@@ -1021,6 +1415,8 @@ body[data-maximized="true"] {
     /* We have to use !important in order to overwrite the in-line styles. */
     display: block !important;
     top: 0 !important;
+    /* Above the backdrop, like the editing area. */
+    z-index: 9995;
   }
 
   /*

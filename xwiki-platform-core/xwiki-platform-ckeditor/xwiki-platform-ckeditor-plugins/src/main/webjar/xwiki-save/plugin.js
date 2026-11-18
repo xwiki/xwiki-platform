@@ -36,6 +36,15 @@
       if (editor._.xwikiCache[contentTypeField.attr('name')] === false || contentTypeField.prop('disabled')) {
         contentTypeField.prop('disabled', true);
         editor.config.startupMode = 'source';
+        // The in-line editor ignores the startup mode, so it would load the wiki syntax from the text area as HTML.
+        if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE && editor.element.is('textarea') &&
+            editor.plugins['xwiki-source']) {
+          // The WYSIWYG mode is loaded empty, before switching to Source.
+          editor.setData('', null, true);
+          editor.once('instanceReady', () => {
+            CKEDITOR.plugins.xwikiSource.setModeWithoutConversion(editor, 'source', editor.element.getValue());
+          });
+        }
       }
 
       // Keyboard shortcuts for the edit form.
@@ -111,7 +120,8 @@
       var success = true;
       fullData = fullData === true;
       this.getEditors().forEach(function(editor) {
-        if (editor.elementMode === CKEDITOR.ELEMENT_MODE_REPLACE && !this.updateContent(editor, fullData)) {
+        if ((editor.elementMode === CKEDITOR.ELEMENT_MODE_REPLACE || editor.element.is('textarea')) &&
+            !this.updateContent(editor, fullData)) {
           success = false;
         }
         this.updateContentType(editor);

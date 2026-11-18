@@ -235,6 +235,11 @@ a[data-linktype="create"]::after {
   content: attr(data-xwiki-focusedplaceholder);
 }
 
+/* Let the clicks go through the placeholder to the empty paragraph, so that the caret is placed in it. */
+[data-cke-editorplaceholder]::before {
+  pointer-events: none;
+}
+
 .macro-placeholder {
   /* Hide the placeholder by default and show it only if the macro is editable. */
   display: none;

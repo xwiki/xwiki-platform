@@ -19,17 +19,20 @@
 -->
 <template>
   <div class="xwiki-blocknote" v-if="!isLoading">
-    <suspense>
-      <BlocknoteEditor
-        v-if="editorContent && editorOptions"
-        ref="editor"
-        :options="editorOptions"
-        :content="editorContent"
-        @instant-change="dirty = true"
-        @debounced-change="updateValue"
-        @local-instant-change="onLocalInstantChange"
-      ></BlocknoteEditor>
-    </suspense>
+    <!-- Only used to disable the form fields that macros output in the edited content, when the form is submitted. -->
+    <fieldset class="xwiki-blocknote-content">
+      <suspense>
+        <BlocknoteEditor
+          v-if="editorContent && editorOptions"
+          ref="editor"
+          :options="editorOptions"
+          :content="editorContent"
+          @instant-change="dirty = true"
+          @debounced-change="updateValue"
+          @local-instant-change="onLocalInstantChange"
+        ></BlocknoteEditor>
+      </suspense>
+    </fieldset>
     <input
       v-if="name"
       ref="valueInput"
@@ -456,6 +459,11 @@ defineExpose({
 </script>
 
 <style>
+/* The field set around the editor has no layout. */
+.xwiki-blocknote-content {
+  display: contents;
+}
+
 .xwiki-blocknote {
   .bn-container {
     --bn-font-family: unset;

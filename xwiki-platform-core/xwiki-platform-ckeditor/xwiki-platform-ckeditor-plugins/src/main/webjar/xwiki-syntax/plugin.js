@@ -130,7 +130,7 @@
     // Wait for the editor to be reloaded, i.e. for the new editor instance to be ready.
     editor = await data.promise;
     // Restore the previous edit mode and set the updated content after the editor is reloaded.
-    await maybeSetEditMode(editor, mode, content);
+    await CKEDITOR.plugins.xwikiSource.setModeWithoutConversion(editor, mode, content);
     await setEditedContent(editor, content);
     if (!syntax.renderer) {
       // Disable the edit mode switch if the new syntax doesn't support the WYSIWYG edit mode..
@@ -140,25 +140,6 @@
     }
     // Return the new editor instance.
     return editor;
-  }
-
-  function maybeSetEditMode(editor, mode, content) {
-    return new Promise(resolve => {
-      // We need this check because CKEditor doesn't call the callback if the given mode is already set.
-      if (mode === editor.mode) {
-        resolve(editor);
-      } else {
-        // Avoid any conversion when switching modes.
-        const previousMode = editor._.modes[editor.mode];
-        previousMode.data = CKEDITOR.plugins.xwikiSource.getFullData(editor);
-        editor._.modes[mode].data = content;
-        editor.setMode(mode, () => {
-          // Force a conversion on the next mode switch.
-          delete previousMode.data;
-          resolve(editor);
-        });
-      }
-    });
   }
 
   function setEditedContent(editor, content) {

@@ -122,6 +122,8 @@
 
 #macro (importCKEditorResources)
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
+  ## Custom styles for the edited content.
+  #set ($discard = $xwiki.ssx.use('CKEditor.ContentSheet'))
   ## Add the version of each JavaScript dependency of CKEditor Integration to the URL used to load the CKEditor in order
   ## to make sure the browser cache is invalidated when one of these versions changes (e.g. when we upgrade XWiki or one
   ## of these dependencies but the CKEditor version remains the same).
@@ -206,9 +208,9 @@
     #foreach ($entry in $parameters.attributes.entrySet())
       $entry.key="$!escapetool.xml($entry.value)"
     #end
-  ## We render the content sheet at the end because the edited content can overwrite the variables used by this macro.
-  #set ($content = "#ckeditor_renderContentSheet($source)")
-  &gt;$!escapetool.xml($content)&lt;/textarea&gt;
+  ## We render the edited content at the end because it can overwrite the variables used by this macro.
+  #ckeditor_getRenderedContent($source)
+  &gt;$!escapetool.xml($html)&lt;/textarea&gt;
 #end
 
 #macro (displayCKEditorConfigProperty $configDoc $propName $action)

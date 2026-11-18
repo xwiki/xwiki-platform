@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.hql.internal.HQLStatementValidator;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provider various HQL related scripting APIs.
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("query.hql")
 @Singleton
-@Unstable
 public class HqlQueryScriptService implements ScriptService
 {
     @Inject

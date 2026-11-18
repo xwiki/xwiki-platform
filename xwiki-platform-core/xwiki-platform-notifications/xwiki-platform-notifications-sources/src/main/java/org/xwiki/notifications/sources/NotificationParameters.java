@@ -30,7 +30,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -111,7 +110,6 @@ public class NotificationParameters
      *
      * @since 17.10.1
      */
-    @Unstable
     public Date fromPrefilteringDate;
 
     @Override

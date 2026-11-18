@@ -113,7 +113,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @since 16.10.4
      * @since 16.4.7
      */
-    @Unstable
     public boolean isDirty()
     {
         return this.dirty;
@@ -125,7 +124,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @since 16.10.4
      * @since 16.4.7
      */
-    @Unstable
     public void setDirty(boolean dirty)
     {
         this.dirty = dirty;
@@ -387,7 +385,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @since 17.3.0RC1
      * @since 17.2.1
      */
-    @Unstable
     protected void detachOwner()
     {
         this.ownerDocument = null;
@@ -401,7 +398,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @since 17.3.0RC1
      * @since 17.2.1
      */
-    @Unstable
     protected void cloneOwner()
     {
         if (this.ownerDocument != null) {
@@ -422,7 +418,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @since 17.3.0RC1
      * @since 17.2.1
      */
-    @Unstable
     public BaseElement<R> clone(boolean detach)
     {
         BaseElement<R> element;
@@ -456,7 +451,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @since 17.3.0RC1
      * @since 17.2.1
      */
-    @Unstable
     protected void cloneContent(BaseElement<R> element)
     {
         element.setPrettyName(getPrettyName());

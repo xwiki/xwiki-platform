@@ -28,7 +28,6 @@ import javax.ws.rs.PathParam;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRights;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRightsAnalysisResult;
-import org.xwiki.stability.Unstable;
 
 /**
  * Get the result of the required rights analysis of a page.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.4.0RC1
  */
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/requiredRights")
-@Unstable
 public interface RequiredRightsRestResource
 {
     /**

@@ -27,7 +27,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.PropertyGroupDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -45,7 +44,6 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      * @since 17.3.0RC1
      * @since 16.10.6
      */
-    @Unstable
     public static final String ADVANCED_PARAMETER_NAME = "advanced";
 
     /**
@@ -55,7 +53,6 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      * @since 17.3.0RC1
      * @since 16.10.6
      */
-    @Unstable
     public static final String HIDDEN_PARAMETER_NAME = "hidden";
 
     /**
@@ -65,7 +62,6 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      * @since 17.3.0RC1
      * @since 16.10.6
      */
-    @Unstable
     public static final String DEPRECATED_PARAMETER_NAME = "deprecated";
 
     /**
@@ -75,7 +71,6 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      * @since 17.3.0RC1
      * @since 16.10.6
      */
-    @Unstable
     public static final String GROUP_PARAMETER_NAME = "group";
 
     /**
@@ -84,7 +79,6 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      * @see #getOrder()
      * @since 17.5.0
      */
-    @Unstable
     public static final String ORDER_PARAMETER_NAME = "order";
 
     /**
@@ -176,7 +170,6 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      * @since 17.3.0RC1
      * @since 16.10.6
      */
-    @Unstable
     public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue,
         Type parameterType, Map<String, Object> parameters)
     {

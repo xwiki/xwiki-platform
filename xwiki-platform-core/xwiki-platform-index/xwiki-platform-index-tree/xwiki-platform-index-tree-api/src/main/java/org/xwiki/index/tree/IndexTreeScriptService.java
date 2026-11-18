@@ -44,7 +44,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.10.5
  * @since 16.4.7
  */
-@Unstable
 @Component
 @Singleton
 @Named("index.tree")

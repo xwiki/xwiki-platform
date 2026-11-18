@@ -49,7 +49,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
@@ -574,7 +573,6 @@ public class WysiwygEditorScriptService implements ScriptService
      *     it couldn't be found or initialized.
      * @since 17.5.0
      */
-    @Unstable
     public MacroDescriptorUI getMacroDescriptorUI(String macroIdAsString)
     {
         try {

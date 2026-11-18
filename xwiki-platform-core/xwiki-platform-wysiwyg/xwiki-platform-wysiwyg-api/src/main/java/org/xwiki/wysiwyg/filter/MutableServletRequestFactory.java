@@ -23,7 +23,6 @@ import jakarta.servlet.ServletRequest;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wysiwyg.internal.filter.http.JakartaToJavaxMutableHttpServletRequest;
 import org.xwiki.wysiwyg.internal.filter.http.JavaxToJakartaMutableHttpServletRequest;
 
@@ -57,7 +56,6 @@ public interface MutableServletRequestFactory
      * @return a new mutable servlet request.
      * @since 17.0.0RC1
      */
-    @Unstable
     default MutableJakartaServletRequest newInstance(ServletRequest request)
     {
         return new JakartaToJavaxMutableHttpServletRequest(newInstance(JakartaServletBridge.toJavax(request)));

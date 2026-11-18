@@ -36,6 +36,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.store.hibernate.HibernateStoreException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -192,12 +193,26 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     {
         try {
             liquibaseUpdate(migrations, true);
+            repairDatabase();
             hibernateShemaUpdate();
             liquibaseUpdate(migrations, false);
         } catch (Exception e) {
             throw new DataMigrationException(
                 String.format("Unable to update schema of wiki [%s]", getXWikiContext().getWikiId()), e);
         }
+    }
+
+    /**
+     * Repair the inconsistencies of the database which are not covered by the Hibernate schema update.
+     *
+     * @throws DataMigrationException if the store is not accessible
+     * @throws HibernateStoreException when failing to repair the database
+     */
+    private void repairDatabase() throws DataMigrationException, HibernateStoreException
+    {
+        HibernateStore store = getStore();
+
+        store.getAdapter().repairDatabase(store.getConfigurationMetadata());
     }
 
     /**

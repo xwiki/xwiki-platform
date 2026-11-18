@@ -87,9 +87,18 @@ export type {
   MacroFeatureOptions,
 } from "./editorOptions";
 
-export { fileUploaderName, getFileUploader } from "./files/fileUploader";
+export {
+  fileUploadListenerName,
+  fileUploaderName,
+  getFileUploader,
+  uploadFile,
+} from "./files/fileUploader";
 
-export type { FileUploader, UploadedFile } from "./files/fileUploader";
+export type {
+  FileUploadListener,
+  FileUploader,
+  UploadedFile,
+} from "./files/fileUploader";
 
 export {
   imageEditorName,

@@ -155,6 +155,15 @@ export interface FileUploader {
 export const fileUploaderName = "FileUploader";
 
 // @beta
+export interface FileUploadListener {
+    onUpload?(instance: EditorInstance, file: UploadedFile): void;
+    onUploadFailed?(instance: EditorInstance, file: File, error: unknown): void;
+}
+
+// @beta
+export const fileUploadListenerName = "FileUploadListener";
+
+// @beta
 export function getFileUploader(instance: Pick<EditorInstance, "options" | "serviceContainer">): FileUploader | undefined;
 
 // @beta
@@ -287,6 +296,9 @@ export type UploadedFile = {
     name: string;
     reference?: string;
 };
+
+// @beta
+export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
 
 // (No @packageDocumentation comment for this package)
 

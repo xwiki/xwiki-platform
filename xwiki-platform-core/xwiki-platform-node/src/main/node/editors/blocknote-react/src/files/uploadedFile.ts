@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { getFileUploader } from "./fileUploader";
+import { getFileUploader, uploadFile } from "./fileUploader";
 import { suggestedLinkData } from "../components/links/suggestedLink";
 import { pickFile } from "../misc/filePicker";
 import { toResourceReference } from "../misc/resourceReference";
@@ -75,7 +75,7 @@ function uploadedFileLink(
  * Opens the system file picker and uploads the selected file with the file uploader of the given editor instance.
  *
  * Meant for UI event handlers, which don't handle the returned promise: an upload failure is logged rather than
- * rejected (the file uploader reports it to the user).
+ * rejected (the file upload listeners can report it to the user).
  *
  * @param instance - the editor instance where the file is uploaded
  * @param accept - the file types the file picker offers, e.g. "image/*" (all types when not specified)
@@ -88,13 +88,12 @@ async function pickAndUploadFile(
   accept: string | undefined,
   failureMessage: string,
 ): Promise<UploadedFile | undefined> {
-  const fileUploader = getFileUploader(instance);
-  const file = fileUploader && (await pickFile(accept));
+  const file = getFileUploader(instance) && (await pickFile(accept));
   if (!file) {
     return undefined;
   }
   try {
-    return await fileUploader.upload(instance, file);
+    return await uploadFile(instance, file);
   } catch (error) {
     console.error(failureMessage, error);
     return undefined;

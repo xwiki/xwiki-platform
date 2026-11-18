@@ -17,13 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { getUploadListener } from "./uploadListener";
+import { getTemporaryUploads } from "./temporaryUploads";
 import { ConnectionStatus } from "@xwiki/platform-collaboration-api";
 import { fileUploaderName } from "@xwiki/platform-editors-blocknote-react";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
 import { AttachmentReference, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container, inject, injectable } from "inversify";
-import type { UploadListener } from "./uploadListener";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type {
   EditorInstance,
@@ -35,8 +34,8 @@ import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xw
 /**
  * Attaches the uploaded files to the source document of the edited content (the current document when not specified),
  * either right away, or through the temporary store of the user session, from where the save request attaches them, as
- * the CKEditor integration does. The upload listener of the editor instance, when bound, is told about the temporary
- * uploads and the failures.
+ * the CKEditor integration does. The files uploaded to the temporary store are recorded in the
+ * {@link TemporaryUploads} of the editor instance, so that the save request asks for them.
  *
  * @since 18.10.0RC1
  */
@@ -58,20 +57,6 @@ export class XWikiFileUploader implements FileUploader {
     instance: EditorInstance,
     file: File,
   ): Promise<UploadedFile> {
-    const listener = getUploadListener(instance);
-    try {
-      return await this.attach(instance, file, listener);
-    } catch (error) {
-      listener?.onUploadFailed(file.name, error);
-      throw error;
-    }
-  }
-
-  private async attach(
-    instance: EditorInstance,
-    file: File,
-    listener?: UploadListener,
-  ): Promise<UploadedFile> {
     const documentReference = this.getDocumentReference(instance);
     const temporary = this.isTemporary(instance);
     const result = await this.storageProvider
@@ -87,7 +72,7 @@ export class XWikiFileUploader implements FileUploader {
     // report, rather than the name of the uploaded file.
     const name = attachment.reference;
     if (temporary) {
-      listener?.onTemporaryUpload(name);
+      getTemporaryUploads(instance)?.add(name);
     }
     return {
       url: attachment.href,

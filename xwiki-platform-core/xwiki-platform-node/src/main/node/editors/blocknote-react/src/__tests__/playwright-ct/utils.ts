@@ -38,6 +38,34 @@ async function pressKeySettled(
   key: string,
 ): Promise<void> {
   await page.keyboard.press(key);
+  await waitForPaint(page);
+}
+
+/**
+ * Clicks and waits for the resulting DOM change to be painted before returning, for the same reason as
+ * {@link pressKeySettled}: the editor updates its selection asynchronously after a click, so a key pressed right
+ * after the click can be applied before the selection made by the click, and then be overridden by it.
+ *
+ * @param page - the page holding the clicked element
+ * @param locator - the element to click
+ * @param options - where to click in the element
+ */
+async function clickSettled(
+  page: PageWithKeyboard,
+  locator: {
+    click(options?: { position?: { x: number; y: number } }): Promise<void>;
+  },
+  options?: { position?: { x: number; y: number } },
+): Promise<void> {
+  await locator.click(options);
+  await waitForPaint(page);
+}
+
+/**
+ * Waits for two animation frames: the first to let the browser schedule the pending update, the second to confirm it
+ * has been painted.
+ */
+async function waitForPaint(page: PageWithKeyboard): Promise<void> {
   await page.evaluate(
     () =>
       new Promise<void>((resolve) => {
@@ -46,4 +74,4 @@ async function pressKeySettled(
   );
 }
 
-export { pressKeySettled };
+export { clickSettled, pressKeySettled };

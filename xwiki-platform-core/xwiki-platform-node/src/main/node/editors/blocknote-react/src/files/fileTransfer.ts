@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { moveCaretTo } from "./caret";
-import { getFileUploader } from "./fileUploader";
+import { getFileUploader, uploadFile } from "./fileUploader";
 import { withUniqueName } from "./uniqueFileName";
 import { uploadedFileLink, uploadedImage } from "./uploadedFile";
 import { updateImage } from "../components/images/imageEditor";
@@ -68,11 +68,11 @@ function toUpload(file: File, paste: boolean): File {
 /**
  * @param instance - the editor instance where the file is uploaded
  * @param file - the file to upload
- * @returns the uploaded file, or undefined when the upload fails (the file uploader reports it to the user)
+ * @returns the uploaded file, or undefined when the upload fails (the file upload listeners can report it to the user)
  */
 async function upload(instance: EditorInstance, file: File) {
   try {
-    return await getFileUploader(instance)!.upload(instance, file);
+    return await uploadFile(instance, file);
   } catch (error) {
     console.error(`Failed to upload [${file.name}].`, error);
     return undefined;
@@ -144,7 +144,7 @@ function placeCaret(instance: EditorInstance, transfer: FileTransfer): boolean {
 
 /**
  * Takes over the transfers of files that aren't images: their links are inserted where the user is. The images are
- * left to BlockNote, which inserts an image block for each of them, then calls {@link uploadFile}. A transfer that
+ * left to BlockNote, which inserts an image block for each of them, then calls {@link uploadForBlock}. A transfer that
  * mixes images with other files is left to BlockNote as a whole, rather than being split over two code paths.
  *
  * @returns true when the transfer is taken over
@@ -164,7 +164,7 @@ function takeOver(instance: EditorInstance, transfer: FileTransfer): boolean {
 
 /**
  * Handles the files pasted or dropped in the editor. It remembers whether the last transfer was a paste, because
- * BlockNote doesn't tell {@link uploadFile} what brought the file. The flag stays set until the opposite event rather
+ * BlockNote doesn't tell {@link uploadForBlock} what brought the file. The flag stays set until the opposite event rather
  * than being cleared once the upload starts, because BlockNote uploads the pasted files one after another, so all but
  * the first are read after the paste event is over.
  */
@@ -222,7 +222,7 @@ const FileTransferExtension = createExtension(
  * @param blockId - the id of the block inserted for the file
  * @returns what BlockNote updates the block with
  */
-async function uploadFile(
+async function uploadForBlock(
   instance: EditorInstance,
   file: File,
   blockId?: string,
@@ -284,7 +284,8 @@ function contributeFileTransfer(context: FeatureContext): FeatureContribution {
   return {
     blockNoteExtensions: [FileTransferExtension({ getInstance })],
     blockNoteOptions: {
-      uploadFile: (file, blockId) => uploadFile(getInstance(), file, blockId),
+      uploadFile: (file, blockId) =>
+        uploadForBlock(getInstance(), file, blockId),
     },
   };
 }

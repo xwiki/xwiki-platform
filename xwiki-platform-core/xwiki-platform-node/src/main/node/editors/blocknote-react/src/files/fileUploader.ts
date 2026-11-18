@@ -36,6 +36,14 @@ import type {
 const fileUploaderName = "FileUploader";
 
 /**
+ * The name under which the {@link FileUploadListener}s are bound in the service container.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+const fileUploadListenerName = "FileUploadListener";
+
+/**
  * A file stored by the {@link FileUploader}.
  *
  * @since 18.10.0RC1
@@ -73,14 +81,42 @@ type UploadedFile = {
  */
 interface FileUploader {
   /**
-   * Stores the given file. A failure is reported to the user by the uploader, when it can, and to the caller by
-   * rejecting.
+   * Stores the given file. The editor stores the files with {@link uploadFile}, which tells the
+   * {@link FileUploadListener}s about the outcome.
    *
    * @param instance - the editor instance where the file is uploaded
    * @param file - the file to store
    * @returns the stored file
    */
   upload(instance: EditorInstance, file: File): Promise<UploadedFile>;
+}
+
+/**
+ * Told about the files uploaded in an editor instance, whatever the way they reach the editor and whatever the
+ * {@link FileUploader}. Any number of listeners can be bound in the service container (see
+ * {@link fileUploadListenerName}), either for all the editor instances, or in the service container of an editor
+ * instance, for that editor instance only.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+interface FileUploadListener {
+  /**
+   * Called once a file is stored.
+   *
+   * @param instance - the editor instance where the file is uploaded
+   * @param file - the stored file
+   */
+  onUpload?(instance: EditorInstance, file: UploadedFile): void;
+
+  /**
+   * Called when a file can't be stored, e.g. to tell the user.
+   *
+   * @param instance - the editor instance where the file is uploaded
+   * @param file - the file that couldn't be stored
+   * @param error - why the file couldn't be stored
+   */
+  onUploadFailed?(instance: EditorInstance, file: File, error: unknown): void;
 }
 
 /**
@@ -142,5 +178,72 @@ function getFileUploader(
   return undefined;
 }
 
-export { fileUploaderName, getFileUploader };
-export type { FileUploader, UploadedFile };
+/**
+ * @param instance - the editor instance
+ * @param notify - tells a listener
+ */
+function notifyListeners(
+  instance: EditorInstance,
+  notify: (listener: FileUploadListener) => void,
+): void {
+  const { serviceContainer } = instance;
+  if (!serviceContainer.isBound(fileUploadListenerName)) {
+    return;
+  }
+  // Chained, so that the listeners bound for all the editor instances are told, as well as the ones bound for this
+  // editor instance.
+  for (const listener of serviceContainer.getAll<FileUploadListener>(
+    fileUploadListenerName,
+    { chained: true },
+  )) {
+    try {
+      notify(listener);
+    } catch (error) {
+      // A failing listener doesn't prevent the others from being told.
+      console.error("A file upload listener failed.", error);
+    }
+  }
+}
+
+/**
+ * Stores the given file with the file uploader of the given editor instance, and tells the
+ * {@link FileUploadListener}s about the outcome.
+ *
+ * @param instance - the editor instance where the file is uploaded
+ * @param file - the file to store
+ * @returns the stored file (rejected when the file can't be stored, or when the user can't upload files)
+ * @since 18.10.0RC1
+ * @beta
+ */
+async function uploadFile(
+  instance: EditorInstance,
+  file: File,
+): Promise<UploadedFile> {
+  const fileUploader = getFileUploader(instance);
+  if (!fileUploader) {
+    throw new Error(
+      `Uploading files is disabled, can't upload [${file.name}].`,
+    );
+  }
+  let uploaded: UploadedFile;
+  try {
+    uploaded = await fileUploader.upload(instance, file);
+  } catch (error) {
+    notifyListeners(instance, (listener) =>
+      listener.onUploadFailed?.(instance, file, error),
+    );
+    throw error;
+  }
+  notifyListeners(instance, (listener) =>
+    listener.onUpload?.(instance, uploaded),
+  );
+  return uploaded;
+}
+
+export {
+  fileUploadListenerName,
+  fileUploaderName,
+  getFileUploader,
+  uploadFile,
+};
+export type { FileUploadListener, FileUploader, UploadedFile };

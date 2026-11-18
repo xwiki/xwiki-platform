@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { BlockNoteWithLinkMetadataHandler } from "./LinkEdition.story";
-import { pressKeySettled } from "./utils";
+import { clickSettled, pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockType } from "../../blocknote";
 import type { Locator, Page } from "@playwright/test";
@@ -205,9 +205,9 @@ async function moveCaretIntoLink(editorEl: Locator, page: Page): Promise<void> {
  * Selects "First", the text before the link.
  */
 async function selectFirstWord(editorEl: Locator, page: Page): Promise<void> {
-  await editorEl
-    .locator("p.bn-inline-content")
-    .click({ position: { x: 5, y: 5 } });
+  await clickSettled(page, editorEl.locator("p.bn-inline-content"), {
+    position: { x: 5, y: 5 },
+  });
   await pressKeySettled(page, "Home");
   for (let i = 0; i < 5; i++) {
     await pressKeySettled(page, "Shift+ArrowRight");

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { BlockNoteWithFileUploader } from "./FileUpload.story";
+import { clickSettled, pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockType } from "../../blocknote";
 import type { Locator, Page } from "@playwright/test";
@@ -108,8 +109,9 @@ async function getUploadedFiles(page: Page): Promise<string[]> {
  * Puts the caret at the end of the first paragraph, which the pasted files are inserted at.
  */
 async function focusEnd(component: Locator, page: Page): Promise<void> {
-  await component.locator("p.bn-inline-content").first().click();
-  await page.keyboard.press("End");
+  await clickSettled(page, component.locator("p.bn-inline-content").first());
+  // Awaited until painted (see pressKeySettled), so that the paste doesn't outrun the selection update.
+  await pressKeySettled(page, "End");
 }
 
 test("A dropped image is uploaded under its name and shown", async ({
@@ -124,6 +126,10 @@ test("A dropped image is uploaded under its name and shown", async ({
     component.locator('img[src="/download/photo.png"]'),
   ).toBeVisible();
   expect(await getUploadedFiles(page)).toEqual(["photo.png"]);
+  // The file upload listeners are told.
+  await expect(page.locator('[data-test="uploadEvents"]')).toHaveText(
+    JSON.stringify(["uploaded /download/photo.png"]),
+  );
 });
 
 test("A pasted image is uploaded under a generated name and shown", async ({
@@ -154,6 +160,9 @@ test("A failed upload leaves no block behind", async ({ mount, page }) => {
     0,
   );
   await expect(component.locator("img")).toHaveCount(0);
+  await expect(page.locator('[data-test="uploadEvents"]')).toHaveText(
+    JSON.stringify(["failed photo.png"]),
+  );
 });
 
 test("A pasted file that isn't an image is linked where the caret is", async ({

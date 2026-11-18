@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { XWikiFileUploader } from "./XWikiFileUploader";
-import { uploadListenerName } from "./uploadListener";
+import { temporaryUploadsName } from "./temporaryUploads";
 import { ConnectionStatus } from "@xwiki/platform-collaboration-api";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
@@ -34,21 +34,22 @@ function uploadedAttachment(name) {
 }
 
 describe("XWikiFileUploader", () => {
-  let saveAttachments, listener, fileUploader;
+  let saveAttachments, temporaryUploads, fileUploader;
 
   /**
    * @param options - the options of the editor instance
-   * @param withListener - whether the editor instance has an upload listener
+   * @param withTemporaryUploads - whether the editor instance records its temporary uploads
    * @returns an editor instance editing the content of the source document, when specified
    */
   function editorInstance(
     { sourceDocumentReference, ...options } = {},
-    withListener = true,
+    withTemporaryUploads = true,
   ) {
     return {
       serviceContainer: {
-        isBound: (name) => withListener && name === uploadListenerName,
-        get: () => listener,
+        isBound: (name) =>
+          withTemporaryUploads && name === temporaryUploadsName,
+        get: () => temporaryUploads,
       },
       options: {
         sourceDocumentReference:
@@ -70,7 +71,7 @@ describe("XWikiFileUploader", () => {
     saveAttachments = vi.fn(async (_page, [{ name }]) => [
       uploadedAttachment(name),
     ]);
-    listener = { onTemporaryUpload: vi.fn(), onUploadFailed: vi.fn() };
+    temporaryUploads = { add: vi.fn() };
     global.XWiki = {
       currentDocument: {
         documentReference: Model.resolve(
@@ -131,7 +132,7 @@ describe("XWikiFileUploader", () => {
       await fileUploader.upload(editorInstance(), file("cat.png"));
 
       expect(saveAttachments.mock.calls[0][2]).toEqual({ temporary: false });
-      expect(listener.onTemporaryUpload).not.toHaveBeenCalled();
+      expect(temporaryUploads.add).not.toHaveBeenCalled();
     });
 
     it("attaches the file right away when editing in realtime", async () => {
@@ -146,7 +147,7 @@ describe("XWikiFileUploader", () => {
       expect(saveAttachments.mock.calls[0][2]).toEqual({ temporary: false });
     });
 
-    it("uploads to the temporary store and tells the name to commit, the realtime session being disconnected", async () => {
+    it("uploads to the temporary store and records the name to commit, the realtime session being disconnected", async () => {
       saveAttachments.mockResolvedValue([uploadedAttachment("cat-1.png")]);
 
       await fileUploader.upload(
@@ -158,10 +159,10 @@ describe("XWikiFileUploader", () => {
       );
 
       expect(saveAttachments.mock.calls[0][2]).toEqual({ temporary: true });
-      expect(listener.onTemporaryUpload).toHaveBeenCalledWith("cat-1.png");
+      expect(temporaryUploads.add).toHaveBeenCalledWith("cat-1.png");
     });
 
-    it("uploads to the temporary store without listener", async () => {
+    it("uploads to the temporary store even when nothing records the temporary uploads", async () => {
       await expect(
         fileUploader.upload(
           editorInstance({ name: "content" }, false),
@@ -180,7 +181,7 @@ describe("XWikiFileUploader", () => {
 
     for (const [label, fail] of Object.entries(failures)) {
       describe(`when ${label}`, () => {
-        it("rejects and tells the listener, without registering a temporary upload", async () => {
+        it("rejects without recording a temporary upload", async () => {
           fail();
 
           await expect(
@@ -189,11 +190,7 @@ describe("XWikiFileUploader", () => {
               file("cat.png"),
             ),
           ).rejects.toThrow();
-          expect(listener.onUploadFailed).toHaveBeenCalledWith(
-            "cat.png",
-            expect.any(Error),
-          );
-          expect(listener.onTemporaryUpload).not.toHaveBeenCalled();
+          expect(temporaryUploads.add).not.toHaveBeenCalled();
         });
       });
     }

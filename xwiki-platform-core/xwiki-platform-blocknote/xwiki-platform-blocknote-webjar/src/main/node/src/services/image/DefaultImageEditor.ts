@@ -20,6 +20,7 @@
 import {
   getFileUploader,
   imageEditorName,
+  uploadFile,
 } from "@xwiki/platform-editors-blocknote-react";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
 import { AttachmentReference } from "@xwiki/platform-xwiki-model-api";
@@ -273,14 +274,13 @@ export class DefaultImageEditor implements ImageEditor {
     callback: UploadCallback,
     documentReference: XWikiEntityReference,
   ): Promise<void> {
-    const fileUploader = getFileUploader(instance);
-    if (!fileUploader) {
+    if (!getFileUploader(instance)) {
       // The user can't upload files.
       callback.onAbort();
       return;
     }
     try {
-      const { name } = await fileUploader.upload(instance, file);
+      const { name } = await uploadFile(instance, file);
       callback.onSuccess(new AttachmentReference(name, documentReference));
     } catch (error) {
       callback.onError(

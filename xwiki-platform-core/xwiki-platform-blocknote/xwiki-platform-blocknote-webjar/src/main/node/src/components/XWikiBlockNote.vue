@@ -85,13 +85,14 @@
 </template>
 
 <script setup lang="ts">
-import { uploadListenerName } from "../services/attachments/uploadListener";
+import { temporaryUploadsName } from "../services/attachments/temporaryUploads";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
+import { fileUploadListenerName } from "@xwiki/platform-editors-blocknote-react";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
@@ -105,7 +106,7 @@ import {
   watch,
 } from "vue";
 import type { Logic } from "../services/Logic";
-import type { UploadListener } from "../services/attachments/uploadListener";
+import type { TemporaryUploads } from "../services/attachments/temporaryUploads";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
@@ -117,6 +118,7 @@ import type { HeadlessEditorOptions } from "@xwiki/platform-editors-blocknote-he
 import type {
   BlockType,
   EditorLanguage,
+  FileUploadListener,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
@@ -214,21 +216,26 @@ const temporaryAttachments: Ref<Set<string>> = ref(new Set<string>());
 
 // The services specific to this editor instance are bound in a child of the shared container.
 const editorContainer = new Container({ parent: container });
-editorContainer.bind<UploadListener>(uploadListenerName).toConstantValue({
-  onTemporaryUpload: (fileName) => {
+// The files uploaded to the temporary store, which the save request has to ask for.
+editorContainer.bind<TemporaryUploads>(temporaryUploadsName).toConstantValue({
+  add: (fileName) => {
     temporaryAttachments.value.add(fileName);
   },
-  // The editor logs the error itself.
-  onUploadFailed: async (fileName) => {
-    try {
-      const message = await translate("upload.failed", undefined, fileName);
-      XWiki.widgets.Notification.show(message, "error");
-    } catch (notificationError) {
-      // Nobody awaits this callback, so an error here would go unhandled.
-      console.error("Failed to notify the user.", notificationError);
-    }
-  },
 });
+// Tell the user about the files that can't be uploaded (the editor logs the error itself).
+editorContainer
+  .bind<FileUploadListener>(fileUploadListenerName)
+  .toConstantValue({
+    onUploadFailed: async (_instance, file) => {
+      try {
+        const message = await translate("upload.failed", undefined, file.name);
+        XWiki.widgets.Notification.show(message, "error");
+      } catch (notificationError) {
+        // Nobody awaits this callback, so an error here would go unhandled.
+        console.error("Failed to notify the user.", notificationError);
+      }
+    },
+  });
 
 // This is passed to the BlockNote editor component.
 // Shallow on purpose: a normal ref would hide the refs inside, leaving connectionStatus.value undefined.

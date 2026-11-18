@@ -19,15 +19,21 @@
  */
 import { BlockNoteForTest } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
-import { fileUploaderName } from "../../files/fileUploader";
+import {
+  fileUploadListenerName,
+  fileUploaderName,
+} from "../../files/fileUploader";
 import { useState } from "react";
 import type { BlockType } from "../../blocknote";
-import type { FileUploader } from "../../files/fileUploader";
+import type {
+  FileUploadListener,
+  FileUploader,
+} from "../../files/fileUploader";
 
 /**
  * Renders the editor with a file uploader defined natively (i.e. running in the browser), since a function passed from
  * the test runs outside of the browser. The uploader stores the files under their name, and the names of the files it
- * gets are rendered, so that the tests can check them.
+ * gets are rendered, so that the tests can check them, together with what a file upload listener is told.
  */
 export const BlockNoteWithFileUploader: React.FC<{
   content: BlockType[];
@@ -37,13 +43,14 @@ export const BlockNoteWithFileUploader: React.FC<{
   fail?: boolean;
 }> = ({ content, upload, fail }) => {
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+  const [uploadEvents, setUploadEvents] = useState<string[]>([]);
 
   return (
     <>
       <BlockNoteForTest
         content={content}
         options={{ syntax: FULL_SYNTAX, upload }}
-        bind={(container) =>
+        bind={(container) => {
           container.bind<FileUploader>(fileUploaderName).toConstantValue({
             async upload(_instance, file) {
               setUploadedFiles((names) => [...names, file.name]);
@@ -52,10 +59,23 @@ export const BlockNoteWithFileUploader: React.FC<{
               }
               return { url: `/download/${file.name}`, name: file.name };
             },
-          })
-        }
+          });
+          // Bound for all the editor instances, so it is found from the service container of the editor instance.
+          container
+            .bind<FileUploadListener>(fileUploadListenerName)
+            .toConstantValue({
+              onUpload: (_instance, file) =>
+                setUploadEvents((events) => [
+                  ...events,
+                  `uploaded ${file.url}`,
+                ]),
+              onUploadFailed: (_instance, file) =>
+                setUploadEvents((events) => [...events, `failed ${file.name}`]),
+            });
+        }}
       />
       <output data-test="uploadedFiles">{JSON.stringify(uploadedFiles)}</output>
+      <output data-test="uploadEvents">{JSON.stringify(uploadEvents)}</output>
     </>
   );
 };

@@ -19,7 +19,12 @@
  */
 // @vitest-environment jsdom
 
-import { fileUploaderName, getFileUploader } from "../../files/fileUploader";
+import {
+  fileUploadListenerName,
+  fileUploaderName,
+  getFileUploader,
+  uploadFile,
+} from "../../files/fileUploader";
 import {
   pickAndUploadFile,
   uploadedFileLink,
@@ -34,7 +39,10 @@ import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 import type { EditorInstance } from "../../editorInstance";
-import type { FileUploader } from "../../files/fileUploader";
+import type {
+  FileUploadListener,
+  FileUploader,
+} from "../../files/fileUploader";
 import type {
   Attachment,
   AttachmentsService,
@@ -90,6 +98,8 @@ function buildInstance(
     fileUploader?: FileUploader;
     // Whether the attachments service is bound (true by default).
     attachmentsService?: boolean;
+    // The file upload listeners bound in the service container.
+    listeners?: FileUploadListener[];
   } = {},
 ): { instance: EditorInstance; attachmentsService: AttachmentsService } {
   const container = mock<Container>();
@@ -98,7 +108,11 @@ function buildInstance(
     AttachmentsService:
       options.attachmentsService === false ? undefined : attachmentsService,
     [fileUploaderName]: options.fileUploader,
+    [fileUploadListenerName]: options.listeners,
   });
+  container.getAll.mockImplementation((name) =>
+    name === fileUploadListenerName ? (options.listeners ?? []) : [],
+  );
   mockReferenceServices(container, options.serializeReferences !== false);
 
   const instance = {
@@ -253,6 +267,76 @@ describe("the default file uploader", () => {
     await expect(
       getFileUploader(instance)!.upload(instance, buildFile()),
     ).rejects.toThrow("Upload failed");
+  });
+});
+
+describe("uploadFile", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function listener(): FileUploadListener {
+    return { onUpload: vi.fn(), onUploadFailed: vi.fn() };
+  }
+
+  test("tells the listeners about the stored file", async () => {
+    const listeners = [listener(), listener()];
+    const { instance } = buildInstance({ listeners });
+
+    const uploaded = await uploadFile(instance, buildFile());
+
+    expect(uploaded).toMatchObject({ url: UPLOADED_URL });
+    for (const { onUpload, onUploadFailed } of listeners) {
+      expect(onUpload).toHaveBeenCalledWith(instance, uploaded);
+      expect(onUploadFailed).not.toHaveBeenCalled();
+    }
+  });
+
+  test("tells the listeners about the failure, and rejects", async () => {
+    const listeners = [listener(), listener()];
+    const { instance } = buildInstance({ listeners, failUpload: true });
+    const file = buildFile();
+
+    await expect(uploadFile(instance, file)).rejects.toThrow("Upload failed");
+    for (const { onUpload, onUploadFailed } of listeners) {
+      expect(onUploadFailed).toHaveBeenCalledWith(
+        instance,
+        file,
+        expect.objectContaining({ message: "Upload failed" }),
+      );
+      expect(onUpload).not.toHaveBeenCalled();
+    }
+  });
+
+  test("tells the other listeners when one of them fails, and listeners can ignore an event", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const failing: FileUploadListener = {
+      onUpload: () => {
+        throw new Error("Listener failed");
+      },
+    };
+    const other = listener();
+    const { instance } = buildInstance({
+      listeners: [failing, {}, other],
+    });
+
+    await uploadFile(instance, buildFile());
+
+    expect(other.onUpload).toHaveBeenCalledOnce();
+    expect(consoleError).toHaveBeenCalledWith(
+      "A file upload listener failed.",
+      expect.objectContaining({ message: "Listener failed" }),
+    );
+  });
+
+  test("rejects when the user can't upload files", async () => {
+    const { instance } = buildInstance({ upload: false });
+
+    await expect(uploadFile(instance, buildFile())).rejects.toThrow(
+      "Uploading files is disabled",
+    );
   });
 });
 

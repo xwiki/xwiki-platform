@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="CKEditor.OfficeImporter" locale="">
-  <web>CKEditor</web>
+<xwikidoc version="1.6" reference="XWiki.WYSIWYG.OfficeImporter" locale="">
+  <web>XWiki.WYSIWYG</web>
   <name>OfficeImporter</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>CKEditor.WebHome</parent>
+  <parent>XWiki.WYSIWYG.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,9 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="CKEditor.VelocityMacros" /}}
-
-{{velocity wiki="false"}}
+  <content>{{velocity wiki="false"}}
 #if ("$!request.fileName" != '')
   #set ($attachmentReference = $services.model.createAttachmentReference($doc.documentReference, $request.fileName))
   #set ($parameters = {
@@ -47,7 +45,10 @@
   })
   #template('display_macros.vm')
   #initRequiredSkinExtensions()
-  #set ($output = $services.wysiwyg.importOfficeAttachment($attachmentReference, $parameters))
+  ## Not named outputSyntax: that request parameter already selects the syntax this page is rendered in (callers pass
+  ## plain). An unset value falls back to annotated XHTML, which is what the editors that edit HTML expect.
+  #set ($output = $services.wysiwyg.importOfficeAttachment($attachmentReference, $parameters,
+    "$!request.targetSyntax"))
   #if ($output != '' &amp;&amp; "$!output" == '')
     ## Null output means an error has occurred.
     $response.sendError(500)
@@ -67,13 +68,13 @@
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;label&gt;
-          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filePath'))
+          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filePath'))
           &lt;span class="xRequired"&gt;
-            ($escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.required')))
+            ($escapetool.xml($services.localization.render('wysiwyg.office.importer.required')))
           &lt;/span&gt;
         &lt;/label&gt;
         &lt;span class="xHint"&gt;
-          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filePath.hint'))
+          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filePath.hint'))
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
@@ -82,20 +83,20 @@
       &lt;dt&gt;
         &lt;label&gt;
           &lt;input type="checkbox" name="filterStyles" value="true" checked="checked" /&gt;
-          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filterStyles'))
+          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filterStyles'))
         &lt;/label&gt;
         &lt;span class="xHint"&gt;
-          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filterStyles.hint'))
+          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filterStyles.hint'))
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;&lt;/dd&gt;
       &lt;dt&gt;
         &lt;label&gt;
           &lt;input type="checkbox" name="useOfficeViewer" value="true" /&gt;
-          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer'))
+          $escapetool.xml($services.localization.render('wysiwyg.office.importer.useOfficeViewer'))
         &lt;/label&gt;
         &lt;span class="xHint"&gt;
-          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer.hint'))
+          $escapetool.xml($services.localization.render('wysiwyg.office.importer.useOfficeViewer.hint'))
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;&lt;/dd&gt;

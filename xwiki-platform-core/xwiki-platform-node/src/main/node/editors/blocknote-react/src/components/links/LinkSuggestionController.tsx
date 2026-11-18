@@ -17,15 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { insertLink } from "./insertLink";
+import { insertLink, useLinkEditing } from "./linkEditor";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
-import {
-  ServiceContainerContext,
-  SourceDocumentReferenceContext,
-} from "../../contexts";
-import { useEditor } from "../../hooks";
-import { triggerUserAttachmentUpload } from "../../misc/fileUpload";
-import { toLinkResourceReference } from "../../misc/linkResourceReference";
+import { suggestedLinkData } from "./suggestedLink";
+import { EditorInstanceContext } from "../../contexts";
+import { canUploadFiles } from "../../files/fileUploader";
+import { pickAndUploadFile, uploadedFileLink } from "../../files/uploadedFile";
 import { SuggestionMenuController } from "@blocknote/react";
 import {
   debounceAsync,
@@ -40,16 +37,14 @@ import {
   RiLink,
   RiUpload2Line,
 } from "react-icons/ri";
-import type { EditorType } from "../../blocknote";
-import type { LinkEditionData, LinkEditionHandler } from "./linkEdition";
-import type { LinkEditionHooks } from "./linkEditionHooks";
+import type { LinkEditionData } from "./linkEditor";
+import type { SuggestedLink } from "./suggestedLink";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   Link,
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/platform-link-suggest-api";
-import type { Container } from "inversify";
 
 /**
  * Inserts a link selected by the user.
@@ -58,19 +53,7 @@ import type { Container } from "inversify";
  */
 type InsertLink = (linkData: LinkEditionData) => void;
 
-/**
- * A suggested or uploaded page or attachment to link to.
- */
-type SuggestedLink = Pick<Link, "label" | "url" | "type"> & {
-  /** The absolute serialized reference of the page or attachment, when known. */
-  reference?: string;
-};
-
 export type LinkSuggestionControllerProps = {
-  /** Opens the link editor, for the links that the suggestions don't cover. */
-  linkEditionHandler: LinkEditionHandler;
-  /** Intercepts the inserted links. */
-  linkEditionHooks?: LinkEditionHooks;
   /** The maximum number of suggestions shown, pages and attachments together. */
   maxSuggestions: number;
   /**
@@ -82,27 +65,19 @@ export type LinkSuggestionControllerProps = {
 
 /**
  * Suggests the pages and attachments to link to, as the user types after the link suggestion trigger, in addition to
- * uploading a file to link to and opening the link editor for any other link.
+ * uploading a file to link to and opening the link editor (when bound) for any other link.
  */
 export function LinkSuggestionController({
-  linkEditionHandler,
-  linkEditionHooks,
   maxSuggestions,
   pageSuggestionsShare,
 }: LinkSuggestionControllerProps) {
-  const serviceContainer = useContext(ServiceContainerContext)!;
+  const { serviceContainer } = useContext(EditorInstanceContext)!;
 
   const linkSuggestService = serviceContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
 
-  const editor = useEditor();
-  const { insertSuggested, openLinkEditor, uploadFile } = useLinkInsertion(
-    editor,
-    serviceContainer,
-    linkEditionHandler,
-    linkEditionHooks,
-  );
+  const { insertSuggested, openLinkEditor, uploadFile } = useLinkInsertion();
 
   const { t } = useTranslation();
 
@@ -120,16 +95,26 @@ export function LinkSuggestionController({
         );
 
         const actions: DefaultReactSuggestionItem[] = [
-          {
-            title: t("blocknote.linkSuggestion.linkTo"),
-            icon: <RiLink size={18} />,
-            onItemClick: openLinkEditor,
-          },
-          {
-            title: t("blocknote.linkSuggestion.upload"),
-            icon: <RiUpload2Line size={18} />,
-            onItemClick: uploadFile,
-          },
+          // Offered only when there's a link editor.
+          ...(openLinkEditor
+            ? [
+                {
+                  title: t("blocknote.linkSuggestion.linkTo"),
+                  icon: <RiLink size={18} />,
+                  onItemClick: openLinkEditor,
+                },
+              ]
+            : []),
+          // Offered only when the user can upload files.
+          ...(uploadFile
+            ? [
+                {
+                  title: t("blocknote.linkSuggestion.upload"),
+                  icon: <RiUpload2Line size={18} />,
+                  onItemClick: uploadFile,
+                },
+              ]
+            : []),
         ];
 
         return [
@@ -175,66 +160,45 @@ export function LinkSuggestionController({
  *   directly; the link is inserted at the editor's selection, where the link suggestion menu was (the menu itself is
  *   already closed, and its query removed, by the time an item is clicked)
  */
-function useLinkInsertion(
-  editor: EditorType,
-  serviceContainer: Container,
-  linkEditionHandler: LinkEditionHandler,
-  linkEditionHooks?: LinkEditionHooks,
-) {
+function useLinkInsertion() {
+  const instance = useContext(EditorInstanceContext)!;
+  const linkEditing = useLinkEditing();
+
   const insert: InsertLink = useCallback(
-    (linkData) => insertLink(editor, linkData, linkEditionHooks),
-    [editor, linkEditionHooks],
+    (linkData) => insertLink(instance, linkData),
+    [instance],
   );
 
-  const openLinkEditor = useCallback(
+  const openLinkEditor = useMemo(
     () =>
-      linkEditionHandler({
-        mode: "createNew",
-        current: { title: "", url: "" },
-        onSubmit: insert,
+      linkEditing &&
+      (async () => {
+        await linkEditing.insert({}, insert);
+        instance.editor.focus();
       }),
-    [linkEditionHandler, insert],
+    [instance, linkEditing, insert],
   );
 
-  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
-
-  // The label of a link to a suggested or uploaded page or attachment is generated from its target (the title of the
-  // page, the name of the attachment), which is the label of the suggestion.
   const insertSuggested = useCallback(
-    (link: SuggestedLink) =>
-      insert({
-        title: link.label,
-        generatedTitle: true,
-        url: link.url,
-        // Without a reference, the link is saved from its URL.
-        reference:
-          link.reference === undefined
-            ? undefined
-            : toLinkResourceReference(
-                serviceContainer,
-                link.reference,
-                link.type,
-                sourceDocumentReference,
-              ),
-      }),
-    [serviceContainer, sourceDocumentReference, insert],
+    (link: SuggestedLink) => insert(suggestedLinkData(instance, link)),
+    [instance, insert],
   );
 
-  const uploadFile = useCallback(async () => {
-    const attachment = await triggerUserAttachmentUpload(
-      serviceContainer,
-      sourceDocumentReference,
-    );
-
-    if (attachment) {
-      insertSuggested({
-        label: attachment.name,
-        url: attachment.url,
-        reference: attachment.reference?.reference,
-        type: LinkType.ATTACHMENT,
-      });
-    }
-  }, [serviceContainer, sourceDocumentReference, insertSuggested]);
+  const uploadFile = useMemo(
+    () =>
+      canUploadFiles(instance) &&
+      (async () => {
+        const uploadedFile = await pickAndUploadFile(
+          instance,
+          undefined,
+          "Failed to upload the selected file.",
+        );
+        if (uploadedFile) {
+          insert(uploadedFileLink(instance, uploadedFile));
+        }
+      }),
+    [instance, insert],
+  );
 
   return { insertSuggested, openLinkEditor, uploadFile };
 }

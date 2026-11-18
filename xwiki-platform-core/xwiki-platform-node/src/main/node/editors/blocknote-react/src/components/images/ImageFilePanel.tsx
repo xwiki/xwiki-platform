@@ -18,34 +18,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
-import { useEditor } from "../../hooks";
+import { updateImage } from "./imageEditor";
+import { EditorInstanceContext } from "../../contexts";
 import { Paper } from "@mantine/core";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 import type { BlockOfType } from "../../blocknote";
-import type { ImageEditionHooks } from "./imageEditionHooks";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type ImageFilePanelProps = {
   currentBlock: BlockOfType<"image">;
-  imageEditionHooks?: ImageEditionHooks;
 };
 
 export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
   currentBlock: image,
-  imageEditionHooks,
 }) => {
-  const editor = useEditor();
+  const instance = useContext(EditorInstanceContext)!;
 
-  const updateImage = useCallback(
+  const replaceImage = useCallback(
     (url: string, reference?: ResourceReference) => {
-      const updatedImage = editor.updateBlock(
-        { id: image.id },
-        { props: { url } },
-      ) as BlockOfType<"image">;
-      imageEditionHooks?.afterUpdate?.(updatedImage, reference);
-      editor.focus();
+      updateImage(instance, image, { url }, reference);
+      instance.editor.focus();
     },
-    [editor, image, imageEditionHooks],
+    [instance, image],
   );
 
   return (
@@ -54,7 +48,7 @@ export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
     <Paper shadow="md" p="sm">
       <ImageSelector
         currentSelection={image.props.url}
-        onSelected={updateImage}
+        onSelected={replaceImage}
       />
     </Paper>
   );

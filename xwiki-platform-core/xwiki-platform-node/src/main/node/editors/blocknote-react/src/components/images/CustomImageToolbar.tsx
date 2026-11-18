@@ -18,83 +18,41 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageFilePanel } from "./ImageFilePanel";
-import {
-  useBlockNoteEditor,
-  useComponentsContext,
-  usePortalElement,
-} from "@blocknote/react";
-import { assertUnreachable } from "@xwiki/platform-fn-utils";
-import { useCallback, useState } from "react";
+import { getEditedImage, updateImage, useImageEditing } from "./imageEditor";
+import { EditorInstanceContext } from "../../contexts";
+import { useComponentsContext, usePortalElement } from "@blocknote/react";
+import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
 import type { BlockOfType } from "../../blocknote";
-import type { ImageEditionHooks } from "./imageEditionHooks";
 
 type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;
-  imageEditionOverrideFn?: ImageEditionOverrideFn;
-  imageEditionHooks?: ImageEditionHooks;
 };
-
-/**
- * Interceptor for the image edition mechanism
- *
- * @since 0.26
- * @beta
- */
-type ImageEditionOverrideFn = (
-  block: BlockOfType<"image">,
-  update: (updateResult: ImageUpdateResult) => void,
-) => void;
-
-/**
- * Result of an image update process, from `ImageEditionOverrideFn`
- *
- * @since 18.0.0RC1
- * @beta
- */
-type ImageUpdateResult =
-  | { type: "update"; updatedProps: Partial<BlockOfType<"image">["props"]> }
-  | { type: "aborted" };
 
 export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   currentBlock,
-  imageEditionOverrideFn,
-  imageEditionHooks,
 }) => {
   const Components = useComponentsContext()!;
   const portalElement = usePortalElement();
   const { t } = useTranslation();
-  const editor = useBlockNoteEditor();
+  const instance = useContext(EditorInstanceContext)!;
+  const imageEditing = useImageEditing();
 
   const [showImageEditor, setShowImageEditor] = useState(false);
 
-  const updateImageProps = useCallback(
-    (updateResult: ImageUpdateResult) => {
-      switch (updateResult.type) {
-        case "update":
-          editor.updateBlock(currentBlock, {
-            props: updateResult.updatedProps,
-          });
-          break;
-
-        case "aborted":
-          break;
-
-        default:
-          assertUnreachable(updateResult);
-      }
-    },
-    [currentBlock, editor],
-  );
-
+  // The image is edited with the image editor when bound, and with the image selector of the editor otherwise.
   const openEditor = useCallback(() => {
-    if (imageEditionOverrideFn) {
-      imageEditionOverrideFn(currentBlock, updateImageProps);
+    if (imageEditing) {
+      void imageEditing.edit(
+        getEditedImage(instance, currentBlock),
+        ({ reference, ...props }) =>
+          updateImage(instance, currentBlock, props, reference),
+      );
     } else {
       setShowImageEditor(true);
     }
-  }, [imageEditionOverrideFn, currentBlock, editor]);
+  }, [instance, imageEditing, currentBlock]);
 
   return (
     <>
@@ -117,10 +75,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
           className="bn-popover-content bn-form-popover"
           variant="form-popover"
         >
-          <ImageFilePanel
-            currentBlock={currentBlock}
-            imageEditionHooks={imageEditionHooks}
-          />
+          <ImageFilePanel currentBlock={currentBlock} />
         </Components.Generic.Popover.Content>
       </Components.Generic.Popover.Root>
 
@@ -135,8 +90,4 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   );
 };
 
-export type {
-  CustomImageToolbarProps,
-  ImageEditionOverrideFn,
-  ImageUpdateResult,
-};
+export type { CustomImageToolbarProps };

@@ -17,12 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { XWikiFileUploader } from "./attachments/XWikiFileUploader";
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
+import { DefaultLinkMetadataHandler } from "./blocknote/DefaultLinkMetadataHandler";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
-import { DefaultImageWizard } from "./image/DefaultImageWizard";
+import { DefaultImageEditor } from "./image/DefaultImageEditor";
+import { DefaultImageMetadataHandler } from "./image/DefaultImageMetadataHandler";
+import { DefaultMacroEditor } from "./macros/DefaultMacroEditor";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
-import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
@@ -82,9 +85,12 @@ new LinkTypeUIComponentInit(container);
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);
 
-DefaultImageWizard.bind(container);
+XWikiFileUploader.bind(container);
+DefaultImageEditor.bind(container);
+DefaultImageMetadataHandler.bind(container);
+DefaultLinkMetadataHandler.bind(container);
 DefaultMacroWizard.bind(container);
-DefaultBlockNoteMacroWizard.bind(container);
+DefaultMacroEditor.bind(container);
 
 MinimalApp.bind(container);
 

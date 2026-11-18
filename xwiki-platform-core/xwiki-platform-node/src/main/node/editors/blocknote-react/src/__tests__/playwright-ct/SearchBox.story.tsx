@@ -19,10 +19,11 @@
  */
 import { serviceContainerMock } from "./serviceContainer.mock";
 import { SearchBox } from "../../components/SearchBox";
-import { ServiceContainerContext } from "../../contexts";
+import { EditorInstanceContext } from "../../contexts";
 import { MantineProvider } from "@mantine/core";
 import { EntityType } from "@xwiki/platform-model-api";
 import { useCallback, useMemo, useState } from "react";
+import type { EditorInstance } from "../../editorInstance";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 export type SearchBoxForTestProps = {
@@ -34,7 +35,11 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
   onSelect,
   onSubmit,
 }) => {
-  const serviceContainer = useMemo(serviceContainerMock, []);
+  // The search box only uses the service container of the editor instance it is part of.
+  const instance = useMemo(
+    () => ({ serviceContainer: serviceContainerMock() }) as EditorInstance,
+    [],
+  );
 
   // Every query searched so far, rendered for the tests to check which searches were performed.
   const [searchedQueries, setSearchedQueries] = useState<string[]>([]);
@@ -64,7 +69,7 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
 
   return (
     <MantineProvider>
-      <ServiceContainerContext value={serviceContainer}>
+      <EditorInstanceContext value={instance}>
         <SearchBox
           initialValue="Some great initial value"
           placeholder="Some super placeholder"
@@ -79,7 +84,7 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
         <output data-test="searchedQueries">
           {JSON.stringify(searchedQueries)}
         </output>
-      </ServiceContainerContext>
+      </EditorInstanceContext>
     </MantineProvider>
   );
 };

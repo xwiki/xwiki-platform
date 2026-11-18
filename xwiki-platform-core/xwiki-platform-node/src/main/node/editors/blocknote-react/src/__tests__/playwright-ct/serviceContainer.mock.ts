@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { FULL_SYNTAX } from "./syntax.mock";
 import {
   AttachmentReference,
   DocumentReference,
@@ -25,7 +26,8 @@ import {
   SpaceReference,
 } from "@xwiki/platform-model-api";
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
-import { mock } from "vitest-mock-extended";
+import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
+import { Container } from "inversify";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceHandlerProvider,
@@ -37,20 +39,26 @@ import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/platform-model-remote-url-api";
-import type { Container } from "inversify";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
+/**
+ * @param syntaxes - the syntax configurations registered in the container, the full syntax when not specified
+ * @returns a container providing mocks of the services the editor needs (a real container, because the editor creates
+ *   a child container for each editor instance)
+ */
 // eslint-disable-next-line max-statements
-export function serviceContainerMock(): Container {
-  const container = mock<Container>(
-    {},
-    {
-      fallbackMockImplementation: (id: unknown) => {
-        throw new Error(`Unexpected service: ${String(id)}`);
-      },
-    },
-  );
+export function serviceContainerMock(
+  syntaxes: SyntaxConfig[] = [FULL_SYNTAX],
+): Container {
+  const container = new Container();
 
-  container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
+  for (const syntax of syntaxes) {
+    container
+      .bind<SyntaxConfig>(SYNTAX_CONFIG_COMPONENT_GROUP_NAME)
+      .toConstantValue(syntax);
+  }
+
+  container.bind("RemoteURLParserProvider").toConstantValue({
     get: () => ({
       parse() {
         throw new Error("Unreachable");
@@ -58,7 +66,7 @@ export function serviceContainerMock(): Container {
     }),
   } satisfies RemoteURLParserProvider);
 
-  container.get.calledWith("RemoteURLSerializerProvider").mockReturnValue({
+  container.bind("RemoteURLSerializerProvider").toConstantValue({
     get: () => ({
       serialize(reference) {
         if (reference?.type === EntityType.ATTACHMENT) {
@@ -70,7 +78,7 @@ export function serviceContainerMock(): Container {
     }),
   } satisfies RemoteURLSerializerProvider);
 
-  container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+  container.bind("ModelReferenceParserProvider").toConstantValue({
     get: () => ({
       parse(reference, options) {
         return parseModelReference(reference, options);
@@ -82,7 +90,7 @@ export function serviceContainerMock(): Container {
     }),
   } satisfies ModelReferenceParserProvider);
 
-  container.get.calledWith("ModelReferenceHandlerProvider").mockReturnValue({
+  container.bind("ModelReferenceHandlerProvider").toConstantValue({
     get: () => ({
       createDocumentReference() {
         throw new Error("Unreachable");
@@ -99,7 +107,7 @@ export function serviceContainerMock(): Container {
     }),
   } satisfies ModelReferenceHandlerProvider);
 
-  container.get.calledWith("ModelReferenceSerializerProvider").mockReturnValue({
+  container.bind("ModelReferenceSerializerProvider").toConstantValue({
     get: () => ({
       serialize(reference) {
         if (!reference) {
@@ -119,7 +127,7 @@ export function serviceContainerMock(): Container {
     }),
   } satisfies ModelReferenceSerializerProvider);
 
-  container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue({
+  container.bind("LinkSuggestServiceProvider").toConstantValue({
     get: () => ({
       async getLinks() {
         return [
@@ -144,12 +152,9 @@ export function serviceContainerMock(): Container {
     }),
   } satisfies LinkSuggestServiceProvider);
 
-  container.get
-    .calledWith("ResourceReferenceParser")
-    .mockReturnValue(new DefaultResourceReferenceParser());
-
-  container.get.calledWith("AttachmentsService").mockReturnValue(null);
-  container.get.calledWith("DocumentsService").mockReturnValue(null);
+  container
+    .bind("ResourceReferenceParser")
+    .toConstantValue(new DefaultResourceReferenceParser());
 
   return container;
 }

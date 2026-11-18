@@ -59,7 +59,7 @@ export const CollaborationForTest: React.FC<CollaborationForTestProps> = ({
             options={{
               serviceContainer,
               name,
-              syntax: FULL_SYNTAX,
+              syntax: FULL_SYNTAX.id,
               lang: "en",
               label: `Editor ${index}`,
               collaboration,
@@ -77,9 +77,6 @@ export const CollaborationForTest: React.FC<CollaborationForTestProps> = ({
                 children: [],
               },
             ]}
-            linkEditionHandler={() => {
-              throw new Error("Link editor should not open for this test");
-            }}
           />
         </div>
       ))}

@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { getMacroOutput } from "./macroMetadata";
 import { applyXWikiParameters } from "./parameters";
-import { MacrosContext } from "../contexts";
+import { EditorInstanceContext } from "../contexts";
 import { Fragment, createElement, useContext } from "react";
-import type { ContextForMacros, MacroCall } from "./utils";
+import type { BlockMetadataStore } from "../misc/blockMetadata";
+import type { MacroCall } from "./utils";
 import type { CSSProperties, ReactNode } from "react";
 
 /**
@@ -362,7 +364,11 @@ function NestedMacro({
   readonly depth: number;
 }): ReactNode {
   const call = (node.props?.call ?? {}) as MacroCall;
-  const output = getNestedMacroOutput(node, call, useContext(MacrosContext));
+  const output = getNestedMacroOutput(
+    node,
+    call,
+    useContext(EditorInstanceContext)?.metadata,
+  );
   const tag = inline ? "span" : "div";
   if (!output.length) {
     return createElement(
@@ -386,14 +392,13 @@ function NestedMacro({
 /**
  * @param node - a nested macro node
  * @param call - the nested macro call
- * @param macros - the macro context, used to retrieve the output of a macro nested in the parameters or content of
- *   another macro call
+ * @param metadata - where the output of a macro nested in the parameters or content of another macro call is kept
  * @returns the output of the given nested macro, or an empty array if not available
  */
 function getNestedMacroOutput(
   node: RawNode,
   call: MacroCall,
-  macros: ContextForMacros | null,
+  metadata: BlockMetadataStore | undefined,
 ): OutputNode[] {
   // A macro nested in the output of another macro carries its own output, because the whole output of the top-level
   // macro was rendered for the current user and is kept outside the edited content.
@@ -403,10 +408,11 @@ function getNestedMacroOutput(
   }
   // A macro nested in the parameters or content of another macro call (i.e. in an xwikiEditable value) is part of the
   // edited content, which is shared with the other users when editing in realtime, so it doesn't carry its output
-  // (rendered for the current user). Its output, if available, is kept by the macro context, under the macro id.
+  // (rendered for the current user). Its output, if available, is kept in the metadata of the editor instance, under
+  // the macro id.
   const id = node.props?.id;
   if (typeof id === "string" && id) {
-    return (macros?.getMacroOutput?.(id, JSON.stringify(call)) ??
+    return (getMacroOutput(metadata, id, JSON.stringify(call)) ??
       []) as OutputNode[];
   }
   return [];

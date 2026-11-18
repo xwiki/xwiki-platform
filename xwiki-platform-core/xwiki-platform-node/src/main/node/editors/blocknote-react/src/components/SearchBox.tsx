@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ServiceContainerContext } from "../contexts";
+import { EditorInstanceContext } from "../contexts";
 import { toResourceReference } from "../misc/resourceReference";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
 import { debounceAsync } from "@xwiki/platform-fn-utils";
@@ -129,11 +129,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   onSubmit,
   // eslint-disable-next-line max-statements
 }) => {
-  const serviceContainer = useContext(ServiceContainerContext);
-
-  if (!serviceContainer) {
-    throw new Error("Missing dependencies container in React context");
-  }
+  const { serviceContainer } = useContext(EditorInstanceContext)!;
 
   const modelReferenceParser = serviceContainer
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")

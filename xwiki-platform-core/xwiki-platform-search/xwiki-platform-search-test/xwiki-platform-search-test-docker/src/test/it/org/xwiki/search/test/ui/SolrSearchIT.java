@@ -423,7 +423,8 @@ class SolrSearchIT
      */
     @Test
     @Order(8)
-    void suggestServiceParameters(TestUtils setup, TestReference testReference) throws Exception
+    void suggestServiceParameters(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference)
+        throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -432,7 +433,7 @@ class SolrSearchIT
         setup.rest().savePage(new DocumentReference("Apple", space), matchedWord, "Apple");
         setup.rest().savePage(new DocumentReference("Banana", space), matchedWord + " " + matchedWord, "Banana");
 
-        new SolrTestUtils(setup).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         String query = String.join("\n", "fq=type:DOCUMENT", "qf=doccontent");
         String results = getSuggestResults(setup, query, matchedWord);

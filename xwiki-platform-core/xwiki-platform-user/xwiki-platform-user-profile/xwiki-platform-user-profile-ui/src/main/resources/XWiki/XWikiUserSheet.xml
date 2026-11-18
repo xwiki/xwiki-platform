@@ -271,11 +271,13 @@
 Object.extend(XWiki, {
   userprofile : {
     init : function(container) {
-      this.crtCategory = '';
-      this.tabsContainer = (container || $('body')).down('#user-vertical-menu');
-      if (!this.tabsContainer) {
+      // The DOM update events also target containers without the menu, which must not reset the current state.
+      const tabsContainer = (container || $('body')).down('#user-vertical-menu');
+      if (!tabsContainer) {
         return;
       }
+      this.crtCategory = '';
+      this.tabsContainer = tabsContainer;
       this.tabsContainer.select('.list-group-item[data-id]').each(function (tabElement) {
         tabElement.observe('click', function(event) {
           Event.stop(event);
@@ -493,6 +495,10 @@ return XWiki;
 #user-menu-col {
   float: left;
   width: 13em;
+}
+
+#user-profile-menu {
+  margin-top: @line-height-computed / 2;
 }
 
 #avatar {

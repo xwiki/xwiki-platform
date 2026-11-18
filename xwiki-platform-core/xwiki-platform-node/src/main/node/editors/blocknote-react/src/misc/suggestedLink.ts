@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { toLinkResourceReference } from "../../misc/linkResourceReference";
-import { getSourceDocument } from "../../misc/sourceDocument";
-import type { EditorInstance } from "../../editorInstance";
-import type { LinkEditionData } from "./linkEditor";
+import { toLinkResourceReference } from "./linkResourceReference";
+import { getSourceDocument } from "./sourceDocument";
+import type { EditorInstance } from "../editorInstance";
+import type { LinkEditionData } from "../services/linkEditor";
 import type { Link } from "@xwiki/platform-link-suggest-api";
 
 /**

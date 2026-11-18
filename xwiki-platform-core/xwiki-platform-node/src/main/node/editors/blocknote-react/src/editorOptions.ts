@@ -81,6 +81,14 @@ interface EditorFeatures {
   images?: false;
 
   /**
+   * The links are enabled when this is missing. `false` disables the actions to insert and edit links (the slash menu
+   * item, the link suggestions, the button creating a link, the link toolbar), even when a `LinkEditor` is bound. The
+   * links already in the content are still displayed. The options of the links feature are those of the `LinkEditor`,
+   * declared by the integration binding it (e.g. blocknote-headless declares those of its link modal).
+   */
+  links?: object | false;
+
+  /**
    * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
    * insert or edit a macro, even when a `MacroEditor` is bound.
    */

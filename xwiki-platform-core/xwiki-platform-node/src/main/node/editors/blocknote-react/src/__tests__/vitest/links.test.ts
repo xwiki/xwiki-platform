@@ -23,9 +23,13 @@ import {
   createBlockNoteSchema,
   querySuggestionsMenuItems,
 } from "../../blocknote";
+import { linksFeature } from "../../features/links/links";
 import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
 import { BlockNoteEditor } from "@blocknote/core";
 import { beforeAll, describe, expect, test } from "vitest";
+import type { EditorInstance } from "../../editorInstance";
+import type { FeatureContext } from "../../features/editorFeature";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyEditor = BlockNoteEditor<any, any, any>;
@@ -34,7 +38,7 @@ type AnyEditor = BlockNoteEditor<any, any, any>;
 // which keeps the assertions below tied directly to the keys added in `translation-en.json`.
 const t = (key: string) => key;
 
-describe("querySuggestionsMenuItems (Link quick action)", () => {
+describe("linksFeature", () => {
   let editor: AnyEditor;
 
   beforeAll(() => {
@@ -42,6 +46,14 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
       schema: createBlockNoteSchema([]),
     }) as AnyEditor;
   });
+
+  function context(syntax: SyntaxConfig = FULL_SYNTAX): FeatureContext {
+    return {
+      syntax,
+      t,
+      getInstance: () => ({ editor }) as EditorInstance,
+    } as FeatureContext;
+  }
 
   function findLinkItem(query = "") {
     const items = querySuggestionsMenuItems({
@@ -51,7 +63,7 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
       syntax: FULL_SYNTAX,
       t,
       macroEditing: undefined,
-      featureItems: [],
+      featureItems: linksFeature.contribute(context())!.slashMenuItems!(),
     });
 
     return items.find(
@@ -74,5 +86,12 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
 
   test("the Link entry is filtered out by a query matching neither its title nor its alias", () => {
     expect(findLinkItem("table")).toBeUndefined();
+  });
+
+  test("contributes nothing when the syntax doesn't support links", () => {
+    const syntax = structuredClone(FULL_SYNTAX);
+    syntax.features.inlineContents.links.basicLinks = false;
+
+    expect(linksFeature.contribute(context(syntax))).toBeUndefined();
   });
 });

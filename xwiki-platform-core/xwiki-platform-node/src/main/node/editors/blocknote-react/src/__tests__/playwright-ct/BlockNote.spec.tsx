@@ -154,6 +154,27 @@ test("A disabled editor feature leaves BlockNote's default slash menu item", asy
   await expect(page.locator(".bn-suggestion-menu")).toHaveCount(0);
 });
 
+test("The links feature can be disabled", async ({ mount, page }) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[]}
+      options={{ syntax: FULL_SYNTAX, features: { links: false } }}
+    />,
+  );
+
+  await component.locator(".bn-editor").press("/");
+
+  const slashMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+  await slashMenuEl.waitFor({ state: "attached" });
+  const menuItems = slashMenuEl.locator(
+    ".bn-suggestion-menu-item p:first-child",
+  );
+  await expect(menuItems.filter({ hasText: /^Table$/ })).toHaveCount(1);
+  await expect(menuItems.filter({ hasText: /^Link$/ })).toHaveCount(0);
+});
+
 test("Macros can be inserted with the macro editor", async ({
   mount,
   page,

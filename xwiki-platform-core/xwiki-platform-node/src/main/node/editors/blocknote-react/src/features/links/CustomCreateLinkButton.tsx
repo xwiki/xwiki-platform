@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { insertLink, useLinkEditing } from "./linkEditor";
+import { useLinkEditing } from "./linkEditing";
 import { EditorInstanceContext } from "../../contexts";
 import { selectionHasInlineContent } from "../../selection";
+import { insertLink } from "../../services/linkEditor";
 import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
 import { useContext } from "react";

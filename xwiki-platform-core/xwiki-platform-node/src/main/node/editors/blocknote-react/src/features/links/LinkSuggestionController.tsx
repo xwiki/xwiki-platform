@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { insertLink, useLinkEditing } from "./linkEditor";
+import { useLinkEditing } from "./linkEditing";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
-import { suggestedLinkData } from "./suggestedLink";
 import { EditorInstanceContext } from "../../contexts";
 import { canUploadFiles } from "../../files/fileUploader";
 import { pickAndUploadFile, uploadedFileLink } from "../../files/uploadedFile";
+import { suggestedLinkData } from "../../misc/suggestedLink";
+import { insertLink } from "../../services/linkEditor";
 import { SuggestionMenuController } from "@blocknote/react";
 import {
   debounceAsync,
@@ -37,8 +38,8 @@ import {
   RiLink,
   RiUpload2Line,
 } from "react-icons/ri";
-import type { LinkEditionData } from "./linkEditor";
-import type { SuggestedLink } from "./suggestedLink";
+import type { SuggestedLink } from "../../misc/suggestedLink";
+import type { LinkEditionData } from "../../services/linkEditor";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   Link,

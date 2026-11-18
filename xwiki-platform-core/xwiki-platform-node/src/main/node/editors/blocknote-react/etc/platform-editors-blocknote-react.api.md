@@ -116,6 +116,7 @@ export const editorFeatureName = "EditorFeature";
 // @beta
 export interface EditorFeatures {
     images?: false;
+    links?: object | false;
     macros?: MacroFeatureOptions | false;
 }
 
@@ -287,6 +288,9 @@ export interface LinkMetadataHandler {
 
 // @beta
 export const linkMetadataHandlerName = "LinkMetadataHandler";
+
+// @beta
+export const linksFeature: EditorFeature;
 
 // @beta
 export const MACRO_NAME_PREFIX = "Macro_";

@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { getEditedLink, updateLink, useLinkEditing } from "./linkEditor";
+import { useLinkEditing } from "./linkEditing";
 import { EditorInstanceContext } from "../../contexts";
+import { getEditedLink, updateLink } from "../../services/linkEditor";
 import { LinkToolbarExtension } from "@blocknote/core/extensions";
 import { useComponentsContext, useExtension } from "@blocknote/react";
 import { useContext } from "react";
@@ -28,7 +29,7 @@ import {
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
-import type { LinkEditionData } from "./linkEditor";
+import type { LinkEditionData } from "../../services/linkEditor";
 import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {

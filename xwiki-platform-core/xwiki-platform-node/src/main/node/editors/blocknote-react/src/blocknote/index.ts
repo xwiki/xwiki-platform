@@ -29,7 +29,6 @@ import {
   XWikiParametersStyle,
 } from "./styles";
 import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
-import { openLinkSuggestionMenu } from "../components/links/linkSuggestionMenu";
 import { XWikiCodeBlock } from "../features/codeBlocks/codeBlockSpec";
 import { XWikiImageBlock } from "../features/images/imageBlockSpec";
 import translations from "../translations";
@@ -46,7 +45,7 @@ import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { createElement } from "react";
-import { RiFileList3Fill, RiLink } from "react-icons/ri";
+import { RiFileList3Fill } from "react-icons/ri";
 import type { SlashMenuItem } from "../features/editorFeature";
 import type { MacroEditing } from "./macroEditor";
 import type { BlockNoteConcreteMacro } from "./utils";
@@ -250,22 +249,6 @@ function querySuggestionsMenuItems({
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
 
-  // A single generic "Link" entry that opens the link suggestion menu, which suggests pages and attachments to link to,
-  // in addition to uploading a file to link to and opening the link editor. Only enabled if the syntax supports it
-  const genericLinkItem: DefaultReactSuggestionItem[] = inlineSupport.links
-    .basicLinks
-    ? [
-        {
-          title: t("blocknote.slashMenu.link.title"),
-          subtext: t("blocknote.slashMenu.link.subtext"),
-          aliases: ["link"],
-          group: t("blocknote.slashMenu.link.group"),
-          icon: createElement(RiLink),
-          onItemClick: () => openLinkSuggestionMenu(editor),
-        },
-      ]
-    : [];
-
   // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
   // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).
   const genericMacroItem: DefaultReactSuggestionItem[] =
@@ -323,7 +306,6 @@ function querySuggestionsMenuItems({
           )
         : [],
 
-      genericLinkItem,
       genericMacroItem,
       additionalItems,
     ),

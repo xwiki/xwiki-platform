@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
 import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
 import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
@@ -195,9 +194,6 @@ const getDefaultFormattingToolbarItems = (
     <ColorStyleButton key={"colorStyleButton"} />,
     <NestBlockButton key={"nestBlockButton"} />,
     <UnnestBlockButton key={"unnestBlockButton"} />,
-    // This button has the exact same appearance as the default creation link button, but opens the link editor (and
-    // is hidden when there's none).
-    <CustomCreateLinkButton key={"createLinkButton"} />,
     ...featureItems,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,

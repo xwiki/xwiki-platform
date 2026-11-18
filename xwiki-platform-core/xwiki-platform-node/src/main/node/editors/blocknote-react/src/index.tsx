@@ -108,6 +108,8 @@ export { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
 
 export { imagesFeature } from "./features/images/images";
 
+export { linksFeature } from "./features/links/links";
+
 export { editorFeatureName } from "./features/editorFeature";
 
 export type {
@@ -148,13 +150,10 @@ export type {
   MacroInsertionEditorPrefillData,
 } from "./blocknote/utils";
 
-export {
-  linkEditorName,
-  linkMetadataHandlerName,
-} from "./components/links/linkEditor";
+export { linkEditorName, linkMetadataHandlerName } from "./services/linkEditor";
 
 export type {
   LinkEditionData,
   LinkEditor,
   LinkMetadataHandler,
-} from "./components/links/linkEditor";
+} from "./services/linkEditor";

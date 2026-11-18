@@ -40,7 +40,7 @@ export { EditorType }
 // @beta
 export type HeadlessEditorOptions = Omit<EditorOptions, "features"> & {
     features?: EditorFeatures & {
-        links?: HeadlessLinkFeatureOptions;
+        links?: HeadlessLinkFeatureOptions | false;
     };
 };
 

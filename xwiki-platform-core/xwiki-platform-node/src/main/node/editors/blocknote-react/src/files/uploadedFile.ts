@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { canUploadFiles, uploadFile } from "./fileUploader";
-import { suggestedLinkData } from "../components/links/suggestedLink";
 import { pickFile } from "../misc/filePicker";
 import { toResourceReference } from "../misc/resourceReference";
+import { suggestedLinkData } from "../misc/suggestedLink";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
-import type { LinkEditionData } from "../components/links/linkEditor";
 import type { EditorInstance } from "../editorInstance";
+import type { LinkEditionData } from "../services/linkEditor";
 import type { UploadedFile } from "./fileUploader";
 import type {
   ResourceReference,

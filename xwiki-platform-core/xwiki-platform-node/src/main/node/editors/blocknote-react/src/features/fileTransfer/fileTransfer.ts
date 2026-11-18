@@ -19,15 +19,15 @@
  */
 import { moveCaretTo } from "./caret";
 import { withUniqueName } from "./uniqueFileName";
-import { getLinkMetadataHandler } from "../../components/links/linkEditor";
 import { canUploadFiles, uploadFile } from "../../files/fileUploader";
 import { uploadedFileLink, uploadedImage } from "../../files/uploadedFile";
 import { updateImage } from "../../services/imageEditor";
+import { getLinkMetadataHandler } from "../../services/linkEditor";
 import { createExtension, createStore } from "@blocknote/core";
 import type { EditorPartialLink } from "../../blocknote";
-import type { LinkEditionData } from "../../components/links/linkEditor";
 import type { EditorInstance } from "../../editorInstance";
 import type { UploadedFile } from "../../files/fileUploader";
+import type { LinkEditionData } from "../../services/linkEditor";
 import type {
   EditorFeature,
   FeatureContext,

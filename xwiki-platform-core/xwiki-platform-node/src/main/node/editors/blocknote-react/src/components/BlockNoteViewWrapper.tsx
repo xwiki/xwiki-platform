@@ -20,8 +20,6 @@
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
 import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
-import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
-import { LinkSuggestionController } from "./links/LinkSuggestionController";
 import {
   createBlockNoteSchema,
   createDictionary,
@@ -39,9 +37,7 @@ import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import "./BlockNoteViewWrapper.css";
 import {
-  FormattingToolbar,
   FormattingToolbarController,
-  LinkToolbarController,
   SideMenuController,
   SuggestionMenuController,
   useCreateBlockNote,
@@ -326,13 +322,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           }
         />
 
-        {syntax.features.inlineContents.links.basicLinks && (
-          <LinkSuggestionController
-            maxSuggestions={8}
-            pageSuggestionsShare={5}
-          />
-        )}
-
         {/* TODO: suggestions menu for inline macros */}
 
         <FormattingToolbarController
@@ -349,14 +338,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               featureItems={contributions.formattingToolbar.items}
               blockToolbars={contributions.formattingToolbar.blockToolbars}
             />
-          )}
-        />
-
-        <LinkToolbarController
-          linkToolbar={(props) => (
-            <FormattingToolbar>
-              <CustomLinkToolbar linkToolbarProps={props} />
-            </FormattingToolbar>
           )}
         />
 

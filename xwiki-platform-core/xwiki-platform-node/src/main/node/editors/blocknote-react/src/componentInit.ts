@@ -21,6 +21,7 @@ import { codeBlocksFeature } from "./features/codeBlocks/codeBlocks";
 import { editorFeatureName } from "./features/editorFeature";
 import { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
 import { imagesFeature } from "./features/images/images";
+import { linksFeature } from "./features/links/links";
 import type { EditorFeature } from "./features/editorFeature";
 import type { Container } from "inversify";
 
@@ -40,6 +41,7 @@ export class ComponentInit {
       fileTransferFeature,
       codeBlocksFeature,
       imagesFeature,
+      linksFeature,
     ]) {
       container.bind<EditorFeature>(editorFeatureName).toConstantValue(feature);
     }

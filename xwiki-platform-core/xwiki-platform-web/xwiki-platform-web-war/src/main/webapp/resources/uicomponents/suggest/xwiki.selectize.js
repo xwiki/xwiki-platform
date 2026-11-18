@@ -299,8 +299,9 @@ define('xwiki-selectize', [
         // Select a known value without triggering a change event.
         selectize.addItem(value, true);
       } else {
-        // Select unknown value.
-        selectize.createItem(value);
+        // Select an unknown value without triggering a change event, even when creating options is disabled.
+        selectize.addOption({[selectize.settings.valueField]: value, [selectize.settings.labelField]: value});
+        selectize.addItem(value, true);
       }
     });
     loadSelectedValues(input);
@@ -315,6 +316,10 @@ define('xwiki-selectize', [
     const hadTabIndex = input.hasAttribute('tabindex');
     const originalTabIndex = input.getAttribute('tabindex');
 
+    // Tom Select drops the initial values of a text input that have no option when the settings have their own options,
+    // and splits the initial value even when multiple selection is disabled. Save it to select it again afterwards.
+    // A select keeps its value in its options, which Tom Select doesn't drop.
+    const initialValue = input.tagName === 'SELECT' ? null : input.value;
     const tomSelect = new TomSelect(input, getSettings($(input), settings));
 
     // Tom Select sets input.tabIndex (see above) AFTER firing its own 'destroy' event, so a 'destroy' listener runs
@@ -379,7 +384,15 @@ define('xwiki-selectize', [
 
     customize(input);
 
-    loadSelectedValues(input);
+    if (initialValue !== null) {
+      input.value = initialValue;
+    }
+    if (isSelectizeValueUpToDate(input)) {
+      loadSelectedValues(input);
+    } else {
+      // Also loads the labels of the selected values.
+      updateSelectizeValue(input);
+    }
   }
 
   $.fn.xwikiSelectize = function(settings) {

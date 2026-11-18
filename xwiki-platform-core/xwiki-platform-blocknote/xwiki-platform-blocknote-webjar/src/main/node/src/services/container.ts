@@ -36,6 +36,7 @@ import { ComponentInit as BackendXWikiComponentList } from "@xwiki/platform-back
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as DocumentXWikiComponentList } from "@xwiki/platform-document-xwiki";
+import { ComponentInit as BlockNoteReactComponentInit } from "@xwiki/platform-editors-blocknote-react";
 import { ComponentInit as LinkSuggestComponentList } from "@xwiki/platform-link-suggest-api";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as LinkTypeComponentInit } from "@xwiki/platform-link-type-api";
@@ -81,6 +82,9 @@ new LinkSuggestXWikiComponentList(container);
 new LinkTypeComponentInit(container);
 new LinkTypeDefaultComponentInit(container);
 new LinkTypeUIComponentInit(container);
+
+// The generic editing features of the BlockNote editor.
+new BlockNoteReactComponentInit(container);
 
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);

@@ -81,6 +81,11 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 export function canUploadFiles(instance: Pick<EditorInstance, "options" | "serviceContainer">): boolean;
 
 // @beta
+export class ComponentInit {
+    constructor(container: Container);
+}
+
+// @beta
 export type ContributedBlockNoteOptions = Partial<Pick<BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>, "uploadFile">>;
 
 // @beta

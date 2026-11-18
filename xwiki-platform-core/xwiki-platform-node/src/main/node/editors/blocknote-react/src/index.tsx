@@ -100,6 +100,8 @@ export type {
   UploadedFile,
 } from "./files/fileUploader";
 
+export { ComponentInit } from "./componentInit";
+
 export { editorFeatureName } from "./features/editorFeature";
 
 export type {

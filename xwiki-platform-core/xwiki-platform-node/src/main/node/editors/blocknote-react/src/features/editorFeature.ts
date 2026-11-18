@@ -37,8 +37,8 @@ import type { Container } from "inversify";
 import type { ReactElement, ReactNode } from "react";
 
 /**
- * The name under which the {@link EditorFeature}s are bound in the service container, in addition to the features
- * built into the editor.
+ * The name under which the {@link EditorFeature}s are bound in the service container. The editor has no feature of its
+ * own: the generic features are bound by the `ComponentInit` of this package, which the integrations call.
  *
  * @since 18.10.0RC1
  * @beta
@@ -146,8 +146,10 @@ type FeatureContribution = {
 
 /**
  * Something the user can do while editing (e.g. create a link to a wiki page, upload a file, insert a macro call). The
- * editor doesn't know about the features: it applies what they contribute. Besides the features built into the
- * editor, any number of features can be bound in the service container (see {@link editorFeatureName}).
+ * editor doesn't know about the features: it applies what they contribute. The features are bound in the service
+ * container (see {@link editorFeatureName}), either for all the editor instances, or in the service container of an
+ * editor instance, for that editor instance only. The features bound for the editor instance contribute first, then
+ * the shared ones, each in the order they are bound in.
  *
  * @since 18.10.0RC1
  * @beta
@@ -247,44 +249,29 @@ function mergeContributions(
 
 /**
  * @param serviceContainer - the service container of the editor instance
- * @param builtInFeatures - the features built into the editor
- * @returns the features built into the editor, followed by the ones bound in the service container
+ * @returns the features bound in the given service container: the ones bound for the editor instance, then the ones
+ *   bound for all the editor instances (in the parent containers)
  */
-function getEditorFeatures(
-  serviceContainer: Container,
-  builtInFeatures: EditorFeature[],
-): EditorFeature[] {
-  return [
-    ...builtInFeatures,
-    // Chained, so that the features bound for all the editor instances are found, as well as the ones bound for this
-    // editor instance.
-    ...(serviceContainer.isBound(editorFeatureName)
-      ? serviceContainer.getAll<EditorFeature>(editorFeatureName, {
-          chained: true,
-        })
-      : []),
-  ];
+function getEditorFeatures(serviceContainer: Container): EditorFeature[] {
+  return serviceContainer.isBound(editorFeatureName)
+    ? serviceContainer.getAll<EditorFeature>(editorFeatureName, {
+        chained: true,
+      })
+    : [];
 }
 
 /**
  * Asks the enabled editing features for their contributions to an editor instance, and merges them.
  *
  * @param context - the editor instance the features contribute to
- * @param builtInFeatures - the features built into the editor
  * @returns the merged contributions
  */
-function contributeFeatures(
-  context: FeatureContext,
-  builtInFeatures: EditorFeature[],
-): MergedContributions {
+function contributeFeatures(context: FeatureContext): MergedContributions {
   const featureOptions = context.options.features as
     | Record<string, unknown>
     | undefined;
   const contributions: FeatureContribution[] = [];
-  for (const feature of getEditorFeatures(
-    context.serviceContainer,
-    builtInFeatures,
-  )) {
+  for (const feature of getEditorFeatures(context.serviceContainer)) {
     if (featureOptions?.[feature.id] === false) {
       continue;
     }

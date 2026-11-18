@@ -72,40 +72,42 @@ describe("contributeFeatures", () => {
     vi.restoreAllMocks();
   });
 
-  test("merges the contributions of the built-in features, then of the bound ones", () => {
+  test("merges the contributions of the bound features, in the order they are found", () => {
     const merged = contributeFeatures(
       context([
-        feature("bound", {
-          slashMenuItems: () => [{ title: "bound", onItemClick: () => {} }],
+        feature("first", {
+          slashMenuItems: () => [{ title: "first", onItemClick: () => {} }],
+          components: "first component",
+        }),
+        feature("second", {
+          slashMenuItems: () => [{ title: "second", onItemClick: () => {} }],
           formattingToolbar: { blockTypeSelectItems: [] },
-          components: "bound component",
+          components: "second component",
         }),
       ]),
-      [
-        feature("builtIn", {
-          slashMenuItems: () => [{ title: "builtIn", onItemClick: () => {} }],
-          components: "built-in component",
-        }),
-      ],
     );
 
     expect(merged.slashMenuItems().map(({ title }) => title)).toEqual([
-      "builtIn",
-      "bound",
+      "first",
+      "second",
     ]);
-    expect(merged.components).toEqual([
-      "built-in component",
-      "bound component",
-    ]);
+    expect(merged.components).toEqual(["first component", "second component"]);
+  });
+
+  test("contributes nothing when no feature is bound", () => {
+    const merged = contributeFeatures(context());
+
+    expect(merged.slashMenuItems()).toEqual([]);
+    expect(merged.components).toEqual([]);
   });
 
   test("passes the context of the editor instance to the features", () => {
-    const builtIn = feature("builtIn");
-    const editorContext = context();
+    const bound = feature("bound");
+    const editorContext = context([bound]);
 
-    contributeFeatures(editorContext, [builtIn]);
+    contributeFeatures(editorContext);
 
-    expect(builtIn.contribute).toHaveBeenCalledWith(editorContext);
+    expect(bound.contribute).toHaveBeenCalledWith(editorContext);
   });
 
   test("doesn't ask a disabled feature for its contribution", () => {
@@ -113,8 +115,7 @@ describe("contributeFeatures", () => {
     const enabled = feature("enabled", { components: "enabled" });
 
     const merged = contributeFeatures(
-      context([], { disabled: false, enabled: {} }),
-      [disabled, enabled],
+      context([disabled, enabled], { disabled: false, enabled: {} }),
     );
 
     expect(disabled.contribute).not.toHaveBeenCalled();
@@ -132,10 +133,9 @@ describe("contributeFeatures", () => {
       },
     };
 
-    const merged = contributeFeatures(context(), [
-      failing,
-      feature("other", { components: "other" }),
-    ]);
+    const merged = contributeFeatures(
+      context([failing, feature("other", { components: "other" })]),
+    );
 
     expect(merged.components).toEqual(["other"]);
     expect(consoleError).toHaveBeenCalledWith(
@@ -151,16 +151,18 @@ describe("contributeFeatures", () => {
     const firstUpload = vi.fn();
     const firstToolbar = vi.fn();
 
-    const merged = contributeFeatures(context(), [
-      feature("first", {
-        blockNoteOptions: { uploadFile: firstUpload },
-        formattingToolbar: { blockToolbars: { image: firstToolbar } },
-      }),
-      feature("second", {
-        blockNoteOptions: { uploadFile: vi.fn() },
-        formattingToolbar: { blockToolbars: { image: vi.fn() } },
-      }),
-    ]);
+    const merged = contributeFeatures(
+      context([
+        feature("first", {
+          blockNoteOptions: { uploadFile: firstUpload },
+          formattingToolbar: { blockToolbars: { image: firstToolbar } },
+        }),
+        feature("second", {
+          blockNoteOptions: { uploadFile: vi.fn() },
+          formattingToolbar: { blockToolbars: { image: vi.fn() } },
+        }),
+      ]),
+    );
 
     expect(merged.blockNoteOptions.uploadFile).toBe(firstUpload);
     expect(merged.formattingToolbar.blockToolbars.image).toBe(firstToolbar);
@@ -173,7 +175,7 @@ describe("contributeFeatures", () => {
   });
 
   test("merges nothing when the features contribute nothing", () => {
-    const merged = contributeFeatures(context(), [feature("nothing")]);
+    const merged = contributeFeatures(context([feature("nothing")]));
 
     expect(merged.blockNoteExtensions).toEqual([]);
     expect(merged.blockNoteOptions).toEqual({});

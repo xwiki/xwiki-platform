@@ -20,9 +20,11 @@ it, and the existing ones are checked against it.
 
 ### Features
 
-1. **Editing features are decoupled from the editor.** A feature is an `EditorFeature`: either built into the editor,
-   or bound in the service container under `editorFeatureName` (for all the editor instances, or for one of them). The
-   editor collects what the features contribute and applies it; it doesn't name or special-case any feature.
+1. **Editing features are decoupled from the editor.** A feature is an `EditorFeature` bound in the service container
+   under `editorFeatureName`, for all the editor instances or for one of them. The editor has no feature of its own:
+   the generic ones are bound by the `ComponentInit` of this package, which the integrations call (an integration that
+   doesn't gets an editor without them, silently). The editor collects what the features contribute and applies it;
+   it doesn't name or special-case any feature.
    `features.<id>: false` disables a feature, and a feature contributes nothing when the syntax of the edited content
    can't save what it adds.
 2. **A feature contributes, it doesn't patch.** A feature can contribute slash menu items, formatting toolbar items

@@ -34,7 +34,6 @@ import { getMacroEditing } from "../blocknote/macroEditor";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import { EditorInstanceContext } from "../contexts";
 import { contributeFeatures } from "../features/editorFeature";
-import { fileTransferFeature } from "../files/fileTransfer";
 import { createBlockMetadataStore } from "../misc/blockMetadata";
 import { getSyntaxConfig } from "../misc/syntax";
 import { syntaxHighlighter } from "@blocknote/code-block";
@@ -60,7 +59,6 @@ import type { BlockType, EditorSchema, EditorType } from "../blocknote";
 import type { BlockNoteConcreteMacro } from "../blocknote/utils";
 import type { EditorInstance } from "../editorInstance";
 import type { EditorOptions } from "../editorOptions";
-import type { EditorFeature } from "../features/editorFeature";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 
@@ -112,11 +110,6 @@ const SIDE_MENU_FLOATING_OPTIONS = {
     middleware: [centerOnFirstLine()],
   },
 };
-
-/**
- * The editing features built into the editor, which contribute before the ones bound in the service container.
- */
-const BUILT_IN_FEATURES: EditorFeature[] = [fileTransferFeature];
 
 /**
  * BlockNote editor wrapper
@@ -214,16 +207,13 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // The editing features contribute to the editor before it is created, and get the editor instance once it is (from
   // the event handlers they contribute).
   const instanceRef = useRef<EditorInstance>(undefined);
-  const contributions = contributeFeatures(
-    {
-      options,
-      serviceContainer,
-      syntax,
-      t,
-      getInstance: () => instanceRef.current!,
-    },
-    BUILT_IN_FEATURES,
-  );
+  const contributions = contributeFeatures({
+    options,
+    serviceContainer,
+    syntax,
+    t,
+    getInstance: () => instanceRef.current!,
+  });
 
   const editorOptions = {
     ...contributions.blockNoteOptions,

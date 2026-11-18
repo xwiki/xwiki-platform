@@ -26,7 +26,8 @@ import type { Container } from "inversify";
  * Binds the generic editing features in the given service container. The editor has no feature of its own, so an
  * integration that doesn't call this gets an editor without them (e.g. without the handling of the pasted and dropped
  * files), unless it binds its own. The features are bound in the order they contribute in (e.g. to the formatting
- * toolbar).
+ * toolbar). An integration needing only some of them, another order, or its own version of one of them binds the
+ * exported features itself (e.g. `fileTransferFeature`) instead of calling this.
  *
  * @since 18.10.0RC1
  * @beta

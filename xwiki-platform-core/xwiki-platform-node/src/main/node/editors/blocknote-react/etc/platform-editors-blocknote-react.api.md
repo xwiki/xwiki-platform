@@ -187,6 +187,9 @@ export type FeatureContribution = {
 };
 
 // @beta
+export const fileTransferFeature: EditorFeature;
+
+// @beta
 export interface FileUploader {
     upload(instance: EditorInstance, file: File): Promise<UploadedFile>;
 }

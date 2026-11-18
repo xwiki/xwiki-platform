@@ -277,6 +277,9 @@ function updateBlock(
  * The files pasted or dropped in the editor are uploaded with the file uploader: the images are inserted as image
  * blocks, and links to the other files are inserted where the user is. Nothing is contributed when the user can't
  * upload files, so that BlockNote ignores the pasted and dropped files.
+ *
+ * @since 18.10.0RC1
+ * @beta
  */
 const fileTransferFeature: EditorFeature = {
   id: "fileTransfer",

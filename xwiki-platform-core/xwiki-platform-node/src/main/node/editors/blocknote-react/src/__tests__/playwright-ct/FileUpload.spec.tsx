@@ -17,16 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { BlockNoteForTest } from "./BlockNote.story";
-import { FULL_SYNTAX } from "./syntax.mock";
+import { BlockNoteWithFileUploader } from "./FileUpload.story";
 import { expect, test } from "@playwright/experimental-ct-react";
-import type { Page } from "@playwright/test";
+import type { BlockType } from "../../blocknote";
+import type { Locator, Page } from "@playwright/test";
 
 // A 1x1 transparent PNG, small enough to inline.
 const PNG_BASE64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
-const UPLOADED_URL = "/xwiki/bin/download/Space/Page/uploaded.png";
+// The name the browser gives a pasted file is replaced with a generated one: <timestamp>-<random 100..999>.
+const GENERATED_NAME = /^\d+-[1-9]\d\d\.png$/;
 
 // Synthetic events, so BlockNote runs its real file insertion handler. The functional tests drive it the same way.
 async function insertFile(
@@ -74,84 +75,115 @@ function dropFile(
   return insertFile(page, "drop", name, type, base64);
 }
 
-test("A dropped image is uploaded and shown", async ({ mount, page }) => {
-  const component = await mount(
-    <BlockNoteForTest
-      content={[]}
-      options={{
-        upload: { uploadFile: async () => UPLOADED_URL },
-        syntax: FULL_SYNTAX,
-      }}
-    />,
+function pasteFile(
+  page: Page,
+  name: string,
+  type: string,
+  base64: string,
+): Promise<void> {
+  return insertFile(page, "paste", name, type, base64);
+}
+
+function paragraph(text: string): BlockType {
+  return {
+    id: "paragraph",
+    type: "paragraph",
+    props: {
+      backgroundColor: "default",
+      textAlignment: "left",
+      textColor: "default",
+    },
+    content: [{ type: "text", text, styles: {} }],
+    children: [],
+  };
+}
+
+async function getUploadedFiles(page: Page): Promise<string[]> {
+  return JSON.parse(
+    (await page.locator('[data-test="uploadedFiles"]').textContent()) ?? "[]",
   );
+}
+
+/**
+ * Puts the caret at the end of the first paragraph, which the pasted files are inserted at.
+ */
+async function focusEnd(component: Locator, page: Page): Promise<void> {
+  await component.locator("p.bn-inline-content").first().click();
+  await page.keyboard.press("End");
+}
+
+test("A dropped image is uploaded under its name and shown", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(<BlockNoteWithFileUploader content={[]} />);
 
   await dropFile(page, "photo.png", "image/png", PNG_BASE64);
 
-  await expect(component.locator(`img[src="${UPLOADED_URL}"]`)).toBeVisible();
+  await expect(
+    component.locator('img[src="/download/photo.png"]'),
+  ).toBeVisible();
+  expect(await getUploadedFiles(page)).toEqual(["photo.png"]);
 });
 
-test("A pasted image is uploaded and shown", async ({ mount, page }) => {
-  const component = await mount(
-    <BlockNoteForTest
-      content={[]}
-      options={{
-        upload: { uploadFile: async () => UPLOADED_URL },
-        syntax: FULL_SYNTAX,
-      }}
-    />,
-  );
+test("A pasted image is uploaded under a generated name and shown", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(<BlockNoteWithFileUploader content={[]} />);
 
-  await insertFile(page, "paste", "photo.png", "image/png", PNG_BASE64);
+  await pasteFile(page, "image.png", "image/png", PNG_BASE64);
 
-  await expect(component.locator(`img[src="${UPLOADED_URL}"]`)).toBeVisible();
+  await expect(component.locator('img[src^="/download/"]')).toBeVisible();
+  const uploadedFiles = await getUploadedFiles(page);
+  expect(uploadedFiles).toHaveLength(1);
+  expect(uploadedFiles[0]).toMatch(GENERATED_NAME);
 });
 
 test("A failed upload leaves no block behind", async ({ mount, page }) => {
   const component = await mount(
-    <BlockNoteForTest
-      content={[]}
-      options={{
-        upload: {
-          // What the XWiki integration returns on failure: BlockNote doesn't handle a rejection.
-          uploadFile: async () => ({ type: "paragraph", content: [] }),
-        },
-        syntax: FULL_SYNTAX,
-      }}
-    />,
+    <BlockNoteWithFileUploader content={[]} fail />,
   );
 
   await dropFile(page, "photo.png", "image/png", PNG_BASE64);
 
+  await expect(page.locator('[data-test="uploadedFiles"]')).toHaveText(
+    JSON.stringify(["photo.png"]),
+  );
   await expect(component.locator(".bn-file-block-content-wrapper")).toHaveCount(
     0,
   );
   await expect(component.locator("img")).toHaveCount(0);
 });
 
-test("A dropped non-image file can be replaced by a link", async ({
+test("A pasted file that isn't an image is linked where the caret is", async ({
   mount,
   page,
 }) => {
   const component = await mount(
-    <BlockNoteForTest
-      content={[]}
-      options={{
-        upload: {
-          // What the XWiki integration returns for a file it links instead of embedding.
-          uploadFile: async () => ({
-            type: "paragraph",
-            content: [
-              {
-                type: "link",
-                href: "/download/report.pdf",
-                content: "report.pdf",
-              },
-            ],
-          }),
-        },
-        syntax: FULL_SYNTAX,
-      }}
-    />,
+    <BlockNoteWithFileUploader content={[paragraph("Some text")]} />,
+  );
+  await focusEnd(component, page);
+
+  await pasteFile(page, "report.pdf", "application/pdf", PNG_BASE64);
+
+  // The link is inserted in the paragraph holding the caret, rather than in a block of its own.
+  const link = component.locator('p.bn-inline-content a[href^="/download/"]');
+  await expect(link).toBeVisible();
+  await expect(component.locator("p.bn-inline-content").first()).toContainText(
+    "Some text",
+  );
+  await expect(component.locator(".bn-file-block-content-wrapper")).toHaveCount(
+    0,
+  );
+});
+
+test("A dropped file that isn't an image is uploaded under its name and linked", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteWithFileUploader content={[paragraph("Some text")]} />,
   );
 
   await dropFile(page, "report.pdf", "application/pdf", PNG_BASE64);
@@ -162,4 +194,24 @@ test("A dropped non-image file can be replaced by a link", async ({
   await expect(component.locator(".bn-file-block-content-wrapper")).toHaveCount(
     0,
   );
+});
+
+test("The pasted and dropped files are ignored when uploading is disabled", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteWithFileUploader
+      content={[paragraph("Some text")]}
+      upload={false}
+    />,
+  );
+  await focusEnd(component, page);
+
+  await pasteFile(page, "image.png", "image/png", PNG_BASE64);
+  await dropFile(page, "report.pdf", "application/pdf", PNG_BASE64);
+
+  await expect(component.locator("img")).toHaveCount(0);
+  await expect(component.locator("a")).toHaveCount(0);
+  expect(await getUploadedFiles(page)).toEqual([]);
 });

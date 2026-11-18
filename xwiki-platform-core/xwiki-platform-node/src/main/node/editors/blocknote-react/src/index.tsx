@@ -85,8 +85,11 @@ export type {
   EditorFeatures,
   EditorOptions,
   MacroFeatureOptions,
-  UploadOptions,
 } from "./editorOptions";
+
+export { fileUploaderName, getFileUploader } from "./files/fileUploader";
+
+export type { FileUploader, UploadedFile } from "./files/fileUploader";
 
 export {
   imageEditorName,

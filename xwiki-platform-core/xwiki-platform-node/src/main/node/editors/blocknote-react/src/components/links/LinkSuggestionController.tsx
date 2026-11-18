@@ -19,12 +19,10 @@
  */
 import { insertLink, useLinkEditing } from "./linkEditor";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
-import {
-  EditorInstanceContext,
-  SourceDocumentReferenceContext,
-} from "../../contexts";
-import { triggerUserAttachmentUpload } from "../../misc/fileUpload";
-import { toLinkResourceReference } from "../../misc/linkResourceReference";
+import { suggestedLinkData } from "./suggestedLink";
+import { EditorInstanceContext } from "../../contexts";
+import { getFileUploader } from "../../files/fileUploader";
+import { pickAndUploadFile, uploadedFileLink } from "../../files/uploadedFile";
 import { SuggestionMenuController } from "@blocknote/react";
 import {
   debounceAsync,
@@ -40,6 +38,7 @@ import {
   RiUpload2Line,
 } from "react-icons/ri";
 import type { LinkEditionData } from "./linkEditor";
+import type { SuggestedLink } from "./suggestedLink";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   Link,
@@ -53,14 +52,6 @@ import type {
  * @param linkData - the link to insert
  */
 type InsertLink = (linkData: LinkEditionData) => void;
-
-/**
- * A suggested or uploaded page or attachment to link to.
- */
-type SuggestedLink = Pick<Link, "label" | "url" | "type"> & {
-  /** The absolute serialized reference of the page or attachment, when known. */
-  reference?: string;
-};
 
 export type LinkSuggestionControllerProps = {
   /** The maximum number of suggestions shown, pages and attachments together. */
@@ -114,11 +105,16 @@ export function LinkSuggestionController({
                 },
               ]
             : []),
-          {
-            title: t("blocknote.linkSuggestion.upload"),
-            icon: <RiUpload2Line size={18} />,
-            onItemClick: uploadFile,
-          },
+          // Offered only when the user can upload files.
+          ...(uploadFile
+            ? [
+                {
+                  title: t("blocknote.linkSuggestion.upload"),
+                  icon: <RiUpload2Line size={18} />,
+                  onItemClick: uploadFile,
+                },
+              ]
+            : []),
         ];
 
         return [
@@ -166,7 +162,6 @@ export function LinkSuggestionController({
  */
 function useLinkInsertion() {
   const instance = useContext(EditorInstanceContext)!;
-  const { serviceContainer } = instance;
   const linkEditing = useLinkEditing();
 
   const insert: InsertLink = useCallback(
@@ -184,45 +179,26 @@ function useLinkInsertion() {
     [instance, linkEditing, insert],
   );
 
-  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
-
-  // The label of a link to a suggested or uploaded page or attachment is generated from its target (the title of the
-  // page, the name of the attachment), which is the label of the suggestion.
   const insertSuggested = useCallback(
-    (link: SuggestedLink) =>
-      insert({
-        title: link.label,
-        generatedTitle: true,
-        url: link.url,
-        // Without a reference, the link is saved from its URL.
-        reference:
-          link.reference === undefined
-            ? undefined
-            : toLinkResourceReference(
-                serviceContainer,
-                link.reference,
-                link.type,
-                sourceDocumentReference,
-              ),
-      }),
-    [serviceContainer, sourceDocumentReference, insert],
+    (link: SuggestedLink) => insert(suggestedLinkData(instance, link)),
+    [instance, insert],
   );
 
-  const uploadFile = useCallback(async () => {
-    const attachment = await triggerUserAttachmentUpload(
-      serviceContainer,
-      sourceDocumentReference,
-    );
-
-    if (attachment) {
-      insertSuggested({
-        label: attachment.name,
-        url: attachment.url,
-        reference: attachment.reference?.reference,
-        type: LinkType.ATTACHMENT,
-      });
-    }
-  }, [serviceContainer, sourceDocumentReference, insertSuggested]);
+  const uploadFile = useMemo(
+    () =>
+      getFileUploader(instance) &&
+      (async () => {
+        const file = await pickAndUploadFile(
+          instance,
+          undefined,
+          "Failed to upload the selected file.",
+        );
+        if (file) {
+          insert(uploadedFileLink(instance, file));
+        }
+      }),
+    [instance, insert],
+  );
 
   return { insertSuggested, openLinkEditor, uploadFile };
 }

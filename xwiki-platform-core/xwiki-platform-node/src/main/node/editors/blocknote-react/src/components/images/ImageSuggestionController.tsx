@@ -20,11 +20,9 @@
 import { ImageSelector } from "./ImageSelector";
 import { insertImage, useImageEditing } from "./imageEditor";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
-import {
-  EditorInstanceContext,
-  SourceDocumentReferenceContext,
-} from "../../contexts";
-import { triggerUserImageUpload } from "../../misc/fileUpload";
+import { EditorInstanceContext } from "../../contexts";
+import { getFileUploader } from "../../files/fileUploader";
+import { pickAndUploadFile, uploadedImage } from "../../files/uploadedFile";
 import { toResourceReference } from "../../misc/resourceReference";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
@@ -101,11 +99,16 @@ export function ImageSuggestionController({
             icon: <RiFolderImageLine size={18} />,
             onItemClick: openImageSelector,
           },
-          {
-            title: t("blocknote.imageSuggestion.upload"),
-            icon: <RiUpload2Line size={18} />,
-            onItemClick: uploadImage,
-          },
+          // Offered only when the user can upload files.
+          ...(uploadImage
+            ? [
+                {
+                  title: t("blocknote.imageSuggestion.upload"),
+                  icon: <RiUpload2Line size={18} />,
+                  onItemClick: uploadImage,
+                },
+              ]
+            : []),
         ];
 
         return [
@@ -196,23 +199,27 @@ function useImageSelector(insertSelectedImage: InsertImage) {
  */
 function useImageInsertion() {
   const instance = useContext(EditorInstanceContext)!;
-  const { serviceContainer } = instance;
   const insertSelectedImage: InsertImage = useCallback(
     (props, reference) => insertImage(instance, props, reference),
     [instance],
   );
 
-  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
-  const uploadImage = useCallback(async () => {
-    const image = await triggerUserImageUpload(
-      serviceContainer,
-      sourceDocumentReference,
-    );
-
-    if (image) {
-      insertSelectedImage({ url: image.url }, image.reference);
-    }
-  }, [serviceContainer, sourceDocumentReference, insertSelectedImage]);
+  const uploadImage = useMemo(
+    () =>
+      getFileUploader(instance) &&
+      (async () => {
+        const file = await pickAndUploadFile(
+          instance,
+          "image/*",
+          "Failed to upload the selected image.",
+        );
+        if (file) {
+          const { url, reference } = uploadedImage(instance, file);
+          insertSelectedImage({ url }, reference);
+        }
+      }),
+    [instance, insertSelectedImage],
+  );
 
   return { insertSelectedImage, uploadImage };
 }

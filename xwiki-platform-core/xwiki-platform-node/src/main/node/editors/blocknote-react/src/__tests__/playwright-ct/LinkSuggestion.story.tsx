@@ -81,6 +81,8 @@ export type LinkSuggestionForTestProps = {
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
   syntax?: SyntaxConfig;
+  // The upload option of the editor.
+  upload?: boolean;
 };
 
 /**
@@ -143,6 +145,7 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
   noLinkEditor,
   content,
   syntax,
+  upload,
 }) => {
   // The links received by the link metadata handler before being inserted, and the link data the link editor was
   // opened with, rendered so that the tests can assert on them.
@@ -258,6 +261,7 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
           label: "Some Label",
           serviceContainer,
           syntax: (syntax ?? FULL_SYNTAX).id,
+          upload,
         }}
         content={content ?? []}
       />

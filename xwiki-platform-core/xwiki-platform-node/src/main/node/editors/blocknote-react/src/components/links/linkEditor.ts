@@ -297,6 +297,7 @@ function useLinkEditing(): LinkEditing | undefined {
 export {
   getEditedLink,
   getLinkEditing,
+  getLinkMetadataHandler,
   insertLink,
   linkEditorName,
   linkMetadataHandlerName,

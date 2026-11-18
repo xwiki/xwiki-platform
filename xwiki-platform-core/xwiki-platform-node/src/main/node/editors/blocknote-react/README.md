@@ -74,9 +74,6 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| Links, images, macros, code block | wired directly by the editor, which also checks the syntax features | 1, 2 |
-| Paste and drop handling, file upload | in the WebJar, in a stateful per-editor object writing the metadata itself | 5, 9, 13 |
-| Upload buttons of the link and image menus | call the `AttachmentsService` directly, so they ignore the WebJar upload settings | 3 |
-| `moveCaretTo` | framework-agnostic code in `blocknote-headless` | 12 |
+| Links, images, macros, code block | wired directly by the editor, which also checks the syntax features (only the file transfer contributes through `mergeContributions`) | 1, 2 |
 | `lang` option | changes a module-global translation instance | 9, 10 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 5, 10 |

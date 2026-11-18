@@ -121,7 +121,7 @@ export type EditorOptions = {
     autofocus?: boolean;
     appearance?: EditorAppearance;
     collaboration?: Collaboration;
-    upload?: UploadOptions;
+    upload?: boolean;
     metadata?: BlockMetadataStore;
     features?: EditorFeatures;
 };
@@ -145,6 +145,17 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 
 // @beta
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
+
+// @beta
+export interface FileUploader {
+    upload(instance: EditorInstance, file: File): Promise<UploadedFile>;
+}
+
+// @beta
+export const fileUploaderName = "FileUploader";
+
+// @beta
+export function getFileUploader(instance: Pick<EditorInstance, "options" | "serviceContainer">): FileUploader | undefined;
 
 // @beta
 export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
@@ -271,8 +282,10 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
 
 // @beta
-export type UploadOptions = {
-    uploadFile: (file: File, blockId?: string) => Promise<string | Record<string, unknown>>;
+export type UploadedFile = {
+    url: string;
+    name: string;
+    reference?: string;
 };
 
 // (No @packageDocumentation comment for this package)

@@ -17,12 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { imageEditorName } from "@xwiki/platform-editors-blocknote-react";
+import {
+  getFileUploader,
+  imageEditorName,
+} from "@xwiki/platform-editors-blocknote-react";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
-import { AttachmentReference, Model } from "@xwiki/platform-xwiki-model-api";
+import { AttachmentReference } from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 import { Container, inject, injectable } from "inversify";
-import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type {
   EditorInstance,
   ImageEditionData,
@@ -117,8 +119,6 @@ export class DefaultImageEditor implements ImageEditor {
   constructor(
     @inject("ResourceReferenceParser")
     private readonly resourceReferenceParser: ResourceReferenceParser,
-    @inject("StorageProvider")
-    private readonly storageProvider: StorageProvider,
   ) {}
 
   public insert(
@@ -166,7 +166,7 @@ export class DefaultImageEditor implements ImageEditor {
         isHTML5: true,
         isInsert: !image,
         upload: (file, uploadCallback) =>
-          this.upload(file, uploadCallback, documentReference),
+          this.upload(instance, file, uploadCallback, documentReference),
       });
     } catch {
       // The Image Wizard rejects when the user closes it.
@@ -259,31 +259,29 @@ export class DefaultImageEditor implements ImageEditor {
   }
 
   /**
-   * Uploads the given image file as an attachment of the edited document and notifies the Image Wizard about the upload
-   * status.
+   * Uploads the given image file with the file uploader of the editor instance (which attaches it to the edited
+   * document) and notifies the Image Wizard about the upload status.
    *
+   * @param instance - the editor instance where the image is inserted or edited
    * @param file - the image file to upload
    * @param callback - used to notify the Image Wizard about the upload progress
    * @param documentReference - the reference of the edited document
    */
   private async upload(
+    instance: EditorInstance,
     file: File,
     callback: UploadCallback,
     documentReference: XWikiEntityReference,
   ): Promise<void> {
+    const fileUploader = getFileUploader(instance);
+    if (!fileUploader) {
+      // The user can't upload files.
+      callback.onAbort();
+      return;
+    }
     try {
-      const result = await this.storageProvider
-        .get()
-        .saveAttachments(Model.serialize(documentReference), [file]);
-      // The storage identifies the uploaded attachment by its name.
-      const attachmentName = result?.[0]?.reference;
-      if (attachmentName) {
-        callback.onSuccess(
-          new AttachmentReference(attachmentName, documentReference),
-        );
-      } else {
-        callback.onAbort();
-      }
+      const { name } = await fileUploader.upload(instance, file);
+      callback.onSuccess(new AttachmentReference(name, documentReference));
     } catch (error) {
       callback.onError(
         error instanceof Error ? error : new Error(String(error)),

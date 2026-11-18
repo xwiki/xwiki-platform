@@ -28,8 +28,7 @@ import "../../testUtils";
 describe("DefaultImageEditor", () => {
   let capturedOptions;
   let resolvedImageData;
-  let uploadedAttachments;
-  let uploadTarget;
+  let fileUploader;
   let imageEditor;
 
   /**
@@ -38,6 +37,11 @@ describe("DefaultImageEditor", () => {
    */
   function editorInstance(sourceDocumentReference) {
     return {
+      // Provides the file uploader, when there's one.
+      serviceContainer: {
+        isBound: (name) => name === "FileUploader" && !!fileUploader,
+        get: () => fileUploader,
+      },
       options: {
         sourceDocumentReference: sourceDocumentReference
           ? toCristalEntityReference(
@@ -52,8 +56,7 @@ describe("DefaultImageEditor", () => {
     capturedOptions = undefined;
     // The image data submitted by the user, when the test doesn't care about it.
     resolvedImageData = {};
-    uploadedAttachments = [];
-    uploadTarget = undefined;
+    fileUploader = undefined;
 
     // Register a fake legacy image wizard that captures its options and resolves with a chosen image data.
     global.define("xwiki-wysiwyg-image-wizard", () => (options) => {
@@ -91,18 +94,7 @@ describe("DefaultImageEditor", () => {
     const resourceReferenceParser = {
       parse: () => ({ type: "attach", typed: true, reference: "" }),
     };
-    const storageProvider = {
-      get: () => ({
-        saveAttachments: async (page) => {
-          uploadTarget = page;
-          return uploadedAttachments;
-        },
-      }),
-    };
-    imageEditor = new DefaultImageEditor(
-      resourceReferenceParser,
-      storageProvider,
-    );
+    imageEditor = new DefaultImageEditor(resourceReferenceParser);
   });
 
   function edit(image, sourceDocumentReference) {
@@ -261,37 +253,49 @@ describe("DefaultImageEditor", () => {
       return callback;
     }
 
-    it("reports the reference of the uploaded attachment, attached to the current document", async () => {
+    it("uploads the file with the file uploader, and reports the reference of the uploaded attachment, attached to the current document", async () => {
       // The storage identifies the uploaded attachment by its name, which can contain reference separators.
-      uploadedAttachments = [
-        {
-          reference: "cat@home.png",
-          href: "/xwiki/bin/download/Space/Page/cat%40home.png",
-        },
-      ];
+      fileUploader = {
+        upload: vi.fn(async () => ({ url: "catURL", name: "cat@home.png" })),
+      };
 
       const callback = await upload();
 
+      expect(fileUploader.upload).toHaveBeenCalledOnce();
+      expect(fileUploader.upload.mock.calls[0][1].name).toBe("cat.png");
       expect(callback.onSuccess).toHaveBeenCalledOnce();
       expect(Model.serialize(callback.onSuccess.mock.calls[0][0])).toBe(
         "wiki:Space.Page@cat\\@home.png",
       );
     });
 
-    it("uploads to the source document, when specified", async () => {
-      uploadedAttachments = [{ reference: "cat.png" }];
+    it("reports the attachment of the source document, when specified", async () => {
+      fileUploader = {
+        upload: async () => ({ url: "catURL", name: "cat.png" }),
+      };
 
       const callback = await upload("wiki:Other.Page");
 
-      expect(uploadTarget).toBe("wiki:Other.Page");
       expect(Model.serialize(callback.onSuccess.mock.calls[0][0])).toBe(
         "wiki:Other.Page@cat.png",
       );
     });
 
-    it("aborts when the storage doesn't report the uploaded attachment", async () => {
-      uploadedAttachments = [undefined];
+    it("reports the failure of the upload", async () => {
+      const error = new Error("Failed to attach [cat.png].");
+      fileUploader = {
+        upload: async () => {
+          throw error;
+        },
+      };
 
+      const callback = await upload();
+
+      expect(callback.onSuccess).not.toHaveBeenCalled();
+      expect(callback.onError).toHaveBeenCalledWith(error);
+    });
+
+    it("aborts when the user can't upload files", async () => {
       const callback = await upload();
 
       expect(callback.onSuccess).not.toHaveBeenCalled();

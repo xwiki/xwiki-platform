@@ -70,6 +70,8 @@ export type ImageSuggestionForTestProps = {
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
   syntax?: SyntaxConfig;
+  // The upload option of the editor.
+  upload?: boolean;
 };
 
 /**
@@ -91,6 +93,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   imageReferences,
   content,
   syntax,
+  upload,
 }) => {
   // The images selected by the user, as reported to the image metadata handler.
   const [selectedImages, setSelectedImages] = useState<unknown[]>([]);
@@ -222,6 +225,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
                 new DocumentReference(documentReference, new SpaceReference()),
           syntax: (syntax ?? FULL_SYNTAX).id,
           metadata,
+          upload,
         }}
         content={content ?? []}
       />

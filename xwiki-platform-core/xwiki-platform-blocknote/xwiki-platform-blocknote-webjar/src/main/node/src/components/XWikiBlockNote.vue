@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
-  <div class="xwiki-blocknote" ref="root" v-if="!isLoading">
+  <div class="xwiki-blocknote" v-if="!isLoading">
     <suspense>
       <BlocknoteEditor
         v-if="editorContent && editorOptions"
@@ -85,13 +85,10 @@
 </template>
 
 <script setup lang="ts">
+import { uploadListenerName } from "../services/attachments/uploadListener";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
-import { createFileUploader } from "../services/blocknote/createFileUploader";
 import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
-import {
-  ConnectionStatus,
-  collaborationManagerProviderName,
-} from "@xwiki/platform-collaboration-api";
+import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
@@ -108,8 +105,8 @@ import {
   watch,
 } from "vue";
 import type { Logic } from "../services/Logic";
+import type { UploadListener } from "../services/attachments/uploadListener";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
-import type { FileUploader } from "../services/blocknote/createFileUploader";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -215,48 +212,23 @@ const defaultLabel = "Editor";
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
 const temporaryAttachments: Ref<Set<string>> = ref(new Set<string>());
 
-// Created only once the editor is in the DOM, because that is what the uploader listens on. See the watch below.
-let fileUploader: FileUploader | undefined;
-
-// BlockNote asks for an upload only from the editor, which exists just as long as the uploader does.
-const uploadFile = uploadDisabled
-  ? undefined
-  : (file: File, blockId?: string) => fileUploader!.upload(file, blockId);
-
-/**
- * @param eventTarget - where the uploader listens for the paste and drop events that tell it how a file reached the
- *   editor
- * @returns the uploader attaching the pasted and dropped files to the edited document
- */
-function newFileUploader(eventTarget: EventTarget): FileUploader {
-  return createFileUploader(container, {
-    eventTarget,
-    getDocumentReference: () => documentReference,
-    getBlockNoteDocument: () => blockNoteDocument,
-    getEditor: () => editorInstance.value?.getEditor(),
-    // A file in the temporary store is visible only to the session that uploaded it, and only a save made from that
-    // session attaches it to the document. In a realtime session any of the collaborators can be the one that saves,
-    // so we attach the file right away instead, like the CKEditor integration does. The same goes when the editor
-    // has no field name, because then nothing it holds is submitted and the file would never be attached.
-    isTemporaryUpload: () =>
-      !!name &&
-      collaboration.value?.connectionStatus.value !==
-        ConnectionStatus.Connected,
-    registerTemporaryAttachment: (fileName) => {
-      temporaryAttachments.value.add(fileName);
-    },
-    notifyUploadFailed: async (fileName, error) => {
-      console.error(`Failed to upload [${fileName}].`, error);
-      try {
-        const message = await translate("upload.failed", undefined, fileName);
-        XWiki.widgets.Notification.show(message, "error");
-      } catch (notificationError) {
-        // Nobody awaits this callback, so an error here would go unhandled.
-        console.error("Failed to notify the user.", notificationError);
-      }
-    },
-  });
-}
+// The services specific to this editor instance are bound in a child of the shared container.
+const editorContainer = new Container({ parent: container });
+editorContainer.bind<UploadListener>(uploadListenerName).toConstantValue({
+  onTemporaryUpload: (fileName) => {
+    temporaryAttachments.value.add(fileName);
+  },
+  // The editor logs the error itself.
+  onUploadFailed: async (fileName) => {
+    try {
+      const message = await translate("upload.failed", undefined, fileName);
+      XWiki.widgets.Notification.show(message, "error");
+    } catch (notificationError) {
+      // Nobody awaits this callback, so an error here would go unhandled.
+      console.error("Failed to notify the user.", notificationError);
+    }
+  },
+});
 
 // This is passed to the BlockNote editor component.
 // Shallow on purpose: a normal ref would hide the refs inside, leaving connectionStatus.value undefined.
@@ -297,7 +269,7 @@ onBeforeMount(async () => {
 function createEditorOptions(label: string): HeadlessEditorOptions {
   return {
     // The Inversify container used by the editor to get the services and components it needs.
-    serviceContainer: container,
+    serviceContainer: editorContainer,
     // The name of the BlockNote field. It tells apart the BlockNote fields of the same form, and identifies the content
     // they edit within the realtime collaboration session.
     name,
@@ -326,9 +298,9 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
       codeBlockClassName: "box code",
     },
     collaboration: collaboration.value,
-    // Attach to the edited document the files that are pasted or dropped in the content, or uploaded from the file
-    // panel (e.g. of an image block). Note that the upload buttons of the link and image menus don't use this yet.
-    upload: uploadFile && { uploadFile },
+    // Whether the user can attach files to the edited document (by pasting or dropping them, or with the upload
+    // actions).
+    upload: !uploadDisabled,
     // The data that the BlockNote schema can't hold, extracted from the loaded content and put back on save, and the
     // output of the macros, kept outside the edited content (which is shared with the other users when editing in
     // realtime) because it was rendered for the current user.
@@ -368,7 +340,6 @@ async function joinCollaborationSession(): Promise<void> {
 }
 
 onUnmounted(async () => {
-  fileUploader?.dispose();
   // The realtime toolbar is removed and the auto-saver is stopped when the last editor leaves the session.
   try {
     (await formCollaboration)?.leave();
@@ -427,16 +398,6 @@ function getSourceDocument(): XWikiDocument {
 const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
 const editorInstance =
   useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
-const root = useTemplateRef<HTMLElement>("root");
-
-// The editor is rendered only once its content is loaded, so it isn't in the DOM yet when this component is set up.
-// Watching its element rather than creating the uploader on mount also keeps the two in sync if it is ever re-created.
-watch(root, (element) => {
-  fileUploader?.dispose();
-  fileUploader =
-    element && !uploadDisabled ? newFileUploader(element) : undefined;
-});
-
 // Start the auto-save (and show the realtime toolbar) only once the editor is there, because the first client joining
 // a session loads the initial content into the shared document, and that is a local Yjs change: counting it would
 // make the session dirty and trigger an auto-save before anyone typed anything.

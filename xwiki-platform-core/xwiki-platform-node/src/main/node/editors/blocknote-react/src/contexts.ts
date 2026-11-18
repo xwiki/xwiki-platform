@@ -25,12 +25,4 @@ import type { EditorInstance } from "./editorInstance";
  */
 const EditorInstanceContext = createContext<EditorInstance | null>(null);
 
-/**
- * The serialized reference of the source document (holding the edited content), when specified. The current document
- * is used otherwise.
- */
-const SourceDocumentReferenceContext = createContext<string | undefined>(
-  undefined,
-);
-
-export { EditorInstanceContext, SourceDocumentReferenceContext };
+export { EditorInstanceContext };

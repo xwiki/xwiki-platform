@@ -445,6 +445,25 @@ test("A failed search for one kind of links still shows the other kind, and the 
   ]);
 });
 
+test("The link quick action doesn't offer the upload action when uploading is disabled", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <LinkSuggestionForTest
+      linkSuggestServiceUnavailable={true}
+      upload={false}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openLinkQuickAction(page, editorEl);
+
+  // Only the link editor action is offered.
+  const items = page.locator(".bn-suggestion-menu-item");
+  await expect(items).toHaveText([LINK_TO]);
+});
+
 test("Only shows the actions when the backend doesn't support search", async ({
   mount,
   page,

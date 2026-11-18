@@ -281,6 +281,32 @@ test("Only shows the browse and upload actions when the backend doesn't support 
   await expect(menuEl.locator(".bn-suggestion-menu-label")).toHaveCount(0);
 });
 
+test("Neither the image quick action nor the image selector offer to upload when uploading is disabled", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      linkSuggestServiceUnavailable={true}
+      upload={false}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openImageQuickAction(page, editorEl);
+
+  // Only the browse action is offered.
+  const items = page.locator(".bn-suggestion-menu-item");
+  await expect(items).toHaveText(["blocknote.imageSuggestion.browse"]);
+
+  // The image selector it opens has no upload button either.
+  await items.first().click();
+  await expect(page.locator('[data-test="searchBoxInput"]')).toBeVisible();
+  await expect(
+    page.getByText("blocknote.imageSelector.uploadButton"),
+  ).not.toBeAttached();
+});
+
 test("Still shows the browse and upload actions when searching for images fails", async ({
   mount,
   page,

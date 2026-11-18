@@ -17,11 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  EditorInstanceContext,
-  SourceDocumentReferenceContext,
-} from "../../contexts";
-import { triggerUserImageUpload } from "../../misc/fileUpload";
+import { EditorInstanceContext } from "../../contexts";
+import { getFileUploader } from "../../files/fileUploader";
+import { pickAndUploadFile, uploadedImage } from "../../files/uploadedFile";
 import { SearchBox } from "../SearchBox";
 import {
   Box,
@@ -64,7 +62,8 @@ export function ImageSelector({
   currentSelection,
   onSelected,
 }: ImageSelectorProps) {
-  const { serviceContainer } = useContext(EditorInstanceContext)!;
+  const instance = useContext(EditorInstanceContext)!;
+  const { serviceContainer } = instance;
 
   const remoteURLParser = serviceContainer
     .get<RemoteURLParserProvider>("RemoteURLParserProvider")
@@ -128,26 +127,31 @@ export function ImageSelector({
     [linkSuggestService],
   );
 
-  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
-
   const uploadImage = useCallback(async () => {
-    const image = await triggerUserImageUpload(
-      serviceContainer,
-      sourceDocumentReference,
+    const file = await pickAndUploadFile(
+      instance,
+      "image/*",
+      "Failed to upload the selected image.",
     );
 
-    if (image) {
-      onSelected(image.url, image.reference);
+    if (file) {
+      const { url, reference } = uploadedImage(instance, file);
+      onSelected(url, reference);
     }
-  }, [serviceContainer, sourceDocumentReference, onSelected]);
+  }, [instance, onSelected]);
 
   return (
     <Box>
-      <Button variant="default" onClick={uploadImage}>
-        {t("blocknote.imageSelector.uploadButton")}
-      </Button>
+      {/* Offered only when the user can upload files. */}
+      {getFileUploader(instance) && (
+        <>
+          <Button variant="default" onClick={uploadImage}>
+            {t("blocknote.imageSelector.uploadButton")}
+          </Button>
 
-      <Space h="sm" />
+          <Space h="sm" />
+        </>
+      )}
 
       <SearchBox
         placeholder={t("blocknote.imageSelector.placeholder")}

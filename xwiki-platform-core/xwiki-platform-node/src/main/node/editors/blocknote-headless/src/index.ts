@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import BlocknoteEditor from "./vue/c-blocknote-view.vue";
-import { moveCaretTo } from "./vue/caret";
 export type { EditorType } from "@xwiki/platform-editors-blocknote-react";
 export type {
   HeadlessEditorOptions,
@@ -31,4 +30,4 @@ export type {
  */
 const BlocknoteEditorAnnotated = BlocknoteEditor;
 
-export { BlocknoteEditorAnnotated as BlocknoteEditor, moveCaretTo };
+export { BlocknoteEditorAnnotated as BlocknoteEditor };

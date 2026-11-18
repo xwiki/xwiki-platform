@@ -51,26 +51,6 @@ type EditorAppearance = {
 };
 
 /**
- * How the files pasted, dropped or picked in the editor are uploaded.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type UploadOptions = {
-  /**
-   * Uploads the given file.
-   *
-   * @param file - the file to upload
-   * @param blockId - the block the file is uploaded for, when there is one
-   * @returns the URL of the uploaded file, or the (partial) block to replace the uploading block with
-   */
-  uploadFile: (
-    file: File,
-    blockId?: string,
-  ) => Promise<string | Record<string, unknown>>;
-};
-
-/**
  * The options of the macro feature.
  *
  * @since 18.10.0RC1
@@ -184,10 +164,12 @@ type EditorOptions = {
   collaboration?: Collaboration;
 
   /**
-   * How the files are uploaded: used when files are pasted or dropped in the content, and by the upload tab of the
-   * file panel (e.g. of an image block). Uploading is disabled when not specified.
+   * Whether the user can upload files to the source document: by pasting or dropping them in the content, or with the
+   * upload actions (e.g. of the link and image menus). The files are stored with the `FileUploader` bound in the
+   * {@link EditorOptions.serviceContainer}, or with the `AttachmentsService` otherwise. Enabled by default, as long as
+   * there's something to store the files with.
    */
-  upload?: UploadOptions;
+  upload?: boolean;
 
   /**
    * Where to keep the data about the blocks of the edited content that isn't part of the content (e.g. the output of
@@ -208,5 +190,4 @@ export type {
   EditorFeatures,
   EditorOptions,
   MacroFeatureOptions,
-  UploadOptions,
 };

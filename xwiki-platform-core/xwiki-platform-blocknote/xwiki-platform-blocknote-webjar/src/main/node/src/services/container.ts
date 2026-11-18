@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { XWikiFileUploader } from "./attachments/XWikiFileUploader";
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
 import { DefaultLinkMetadataHandler } from "./blocknote/DefaultLinkMetadataHandler";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
@@ -84,6 +85,7 @@ new LinkTypeUIComponentInit(container);
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);
 
+XWikiFileUploader.bind(container);
 DefaultImageEditor.bind(container);
 DefaultImageMetadataHandler.bind(container);
 DefaultLinkMetadataHandler.bind(container);

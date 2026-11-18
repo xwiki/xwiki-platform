@@ -49,12 +49,6 @@ export type HeadlessLinkFeatureOptions = {
     excludedTargetTypes?: string[];
 };
 
-// @beta
-export function moveCaretTo(editor: EditorType, coordinates: {
-    left: number;
-    top: number;
-}): boolean;
-
 // (No @packageDocumentation comment for this package)
 
 ```

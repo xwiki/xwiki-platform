@@ -31,13 +31,13 @@ import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xw
  * schema, mapped to a synthetic id that the link carries in its URL (see `linkId`).
  *
  * @param getBlockNoteDocument - provides the edited BlockNote document, which holds the link metadata
- * @param editedDocumentReference - the reference of the edited document, which the references of the linked pages and
+ * @param sourceDocumentReference - the reference of the source document (holding the edited content), which the references of the linked pages and
  *   attachments are relative to
  * @returns the link edition hooks
  */
 function createLinkEditionHooks(
   getBlockNoteDocument: () => BlockNoteDocument | undefined,
-  editedDocumentReference?: XWikiEntityReference,
+  sourceDocumentReference?: XWikiEntityReference,
 ): LinkEditionHooks {
   return {
     // Runs before the link editor is opened on an existing link. We resolve the metadata of the link and inject it into
@@ -84,7 +84,7 @@ function createLinkEditionHooks(
         metadata.xwikiReference = editedLinkResourceReference(
           metadata.xwikiReference as ResourceReference | undefined,
           linkData.reference,
-          editedDocumentReference,
+          sourceDocumentReference,
         );
       }
       // A generated label is not saved, so that it's generated again (server-side) from the link target. A label

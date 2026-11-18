@@ -21,7 +21,7 @@ import { createContext } from "react";
 import type { ContextForMacros } from "./blocknote/utils";
 import type { Container } from "inversify";
 
-const DepsContainerContext = createContext<Container | null>(null);
+const ServiceContainerContext = createContext<Container | null>(null);
 
 /**
  * The macro context (insert / edit callbacks) made available to the server-rendered macro specs so they can wire
@@ -30,8 +30,15 @@ const DepsContainerContext = createContext<Container | null>(null);
 const MacrosContext = createContext<ContextForMacros | null>(null);
 
 /**
- * The serialized reference of the edited document, when specified. The current document is edited otherwise.
+ * The serialized reference of the source document (holding the edited content), when specified. The current document
+ * is used otherwise.
  */
-const EditedDocumentContext = createContext<string | undefined>(undefined);
+const SourceDocumentReferenceContext = createContext<string | undefined>(
+  undefined,
+);
 
-export { DepsContainerContext, EditedDocumentContext, MacrosContext };
+export {
+  MacrosContext,
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
+};

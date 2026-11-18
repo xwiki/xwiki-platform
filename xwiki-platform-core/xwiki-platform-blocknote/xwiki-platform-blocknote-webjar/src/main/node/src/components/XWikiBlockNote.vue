@@ -21,15 +21,10 @@
   <div class="xwiki-blocknote" ref="root" v-if="!isLoading">
     <suspense>
       <BlocknoteEditor
-        v-if="editorContent"
+        v-if="editorContent && editorOptions"
         ref="editor"
-        :editor-props
-        :editor-content
-        :deps-container="container"
-        :excluded-link-target-types="excludedLinkTargetTypes"
-        :link-context
-        :macros
-        :collaboration
+        :options="editorOptions"
+        :content="editorContent"
         @instant-change="dirty = true"
         @debounced-change="updateValue"
         @local-instant-change="onLocalInstantChange"
@@ -126,15 +121,15 @@ import type {
   CollaborationManagerProvider,
 } from "@xwiki/platform-collaboration-api";
 import type { FormCollaboration } from "@xwiki/platform-collaboration-xwiki";
+import type { HeadlessEditorOptions } from "@xwiki/platform-editors-blocknote-headless";
 import type {
-  BlockNoteViewWrapperProps,
   BlockType,
   EditorLanguage,
   ImageEditionHooks,
   ImageEditionOverrideFn,
   ImageInsertionOverrideFn,
+  MacroFeatureOptions,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
@@ -211,7 +206,7 @@ const {
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
-const editedDocumentReference =
+const sourceDocumentReference =
   Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined;
 
 //
@@ -225,6 +220,10 @@ let blockNoteDocument: BlockNoteDocument | undefined;
 
 // This is passed to the BlockNote editor component.
 const editorContent = ref();
+
+// The configuration of the BlockNote editor instance, set once the editor is ready to be created (e.g. once the
+// realtime collaboration session is joined). Shallow on purpose: the collaboration session it holds must stay raw.
+const editorOptions = shallowRef<HeadlessEditorOptions>();
 
 const defaultLabel = "Editor";
 
@@ -247,7 +246,7 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
       },
       cancel: () => update({ type: "aborted" }),
     },
-    { documentReference: editedDocumentReference },
+    { documentReference: sourceDocumentReference },
   );
 };
 
@@ -261,7 +260,7 @@ const imageInsertion: ImageInsertionOverrideFn = (insert) => {
         insert({ type: "insert", props, reference }),
       cancel: () => insert({ type: "aborted" }),
     },
-    { documentReference: editedDocumentReference },
+    { documentReference: sourceDocumentReference },
   );
 };
 
@@ -274,10 +273,10 @@ const imageEditionHooks: ImageEditionHooks = {
     const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
     if (reference?.type === "attach") {
       metadata!.xwikiReference = {
-        ...(editedDocumentReference
+        ...(sourceDocumentReference
           ? toRelativeAttachmentResourceReference(
               reference,
-              editedDocumentReference,
+              sourceDocumentReference,
             )
           : reference),
         // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
@@ -292,22 +291,9 @@ const imageEditionHooks: ImageEditionHooks = {
   },
 };
 
-// The link modal resolves the references of the linked pages and attachments against the edited document, and saves them
-// relative to it, like the image references and like the WYSIWYG editors do, so that the links keep working when the
-// edited document is renamed or copied.
-const linkContext: LinkContext = {
-  sourceDocument: toCristalEntityReference(editedDocumentReference) as
-    | DocumentReference
-    | undefined,
-};
-
-// Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new links, to
-// keep the link type selector short. Existing path and UNC path links are still edited with their own link type.
-const excludedLinkTargetTypes = ["path", "unc"];
-
 const linkEdition = createLinkEditionHooks(
   () => blockNoteDocument,
-  editedDocumentReference,
+  sourceDocumentReference,
 );
 
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
@@ -380,35 +366,6 @@ if (!syntax) {
 }
 
 // This is passed to the BlockNote editor component.
-const editorProps = shallowRef<
-  InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
->({
-  blockNoteOptions: {
-    // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
-    // consistency between edit and view modes.
-    defaultStyles: false,
-    uploadFile,
-    // Put the caret at the start of the content when the editor is focused on creation.
-    autofocus:
-      startupFocus === true || startupFocus === "true" ? "start" : false,
-  },
-  theme: "light",
-  lang: (actualLocale || "en") as EditorLanguage,
-  // The images uploaded from the editor are attached to the edited document.
-  documentReference,
-  // Style the code blocks like the code macro output in view mode.
-  codeBlockClassName: "box code",
-  label: defaultLabel,
-  overrides: {
-    imageEdition,
-    imageEditionHooks,
-    imageInsertion,
-    linkEdition,
-  },
-  syntax,
-});
-
-// This is passed to the BlockNote editor component.
 // Shallow on purpose: a normal ref would hide the refs inside, leaving connectionStatus.value undefined.
 const collaboration = shallowRef<Collaboration | undefined>(undefined);
 // Set as soon as we start joining, so that we can leave even if the editor is unmounted before the join completes.
@@ -421,7 +378,7 @@ onBeforeMount(async () => {
   blockNoteDocument = blockNoteProcessor.load(initialValue);
   editorContent.value = blockNoteDocument.content;
 
-  editorProps.value.label = await translate("editor.label", defaultLabel);
+  const label = await translate("editor.label", defaultLabel);
 
   if (collaborationURL && documentReference) {
     try {
@@ -436,8 +393,66 @@ onBeforeMount(async () => {
     }
   }
 
+  editorOptions.value = createEditorOptions(label);
   isLoading.value = false;
 });
+
+/**
+ * @param label - the accessible label of the editor
+ * @returns the configuration of the BlockNote editor instance
+ */
+function createEditorOptions(label: string): HeadlessEditorOptions {
+  return {
+    // The Inversify container used by the editor to get the services and components it needs.
+    serviceContainer: container,
+    // The name of the BlockNote field. It tells apart the BlockNote fields of the same form, and identifies the content
+    // they edit within the realtime collaboration session.
+    name,
+    // The images and the links are saved relative to the edited document, so that they keep working when the edited
+    // document is renamed or copied. The pasted and dropped files are attached to it.
+    sourceDocumentReference: toCristalEntityReference(
+      sourceDocumentReference,
+    ) as DocumentReference | undefined,
+    // The syntax of the edited content, which is normally the syntax of the source document. The editor offers only
+    // what this syntax supports, so that the edited content can be saved without losing anything.
+    syntax: syntax!,
+    // Translate the editor UI (menus, toolbars, placeholders) in the same language as the rest of the page.
+    lang: (actualLocale || "en") as EditorLanguage,
+    // The accessible name of the editing area, announced by the screen readers to tell which field is being edited.
+    label,
+    // Put the caret at the start of the content when the editor is focused on creation.
+    autofocus: startupFocus === true || startupFocus === "true",
+    appearance: {
+      // BlockNote follows by default the light or dark color scheme preferred by the user (as set in the operating
+      // system or the browser), but the editor UI has to match the XWiki skin, which doesn't follow that preference.
+      theme: "light",
+      // We want the edited content to be styled using the XWiki skin / color theme as much as possible, in order to
+      // have consistency between edit and view modes.
+      contentStyles: "host",
+      // Style the code blocks like the code macro output in view mode.
+      codeBlockClassName: "box code",
+    },
+    collaboration: collaboration.value,
+    // Attach to the edited document the files that are pasted or dropped in the content, or uploaded from the file
+    // panel (e.g. of an image block). Note that the upload buttons of the link and image menus don't use this yet.
+    upload: uploadFile && { uploadFile },
+    features: {
+      links: {
+        hooks: linkEdition,
+        // Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new
+        // links, to keep the link type selector short. Existing path and UNC path links are still edited with their
+        // own link type.
+        excludedTargetTypes: ["path", "unc"],
+      },
+      images: {
+        edition: imageEdition,
+        insertion: imageInsertion,
+        hooks: imageEditionHooks,
+      },
+      macros,
+    },
+  };
+}
 
 /**
  * Join the realtime collaboration session for the edited XWiki document, using the collaboration server URL.
@@ -453,7 +468,7 @@ async function joinCollaborationSession(): Promise<void> {
       .get<CollaborationManagerProvider>(collaborationManagerProviderName)
       .get(),
     // The collaboration session is identified by the reference and the locale of the edited document.
-    document: getEditedDocument(),
+    document: getSourceDocument(),
     formId: form,
     autoSaveVersionSummary,
   });
@@ -498,10 +513,10 @@ async function translate(
 }
 
 /**
- * @returns the document being edited, which the auto-saver keeps up to date with the versions the other clients
+ * @returns the source document (holding the edited content), which the auto-saver keeps up to date with the versions the other clients
  *   create, so that the next save doesn't run into a merge conflict
  */
-function getEditedDocument(): XWikiDocument {
+function getSourceDocument(): XWikiDocument {
   if (
     Model.serialize(xwikiMeta.documentReference) === documentReference &&
     actualLocale === xwikiMeta.locale
@@ -511,7 +526,7 @@ function getEditedDocument(): XWikiDocument {
     return XWikiDocument.currentDocument(xwikiMeta);
   }
   return new XWikiDocument({
-    documentReference: editedDocumentReference,
+    documentReference: sourceDocumentReference,
     language: actualLocale,
   });
 }
@@ -519,7 +534,7 @@ function getEditedDocument(): XWikiDocument {
 // This is passed to the BlockNote editor component. Macros are inserted / edited directly as the server-rendered
 // xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
 // resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
-const macros: BlockNoteViewWrapperProps["macros"] = {
+const macros: MacroFeatureOptions = {
   ctx: {
     // The macro output is kept outside the edited content (which is shared with the other users when editing in
     // realtime) because it was rendered for the current user.

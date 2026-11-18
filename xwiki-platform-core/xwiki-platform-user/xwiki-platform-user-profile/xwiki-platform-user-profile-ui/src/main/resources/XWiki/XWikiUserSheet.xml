@@ -43,50 +43,75 @@
 #set($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
 #set($discard = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
 #########################
-## Setting categories
+## Setting the menu groups
 #########################
-#set($categories = [])
-
-## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
-#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'priority'}))
-  ## We only call this once
-  #set ($uixParameters = $collectiontool.map)
-  #set ($discard = $uixParameters.putAll($uix.parameters))
-  #if(!$uixParameters.containsKey('isActive') || $uixParameters.get('isActive') != 'false')
-    #if (!$uixParameters.containsKey('id'))
-      ## when no id is explicitly provided, we use the id of the UIX.
-      #set ($discard = $uixParameters.put('id', $uix.id))
-    #end
-    #if ($uixParameters.containsKey('icon'))
-      #set ($discard = $uixParameters.put('glyphicon', $uixParameters.get('icon')))
-    #end
-    #set ($discard = $uixParameters.put('uix', $uix))
-    #set($discard = $categories.add($uixParameters))
+## Load the groups of the user menu from the 'org.xwiki.platform.user.profile.menu.group' UIXP.
+#set ($userMenu = [])
+#set ($groupsById = {})
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.user.profile.menu.group', {'sortByParameter': 'priority'}))
+  #set ($groupId = "$!uix.parameters.id")
+  #if ($groupId == '')
+    ## When no id is explicitly provided, we use the id of the UIX.
+    #set ($groupId = $uix.id)
+  #end
+  ## When several groups have the same id, the one with the lowest priority wins.
+  #if (!$groupsById.containsKey($groupId))
+    #set ($group = {
+      'id': $groupId,
+      'name': $services.localization.render("platform.core.profile.menu.group.$groupId"),
+      'icon': "$!uix.parameters.icon",
+      'children': []
+    })
+    #set ($discard = $groupsById.put($groupId, $group))
+    #set ($discard = $userMenu.add($group))
   #end
 #end
+#########################
+## Setting categories
+#########################
+## Load the user menu items from the 'org.xwiki.plaftorm.user.profile.menu' UIXP and put them in their group.
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'priority'}))
+  #set ($uixParameters = $collectiontool.map)
+  #set ($discard = $uixParameters.putAll($uix.parameters))
+  #if (!$uixParameters.containsKey('isActive') || $uixParameters.get('isActive') != 'false')
+    #if (!$uixParameters.containsKey('id'))
+      ## When no id is explicitly provided, we use the id of the UIX.
+      #set ($discard = $uixParameters.put('id', $uix.id))
+    #end
+    #set ($id = $uixParameters.get('id'))
+    #if (!$uixParameters.containsKey('icon') &amp;&amp; $uixParameters.containsKey('glyphicon'))
+      #set ($discard = $uixParameters.put('icon', $uixParameters.get('glyphicon')))
+    #end
+    #set ($discard = $uixParameters.put('uix', $uix))
+    #set ($discard = $uixParameters.put('url', "?category=${id}"))
+    #set ($discard = $uixParameters.put('cssClass', "user-menu-$id"))
+    ## Items without a group, or with a group that doesn't exist, go in the 'other' group.
+    #set ($groupId = "$!uixParameters.get('group')")
+    #if (!$groupsById.containsKey($groupId))
+      #set ($groupId = 'other')
+    #end
+    #if ($groupsById.containsKey($groupId))
+      #set ($discard = $groupsById.get($groupId).children.add($uixParameters))
+    #else
+      #set ($message = "The user profile menu item [{}] is not displayed because its group [{}] doesn't exist and there's no [other] group to fall back on.")
+      #set ($discard = $services.logging.getLogger('XWiki.XWikiUserSheet').warn($message, $id, $uixParameters.get('group')))
+    #end
+  #end
+#end
+## Hide the groups without items.
+#set ($nonEmptyGroups = [])
+#foreach ($group in $userMenu)
+  #if ($group.children.size() &gt; 0)
+    #set ($discard = $nonEmptyGroups.add($group))
+  #end
+#end
+#set ($userMenu = $nonEmptyGroups)
 #########################
 ## Current category
 #########################
-#set($currentCategory = "$!request.category")
-#if($currentCategory == "")
-  #set($currentCategory = $categories[0].get('id'))
-#end
-#########################
-## Creating vertical menu
-#########################
-#set($userMenu = [{
-  'id'       : 'settings',
-  'cssClass' : 'user-menu-title',
-  'children' : $categories
-  }
-])
-## Setting automatically url &amp; css fields of each category
-#foreach($category in $userMenu)
-  #foreach($subcategory in $category.get('children'))
-    #set($id = $subcategory.get('id')) 
-    #set($discard = $subcategory.put('url', "?category=${id}"))
-    #set($discard = $subcategory.put('cssClass', "user-menu-$id category-tab"))
-  #end
+#set ($currentCategory = "$!request.category")
+#if ($currentCategory == '' &amp;&amp; $userMenu.size() &gt; 0)
+  #set ($currentCategory = $userMenu[0].children[0].id)
 #end
 #########################
 ## Display the left menu
@@ -114,7 +139,15 @@
   ##########
   (% id="user-vertical-menu" %)
   (((
-    #verticalNavigation($userMenu, {'translationPrefix' : 'platform.core.profile.category.', 'crtItemId' : $currentCategory, 'cssClass' : 'profile-menu'})
+    {{html clean="false"}}
+    #verticalNavigationAccordion($userMenu, {
+      'id': 'user-profile-menu',
+      'label': $services.localization.render('platform.core.profile.menu.label'),
+      'translationPrefix': 'platform.core.profile.category.',
+      'crtItemId': $currentCategory,
+      'cssClass': 'profile-menu'
+    })
+    {{/html}}
   )))
 )))
 #########################
@@ -243,15 +276,15 @@ Object.extend(XWiki, {
       if (!this.tabsContainer) {
         return;
       }
-      this.tabsContainer.select('.category-tab').each(function (tabElement) {
+      this.tabsContainer.select('.list-group-item[data-id]').each(function (tabElement) {
         tabElement.observe('click', function(event) {
           Event.stop(event);
-          this.switchTab(tabElement.id, true);
+          this.switchTab(tabElement.dataset.id, true);
         }.bindAsEventListener(this));
       }.bind(this));
-      this.tabsContainer.select('.category-tab.current').each(function (activeTab) {
-        this.updateCategoryFields(activeTab.id);
-        document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.id});
+      this.tabsContainer.select('.list-group-item[data-id].active').each(function (activeTab) {
+        this.updateCategoryFields(activeTab.dataset.id);
+        document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.dataset.id});
         document.fire('xwiki:dom:refresh');
       }.bind(this));
       this.handleCancelAction();
@@ -259,35 +292,45 @@ Object.extend(XWiki, {
       // History navigation through our pushed states.
       window.addEventListener('popstate', function(event) {
         if (event.state &amp;&amp; event.state.category) {
-          this.switchTab('vertical-menu-' + event.state.category);
+          this.switchTab(event.state.category);
         }
       }.bindAsEventListener(this));
       // Store the initial history state so we can go back.
       history.replaceState({
-        category: window.location.search.toQueryParams().category || 'profile'
+        category: window.location.search.toQueryParams().category || this.crtCategory
       }, document.title, document.location.href);
     },
 
-    switchTab : function(tab, pushHistory) {
-      var tabName = tab.substring(14); // 14 = len('vertical-menu-')
+    switchTab : function(category, pushHistory) {
+      const tab = this.tabsContainer.down('.list-group-item[data-id="' + CSS.escape(category) + '"]');
+      if (!tab) {
+        return;
+      }
       $("user-page-content").select("div.user-page-pane").each(function(pane){
         pane.addClassName('hidden');
       });
-      $(tabName + 'Pane').removeClassName('hidden');
-      $("user-vertical-menu").select("span.category-tab").each(function(tab){
-        tab.removeClassName('current');
+      $(category + 'Pane').removeClassName('hidden');
+      this.tabsContainer.select('.list-group-item[data-id].active').each(function(activeTab) {
+        activeTab.removeClassName('active');
+        activeTab.removeAttribute('aria-current');
       });
-      $(tab).addClassName('current');
-      this.updateCategoryFields(tab);
-      if (pushHistory) {
-        this.updateURL(tabName);
+      tab.addClassName('active');
+      tab.setAttribute('aria-current', 'page');
+      // Expand the group of the tab when it's collapsed, e.g. when navigating through the history. Clicking the group
+      // heading collapses the other groups.
+      const groupHeading = tab.up('.panel').down('.panel-heading');
+      if (groupHeading.hasClassName('collapsed')) {
+        groupHeading.click();
       }
-      document.fire('xwiki:profile:switchedCategory', {'category' : tab});
+      this.updateCategoryFields(category);
+      if (pushHistory) {
+        this.updateURL(category);
+      }
+      document.fire('xwiki:profile:switchedCategory', {'category' : category});
       document.fire('xwiki:dom:refresh');
     },
 
     updateCategoryFields : function (category) {
-      category = category.substring(14); // 14 = len('vertical-menu-')
       this.crtCategory = category;
       this.updateField('xredirect', XWiki.currentDocument.getURL('view', 'category=' + category));
       this.updateField('xcontinue', XWiki.currentDocument.getURL('edit', 'editor=inline&amp;category=' + category));
@@ -471,54 +514,6 @@ return XWiki;
     border-radius: @border-radius-base;
     padding: @border-width;
   }
-}
-
-.profile-menu .category-tab:before {
-  float: left;
-  margin: 5px 0 0 5px;
-}
-
-.profile-menu .user-menu-profile:before {
-  content: url("$xwiki.getSkinFile('icons/silk/vcard.png')");
-}
-
-.profile-menu .user-menu-preferences:before {
-  content: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
-}
-
-.profile-menu .user-menu-watchlist:before {
-  content: url("$xwiki.getSkinFile('icons/silk/star.png')");
-}
-
-.profile-menu .user-menu-network:before {
-  content: url("$xwiki.getSkinFile('icons/silk/group.png')");
-}
-
-.profile-menu .user-menu-dashboard:before {
-  content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
-}
-
-.profile-menu .user-menu-wikis:before {
-  content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
-}
-
-.skin-colibri .profile-menu .group.user-menu-title{
-  #set ($menuIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/user.png')${escapetool.S})")
-  #css3_backgroundIconAndLinearGradient($menuIcon, {
-    'to': 'bottom',
-    'colors': [
-      {'color':$theme.menuContentGradientColor,    'position': '0%'},
-      {'color':$theme.menuContentBackgroundColor, 'position': '100%'}
-    ]
-  })  
-}
-
-.profile-menu .group, .profile-menu .group:hover {
-  background-position: 7px 50%,top center;
-}
-
-.user-menu-title a:hover {
-  color: $theme.panelHeaderTextColor !important;
 }
 
 /* ----- Page content ---- */

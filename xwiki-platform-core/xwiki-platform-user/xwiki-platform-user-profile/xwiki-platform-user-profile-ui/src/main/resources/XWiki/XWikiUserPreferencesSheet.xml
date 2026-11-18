@@ -362,6 +362,7 @@
 icon=wrench
 # isActive: The user is seeing her own profile or the user is an admin.
 isActive=#if ($xcontext.userReference == $doc.documentReference || $hasAdmin)true#{else}false#end
+group=settings
 priority=20</parameters>
     </property>
     <property>

@@ -34,10 +34,15 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.Logger;
+import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.logging.script.LoggingScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
@@ -56,10 +61,12 @@ import com.xpn.xwiki.web.XWikiResponse;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -497,6 +504,54 @@ class MacrosTest extends PageTest
         assertTrue(output.contains("{{html}}<a href=\"/x?a&#38;b\">&#60;b&#62;a&#60;/b&#62;&#123;&#123;/html}}"
             + "&#123;&#123;info}}x"
             + "&#123;&#123;/info}}&#123;&#123;html}}</a>{{/html}}"), output);
+    }
+
+    @Test
+    void verticalNavigationAccordion() throws Exception
+    {
+        IconManagerScriptService iconManagerScriptService = mock(IconManagerScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "icon", iconManagerScriptService);
+        when(iconManagerScriptService.renderHTML(any(String.class)))
+            .then(invocation -> "<i>" + invocation.getArgument(0) + "</i>");
+
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        velocityContext.put("menu", List.of(
+            Map.of("id", "first", "name", "<b>First</b>{{/html}}", "icon", "user", "children", List.of(
+                Map.of("id", "a", "name", "A", "url", "?category=a&x=y"),
+                Map.of("id", "b", "name", "B", "cssClass", "custom"))),
+            Map.of("id", "second", "name", "Second", "children", List.of(
+                Map.of("id", "c", "name", "<em>C</em>", "icon", "wrench")))));
+
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "verticalNavigationAccordion", new StringReader(
+            "#verticalNavigationAccordion($menu {'id': 'menu', 'label': 'Menu', 'crtItemId': 'c'})"));
+
+        Document document = Jsoup.parseBodyFragment(writer.toString());
+        Element nav = document.selectFirst("nav#menu.vertical-accordion-menu");
+        assertEquals("Menu", nav.attr("aria-label"));
+
+        Elements headings = nav.select(".panel > a.panel-heading");
+        assertEquals(List.of("<b>First</b>{{/html}}", "Second"),
+            headings.stream().map(heading -> heading.child(0).ownText().trim()).toList());
+        assertEquals("user", headings.get(0).selectFirst("span > i").text());
+        // Only the group holding the current item is expanded, and expanding a group collapses the others.
+        assertEquals(List.of("false", "true"), headings.eachAttr("aria-expanded"));
+        assertEquals(List.of(true, false), headings.stream().map(h -> h.hasClass("collapsed")).toList());
+        assertEquals(List.of("#menu", "#menu"), headings.eachAttr("data-parent"));
+        Elements groupBodies = nav.select(".panel > section.panel-collapse");
+        assertEquals(List.of(false, true), groupBodies.stream().map(body -> body.hasClass("in")).toList());
+
+        Elements items = nav.select(".list-group > a.list-group-item");
+        assertEquals(List.of("a", "b", "c"), items.eachAttr("data-id"));
+        assertEquals(List.of("vertical-menu-a", "vertical-menu-b", "vertical-menu-c"), items.eachAttr("id"));
+        assertEquals("?category=a&x=y", items.get(0).attr("href"));
+        assertFalse(items.get(1).hasAttr("href"));
+        assertTrue(items.get(1).hasClass("custom"));
+        assertEquals("<em>C</em>", items.get(2).ownText().trim());
+        assertEquals("wrench", items.get(2).selectFirst("i").text());
+        // Only the current item is marked as active.
+        assertEquals(List.of("c"), items.select(".active").eachAttr("data-id"));
+        assertEquals(List.of("page"), items.select("[aria-current]").eachAttr("aria-current"));
     }
 
     @Test

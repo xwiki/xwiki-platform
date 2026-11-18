@@ -55,6 +55,21 @@ public class ExtensionPage extends ViewPage
         return !elements.isEmpty();
     }
 
+    /**
+     * @return the dependencies listed in the "Dependencies" section, each as its id followed by its version
+     *     constraint, or an empty list when the section is not displayed
+     * @since 18.10.0RC1
+     * @since 18.4.9
+     * @since 17.10.16
+     */
+    public List<String> getDependencies()
+    {
+        return getDriver()
+            .findElementsWithoutWaiting(
+                By.xpath("//h1[normalize-space(.) = 'Dependencies']/following-sibling::ul[1]/li"))
+            .stream().map(WebElement::getText).toList();
+    }
+
     public ExtensionPage updateExtension()
     {
         this.update.click();

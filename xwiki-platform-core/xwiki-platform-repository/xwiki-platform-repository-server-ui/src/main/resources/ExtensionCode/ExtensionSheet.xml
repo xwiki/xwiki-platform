@@ -188,6 +188,11 @@
         #set($lastVersion = $doc.getValue("lastVersion"))
         #if ("$!lastVersion" != '')
           #set ($lastVersionObject = $services.repository.getVersionObject($extension.getProperty('id').value, $lastVersion))
+          ## The displayed document can be an old revision whose last version is unknown to the current version
+          ## storage, but which still holds the version objects on the extension page itself.
+          #if (!$lastVersionObject)
+            #set ($lastVersionObject = $doc.getObject('ExtensionCode.ExtensionVersionClass', 'version', $lastVersion))
+          #end
           #set ($version = $lastVersionObject.getProperty('version').value)
           #set ($download = $lastVersionObject.getProperty("download").value)
           #if ("$!download" == '')
@@ -349,7 +354,14 @@
       #end
     #end
 
-    #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
+    ## Dependency objects reference the version through its string value, as stored in lastVersion. Never get them for
+    ## an empty version: Document#getObjects returns all the objects of the class for a null value.
+    #set ($dependenciesVersion = "$!doc.getValue('lastVersion')")
+    #if ($dependenciesVersion != '')
+      #set ($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $dependenciesVersion))
+    #else
+      #set ($extensionDependencies = [])
+    #end
     #if ($extensionDependencies.size() &gt; 0)
       = Dependencies =
 

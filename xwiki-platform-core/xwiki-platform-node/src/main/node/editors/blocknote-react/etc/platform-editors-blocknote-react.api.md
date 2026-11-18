@@ -5,22 +5,23 @@
 ```ts
 
 import { Block } from '@blocknote/core';
-import { BlockConfig } from '@blocknote/core';
 import { BlockNoteEditor } from '@blocknote/core';
+import { BlockNoteEditorOptions } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import { BlockSchemaFromSpecs } from '@blocknote/core';
 import { BlockSpec } from '@blocknote/core';
+import { BlockSpecs } from '@blocknote/core';
 import { BlockTypeSelectItem } from '@blocknote/react';
 import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { Container } from 'inversify';
 import { CustomInlineContentConfig } from '@blocknote/core';
 import { DefaultInlineContentSchema } from '@blocknote/core';
+import { DefaultReactSuggestionItem } from '@blocknote/react';
 import { DefaultStyleSchema } from '@blocknote/core';
 import { DocumentReference } from '@xwiki/platform-model-api';
 import { Extension } from '@blocknote/core';
 import { ExtensionFactoryInstance } from '@blocknote/core';
 import { InlineContent } from '@blocknote/core';
-import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
 import { InlineMacroInvocation as InlineMacroInvocation_2 } from '@xwiki/platform-uniast-api';
@@ -29,19 +30,16 @@ import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
 import { MacroBlockInvocation as MacroBlockInvocation_2 } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
-import { PartialBlockFromConfig } from '@blocknote/core';
-import { PartialInlineContent } from '@blocknote/core';
 import { PartialLink } from '@blocknote/core';
-import { PropSchema } from '@blocknote/core';
-import { ReactCustomBlockImplementation } from '@blocknote/react';
-import { ReactInlineContentImplementation } from '@blocknote/react';
+import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
-import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
+import { StyleSpecs } from '@blocknote/core';
+import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 
 // @beta
 export type BlockMetadata = Record<string, unknown>;
@@ -77,22 +75,51 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 export function canUploadFiles(instance: Pick<EditorInstance, "options" | "serviceContainer">): boolean;
 
 // @beta
+export const codeBlocksFeature: EditorFeature;
+
+// @beta
+export type CodeBlocksFeatureOptions = {
+    className?: string;
+};
+
+// @beta
+export class ComponentInit {
+    constructor(container: Container);
+}
+
+// @beta
+export type ContributedBlockNoteOptions = Partial<Pick<BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>, "uploadFile">>;
+
+// @beta
 export function createBlockMetadataStore(): BlockMetadataStore;
 
 // @beta
 export type EditorAppearance = {
     theme?: "light" | "dark";
     contentStyles?: "editor" | "host";
-    codeBlockClassName?: string;
 };
 
 // @beta
 export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer BlockSchema, infer _, infer __> ? BlockSchema : never;
 
 // @beta
-export type EditorFeatures = {
+export interface EditorFeature {
+    contribute(context: FeatureContext): FeatureContribution | undefined;
+    readonly id: string;
+}
+
+// @beta
+export const editorFeatureName = "EditorFeature";
+
+// @beta
+export interface EditorFeatures {
+    codeBlocks?: CodeBlocksFeatureOptions | false;
+    images?: false;
+    links?: object | false;
     macros?: MacroFeatureOptions | false;
-};
+    textStyles?: false;
+    xwikiRendering?: false;
+}
 
 // @beta
 export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<infer _, infer InlineContentSchema, infer __> ? InlineContentSchema : never;
@@ -150,6 +177,26 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
+export type FeatureContext = Pick<EditorInstance, "options" | "serviceContainer"> & {
+    syntax: SyntaxConfig;
+    t: (key: string) => string;
+    getInstance(): EditorInstance;
+};
+
+// @beta
+export type FeatureContribution = {
+    schema?: SchemaContribution;
+    blockNoteExtensions?: ExtensionFactoryInstance[];
+    blockNoteOptions?: ContributedBlockNoteOptions;
+    slashMenuItems?: () => SlashMenuItem[];
+    formattingToolbar?: FormattingToolbarContribution;
+    components?: ReactNode;
+};
+
+// @beta
+export const fileTransferFeature: EditorFeature;
+
+// @beta
 export interface FileUploader {
     upload(instance: EditorInstance, file: File): Promise<UploadedFile>;
 }
@@ -165,6 +212,13 @@ export interface FileUploadListener {
 
 // @beta
 export const fileUploadListenerName = "FileUploadListener";
+
+// @beta
+export type FormattingToolbarContribution = {
+    items?: ReactElement[];
+    blockTypeSelectItems?: BlockTypeSelectItem[];
+    blockToolbars?: Record<string, (block: BlockType) => ReactNode>;
+};
 
 // @beta
 export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
@@ -191,6 +245,9 @@ export interface ImageMetadataHandler {
 
 // @beta
 export const imageMetadataHandlerName = "ImageMetadataHandler";
+
+// @beta
+export const imagesFeature: EditorFeature;
 
 // @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
@@ -233,6 +290,9 @@ export interface LinkMetadataHandler {
 
 // @beta
 export const linkMetadataHandlerName = "LinkMetadataHandler";
+
+// @beta
+export const linksFeature: EditorFeature;
 
 // @beta
 export const MACRO_NAME_PREFIX = "Macro_";
@@ -283,12 +343,30 @@ export type MacroInsertionEditorPrefillData = {
 };
 
 // @beta
+export const macrosFeature: EditorFeature;
+
+// @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
 };
 
 // @beta
+export type SchemaContribution = {
+    blockSpecs?: BlockSpecs;
+    inlineContentSpecs?: Record<string, InlineContentSpec<CustomInlineContentConfig>>;
+    styleSpecs?: StyleSpecs;
+};
+
+// @beta
 export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
+
+// @beta
+export type SlashMenuItem = DefaultReactSuggestionItem & {
+    key?: string;
+};
+
+// @beta
+export const textStylesFeature: EditorFeature;
 
 // @beta
 export type UploadedFile = {
@@ -299,6 +377,9 @@ export type UploadedFile = {
 
 // @beta
 export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
+
+// @beta
+export const xwikiRenderingFeature: EditorFeature;
 
 // (No @packageDocumentation comment for this package)
 

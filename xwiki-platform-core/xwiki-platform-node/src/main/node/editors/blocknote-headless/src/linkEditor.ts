@@ -92,7 +92,9 @@ function showLinkModal(
           : linkTargetTypeManager.fromURL(current.url ?? ""),
       },
       depsContainer: serviceContainer,
-      excludedLinkTargetTypes: features?.links?.excludedTargetTypes,
+      excludedLinkTargetTypes: features?.links
+        ? features.links.excludedTargetTypes
+        : undefined,
       linkContext,
       mode,
       onSubmit: ({ displayText, generatedDisplayText, target }: LinkData) =>

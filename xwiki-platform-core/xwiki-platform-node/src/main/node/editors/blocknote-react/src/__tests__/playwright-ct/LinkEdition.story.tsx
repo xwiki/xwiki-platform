@@ -22,14 +22,14 @@ import { FULL_SYNTAX } from "./syntax.mock";
 import {
   linkEditorName,
   linkMetadataHandlerName,
-} from "../../components/links/linkEditor";
+} from "../../services/linkEditor";
 import { useState } from "react";
 import type { BlockType } from "../../blocknote";
 import type {
   LinkEditionData,
   LinkEditor,
   LinkMetadataHandler,
-} from "../../components/links/linkEditor";
+} from "../../services/linkEditor";
 
 /**
  * Renders the editor with a link metadata handler and a link editor defined natively (i.e. running in the browser).

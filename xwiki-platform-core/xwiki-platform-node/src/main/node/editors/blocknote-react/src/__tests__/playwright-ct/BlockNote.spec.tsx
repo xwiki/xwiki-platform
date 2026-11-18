@@ -86,6 +86,10 @@ test("Allowed syntax features should be available", async ({ mount, page }) => {
 
   expect(menuItemsText).toContain("Table");
   expect(menuItemsText).toContain("Quote");
+  // The images feature replaces BlockNote's "Image" item, which keeps its place.
+  expect(menuItemsText.indexOf("Image")).toBeLessThan(
+    menuItemsText.indexOf("Video"),
+  );
 });
 
 test("Disallowed syntax features should be unavailable", async ({
@@ -96,6 +100,7 @@ test("Disallowed syntax features should be unavailable", async ({
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.blocks.tables.basicTables = false;
   syntax.features.blocks.quotes = false;
+  syntax.features.blocks.images.basicImages = false;
 
   const component = await mount(
     <BlockNoteForTest content={[]} options={{ syntax }} />,
@@ -121,6 +126,72 @@ test("Disallowed syntax features should be unavailable", async ({
 
   expect(menuItemsText).not.toContain("Table");
   expect(menuItemsText).not.toContain("Quote");
+  expect(menuItemsText).not.toContain("Image");
+});
+
+test("A disabled editor feature leaves BlockNote's default slash menu item", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[]}
+      options={{ syntax: FULL_SYNTAX, features: { images: false } }}
+    />,
+  );
+
+  await component.locator(".bn-editor").click();
+  await page.keyboard.type("/image");
+  await expect(
+    page.locator('.bn-suggestion-menu-item[aria-selected="true"]'),
+  ).toContainText("Image");
+  await page.keyboard.press("Enter");
+
+  // BlockNote's "Image" item inserts an empty image block, instead of opening the image suggestions.
+  await expect(
+    component.locator('.bn-block-content[data-content-type="image"]'),
+  ).toHaveCount(1);
+  await expect(page.locator(".bn-suggestion-menu")).toHaveCount(0);
+});
+
+test("The links feature can be disabled", async ({ mount, page }) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[]}
+      options={{ syntax: FULL_SYNTAX, features: { links: false } }}
+    />,
+  );
+
+  await component.locator(".bn-editor").press("/");
+
+  const slashMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+  await slashMenuEl.waitFor({ state: "attached" });
+  const menuItems = slashMenuEl.locator(
+    ".bn-suggestion-menu-item p:first-child",
+  );
+  await expect(menuItems.filter({ hasText: /^Table$/ })).toHaveCount(1);
+  await expect(menuItems.filter({ hasText: /^Link$/ })).toHaveCount(0);
+});
+
+test("The formatting toolbar offers only the text styles that the syntax supports", async ({
+  mount,
+  page,
+}) => {
+  const syntax = structuredClone(FULL_SYNTAX);
+  syntax.features.inlineContents.textStyles.superscript = false;
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["Yeah"])}
+      options={{ syntax }}
+    />,
+  );
+
+  // Trigger the formatting toolbar.
+  await component.locator("p.bn-inline-content").dblclick();
+  await page.locator('button[data-test="subscript"]').waitFor();
+  await expect(page.locator('button[data-test="superscript"]')).toHaveCount(0);
 });
 
 test("Macros can be inserted with the macro editor", async ({
@@ -246,16 +317,20 @@ test("A canceled macro edition leaves the macro unchanged", async ({
   await expect(macro).toHaveText("macro:info");
 });
 
-test("Macros can't be inserted without a macro editor, or when disabled", async ({
+test("Macros can't be inserted without a macro editor, when disabled, or when the syntax can't save them", async ({
   mount,
   page,
 }) => {
+  const syntaxWithoutMacros = structuredClone(FULL_SYNTAX);
+  syntaxWithoutMacros.features.blocks.macros = false;
+  syntaxWithoutMacros.features.inlineContents.macros = false;
   for (const props of [
     { options: { syntax: FULL_SYNTAX } },
     {
       options: { syntax: FULL_SYNTAX, features: { macros: false as const } },
       macroEditor: {},
     },
+    { options: { syntax: syntaxWithoutMacros }, macroEditor: {} },
   ]) {
     const component = await mount(
       <BlockNoteForTest content={buildParagraphs(["Yeah"])} {...props} />,
@@ -464,6 +539,26 @@ test("Ctrl+Alt+C turns the current block into a code block", async ({
   await expect(codeBlock.locator("code")).toHaveText("foo");
   await expect(codeBlock.locator("select")).toHaveValue("text");
   await expect(component.locator("p.bn-inline-content")).toHaveCount(0);
+});
+
+test("The code blocks have the CSS classes set in the options of the code blocks feature", async ({
+  mount,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[buildCodeBlock("java", "int count = 0;")]}
+      options={{
+        syntax: FULL_SYNTAX,
+        features: { codeBlocks: { className: "box code" } },
+      }}
+    />,
+  );
+
+  await expect(
+    component.locator(
+      '.bn-block-content[data-content-type="codeBlock"] pre.box.code',
+    ),
+  ).toHaveCount(1);
 });
 
 test("The language selector keeps the focus when changing the language", async ({

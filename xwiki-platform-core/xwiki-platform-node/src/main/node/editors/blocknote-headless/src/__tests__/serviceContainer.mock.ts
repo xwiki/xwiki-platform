@@ -19,6 +19,7 @@
  */
 
 import { FULL_SYNTAX } from "./playwright-ct/syntax.mock";
+import { ComponentInit as BlockNoteComponentInit } from "@xwiki/platform-editors-blocknote-react";
 import { ComponentInit as LinkTypeComponentInit } from "@xwiki/platform-link-type-api";
 import { ComponentInit as LinkTypeDefaultComponentInit } from "@xwiki/platform-link-type-default";
 import { ComponentInit as LinkTypeUIComponentInit } from "@xwiki/platform-link-type-ui";
@@ -170,6 +171,9 @@ export function serviceContainerMock(
   new LinkTypeComponentInit(container);
   new LinkTypeDefaultComponentInit(container);
   new LinkTypeUIComponentInit(container);
+
+  // The generic editing features (e.g. the links), bound the same way the BlockNote webjar binds them.
+  new BlockNoteComponentInit(container);
 
   return container;
 }

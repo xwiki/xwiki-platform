@@ -118,6 +118,10 @@ type EditorFeatures = {
  * 5. Each option is declared once, by the lowest layer using it (e.g. the options of the link modal are declared by
  *    the Vue integration that shows it).
  * 6. Feature options should be JSON-serializable, so that they can come from a server-side configuration.
+ * 7. Options hold values, not behavior, which is injected through {@link EditorOptions.serviceContainer}. Callbacks
+ *    are used only at a framework boundary or for the editor's own events.
+ *
+ * See the README of this package for the architecture the editor and its features follow.
  *
  * @since 18.10.0RC1
  * @beta

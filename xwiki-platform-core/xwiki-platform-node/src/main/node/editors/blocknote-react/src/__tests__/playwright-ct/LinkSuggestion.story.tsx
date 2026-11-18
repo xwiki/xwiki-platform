@@ -23,7 +23,7 @@ import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import {
   linkEditorName,
   linkMetadataHandlerName,
-} from "../../components/links/linkEditor";
+} from "../../services/linkEditor";
 import {
   AttachmentReference,
   DocumentReference,
@@ -39,7 +39,7 @@ import type {
   LinkEditionData,
   LinkEditor,
   LinkMetadataHandler,
-} from "../../components/links/linkEditor";
+} from "../../services/linkEditor";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceParserProvider,

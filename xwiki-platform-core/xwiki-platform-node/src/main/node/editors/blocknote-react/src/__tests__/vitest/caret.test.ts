@@ -19,7 +19,7 @@
  */
 // @vitest-environment jsdom
 
-import { moveCaretTo } from "../../files/caret";
+import { moveCaretTo } from "../../features/fileTransfer/caret";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { EditorType } from "../../blocknote";
 

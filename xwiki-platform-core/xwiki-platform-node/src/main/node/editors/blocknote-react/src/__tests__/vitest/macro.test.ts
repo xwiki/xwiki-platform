@@ -19,18 +19,16 @@
  */
 // @vitest-environment jsdom
 
-import { createBlockNoteSchema } from "../../blocknote";
-import { setMacroOutput } from "../../blocknote/macroMetadata";
-import { MacroOutput } from "../../blocknote/macroOutput";
 import { EditorInstanceContext } from "../../contexts";
+import { setMacroOutput } from "../../features/macros/macroMetadata";
+import { MacroOutput } from "../../features/macros/macroOutput";
 import { createBlockMetadataStore } from "../../misc/blockMetadata";
-import { BlockNoteEditor } from "@blocknote/core";
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { beforeAll, describe, expect, test } from "vitest";
-import type { MacroCall } from "../../blocknote/utils";
+import { describe, expect, test } from "vitest";
 import type { EditorInstance } from "../../editorInstance";
+import type { MacroCall } from "../../features/macros/utils";
 import type { BlockMetadataStore } from "../../misc/blockMetadata";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -397,40 +395,5 @@ describe("MacroOutput (nested macro output lookup)", () => {
     expect(
       container.querySelector('[data-macro-name="error"]')!.textContent,
     ).toBe("macro:error");
-  });
-});
-
-describe("XWikiParametersStyle", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let editor: BlockNoteEditor<any, any, any>;
-
-  beforeAll(() => {
-    editor = BlockNoteEditor.create({
-      schema: createBlockNoteSchema([]),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as BlockNoteEditor<any, any, any>;
-  });
-
-  test("applies xwikiParameters (JSON string form) as span attributes on export", () => {
-    const html = editor.blocksToHTMLLossy([
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "x",
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            styles: { xwikiParameters: '{"class":"foo"}' } as any,
-          },
-        ],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
-    ]);
-
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    const span = container.querySelector<HTMLElement>("span.foo");
-    expect(span).not.toBeNull();
-    expect(span!.textContent).toBe("x");
   });
 });

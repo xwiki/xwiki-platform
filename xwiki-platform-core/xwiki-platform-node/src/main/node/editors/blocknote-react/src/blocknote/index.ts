@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { XWikiCodeBlock } from "./codeBlock";
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
 import { XWikiImageBlock } from "./imageBlock";
@@ -33,6 +32,7 @@ import {
 import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
 import { openImageSuggestionMenu } from "../components/images/imageSuggestionMenu";
 import { openLinkSuggestionMenu } from "../components/links/linkSuggestionMenu";
+import { XWikiCodeBlock } from "../features/codeBlocks/codeBlockSpec";
 import translations from "../translations";
 import {
   BlockNoteEditor,

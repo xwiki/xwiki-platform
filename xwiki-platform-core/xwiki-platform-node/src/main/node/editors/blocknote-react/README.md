@@ -84,6 +84,7 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| Links, images, macros, code block | wired directly by the editor, which also checks the syntax features, instead of being `EditorFeature`s (only the file transfer is one so far), their code spread over `src/components`, `src/blocknote` and `src/misc` | 1, 2, 5 |
+| Links, images, macros | wired directly by the editor, which also checks the syntax features, instead of being `EditorFeature`s, their code spread over `src/components`, `src/blocknote` and `src/misc` | 1, 2, 5 |
+| Code block spec | part of the static schema of the editor, which imports it from `src/features/codeBlocks` (the typed API derives from the schema), so its Ctrl+Alt+C shortcut (registered by BlockNote) works even when the syntax can't save code blocks | 1 |
 | `lang` option | changes a module-global translation instance | 10, 11 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 6, 11 |

@@ -81,6 +81,9 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 export function canUploadFiles(instance: Pick<EditorInstance, "options" | "serviceContainer">): boolean;
 
 // @beta
+export const codeBlocksFeature: EditorFeature;
+
+// @beta
 export class ComponentInit {
     constructor(container: Container);
 }

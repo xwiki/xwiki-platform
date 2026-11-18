@@ -36,7 +36,6 @@ import { EditorInstanceContext } from "../contexts";
 import { contributeFeatures } from "../features/editorFeature";
 import { createBlockMetadataStore } from "../misc/blockMetadata";
 import { getSyntaxConfig } from "../misc/syntax";
-import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -220,8 +219,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     initialContent,
     // Editor's schema, with custom blocks definition
     schema,
-    // Highlight the code blocks based on their language.
-    extensions: [syntaxHighlighter, ...contributions.blockNoteExtensions],
+    extensions: contributions.blockNoteExtensions,
     // Use the provided language for the dictionary
     dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace

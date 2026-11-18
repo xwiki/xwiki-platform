@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { codeBlocksFeature } from "./features/codeBlocks/codeBlocks";
 import { editorFeatureName } from "./features/editorFeature";
 import { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
 import type { EditorFeature } from "./features/editorFeature";
@@ -34,7 +35,7 @@ import type { Container } from "inversify";
  */
 export class ComponentInit {
   constructor(container: Container) {
-    for (const feature of [fileTransferFeature]) {
+    for (const feature of [fileTransferFeature, codeBlocksFeature]) {
       container.bind<EditorFeature>(editorFeatureName).toConstantValue(feature);
     }
   }

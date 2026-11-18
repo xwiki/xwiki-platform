@@ -102,6 +102,8 @@ export type {
 
 export { ComponentInit } from "./componentInit";
 
+export { codeBlocksFeature } from "./features/codeBlocks/codeBlocks";
+
 export { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
 
 export { editorFeatureName } from "./features/editorFeature";

@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import { DocumentReference, SpaceReference } from "@xwiki/platform-model-api";
 import { useMemo, useState } from "react";
 // NOTE: `LinkType` is intentionally not imported here (not even type-only): the module also
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
@@ -59,7 +60,7 @@ export type ImageSuggestionForTestProps = {
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
-  syntax?: BlockNoteViewWrapperProps["syntax"];
+  syntax?: BlockNoteViewWrapperProps["options"]["syntax"];
 };
 
 /**
@@ -102,8 +103,8 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     [],
   );
 
-  const depsContainer = useMemo(() => {
-    const container = depsContainerMock();
+  const serviceContainer = useMemo(() => {
+    const container = serviceContainerMock();
 
     container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue(
       linkSuggestServiceUnavailable
@@ -164,8 +165,11 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
         get: () => ({
           serialize: (reference: {
             name: string;
-            document: { name: string };
-          }) => `attach:${reference.document.name}@${reference.name}`,
+            document?: { name: string };
+          }) =>
+            reference.document
+              ? `attach:${reference.document.name}@${reference.name}`
+              : reference.name,
         }),
       });
 
@@ -175,17 +179,24 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   return (
     <>
       <BlockNoteViewWrapper
-        lang="en"
-        label="Some Label"
-        depsContainer={depsContainer}
-        documentReference={documentReference}
-        macros={false}
+        options={{
+          lang: "en",
+          label: "Some Label",
+          serviceContainer,
+          sourceDocumentReference:
+            documentReference === undefined
+              ? undefined
+              : // The mocked model reference serializer serializes a page reference as its name.
+                new DocumentReference(documentReference, new SpaceReference()),
+          syntax: syntax ?? FULL_SYNTAX,
+          features: {
+            images: { hooks: imageEditionHooks, insertion: imageInsertion },
+          },
+        }}
         content={content ?? []}
-        syntax={syntax ?? FULL_SYNTAX}
         linkEditionHandler={() => {
           throw new Error("Link editor should not open for this test");
         }}
-        overrides={{ imageEditionHooks, imageInsertion }}
       />
       <output data-testid="selectedImages">
         {JSON.stringify(selectedImages)}

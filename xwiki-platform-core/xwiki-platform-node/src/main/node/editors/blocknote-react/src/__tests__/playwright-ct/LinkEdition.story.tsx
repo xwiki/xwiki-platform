@@ -55,23 +55,26 @@ export const BlockNoteWithLinkEditionHooks: React.FC<{
       )}
       <BlockNoteForTest
         content={content}
-        macros={false}
-        syntax={FULL_SYNTAX}
         linkEditionHandler={({ current, onSubmit }) => {
           setEditorInput(JSON.stringify(current));
           onSubmit(submit ?? current);
         }}
-        overrides={{
-          linkEdition: {
-            beforeEdit:
-              beforeEditTitle === undefined
-                ? undefined
-                : (linkData) => ({ ...linkData, title: beforeEditTitle }),
-            beforeUpdate: (linkData, previous) => {
-              setUpdateInput(JSON.stringify({ linkData, previous }));
-              return beforeUpdateUrl === undefined
-                ? linkData
-                : { ...linkData, url: beforeUpdateUrl };
+        options={{
+          syntax: FULL_SYNTAX,
+          features: {
+            links: {
+              hooks: {
+                beforeEdit:
+                  beforeEditTitle === undefined
+                    ? undefined
+                    : (linkData) => ({ ...linkData, title: beforeEditTitle }),
+                beforeUpdate: (linkData, previous) => {
+                  setUpdateInput(JSON.stringify({ linkData, previous }));
+                  return beforeUpdateUrl === undefined
+                    ? linkData
+                    : { ...linkData, url: beforeUpdateUrl };
+                },
+              },
             },
           },
         }}

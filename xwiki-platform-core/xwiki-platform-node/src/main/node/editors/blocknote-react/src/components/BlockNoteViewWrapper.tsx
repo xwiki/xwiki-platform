@@ -32,9 +32,9 @@ import {
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import {
-  DepsContainerContext,
-  EditedDocumentContext,
   MacrosContext,
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
 } from "../contexts";
 import { syntaxHighlighter } from "@blocknote/code-block";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
@@ -52,45 +52,15 @@ import {
 } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import type {
-  BlockType,
-  EditorBlockSchema,
-  EditorInlineContentSchema,
-  EditorLanguage,
-  EditorSchema,
-  EditorStyleSchema,
-  EditorType,
-} from "../blocknote";
-import type {
-  BlockNoteConcreteMacro,
-  ContextForMacros,
-} from "../blocknote/utils";
-import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
-import type { ImageEditionHooks } from "./images/imageEditionHooks";
-import type { ImageInsertionOverrideFn } from "./images/imageInsertionOverride";
+import type { BlockType, EditorSchema, EditorType } from "../blocknote";
+import type { BlockNoteConcreteMacro } from "../blocknote/utils";
+import type { EditorOptions } from "../editorOptions";
 import type { LinkEditionHandler } from "./links/linkEdition";
-import type { LinkEditionHooks } from "./links/linkEditionHooks";
-import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
-import type { Collaboration } from "@xwiki/platform-collaboration-api";
-import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type { ModelReferenceSerializerProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
-import type { Container } from "inversify";
-
-/**
- * Default options for the BlockNote editor
- *
- * @since 0.16
- * @beta
- */
-type DefaultBlockNoteEditorOptions = BlockNoteEditorOptions<
-  EditorBlockSchema,
-  EditorInlineContentSchema,
-  EditorStyleSchema
->;
 
 /**
  * Properties for the BlockNote editor component.
@@ -100,94 +70,17 @@ type DefaultBlockNoteEditorOptions = BlockNoteEditorOptions<
  */
 type BlockNoteViewWrapperProps = {
   /**
-   * Options to forward to the BlockNote editor
-   */
-  blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema">>;
-
-  /**
-   * The name of the editor instance, usually the name of the form field it is attached to. When realtime collaboration
-   * is enabled, this is used to identify the Yjs document fragment that the editor is bound to (because a document can
-   * have multiple fields that are being edited in realtime time).
-   *
-   * @since 18.3.0RC1
-   */
-  name?: string;
-
-  /**
-   * The display theme to use
-   */
-  theme?: "light" | "dark";
-
-  /**
-   * The editor's language
-   */
-  lang: EditorLanguage;
-
-  /**
-   * The editor's label. Used for accessibility.
-   * @since 18.3.0RC1
-   */
-  label: string;
-
-  /**
-   * The serialized reference of the edited document, e.g. to upload files to. The current document (as provided by the
-   * `DocumentService`) is edited when not specified.
+   * The configuration of the editor instance.
    *
    * @since 18.10.0RC1
    */
-  documentReference?: string;
+  options: EditorOptions;
 
   /**
    * The editor's initial content
    * If realtime is enabled, this content may be replaced by the other users' own editor content
    */
   content: BlockType[];
-
-  /**
-   * Macros to show in the editor
-   *
-   * @since 18.0.0RC1
-   * @beta
-   */
-  macros:
-    | {
-        /**
-         * List of buildable, client-rendered macros. Optional: consumers that only use the server-rendered
-         * xwikiMacroBlock / xwikiInlineMacro specs (edited/inserted through {@link ctx}) can omit it.
-         *
-         * @since 18.0.0RC1
-         * @beta
-         */
-        list?: MacroWithUnknownParamsType[];
-
-        /**
-         * Context for macros
-         *
-         * @since 18.0.0RC1
-         * @beta
-         */
-        ctx: ContextForMacros;
-      }
-    | false;
-
-  /**
-   * The collaboration session.
-   */
-  collaboration?: Collaboration;
-
-  /**
-   * Run a function when the document's content change
-   * WARN: this function may be fired at a rapid rate if the user types rapidly. Debouncing may be required on your end.
-   */
-  onChange?: (editor: EditorType) => void;
-
-  /**
-   * Container for dependency injection
-   *
-   * @since 18.5.0RC1
-   * @beta
-   */
-  depsContainer: Container;
 
   /**
    * Intercept link edition mechanism (i.e. inserting or editing a link)
@@ -198,56 +91,10 @@ type BlockNoteViewWrapperProps = {
   linkEditionHandler: LinkEditionHandler;
 
   /**
-   * Overrides for default behavior
-   *
-   * @since 0.26
+   * Run a function when the document's content change
+   * WARN: this function may be fired at a rapid rate if the user types rapidly. Debouncing may be required on your end.
    */
-  overrides?: {
-    /**
-     * Intercept image edition mechanism (i.e. clicking on the edition icon in images' toolbar)
-     */
-    imageEdition?: ImageEditionOverrideFn;
-
-    /**
-     * Hooks to intercept the image insertion / edition flow.
-     *
-     * @since 18.10.0RC1
-     */
-    imageEditionHooks?: ImageEditionHooks;
-
-    /**
-     * Intercept the image insertion mechanism (i.e. browsing the images to insert, from the image quick action)
-     *
-     * @since 18.10.0RC1
-     */
-    imageInsertion?: ImageInsertionOverrideFn;
-
-    /**
-     * Hooks to intercept the link creation / edition flow.
-     *
-     * @since 18.7.0RC1
-     */
-    linkEdition?: LinkEditionHooks;
-  };
-
-  /**
-   * List of features supported by the underlying syntax
-   *
-   * Features not enabled here will be disabled in the future (when possible)
-   *
-   * @since 18.6.0RC1
-   * @beta
-   */
-  syntax: SyntaxConfig;
-
-  /**
-   * The CSS classes (space separated) to add to the code blocks, e.g. to style them like the code snippets displayed in
-   * view mode.
-   *
-   * @since 18.9.0RC1
-   * @beta
-   */
-  codeBlockClassName?: string;
+  onChange?: (editor: EditorType) => void;
 
   /**
    * Make the wrapper forward some data through references
@@ -272,31 +119,56 @@ const SIDE_MENU_FLOATING_OPTIONS = {
  */
 
 const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
-  blockNoteOptions,
-  name = "content",
-  theme,
-  documentReference,
+  options: {
+    serviceContainer,
+    name,
+    sourceDocumentReference,
+    syntax,
+    lang,
+    label,
+    autofocus,
+    appearance: { theme, contentStyles, codeBlockClassName } = {},
+    collaboration: requestedCollaboration,
+    upload,
+    features: { links, images, macros } = {},
+  },
   content,
-  macros,
-  collaboration,
-  onChange,
-  lang,
-  depsContainer,
   linkEditionHandler,
-  overrides,
-  label,
-  syntax,
-  codeBlockClassName,
+  onChange,
   refs: { setEditor } = {},
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
 
+  // The collaboration session holds the content of all the editor instances taking part in it, each instance editing
+  // the content stored under its name, so an instance without a name can't take part.
+  const collaboration = name ? requestedCollaboration : undefined;
+  useEffect(() => {
+    if (requestedCollaboration && !name) {
+      console.warn(
+        "The editor instance has no name: editing without realtime collaboration.",
+      );
+    }
+  }, [requestedCollaboration, name]);
+
+  // The components below take the source document reference serialized.
+  const serializedSourceDocumentReference = useMemo(
+    () =>
+      sourceDocumentReference &&
+      serviceContainer
+        .get<ModelReferenceSerializerProvider>(
+          "ModelReferenceSerializerProvider",
+        )
+        .get()
+        ?.serialize(sourceDocumentReference),
+    [serviceContainer, sourceDocumentReference],
+  );
+
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
     const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
-      depsContainer
+      serviceContainer
         .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
         .get()!,
     );
@@ -324,7 +196,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
     return {
       provider: collaboration.provider,
-      fragment: collaboration.doc.getXmlFragment(name),
+      fragment: collaboration.doc.getXmlFragment(name!),
       user: {
         name: collaborator.user.username!,
         color: collaborator.color,
@@ -333,12 +205,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   };
 
   const editorOptions = {
-    ...blockNoteOptions,
     initialContent,
     // Editor's schema, with custom blocks definition
     schema,
     // Highlight the code blocks based on their language.
-    extensions: [...(blockNoteOptions?.extensions ?? []), syntaxHighlighter],
+    extensions: [syntaxHighlighter],
     // Use the provided language for the dictionary
     dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace
@@ -351,6 +222,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         "aria-label": label,
       },
     },
+    // BlockNote's default styles are applied to the edited content unless the hosting page styles it.
+    defaultStyles: contentStyles !== "host",
+    uploadFile: upload?.uploadFile,
+    // Put the caret at the start of the content.
+    autofocus: autofocus ? ("start" as const) : false,
   };
 
   const collaborationOptions = getCollaborationOptions();
@@ -373,28 +249,32 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   // When realtime collaboration is enabled, the first user joining the session must set the initial content. The rest
   // of the participants will retrieve the editor content from the realtime server. We know who is the first user
-  // joining the session by checking for the absence of an initialContentLoaded key in the document's configuration map
-  // (shared across all session participants).
+  // joining the session by checking whether the name of the editor instance is in the map of the loaded contents
+  // (shared across all session participants), because each editor instance taking part in the session has its own
+  // initial content.
   if (collaboration) {
-    const config = collaboration.doc.getMap("configuration");
-    const initialContentLoaded = config.get("initialContentLoaded");
-    if (!initialContentLoaded) {
-      // This is the first user joining the realtime collaboration session.
-      config.set("initialContentLoaded", true);
+    const initialContentLoaded = collaboration.doc.getMap<boolean>(
+      "initialContentLoaded",
+    );
+    if (!initialContentLoaded.get(name!)) {
+      // This is the first user joining the realtime collaboration session with this editor instance.
+      initialContentLoaded.set(name!, true);
       console.debug(
         "Setting initial content for realtime collaboration session.",
         content,
       );
       // Initialize the realtime collaboration session with the provided content.
-      const fragment = collaboration.doc.getXmlFragment(name);
+      const fragment = collaboration.doc.getXmlFragment(name!);
       blocksToYXmlFragment(editor, content, fragment);
     }
   }
 
   // Renders the editor instance using a React component.
   return (
-    <DepsContainerContext.Provider value={depsContainer}>
-      <EditedDocumentContext.Provider value={documentReference}>
+    <ServiceContainerContext.Provider value={serviceContainer}>
+      <SourceDocumentReferenceContext.Provider
+        value={serializedSourceDocumentReference}
+      >
         <MacrosContext.Provider value={macros ? macros.ctx : null}>
           <BlockNoteView
             editor={editor}
@@ -432,15 +312,15 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             {syntax.features.blocks.images.basicImages && (
               <ImageSuggestionController
                 maxSuggestions={5}
-                imageEditionHooks={overrides?.imageEditionHooks}
-                imageInsertionOverrideFn={overrides?.imageInsertion}
+                imageEditionHooks={images?.hooks}
+                imageInsertionOverrideFn={images?.insertion}
               />
             )}
 
             {syntax.features.inlineContents.links.basicLinks && (
               <LinkSuggestionController
                 linkEditionHandler={linkEditionHandler}
-                linkEditionHooks={overrides?.linkEdition}
+                linkEditionHooks={links?.hooks}
                 maxSuggestions={8}
                 pageSuggestionsShare={5}
               />
@@ -452,15 +332,15 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               formattingToolbar={(props) => (
                 <CustomFormattingToolbar
                   formattingToolbarProps={props}
-                  imageEditionOverrideFn={overrides?.imageEdition}
-                  imageEditionHooks={overrides?.imageEditionHooks}
+                  imageEditionOverrideFn={images?.edition}
+                  imageEditionHooks={images?.hooks}
                   linkEditionHandler={linkEditionHandler}
-                  linkEditionHooks={overrides?.linkEdition}
+                  linkEditionHooks={links?.hooks}
                   additionalBlockTypes={filterMap(
                     builtMacros,
                     (built) => built.dropdownTransformItem,
                   )}
-                  macros={macros}
+                  macros={macros ?? false}
                 />
               )}
             />
@@ -471,7 +351,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
                   <CustomLinkToolbar
                     linkToolbarProps={props}
                     linkEditionHandler={linkEditionHandler}
-                    linkEditionHooks={overrides?.linkEdition}
+                    linkEditionHooks={links?.hooks}
                   />
                 </FormattingToolbar>
               )}
@@ -484,15 +364,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             />
           </BlockNoteView>
         </MacrosContext.Provider>
-      </EditedDocumentContext.Provider>
-    </DepsContainerContext.Provider>
+      </SourceDocumentReferenceContext.Provider>
+    </ServiceContainerContext.Provider>
   );
 };
 
-export type {
-  BlockNoteViewWrapperProps,
-  DefaultBlockNoteEditorOptions,
-  EditorSchema,
-};
+export type { BlockNoteViewWrapperProps, EditorSchema };
 
 export { BlockNoteViewWrapper };

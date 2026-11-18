@@ -23,6 +23,10 @@ export type {
   ContextForMacros,
   EditorType,
 } from "@xwiki/platform-editors-blocknote-react";
+export type {
+  HeadlessEditorOptions,
+  HeadlessLinkFeatureOptions,
+} from "./editorOptions";
 
 /**
  * @since 18.0.0RC1

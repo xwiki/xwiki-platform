@@ -19,7 +19,10 @@
  */
 import { ImageSelector } from "./ImageSelector";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
-import { DepsContainerContext, EditedDocumentContext } from "../../contexts";
+import {
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
+} from "../../contexts";
 import { useEditor } from "../../hooks";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { toResourceReference } from "../../misc/resourceReference";
@@ -72,20 +75,20 @@ export function ImageSuggestionController({
   imageEditionHooks,
   imageInsertionOverrideFn,
 }: ImageSuggestionControllerProps) {
-  const depsContainer = useContext(DepsContainerContext)!;
+  const serviceContainer = useContext(ServiceContainerContext)!;
 
-  const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
+  const linkSuggestService = serviceContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
 
-  const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
+  const resourceReferenceParser = serviceContainer.get<ResourceReferenceParser>(
     "ResourceReferenceParser",
   );
 
   const editor = useEditor();
   const { insertImage, uploadImage } = useImageInsertion(
     editor,
-    depsContainer,
+    serviceContainer,
     imageEditionHooks,
   );
 
@@ -196,7 +199,7 @@ export function ImageSuggestionController({
  */
 function useImageInsertion(
   editor: EditorType,
-  depsContainer: Container,
+  serviceContainer: Container,
   imageEditionHooks?: ImageEditionHooks,
 ) {
   const insertImage: InsertImage = useCallback(
@@ -210,17 +213,17 @@ function useImageInsertion(
     [editor, imageEditionHooks],
   );
 
-  const editedDocumentReference = useContext(EditedDocumentContext);
+  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
   const uploadImage = useCallback(async () => {
     const image = await triggerUserImageUpload(
-      depsContainer,
-      editedDocumentReference,
+      serviceContainer,
+      sourceDocumentReference,
     );
 
     if (image) {
       insertImage({ url: image.url }, image.reference);
     }
-  }, [depsContainer, editedDocumentReference, insertImage]);
+  }, [serviceContainer, sourceDocumentReference, insertImage]);
 
   return { insertImage, uploadImage };
 }

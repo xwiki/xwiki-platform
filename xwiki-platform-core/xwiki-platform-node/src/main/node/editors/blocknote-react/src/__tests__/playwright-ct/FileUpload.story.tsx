@@ -64,10 +64,10 @@ export const BlockNoteWithFileUploader: React.FC<{
           container
             .bind<FileUploadListener>(fileUploadListenerName)
             .toConstantValue({
-              onUpload: (_instance, file) =>
+              onUpload: (_instance, uploadedFile) =>
                 setUploadEvents((events) => [
                   ...events,
-                  `uploaded ${file.url}`,
+                  `uploaded ${uploadedFile.url}`,
                 ]),
               onUploadFailed: (_instance, file) =>
                 setUploadEvents((events) => [...events, `failed ${file.name}`]),

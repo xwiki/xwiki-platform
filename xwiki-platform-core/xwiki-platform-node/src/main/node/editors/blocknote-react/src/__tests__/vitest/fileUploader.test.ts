@@ -283,11 +283,11 @@ describe("uploadFile", () => {
     const listeners = [listener(), listener()];
     const { instance } = buildInstance({ listeners });
 
-    const uploaded = await uploadFile(instance, buildFile());
+    const uploadedFile = await uploadFile(instance, buildFile());
 
-    expect(uploaded).toMatchObject({ url: UPLOADED_URL });
+    expect(uploadedFile).toMatchObject({ url: UPLOADED_URL });
     for (const { onUpload, onUploadFailed } of listeners) {
-      expect(onUpload).toHaveBeenCalledWith(instance, uploaded);
+      expect(onUpload).toHaveBeenCalledWith(instance, uploadedFile);
       expect(onUploadFailed).not.toHaveBeenCalled();
     }
   });
@@ -384,7 +384,7 @@ describe("pickAndUploadFile", () => {
 });
 
 describe("the uploaded files", () => {
-  const uploaded = {
+  const uploadedFile = {
     url: UPLOADED_URL,
     name: "uploaded.png",
     reference: "Edited.Page@uploaded.png",
@@ -394,7 +394,7 @@ describe("the uploaded files", () => {
     const { instance } = buildInstance({ sourceDocument: true });
 
     // Untyped, like the references of the image suggestions, since an image designates an attachment by default.
-    expect(uploadedImage(instance, uploaded)).toEqual({
+    expect(uploadedImage(instance, uploadedFile)).toEqual({
       url: UPLOADED_URL,
       reference: {
         type: "attach",
@@ -409,7 +409,7 @@ describe("the uploaded files", () => {
     const { instance } = buildInstance({ sourceDocument: true });
 
     // Typed, since a link designates a page by default.
-    expect(uploadedFileLink(instance, uploaded)).toMatchObject({
+    expect(uploadedFileLink(instance, uploadedFile)).toMatchObject({
       title: "uploaded.png",
       generatedTitle: true,
       url: UPLOADED_URL,
@@ -419,7 +419,7 @@ describe("the uploaded files", () => {
 
   test("without a reference are inserted and linked by their URL", () => {
     const { instance } = buildInstance();
-    const { url, name } = uploaded;
+    const { url, name } = uploadedFile;
 
     expect(uploadedImage(instance, { url, name }).reference).toBeUndefined();
     expect(uploadedFileLink(instance, { url, name }).reference).toBeUndefined();

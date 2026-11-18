@@ -84,13 +84,13 @@ describe("XWikiFileUploader", () => {
   });
 
   it("attaches the file to the current document and returns the stored file", async () => {
-    const uploaded = await fileUploader.upload(
+    const uploadedFile = await fileUploader.upload(
       editorInstance(),
       file("cat.png"),
     );
 
     expect(saveAttachments.mock.calls[0][0]).toBe("wiki:Space.Page");
-    expect(uploaded).toEqual({
+    expect(uploadedFile).toEqual({
       url: "/xwiki/bin/download/Space/Page/cat.png",
       name: "cat.png",
       reference: "wiki:Space.Page@cat.png",
@@ -98,33 +98,33 @@ describe("XWikiFileUploader", () => {
   });
 
   it("attaches the file to the source document, when specified", async () => {
-    const uploaded = await fileUploader.upload(
+    const uploadedFile = await fileUploader.upload(
       editorInstance({ sourceDocumentReference: "wiki:Other.Page" }),
       file("cat.png"),
     );
 
     expect(saveAttachments.mock.calls[0][0]).toBe("wiki:Other.Page");
-    expect(uploaded.reference).toBe("wiki:Other.Page@cat.png");
+    expect(uploadedFile.reference).toBe("wiki:Other.Page@cat.png");
   });
 
   it("escapes a file name the reference syntax would otherwise split", async () => {
-    const uploaded = await fileUploader.upload(
+    const uploadedFile = await fileUploader.upload(
       editorInstance(),
       file("logo@2x.png"),
     );
 
-    expect(uploaded.reference).toBe("wiki:Space.Page@logo\\@2x.png");
+    expect(uploadedFile.reference).toBe("wiki:Space.Page@logo\\@2x.png");
   });
 
   it("returns the name the storage gave the file", async () => {
     saveAttachments.mockResolvedValue([uploadedAttachment("cat-1.png")]);
 
-    const uploaded = await fileUploader.upload(
+    const uploadedFile = await fileUploader.upload(
       editorInstance(),
       file("cat.png"),
     );
 
-    expect(uploaded.name).toBe("cat-1.png");
+    expect(uploadedFile.name).toBe("cat-1.png");
   });
 
   describe("temporary uploads", () => {

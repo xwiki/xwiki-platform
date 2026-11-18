@@ -105,9 +105,9 @@ interface FileUploadListener {
    * Called once a file is stored.
    *
    * @param instance - the editor instance where the file is uploaded
-   * @param file - the stored file
+   * @param uploadedFile - the stored file
    */
-  onUpload?(instance: EditorInstance, file: UploadedFile): void;
+  onUpload?(instance: EditorInstance, uploadedFile: UploadedFile): void;
 
   /**
    * Called when a file can't be stored, e.g. to tell the user.
@@ -225,9 +225,9 @@ async function uploadFile(
       `Uploading files is disabled, can't upload [${file.name}].`,
     );
   }
-  let uploaded: UploadedFile;
+  let uploadedFile: UploadedFile;
   try {
-    uploaded = await fileUploader.upload(instance, file);
+    uploadedFile = await fileUploader.upload(instance, file);
   } catch (error) {
     notifyListeners(instance, (listener) =>
       listener.onUploadFailed?.(instance, file, error),
@@ -235,9 +235,9 @@ async function uploadFile(
     throw error;
   }
   notifyListeners(instance, (listener) =>
-    listener.onUpload?.(instance, uploaded),
+    listener.onUpload?.(instance, uploadedFile),
   );
-  return uploaded;
+  return uploadedFile;
 }
 
 export {

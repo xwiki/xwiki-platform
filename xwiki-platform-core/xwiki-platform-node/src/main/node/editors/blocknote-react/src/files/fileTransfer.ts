@@ -106,11 +106,11 @@ async function insertFilesInline(
     for (const file of files) {
       // One upload at a time: two files renamed in the same tick would get the same generated name, since it is made
       // of the current timestamp and a small random number.
-      const uploaded = await upload(instance, toUpload(file, paste));
-      if (uploaded) {
+      const uploadedFile = await upload(instance, toUpload(file, paste));
+      if (uploadedFile) {
         const link = toInlineLink(
           instance,
-          uploadedFileLink(instance, uploaded),
+          uploadedFileLink(instance, uploadedFile),
         );
         // updateSelection leaves the caret after the link, so the next file lines up behind it, separated by a space
         // so that the links don't run into each other.
@@ -230,27 +230,29 @@ async function uploadForBlock(
   const paste =
     instance.editor.getExtension(FileTransferExtension)?.store.state.paste ??
     false;
-  const uploaded = await upload(instance, toUpload(file, paste));
-  if (!uploaded) {
+  const uploadedFile = await upload(instance, toUpload(file, paste));
+  if (!uploadedFile) {
     return EMPTY_PARAGRAPH;
   }
-  return blockId ? updateBlock(instance, uploaded, blockId) : uploaded.url;
+  return blockId
+    ? updateBlock(instance, uploadedFile, blockId)
+    : uploadedFile.url;
 }
 
 /**
  * @param instance - the editor instance where the file is uploaded
- * @param uploaded - the uploaded file
+ * @param uploadedFile - the uploaded file
  * @param blockId - the id of the block inserted for the file
  * @returns what BlockNote updates the block with
  */
 function updateBlock(
   instance: EditorInstance,
-  uploaded: UploadedFile,
+  uploadedFile: UploadedFile,
   blockId: string,
 ): Record<string, unknown> {
   const block = instance.editor.getBlock(blockId);
   if (block?.type === "image") {
-    const { url, reference } = uploadedImage(instance, uploaded);
+    const { url, reference } = uploadedImage(instance, uploadedFile);
     // Empty name, otherwise BlockNote saves it as the alternative text of the image, and for a pasted file that is
     // the name the browser made up rather than the attachment we uploaded.
     updateImage(instance, block, { url, name: "" }, reference);
@@ -261,7 +263,9 @@ function updateBlock(
     // becomes a link to the uploaded file instead, in a paragraph replacing the file block.
     return {
       type: "paragraph",
-      content: [toInlineLink(instance, uploadedFileLink(instance, uploaded))],
+      content: [
+        toInlineLink(instance, uploadedFileLink(instance, uploadedFile)),
+      ],
     };
   }
   // The block was removed while the file was uploaded.

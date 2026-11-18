@@ -32,23 +32,23 @@ import type {
 
 /**
  * @param instance - the editor instance where the image is inserted
- * @param file - an uploaded image
+ * @param uploadedFile - an uploaded image
  * @returns the URL of the uploaded image, and its resource reference when known
  */
 function uploadedImage(
   instance: EditorInstance,
-  file: UploadedFile,
+  uploadedFile: UploadedFile,
 ): { url: string; reference?: ResourceReference } {
   return {
-    url: file.url,
+    url: uploadedFile.url,
     reference:
-      file.reference === undefined
+      uploadedFile.reference === undefined
         ? undefined
         : toResourceReference(
             instance.serviceContainer.get<ResourceReferenceParser>(
               "ResourceReferenceParser",
             ),
-            file.reference,
+            uploadedFile.reference,
             LinkType.ATTACHMENT,
           ),
   };
@@ -56,17 +56,17 @@ function uploadedImage(
 
 /**
  * @param instance - the editor instance where the link is inserted
- * @param file - an uploaded file
+ * @param uploadedFile - an uploaded file
  * @returns the link to the uploaded file, labeled with the name of the file
  */
 function uploadedFileLink(
   instance: EditorInstance,
-  file: UploadedFile,
+  uploadedFile: UploadedFile,
 ): LinkEditionData {
   return suggestedLinkData(instance, {
-    label: file.name,
-    url: file.url,
-    reference: file.reference,
+    label: uploadedFile.name,
+    url: uploadedFile.url,
+    reference: uploadedFile.reference,
     type: LinkType.ATTACHMENT,
   });
 }

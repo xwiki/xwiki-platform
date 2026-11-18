@@ -128,14 +128,14 @@ export function ImageSelector({
   );
 
   const uploadImage = useCallback(async () => {
-    const file = await pickAndUploadFile(
+    const uploadedFile = await pickAndUploadFile(
       instance,
       "image/*",
       "Failed to upload the selected image.",
     );
 
-    if (file) {
-      const { url, reference } = uploadedImage(instance, file);
+    if (uploadedFile) {
+      const { url, reference } = uploadedImage(instance, uploadedFile);
       onSelected(url, reference);
     }
   }, [instance, onSelected]);

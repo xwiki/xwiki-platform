@@ -188,13 +188,13 @@ function useLinkInsertion() {
     () =>
       getFileUploader(instance) &&
       (async () => {
-        const file = await pickAndUploadFile(
+        const uploadedFile = await pickAndUploadFile(
           instance,
           undefined,
           "Failed to upload the selected file.",
         );
-        if (file) {
-          insert(uploadedFileLink(instance, file));
+        if (uploadedFile) {
+          insert(uploadedFileLink(instance, uploadedFile));
         }
       }),
     [instance, insert],

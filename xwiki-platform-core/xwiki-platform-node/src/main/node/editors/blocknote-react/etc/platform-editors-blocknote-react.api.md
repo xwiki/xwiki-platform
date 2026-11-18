@@ -156,7 +156,7 @@ export const fileUploaderName = "FileUploader";
 
 // @beta
 export interface FileUploadListener {
-    onUpload?(instance: EditorInstance, file: UploadedFile): void;
+    onUpload?(instance: EditorInstance, uploadedFile: UploadedFile): void;
     onUploadFailed?(instance: EditorInstance, file: File, error: unknown): void;
 }
 

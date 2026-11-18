@@ -319,7 +319,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               query,
               macros: builtMacros,
               syntax,
-              lang,
               t,
               macroEditing: getMacroEditing(instance),
               featureItems: contributions.slashMenuItems(),

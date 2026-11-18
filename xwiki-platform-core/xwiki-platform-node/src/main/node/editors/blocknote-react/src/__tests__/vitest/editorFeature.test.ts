@@ -174,6 +174,30 @@ describe("contributeFeatures", () => {
     );
   });
 
+  test("keeps the first of the slash menu items replacing the same default item, and reports it", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const first = { key: "image", title: "First", onItemClick: vi.fn() };
+    const added = { title: "Added", onItemClick: vi.fn() };
+
+    const merged = contributeFeatures(
+      context([
+        feature("first", { slashMenuItems: () => [first, added] }),
+        feature("second", {
+          slashMenuItems: () => [
+            { key: "image", title: "Second", onItemClick: vi.fn() },
+          ],
+        }),
+      ]),
+    );
+
+    expect(merged.slashMenuItems()).toEqual([first, added]);
+    expect(consoleError).toHaveBeenCalledWith(
+      "The slash menu item [image] is replaced by several editor features. Only the first one is taken into account.",
+    );
+  });
+
   test("merges nothing when the features contribute nothing", () => {
     const merged = contributeFeatures(context([feature("nothing")]));
 

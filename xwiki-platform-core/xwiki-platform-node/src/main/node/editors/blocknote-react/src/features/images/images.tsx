@@ -30,18 +30,18 @@ import type {
   EditorFeature,
   FeatureContext,
   FeatureContribution,
+  SlashMenuItem,
 } from "../editorFeature";
-import type { DefaultReactSuggestionItem } from "@blocknote/react";
 
 /**
  * @param editor - the editor where the image is inserted
- * @returns the "Image" item of the slash menu: BlockNote's own item, which suggests images to insert (in addition to
- *   uploading or browsing images) instead of inserting an empty image block
+ * @returns the item replacing BlockNote's "Image" item of the slash menu, which suggests images to insert (in addition
+ *   to uploading or browsing images) instead of inserting an empty image block
  */
-function imageSlashMenuItem(editor: EditorType): DefaultReactSuggestionItem[] {
-  const title = editor.dictionary.slash_menu.image.title;
-  return getDefaultReactSlashMenuItems(editor)
-    .filter((item) => item.title === title)
+function imageSlashMenuItem(editor: EditorType): SlashMenuItem[] {
+  // The default items keep the key of their BlockNote dictionary entry, even if their type doesn't declare it.
+  return (getDefaultReactSlashMenuItems(editor) as SlashMenuItem[])
+    .filter((item) => item.key === "image")
     .map((item) => ({
       ...item,
       onItemClick: () => openImageSuggestionMenu(editor),

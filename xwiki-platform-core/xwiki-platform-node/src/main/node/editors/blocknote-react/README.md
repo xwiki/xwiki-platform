@@ -28,11 +28,13 @@ it, and the existing ones are checked against it.
    it doesn't name or special-case any feature.
    `features.<id>: false` disables a feature, and a feature contributes nothing when the syntax of the edited content
    can't save what it adds.
-2. **A feature contributes, it doesn't patch.** A feature can contribute slash menu items, formatting toolbar items
-   (including the toolbar shown for a block type), components rendered with the editor (e.g. its menus and toolbars),
-   BlockNote extensions (ProseMirror plugins, paste and drop handling, keyboard shortcuts, input rules) and BlockNote
-   editor options (e.g. `uploadFile`). The editor merges the contributions and reports a conflict (e.g. two features
-   setting the same BlockNote option) rather than letting the last one win.
+2. **A feature contributes, it doesn't patch.** A feature can contribute slash menu items (an item with the key of a
+   BlockNote default item replaces it, in place), formatting toolbar items (including the toolbar shown for a block
+   type), components rendered with the editor (e.g. its menus and toolbars), BlockNote extensions (ProseMirror plugins,
+   paste and drop handling, keyboard shortcuts, input rules) and BlockNote editor options (e.g. `uploadFile`). The
+   editor merges the contributions and reports a conflict (e.g. two features setting the same BlockNote option or
+   replacing the same slash menu item) rather than letting the last one win. The editor itself only removes the
+   BlockNote default items that the syntax of the edited content can't save.
 3. **Horizontal features are used through their service, never through the feature.** Links and images call the
    `FileUploader`; they don't depend on the feature handling the files pasted or dropped in the editor, which can be
    disabled on its own.

@@ -47,6 +47,7 @@ import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { createElement } from "react";
 import { RiFileList3Fill, RiLink } from "react-icons/ri";
+import type { SlashMenuItem } from "../features/editorFeature";
 import type { MacroEditing } from "./macroEditor";
 import type { BlockNoteConcreteMacro } from "./utils";
 import type {
@@ -164,43 +165,90 @@ type SuggestionMenuItemsParams = {
   macros: BlockNoteConcreteMacro[];
   /** Syntax of the current document */
   syntax: SyntaxConfig;
-  /** Language to translate the items as */
-  lang: EditorLanguage;
   /** `t` property from `react-i18n`'s useTranslation() return value */
   t: ReturnType<typeof useTranslation>["t"];
   /** The macro editor of the editor instance, when available */
   macroEditing?: MacroEditing;
   /** The items contributed by the editing features */
-  featureItems: DefaultReactSuggestionItem[];
+  featureItems: SlashMenuItem[];
 };
+
+/**
+ * @param blocks - the blocks supported by the syntax of the edited content
+ * @returns the keys of BlockNote's default slash menu items inserting blocks that the syntax can't save
+ */
+function getUnsupportedDefaultItemKeys(
+  blocks: SyntaxConfig["features"]["blocks"],
+): Set<string> {
+  const unsupported: [boolean, string[]][] = [
+    [
+      blocks.headings.levels1To3,
+      [
+        "heading",
+        "heading_2",
+        "heading_3",
+        "toggle_heading",
+        "toggle_heading_2",
+        "toggle_heading_3",
+      ],
+    ],
+    [blocks.headings.levels4To6, ["heading_4", "heading_5", "heading_6"]],
+    [blocks.code.basicCodeBlocks, ["code_block"]],
+    [blocks.quotes, ["quote"]],
+    [blocks.lists.bulletLists, ["bullet_list", "toggle_list"]],
+    [blocks.lists.contiguousNumberedLists, ["numbered_list"]],
+    [blocks.lists.checkableLists, ["check_list"]],
+    [blocks.tables.basicTables, ["table"]],
+    [blocks.images.basicImages, ["image"]],
+    [blocks.dividers, ["divider"]],
+  ];
+  return new Set(
+    unsupported.flatMap(([supported, keys]) => (supported ? [] : keys)),
+  );
+}
+
+/**
+ * The editing features replace a default slash menu item by contributing an item with the same key, which takes the
+ * place of the default one.
+ *
+ * @param defaultItems - BlockNote's default slash menu items
+ * @param featureItems - the slash menu items contributed by the editing features
+ * @returns the default items, some of them replaced, and the contributed items that don't replace any default item
+ */
+function replaceDefaultItems(
+  defaultItems: SlashMenuItem[],
+  featureItems: SlashMenuItem[],
+): { items: SlashMenuItem[]; additionalItems: SlashMenuItem[] } {
+  const defaultKeys = new Set(defaultItems.map((item) => item.key));
+  const replacements = new Map(
+    featureItems
+      .filter((item) => item.key && defaultKeys.has(item.key))
+      .map((item) => [item.key, item]),
+  );
+  return {
+    items: defaultItems.map((item) => replacements.get(item.key) ?? item),
+    additionalItems: featureItems.filter(
+      (item) => !item.key || !defaultKeys.has(item.key),
+    ),
+  };
+}
 
 /**
  * Suggests a set of suggestion from the menu items.
  *
  * @param params - see {@link SuggestionMenuItemsParams}
  */
-// eslint-disable-next-line max-statements
 function querySuggestionsMenuItems({
   editor,
   query,
   macros,
   syntax,
-  lang,
   t,
   macroEditing,
   featureItems,
 }: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
-
-  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
-  // eslint-disable-next-line import-x/namespace
-  const locale = locales[lang].slash_menu;
-
-  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
-    candidates.some(
-      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
-    );
 
   // A single generic "Link" entry that opens the link suggestion menu, which suggests pages and attachments to link to,
   // in addition to uploading a file to link to and opening the link editor. Only enabled if the syntax supports it
@@ -243,12 +291,18 @@ function querySuggestionsMenuItems({
         ]
       : [];
 
-  let items = filterSuggestionItems(
+  // The default items keep the key of their BlockNote dictionary entry, even if their type doesn't declare it.
+  const unsupportedKeys = getUnsupportedDefaultItemKeys(blocksSupport);
+  const { items: defaultItems, additionalItems } = replaceDefaultItems(
+    (getDefaultReactSlashMenuItems(editor) as SlashMenuItem[]).filter(
+      (item) => !unsupportedKeys.has(item.key!),
+    ),
+    featureItems,
+  );
+
+  return filterSuggestionItems(
     combineByGroup(
-      // The "Image" item is contributed by the images feature, which has its own way of inserting images.
-      getDefaultReactSlashMenuItems(editor).filter(
-        (item) => !isLocale(item.title, ["image"]),
-      ),
+      defaultItems,
 
       // Block macros
       blocksSupport.macros
@@ -271,62 +325,10 @@ function querySuggestionsMenuItems({
 
       genericLinkItem,
       genericMacroItem,
-      featureItems,
+      additionalItems,
     ),
     query,
   );
-
-  if (!blocksSupport.headings.levels1To3) {
-    items = items.filter(
-      (item) =>
-        !isLocale(item.title, [
-          "heading",
-          "heading_2",
-          "heading_3",
-          "toggle_heading",
-          "toggle_heading_2",
-          "toggle_heading_3",
-        ]),
-    );
-  }
-
-  if (!blocksSupport.headings.levels4To6) {
-    items = items.filter(
-      (item) => !isLocale(item.title, ["heading_4", "heading_5", "heading_6"]),
-    );
-  }
-
-  if (!blocksSupport.code.basicCodeBlocks) {
-    items = items.filter((item) => !isLocale(item.title, ["code_block"]));
-  }
-
-  if (!blocksSupport.quotes) {
-    items = items.filter((item) => !isLocale(item.title, ["quote"]));
-  }
-
-  if (!blocksSupport.lists.bulletLists) {
-    items = items.filter(
-      (item) => !isLocale(item.title, ["bullet_list", "toggle_list"]),
-    );
-  }
-
-  if (!blocksSupport.lists.contiguousNumberedLists) {
-    items = items.filter((item) => !isLocale(item.title, ["numbered_list"]));
-  }
-
-  if (!blocksSupport.lists.checkableLists) {
-    items = items.filter((item) => !isLocale(item.title, ["check_list"]));
-  }
-
-  if (!blocksSupport.tables.basicTables) {
-    items = items.filter((item) => !isLocale(item.title, ["table"]));
-  }
-
-  if (!blocksSupport.dividers) {
-    items = items.filter((item) => !isLocale(item.title, ["divider"]));
-  }
-
-  return items;
 }
 
 /**

@@ -185,7 +185,7 @@ export type FeatureContext = Pick<EditorInstance, "options" | "serviceContainer"
 export type FeatureContribution = {
     blockNoteExtensions?: ExtensionFactoryInstance[];
     blockNoteOptions?: ContributedBlockNoteOptions;
-    slashMenuItems?: () => DefaultReactSuggestionItem[];
+    slashMenuItems?: () => SlashMenuItem[];
     formattingToolbar?: FormattingToolbarContribution;
     components?: ReactNode;
 };
@@ -343,6 +343,11 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 
 // @beta
 export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
+
+// @beta
+export type SlashMenuItem = DefaultReactSuggestionItem & {
+    key?: string;
+};
 
 // @beta
 export type UploadedFile = {

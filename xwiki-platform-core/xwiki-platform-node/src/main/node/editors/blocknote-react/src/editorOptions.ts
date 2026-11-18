@@ -74,9 +74,9 @@ type MacroFeatureOptions = {
  */
 interface EditorFeatures {
   /**
-   * The images are enabled when this is missing. `false` disables the actions to insert and edit images (the slash
-   * menu item, the image suggestions, the image toolbar), even when an `ImageEditor` is bound. The images already in
-   * the content are still displayed.
+   * The images are enabled when this is missing. `false` disables the image suggestions, the image toolbar and the
+   * image panel, even when an `ImageEditor` is bound: the "Image" item of the slash menu is BlockNote's own, which
+   * inserts an empty image block. Whether the content can hold images at all depends on the syntax.
    */
   images?: false;
 

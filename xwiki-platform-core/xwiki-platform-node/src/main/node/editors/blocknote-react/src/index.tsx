@@ -116,6 +116,7 @@ export type {
   FeatureContext,
   FeatureContribution,
   FormattingToolbarContribution,
+  SlashMenuItem,
 } from "./features/editorFeature";
 
 export {

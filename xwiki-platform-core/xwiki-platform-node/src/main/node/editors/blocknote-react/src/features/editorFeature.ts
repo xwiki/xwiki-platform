@@ -88,6 +88,20 @@ type ContributedBlockNoteOptions = Partial<
 >;
 
 /**
+ * An item of the slash menu.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type SlashMenuItem = DefaultReactSuggestionItem & {
+  /**
+   * The key of the BlockNote default slash menu item that this item replaces (e.g. "image"), taking its place in the
+   * slash menu. BlockNote's default items are keyed by their entry in the `slash_menu` of the BlockNote dictionary.
+   */
+  key?: string;
+};
+
+/**
  * What an editing feature adds to the formatting toolbar.
  *
  * @since 18.10.0RC1
@@ -129,9 +143,10 @@ type FeatureContribution = {
   blockNoteOptions?: ContributedBlockNoteOptions;
 
   /**
-   * @returns the items to add to the slash menu, which the editor filters with the query typed by the user
+   * @returns the items to add to the slash menu, which the editor filters with the query typed by the user; an item
+   *   with the key of a BlockNote default item replaces it (two features can't replace the same item)
    */
-  slashMenuItems?: () => DefaultReactSuggestionItem[];
+  slashMenuItems?: () => SlashMenuItem[];
 
   /**
    * What to add to the formatting toolbar.
@@ -179,7 +194,7 @@ interface EditorFeature {
 type MergedContributions = {
   blockNoteExtensions: ExtensionFactoryInstance[];
   blockNoteOptions: ContributedBlockNoteOptions;
-  slashMenuItems: () => DefaultReactSuggestionItem[];
+  slashMenuItems: () => SlashMenuItem[];
   formattingToolbar: Required<FormattingToolbarContribution>;
   components: ReactNode[];
 };
@@ -202,6 +217,26 @@ function mergeRecord(
       target[key] = value;
     }
   }
+}
+
+/**
+ * Keeps the first of the slash menu items replacing the same BlockNote default item, reporting the others, so that the
+ * outcome doesn't depend on which feature comes last.
+ */
+function keepFirstReplacements(items: SlashMenuItem[]): SlashMenuItem[] {
+  const keys = new Set<string>();
+  return items.filter((item) => {
+    if (!item.key) {
+      return true;
+    } else if (keys.has(item.key)) {
+      console.error(
+        `The slash menu item [${item.key}] is replaced by several editor features. Only the first one is taken into account.`,
+      );
+      return false;
+    }
+    keys.add(item.key);
+    return true;
+  });
 }
 
 /**
@@ -233,8 +268,10 @@ function mergeContributions(
     ),
     blockNoteOptions,
     slashMenuItems: () =>
-      contributions.flatMap(
-        (contribution) => contribution.slashMenuItems?.() ?? [],
+      keepFirstReplacements(
+        contributions.flatMap(
+          (contribution) => contribution.slashMenuItems?.() ?? [],
+        ),
       ),
     formattingToolbar: {
       items: contributions.flatMap(
@@ -296,4 +333,5 @@ export type {
   FeatureContribution,
   FormattingToolbarContribution,
   MergedContributions,
+  SlashMenuItem,
 };

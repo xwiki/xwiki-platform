@@ -49,7 +49,6 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
       query,
       macros: [],
       syntax: FULL_SYNTAX,
-      lang: "en",
       t,
       macroEditing: undefined,
       featureItems: [],

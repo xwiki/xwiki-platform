@@ -86,7 +86,10 @@ test("Allowed syntax features should be available", async ({ mount, page }) => {
 
   expect(menuItemsText).toContain("Table");
   expect(menuItemsText).toContain("Quote");
-  expect(menuItemsText).toContain("Image");
+  // The images feature replaces BlockNote's "Image" item, which keeps its place.
+  expect(menuItemsText.indexOf("Image")).toBeLessThan(
+    menuItemsText.indexOf("Video"),
+  );
 });
 
 test("Disallowed syntax features should be unavailable", async ({
@@ -126,7 +129,7 @@ test("Disallowed syntax features should be unavailable", async ({
   expect(menuItemsText).not.toContain("Image");
 });
 
-test("A disabled editor feature contributes nothing", async ({
+test("A disabled editor feature leaves BlockNote's default slash menu item", async ({
   mount,
   page,
 }) => {
@@ -137,17 +140,18 @@ test("A disabled editor feature contributes nothing", async ({
     />,
   );
 
-  await component.locator(".bn-editor").press("/");
+  await component.locator(".bn-editor").click();
+  await page.keyboard.type("/image");
+  await expect(
+    page.locator('.bn-suggestion-menu-item[aria-selected="true"]'),
+  ).toContainText("Image");
+  await page.keyboard.press("Enter");
 
-  const slashMenuEl = page.locator(
-    "[data-floating-ui-portal] .bn-suggestion-menu",
-  );
-  await slashMenuEl.waitFor({ state: "attached" });
-  const menuItems = slashMenuEl.locator(
-    ".bn-suggestion-menu-item p:first-child",
-  );
-  await expect(menuItems.filter({ hasText: "Table" })).toHaveCount(1);
-  await expect(menuItems.filter({ hasText: /^Image$/ })).toHaveCount(0);
+  // BlockNote's "Image" item inserts an empty image block, instead of opening the image suggestions.
+  await expect(
+    component.locator('.bn-block-content[data-content-type="image"]'),
+  ).toHaveCount(1);
+  await expect(page.locator(".bn-suggestion-menu")).toHaveCount(0);
 });
 
 test("Macros can be inserted with the macro editor", async ({

@@ -41,11 +41,15 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.Resources;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
+import org.xwiki.repository.test.RepositoryTestUtils;
 import org.xwiki.repository.test.TestExtension;
 import org.xwiki.repository.test.po.ExtensionImportPage;
 import org.xwiki.repository.test.po.ExtensionPage;
@@ -59,13 +63,17 @@ import org.xwiki.repository.test.po.edit.ExtensionInlinePage;
 import org.xwiki.repository.test.po.edit.ExtensionSupportPlanInlinePage;
 import org.xwiki.repository.test.po.edit.ExtensionSupporterInlinePage;
 import org.xwiki.repository.test.ui.AbstractExtensionAdminAuthenticatedIT;
+import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.xwiki.test.ui.TestUtils.RestTestUtils.object;
+import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
 
 /**
  * Repository Test.
@@ -125,6 +133,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         setUpXWiki();
         addSupportPlans();
         addExtension();
+        validateDependenciesOfOldRevision();
         ExtensionPage importedExtensionPage = importExtension();
         enableProxying(importedExtensionPage);
         validateSupport();
@@ -415,6 +424,60 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         }
 
         return extension;
+    }
+
+    /**
+     * An old revision of an extension page storing its versions on the page itself lists only the dependencies of its
+     * own last version, even when the current revision of the page doesn't have this version anymore.
+     */
+    private void validateDependenciesOfOldRevision() throws Exception
+    {
+        String extensionName = "Dependencies extension";
+        String extensionId = IDPREFIX + "dependencies-extension";
+        LocalDocumentReference extensionReference =
+            new LocalDocumentReference(List.of("Extension", extensionName), "WebHome");
+        getRepositoryTestUtils().deleteExtension(extensionName);
+
+        Page extensionPage = getUtil().rest().page(extensionReference);
+        extensionPage.setObjects(new Objects());
+        org.xwiki.rest.model.jaxb.Object extensionObject = object(XWikiRepositoryModel.EXTENSION_CLASSNAME);
+        extensionObject.getProperties().addAll(List.of(
+            property(XWikiRepositoryModel.PROP_EXTENSION_ID, extensionId),
+            property(XWikiRepositoryModel.PROP_EXTENSION_NAME, extensionName),
+            property(XWikiRepositoryModel.PROP_EXTENSION_TYPE, "jar")));
+        extensionPage.getObjects().getObjectSummaries().add(extensionObject);
+        // The dependency of the last version is an existing extension, so that it's displayed as a link to its page.
+        Map<String, String> dependencies =
+            Map.of("1.0", "dependency-of-1.0", "2.0", this.baseExtension.getId().getId());
+        List<String> versions = List.of("1.0", "2.0");
+        for (int number = 0; number < versions.size(); number++) {
+            String version = versions.get(number);
+            org.xwiki.rest.model.jaxb.Object versionObject =
+                RepositoryTestUtils.extensionVersionObject(version, null, null);
+            versionObject.setNumber(number);
+            versionObject.getProperties().add(property(XWikiRepositoryModel.PROP_VERSION_ID, extensionId));
+            extensionPage.getObjects().getObjectSummaries().add(versionObject);
+            org.xwiki.rest.model.jaxb.Object dependencyObject = RepositoryTestUtils.extensionDependencyObject(version,
+                new DefaultExtensionDependency(dependencies.get(version), new DefaultVersionConstraint(version)));
+            dependencyObject.setNumber(number);
+            extensionPage.getObjects().getObjectSummaries().add(dependencyObject);
+        }
+        getUtil().rest().save(extensionPage, TestUtils.STATUS_CREATED);
+
+        String revision = getUtil().rest().<Page>get(extensionReference).getVersion();
+        String lastVersionDependency = this.baseExtension.getId().getId() + " 2.0";
+        assertEquals(List.of(lastVersionDependency), ExtensionPage.gotoPage(extensionName).getDependencies());
+
+        // Remove the last version from the current revision of the page.
+        getUtil().rest().delete(new ObjectReference(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME + "[1]",
+            new DocumentReference(extensionReference, new WikiReference("xwiki"))));
+        assertEquals(List.of("dependency-of-1.0 1.0"), ExtensionPage.gotoPage(extensionName).getDependencies());
+
+        getUtil().gotoPage(extensionReference, "view", "rev=" + revision);
+        assertEquals(List.of(lastVersionDependency), new ExtensionPage().getDependencies());
+
+        // Don't list this extension in the following steps.
+        getRepositoryTestUtils().deleteExtension(extensionName);
     }
 
     private ExtensionPage importExtension() throws Exception

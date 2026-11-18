@@ -66,6 +66,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -132,6 +133,8 @@ class ExtensionSheetPageTest extends PageTest
     private XWikiDocument extensionSheetDocument;
 
     private String testString;
+
+    private RepositoryScriptService repositoryScriptService;
 
     @MockComponent
     @Named("groovy")
@@ -200,10 +203,10 @@ class ExtensionSheetPageTest extends PageTest
             !((MacroTransformationContext) i.getArgument(1)).getTransformationContext().isRestricted());
 
         // Mock repository script service
-        RepositoryScriptService repositoryScriptService =
+        this.repositoryScriptService =
             this.componentManager.registerMockComponent(ScriptService.class, "repository",
                 RepositoryScriptService.class, false);
-        when(repositoryScriptService.getVersionObject(any(), any())).thenReturn(new Object(extensionVersionObject,
+        when(this.repositoryScriptService.getVersionObject(any(), any())).thenReturn(new Object(extensionVersionObject,
             null));
     }
 
@@ -239,5 +242,39 @@ class ExtensionSheetPageTest extends PageTest
         assertEquals("Extension imported from repository %s".formatted(this.testString),
             document.select("span.infomessage").text());
         assertEquals("http://example.com]]MARKER", document.select("span.infomessage a").attr("href"));
+    }
+
+    /**
+     * An old revision of an extension page holds the version and dependency objects of all its versions, while the
+     * current version storage may not know its last version anymore: only the dependencies of the last version of the
+     * displayed revision are listed, and its release notes are displayed from its own version objects.
+     */
+    @Test
+    void oldRevisionWithVersionsUnknownToTheCurrentStorage() throws Exception
+    {
+        XWikiDocument oldRevision =
+            this.xwiki.getDocument(new DocumentReference(WIKI_NAME, "Test", "OldRevision"), this.context);
+        BaseObject extensionObject = oldRevision.newXObject(EXTENSION_CLASS, this.context);
+        extensionObject.setStringValue("id", "org.example:extension");
+        extensionObject.setStringValue("name", "Extension");
+        extensionObject.setStringValue("lastVersion", "2.0");
+        for (String version : List.of("1.0", "2.0")) {
+            BaseObject versionObject = oldRevision.newXObject(EXTENSION_VERSION_CLASS, this.context);
+            versionObject.setStringValue("version", version);
+            versionObject.setStringValue("notes", "Notes of version " + version);
+            BaseObject dependencyObject = oldRevision.newXObject(EXTENSION_DEPENDENCY_CLASS, this.context);
+            dependencyObject.setStringValue("extensionVersion", version);
+            dependencyObject.setStringValue("id", "org.example:dependency-of-" + version);
+            dependencyObject.setStringValue("constraint", version);
+        }
+        when(this.repositoryScriptService.getVersionObject(any(), any())).thenReturn(null);
+
+        this.context.setDoc(oldRevision);
+        Document document = renderHTMLPage(this.extensionSheetDocument);
+
+        List<String> listItems = document.select("li").eachText();
+        assertTrue(listItems.contains("org.example:dependency-of-2.0 2.0"), listItems::toString);
+        assertTrue(listItems.stream().noneMatch(item -> item.contains("dependency-of-1.0")), listItems::toString);
+        assertTrue(document.text().contains("Notes of version 2.0"), document::text);
     }
 }

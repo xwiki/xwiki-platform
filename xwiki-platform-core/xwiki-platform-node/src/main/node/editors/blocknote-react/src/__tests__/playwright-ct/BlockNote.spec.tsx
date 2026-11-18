@@ -26,7 +26,7 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
+    <BlockNoteForTest content={[]} options={{ syntax: FULL_SYNTAX }} />,
   );
 
   await expect(component).toBeVisible();
@@ -37,8 +37,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
   const component = await mount(
     <BlockNoteForTest
       content={buildParagraphs(["Hello,", "world!"])}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -48,7 +47,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
 
 test("BlockNote's content can be modified", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
+    <BlockNoteForTest content={[]} options={{ syntax: FULL_SYNTAX }} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -69,14 +68,17 @@ test("Image insertion UI can be overridden", async ({ mount, page }) => {
   const component = await mount(
     <BlockNoteForTest
       content={[buildImage(SMALL_IMG_DATA_URL)]}
-      macros={false}
-      overrides={{
-        // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
-        imageEdition: (block) => {
-          overrideFnCalledWithUrl = block.props.url;
+      options={{
+        syntax: FULL_SYNTAX,
+        features: {
+          images: {
+            // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
+            edition: (block) => {
+              overrideFnCalledWithUrl = block.props.url;
+            },
+          },
         },
       }}
-      syntax={FULL_SYNTAX}
     />,
   );
 
@@ -105,7 +107,7 @@ test("Image insertion UI can be overridden", async ({ mount, page }) => {
 
 test("Allowed syntax features should be available", async ({ mount, page }) => {
   const component = await mount(
-    <BlockNoteForTest macros={false} content={[]} syntax={FULL_SYNTAX} />,
+    <BlockNoteForTest content={[]} options={{ syntax: FULL_SYNTAX }} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -140,7 +142,7 @@ test("Disallowed syntax features should be unavailable", async ({
   syntax.features.blocks.quotes = false;
 
   const component = await mount(
-    <BlockNoteForTest macros={false} content={[]} syntax={syntax} />,
+    <BlockNoteForTest content={[]} options={{ syntax }} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -184,19 +186,23 @@ test("Macros can be inserted", async ({ mount, page }) => {
           },
         },
       ]}
-      macros={{
-        ctx: {
-          openParamsEditor() {
-            throw new Error("Unreachable");
-          },
+      options={{
+        syntax: FULL_SYNTAX,
+        features: {
+          macros: {
+            ctx: {
+              openParamsEditor() {
+                throw new Error("Unreachable");
+              },
 
-          openInsertionEditor() {
-            macroInsertionModalTriggered = true;
+              openInsertionEditor() {
+                macroInsertionModalTriggered = true;
+              },
+            },
+            list: macros,
           },
         },
-        list: macros,
       }}
-      syntax={FULL_SYNTAX}
     />,
   );
 
@@ -241,8 +247,7 @@ test("Code blocks with supported and unsupported languages", async ({
       content={languages.map((language) =>
         buildCodeBlock(language, "if (true) { return 'foo'; }"),
       )}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -283,8 +288,7 @@ test("Code block languages use ids known by the code macro", async ({
         buildCodeBlock("md", "**foo**"),
         buildCodeBlock("text", "foo"),
       ]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -323,8 +327,7 @@ test("Code blocks created by typing ``` use the typed language or Plain Text", a
   const component = await mount(
     <BlockNoteForTest
       content={buildParagraphs(["", ""])}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -355,8 +358,7 @@ test("Ctrl+Alt+C turns the current block into a code block", async ({
   const component = await mount(
     <BlockNoteForTest
       content={buildParagraphs(["foo"])}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -379,8 +381,7 @@ test("The language selector keeps the focus when changing the language", async (
   const component = await mount(
     <BlockNoteForTest
       content={[buildCodeBlock("java", "int count = 0;")]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 

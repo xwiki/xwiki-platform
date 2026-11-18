@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { SearchBox } from "../../components/SearchBox";
-import { DepsContainerContext } from "../../contexts";
+import { ServiceContainerContext } from "../../contexts";
 import { MantineProvider } from "@mantine/core";
 import { EntityType } from "@xwiki/platform-model-api";
 import { useCallback, useMemo, useState } from "react";
@@ -34,7 +34,7 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
   onSelect,
   onSubmit,
 }) => {
-  const depsContainer = useMemo(depsContainerMock, []);
+  const serviceContainer = useMemo(serviceContainerMock, []);
 
   // Every query searched so far, rendered for the tests to check which searches were performed.
   const [searchedQueries, setSearchedQueries] = useState<string[]>([]);
@@ -64,7 +64,7 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
 
   return (
     <MantineProvider>
-      <DepsContainerContext value={depsContainer}>
+      <ServiceContainerContext value={serviceContainer}>
         <SearchBox
           initialValue="Some great initial value"
           placeholder="Some super placeholder"
@@ -79,7 +79,7 @@ export const SearchBoxForTest: React.FC<SearchBoxForTestProps> = ({
         <output data-test="searchedQueries">
           {JSON.stringify(searchedQueries)}
         </output>
-      </DepsContainerContext>
+      </ServiceContainerContext>
     </MantineProvider>
   );
 };

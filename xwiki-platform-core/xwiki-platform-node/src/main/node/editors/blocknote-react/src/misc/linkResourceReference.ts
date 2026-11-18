@@ -35,7 +35,7 @@ import type { Container } from "inversify";
  * the edited page, so that the link keeps pointing to the same entity when the edited page is moved together with it
  * (e.g. along with its attachments or its child pages).
  *
- * @param depsContainer - the container providing the model reference services
+ * @param serviceContainer - the container providing the model reference services
  * @param reference - the absolute serialized reference of the linked page or attachment
  * @param type - the type of the linked entity
  * @param page - the serialized reference of the edited page, the current page when not specified
@@ -43,15 +43,15 @@ import type { Container } from "inversify";
  *   (the link is then saved from its URL)
  */
 function toLinkResourceReference(
-  depsContainer: Container,
+  serviceContainer: Container,
   reference: string,
   type: LinkType,
   page?: string,
 ): ResourceReference | undefined {
-  const parser = depsContainer
+  const parser = serviceContainer
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
     .get();
-  const serializer = depsContainer
+  const serializer = serviceContainer
     .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
     .get();
   const isAttachment = type === LinkType.ATTACHMENT;
@@ -62,7 +62,7 @@ function toLinkResourceReference(
     }),
   );
   const base = tryFallible(() =>
-    parser?.parse(page ?? getCurrentPage(depsContainer), {
+    parser?.parse(page ?? getCurrentPage(serviceContainer), {
       type: EntityType.DOCUMENT,
       relative: false,
     }),

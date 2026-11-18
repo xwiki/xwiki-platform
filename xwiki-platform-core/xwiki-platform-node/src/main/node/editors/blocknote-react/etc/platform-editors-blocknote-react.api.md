@@ -7,7 +7,6 @@
 import { Block } from '@blocknote/core';
 import { BlockConfig } from '@blocknote/core';
 import { BlockNoteEditor } from '@blocknote/core';
-import { BlockNoteEditorOptions } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import { BlockSchemaFromSpecs } from '@blocknote/core';
 import { BlockSpec } from '@blocknote/core';
@@ -17,6 +16,7 @@ import { Container } from 'inversify';
 import { CustomInlineContentConfig } from '@blocknote/core';
 import { DefaultInlineContentSchema } from '@blocknote/core';
 import { DefaultStyleSchema } from '@blocknote/core';
+import { DocumentReference } from '@xwiki/platform-model-api';
 import { Extension } from '@blocknote/core';
 import { ExtensionFactoryInstance } from '@blocknote/core';
 import { InlineContent } from '@blocknote/core';
@@ -46,29 +46,10 @@ import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 
 // @beta
 export type BlockNoteViewWrapperProps = {
-    blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema">>;
-    name?: string;
-    theme?: "light" | "dark";
-    lang: EditorLanguage;
-    label: string;
-    documentReference?: string;
+    options: EditorOptions;
     content: BlockType[];
-    macros: {
-        list?: MacroWithUnknownParamsType[];
-        ctx: ContextForMacros;
-    } | false;
-    collaboration?: Collaboration;
-    onChange?: (editor: EditorType) => void;
-    depsContainer: Container;
     linkEditionHandler: LinkEditionHandler;
-    overrides?: {
-        imageEdition?: ImageEditionOverrideFn;
-        imageEditionHooks?: ImageEditionHooks;
-        imageInsertion?: ImageInsertionOverrideFn;
-        linkEdition?: LinkEditionHooks;
-    };
-    syntax: SyntaxConfig;
-    codeBlockClassName?: string;
+    onChange?: (editor: EditorType) => void;
     refs?: {
         setEditor?: (editor: EditorType) => void;
     };
@@ -93,10 +74,21 @@ export type ContextForMacros = {
 };
 
 // @beta
-export type DefaultBlockNoteEditorOptions = BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>;
+export type EditorAppearance = {
+    theme?: "light" | "dark";
+    contentStyles?: "editor" | "host";
+    codeBlockClassName?: string;
+};
 
 // @beta
 export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer BlockSchema, infer _, infer __> ? BlockSchema : never;
+
+// @beta
+export type EditorFeatures = {
+    links?: LinkFeatureOptions;
+    images?: ImageFeatureOptions;
+    macros?: MacroFeatureOptions | false;
+};
 
 // @beta
 export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<infer _, infer InlineContentSchema, infer __> ? InlineContentSchema : never;
@@ -108,6 +100,21 @@ export type EditorLanguage = keyof typeof locales & keyof typeof _default;
 
 // @beta
 export type EditorLink = Link<EditorStyleSchema>;
+
+// @beta
+export type EditorOptions = {
+    serviceContainer: Container;
+    name?: string;
+    sourceDocumentReference?: DocumentReference;
+    syntax: SyntaxConfig;
+    lang: EditorLanguage;
+    label: string;
+    autofocus?: boolean;
+    appearance?: EditorAppearance;
+    collaboration?: Collaboration;
+    upload?: UploadOptions;
+    features?: EditorFeatures;
+};
 
 // @beta
 export type EditorPartialLink = PartialLink<EditorStyleSchema>;
@@ -136,6 +143,13 @@ export type ImageEditionHooks = {
 
 // @beta
 export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;
+
+// @beta
+export type ImageFeatureOptions = {
+    edition?: ImageEditionOverrideFn;
+    insertion?: ImageInsertionOverrideFn;
+    hooks?: ImageEditionHooks;
+};
 
 // @beta
 export type ImageInsertionOverrideFn = (insert: (insertionResult: ImageInsertionResult) => void) => void;
@@ -198,6 +212,11 @@ export type LinkEditionHooks = {
 };
 
 // @beta
+export type LinkFeatureOptions = {
+    hooks?: LinkEditionHooks;
+};
+
+// @beta
 export const MACRO_NAME_PREFIX = "Macro_";
 
 // @beta
@@ -224,6 +243,12 @@ export type MacroCall = {
 export type MacroCallParams = Record<string, boolean | number | string>;
 
 // @beta
+export type MacroFeatureOptions = {
+    list?: MacroWithUnknownParamsType[];
+    ctx: ContextForMacros;
+};
+
+// @beta
 export type MacroInsertionEditorPrefillData = {
     kind: "block" | "inline";
     id: string | null;
@@ -234,6 +259,11 @@ export type MacroInsertionEditorPrefillData = {
 // @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
+};
+
+// @beta
+export type UploadOptions = {
+    uploadFile: (file: File, blockId?: string) => Promise<string | Record<string, unknown>>;
 };
 
 // (No @packageDocumentation comment for this package)

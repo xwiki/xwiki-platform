@@ -19,7 +19,10 @@
  */
 import { insertLink } from "./insertLink";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
-import { DepsContainerContext, EditedDocumentContext } from "../../contexts";
+import {
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
+} from "../../contexts";
 import { useEditor } from "../../hooks";
 import { triggerUserAttachmentUpload } from "../../misc/fileUpload";
 import { toLinkResourceReference } from "../../misc/linkResourceReference";
@@ -87,16 +90,16 @@ export function LinkSuggestionController({
   maxSuggestions,
   pageSuggestionsShare,
 }: LinkSuggestionControllerProps) {
-  const depsContainer = useContext(DepsContainerContext)!;
+  const serviceContainer = useContext(ServiceContainerContext)!;
 
-  const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
+  const linkSuggestService = serviceContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
 
   const editor = useEditor();
   const { insertSuggested, openLinkEditor, uploadFile } = useLinkInsertion(
     editor,
-    depsContainer,
+    serviceContainer,
     linkEditionHandler,
     linkEditionHooks,
   );
@@ -174,7 +177,7 @@ export function LinkSuggestionController({
  */
 function useLinkInsertion(
   editor: EditorType,
-  depsContainer: Container,
+  serviceContainer: Container,
   linkEditionHandler: LinkEditionHandler,
   linkEditionHooks?: LinkEditionHooks,
 ) {
@@ -193,7 +196,7 @@ function useLinkInsertion(
     [linkEditionHandler, insert],
   );
 
-  const editedDocumentReference = useContext(EditedDocumentContext);
+  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
 
   // The label of a link to a suggested or uploaded page or attachment is generated from its target (the title of the
   // page, the name of the attachment), which is the label of the suggestion.
@@ -208,19 +211,19 @@ function useLinkInsertion(
           link.reference === undefined
             ? undefined
             : toLinkResourceReference(
-                depsContainer,
+                serviceContainer,
                 link.reference,
                 link.type,
-                editedDocumentReference,
+                sourceDocumentReference,
               ),
       }),
-    [depsContainer, editedDocumentReference, insert],
+    [serviceContainer, sourceDocumentReference, insert],
   );
 
   const uploadFile = useCallback(async () => {
     const attachment = await triggerUserAttachmentUpload(
-      depsContainer,
-      editedDocumentReference,
+      serviceContainer,
+      sourceDocumentReference,
     );
 
     if (attachment) {
@@ -231,7 +234,7 @@ function useLinkInsertion(
         type: LinkType.ATTACHMENT,
       });
     }
-  }, [depsContainer, editedDocumentReference, insertSuggested]);
+  }, [serviceContainer, sourceDocumentReference, insertSuggested]);
 
   return { insertSuggested, openLinkEditor, uploadFile };
 }

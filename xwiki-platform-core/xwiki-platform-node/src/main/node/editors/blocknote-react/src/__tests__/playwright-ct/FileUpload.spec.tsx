@@ -77,10 +77,11 @@ function dropFile(
 test("A dropped image is uploaded and shown", async ({ mount, page }) => {
   const component = await mount(
     <BlockNoteForTest
-      blockNoteOptions={{ uploadFile: async () => UPLOADED_URL }}
       content={[]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{
+        upload: { uploadFile: async () => UPLOADED_URL },
+        syntax: FULL_SYNTAX,
+      }}
     />,
   );
 
@@ -92,10 +93,11 @@ test("A dropped image is uploaded and shown", async ({ mount, page }) => {
 test("A pasted image is uploaded and shown", async ({ mount, page }) => {
   const component = await mount(
     <BlockNoteForTest
-      blockNoteOptions={{ uploadFile: async () => UPLOADED_URL }}
       content={[]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{
+        upload: { uploadFile: async () => UPLOADED_URL },
+        syntax: FULL_SYNTAX,
+      }}
     />,
   );
 
@@ -107,13 +109,14 @@ test("A pasted image is uploaded and shown", async ({ mount, page }) => {
 test("A failed upload leaves no block behind", async ({ mount, page }) => {
   const component = await mount(
     <BlockNoteForTest
-      blockNoteOptions={{
-        // What the XWiki integration returns on failure: BlockNote doesn't handle a rejection.
-        uploadFile: async () => ({ type: "paragraph", content: [] }),
-      }}
       content={[]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{
+        upload: {
+          // What the XWiki integration returns on failure: BlockNote doesn't handle a rejection.
+          uploadFile: async () => ({ type: "paragraph", content: [] }),
+        },
+        syntax: FULL_SYNTAX,
+      }}
     />,
   );
 
@@ -131,22 +134,23 @@ test("A dropped non-image file can be replaced by a link", async ({
 }) => {
   const component = await mount(
     <BlockNoteForTest
-      blockNoteOptions={{
-        // What the XWiki integration returns for a file it links instead of embedding.
-        uploadFile: async () => ({
-          type: "paragraph",
-          content: [
-            {
-              type: "link",
-              href: "/download/report.pdf",
-              content: "report.pdf",
-            },
-          ],
-        }),
-      }}
       content={[]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{
+        upload: {
+          // What the XWiki integration returns for a file it links instead of embedding.
+          uploadFile: async () => ({
+            type: "paragraph",
+            content: [
+              {
+                type: "link",
+                href: "/download/report.pdf",
+                content: "report.pdf",
+              },
+            ],
+          }),
+        },
+        syntax: FULL_SYNTAX,
+      }}
     />,
   );
 

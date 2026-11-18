@@ -17,7 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DepsContainerContext, EditedDocumentContext } from "../../contexts";
+import {
+  ServiceContainerContext,
+  SourceDocumentReferenceContext,
+} from "../../contexts";
 import { triggerUserImageUpload } from "../../misc/fileUpload";
 import { SearchBox } from "../SearchBox";
 import {
@@ -61,17 +64,17 @@ export function ImageSelector({
   currentSelection,
   onSelected,
 }: ImageSelectorProps) {
-  const depsContainer = useContext(DepsContainerContext)!;
+  const serviceContainer = useContext(ServiceContainerContext)!;
 
-  const remoteURLParser = depsContainer
+  const remoteURLParser = serviceContainer
     .get<RemoteURLParserProvider>("RemoteURLParserProvider")
     .get()!;
 
-  const modelReferenceHandler = depsContainer
+  const modelReferenceHandler = serviceContainer
     .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
     .get()!;
 
-  const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
+  const linkSuggestService = serviceContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
   ).get!();
 
@@ -125,18 +128,18 @@ export function ImageSelector({
     [linkSuggestService],
   );
 
-  const editedDocumentReference = useContext(EditedDocumentContext);
+  const sourceDocumentReference = useContext(SourceDocumentReferenceContext);
 
   const uploadImage = useCallback(async () => {
     const image = await triggerUserImageUpload(
-      depsContainer,
-      editedDocumentReference,
+      serviceContainer,
+      sourceDocumentReference,
     );
 
     if (image) {
       onSelected(image.url, image.reference);
     }
-  }, [depsContainer, editedDocumentReference, onSelected]);
+  }, [serviceContainer, sourceDocumentReference, onSelected]);
 
   return (
     <Box>

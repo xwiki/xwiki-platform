@@ -59,15 +59,14 @@ function buildFormattedParagraph(
  */
 async function mountParagraph(
   mount: Parameters<typeof mountBlockNoteHeadless>[0],
-  editorContent: BlockType[],
+  content: BlockType[],
 ): Promise<{
   editorEl: ReturnType<Page["locator"]>;
   paragraph: ReturnType<Page["locator"]>;
 }> {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent,
-    editorProps: { syntax: FULL_SYNTAX },
-    macros: false,
+    content,
+    options: { syntax: FULL_SYNTAX },
   });
   const editorEl = component.locator(".bn-editor");
   const paragraph = editorEl.locator("p.bn-inline-content");
@@ -112,11 +111,8 @@ test("Creating a link on a word in the middle of a line keeps the text intact", 
   page,
 }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphs(["First second third fourth"]),
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
+    content: buildParagraphs(["First second third fourth"]),
+    options: { syntax: FULL_SYNTAX },
   });
 
   const editorEl = component.locator(".bn-editor");

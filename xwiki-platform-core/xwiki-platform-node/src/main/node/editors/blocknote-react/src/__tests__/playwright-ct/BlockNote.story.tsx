@@ -17,32 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { useMemo } from "react";
-import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
+import type { BlockType } from "../../blocknote";
 import type { LinkEditionHandler } from "../../components/links/linkEdition";
+import type { EditorOptions } from "../../editorOptions";
 
-export type BlockNoteForTestProps = Omit<
-  BlockNoteViewWrapperProps,
-  "lang" | "label" | "depsContainer" | "linkEditionHandler"
-> & { linkEditionHandler?: LinkEditionHandler };
+export type BlockNoteForTestProps = {
+  content: BlockType[];
+  // The options that the tests need to set, the others being the same for all the tests.
+  options: Omit<EditorOptions, "lang" | "label" | "serviceContainer">;
+  linkEditionHandler?: LinkEditionHandler;
+};
 
-export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = (props) => {
-  const depsContainer = useMemo(depsContainerMock, []);
+export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
+  content,
+  options,
+  linkEditionHandler,
+}) => {
+  const serviceContainer = useMemo(serviceContainerMock, []);
 
   return (
     <BlockNoteViewWrapper
-      lang="en"
-      label="Some Label"
-      depsContainer={depsContainer}
+      options={{
+        lang: "en",
+        label: "Some Label",
+        serviceContainer,
+        ...options,
+      }}
+      content={content}
       linkEditionHandler={
-        props.linkEditionHandler ??
+        linkEditionHandler ??
         (() => {
           throw new Error("Link editor should not open for this test");
         })
       }
-      {...props}
     />
   );
 };

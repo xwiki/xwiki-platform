@@ -141,7 +141,7 @@ export class DefaultImageWizard implements ImageWizard {
     // images are uploaded to it.
     const documentReference =
       context?.documentReference ?? XWiki.currentDocument.documentReference;
-    const editedDocument = context?.documentReference
+    const sourceDocument = context?.documentReference
       ? new XWiki.Document(context.documentReference)
       : XWiki.currentDocument;
     try {
@@ -152,7 +152,7 @@ export class DefaultImageWizard implements ImageWizard {
         captionAllowed: true,
         currentDocument: documentReference,
         getImageResourceURL: (resourceReference, extraParams) =>
-          this.getResourceURL(resourceReference, extraParams, editedDocument),
+          this.getResourceURL(resourceReference, extraParams, sourceDocument),
         imageData: image ? this.getImageData(image) : {},
         isHTML5: true,
         isInsert: !image,
@@ -168,7 +168,7 @@ export class DefaultImageWizard implements ImageWizard {
   private getResourceURL(
     resourceReference: ResourceReference,
     extraParams: Record<string, string>,
-    editedDocument: LegacyXWikiDocument,
+    sourceDocument: LegacyXWikiDocument,
   ): string {
     if (["url", "path", "unc", "unknown"].includes(resourceReference.type)) {
       return resourceReference.reference;
@@ -185,7 +185,7 @@ export class DefaultImageWizard implements ImageWizard {
       parameters.set("type", resourceReference.type);
       parameters.set("reference", resourceReference.reference);
       // The resource reference is resolved relative to the document the URL points to.
-      return editedDocument.getURL("get", parameters);
+      return sourceDocument.getURL("get", parameters);
     }
   }
 

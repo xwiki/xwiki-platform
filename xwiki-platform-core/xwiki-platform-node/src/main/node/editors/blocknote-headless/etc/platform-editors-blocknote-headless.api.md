@@ -7,12 +7,10 @@
 import { BlockType } from '@xwiki/platform-editors-blocknote-react';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
-import { ContextForMacros } from '@xwiki/platform-editors-blocknote-react';
 import { DefineComponent } from 'vue';
 import { EditorFeatures } from '@xwiki/platform-editors-blocknote-react';
 import { EditorOptions } from '@xwiki/platform-editors-blocknote-react';
 import { EditorType } from '@xwiki/platform-editors-blocknote-react';
-import { LinkFeatureOptions } from '@xwiki/platform-editors-blocknote-react';
 import { PublicProps } from 'vue';
 
 // @beta (undocumented)
@@ -35,29 +33,21 @@ content: BlockType[];
 "onLocal-instant-change"?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
-}, any>;
-
-export { ContextForMacros }
+}, HTMLDivElement>;
 
 export { EditorType }
 
 // @beta
 export type HeadlessEditorOptions = Omit<EditorOptions, "features"> & {
-    features?: Omit<EditorFeatures, "links"> & {
+    features?: EditorFeatures & {
         links?: HeadlessLinkFeatureOptions;
     };
 };
 
 // @beta
-export type HeadlessLinkFeatureOptions = LinkFeatureOptions & {
+export type HeadlessLinkFeatureOptions = {
     excludedTargetTypes?: string[];
 };
-
-// @beta
-export function moveCaretTo(editor: EditorType, coordinates: {
-    left: number;
-    top: number;
-}): boolean;
 
 // (No @packageDocumentation comment for this package)
 

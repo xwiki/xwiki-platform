@@ -42,16 +42,23 @@ import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
-import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
+
+// @beta
+export type BlockMetadata = Record<string, unknown>;
+
+// @beta
+export interface BlockMetadataStore {
+    get(id: string): Readonly<BlockMetadata> | undefined;
+    set(id: string, key: string, value: unknown): void;
+}
 
 // @beta
 export type BlockNoteViewWrapperProps = {
     options: EditorOptions;
     content: BlockType[];
-    linkEditionHandler: LinkEditionHandler;
     onChange?: (editor: EditorType) => void;
     refs?: {
-        setEditor?: (editor: EditorType) => void;
+        setInstance?: (instance: EditorInstance) => void;
     };
 };
 
@@ -67,11 +74,10 @@ export type BlockType = Block<EditorBlockSchema, EditorInlineContentSchema, Edit
 export function buildMacroRawContent(content: string): InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>;
 
 // @beta
-export type ContextForMacros = {
-    openParamsEditor?(invocation: MacroBlockInvocation | InlineMacroInvocation, update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void): void;
-    openInsertionEditor?(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
-    getMacroOutput?(id: string, call: string): unknown[] | undefined;
-};
+export function canUploadFiles(instance: Pick<EditorInstance, "options" | "serviceContainer">): boolean;
+
+// @beta
+export function createBlockMetadataStore(): BlockMetadataStore;
 
 // @beta
 export type EditorAppearance = {
@@ -85,13 +91,19 @@ export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer Block
 
 // @beta
 export type EditorFeatures = {
-    links?: LinkFeatureOptions;
-    images?: ImageFeatureOptions;
     macros?: MacroFeatureOptions | false;
 };
 
 // @beta
 export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<infer _, infer InlineContentSchema, infer __> ? InlineContentSchema : never;
+
+// @beta
+export type EditorInstance = {
+    editor: EditorType;
+    options: Readonly<Omit<EditorOptions, "serviceContainer" | "metadata">>;
+    metadata: BlockMetadataStore;
+    serviceContainer: Container;
+};
 
 // Warning: (ae-forgotten-export) The symbol "_default" needs to be exported by the entry point index.d.ts
 //
@@ -106,13 +118,14 @@ export type EditorOptions = {
     serviceContainer: Container;
     name?: string;
     sourceDocumentReference?: DocumentReference;
-    syntax: SyntaxConfig;
+    syntax: string;
     lang: EditorLanguage;
     label: string;
     autofocus?: boolean;
     appearance?: EditorAppearance;
     collaboration?: Collaboration;
-    upload?: UploadOptions;
+    upload?: boolean;
+    metadata?: BlockMetadataStore;
     features?: EditorFeatures;
 };
 
@@ -137,39 +150,47 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
-export type ImageEditionHooks = {
-    afterUpdate?: (block: BlockOfType<"image">, reference?: ResourceReference) => void;
-};
+export interface FileUploader {
+    upload(instance: EditorInstance, file: File): Promise<UploadedFile>;
+}
 
 // @beta
-export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;
+export const fileUploaderName = "FileUploader";
 
 // @beta
-export type ImageFeatureOptions = {
-    edition?: ImageEditionOverrideFn;
-    insertion?: ImageInsertionOverrideFn;
-    hooks?: ImageEditionHooks;
-};
+export interface FileUploadListener {
+    onUpload?(instance: EditorInstance, uploadedFile: UploadedFile): void;
+    onUploadFailed?(instance: EditorInstance, file: File, error: unknown): void;
+}
 
 // @beta
-export type ImageInsertionOverrideFn = (insert: (insertionResult: ImageInsertionResult) => void) => void;
+export const fileUploadListenerName = "FileUploadListener";
 
 // @beta
-export type ImageInsertionResult = {
-    type: "insert";
-    props: Partial<BlockOfType<"image">["props"]>;
+export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
+
+// @beta
+export type ImageEditionData = Partial<BlockOfType<"image">["props"]> & {
     reference?: ResourceReference;
-} | {
-    type: "aborted";
 };
 
 // @beta
-export type ImageUpdateResult = {
-    type: "update";
-    updatedProps: Partial<BlockOfType<"image">["props"]>;
-} | {
-    type: "aborted";
-};
+export interface ImageEditor {
+    edit(instance: EditorInstance, image: ImageEditionData): Promise<ImageEditionData | undefined>;
+    insert(instance: EditorInstance): Promise<ImageEditionData | undefined>;
+}
+
+// @beta
+export const imageEditorName = "ImageEditor";
+
+// @beta
+export interface ImageMetadataHandler {
+    afterUpdate(instance: EditorInstance, block: BlockOfType<"image">, reference?: ResourceReference): void;
+    beforeEdit(instance: EditorInstance, block: BlockOfType<"image">): ImageEditionData;
+}
+
+// @beta
+export const imageMetadataHandlerName = "ImageMetadataHandler";
 
 // @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
@@ -196,25 +217,22 @@ export type LinkEditionData = {
 };
 
 // @beta
-export type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
+export interface LinkEditor {
+    edit(instance: EditorInstance, link: LinkEditionData): Promise<LinkEditionData | undefined>;
+    insert(instance: EditorInstance, prefill: Partial<LinkEditionData>): Promise<LinkEditionData | undefined>;
+}
 
 // @beta
-export type LinkEditionHandlerProps = {
-    current: LinkEditionData;
-    onSubmit: (link: LinkEditionData) => void;
-    mode: "createNew" | "editExisting";
-};
+export const linkEditorName = "LinkEditor";
 
 // @beta
-export type LinkEditionHooks = {
-    beforeEdit?: (linkData: LinkEditionData) => LinkEditionData | void;
-    beforeUpdate?: (linkData: LinkEditionData, previous?: LinkEditionData) => LinkEditionData | void;
-};
+export interface LinkMetadataHandler {
+    beforeEdit(instance: EditorInstance, link: LinkEditionData): LinkEditionData;
+    beforeUpdate(instance: EditorInstance, link: LinkEditionData, previous?: LinkEditionData): LinkEditionData;
+}
 
 // @beta
-export type LinkFeatureOptions = {
-    hooks?: LinkEditionHooks;
-};
+export const linkMetadataHandlerName = "LinkMetadataHandler";
 
 // @beta
 export const MACRO_NAME_PREFIX = "Macro_";
@@ -243,9 +261,17 @@ export type MacroCall = {
 export type MacroCallParams = Record<string, boolean | number | string>;
 
 // @beta
+export interface MacroEditor {
+    edit(instance: EditorInstance, invocation: MacroBlockInvocation | InlineMacroInvocation): Promise<MacroBlockInvocation | InlineMacroInvocation | undefined>;
+    insert(instance: EditorInstance, prefill: MacroInsertionEditorPrefillData): Promise<MacroBlockInvocation | InlineMacroInvocation | undefined>;
+}
+
+// @beta
+export const macroEditorName = "MacroEditor";
+
+// @beta
 export type MacroFeatureOptions = {
     list?: MacroWithUnknownParamsType[];
-    ctx: ContextForMacros;
 };
 
 // @beta
@@ -262,9 +288,17 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 };
 
 // @beta
-export type UploadOptions = {
-    uploadFile: (file: File, blockId?: string) => Promise<string | Record<string, unknown>>;
+export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
+
+// @beta
+export type UploadedFile = {
+    url: string;
+    name: string;
+    reference?: string;
 };
+
+// @beta
+export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
 
 // (No @packageDocumentation comment for this package)
 

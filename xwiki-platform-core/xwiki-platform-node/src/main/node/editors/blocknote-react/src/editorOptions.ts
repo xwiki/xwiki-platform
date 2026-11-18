@@ -18,15 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { EditorLanguage } from "./blocknote";
-import type { ContextForMacros } from "./blocknote/utils";
-import type { ImageEditionOverrideFn } from "./components/images/CustomImageToolbar";
-import type { ImageEditionHooks } from "./components/images/imageEditionHooks";
-import type { ImageInsertionOverrideFn } from "./components/images/imageInsertionOverride";
-import type { LinkEditionHooks } from "./components/links/linkEditionHooks";
+import type { BlockMetadataStore } from "./misc/blockMetadata";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 
 /**
@@ -56,62 +51,6 @@ type EditorAppearance = {
 };
 
 /**
- * How the files pasted, dropped or picked in the editor are uploaded.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type UploadOptions = {
-  /**
-   * Uploads the given file.
-   *
-   * @param file - the file to upload
-   * @param blockId - the block the file is uploaded for, when there is one
-   * @returns the URL of the uploaded file, or the (partial) block to replace the uploading block with
-   */
-  uploadFile: (
-    file: File,
-    blockId?: string,
-  ) => Promise<string | Record<string, unknown>>;
-};
-
-/**
- * The options of the link feature.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type LinkFeatureOptions = {
-  /**
-   * Hooks to intercept the link creation / edition flow.
-   */
-  hooks?: LinkEditionHooks;
-};
-
-/**
- * The options of the image feature.
- *
- * @since 18.10.0RC1
- * @beta
- */
-type ImageFeatureOptions = {
-  /**
-   * Replaces the default image edition UI (i.e. the edition action of the image toolbar).
-   */
-  edition?: ImageEditionOverrideFn;
-
-  /**
-   * Replaces the default image insertion UI (i.e. browsing the images to insert, from the image quick action).
-   */
-  insertion?: ImageInsertionOverrideFn;
-
-  /**
-   * Hooks to intercept the image insertion / edition flow.
-   */
-  hooks?: ImageEditionHooks;
-};
-
-/**
  * The options of the macro feature.
  *
  * @since 18.10.0RC1
@@ -119,15 +58,10 @@ type ImageFeatureOptions = {
  */
 type MacroFeatureOptions = {
   /**
-   * The client-rendered macros. Optional: an integration that only uses the server-rendered macro blocks (edited and
-   * inserted through {@link MacroFeatureOptions.ctx}) can omit it.
+   * The client-rendered macros, if any. The macros rendered server-side are inserted and edited with the
+   * `MacroEditor` bound in the {@link EditorOptions.serviceContainer}, when there's one.
    */
   list?: MacroWithUnknownParamsType[];
-
-  /**
-   * How the macros are edited and inserted, and where their output comes from.
-   */
-  ctx: ContextForMacros;
 };
 
 /**
@@ -137,12 +71,9 @@ type MacroFeatureOptions = {
  * @beta
  */
 type EditorFeatures = {
-  links?: LinkFeatureOptions;
-  images?: ImageFeatureOptions;
-
   /**
-   * The macros are disabled when this is missing or `false`, since inserting and editing them requires an
-   * integration.
+   * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
+   * insert or edit a macro, even when a `MacroEditor` is bound.
    */
   macros?: MacroFeatureOptions | false;
 };
@@ -167,6 +98,10 @@ type EditorFeatures = {
  * 5. Each option is declared once, by the lowest layer using it (e.g. the options of the link modal are declared by
  *    the Vue integration that shows it).
  * 6. Feature options should be JSON-serializable, so that they can come from a server-side configuration.
+ * 7. Options hold values, not behavior, which is injected through {@link EditorOptions.serviceContainer}. Callbacks
+ *    are used only at a framework boundary or for the editor's own events.
+ *
+ * See the README of this package for the architecture the editor and its features follow.
  *
  * @since 18.10.0RC1
  * @beta
@@ -193,10 +128,12 @@ type EditorOptions = {
   sourceDocumentReference?: DocumentReference;
 
   /**
-   * The syntax of the edited content, which is normally the syntax of the source document. It determines the editor
-   * features that are available, since only what the syntax can represent can be saved.
+   * The id of the syntax of the edited content (e.g. "xwiki/2.1"), which is normally the syntax of the source document.
+   * Its configuration, looked up in the {@link EditorOptions.serviceContainer}, determines the editor features that
+   * are available, since only what the syntax can represent can be saved. The minimal syntax, which disables most
+   * editor features, is used when the syntax has no configuration.
    */
-  syntax: SyntaxConfig;
+  syntax: string;
 
   /**
    * The language of the editor UI (menus, toolbars, placeholders), usually the language of the page hosting the
@@ -227,10 +164,20 @@ type EditorOptions = {
   collaboration?: Collaboration;
 
   /**
-   * How the files are uploaded: used when files are pasted or dropped in the content, and by the upload tab of the
-   * file panel (e.g. of an image block). Uploading is disabled when not specified.
+   * Whether the user can upload files to the source document: by pasting or dropping them in the content, or with the
+   * upload actions (e.g. of the link and image menus). The files are stored with the `FileUploader` bound in the
+   * {@link EditorOptions.serviceContainer}, or with the `AttachmentsService` otherwise. Enabled by default, as long as
+   * there's something to store the files with.
    */
-  upload?: UploadOptions;
+  upload?: boolean;
+
+  /**
+   * Where to keep the data about the blocks of the edited content that isn't part of the content (e.g. the output of
+   * the macros, rendered for the current user). An integration specifies it when it fills it before the editor is
+   * created (e.g. with what it extracted while loading the content) or reads it after (e.g. to save the content). A
+   * store is created for the editor instance otherwise.
+   */
+  metadata?: BlockMetadataStore;
 
   /**
    * The options of each editor feature.
@@ -242,8 +189,5 @@ export type {
   EditorAppearance,
   EditorFeatures,
   EditorOptions,
-  ImageFeatureOptions,
-  LinkFeatureOptions,
   MacroFeatureOptions,
-  UploadOptions,
 };

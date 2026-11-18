@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { EditorType } from "@xwiki/platform-editors-blocknote-react";
+import type { EditorType } from "../blocknote";
 
 // caretPositionFromPoint is the standard one, which WebKit and older Chrome lack.
 function caretAt(left: number, top: number): [Node, number] | undefined {
@@ -39,8 +39,6 @@ function caretAt(left: number, top: number): [Node, number] | undefined {
  * @param coordinates - where the pointer is, in viewport coordinates
  * @returns false when there is no place for the caret under the pointer, e.g. because it is over the chrome around
  *   the content rather than over the content itself, which leaves the caret where it was
- * @since 18.10.0RC1
- * @beta
  */
 function moveCaretTo(
   editor: EditorType,

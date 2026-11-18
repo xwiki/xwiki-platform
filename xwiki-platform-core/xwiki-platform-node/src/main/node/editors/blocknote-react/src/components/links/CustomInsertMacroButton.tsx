@@ -17,20 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { useMacroEditing } from "../../blocknote/macroEditor";
 import { insertMacroInvocation } from "../../blocknote/utils";
 import { useEditor } from "../../hooks";
 import { useComponentsContext } from "@blocknote/react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import type { ContextForMacros } from "../../blocknote/utils";
-
-export type CustomInsertMacroButtonProps = {
-  openEditor: NonNullable<ContextForMacros["openInsertionEditor"]>;
-};
-
-export const CustomInsertMacroButton: React.FC<
-  CustomInsertMacroButtonProps
-> = ({ openEditor }) => {
+export const CustomInsertMacroButton: React.FC = () => {
+  const macroEditing = useMacroEditing();
   const editor = useEditor();
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
@@ -42,7 +36,7 @@ export const CustomInsertMacroButton: React.FC<
     selected && selected.blocks.length === 1 ? selected.blocks[0] : null;
 
   const openPrefilledEditor = useCallback(() => {
-    openEditor(
+    macroEditing?.insert(
       {
         kind: "block",
         id: null,
@@ -59,9 +53,10 @@ export const CustomInsertMacroButton: React.FC<
       // currently selected block (for a block macro).
       (invocation) => insertMacroInvocation(editor, invocation, selectedBlock),
     );
-  }, [openEditor, selectedBlock, editor]);
+  }, [macroEditing, selectedBlock, editor]);
 
-  if (!selectedBlock) {
+  // Hide the insert action when no macro editor is available.
+  if (!macroEditing || !selectedBlock) {
     return <></>;
   }
 

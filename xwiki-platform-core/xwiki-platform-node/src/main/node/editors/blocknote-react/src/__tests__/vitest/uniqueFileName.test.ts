@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { withUniqueName } from "./uniqueFileName";
+import { withUniqueName } from "../../files/uniqueFileName";
 import { describe, expect, it } from "vitest";
 
 describe("withUniqueName", () => {
   // <timestamp>-<random 100..999>.
   const generatedName = /^\d+-[1-9]\d\d/;
 
-  function file(name, type = "image/png") {
+  function file(name: string, type = "image/png"): File {
     return new File(["content"], name, { type, lastModified: 1234567890 });
   }
 

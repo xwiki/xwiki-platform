@@ -171,7 +171,10 @@ interface EditorFeature {
 }
 
 /**
- * The contributions of all the editing features.
+ * The contributions of all the editing features, merged into one, which the editor applies. Unlike a
+ * {@link FeatureContribution}, where a feature leaves out what it doesn't contribute, every field is set, even when no
+ * feature contributes to it (e.g. an empty list of extensions, a slash menu item getter returning no item), so that the
+ * editor applies them without checking whether they are there.
  */
 type MergedContributions = {
   blockNoteExtensions: ExtensionFactoryInstance[];

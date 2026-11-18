@@ -19,15 +19,12 @@
  */
 package org.xwiki.observation.remote;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represent a member of a {@link NetworkChannel}.
  * 
  * @version $Id$
  * @since 17.9.0RC1
  */
-@Unstable
 public interface NetworkMember
 {
     /**

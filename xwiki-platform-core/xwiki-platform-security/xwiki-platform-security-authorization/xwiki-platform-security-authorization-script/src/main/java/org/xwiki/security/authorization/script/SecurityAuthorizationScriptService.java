@@ -34,7 +34,6 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Security Authorization Script Service.
@@ -179,7 +178,6 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @since 16.10.5
      * @since 16.4.7
      */
-    @Unstable
     public boolean isSuperAdmin(DocumentReference user)
     {
         return this.authorizationManager.isSuperAdmin(user);

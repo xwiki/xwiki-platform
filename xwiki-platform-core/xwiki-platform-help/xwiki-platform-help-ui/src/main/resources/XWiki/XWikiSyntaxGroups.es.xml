@@ -51,7 +51,7 @@ Los grupos se pueden usar para insertar otro documento directamente en línea en
 |((({{{
 |=Encabezado 1|=Encabezado 2|=Encabezado 3
 |Celda uno|(((
-= Documento incrustado =
+== Documento incrustado ==
 
 Algún párrafo incrustado.
 
@@ -65,7 +65,7 @@ Párrafo siguiente en el documento de nivel superior
 }}})))|(((
 |=Encabezado 1|=Encabezado 2|=Encabezado 3
 |Celda uno|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Documento incrustado&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Documento incrustado&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Algún párrafo incrustado.
 

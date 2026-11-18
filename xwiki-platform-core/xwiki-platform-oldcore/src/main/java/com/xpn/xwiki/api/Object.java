@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.evaluation.ObjectEvaluator;
 import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -152,7 +151,6 @@ public class Object extends Collection
      * @return a string representing the display output or {@code null} in case of problem
      * @since 17.3.0RC1
      */
-    @Unstable
     public String display(String name, String mode, boolean isolated, boolean number)
     {
         try {

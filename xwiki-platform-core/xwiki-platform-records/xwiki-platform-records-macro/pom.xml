@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-records</artifactId>
-    <version>18.10.0-SNAPSHOT</version>
+    <version>19.0.0-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-records-macro</artifactId>
@@ -88,12 +88,11 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- The source the Live Data the macro renders is backed by. -->
+    <!-- The source the Live Data the macro renders is backed by, also checks row naming strategies. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-livedata-livetable</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <!-- The Live Data component the script loaded by the Live Data renderer requires. -->
     <dependency>

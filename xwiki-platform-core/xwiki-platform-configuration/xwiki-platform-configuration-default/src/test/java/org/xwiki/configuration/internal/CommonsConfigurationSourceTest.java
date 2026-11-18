@@ -105,14 +105,12 @@ class CommonsConfigurationSourceTest
     }
 
     @Test
-    void stringPropertyWhenConversionError()
+    void stringPropertyAsBoolean()
     {
         this.configuration.setProperty("string", "value");
 
-        // Try to retrieve a String property as a Boolean
-        Exception exception =
-            assertThrows(ConversionException.class, () -> this.source.getProperty("string", Boolean.class));
-        assertEquals("Key [string] is not compatible with type [java.lang.Boolean]", exception.getMessage());
+        // A value that isn't a boolean is converted to false rather than failing.
+        assertFalse(this.source.getProperty("string", Boolean.class));
     }
 
     @Test

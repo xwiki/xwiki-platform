@@ -30,6 +30,7 @@ import org.xwiki.ckeditor.test.ui.AbstractCKEditorIT;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.records.test.po.RecordsMacroEditModal;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -38,6 +39,8 @@ import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the Records macro dialog in CKEditor.
@@ -54,6 +57,12 @@ class RecordsMacroIT extends AbstractCKEditorIT
     private static final String GENRE = "genre";
 
     private static final String FILTER_SORT_TAB = "filterSort";
+
+    private static final String EDITING_TAB = "editing";
+
+    private static final String COLUMNS_TAB = "columns";
+
+    private static final String TITLE_STRATEGY = "Use user-submitted title as page name";
 
     private static final String TITLE_COLUMN = "Title";
 
@@ -125,6 +134,68 @@ class RecordsMacroIT extends AbstractCKEditorIT
         assertEquals("status=published", macroEditModal.getFilters());
         macroEditModal.clickSubmit();
         assertSourceContains("filters=\"status=published\"");
+    }
+
+    /**
+     * Entries can only be created in edit mode, so the creation strategy can only be picked while the edit mode is
+     * allowed. A saved strategy is kept when the dialog opens, even one that is no longer installed. A strategy needs
+     * the columns it names the new pages after. The entries created from the table go to the location picked in the
+     * dialog.
+     */
+    @Test
+    @Order(2)
+    void createEntries(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        DocumentReference classReference = new DocumentReference("TaskClass", testReference.getLastSpaceReference());
+        setup.rest().delete(classReference);
+        setup.addClassProperty(classReference, STATUS, "String");
+        String className = setup.serializeReference(classReference.getLocalDocumentReference());
+        SpaceReference location = new SpaceReference("Tasks", testReference.getLastSpaceReference());
+        setup.createPage(new DocumentReference("WebHome", location), "", "Tasks");
+
+        edit(setup, testReference, """
+            {{records class="%s" id="%s" properties="%s" creationStrategy="missing"/}}"""
+            .formatted(className, LIVE_DATA_ID, STATUS));
+        RecordsMacroEditModal macroEditModal = editMacro().openTab(EDITING_TAB);
+        // The saved strategy is disabled while the edit mode is off, and given back once it is allowed.
+        assertEquals("missing", macroEditModal.getCreationStrategy());
+        assertFalse(macroEditModal.isCreationStrategyEnabled());
+        macroEditModal.setAllowEditMode(true);
+        assertTrue(macroEditModal.isCreationStrategyEnabled());
+        assertEquals("missing", macroEditModal.getCreationStrategy());
+        assertFalse(macroEditModal.isCreationStrategyAvailable(TITLE_STRATEGY));
+        assertEquals("\"" + TITLE_STRATEGY + "\" cannot be used because the table does not display Page Title.",
+            macroEditModal.getCreationStrategyWarning());
+        macroEditModal.openTab(COLUMNS_TAB).getColumnsPicker().sendKeys("Page Title").waitForSuggestions()
+            .selectByValue("doc.title").hideSuggestions();
+        macroEditModal.openTab(EDITING_TAB);
+        assertTrue(macroEditModal.isCreationStrategyAvailable(TITLE_STRATEGY));
+        assertEquals("", macroEditModal.getCreationStrategyWarning());
+        macroEditModal.setCreationStrategy(TITLE_STRATEGY);
+        macroEditModal.setNewEntriesLocation(location);
+        String savedLocation = macroEditModal.getNewEntriesLocation();
+        macroEditModal.clickSubmit();
+        assertSourceContains("creationStrategy=\"title\"");
+        assertSourceContains("allowEditMode=\"true\"");
+        assertSourceContains("properties=\"status,doc.title\"");
+        assertSourceContains("newEntriesLocation=\"%s\"".formatted(savedLocation));
+
+        // The picked location is shown again when the dialog is reopened.
+        macroEditModal = editMacro().openTab(EDITING_TAB);
+        assertEquals(savedLocation, macroEditModal.getNewEntriesLocation());
+        macroEditModal.clickCancel();
+
+        this.editPage.clickSaveAndView();
+        LiveDataElement liveData = new LiveDataElement(LIVE_DATA_ID);
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(0);
+        liveData.toggleEditMode();
+        tableLayout.startNewEntry();
+        tableLayout.createNewEntryFromDocumentProperty(TITLE_COLUMN, "First task");
+        assertEquals(1, tableLayout.getTotalEntries());
+        assertTrue(setup.rest().exists(new DocumentReference("First task", location)));
     }
 
     private void createEntry(TestUtils setup, TestReference testReference, String className, String title,

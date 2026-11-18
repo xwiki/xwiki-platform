@@ -26,10 +26,15 @@ import type { Storage } from "@xwiki/platform-api";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { AttachmentReference } from "@xwiki/platform-model-api";
 import type {
+  ModelReferenceParser,
   ModelReferenceParserProvider,
+  ModelReferenceSerializer,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type {
+  RemoteURLSerializer,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 
 function initServiceWithMocks({ resolveURLs = true } = {}) {
   const storageProviderMock = mock<StorageProvider>();
@@ -38,26 +43,30 @@ function initServiceWithMocks({ resolveURLs = true } = {}) {
   storageMock.saveAttachments.mockReturnValue(Promise.resolve(undefined));
 
   storageProviderMock.get.mockReturnValue(storageMock);
-  const modelReferenceParserProvider = {
-    get: () => ({
-      parse: (page: string) =>
-        new DocumentReference(page, new SpaceReference()),
-    }),
-  } as unknown as ModelReferenceParserProvider;
-  const modelReferenceSerializerProvider = {
-    get: () => ({
-      serialize: (reference: AttachmentReference) =>
-        `${reference.document.name}@${reference.name}`,
-    }),
-  } as unknown as ModelReferenceSerializerProvider;
-  const remoteURLSerializerProvider = {
-    get: () => ({
-      serialize: (reference: AttachmentReference) =>
-        resolveURLs
-          ? `/download/${reference.document.name}/${reference.name}`
-          : undefined,
-    }),
-  } as unknown as RemoteURLSerializerProvider;
+  const modelReferenceParserProvider = mock<ModelReferenceParserProvider>({
+    get: () =>
+      mock<ModelReferenceParser>({
+        parse: (page: string) =>
+          new DocumentReference(page, new SpaceReference()),
+      }),
+  });
+  const modelReferenceSerializerProvider =
+    mock<ModelReferenceSerializerProvider>({
+      get: () =>
+        mock<ModelReferenceSerializer>({
+          serialize: (reference: AttachmentReference) =>
+            `${reference.document.name}@${reference.name}`,
+        }),
+    });
+  const remoteURLSerializerProvider = mock<RemoteURLSerializerProvider>({
+    get: () =>
+      mock<RemoteURLSerializer>({
+        serialize: (reference: AttachmentReference) =>
+          resolveURLs
+            ? `/download/${reference.document.name}/${reference.name}`
+            : undefined,
+      }),
+  });
   const service = new DefaultAttachmentsService(
     storageProviderMock,
     modelReferenceParserProvider,

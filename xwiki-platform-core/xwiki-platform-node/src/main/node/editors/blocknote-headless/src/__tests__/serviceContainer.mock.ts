@@ -48,7 +48,14 @@ import type { Container } from "inversify";
 import type { MockProxy } from "vitest-mock-extended";
 
 export function serviceContainerMock(): Container {
-  const container = mock<Container>();
+  const container = mock<Container>(
+    {},
+    {
+      fallbackMockImplementation: (id: unknown) => {
+        throw new Error(`Unexpected service: ${String(id)}`);
+      },
+    },
+  );
 
   container.get.calledWith("RemoteURLParserProvider").mockReturnValue({
     get: () => ({
@@ -149,8 +156,13 @@ export function serviceContainerMock(): Container {
     }),
   } satisfies LinkSuggestServiceProvider);
 
-  container.get.calledWith("AttachmentsService").mockReturnValue(null);
-  container.get.calledWith("DocumentService").mockReturnValue(null);
+  for (const service of [
+    "AttachmentsService",
+    "DocumentService",
+    "ResourceReferenceParser",
+  ]) {
+    container.get.calledWith(service).mockReturnValue(null);
+  }
 
   return withBuiltInLinkTargetTypes(container);
 }

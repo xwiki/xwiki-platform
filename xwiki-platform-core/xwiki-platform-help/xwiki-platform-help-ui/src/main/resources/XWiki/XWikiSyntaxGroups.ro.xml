@@ -51,7 +51,7 @@ Grupurile pot fi folosite pentru a insera un alt document direct în documentul 
 |((({{{
 |=Antet 1|=Antet 2|=Antet 3
 |Celula Unu|(((
-= Document încorporat =
+== Document încorporat ==
 
 Un paragraf încorporat.
 
@@ -65,7 +65,7 @@ Următorul paragraf din documentul de nivel superior
 }}})))|(((
 |=Antet 1|=Antet 2|=Antet 3
 |Celula Unu|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Document încorporat&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Document încorporat&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Un paragraf încorporat.
 

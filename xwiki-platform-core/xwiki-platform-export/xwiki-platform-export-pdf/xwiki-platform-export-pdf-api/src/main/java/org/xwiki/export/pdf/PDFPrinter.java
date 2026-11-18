@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.util.function.BooleanSupplier;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Generic interface to print some data as PDF.
@@ -56,7 +55,6 @@ public interface PDFPrinter<T>
      * @since 16.10.8
      * @since 17.4.0RC1
      */
-    @Unstable
     default InputStream print(T input, BooleanSupplier isCanceled) throws IOException
     {
         return print(input);

@@ -25,7 +25,6 @@ import java.util.Optional;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * A factory in charge of providing a specific {@link HibernateAdapter} instance, generally based on information found
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.1.0RC1
  */
-@Unstable
 @Role
 public interface HibernateAdapterFactory
 {

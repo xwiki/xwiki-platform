@@ -28,11 +28,13 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.executor.ContentExecutor;
 import org.xwiki.rendering.executor.ContentExecutorException;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationException;
 
@@ -52,6 +54,12 @@ public class MacroContentExecutor implements ContentExecutor<MacroTransformation
     @Inject
     @Named("macro")
     private Transformation macroTransformation;
+
+    /**
+     * Used to execute the transformation in its own rendering context.
+     */
+    @Inject
+    private RenderingContext renderingContext;
 
     @Override
     public XDOM execute(String content, Syntax syntax, MacroTransformationContext macroContext)
@@ -74,7 +82,10 @@ public class MacroContentExecutor implements ContentExecutor<MacroTransformation
     private void executeContent(XDOM xdom, MacroTransformationContext macroContext) throws ContentExecutorException
     {
         try {
-            this.macroTransformation.transform(xdom, macroContext.getTransformationContext());
+            // Execute the transformation through the rendering context and not directly so that it gets its own
+            // rendering context instead of modifying the context of the transformation that triggered this execution.
+            ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation,
+                macroContext.getTransformationContext(), xdom);
         } catch (TransformationException e) {
             throw new ContentExecutorException("Failed to execute content", e);
         }

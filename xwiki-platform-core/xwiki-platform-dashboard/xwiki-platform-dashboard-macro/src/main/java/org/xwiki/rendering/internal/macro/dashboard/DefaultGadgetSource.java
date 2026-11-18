@@ -87,10 +87,18 @@ public class DefaultGadgetSource implements GadgetSource
 
     private static final String SOURCE_SYNTAX_PARAMETER_NAME = "data-source-syntax";
 
-    static final Pattern TRANSLATION_SCRIPT_PATTERN =
-        Pattern.compile("\\s*\\$services\\.localization\\.render\\(\\s*'([a-zA-Z0-9.]+)'\\s*\\)\\s*");
-    static final Pattern TRANSLATION_MACRO_PATTERN =
-        Pattern.compile("^\\s*(\\{\\{)\\s*(translation)\\s*(key=\")[a-zA-Z0-9.]+(\")\\s*(/}})\\s*$");
+    /**
+     * The characters allowed in a translation key used in a gadget title: letters, digits, dots, hyphens and
+     * underscores. Hyphens and underscores are needed because the default gadget title is a translation key built
+     * from the macro id, and macro ids can contain them.
+     */
+    private static final String TRANSLATION_KEY_REGEX = "[a-zA-Z0-9._-]+";
+
+    static final Pattern TRANSLATION_SCRIPT_PATTERN = Pattern.compile(
+        "\\s*\\$services\\.localization\\.render\\(\\s*'(" + TRANSLATION_KEY_REGEX + ")'\\s*\\)\\s*");
+
+    static final Pattern TRANSLATION_MACRO_PATTERN = Pattern.compile(
+        "^\\s*(\\{\\{)\\s*(translation)\\s*(key=\")" + TRANSLATION_KEY_REGEX + "(\")\\s*(/}})\\s*$");
 
     /**
      * The execution context, to grab XWiki context and access to documents.

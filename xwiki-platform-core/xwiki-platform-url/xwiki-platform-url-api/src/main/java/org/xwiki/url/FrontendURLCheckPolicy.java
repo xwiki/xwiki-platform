@@ -19,8 +19,6 @@
  */
 package org.xwiki.url;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Available policies related to the frontend URL check mechanism, to know if we should require users' confirmation
  * before going to an untrusted domain.
@@ -30,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.4.7
  * @since 16.10.14
  */
-@Unstable
 public enum FrontendURLCheckPolicy
 {
     /**

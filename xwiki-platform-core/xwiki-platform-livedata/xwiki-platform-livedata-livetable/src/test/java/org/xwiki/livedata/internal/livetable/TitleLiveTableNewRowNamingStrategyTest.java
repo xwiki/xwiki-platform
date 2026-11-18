@@ -152,6 +152,22 @@ class TitleLiveTableNewRowNamingStrategyTest
     }
 
     @Test
+    void generateAppliesTheNameStrategyToTheSuffix() throws Exception
+    {
+        when(this.currentSpaceReferenceResolver.resolve(LOCATION)).thenReturn(this.space);
+        EntityNameValidation nameStrategy = mock(EntityNameValidation.class);
+        when(this.entityNameValidationManager.getEntityReferenceNameStrategy()).thenReturn(nameStrategy);
+        when(this.entityNameValidationConfiguration.useTransformation()).thenReturn(true);
+        // A name strategy replacing the dashes.
+        when(nameStrategy.transform(TITLE)).thenReturn("My_first_entry");
+        when(nameStrategy.transform("My_first_entry-1")).thenReturn("My_first_entry_1");
+        when(this.modelBridge.exists(new DocumentReference("My_first_entry", this.space))).thenReturn(true);
+
+        assertEquals(new DocumentReference("My_first_entry_1", this.space),
+            this.strategy.generate(PARAMETERS, Map.of(TITLE_PROPERTY, TITLE)));
+    }
+
+    @Test
     void generateWithMissingTitle()
     {
         when(this.currentSpaceReferenceResolver.resolve(LOCATION)).thenReturn(this.space);

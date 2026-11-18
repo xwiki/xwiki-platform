@@ -51,7 +51,7 @@
 |((({{{
 |=ヘッダー1|=ヘッダー2|=ヘッダー3
 |セル1|(((
-= Embedded document =
+== Embedded document ==
 
 埋め込まれた段落。
 
@@ -65,7 +65,7 @@
 }}})))|(((
 |=ヘッダー1|=ヘッダー2|=ヘッダー3
 |セル1|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 埋め込まれた段落。
 

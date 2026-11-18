@@ -28,7 +28,6 @@ import org.xwiki.container.Container;
 import org.xwiki.container.servlet.HttpServletResponseStub;
 import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 
 /**
  * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
@@ -51,7 +50,6 @@ public class XWikiServletResponseStub extends HttpServletResponseWrapper
      * @param jakarta the request wrap
      * @since 17.0.0RC1
      */
-    @Unstable
     public XWikiServletResponseStub(HttpServletResponseStub jakarta)
     {
         super(JakartaServletBridge.toJavax(jakarta));

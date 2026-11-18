@@ -22,7 +22,6 @@ package org.xwiki.url;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
@@ -97,7 +96,6 @@ public interface URLConfiguration
      * @since 17.4.7
      * @since 16.10.14
      */
-    @Unstable
     default FrontendURLCheckPolicy getFrontendUrlCheckPolicy()
     {
         return FrontendURLCheckPolicy.COMMENTS;
@@ -113,7 +111,6 @@ public interface URLConfiguration
      * @since 17.4.6
      * @since 16.10.13
      */
-    @Unstable
     default List<String> getAllowedFrontendUrls()
     {
         return List.of();

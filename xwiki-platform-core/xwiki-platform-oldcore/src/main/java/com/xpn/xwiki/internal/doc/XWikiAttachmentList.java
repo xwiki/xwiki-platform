@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections4.list.AbstractListDecorator;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment.AttachmentContainer;
@@ -305,7 +304,6 @@ public class XWikiAttachmentList extends AbstractListDecorator<XWikiAttachment> 
      * @since 17.2.1
      * @since 17.3.0RC1
      */
-    @Unstable
     public void setDirty(boolean dirty, boolean deep)
     {
         this.map.values().forEach(attachment -> attachment.setDirty(dirty, deep));

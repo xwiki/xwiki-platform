@@ -48,7 +48,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.1.0RC1
  */
-@Unstable
 @Role
 public interface HibernateAdapter
 {

@@ -25,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * This API is for checking the access rights of any users on any XWiki entities. It replaces
@@ -62,7 +61,6 @@ public interface AuthorizationManager
      * @since 16.10.5
      * @since 16.4.7
      */
-    @Unstable
     default boolean isSuperAdmin(DocumentReference user)
     {
         return user != null && StringUtils.equalsIgnoreCase(user.getName(), SUPERADMIN_USER);

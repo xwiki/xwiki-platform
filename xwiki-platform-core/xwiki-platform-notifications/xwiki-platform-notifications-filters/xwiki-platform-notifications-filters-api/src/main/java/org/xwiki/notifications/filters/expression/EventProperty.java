@@ -19,8 +19,6 @@
  */
 package org.xwiki.notifications.filters.expression;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The several properties you can have in an {@link org.xwiki.eventstream.Event}.
  *
@@ -104,6 +102,5 @@ public enum EventProperty
      *
      * @since 17.10.1
      */
-    @Unstable
     PREFILTERING_DATE
 }

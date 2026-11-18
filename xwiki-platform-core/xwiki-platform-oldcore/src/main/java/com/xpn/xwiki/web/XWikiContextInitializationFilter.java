@@ -37,7 +37,6 @@ import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -161,7 +160,6 @@ public class XWikiContextInitializationFilter implements Filter
      * @throws XWikiException when failing to authenticate
      * @since 17.10.0RC1
      */
-    @Unstable
     protected void authenticate(XWikiContext context, HttpServletRequest request) throws XWikiException
     {
         // Initialize the current user.

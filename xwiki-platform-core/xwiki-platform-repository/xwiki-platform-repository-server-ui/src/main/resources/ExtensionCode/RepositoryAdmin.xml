@@ -350,7 +350,7 @@ $repositoryConfigDoc.displayEdit($erValidTypesPropertyClass, "${repositoryConfig
       <heading/>
     </property>
     <property>
-      <iconAttachment>incon.png</iconAttachment>
+      <iconAttachment/>
     </property>
     <property>
       <linkPrefix/>

@@ -61,6 +61,9 @@ function givenDialog(
         <select name="newEntriesLocation"></select>
         <button type="button">Browse</button>
       </div>
+      <select name="templateProvider">
+        <option value="">Default template</option>
+      </select>
     </form>`;
   return document.querySelector("form")!;
 }
@@ -95,6 +98,12 @@ function pickColumns(...columns: string[]): void {
 function locationSelect(): HTMLSelectElement {
   return document.querySelector<HTMLSelectElement>(
     'select[name="newEntriesLocation"]',
+  )!;
+}
+
+function templateProviderSelect(): HTMLSelectElement {
+  return document.querySelector<HTMLSelectElement>(
+    'select[name="templateProvider"]',
   )!;
 }
 
@@ -140,17 +149,19 @@ function allowEditMode(allowed = true): void {
 }
 
 describe("updateCreationFields, following the edit mode", () => {
-  it("enables the strategy, and the location once a strategy is picked, when the edit mode is allowed", () => {
+  it("enables the strategy, then the location and template once one is picked", () => {
     const scope = givenDialog({ editMode: true });
 
     updateCreationFields(scope, false);
     expect(strategySelect().disabled).toBe(false);
     expect(locationSelect().disabled).toBe(true);
+    expect(templateProviderSelect().disabled).toBe(true);
 
     strategySelect().value = "uuid";
     updateCreationFields(scope, false);
     expect(locationSelect().disabled).toBe(false);
     expect(locationButton().disabled).toBe(false);
+    expect(templateProviderSelect().disabled).toBe(false);
   });
 
   it("enables and disables the enhanced location picker through its own API", () => {
@@ -302,7 +313,7 @@ describe("wireCreationFields", () => {
     expect(strategySelect().disabled).toBe(false);
   });
 
-  it("disables the strategy and the location once the edit mode is turned off", () => {
+  it("disables the strategy, the location and the template once the edit mode is turned off", () => {
     givenWiredDialog({ editMode: true, strategy: "uuid" });
 
     allowEditMode(false);
@@ -310,6 +321,7 @@ describe("wireCreationFields", () => {
     expect(strategySelect().disabled).toBe(true);
     expect(locationSelect().disabled).toBe(true);
     expect(locationButton().disabled).toBe(true);
+    expect(templateProviderSelect().disabled).toBe(true);
   });
 
   it("gives back the strategy picked before the edit mode was turned off once it is allowed again", () => {
@@ -334,5 +346,6 @@ describe("wireCreationFields", () => {
 
     expect(strategySelect().value).toBe("");
     expect(locationSelect().disabled).toBe(true);
+    expect(templateProviderSelect().disabled).toBe(true);
   });
 });

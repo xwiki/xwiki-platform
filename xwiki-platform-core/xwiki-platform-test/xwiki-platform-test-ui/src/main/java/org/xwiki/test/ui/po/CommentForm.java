@@ -75,10 +75,8 @@ public class CommentForm extends BaseElement
             .toList();
 
         if (textareas.isEmpty() || !textareas.get(0).isDisplayed()) {
-            WebElement iframe = getContainer().findElement(By.tagName("iframe"));
-            getDriver().switchTo().frame(iframe);
-            action.accept(getDriver().findElement(By.tagName("body")));
-            getDriver().switchTo().parentFrame();
+            // The text area is replaced by a rich text editor, which edits the content in-line.
+            action.accept(getContainer().findElement(By.cssSelector("[contenteditable='true']")));
         } else {
             action.accept(textareas.get(0));
         }

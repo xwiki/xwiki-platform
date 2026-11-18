@@ -37,7 +37,7 @@ describe("querySuggestionsMenuItems (contributed items)", () => {
 
   beforeAll(() => {
     editor = BlockNoteEditor.create({
-      schema: createBlockNoteSchema([]),
+      schema: createBlockNoteSchema(),
     }) as AnyEditor;
   });
 
@@ -48,9 +48,7 @@ describe("querySuggestionsMenuItems (contributed items)", () => {
     return querySuggestionsMenuItems({
       editor,
       query: "",
-      macros: [],
       syntax,
-      t: (key: string) => key,
       featureItems,
     }).map((item) => item.title);
   }

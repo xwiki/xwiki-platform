@@ -26,7 +26,10 @@ import type {
 import type { EditorInstance } from "../editorInstance";
 import type {
   BlockNoteEditorOptions,
+  BlockSpecs,
+  CustomInlineContentConfig,
   ExtensionFactoryInstance,
+  InlineContentSpec,
 } from "@blocknote/core";
 import type {
   BlockTypeSelectItem,
@@ -102,6 +105,28 @@ type SlashMenuItem = DefaultReactSuggestionItem & {
 };
 
 /**
+ * The block and inline content types that an editing feature adds to the schema of the editor. Their types are erased:
+ * the typed API of the editor (e.g. `BlockOfType`) only knows the types of its own schema.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type SchemaContribution = {
+  /**
+   * The specifications of the block types to add, keyed by block type.
+   */
+  blockSpecs?: BlockSpecs;
+
+  /**
+   * The specifications of the inline content types to add, keyed by inline content type.
+   */
+  inlineContentSpecs?: Record<
+    string,
+    InlineContentSpec<CustomInlineContentConfig>
+  >;
+};
+
+/**
  * What an editing feature adds to the formatting toolbar.
  *
  * @since 18.10.0RC1
@@ -132,6 +157,11 @@ type FormattingToolbarContribution = {
  * @beta
  */
 type FeatureContribution = {
+  /**
+   * The block and inline content types to add to the schema of the editor. Two features can't add the same type.
+   */
+  schema?: SchemaContribution;
+
   /**
    * The BlockNote extensions to register, e.g. to handle DOM events or to add ProseMirror plugins.
    */
@@ -192,6 +222,7 @@ interface EditorFeature {
  * editor applies them without checking whether they are there.
  */
 type MergedContributions = {
+  schema: Required<SchemaContribution>;
   blockNoteExtensions: ExtensionFactoryInstance[];
   blockNoteOptions: ContributedBlockNoteOptions;
   slashMenuItems: () => SlashMenuItem[];
@@ -248,9 +279,18 @@ function keepFirstReplacements(items: SlashMenuItem[]): SlashMenuItem[] {
 function mergeContributions(
   contributions: FeatureContribution[],
 ): MergedContributions {
+  const blockSpecs: BlockSpecs = {};
+  const inlineContentSpecs: Required<SchemaContribution>["inlineContentSpecs"] =
+    {};
   const blockNoteOptions: Record<string, unknown> = {};
   const blockToolbars: Record<string, (block: BlockType) => ReactNode> = {};
   for (const contribution of contributions) {
+    mergeRecord(blockSpecs, contribution.schema?.blockSpecs, "block type");
+    mergeRecord(
+      inlineContentSpecs,
+      contribution.schema?.inlineContentSpecs,
+      "inline content type",
+    );
     mergeRecord(
       blockNoteOptions,
       contribution.blockNoteOptions,
@@ -263,6 +303,7 @@ function mergeContributions(
     );
   }
   return {
+    schema: { blockSpecs, inlineContentSpecs },
     blockNoteExtensions: contributions.flatMap(
       (contribution) => contribution.blockNoteExtensions ?? [],
     ),
@@ -333,5 +374,6 @@ export type {
   FeatureContribution,
   FormattingToolbarContribution,
   MergedContributions,
+  SchemaContribution,
   SlashMenuItem,
 };

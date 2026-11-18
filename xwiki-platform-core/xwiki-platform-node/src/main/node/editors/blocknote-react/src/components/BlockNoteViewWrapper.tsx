@@ -26,8 +26,6 @@ import {
   querySuggestionsMenuItems,
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
-import { getMacroEditing } from "../blocknote/macroEditor";
-import { adaptMacroForBlockNote } from "../blocknote/utils";
 import { EditorInstanceContext } from "../contexts";
 import { contributeFeatures } from "../features/editorFeature";
 import { createBlockMetadataStore } from "../misc/blockMetadata";
@@ -42,17 +40,13 @@ import {
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
-import { filterMap } from "@xwiki/platform-fn-utils";
-import { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import { Container } from "inversify";
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { BlockType, EditorSchema, EditorType } from "../blocknote";
-import type { BlockNoteConcreteMacro } from "../blocknote/utils";
 import type { EditorInstance } from "../editorInstance";
 import type { EditorOptions } from "../editorOptions";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
-import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 
 /**
  * Properties for the BlockNote editor component.
@@ -122,7 +116,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     autofocus,
     appearance: { theme, contentStyles, codeBlockClassName } = {},
     collaboration: requestedCollaboration,
-    features: { macros } = {},
   } = options;
   const { t } = useTranslation();
 
@@ -156,23 +149,20 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     [serviceContainer, syntaxId],
   );
 
-  const builtMacros: BlockNoteConcreteMacro[] = [];
+  // The editing features contribute to the editor before it is created, and get the editor instance once it is (from
+  // the event handlers they contribute).
+  const instanceRef = useRef<EditorInstance>(undefined);
+  const contributions = contributeFeatures({
+    options,
+    serviceContainer,
+    syntax,
+    t,
+    getInstance: () => instanceRef.current!,
+  });
 
-  if (macros) {
-    const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
-      serviceContainer
-        .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-        .get()!,
-    );
-
-    for (const macro of macros.list ?? []) {
-      builtMacros.push(
-        adaptMacroForBlockNote(macro, uniAstToReactJsxConverter),
-      );
-    }
-  }
-
-  const schema = createBlockNoteSchema(builtMacros, { codeBlockClassName });
+  const schema = createBlockNoteSchema(contributions.schema, {
+    codeBlockClassName,
+  });
 
   // When realtime collaboration is enabled, the initial content is set through the shared document. Moreover, BlockNote
   // doesn't support empty content, as in an empty array of blocks, so instead of passing an empty array we don't pass
@@ -195,17 +185,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       },
     };
   };
-
-  // The editing features contribute to the editor before it is created, and get the editor instance once it is (from
-  // the event handlers they contribute).
-  const instanceRef = useRef<EditorInstance>(undefined);
-  const contributions = contributeFeatures({
-    options,
-    serviceContainer,
-    syntax,
-    t,
-    getInstance: () => instanceRef.current!,
-  });
 
   const editorOptions = {
     ...contributions.blockNoteOptions,
@@ -313,10 +292,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             querySuggestionsMenuItems({
               editor,
               query,
-              macros: builtMacros,
               syntax,
-              t,
-              macroEditing: getMacroEditing(instance),
               featureItems: contributions.slashMenuItems(),
             })
           }
@@ -328,13 +304,9 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           formattingToolbar={(props) => (
             <CustomFormattingToolbar
               formattingToolbarProps={props}
-              additionalBlockTypes={[
-                ...filterMap(
-                  builtMacros,
-                  (built) => built.dropdownTransformItem,
-                ),
-                ...contributions.formattingToolbar.blockTypeSelectItems,
-              ]}
+              additionalBlockTypes={
+                contributions.formattingToolbar.blockTypeSelectItems
+              }
               featureItems={contributions.formattingToolbar.items}
               blockToolbars={contributions.formattingToolbar.blockToolbars}
             />

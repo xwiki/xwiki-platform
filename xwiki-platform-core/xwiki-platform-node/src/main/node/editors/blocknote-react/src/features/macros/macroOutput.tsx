@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { getMacroOutput } from "./macroMetadata";
-import { applyXWikiParameters } from "./parameters";
-import { EditorInstanceContext } from "../contexts";
+import { applyXWikiParameters } from "../../blocknote/parameters";
+import { EditorInstanceContext } from "../../contexts";
 import { Fragment, createElement, useContext } from "react";
-import type { BlockMetadataStore } from "../misc/blockMetadata";
+import type { BlockMetadataStore } from "../../misc/blockMetadata";
 import type { MacroCall } from "./utils";
 import type { CSSProperties, ReactNode } from "react";
 

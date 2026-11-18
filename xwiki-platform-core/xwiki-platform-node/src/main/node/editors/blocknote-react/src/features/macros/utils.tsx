@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { useMacroEditing } from "./macroEditor";
+import { useMacroEditing } from "./macroEditing";
 import { BlockNoteEditor } from "@blocknote/core";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core/extensions";
 import {
@@ -27,7 +27,12 @@ import {
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
 import { RiFileList3Fill } from "react-icons/ri";
-import type { InlineContentType } from ".";
+import type { InlineContentType } from "../../blocknote";
+import type {
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroCallParams,
+} from "../../services/macroEditor";
 import type {
   BlockConfig,
   CustomInlineContentConfig,
@@ -48,10 +53,6 @@ import type {
   ReactInlineContentImplementation,
 } from "@blocknote/react";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type {
-  InlineMacroInvocation as UniAstInlineMacroInvocation,
-  MacroBlockInvocation as UniAstMacroBlockInvocation,
-} from "@xwiki/platform-uniast-api";
 import type { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import type { JSX, ReactNode } from "react";
 
@@ -209,70 +210,6 @@ type BlockNoteConcreteMacro = {
         type: "inline";
         inlineContent: ReturnType<typeof createCustomInlineContentSpec>;
       };
-};
-
-/**
- * A macro call's parameter map: parameter name to primitive value.
- *
- * @since 18.6.0RC1
- * @beta
- */
-type MacroCallParams = Record<string, boolean | number | string>;
-
-/**
- * Information to fill the insertion modal UI with
- *
- * @since 18.5.0RC1
- * @beta
- */
-type MacroInsertionEditorPrefillData = {
-  /** Type of the macro to insert */
-  kind: "block" | "inline";
-
-  /** ID of the macro to insert */
-  id: string | null;
-
-  /** Parameters of the macro */
-  params: MacroCallParams | null;
-
-  /** Body of the macro */
-  body: MacroBlockInvocation["body"] | InlineMacroInvocation["body"] | null;
-};
-
-/**
- * Information about a macro block invocation.
- *
- * Identical to `MacroBlockInvocation` from `@xwiki/platform-uniast-api`, except for `body` which is a BlockNote AST
- * piece here.
- *
- * @since 18.5.0RC1
- * @beta
- */
-type MacroBlockInvocation = Omit<UniAstMacroBlockInvocation, "body"> & {
-  // NOTE: 'InlineContentType[]' should become 'BlockType[]' once BlockNote supports nesting
-  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-  body:
-    | { type: "inlineContents"; content: InlineContentType[] }
-    | { type: "raw"; content: string }
-    | { type: "none" };
-};
-
-/**
- * Information about an inline macro invocation.
- *
- * Identical to `InlineMacroInvocation` from `@xwiki/platform-uniast-api`, except for `body` which is a BlockNote AST
- * piece here.
- *
- * @since 18.5.0RC1
- * @beta
- */
-type InlineMacroInvocation = Omit<UniAstInlineMacroInvocation, "body"> & {
-  // NOTE: 'InlineContentType' should become 'InlineContentType[]' once BlockNote supports nesting
-  // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
-  body:
-    | { type: "inlineContent"; content: InlineContentType }
-    | { type: "raw"; content: string }
-    | { type: "none" };
 };
 
 /**
@@ -718,11 +655,4 @@ export {
   macroToInvocation,
 };
 
-export type {
-  BlockNoteConcreteMacro,
-  InlineMacroInvocation,
-  MacroBlockInvocation,
-  MacroCall,
-  MacroCallParams,
-  MacroInsertionEditorPrefillData,
-};
+export type { BlockNoteConcreteMacro, MacroCall };

@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { useMacroEditing } from "../../blocknote/macroEditor";
-import { insertMacroInvocation } from "../../blocknote/utils";
+import { useMacroEditing } from "./macroEditing";
+import { insertMacroInvocation } from "./utils";
 import { useEditor } from "../../hooks";
 import { useComponentsContext } from "@blocknote/react";
 import { useCallback } from "react";

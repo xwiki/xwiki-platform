@@ -20,7 +20,6 @@
 
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
-import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
 import { XWikiRawBlock } from "./raw";
 import {
   SubscriptStyle,
@@ -28,9 +27,12 @@ import {
   VerbatimStyle,
   XWikiParametersStyle,
 } from "./styles";
-import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
 import { XWikiCodeBlock } from "../features/codeBlocks/codeBlockSpec";
 import { XWikiImageBlock } from "../features/images/imageBlockSpec";
+import {
+  XWikiInlineMacro,
+  XWikiMacroBlock,
+} from "../features/macros/macroSpec";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -43,12 +45,10 @@ import {
 import { filterSuggestionItems } from "@blocknote/core/extensions";
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
-import { filterMap } from "@xwiki/platform-fn-utils";
-import { createElement } from "react";
-import { RiFileList3Fill } from "react-icons/ri";
-import type { SlashMenuItem } from "../features/editorFeature";
-import type { MacroEditing } from "./macroEditor";
-import type { BlockNoteConcreteMacro } from "./utils";
+import type {
+  SchemaContribution,
+  SlashMenuItem,
+} from "../features/editorFeature";
 import type {
   Block,
   InlineContent,
@@ -58,25 +58,20 @@ import type {
 } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
-import type { useTranslation } from "react-i18next";
 
 /**
  * Create the BlockNote editor's schema
  *
  * Contains all the blocks usable inside the editor
  *
+ * @param contributed - the block and inline content types added by the editing features, whose types are erased
+ * @param options - the options of the schema
  * @returns The created schema
  */
 function createBlockNoteSchema(
-  macros: BlockNoteConcreteMacro[],
+  contributed?: SchemaContribution,
   options?: { codeBlockClassName?: string },
 ) {
-  macros = [
-    ...macros.sort((a, b) =>
-      a.macro.infos.name.localeCompare(b.macro.infos.name),
-    ),
-  ];
-
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
@@ -87,38 +82,22 @@ function createBlockNoteSchema(
       xwikiMacroBlock: XWikiMacroBlock(),
       xwikiRaw: XWikiRawBlock(),
 
-      // Macros
-      ...Object.fromEntries(
-        filterMap(macros, ({ macro, bnRendering }) =>
-          bnRendering.type === "block"
-            ? [
-                `${MACRO_NAME_PREFIX}${macro.infos.id}`,
-                bnRendering.block.block(),
-              ]
-            : null,
-        ),
-      ),
+      // The block types added by the editing features, whose types are erased under an index signature.
+      ...Object.fromEntries(Object.entries(contributed?.blockSpecs ?? {})),
     },
 
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,
 
       // The generic inline macro (server-rendered inline macros without a dedicated client-side rendering). It is
-      // registered through Object.fromEntries so that its type stays erased under an index signature, like the dynamic
-      // macros below: a statically-typed custom inline content entry would tighten the inline content schema and break
-      // the call sites that expect the default inline content schema.
+      // registered through Object.fromEntries so that its type stays erased under an index signature, like the types
+      // added by the editing features below: a statically-typed custom inline content entry would tighten the inline
+      // content schema and break the call sites that expect the default inline content schema.
       ...Object.fromEntries([["xwikiInlineMacro", XWikiInlineMacro]]),
 
-      // Macros
+      // The inline content types added by the editing features.
       ...Object.fromEntries(
-        filterMap(macros, ({ macro, bnRendering }) =>
-          bnRendering.type === "inline"
-            ? [
-                `${MACRO_NAME_PREFIX}${macro.infos.id}`,
-                bnRendering.inlineContent.inlineContent,
-              ]
-            : null,
-        ),
+        Object.entries(contributed?.inlineContentSpecs ?? {}),
       ),
     },
 
@@ -160,14 +139,8 @@ type SuggestionMenuItemsParams = {
   query: string;
   /** Instance of the BlockNote editor */
   editor: EditorType;
-  /** The list of all available macros */
-  macros: BlockNoteConcreteMacro[];
   /** Syntax of the current document */
   syntax: SyntaxConfig;
-  /** `t` property from `react-i18n`'s useTranslation() return value */
-  t: ReturnType<typeof useTranslation>["t"];
-  /** The macro editor of the editor instance, when available */
-  macroEditing?: MacroEditing;
   /** The items contributed by the editing features */
   featureItems: SlashMenuItem[];
 };
@@ -240,77 +213,19 @@ function replaceDefaultItems(
 function querySuggestionsMenuItems({
   editor,
   query,
-  macros,
   syntax,
-  t,
-  macroEditing,
   featureItems,
 }: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
-  const { blocks: blocksSupport, inlineContents: inlineSupport } =
-    syntax.features;
-
-  // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
-  // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).
-  const genericMacroItem: DefaultReactSuggestionItem[] =
-    macroEditing && (blocksSupport.macros || inlineSupport.macros)
-      ? [
-          {
-            title: t("blocknote.slashMenu.macro.title"),
-            subtext: t("blocknote.slashMenu.macro.subtext"),
-            aliases: ["macro"],
-            group: t("blocknote.slashMenu.macro.group"),
-            icon: createElement(RiFileList3Fill),
-            onItemClick: () =>
-              macroEditing.insert(
-                {
-                  kind: "block",
-                  id: null,
-                  params: null,
-                  body: { type: "none" },
-                },
-                (invocation) => insertMacroInvocation(editor, invocation),
-              ),
-          },
-        ]
-      : [];
-
   // The default items keep the key of their BlockNote dictionary entry, even if their type doesn't declare it.
-  const unsupportedKeys = getUnsupportedDefaultItemKeys(blocksSupport);
-  const { items: defaultItems, additionalItems } = replaceDefaultItems(
+  const unsupportedKeys = getUnsupportedDefaultItemKeys(syntax.features.blocks);
+  const { items, additionalItems } = replaceDefaultItems(
     (getDefaultReactSlashMenuItems(editor) as SlashMenuItem[]).filter(
       (item) => !unsupportedKeys.has(item.key!),
     ),
     featureItems,
   );
 
-  return filterSuggestionItems(
-    combineByGroup(
-      defaultItems,
-
-      // Block macros
-      blocksSupport.macros
-        ? filterMap(macros, ({ bnRendering }) =>
-            bnRendering.type === "block" && bnRendering.block.slashMenuEntry
-              ? bnRendering.block.slashMenuEntry(editor)
-              : null,
-          )
-        : [],
-
-      // Inline macros
-      inlineSupport.macros
-        ? filterMap(macros, ({ bnRendering }) =>
-            bnRendering.type === "inline" &&
-            bnRendering.inlineContent.slashMenuEntry
-              ? bnRendering.inlineContent.slashMenuEntry(editor)
-              : null,
-          )
-        : [],
-
-      genericMacroItem,
-      additionalItems,
-    ),
-    query,
-  );
+  return filterSuggestionItems(combineByGroup(items, additionalItems), query);
 }
 
 /**

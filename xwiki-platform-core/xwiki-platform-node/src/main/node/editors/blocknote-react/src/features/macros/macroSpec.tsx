@@ -18,17 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import "./macro.css";
-import { useMacroEditing } from "./macroEditor";
+import { useMacroEditing } from "./macroEditing";
 import { getMacroOutput } from "./macroMetadata";
 import { MacroOutput } from "./macroOutput";
 import { invocationToMacroCall, macroCallToInvocation } from "./utils";
-import { EditorInstanceContext } from "../contexts";
+import { EditorInstanceContext } from "../../contexts";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,
 } from "@blocknote/react";
 import { useContext } from "react";
-import type { BlockMetadataStore } from "../misc/blockMetadata";
+import type { BlockMetadataStore } from "../../misc/blockMetadata";
 import type { OutputNode } from "./macroOutput";
 import type { MacroCall } from "./utils";
 

@@ -20,17 +20,17 @@
 // @vitest-environment jsdom
 
 import { createBlockNoteSchema } from "../../blocknote";
-import { setMacroOutput } from "../../blocknote/macroMetadata";
-import { MacroOutput } from "../../blocknote/macroOutput";
 import { EditorInstanceContext } from "../../contexts";
+import { setMacroOutput } from "../../features/macros/macroMetadata";
+import { MacroOutput } from "../../features/macros/macroOutput";
 import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { BlockNoteEditor } from "@blocknote/core";
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { beforeAll, describe, expect, test } from "vitest";
-import type { MacroCall } from "../../blocknote/utils";
 import type { EditorInstance } from "../../editorInstance";
+import type { MacroCall } from "../../features/macros/utils";
 import type { BlockMetadataStore } from "../../misc/blockMetadata";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -406,7 +406,7 @@ describe("XWikiParametersStyle", () => {
 
   beforeAll(() => {
     editor = BlockNoteEditor.create({
-      schema: createBlockNoteSchema([]),
+      schema: createBlockNoteSchema(),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as BlockNoteEditor<any, any, any>;
   });

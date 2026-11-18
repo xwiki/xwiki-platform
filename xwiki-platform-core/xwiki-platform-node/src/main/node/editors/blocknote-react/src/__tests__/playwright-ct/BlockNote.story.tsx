@@ -18,18 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { serviceContainerMock } from "./serviceContainer.mock";
-import { macroEditorName } from "../../blocknote/macroEditor";
-import { setMacroOutput } from "../../blocknote/macroMetadata";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import { setMacroOutput } from "../../features/macros/macroMetadata";
 import { createBlockMetadataStore } from "../../misc/blockMetadata";
+import { macroEditorName } from "../../services/macroEditor";
 import { useMemo, useState } from "react";
 import type { BlockType } from "../../blocknote";
-import type { MacroEditor } from "../../blocknote/macroEditor";
+import type { EditorOptions } from "../../editorOptions";
 import type {
   InlineMacroInvocation,
   MacroBlockInvocation,
-} from "../../blocknote/utils";
-import type { EditorOptions } from "../../editorOptions";
+  MacroEditor,
+} from "../../services/macroEditor";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Container } from "inversify";
 

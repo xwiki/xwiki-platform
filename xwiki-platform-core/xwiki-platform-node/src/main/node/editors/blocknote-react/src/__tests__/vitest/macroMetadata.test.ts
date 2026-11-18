@@ -17,7 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { getMacroOutput, setMacroOutput } from "../../blocknote/macroMetadata";
+import {
+  getMacroOutput,
+  setMacroOutput,
+} from "../../features/macros/macroMetadata";
 import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { describe, expect, test } from "vitest";
 

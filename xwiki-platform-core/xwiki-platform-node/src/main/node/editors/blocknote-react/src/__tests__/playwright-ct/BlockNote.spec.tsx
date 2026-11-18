@@ -298,16 +298,20 @@ test("A canceled macro edition leaves the macro unchanged", async ({
   await expect(macro).toHaveText("macro:info");
 });
 
-test("Macros can't be inserted without a macro editor, or when disabled", async ({
+test("Macros can't be inserted without a macro editor, when disabled, or when the syntax can't save them", async ({
   mount,
   page,
 }) => {
+  const syntaxWithoutMacros = structuredClone(FULL_SYNTAX);
+  syntaxWithoutMacros.features.blocks.macros = false;
+  syntaxWithoutMacros.features.inlineContents.macros = false;
   for (const props of [
     { options: { syntax: FULL_SYNTAX } },
     {
       options: { syntax: FULL_SYNTAX, features: { macros: false as const } },
       macroEditor: {},
     },
+    { options: { syntax: syntaxWithoutMacros }, macroEditor: {} },
   ]) {
     const component = await mount(
       <BlockNoteForTest content={buildParagraphs(["Yeah"])} {...props} />,

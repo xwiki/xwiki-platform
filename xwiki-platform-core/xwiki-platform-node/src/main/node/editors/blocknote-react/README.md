@@ -28,13 +28,14 @@ it, and the existing ones are checked against it.
    it doesn't name or special-case any feature.
    `features.<id>: false` disables a feature, and a feature contributes nothing when the syntax of the edited content
    can't save what it adds.
-2. **A feature contributes, it doesn't patch.** A feature can contribute slash menu items (an item with the key of a
-   BlockNote default item replaces it, in place), formatting toolbar items (including the toolbar shown for a block
-   type), components rendered with the editor (e.g. its menus and toolbars), BlockNote extensions (ProseMirror plugins,
-   paste and drop handling, keyboard shortcuts, input rules) and BlockNote editor options (e.g. `uploadFile`). The
-   editor merges the contributions and reports a conflict (e.g. two features setting the same BlockNote option or
-   replacing the same slash menu item) rather than letting the last one win. The editor itself only removes the
-   BlockNote default items that the syntax of the edited content can't save.
+2. **A feature contributes, it doesn't patch.** A feature can contribute block and inline content types to the schema
+   (their types erased), slash menu items (an item with the key of a BlockNote default item replaces it, in place),
+   formatting toolbar items (including the toolbar shown for a block type), components rendered with the editor (e.g.
+   its menus and toolbars), BlockNote extensions (ProseMirror plugins, paste and drop handling, keyboard shortcuts,
+   input rules) and BlockNote editor options (e.g. `uploadFile`). The editor merges the contributions and reports a
+   conflict (e.g. two features setting the same BlockNote option, adding the same block type or replacing the same
+   slash menu item) rather than letting the last one win. The editor itself only removes the BlockNote default items
+   that the syntax of the edited content can't save.
 3. **Horizontal features are used through their service, never through the feature.** Links and images call the
    `FileUploader`; they don't depend on the feature handling the files pasted or dropped in the editor, which can be
    disabled on its own.
@@ -86,7 +87,6 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| Macros | wired directly by the editor, which also checks the syntax features, instead of being an `EditorFeature`, their code spread over `src/components` (including the macro buttons in `src/components/links`) and `src/blocknote` | 1, 2, 5 |
-| Image and code block specs | part of the static schema of the editor, which imports them from `src/features/images` and `src/features/codeBlocks` (the typed API derives from the schema), so the Ctrl+Alt+C shortcut of the code blocks (registered by BlockNote) works even when the syntax can't save code blocks | 1 |
+| Image, code block and server-rendered macro specs | part of the static schema of the editor, which imports them from `src/features/images`, `src/features/codeBlocks` and `src/features/macros` (the typed API derives from the schema, and the content holding macro calls must load whatever the features), so the Ctrl+Alt+C shortcut of the code blocks (registered by BlockNote) works even when the syntax can't save code blocks | 1 |
 | `lang` option | changes a module-global translation instance | 10, 11 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 6, 11 |

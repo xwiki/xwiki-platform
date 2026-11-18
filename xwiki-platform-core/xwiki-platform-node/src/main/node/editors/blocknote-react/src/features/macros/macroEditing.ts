@@ -17,57 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EditorInstanceContext } from "../contexts";
+import { EditorInstanceContext } from "../../contexts";
+import { macroEditorName } from "../../services/macroEditor";
 import { useContext } from "react";
-import type { EditorInstance } from "../editorInstance";
+import type { EditorInstance } from "../../editorInstance";
 import type {
   InlineMacroInvocation,
   MacroBlockInvocation,
+  MacroEditor,
   MacroInsertionEditorPrefillData,
-} from "./utils";
-
-/**
- * The name under which the {@link MacroEditor} is bound in the service container.
- *
- * @since 18.10.0RC1
- * @beta
- */
-const macroEditorName = "MacroEditor";
-
-/**
- * The UI (e.g. a modal) letting the user choose the macro to insert and set the parameters of a macro call. The
- * actions to insert and edit macros are available only when it is bound in the service container (see
- * {@link macroEditorName}).
- *
- * @since 18.10.0RC1
- * @beta
- */
-interface MacroEditor {
-  /**
-   * Lets the user choose a macro to insert, and set its parameters.
-   *
-   * @param instance - the editor instance where the macro is inserted
-   * @param prefill - what to prefill the UI with (e.g. the selected content, as the macro content)
-   * @returns the macro call to insert, or undefined if the user canceled
-   */
-  insert(
-    instance: EditorInstance,
-    prefill: MacroInsertionEditorPrefillData,
-  ): Promise<MacroBlockInvocation | InlineMacroInvocation | undefined>;
-
-  /**
-   * Lets the user edit the parameters of a macro call. The user may also change the macro, so the returned macro call
-   * can call a different macro.
-   *
-   * @param instance - the editor instance holding the edited macro call
-   * @param invocation - the macro call to edit
-   * @returns the macro call replacing the edited one, or undefined if the user canceled
-   */
-  edit(
-    instance: EditorInstance,
-    invocation: MacroBlockInvocation | InlineMacroInvocation,
-  ): Promise<MacroBlockInvocation | InlineMacroInvocation | undefined>;
-}
+} from "../../services/macroEditor";
 
 /**
  * The macro editor of an editor instance, as used by the editor UI: the macro call returned by the macro editor is
@@ -150,5 +109,5 @@ function useMacroEditing(): MacroEditing | undefined {
   return getMacroEditing(useContext(EditorInstanceContext));
 }
 
-export { getMacroEditing, macroEditorName, useMacroEditing };
-export type { MacroEditing, MacroEditor };
+export { getMacroEditing, useMacroEditing };
+export type { MacroEditing };

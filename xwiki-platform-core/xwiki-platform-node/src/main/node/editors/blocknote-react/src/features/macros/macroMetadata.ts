@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { BlockMetadataStore } from "../misc/blockMetadata";
+import type { BlockMetadataStore } from "../../misc/blockMetadata";
 
 // The metadata entries holding the output of a macro call, and the macro call it was rendered for.
 const MACRO_CALL = "macroCall";

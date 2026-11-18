@@ -5,12 +5,12 @@
 ```ts
 
 import { Block } from '@blocknote/core';
-import { BlockConfig } from '@blocknote/core';
 import { BlockNoteEditor } from '@blocknote/core';
 import { BlockNoteEditorOptions } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import { BlockSchemaFromSpecs } from '@blocknote/core';
 import { BlockSpec } from '@blocknote/core';
+import { BlockSpecs } from '@blocknote/core';
 import { BlockTypeSelectItem } from '@blocknote/react';
 import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { Container } from 'inversify';
@@ -22,7 +22,6 @@ import { DocumentReference } from '@xwiki/platform-model-api';
 import { Extension } from '@blocknote/core';
 import { ExtensionFactoryInstance } from '@blocknote/core';
 import { InlineContent } from '@blocknote/core';
-import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
 import { InlineMacroInvocation as InlineMacroInvocation_2 } from '@xwiki/platform-uniast-api';
@@ -31,18 +30,12 @@ import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
 import { MacroBlockInvocation as MacroBlockInvocation_2 } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
-import { PartialBlockFromConfig } from '@blocknote/core';
-import { PartialInlineContent } from '@blocknote/core';
 import { PartialLink } from '@blocknote/core';
-import { PropSchema } from '@blocknote/core';
-import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactElement } from 'react';
-import { ReactInlineContentImplementation } from '@blocknote/react';
 import { ReactNode } from 'react';
 import { ResourceReference } from '@xwiki/platform-rendering-api';
 import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
-import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
 import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
@@ -184,6 +177,7 @@ export type FeatureContext = Pick<EditorInstance, "options" | "serviceContainer"
 
 // @beta
 export type FeatureContribution = {
+    schema?: SchemaContribution;
     blockNoteExtensions?: ExtensionFactoryInstance[];
     blockNoteOptions?: ContributedBlockNoteOptions;
     slashMenuItems?: () => SlashMenuItem[];
@@ -341,8 +335,17 @@ export type MacroInsertionEditorPrefillData = {
 };
 
 // @beta
+export const macrosFeature: EditorFeature;
+
+// @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
+};
+
+// @beta
+export type SchemaContribution = {
+    blockSpecs?: BlockSpecs;
+    inlineContentSpecs?: Record<string, InlineContentSpec<CustomInlineContentConfig>>;
 };
 
 // @beta

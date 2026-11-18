@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { useMacroEditing } from "../../blocknote/macroEditor";
+import { useMacroEditing } from "./macroEditing";
 import {
   MACRO_NAME_PREFIX,
   invocationToMacroCall,
   macroCallToInvocation,
-} from "../../blocknote/utils";
+} from "./utils";
 import { useEditor } from "../../hooks";
 import { useComponentsContext } from "@blocknote/react";
 import { useMemo } from "react";
@@ -31,9 +31,9 @@ import { RiPencilFill } from "react-icons/ri";
 import type {
   InlineMacroInvocation,
   MacroBlockInvocation,
-  MacroCall,
   MacroCallParams,
-} from "../../blocknote/utils";
+} from "../../services/macroEditor";
+import type { MacroCall } from "./utils";
 
 /** The invocation to edit for a selected macro block, and the writer that applies the wizard's result back to it. */
 type MacroEdit = {

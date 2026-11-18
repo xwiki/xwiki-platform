@@ -43,7 +43,7 @@ describe("linksFeature", () => {
 
   beforeAll(() => {
     editor = BlockNoteEditor.create({
-      schema: createBlockNoteSchema([]),
+      schema: createBlockNoteSchema(),
     }) as AnyEditor;
   });
 
@@ -59,10 +59,7 @@ describe("linksFeature", () => {
     const items = querySuggestionsMenuItems({
       editor,
       query,
-      macros: [],
       syntax: FULL_SYNTAX,
-      t,
-      macroEditing: undefined,
       featureItems: linksFeature.contribute(context())!.slashMenuItems!(),
     });
 

@@ -198,9 +198,42 @@ describe("contributeFeatures", () => {
     );
   });
 
+  test("merges the types added to the schema, keeping the first of the types added by several features, and reports it", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const firstSpec = {};
+    const otherSpec = {};
+
+    const merged = contributeFeatures(
+      context([
+        feature("first", {
+          schema: {
+            blockSpecs: { chart: firstSpec },
+            inlineContentSpecs: { mention: firstSpec },
+          },
+        } as unknown as FeatureContribution),
+        feature("second", {
+          schema: { blockSpecs: { chart: otherSpec, gallery: otherSpec } },
+        } as unknown as FeatureContribution),
+      ]),
+    );
+
+    expect(merged.schema.blockSpecs).toEqual({
+      chart: firstSpec,
+      gallery: otherSpec,
+    });
+    expect(merged.schema.blockSpecs.chart).toBe(firstSpec);
+    expect(merged.schema.inlineContentSpecs).toEqual({ mention: firstSpec });
+    expect(consoleError).toHaveBeenCalledWith(
+      "The block type [chart] is set by several editor features. Only the first one is taken into account.",
+    );
+  });
+
   test("merges nothing when the features contribute nothing", () => {
     const merged = contributeFeatures(context([feature("nothing")]));
 
+    expect(merged.schema).toEqual({ blockSpecs: {}, inlineContentSpecs: {} });
     expect(merged.blockNoteExtensions).toEqual([]);
     expect(merged.blockNoteOptions).toEqual({});
     expect(merged.slashMenuItems()).toEqual([]);

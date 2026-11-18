@@ -18,8 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
-import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
 import { selectionHasInlineContent } from "../selection";
 import {
@@ -197,9 +195,6 @@ const getDefaultFormattingToolbarItems = (
     ...featureItems,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
-    // Hidden when no macro editor is available.
-    <CustomMacroEditButton key={"macroEditButton"} />,
-    <CustomInsertMacroButton key={"insertMacroButton"} />,
   ];
 
 export type { CustomFormattingToolbarProps };

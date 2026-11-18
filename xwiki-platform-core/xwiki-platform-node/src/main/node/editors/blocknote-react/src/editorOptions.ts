@@ -105,8 +105,9 @@ interface EditorFeatures {
   links?: object | false;
 
   /**
-   * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
-   * insert or edit a macro, even when a `MacroEditor` is bound.
+   * The macros are enabled when this is missing. `false` disables them: no macro calls in the schema of the editor, so
+   * content holding macro calls can't be edited, and no action to insert or edit a macro, even when a `MacroEditor` is
+   * bound.
    */
   macros?: MacroFeatureOptions | false;
 }

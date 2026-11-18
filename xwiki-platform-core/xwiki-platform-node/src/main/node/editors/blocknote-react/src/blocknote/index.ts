@@ -27,10 +27,6 @@ import {
   VerbatimStyle,
   XWikiParametersStyle,
 } from "./styles";
-import {
-  XWikiInlineMacro,
-  XWikiMacroBlock,
-} from "../features/macros/macroSpec";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -72,7 +68,6 @@ function createBlockNoteSchema(contributed?: SchemaContribution) {
       ...defaultBlockSpecs,
       xwikiDefinitionListItem: DefinitionListItemBlock(),
       xwikiGroup: XWikiGroupBlock(),
-      xwikiMacroBlock: XWikiMacroBlock(),
       xwikiRaw: XWikiRawBlock(),
 
       // The block types added by the editing features, whose types are erased under an index signature. They replace
@@ -83,13 +78,9 @@ function createBlockNoteSchema(contributed?: SchemaContribution) {
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,
 
-      // The generic inline macro (server-rendered inline macros without a dedicated client-side rendering). It is
-      // registered through Object.fromEntries so that its type stays erased under an index signature, like the types
-      // added by the editing features below: a statically-typed custom inline content entry would tighten the inline
-      // content schema and break the call sites that expect the default inline content schema.
-      ...Object.fromEntries([["xwikiInlineMacro", XWikiInlineMacro]]),
-
-      // The inline content types added by the editing features.
+      // The inline content types added by the editing features. Their types stay erased under an index signature: a
+      // statically-typed custom inline content entry would tighten the inline content schema and break the call sites
+      // that expect the default inline content schema.
       ...Object.fromEntries(
         Object.entries(contributed?.inlineContentSpecs ?? {}),
       ),

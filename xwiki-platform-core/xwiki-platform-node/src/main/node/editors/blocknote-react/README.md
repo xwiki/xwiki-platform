@@ -35,7 +35,8 @@ it, and the existing ones are checked against it.
    input rules) and BlockNote editor options (e.g. `uploadFile`). The editor merges the contributions and reports a
    conflict (e.g. two features setting the same BlockNote option, adding the same block type or replacing the same
    slash menu item) rather than letting the last one win. The editor itself only removes the BlockNote default items
-   that the syntax of the edited content can't save.
+   that the syntax of the edited content can't save. Content holding a block or inline content type that no feature
+   adds (e.g. because the feature is disabled) can't be loaded: the integration reports it to the user.
 3. **Horizontal features are used through their service, never through the feature.** Links and images call the
    `FileUploader`; they don't depend on the feature handling the files pasted or dropped in the editor, which can be
    disabled on its own.
@@ -87,7 +88,6 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| Server-rendered macro specs | part of the static schema of the editor, which imports them from `src/features/macros`, so that the content holding macro calls loads whatever the features | 1 |
 | BlockNote's default blocks | kept in the static schema (the typed API derives from it) when no feature replaces them, so BlockNote's own code block, with its Ctrl+Alt+C shortcut, is there even when the syntax can't save code blocks | 1 |
 | `lang` option | changes a module-global translation instance | 10, 11 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 6, 11 |

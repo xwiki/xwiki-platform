@@ -73,12 +73,16 @@ function context(
 }
 
 describe("macrosFeature", () => {
-  test("adds the client-rendered macros to the schema and to the slash menu", () => {
+  test("adds the macro calls to the schema, and the client-rendered macros to the slash menu", () => {
     const contribution = macrosFeature.contribute(context());
 
     expect(Object.keys(contribution?.schema?.blockSpecs ?? {})).toEqual([
+      "xwikiMacroBlock",
       "Macro_sample",
     ]);
+    expect(Object.keys(contribution?.schema?.inlineContentSpecs ?? {})).toEqual(
+      ["xwikiInlineMacro"],
+    );
     expect(contribution?.slashMenuItems?.().map((item) => item.title)).toEqual([
       "Sample Macro",
     ]);

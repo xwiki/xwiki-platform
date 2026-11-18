@@ -1,4 +1,3 @@
-#template('colorThemeInit.vm')
 .xdialog-modal-container {
   position: fixed;
   top: 0px;
@@ -26,9 +25,9 @@
   padding: 0;
   margin: auto;
   position: relative;
-  color: $theme.panelTextColor;
-  border: 1px solid $theme.borderColor;
-  background-color: $theme.panelBackgroundColor;
+  color: var(--panel-default-text);
+  border: 1px solid var(--xwiki-border-color);
+  background-color: var(--panel-bg);
   border-radius: 10px;
 }
 .xdialog-box {
@@ -50,12 +49,12 @@
 }
 .xdialog-title .xdialog-close {
   font-size: 1.25em;
-  color: $theme.panelHeaderTextColor;
+  color: var(--panel-header-text);
 }
 .xdialog-title {
   font-size: 142%;
   padding: 15px;
-  border-bottom: 1px solid $theme.borderColor;
+  border-bottom: 1px solid var(--xwiki-border-color);
 }
 .xdialog-box .xform {
   width: 100%;

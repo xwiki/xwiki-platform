@@ -22,7 +22,6 @@ package org.xwiki.platform.security.requiredrights;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * An analyzer for a macro parameter.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
 // for different parameter types so it is definitely used.
 @SuppressWarnings("unused")
 @Role
-@Unstable
 public interface MacroParameterRequiredRightsAnalyzer<T>
 {
     /**

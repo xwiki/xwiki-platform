@@ -77,7 +77,7 @@ public class TitleLiveTableNewRowNamingStrategy extends AbstractLocationLiveTabl
         // The title is what the user typed, so two entries can legitimately want the same name. The extra entries get
         // a suffix rather than a failure.
         for (int suffix = 1; this.modelBridge.exists(candidate); suffix++) {
-            candidate = new DocumentReference(String.format("%s-%d", name, suffix), location);
+            candidate = new DocumentReference(getSuffixedName(name, suffix), location);
         }
         // Known limitation: if another user creates a page with the same name before this entry is saved, the save
         // fails. This is very unlikely, and saving the row again then picks the next free name.
@@ -95,22 +95,37 @@ public class TitleLiveTableNewRowNamingStrategy extends AbstractLocationLiveTabl
      * @return the name of the page holding the entry, derived from its title
      * @throws LiveDataException when the title is missing, or holds nothing a name can be built from
      */
-    private String getName(Map<String, Object> entryValues) throws LiveDataException
+    protected String getName(Map<String, Object> entryValues) throws LiveDataException
     {
         String title = Objects.toString(entryValues.get(TITLE_PROPERTY), null);
         if (StringUtils.isBlank(title)) {
             throw new LiveDataException(
                 String.format("Missing [%s] value, which the new entry is named after.", TITLE_PROPERTY));
         }
-        String name = title.trim();
+        String name = transform(title.trim());
+        // A name strategy is free to strip every character of the title.
+        if (StringUtils.isBlank(name)) {
+            throw new LiveDataException(String.format("No page name can be built from the title [%s].", title));
+        }
+        return name;
+    }
+
+    /**
+     * @param name the name of the page holding the entry, as returned by {@link #getName(Map)}
+     * @param suffix the number distinguishing this entry from the existing pages with the same name
+     * @return the suffixed name, which follows the same naming rules as {@code name}
+     */
+    protected String getSuffixedName(String name, int suffix)
+    {
+        return transform(String.format("%s-%d", name, suffix));
+    }
+
+    private String transform(String name)
+    {
         EntityNameValidation nameStrategy = this.entityNameValidationManager.getEntityReferenceNameStrategy();
-        // Admins can turn the transformation off, in which case the other ways of creating a page keep the title as is.
+        // Admins can turn the transformation off, in which case the other ways of creating a page keep the name as is.
         if (this.entityNameValidationConfiguration.useTransformation() && nameStrategy != null) {
-            name = nameStrategy.transform(name);
-            // A name strategy is free to strip every character of the title.
-            if (StringUtils.isBlank(name)) {
-                throw new LiveDataException(String.format("No page name can be built from the title [%s].", title));
-            }
+            return nameStrategy.transform(name);
         }
         return name;
     }

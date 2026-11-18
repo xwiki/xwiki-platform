@@ -37,6 +37,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @OldcoreTest
 @AllComponents
@@ -62,6 +63,9 @@ class XWikiMessageToolBridgeTest
         this.oldcore.notifyDocumentDeletedEvent(true);
 
         Locale.setDefault(Locale.ROOT);
+
+        when(this.oldcore.getWikiDescriptorManager().exists(this.oldcore.getXWikiContext().getWikiId()))
+            .thenReturn(true);
 
         // checking
 

@@ -1,7 +1,6 @@
 /**
  * CSS for the compact location picker: a space suggestion input plus a document tree to browse for locations.
  */
-#template('colorThemeInit.vm')
 
 .location-picker-compact {
   /* Lay the suggestion input and the browse button out in a row, like an input group. */

@@ -31,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.3.0RC1
  */
 @Role
-@Unstable
 public interface WebJarsUrlFactory
 {
     /**

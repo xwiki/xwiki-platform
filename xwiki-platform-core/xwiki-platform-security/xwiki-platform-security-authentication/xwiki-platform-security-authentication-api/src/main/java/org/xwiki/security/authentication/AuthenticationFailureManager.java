@@ -24,7 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Manager of the authentication failures strategies.
@@ -59,7 +58,6 @@ public interface AuthenticationFailureManager
      * @return true if the authentication failure limits defined by the configuration has been reached.
      * @since 17.0.0RC1
      */
-    @Unstable
     default boolean recordAuthenticationFailure(String username, HttpServletRequest request)
     {
         return recordAuthenticationFailure(username, JakartaServletBridge.toJavax(request));
@@ -96,7 +94,6 @@ public interface AuthenticationFailureManager
      * @return the aggregated form information to add to the standard login form, or an empty string.
      * @since 17.0.0RC1
      */
-    @Unstable
     default String getForm(String username, HttpServletRequest request)
     {
         return getForm(username, JakartaServletBridge.toJavax(request));        
@@ -130,7 +127,6 @@ public interface AuthenticationFailureManager
      * @return true if all strategies validate the request or if the user didn't reach the limit.
      * @since 17.0.0RC1
      */
-    @Unstable
     default boolean validateForm(String username, HttpServletRequest request)
     {
         return validateForm(username, JakartaServletBridge.toJavax(request));

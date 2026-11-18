@@ -21,6 +21,8 @@ package org.xwiki.livedata.script.livetable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,8 +35,10 @@ import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.livedata.script.LiveDataScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Scripting APIs for the Live Data implementation based on Live Table.
@@ -64,6 +68,12 @@ public class LiveTableScriptService implements ScriptService
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
 
     /**
+     * Used to list the installed row naming strategies.
+     */
+    @Inject
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    /**
      * Converts the Live Table configuration into Live Data configuration, also adding the default values.
      * 
      * @param id the live table id
@@ -88,5 +98,21 @@ public class LiveTableScriptService implements ScriptService
                 id, columns, columnProperties, options, ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
+    }
+
+    /**
+     * Lists the naming strategies for newly created pages through Live Data, including the set of properties
+     * required for each when no source parameter is given. A strategy that cannot be loaded is left out.
+     *
+     * @return the properties each installed strategy needs, by strategy hint
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public Map<String, Set<String>> getNewRowNamingStrategies()
+    {
+        Map<String, Set<String>> strategies = new TreeMap<>();
+        this.namingStrategyManager.getAll()
+            .forEach((hint, strategy) -> strategies.put(hint, strategy.getMandatoryProperties(Map.of())));
+        return strategies;
     }
 }

@@ -27,7 +27,6 @@ import jakarta.servlet.ServletResponse;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wysiwyg.internal.filter.http.JakartaToJavaxMutableHttpServletRequest;
 
 /**
@@ -75,7 +74,6 @@ public interface RequestParameterConverter
      * @throws IOException in case of problem to write an answer in the response
      * @since 17.0.0RC1
      */
-    @Unstable
     default Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException
     {
         Optional<javax.servlet.ServletRequest> result =
@@ -113,7 +111,6 @@ public interface RequestParameterConverter
      *         and errors that might have occurred
      * @since 17.0.0RC1
      */
-    @Unstable
     default JakartaRequestParameterConversionResult convert(ServletRequest request)
     {
         return new JakartaRequestParameterConversionResult(

@@ -31,7 +31,6 @@ import javax.servlet.http.HttpSession;
 import org.xwiki.container.servlet.HttpServletRequestStub;
 import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.util.Util;
 
@@ -179,7 +178,6 @@ public class XWikiServletRequestStub extends HttpServletRequestWrapper
      * @param jakarta the request wrap
      * @since 17.0.0RC1
      */
-    @Unstable
     public XWikiServletRequestStub(HttpServletRequestStub jakarta)
     {
         super(JakartaServletBridge.toJavax(jakarta));

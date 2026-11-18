@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -80,7 +79,6 @@ public interface TemporaryAttachmentSessionsManager
      *             is reached)
      * @since 17.0.0RC1
      */
-    @Unstable
     default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
         throws TemporaryAttachmentException, AttachmentValidationException
     {
@@ -126,7 +124,6 @@ public interface TemporaryAttachmentSessionsManager
      *             is reached)
      * @since 17.0.0RC1
      */
-    @Unstable
     default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException
     {

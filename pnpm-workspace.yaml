@@ -105,16 +105,16 @@ catalog:
   "@mantine/core": 9.6.3
   "@mantine/hooks": 9.6.3
   "@microsoft/api-extractor": 7.60.1
-  "@oxc-project/runtime": 0.157.0
+  "@oxc-project/runtime": 0.158.0
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
-  "@playwright/test": 1.64.1
-  "@tsconfig/node24": 24.0.5
+  "@playwright/test": 1.65.1
+  "@tsconfig/node26": 26.0.2
   "@types/jquery": 4.0.1
   "@types/jsdom": 30.0.0
   "@types/lodash-es": 4.17.12
   "@types/mdast": 4.0.4
-  "@types/node": 24.13.6
+  "@types/node": 26.6.6
   "@types/react": 19.3.0
   "@types/react-dom": 19.3.0
   "@types/requirejs": 2.1.37
@@ -122,20 +122,20 @@ catalog:
   # TypeScript 7 ships only the native tsc binary, with no JavaScript API. It owns the tsc command, while the typescript
   # entry below provides the TypeScript 6 API that typescript-eslint, vue-tsc, Volar and the dts tooling require.
   "@typescript/native": npm:typescript@7.0.2
-  "@vitejs/plugin-react": 6.1.2
-  "@vitejs/plugin-vue": 6.0.10
+  "@vitejs/plugin-react": 6.3.0
+  "@vitejs/plugin-vue": 6.0.11
   "@vitest/eslint-plugin": 1.6.28
   "@vue/compiler-dom": 3.5.45
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.9.0
-  "@vue/test-utils": 2.5.1
+  "@vue/test-utils": 2.6.0
   "@vue/tsconfig": 0.9.1
   axe-core: 4.14.0
   bootstrap-icons: 1.13.2
   chainpad: 5.3.2
   cross-env: 10.1.0
   diff-dom: 5.2.1
-  dompurify: 3.4.17
+  dompurify: 3.4.18
   esbuild: 0.28.2
   eslint: 10.12.0
   eslint-import-resolver-typescript: 4.4.5
@@ -144,41 +144,41 @@ catalog:
   eslint-plugin-prettier: 5.5.7
   eslint-plugin-promise: 7.3.0
   eslint-plugin-tsdoc: 0.5.4
-  eslint-plugin-vue: 10.12.0
+  eslint-plugin-vue: 10.12.1
   eventemitter3: 5.0.4
   flush-promises: 1.0.2
   globals: 17.14.0
-  i18next: 26.4.4
+  i18next: 27.1.3
   inversify: 8.2.4
   jiti: 2.7.0
   jquery: 4.0.0
   jsdom: 30.1.3
-  lib0: 0.2.119
+  lib0: 0.2.120
   lodash-es: 4.18.1
   lz-string: 1.5.0
   mdast-util-gfm-strikethrough: 2.0.1
   mdast-util-gfm-table: 2.0.1
-  mdast-util-gfm-task-list-item: 2.0.0
+  mdast-util-gfm-task-list-item: 2.0.1
   micromark-extension-gfm-strikethrough: 2.1.0
   micromark-extension-gfm-table: 2.1.2
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-package-json-lint: 11.0.1
   npm-run-all: 4.1.5
   npm-run-all2: 9.0.4
-  nx: 24.0.4
+  nx: 24.0.6
   pinia: 4.1.0
   postcss: 8.5.32
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
   publint: 0.3.25
   qunit: 3.0.0
-  react: 19.3.0
-  react-dom: 19.3.0
-  react-i18next: 17.0.15
+  react: 19.3.1
+  react-dom: 19.3.1
+  react-i18next: 18.0.1
   react-icons: 5.7.0
   reflect-metadata: 0.2.2
   remark-parse: 11.0.0
-  rimraf: 6.1.3
+  rimraf: 6.1.4
   semver: 7.8.6
   sinon: 22.1.0
   tippy.js: 6.3.7
@@ -191,11 +191,11 @@ catalog:
   vite: 8.3.4
   vite-plugin-css-injected-by-js: 5.0.3
   vite-plugin-dts: 4.5.4
-  vitest: 5.0.5
-  vitest-mock-extended: 5.1.1
+  vitest: 5.1.0
+  vitest-mock-extended: 6.0.1
   vue: 3.5.45
-  vue-eslint-parser: 10.4.1
-  vue-i18n: 11.4.18
+  vue-eslint-parser: 10.4.2
+  vue-i18n: 11.4.20
   vue-router: 5.3.1
   vue-tippy: 6.8.0
   vue-tsc: 3.3.14

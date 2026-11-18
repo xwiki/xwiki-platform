@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration;
 
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -157,9 +159,9 @@ class AdminSheetMenuPageTest extends PageTest
 
         Document result = renderHTMLPage(ADMIN_SHEET);
 
-        // The category name is rendered as the (bold) label of the menu entry link. It must be present verbatim, which
+        // The category name is rendered as the label of the menu entry link. It must be present verbatim, which
         // means it was escaped rather than executed as the noscript macro.
-        Element categoryName = result.selectFirst("ul.admin-category strong");
+        Element categoryName = result.selectFirst(".admin-category-name a");
         assertNotNull(categoryName, "No administration category was rendered. Content: " + result.text());
         assertTrue(categoryName.text().contains(NO_SCRIPT),
             "The category name should be escaped and displayed verbatim. Content: " + categoryName.text());
@@ -178,9 +180,9 @@ class AdminSheetMenuPageTest extends PageTest
 
         Document result = renderHTMLPage(ADMIN_SHEET);
 
-        // The section name is rendered as the (bold) label of the menu entry link. It must be present verbatim, which
+        // The section name is rendered as the label of the menu entry link. It must be present verbatim, which
         // means it was escaped rather than executed as the noscript macro.
-        Element sectionName = result.selectFirst("ul.admin-category strong");
+        Element sectionName = result.selectFirst(".admin-category-name a");
         assertNotNull(sectionName, "No administration section was rendered. Content: " + result.text());
         assertTrue(sectionName.text().contains(NO_SCRIPT),
             "The section name should be escaped and displayed verbatim. Content: " + sectionName.text());
@@ -199,12 +201,14 @@ class AdminSheetMenuPageTest extends PageTest
 
         Document result = renderHTMLPage(ADMIN_SHEET);
 
-        // The icon reference is used as the reference of an image nested in the link label. It must be resolved as a
-        // single attachment name instead of being interpreted as wiki syntax.
-        Element icon = result.selectFirst("ul.admin-category img");
+        // The icon reference is used as the reference of an image. It must be resolved as a single attachment name
+        // instead of being interpreted as wiki syntax.
+        Element icon = result.selectFirst(".admin-category-icon img");
         assertNotNull(icon, "No administration section icon was rendered. Content: " + result.html());
-        assertTrue(icon.attr("alt").endsWith(ICON_ATTACHMENT),
-            "The icon reference should be escaped and kept verbatim. Alt: " + icon.attr("alt"));
+        String src = URLDecoder.decode(icon.attr("src"), StandardCharsets.UTF_8);
+        assertTrue(src.contains(ICON_ATTACHMENT), "The icon reference should be escaped and kept verbatim. Src: " + src);
+        // The icon is decorative (the section name is displayed next to it) so it must have an empty alternative text.
+        assertEquals("", icon.attr("alt"));
     }
 
     private void registerConfigurableSection(String displayInCategory, String displayInSection) throws Exception

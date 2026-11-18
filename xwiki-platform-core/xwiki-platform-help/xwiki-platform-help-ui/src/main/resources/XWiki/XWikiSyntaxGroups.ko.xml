@@ -51,7 +51,7 @@
 |((({{{
 |=Header 1|=Header 2|=Header 3
 |Cell One|(((
-= Embedded document =
+== Embedded document ==
 
 삽입된 단락이 있습니다.
 
@@ -65,7 +65,7 @@
 }}})))|(((
 |=Header 1|=Header 2|=Header 3
 |Cell One|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 삽입된 단락이 있습니다.
 

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.query.internal.HiddenDocumentFilter;
-import org.xwiki.stability.Unstable;
 import org.xwiki.tag.internal.TagException;
 import org.xwiki.tag.internal.TagsSelector;
 
@@ -163,7 +162,6 @@ public final class TagQueryUtils
      * @since 17.0.0RC1
      * @since 16.10.1
      */
-    @Unstable
     public static List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, boolean caseSensitive)
         throws XWikiException
     {

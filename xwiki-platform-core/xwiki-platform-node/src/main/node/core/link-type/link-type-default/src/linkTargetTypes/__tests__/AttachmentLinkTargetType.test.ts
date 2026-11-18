@@ -35,9 +35,9 @@ import type {
   RemoteURLSerializer,
 } from "@xwiki/platform-model-remote-url-api";
 
-const attachmentRef = {
+const attachmentRef = mock<AttachmentReference>({
   type: EntityType.ATTACHMENT,
-} as unknown as AttachmentReference;
+});
 
 // The link target type resolves its services through the providers each time it uses them, so the mocks can be reset
 // between the tests.
@@ -175,7 +175,10 @@ describe("AttachmentLinkTargetType", () => {
   it("labels the link with the name of the attached file", () => {
     expect(
       targetType.getDefaultLabel({
-        ref: { ...attachmentRef, name: "file.png" } as AttachmentReference,
+        ref: mock<AttachmentReference>({
+          type: EntityType.ATTACHMENT,
+          name: "file.png",
+        }),
         queryString: "foo=bar",
       }),
     ).toBe("file.png");
@@ -183,10 +186,10 @@ describe("AttachmentLinkTargetType", () => {
   });
 
   describe("relative to the source document of the link", () => {
-    const sourceDocument = {
+    const sourceDocument = mock<DocumentReference>({
       type: EntityType.DOCUMENT,
       name: "Source",
-    } as unknown as DocumentReference;
+    });
     const context: LinkContext = { sourceDocument };
 
     it("resolves the reference against the source document", () => {

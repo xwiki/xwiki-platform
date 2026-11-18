@@ -49,7 +49,7 @@ Gruppering kan användas för att infoga kompexa element i löpande text. Exempe
 |((({{{
 |=Titel 1|=Titel 2|=Titel 3
 |Cell ett|(((
-= Inbäddat dokument
+== Inbäddat dokument
 
 Ett inbäddat stycke
 
@@ -63,7 +63,7 @@ Fortsättningen på toppnivådokumentet
 }}})))|(((
 |=Titel 1|=Titel 2|=Titel 3
 |Cell ett|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Inbäddat dokument&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Inbäddat dokument&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Ett inbäddat stycke
 

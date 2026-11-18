@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -44,7 +43,6 @@ public interface Request
      * 
      * @since 17.0.0RC1
      */
-    @Unstable
     String ATTRIBUTE_EFFECTIVE_AUTHOR = Request.class.getName() + "#effectiveAuthor";
 
     /**
@@ -64,7 +62,6 @@ public interface Request
      * @see #getParameterValues
      * @since 17.0.0RC1
      */
-    @Unstable
     default Object getParameter(String key)
     {
         return null;
@@ -81,7 +78,6 @@ public interface Request
      * @see #getParameter
      * @since 17.0.0RC1
      */
-    @Unstable
     default String[] getParameterValues(String name)
     {
         return null;
@@ -96,7 +92,6 @@ public interface Request
      *         of a request parameter; or an empty <code>Enumeration</code> if the request has no parameters
      * @since 17.0.0RC1
      */
-    @Unstable
     default Enumeration<String> getParameterNames()
     {
         return Collections.emptyEnumeration();
@@ -111,7 +106,6 @@ public interface Request
      *         not exist
      * @since 17.0.0RC1
      */
-    @Unstable
     default Object getAttribute(String name)
     {
         return null;
@@ -124,7 +118,6 @@ public interface Request
      * @param o the <code>Object</code> to be stored
      * @since 17.0.0RC1
      */
-    @Unstable
     default void setAttribute(String name, Object o)
     {
 
@@ -137,7 +130,6 @@ public interface Request
      * @param name a <code>String</code> specifying the name of the attribute to remove
      * @since 17.0.0RC1
      */
-    @Unstable
     default void removeAttribute(String name)
     {
 
@@ -150,7 +142,6 @@ public interface Request
      * @return an <code>Enumeration</code> of strings containing the names of the request's attributes
      * @since 17.0.0RC1
      */
-    @Unstable
     default Enumeration<String> getAttributeNames()
     {
         return Collections.emptyEnumeration();
@@ -165,7 +156,6 @@ public interface Request
      *         information is missing) should be considered the effective author.
      * @since 17.0.0RC1
      */
-    @Unstable
     default UserReference getEffectiveAuthor()
     {
         return (UserReference) getAttribute(ATTRIBUTE_EFFECTIVE_AUTHOR);

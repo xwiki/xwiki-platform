@@ -36,7 +36,6 @@ import org.xwiki.extension.wrap.WrappingIndexedExtension;
 import org.xwiki.extension.wrap.WrappingRatingExtension;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various script APIs related to indexed extensions.
@@ -91,7 +90,6 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      * @since 17.4.2
      * @since 16.10.9
      */
-    @Unstable
     public IndexedExtension getIndexedExtension(Extension extension)
     {
         if (extension instanceof IndexedExtension indexedExtension) {
@@ -113,7 +111,6 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      * @since 17.4.2
      * @since 16.10.9
      */
-    @Unstable
     public RatingExtension getRatingExtension(Extension extension)
     {
         if (extension instanceof RatingExtension ratingExtension) {
@@ -135,7 +132,6 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      * @since 17.4.2
      * @since 16.10.9
      */
-    @Unstable
     public RemoteExtension getRemoteExtension(Extension extension)
     {
         if (extension instanceof RemoteExtension remoteExtension) {

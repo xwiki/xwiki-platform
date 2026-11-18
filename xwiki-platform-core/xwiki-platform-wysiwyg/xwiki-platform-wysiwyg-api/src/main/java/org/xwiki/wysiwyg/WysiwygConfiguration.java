@@ -20,7 +20,6 @@
 package org.xwiki.wysiwyg;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the Wysiwyg Module.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.5.0
  */
 @Role
-@Unstable
 public interface WysiwygConfiguration
 {
     /**

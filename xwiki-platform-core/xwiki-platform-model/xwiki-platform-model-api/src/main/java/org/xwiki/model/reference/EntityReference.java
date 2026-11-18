@@ -34,7 +34,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -48,7 +47,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * See {@link #getParentType()}.
      * @since 17.0.0RC1
      */
-    @Unstable
     public static final String PARENT_TYPE_PARAMETER = "parentType";
 
     /**
@@ -716,7 +714,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @return the type of the parent to be used for computing the proper base reference in resolvers.
      * @since 17.0.0RC1
      */
-    @Unstable
     public EntityType getParentType()
     {
         EntityType result;

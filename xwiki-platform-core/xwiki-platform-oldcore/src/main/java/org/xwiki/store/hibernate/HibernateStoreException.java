@@ -19,7 +19,6 @@
  */
 package org.xwiki.store.hibernate;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.StoreException;
 
 /**
@@ -28,7 +27,6 @@ import org.xwiki.store.StoreException;
  * @version $Id$
  * @since 17.1.0RC1
  */
-@Unstable
 public class HibernateStoreException extends StoreException
 {
     /**

@@ -39,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.logging.LoggerManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateStoreException;
 
@@ -100,7 +99,6 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @return the {@link HibernateAdapter}
      * @since 17.1.0RC1
      */
-    @Unstable
     public HibernateAdapter getHibernateAdapater()
     {
         return this.store.getAdapter();

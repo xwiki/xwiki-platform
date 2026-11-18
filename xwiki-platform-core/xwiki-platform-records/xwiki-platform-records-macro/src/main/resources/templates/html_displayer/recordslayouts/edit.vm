@@ -31,7 +31,7 @@
 #foreach ($layout in $layouts)
   <div class="radio">
     <label>
-      <input type="radio" value="$escapetool.xml($layout)"#if ($layout == "$!displayer.value") checked#end
+      <input type="radio" value="$escapetool.xml($layout)"
         #foreach ($parameter in $displayer.parameters.entrySet())
           $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
         #end

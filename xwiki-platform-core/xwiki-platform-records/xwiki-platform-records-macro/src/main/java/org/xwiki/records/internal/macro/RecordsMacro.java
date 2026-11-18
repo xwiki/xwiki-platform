@@ -23,9 +23,11 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -38,12 +40,19 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.records.macro.RecordsMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -104,6 +113,21 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * translated pretty name the property store already put on their descriptor.
      */
     static final String DOC_TRANSLATION_PREFIX = "platform.index.";
+
+    /**
+     * Source parameter showing the button that switches the table to its edit mode.
+     */
+    static final String EDIT_MODE_PARAMETER = "hasEditMode";
+
+    /**
+     * Source parameter naming the row naming strategy, which lets readers create entries from the table in edit mode.
+     */
+    static final String NAMING_STRATEGY_PARAMETER = "newRowNamingStrategy";
+
+    /**
+     * Source parameter naming the space new entries are created in.
+     */
+    static final String NEW_ROW_LOCATION_PARAMETER = "newRowLocation";
 
     /**
      * The identifier prefix of the page metadata properties, which the default column list leaves out.
@@ -181,8 +205,23 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     private ContextualAuthorizationManager authorization;
 
     /**
-     * Serializes the picked data type for the source. The compact form keeps the wiki only when it is not the current
-     * one, which is what a class reference looks like in a Live Data source parameter.
+     * Tells which strategies entries can be created with, and which properties they need.
+     */
+    @Inject
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Inject
+    private Logger logger;
+
+    /**
+     * Used to find the page under which new entries are created when no location is picked.
+     */
+    @Inject
+    @Named("macro")
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
+
+    /**
+     * Serializes the references passed to the source, keeping the wiki only when it is not the current one.
      */
     @Inject
     @Named("compactwiki")
@@ -237,20 +276,15 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     }
 
     /**
-     * Maps the macro parameters onto the Live Data ones.
-     * <p>
-     * Only {@code class} needs real work, because it is the only parameter that is not already in the shape Live Data
-     * expects: it becomes a source parameter of the {@code liveTable} source. The rest are passed through, since the
-     * macro deliberately reuses Live Data's own encodings — a comma-separated properties list, a query-string filter
-     * and a {@code name:asc} sort list — so that a value an author writes here means the same thing it would mean in a
-     * {@code liveData} macro.
+     * Maps the macro parameters onto the Live Data ones. The macro reuses Live Data's own encodings for the columns,
+     * the filters and the sort, so that a value means the same in both macros.
      *
      * @param parameters the macro parameters
      * @param context the transformation context, which carries the document's identifier generator
      * @param dataTypeReference the reference of the data type
      * @param dataType the serialized reference of the data type
-     * @param warnings receives a warning for every field the data type no longer has, and for every filter and sort
-     *     criterion the field's type does not allow
+     * @param warnings receives a warning for every field the data type no longer has, for every filter and sort
+     *     criterion the field's type does not allow, and when entries cannot be created as asked
      * @return the equivalent Live Data renderer parameters
      */
     private LiveDataRendererParameters toLiveDataParameters(RecordsMacroParameters parameters,
@@ -266,8 +300,9 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         LiveDataRendererParameters liveDataParameters = new LiveDataRendererParameters();
         liveDataParameters.setId(getId(parameters, context));
         liveDataParameters.setSource(SOURCE);
-        liveDataParameters.setSourceParameters(getSourceParameters(dataType));
         String properties = getProperties(parameters, fields, known, unknownColumn, warnings);
+        liveDataParameters
+            .setSourceParameters(getSourceParameters(parameters, context, dataType, properties, warnings));
         liveDataParameters.setProperties(properties);
         String filters = keepKnown(keepReadable(parameters.getFilters(), warnings), FILTER_SEPARATOR,
             this::getFilterField, known, unknownFilter, warnings);
@@ -548,18 +583,93 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     }
 
     /**
+     * @param parameters the macro parameters
+     * @param context the transformation context, which carries the macro block
      * @param dataType the serialized reference of the data type
+     * @param properties the columns displayed
+     * @param warnings receives a warning when entries cannot be created as asked
      * @return the source parameters, as the query string {@link LiveDataRendererParameters} expects
      */
-    private String getSourceParameters(String dataType)
+    private String getSourceParameters(RecordsMacroParameters parameters, MacroTransformationContext context,
+        String dataType, String properties, List<Block> warnings) throws MacroExecutionException
     {
         Map<String, String> sourceParameters = new LinkedHashMap<>();
         sourceParameters.put(CLASS_NAME_PARAMETER, dataType);
         sourceParameters.put(TRANSLATION_PREFIX_PARAMETER, DOC_TRANSLATION_PREFIX);
+        // Entries are created from the edit mode, so the creation parameters are ignored without it.
+        if (parameters.isAllowEditMode()) {
+            sourceParameters.put(EDIT_MODE_PARAMETER, Boolean.TRUE.toString());
+            String strategy = parameters.getCreationStrategy();
+            if (StringUtils.isNotBlank(strategy) && canCreate(strategy, sourceParameters, properties, warnings)) {
+                sourceParameters.put(NAMING_STRATEGY_PARAMETER, strategy);
+                sourceParameters.put(NEW_ROW_LOCATION_PARAMETER,
+                    this.entityReferenceSerializer.serialize(getNewEntriesLocation(parameters, context)));
+            }
+        }
 
         return sourceParameters.entrySet().stream()
             .map(entry -> encode(entry.getKey()) + '=' + encode(entry.getValue()))
             .collect(Collectors.joining(FILTER_SEPARATOR));
+    }
+
+    /**
+     * Checks whether entries can be created with the picked strategy.
+     *
+     * @param strategy the hint of the strategy the author picked
+     * @param sourceParameters the source parameters set so far
+     * @param properties the columns displayed
+     * @param warnings receives a warning when entries cannot be created
+     * @return whether the strategy can be passed to the source
+     */
+    private boolean canCreate(String strategy, Map<String, String> sourceParameters, String properties,
+        List<Block> warnings) throws MacroExecutionException
+    {
+        Optional<LiveTableNewRowNamingStrategy> namingStrategy = getNamingStrategy(strategy);
+        if (namingStrategy.isEmpty()) {
+            warnings.add(this.messages.warning("warning.creationStrategyUnknown", strategy));
+            return false;
+        }
+        Set<String> mandatoryProperties =
+            namingStrategy.get().getMandatoryProperties(Collections.unmodifiableMap(sourceParameters));
+        Set<String> displayed = Stream.of(properties.split(LIST_SEPARATOR)).map(String::trim)
+            .collect(Collectors.toSet());
+        List<String> missing = mandatoryProperties.stream().filter(column -> !displayed.contains(column)).sorted()
+            .toList();
+        for (String column : missing) {
+            warnings.add(this.messages.warning("warning.creationColumnsMissing", strategy, column));
+        }
+        return missing.isEmpty();
+    }
+
+    /**
+     * @param hint the hint of the strategy the author picked
+     * @return the strategy, or {@link Optional#empty()} when it is not installed or cannot be loaded
+     */
+    private Optional<LiveTableNewRowNamingStrategy> getNamingStrategy(String hint)
+    {
+        try {
+            return this.namingStrategyManager.get(hint);
+        } catch (LiveDataException e) {
+            this.logger.warn("Failed to load the row naming strategy [{}]. Root cause is [{}].", hint,
+                ExceptionUtils.getRootCauseMessage(e));
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * @param parameters the macro parameters
+     * @param context the transformation context, which carries the macro block
+     * @return the space the author picked for new entries, or else the space of the page holding the table, which
+     *     puts them under a nested page and next to a terminal one
+     */
+    private SpaceReference getNewEntriesLocation(RecordsMacroParameters parameters, MacroTransformationContext context)
+    {
+        if (parameters.getNewEntriesLocation() != null) {
+            return parameters.getNewEntriesLocation();
+        }
+        DocumentReference hostDocument = new DocumentReference(
+            this.macroEntityReferenceResolver.resolve("", EntityType.DOCUMENT, context.getCurrentMacroBlock()));
+        return hostDocument.getLastSpaceReference();
     }
 
     /**

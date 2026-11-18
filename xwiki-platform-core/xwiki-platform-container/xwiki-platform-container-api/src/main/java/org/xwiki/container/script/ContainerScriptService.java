@@ -34,7 +34,6 @@ import org.xwiki.container.internal.script.ScriptResponse;
 import org.xwiki.container.internal.script.ScriptSession;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * The main entry point for a script to manipulate {@link Container} related APIs.
@@ -45,7 +44,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.8.0RC1
  * @since 17.4.5
  */
-@Unstable
 @Component
 @Named("container")
 @Singleton

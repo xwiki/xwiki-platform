@@ -12,6 +12,7 @@ export interface ActionDescriptor {
     allowProperty?: string;
     id: string;
     location?: string;
+    template?: string;
 }
 
 // @beta

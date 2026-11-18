@@ -30,14 +30,17 @@ import type { FeatureContext } from "../../features/editorFeature";
 function context(basicCodeBlocks: boolean): FeatureContext {
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.blocks.code.basicCodeBlocks = basicCodeBlocks;
-  return { syntax } as FeatureContext;
+  return { syntax, options: {} } as FeatureContext;
 }
 
 describe("codeBlocksFeature", () => {
-  test("highlights the code blocks when the syntax supports code blocks", () => {
-    expect(codeBlocksFeature.contribute(context(true))).toEqual({
-      blockNoteExtensions: [syntaxHighlighter],
-    });
+  test("replaces BlockNote's code block and highlights the code blocks when the syntax supports code blocks", () => {
+    const contribution = codeBlocksFeature.contribute(context(true));
+
+    expect(contribution?.blockNoteExtensions).toEqual([syntaxHighlighter]);
+    expect(Object.keys(contribution?.schema?.blockSpecs ?? {})).toEqual([
+      "codeBlock",
+    ]);
   });
 
   test("contributes nothing when the syntax doesn't support code blocks", () => {

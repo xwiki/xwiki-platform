@@ -301,8 +301,6 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
       // We want the edited content to be styled using the XWiki skin / color theme as much as possible, in order to
       // have consistency between edit and view modes.
       contentStyles: "host",
-      // Style the code blocks like the code macro output in view mode.
-      codeBlockClassName: "box code",
     },
     collaboration: collaboration.value,
     // Whether the user can attach files to the edited document (by pasting or dropping them, or with the upload
@@ -313,6 +311,10 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
     // realtime) because it was rendered for the current user.
     metadata: blockNoteDocument!.metadata,
     features: {
+      codeBlocks: {
+        // Style the code blocks like the code macro output in view mode.
+        className: "box code",
+      },
       links: {
         // Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new
         // links, to keep the link type selector short. Existing path and UNC path links are still edited with their
@@ -483,7 +485,7 @@ defineExpose({
 
     .bn-block-content[data-content-type="codeBlock"] {
       /* The code block is styled by the XWiki skin, like the code macro output in view mode, through the CSS classes
-        added to its pre element (see codeBlockClassName). */
+        added to its pre element (see features.codeBlocks.className). */
       background: transparent;
       border-radius: 0;
 

@@ -36,6 +36,9 @@ describe("imagesFeature", () => {
   test("adds the image slash menu item, toolbar and menus when the syntax supports images", () => {
     const contribution = imagesFeature.contribute(context(true));
 
+    expect(Object.keys(contribution?.schema?.blockSpecs ?? {})).toEqual([
+      "image",
+    ]);
     expect(contribution?.slashMenuItems).toBeTypeOf("function");
     expect(
       Object.keys(contribution?.formattingToolbar?.blockToolbars ?? {}),

@@ -84,6 +84,7 @@ export {
 export type { BlockMetadata, BlockMetadataStore } from "./misc/blockMetadata";
 
 export type {
+  CodeBlocksFeatureOptions,
   EditorAppearance,
   EditorFeatures,
   EditorOptions,

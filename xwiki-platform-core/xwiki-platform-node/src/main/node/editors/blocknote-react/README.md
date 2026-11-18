@@ -87,6 +87,7 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| Image, code block and server-rendered macro specs | part of the static schema of the editor, which imports them from `src/features/images`, `src/features/codeBlocks` and `src/features/macros` (the typed API derives from the schema, and the content holding macro calls must load whatever the features), so the Ctrl+Alt+C shortcut of the code blocks (registered by BlockNote) works even when the syntax can't save code blocks | 1 |
+| Server-rendered macro specs | part of the static schema of the editor, which imports them from `src/features/macros`, so that the content holding macro calls loads whatever the features | 1 |
+| BlockNote's default blocks | kept in the static schema (the typed API derives from it) when no feature replaces them, so BlockNote's own code block, with its Ctrl+Alt+C shortcut, is there even when the syntax can't save code blocks | 1 |
 | `lang` option | changes a module-global translation instance | 10, 11 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 6, 11 |

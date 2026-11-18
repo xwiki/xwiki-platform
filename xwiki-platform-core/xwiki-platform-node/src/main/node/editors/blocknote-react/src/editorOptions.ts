@@ -42,12 +42,20 @@ type EditorAppearance = {
    * look the same in edit and view modes.
    */
   contentStyles?: "editor" | "host";
+};
 
+/**
+ * The options of the code blocks feature.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type CodeBlocksFeatureOptions = {
   /**
    * The CSS classes (space separated) to add to the code blocks, e.g. to style them like the code snippets displayed in
    * view mode.
    */
-  codeBlockClassName?: string;
+  className?: string;
 };
 
 /**
@@ -74,9 +82,17 @@ type MacroFeatureOptions = {
  */
 interface EditorFeatures {
   /**
+   * The code blocks are enabled when this is missing. `false` leaves BlockNote's own code blocks, without syntax
+   * highlighting, nor support for the languages that its language selector doesn't know. Whether the content can hold
+   * code blocks at all depends on the syntax.
+   */
+  codeBlocks?: CodeBlocksFeatureOptions | false;
+
+  /**
    * The images are enabled when this is missing. `false` disables the image suggestions, the image toolbar and the
-   * image panel, even when an `ImageEditor` is bound: the "Image" item of the slash menu is BlockNote's own, which
-   * inserts an empty image block. Whether the content can hold images at all depends on the syntax.
+   * image panel, even when an `ImageEditor` is bound, and leaves BlockNote's own image blocks: the "Image" item of the
+   * slash menu is BlockNote's own, which inserts an empty image block. Whether the content can hold images at all
+   * depends on the syntax.
    */
   images?: false;
 
@@ -203,6 +219,7 @@ type EditorOptions = {
 };
 
 export type {
+  CodeBlocksFeatureOptions,
   EditorAppearance,
   EditorFeatures,
   EditorOptions,

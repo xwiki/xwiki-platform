@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { XWikiCodeBlock } from "./codeBlockSpec";
 import { syntaxHighlighter } from "@blocknote/code-block";
 import type {
   EditorFeature,
@@ -25,20 +26,27 @@ import type {
 } from "../editorFeature";
 
 /**
- * Highlights the code blocks based on their language. The code blocks themselves are part of the editor schema, and the
- * editor offers to insert them only when the syntax of the edited content can save them, so nothing is contributed
- * otherwise.
+ * Replaces BlockNote's code block with one that doesn't fail on the languages that its language selector doesn't know,
+ * saves the languages under the names known server side, and has the CSS classes set by
+ * `features.codeBlocks.className`, and highlights the code blocks based on their language. Nothing is contributed when the syntax of the edited content
+ * doesn't support code blocks.
  *
  * @since 18.10.0RC1
  * @beta
  */
 const codeBlocksFeature: EditorFeature = {
   id: "codeBlocks",
-  contribute({ syntax }: FeatureContext): FeatureContribution | undefined {
+  contribute({
+    options,
+    syntax,
+  }: FeatureContext): FeatureContribution | undefined {
     if (!syntax.features.blocks.code.basicCodeBlocks) {
       return undefined;
     }
+    // Not called when the code blocks are disabled.
+    const className = (options.features?.codeBlocks || undefined)?.className;
     return {
+      schema: { blockSpecs: { codeBlock: XWikiCodeBlock({ className }) } },
       blockNoteExtensions: [syntaxHighlighter],
     };
   },

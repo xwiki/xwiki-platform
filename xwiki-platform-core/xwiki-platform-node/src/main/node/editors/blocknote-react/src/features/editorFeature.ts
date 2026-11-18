@@ -106,7 +106,8 @@ type SlashMenuItem = DefaultReactSuggestionItem & {
 
 /**
  * The block and inline content types that an editing feature adds to the schema of the editor. Their types are erased:
- * the typed API of the editor (e.g. `BlockOfType`) only knows the types of its own schema.
+ * the typed API of the editor (e.g. `BlockOfType`) only knows the types of its own schema. A type with the name of one
+ * of the editor (e.g. BlockNote's "codeBlock" or "image") replaces it, and must keep its properties.
  *
  * @since 18.10.0RC1
  * @beta

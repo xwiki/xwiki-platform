@@ -27,8 +27,6 @@ import {
   VerbatimStyle,
   XWikiParametersStyle,
 } from "./styles";
-import { XWikiCodeBlock } from "../features/codeBlocks/codeBlockSpec";
-import { XWikiImageBlock } from "../features/images/imageBlockSpec";
 import {
   XWikiInlineMacro,
   XWikiMacroBlock,
@@ -64,25 +62,21 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
  *
  * Contains all the blocks usable inside the editor
  *
- * @param contributed - the block and inline content types added by the editing features, whose types are erased
- * @param options - the options of the schema
+ * @param contributed - the block and inline content types added by the editing features, whose types are erased; they
+ *   replace the types of the same name (e.g. BlockNote's code block), whose types the typed API keeps
  * @returns The created schema
  */
-function createBlockNoteSchema(
-  contributed?: SchemaContribution,
-  options?: { codeBlockClassName?: string },
-) {
+function createBlockNoteSchema(contributed?: SchemaContribution) {
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
-      codeBlock: XWikiCodeBlock({ className: options?.codeBlockClassName }),
-      image: XWikiImageBlock(),
       xwikiDefinitionListItem: DefinitionListItemBlock(),
       xwikiGroup: XWikiGroupBlock(),
       xwikiMacroBlock: XWikiMacroBlock(),
       xwikiRaw: XWikiRawBlock(),
 
-      // The block types added by the editing features, whose types are erased under an index signature.
+      // The block types added by the editing features, whose types are erased under an index signature. They replace
+      // the types of the same name (e.g. BlockNote's code block and image), the typed API keeping the types of these.
       ...Object.fromEntries(Object.entries(contributed?.blockSpecs ?? {})),
     },
 

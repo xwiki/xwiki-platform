@@ -522,6 +522,26 @@ test("Ctrl+Alt+C turns the current block into a code block", async ({
   await expect(component.locator("p.bn-inline-content")).toHaveCount(0);
 });
 
+test("The code blocks have the CSS classes set in the options of the code blocks feature", async ({
+  mount,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[buildCodeBlock("java", "int count = 0;")]}
+      options={{
+        syntax: FULL_SYNTAX,
+        features: { codeBlocks: { className: "box code" } },
+      }}
+    />,
+  );
+
+  await expect(
+    component.locator(
+      '.bn-block-content[data-content-type="codeBlock"] pre.box.code',
+    ),
+  ).toHaveCount(1);
+});
+
 test("The language selector keeps the focus when changing the language", async ({
   mount,
   page,

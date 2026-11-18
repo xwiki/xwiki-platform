@@ -77,6 +77,11 @@ export function canUploadFiles(instance: Pick<EditorInstance, "options" | "servi
 export const codeBlocksFeature: EditorFeature;
 
 // @beta
+export type CodeBlocksFeatureOptions = {
+    className?: string;
+};
+
+// @beta
 export class ComponentInit {
     constructor(container: Container);
 }
@@ -91,7 +96,6 @@ export function createBlockMetadataStore(): BlockMetadataStore;
 export type EditorAppearance = {
     theme?: "light" | "dark";
     contentStyles?: "editor" | "host";
-    codeBlockClassName?: string;
 };
 
 // @beta
@@ -108,6 +112,7 @@ export const editorFeatureName = "EditorFeature";
 
 // @beta
 export interface EditorFeatures {
+    codeBlocks?: CodeBlocksFeatureOptions | false;
     images?: false;
     links?: object | false;
     macros?: MacroFeatureOptions | false;

@@ -20,6 +20,7 @@
 import { CustomImageToolbar } from "./CustomImageToolbar";
 import { FilePanel } from "./FilePanel";
 import { ImageSuggestionController } from "./ImageSuggestionController";
+import { XWikiImageBlock } from "./imageBlockSpec";
 import { openImageSuggestionMenu } from "./imageSuggestionMenu";
 import {
   FilePanelController,
@@ -50,7 +51,8 @@ function imageSlashMenuItem(editor: EditorType): SlashMenuItem[] {
 
 /**
  * Inserts and edits images: the "Image" item of the slash menu and the image suggestion menu it opens, the toolbar of
- * the image blocks, and the panel to change the image of an image block. The images are chosen with the `ImageEditor`
+ * the image blocks, and the panel to change the image of an image block. It also replaces BlockNote's image block with
+ * one showing the file name of the images that can't be displayed. The images are chosen with the `ImageEditor`
  * when one is bound in the service container, and with the image selector of the editor otherwise. Nothing is
  * contributed when the syntax of the edited content doesn't support images.
  *
@@ -67,6 +69,7 @@ const imagesFeature: EditorFeature = {
       return undefined;
     }
     return {
+      schema: { blockSpecs: { image: XWikiImageBlock() } },
       slashMenuItems: () => imageSlashMenuItem(getInstance().editor),
       formattingToolbar: {
         blockToolbars: {

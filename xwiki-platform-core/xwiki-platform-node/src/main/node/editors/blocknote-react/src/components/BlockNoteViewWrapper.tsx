@@ -114,7 +114,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     lang,
     label,
     autofocus,
-    appearance: { theme, contentStyles, codeBlockClassName } = {},
+    appearance: { theme, contentStyles } = {},
     collaboration: requestedCollaboration,
   } = options;
   const { t } = useTranslation();
@@ -160,9 +160,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     getInstance: () => instanceRef.current!,
   });
 
-  const schema = createBlockNoteSchema(contributions.schema, {
-    codeBlockClassName,
-  });
+  const schema = createBlockNoteSchema(contributions.schema);
 
   // When realtime collaboration is enabled, the initial content is set through the shared document. Moreover, BlockNote
   // doesn't support empty content, as in an empty array of blocks, so instead of passing an empty array we don't pass

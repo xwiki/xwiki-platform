@@ -26,7 +26,7 @@ package org.xwiki.refactoring.job;
  * @since 7.2M1
  */
 // Old interface not describing a type, hard to remove for backward-compatibility reasons.
-@SuppressWarnings("checkstyle:InterfaceIsType")
+@SuppressWarnings({"checkstyle:InterfaceIsType", "java:S1214"})
 public interface RefactoringJobs
 {
     /**

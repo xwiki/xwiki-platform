@@ -35,7 +35,7 @@
          By using an empty value we force Maven to resolve the parent from the Maven repositories,
          see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
     -->
-    <relativePath/>
+    <relativePath />
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
@@ -134,11 +134,11 @@
     <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
 
     <!-- Enable reproducible builds -->
-    <project.build.outputTimestamp>2026-10-14T08:07:04Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-11-18T16:46:02Z</project.build.outputTimestamp>
   </properties>
   <scm>
     <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
-    <tag>HEAD</tag>
+    <tag>stable-18.10.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

@@ -20,11 +20,11 @@
 import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import {
   imageEditorName,
   imageMetadataHandlerName,
-} from "../../components/images/imageEditor";
-import { createBlockMetadataStore } from "../../misc/blockMetadata";
+} from "../../services/imageEditor";
 import { DocumentReference, SpaceReference } from "@xwiki/platform-model-api";
 import { useMemo, useState } from "react";
 // NOTE: `LinkType` is intentionally not imported here (not even type-only): the module also
@@ -35,7 +35,7 @@ import type {
   ImageEditionData,
   ImageEditor,
   ImageMetadataHandler,
-} from "../../components/images/imageEditor";
+} from "../../services/imageEditor";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";

@@ -19,6 +19,7 @@
  */
 
 import { FULL_SYNTAX } from "./syntax.mock";
+import { ComponentInit } from "../../componentInit";
 import {
   AttachmentReference,
   DocumentReference,
@@ -51,6 +52,9 @@ export function serviceContainerMock(
   syntaxes: SyntaxConfig[] = [FULL_SYNTAX],
 ): Container {
   const container = new Container();
+
+  // The generic editing features.
+  new ComponentInit(container);
 
   for (const syntax of syntaxes) {
     container

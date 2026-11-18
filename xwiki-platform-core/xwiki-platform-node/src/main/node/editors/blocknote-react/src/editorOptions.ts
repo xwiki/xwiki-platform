@@ -42,12 +42,20 @@ type EditorAppearance = {
    * look the same in edit and view modes.
    */
   contentStyles?: "editor" | "host";
+};
 
+/**
+ * The options of the code blocks feature.
+ *
+ * @since 18.10.0RC1
+ * @beta
+ */
+type CodeBlocksFeatureOptions = {
   /**
    * The CSS classes (space separated) to add to the code blocks, e.g. to style them like the code snippets displayed in
    * view mode.
    */
-  codeBlockClassName?: string;
+  className?: string;
 };
 
 /**
@@ -65,18 +73,57 @@ type MacroFeatureOptions = {
 };
 
 /**
- * The options of each editor feature, keyed by feature.
+ * The options of each editor feature, keyed by feature id (see `EditorFeature`). Setting the options of a feature to
+ * `false` disables it. An interface, so that the packages adding editor features can declare their options here (with
+ * TypeScript declaration merging).
  *
  * @since 18.10.0RC1
  * @beta
  */
-type EditorFeatures = {
+interface EditorFeatures {
   /**
-   * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
-   * insert or edit a macro, even when a `MacroEditor` is bound.
+   * The code blocks are enabled when this is missing. `false` leaves BlockNote's own code blocks, without syntax
+   * highlighting, nor support for the languages that its language selector doesn't know. Whether the content can hold
+   * code blocks at all depends on the syntax.
+   */
+  codeBlocks?: CodeBlocksFeatureOptions | false;
+
+  /**
+   * The images are enabled when this is missing. `false` disables the image suggestions, the image toolbar and the
+   * image panel, even when an `ImageEditor` is bound, and leaves BlockNote's own image blocks: the "Image" item of the
+   * slash menu is BlockNote's own, which inserts an empty image block. Whether the content can hold images at all
+   * depends on the syntax.
+   */
+  images?: false;
+
+  /**
+   * The links are enabled when this is missing. `false` disables the actions to insert and edit links (the slash menu
+   * item, the link suggestions, the button creating a link, the link toolbar), even when a `LinkEditor` is bound. The
+   * links already in the content are still displayed. The options of the links feature are those of the `LinkEditor`,
+   * declared by the integration binding it (e.g. blocknote-headless declares those of its link modal).
+   */
+  links?: object | false;
+
+  /**
+   * The macros are enabled when this is missing. `false` disables them: no macro calls in the schema of the editor, so
+   * content holding macro calls can't be edited, and no action to insert or edit a macro, even when a `MacroEditor` is
+   * bound.
    */
   macros?: MacroFeatureOptions | false;
-};
+
+  /**
+   * The subscript and superscript text styles are enabled when this is missing (and the syntax supports them). `false`
+   * removes them from the editor, with their toolbar buttons: content using them can't be edited.
+   */
+  textStyles?: false;
+
+  /**
+   * The block types and text styles produced by the XWiki rendering (definition list items, groups, raw content,
+   * verbatim text, XWiki parameters) are in the editor when this is missing and the integration binds the
+   * `xwikiRenderingFeature`. `false` removes them: content holding them can't be edited.
+   */
+  xwikiRendering?: false;
+}
 
 /**
  * The configuration of a BlockNote editor instance.
@@ -186,6 +233,7 @@ type EditorOptions = {
 };
 
 export type {
+  CodeBlocksFeatureOptions,
   EditorAppearance,
   EditorFeatures,
   EditorOptions,

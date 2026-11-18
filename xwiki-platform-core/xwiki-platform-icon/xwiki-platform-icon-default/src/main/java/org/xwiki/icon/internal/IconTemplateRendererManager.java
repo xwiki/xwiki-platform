@@ -68,9 +68,14 @@ public class IconTemplateRendererManager implements Initializable
 
     private static final String ARGUMENT = "\\s*'([^']+)'\\s*";
 
-    private static final Pattern WEBJAR_URL_PATTERN =
-        Pattern.compile("^\\s*\\$services\\.webjars\\.url\\s*\\(%s(?:,%s(?:,%s)?)?\\)\\s*$"
-            .formatted(ARGUMENT, ARGUMENT, ARGUMENT));
+    private static final String WEBJAR_URL_CALL =
+        "\\$services\\.webjars\\.url\\s*\\(%s(?:,%s(?:,%s)?)?\\)".formatted(ARGUMENT, ARGUMENT, ARGUMENT);
+
+    private static final Pattern WEBJAR_URL_CALL_PATTERN = Pattern.compile(WEBJAR_URL_CALL);
+
+    // Match one or several webjar URLs separated by commas, like the CSS of the Font Awesome icon theme.
+    private static final Pattern WEBJAR_URLS_PATTERN =
+        Pattern.compile("^\\s*%1$s(?:\\s*,\\s*%1$s)*\\s*$".formatted(WEBJAR_URL_CALL));
 
     // Match icons in the form [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")||data-xwiki-lightbox="false"]].
     private static final Pattern SKIN_FILE_PATTERN =
@@ -174,34 +179,54 @@ public class IconTemplateRendererManager implements Initializable
         }
     }
 
-    private Optional<IconTemplateRenderer> getWebJarRenderer(String template) throws IconException
+    private Optional<IconTemplateRenderer> getWebJarRenderer(String template)
     {
-        Matcher webJarUrlMatcher = WEBJAR_URL_PATTERN.matcher(template);
-        if (webJarUrlMatcher.matches()) {
+        if (!WEBJAR_URLS_PATTERN.matcher(template).matches()) {
+            return Optional.empty();
+        }
+
+        // Collect the arguments of each call and the text between the calls (a comma and optional whitespace), which
+        // is kept as is in the result like Velocity does.
+        List<List<String>> callArguments = new ArrayList<>();
+        List<String> separators = new ArrayList<>();
+        Matcher callMatcher = WEBJAR_URL_CALL_PATTERN.matcher(template);
+        int previousEnd = -1;
+        while (callMatcher.find()) {
+            if (previousEnd >= 0) {
+                separators.add(template.substring(previousEnd, callMatcher.start()));
+            }
+            previousEnd = callMatcher.end();
+
             List<String> arguments = new ArrayList<>();
-            for (int i = 1; i <= webJarUrlMatcher.groupCount(); i++) {
-                String argument = webJarUrlMatcher.group(i);
+            for (int i = 1; i <= callMatcher.groupCount(); i++) {
+                String argument = callMatcher.group(i);
                 if (argument != null) {
                     arguments.add(argument);
                 }
             }
-
-            WebJarsUrlFactory webJarsUrlFactory = this.webJarsUrlFactoryProvider.get();
-
-            if (arguments.size() == 1) {
-                return Optional.of((icon, documentReference) -> webJarsUrlFactory.url(arguments.get(0)));
-            } else if (arguments.size() == 2) {
-                return Optional.of((icon, documentReference) ->
-                    webJarsUrlFactory.url(arguments.get(0), arguments.get(1)));
-            } else if (arguments.size() == 3) {
-                return Optional.of((icon, documentReference) ->
-                    webJarsUrlFactory.url(arguments.get(0), arguments.get(1), arguments.get(2)));
-            } else {
-                throw new IconException("Invalid number of arguments for webjar URL: " + arguments.size());
-            }
+            callArguments.add(arguments);
         }
 
-        return Optional.empty();
+        WebJarsUrlFactory webJarsUrlFactory = this.webJarsUrlFactoryProvider.get();
+
+        return Optional.of((icon, documentReference) -> {
+            StringBuilder result = new StringBuilder(getWebJarURL(webJarsUrlFactory, callArguments.get(0)));
+            for (int i = 1; i < callArguments.size(); i++) {
+                result.append(separators.get(i - 1));
+                result.append(getWebJarURL(webJarsUrlFactory, callArguments.get(i)));
+            }
+            return result.toString();
+        });
+    }
+
+    private static String getWebJarURL(WebJarsUrlFactory webJarsUrlFactory, List<String> arguments)
+    {
+        // The pattern only matches calls with one to three arguments.
+        return switch (arguments.size()) {
+            case 1 -> webJarsUrlFactory.url(arguments.get(0));
+            case 2 -> webJarsUrlFactory.url(arguments.get(0), arguments.get(1));
+            default -> webJarsUrlFactory.url(arguments.get(0), arguments.get(1), arguments.get(2));
+        };
     }
 
     private Optional<IconTemplateRenderer> getSkinFileRenderer(String template)

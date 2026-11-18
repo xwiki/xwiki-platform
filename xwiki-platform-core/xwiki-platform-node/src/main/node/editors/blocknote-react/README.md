@@ -30,15 +30,16 @@ it, and the existing ones are checked against it.
    name or special-case any feature.
    `features.<id>: false` disables a feature, and a feature contributes nothing when the syntax of the edited content
    can't save what it adds.
-2. **A feature contributes, it doesn't patch.** A feature can contribute block and inline content types to the schema
-   (their types erased), slash menu items (an item with the key of a BlockNote default item replaces it, in place),
-   formatting toolbar items (including the toolbar shown for a block type), components rendered with the editor (e.g.
-   its menus and toolbars), BlockNote extensions (ProseMirror plugins, paste and drop handling, keyboard shortcuts,
-   input rules) and BlockNote editor options (e.g. `uploadFile`). The editor merges the contributions and reports a
-   conflict (e.g. two features setting the same BlockNote option, adding the same block type or replacing the same
-   slash menu item) rather than letting the last one win. The editor itself only removes the BlockNote default items
-   that the syntax of the edited content can't save. Content holding a block or inline content type that no feature
-   adds (e.g. because the feature is disabled) can't be loaded: the integration reports it to the user.
+2. **A feature contributes, it doesn't patch.** A feature can contribute block types, inline content types and text
+   styles to the schema (their types erased), slash menu items (an item with the key of a BlockNote default item
+   replaces it, in place), formatting toolbar items (including the toolbar shown for a block type), components rendered
+   with the editor (e.g. its menus and toolbars), BlockNote extensions (ProseMirror plugins, paste and drop handling,
+   keyboard shortcuts, input rules) and BlockNote editor options (e.g. `uploadFile`). The editor merges the
+   contributions and reports a conflict (e.g. two features setting the same BlockNote option, adding the same block type
+   or replacing the same slash menu item) rather than letting the last one win. The editor itself only removes the
+   BlockNote default items that the syntax of the edited content can't save. Content holding a block type, an inline
+   content type or a text style that no feature adds (e.g. because the feature is disabled) can't be loaded: the
+   integration reports it to the user.
 3. **Horizontal features are used through their service, never through the feature.** Links and images call the
    `FileUploader`; they don't depend on the feature handling the files pasted or dropped in the editor, which can be
    disabled on its own.
@@ -90,6 +91,7 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| BlockNote's default blocks | kept in the static schema (the typed API derives from it) when no feature replaces them, so BlockNote's own code block, with its Ctrl+Alt+C shortcut, is there even when the syntax can't save code blocks | 1 |
+| BlockNote's default blocks and text styles | kept in the static schema (the typed API derives from it) when no feature replaces them, so BlockNote's own code block, with its Ctrl+Alt+C shortcut, is there even when the syntax can't save code blocks | 1 |
+| Content with an unsupported type | BlockNote throws while the editor is created and no integration catches it: the editor isn't displayed and the user isn't told why | 2 |
 | `lang` option | changes a module-global translation instance | 10, 11 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 6, 11 |

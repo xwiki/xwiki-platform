@@ -263,6 +263,36 @@ class DefaultGadgetSourceTest
     }
 
     @Test
+    void getGadgetsWithTranslationKeysContainingHyphensWithoutScriptRight() throws Exception
+    {
+        BaseObject scriptTitleGadget = mock();
+        when(scriptTitleGadget.getOwnerDocument()).thenReturn(this.ownerDocument);
+        when(scriptTitleGadget.getStringValue("title"))
+            .thenReturn("$services.localization.render('rendering.macro.my-macro_1.name')");
+        when(scriptTitleGadget.getLargeStringValue("content")).thenReturn("Script title content");
+        when(scriptTitleGadget.getNumber()).thenReturn(1);
+
+        String macroTitle = "{{translation key=\"rendering.macro.my-macro_1.name\"/}}";
+        BaseObject macroTitleGadget = mock();
+        when(macroTitleGadget.getOwnerDocument()).thenReturn(this.ownerDocument);
+        when(macroTitleGadget.getStringValue("title")).thenReturn(macroTitle);
+        when(macroTitleGadget.getLargeStringValue("content")).thenReturn("Macro title content");
+        when(macroTitleGadget.getNumber()).thenReturn(2);
+
+        when(this.localizationManager.getTranslationPlain("rendering.macro.my-macro_1.name"))
+            .thenReturn("My Macro");
+        when(this.xWikiDocument.getXObjects(this.gadgetClassReference))
+            .thenReturn(List.of(scriptTitleGadget, macroTitleGadget));
+
+        List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(TEST_SOURCE, this.macroTransformationContext);
+
+        assertEquals(2, gadgets.size());
+        assertEquals("My Macro", gadgets.get(0).getTitle().get(0).toString());
+        // The translation macro is executed only when the title is parsed with the syntax of the dashboard.
+        verify(this.contentExecutor).execute(eq(macroTitle), eq(Syntax.XWIKI_2_1), any(), any());
+    }
+
+    @Test
     void getDashboardSourceMetadata()
     {
         when(this.xwiki.getURL(DOCUMENT_REFERENCE, "save", "", "", this.xWikiContext))

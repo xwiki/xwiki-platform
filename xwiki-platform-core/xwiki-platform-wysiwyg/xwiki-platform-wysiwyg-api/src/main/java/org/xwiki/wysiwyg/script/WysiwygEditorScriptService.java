@@ -275,7 +275,11 @@ public class WysiwygEditorScriptService implements ScriptService
      *
      * @param templateReference specifies the document that serves as the template for the editor content
      * @return the result of rendering the specified content template
+     * @deprecated only the deprecated classic (iframe-based) WYSIWYG editor needs a full HTML page; use
+     *     {@link #toAnnotatedXHTML(String, Syntax, EntityReference, boolean)} to produce the input of the WYSIWYG
+     *     editor, which edits the content directly in the page
      */
+    @Deprecated(since = "18.10.0RC1")
     public String render(DocumentReference templateReference)
     {
         if (!this.authorization.hasAccess(Right.VIEW, templateReference)) {

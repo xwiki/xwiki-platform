@@ -50,6 +50,8 @@
 {{/velocity}}
 
 {{velocity}}
+## Rendering the edited content as a full HTML page is deprecated since 18.10.0RC1, like the classic (iframe-based)
+## editor which needs it.
 #if ($doc.fullName == 'CKEditor.ContentSheet')
   This is the sheet used to obtain the content that is passed to the [[CKEditor&gt;&gt;http://ckeditor.com/]].
 #else

@@ -197,7 +197,13 @@ define('xwiki-ckeditor', [
   };
 
   var oldReplace = ckeditor.replace;
+  var replaceDeprecationLogged = false;
   ckeditor.replace = function(element, config) {
+    if (!replaceDeprecationLogged) {
+      replaceDeprecationLogged = true;
+      console.warn('The classic (iframe-based) CKEditor, created with CKEDITOR.replace(), is deprecated since ' +
+        '18.10.0RC1. Please output the editor with $services.edit.syntaxContent.wysiwyg() instead.');
+    }
     // Take into account the configuration options specified on the target element.
     return oldReplace.call(this, element, ckeditor.tools.extend(getConfig(element), config, true));
   };

@@ -100,6 +100,16 @@ export type {
   UploadedFile,
 } from "./files/fileUploader";
 
+export { editorFeatureName } from "./features/editorFeature";
+
+export type {
+  ContributedBlockNoteOptions,
+  EditorFeature,
+  FeatureContext,
+  FeatureContribution,
+  FormattingToolbarContribution,
+} from "./features/editorFeature";
+
 export {
   imageEditorName,
   imageMetadataHandlerName,

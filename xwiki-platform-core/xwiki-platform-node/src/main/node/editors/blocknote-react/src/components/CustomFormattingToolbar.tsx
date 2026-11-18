@@ -47,11 +47,12 @@ import {
 } from "@blocknote/react";
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
+import type { BlockType } from "../blocknote";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
 } from "@blocknote/react";
-import type { JSX } from "react";
+import type { JSX, ReactElement, ReactNode } from "react";
 
 const BooleanStyleButton: React.FC<{
   style: string;
@@ -95,11 +96,38 @@ const BooleanStyleButton: React.FC<{
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
+  /** The toolbar items contributed by the editing features. */
+  featureItems: ReactElement[];
+  /** The toolbars contributed by the editing features, replacing this one for the blocks of a given type. */
+  blockToolbars: Record<string, (block: BlockType) => ReactNode>;
 };
+
+/**
+ * @param block - the selected block
+ * @param blockToolbars - the toolbars replacing the formatting toolbar for the blocks of a given type
+ * @returns the toolbar replacing the formatting toolbar for the given block, if any
+ */
+function renderBlockToolbar(
+  block: BlockType,
+  blockToolbars: Record<string, (block: BlockType) => ReactNode>,
+): ReactNode | undefined {
+  const blockToolbar = blockToolbars[block.type];
+  if (blockToolbar) {
+    return blockToolbar(block);
+  } else if (block.type === "image") {
+    return <CustomImageToolbar currentBlock={block} />;
+  }
+  return undefined;
+}
 
 export const CustomFormattingToolbar: React.FC<
   CustomFormattingToolbarProps
-> = ({ formattingToolbarProps, additionalBlockTypes }) => {
+> = ({
+  formattingToolbarProps,
+  additionalBlockTypes,
+  featureItems,
+  blockToolbars,
+}) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
 
@@ -116,19 +144,20 @@ export const CustomFormattingToolbar: React.FC<
     <Components.FormattingToolbar.Root
       className={"bn-toolbar bn-formatting-toolbar"}
     >
-      {/* Display a custom toolbar for specific element types (e.g. images) */}
-      {currentBlock.type === "image" ? (
-        <CustomImageToolbar currentBlock={currentBlock} />
-      ) : (
-        // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, t)
-      )}
+      {/* Display a custom toolbar for specific element types (e.g. images), and the "normal" toolbar for the others. */}
+      {renderBlockToolbar(currentBlock, blockToolbars) ??
+        getDefaultFormattingToolbarItems(
+          combinedBlockTypeSelectItems,
+          featureItems,
+          t,
+        )}
     </Components.FormattingToolbar.Root>
   );
 };
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
+  featureItems: ReactElement[],
   t: (key: string) => string,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
@@ -176,6 +205,7 @@ const getDefaultFormattingToolbarItems = (
     // This button has the exact same appearance as the default creation link button, but opens the link editor (and
     // is hidden when there's none).
     <CustomCreateLinkButton key={"createLinkButton"} />,
+    ...featureItems,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
     // Hidden when no macro editor is available.

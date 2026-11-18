@@ -33,8 +33,8 @@ import "@blocknote/core/fonts/inter.css";
 import { getMacroEditing } from "../blocknote/macroEditor";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import { EditorInstanceContext } from "../contexts";
-import { mergeContributions } from "../features/contribution";
-import { contributeFileTransfer } from "../files/fileTransfer";
+import { contributeFeatures } from "../features/editorFeature";
+import { fileTransferFeature } from "../files/fileTransfer";
 import { createBlockMetadataStore } from "../misc/blockMetadata";
 import { getSyntaxConfig } from "../misc/syntax";
 import { syntaxHighlighter } from "@blocknote/code-block";
@@ -54,12 +54,13 @@ import {
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import { Container } from "inversify";
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { BlockType, EditorSchema, EditorType } from "../blocknote";
 import type { BlockNoteConcreteMacro } from "../blocknote/utils";
 import type { EditorInstance } from "../editorInstance";
 import type { EditorOptions } from "../editorOptions";
+import type { EditorFeature } from "../features/editorFeature";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 
@@ -111,6 +112,11 @@ const SIDE_MENU_FLOATING_OPTIONS = {
     middleware: [centerOnFirstLine()],
   },
 };
+
+/**
+ * The editing features built into the editor, which contribute before the ones bound in the service container.
+ */
+const BUILT_IN_FEATURES: EditorFeature[] = [fileTransferFeature];
 
 /**
  * BlockNote editor wrapper
@@ -208,13 +214,16 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // The editing features contribute to the editor before it is created, and get the editor instance once it is (from
   // the event handlers they contribute).
   const instanceRef = useRef<EditorInstance>(undefined);
-  const contributions = mergeContributions([
-    contributeFileTransfer({
+  const contributions = contributeFeatures(
+    {
       options,
       serviceContainer,
+      syntax,
+      t,
       getInstance: () => instanceRef.current!,
-    }),
-  ]);
+    },
+    BUILT_IN_FEATURES,
+  );
 
   const editorOptions = {
     ...contributions.blockNoteOptions,
@@ -328,6 +337,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               lang,
               t,
               macroEditing: getMacroEditing(instance),
+              featureItems: contributions.slashMenuItems(),
             })
           }
         />
@@ -349,10 +359,15 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           formattingToolbar={(props) => (
             <CustomFormattingToolbar
               formattingToolbarProps={props}
-              additionalBlockTypes={filterMap(
-                builtMacros,
-                (built) => built.dropdownTransformItem,
-              )}
+              additionalBlockTypes={[
+                ...filterMap(
+                  builtMacros,
+                  (built) => built.dropdownTransformItem,
+                ),
+                ...contributions.formattingToolbar.blockTypeSelectItems,
+              ]}
+              featureItems={contributions.formattingToolbar.items}
+              blockToolbars={contributions.formattingToolbar.blockToolbars}
             />
           )}
         />
@@ -370,6 +385,11 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             <FilePanel blockId={blockId} editor={editor} />
           )}
         />
+
+        {/* What the editing features render with the editor (e.g. their menus). */}
+        {contributions.components.map((components, index) => (
+          <Fragment key={index}>{components}</Fragment>
+        ))}
       </BlockNoteView>
     </EditorInstanceContext.Provider>
   );

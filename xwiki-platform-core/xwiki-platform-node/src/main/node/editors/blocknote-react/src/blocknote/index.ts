@@ -171,6 +171,8 @@ type SuggestionMenuItemsParams = {
   t: ReturnType<typeof useTranslation>["t"];
   /** The macro editor of the editor instance, when available */
   macroEditing?: MacroEditing;
+  /** The items contributed by the editing features */
+  featureItems: DefaultReactSuggestionItem[];
 };
 
 /**
@@ -187,6 +189,7 @@ function querySuggestionsMenuItems({
   lang,
   t,
   macroEditing,
+  featureItems,
 }: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
@@ -272,6 +275,7 @@ function querySuggestionsMenuItems({
 
       genericLinkItem,
       genericMacroItem,
+      featureItems,
     ),
     query,
   );

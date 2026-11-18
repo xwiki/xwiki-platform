@@ -28,9 +28,10 @@ import type { EditorPartialLink } from "../blocknote";
 import type { LinkEditionData } from "../components/links/linkEditor";
 import type { EditorInstance } from "../editorInstance";
 import type {
+  EditorFeature,
   FeatureContext,
   FeatureContribution,
-} from "../features/contribution";
+} from "../features/editorFeature";
 import type { UploadedFile } from "./fileUploader";
 import type { ExtensionOptions } from "@blocknote/core";
 
@@ -276,22 +277,22 @@ function updateBlock(
  * The files pasted or dropped in the editor are uploaded with the file uploader: the images are inserted as image
  * blocks, and links to the other files are inserted where the user is. Nothing is contributed when the user can't
  * upload files, so that BlockNote ignores the pasted and dropped files.
- *
- * @param context - the editor instance the feature contributes to
- * @returns what the feature contributes to the editor instance
  */
-function contributeFileTransfer(context: FeatureContext): FeatureContribution {
-  if (!canUploadFiles(context)) {
-    return {};
-  }
-  const { getInstance } = context;
-  return {
-    blockNoteExtensions: [FileTransferExtension({ getInstance })],
-    blockNoteOptions: {
-      uploadFile: (file, blockId) =>
-        uploadForBlock(getInstance(), file, blockId),
-    },
-  };
-}
+const fileTransferFeature: EditorFeature = {
+  id: "fileTransfer",
+  contribute(context: FeatureContext): FeatureContribution | undefined {
+    if (!canUploadFiles(context)) {
+      return undefined;
+    }
+    const { getInstance } = context;
+    return {
+      blockNoteExtensions: [FileTransferExtension({ getInstance })],
+      blockNoteOptions: {
+        uploadFile: (file, blockId) =>
+          uploadForBlock(getInstance(), file, blockId),
+      },
+    };
+  },
+};
 
-export { contributeFileTransfer };
+export { fileTransferFeature };

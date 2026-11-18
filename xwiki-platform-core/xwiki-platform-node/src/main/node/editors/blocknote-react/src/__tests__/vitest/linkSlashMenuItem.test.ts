@@ -52,6 +52,7 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
       lang: "en",
       t,
       macroEditing: undefined,
+      featureItems: [],
     });
 
     return items.find(

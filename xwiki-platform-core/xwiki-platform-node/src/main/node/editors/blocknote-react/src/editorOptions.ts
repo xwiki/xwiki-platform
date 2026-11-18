@@ -65,18 +65,20 @@ type MacroFeatureOptions = {
 };
 
 /**
- * The options of each editor feature, keyed by feature.
+ * The options of each editor feature, keyed by feature id (see `EditorFeature`). Setting the options of a feature to
+ * `false` disables it. An interface, so that the packages adding editor features can declare their options here (with
+ * TypeScript declaration merging).
  *
  * @since 18.10.0RC1
  * @beta
  */
-type EditorFeatures = {
+interface EditorFeatures {
   /**
    * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
    * insert or edit a macro, even when a `MacroEditor` is bound.
    */
   macros?: MacroFeatureOptions | false;
-};
+}
 
 /**
  * The configuration of a BlockNote editor instance.

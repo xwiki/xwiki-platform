@@ -20,13 +20,16 @@ it, and the existing ones are checked against it.
 
 ### Features
 
-1. **Editing features are decoupled from the editor.** The editor collects what the features contribute and applies
-   it; it doesn't name or special-case any feature.
-2. **A feature contributes, it doesn't patch.** A feature can contribute toolbar entries, slash menu entries,
-   suggestion menus, BlockNote extensions (ProseMirror plugins, paste and drop handling, keyboard shortcuts, input
-   rules), BlockNote editor options (e.g. `uploadFile`) and default values for its own options. The editor merges the
-   contributions and reports a conflict (e.g. two features setting the same BlockNote option) rather than letting the
-   last one win.
+1. **Editing features are decoupled from the editor.** A feature is an `EditorFeature`: either built into the editor,
+   or bound in the service container under `editorFeatureName` (for all the editor instances, or for one of them). The
+   editor collects what the features contribute and applies it; it doesn't name or special-case any feature.
+   `features.<id>: false` disables a feature, and a feature contributes nothing when the syntax of the edited content
+   can't save what it adds.
+2. **A feature contributes, it doesn't patch.** A feature can contribute slash menu items, formatting toolbar items
+   (including the toolbar shown for a block type), components rendered with the editor (e.g. its menus and toolbars),
+   BlockNote extensions (ProseMirror plugins, paste and drop handling, keyboard shortcuts, input rules) and BlockNote
+   editor options (e.g. `uploadFile`). The editor merges the contributions and reports a conflict (e.g. two features
+   setting the same BlockNote option) rather than letting the last one win.
 3. **Horizontal features are used through their service, never through the feature.** Links and images call the
    `FileUploader`; they don't depend on the feature handling the files pasted or dropped in the editor, which can be
    disabled on its own.
@@ -74,6 +77,6 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| Links, images, macros, code block | wired directly by the editor, which also checks the syntax features (only the file transfer contributes through `mergeContributions`) | 1, 2 |
+| Links, images, macros, code block | wired directly by the editor, which also checks the syntax features, instead of being `EditorFeature`s (only the file transfer is one so far) | 1, 2 |
 | `lang` option | changes a module-global translation instance | 9, 10 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 5, 10 |

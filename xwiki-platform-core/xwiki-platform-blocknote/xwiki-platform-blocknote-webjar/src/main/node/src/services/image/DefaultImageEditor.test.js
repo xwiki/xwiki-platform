@@ -17,25 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DefaultImageWizard } from "./DefaultImageWizard";
+import { DefaultImageEditor } from "./DefaultImageEditor";
+import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 // Import for the side effect of registering the global define / requirejs used to load the legacy image wizard.
 import "../../testUtils";
 
 // eslint-disable-next-line max-statements
-describe("DefaultImageWizard", () => {
+describe("DefaultImageEditor", () => {
   let capturedOptions;
   let resolvedImageData;
-  let uploadedAttachments;
-  let uploadTarget;
-  let wizard;
+  let fileUploader;
+  let imageEditor;
+
+  /**
+   * @param sourceDocumentReference - the serialized reference of the source document, if any
+   * @returns an editor instance editing the content of the given source document
+   */
+  function editorInstance(sourceDocumentReference) {
+    return {
+      // Provides the file uploader, when there's one.
+      serviceContainer: {
+        isBound: (name) => name === "FileUploader" && !!fileUploader,
+        get: () => fileUploader,
+      },
+      options: {
+        sourceDocumentReference: sourceDocumentReference
+          ? toCristalEntityReference(
+              Model.resolve(sourceDocumentReference, EntityType.DOCUMENT),
+            )
+          : undefined,
+      },
+    };
+  }
 
   beforeEach(() => {
     capturedOptions = undefined;
-    resolvedImageData = undefined;
-    uploadedAttachments = [];
-    uploadTarget = undefined;
+    // The image data submitted by the user, when the test doesn't care about it.
+    resolvedImageData = {};
+    fileUploader = undefined;
 
     // Register a fake legacy image wizard that captures its options and resolves with a chosen image data.
     global.define("xwiki-wysiwyg-image-wizard", () => (options) => {
@@ -73,25 +94,11 @@ describe("DefaultImageWizard", () => {
     const resourceReferenceParser = {
       parse: () => ({ type: "attach", typed: true, reference: "" }),
     };
-    const storageProvider = {
-      get: () => ({
-        saveAttachments: async (page) => {
-          uploadTarget = page;
-          return uploadedAttachments;
-        },
-      }),
-    };
-    wizard = new DefaultImageWizard(resourceReferenceParser, storageProvider);
+    imageEditor = new DefaultImageEditor(resourceReferenceParser);
   });
 
-  function edit(image, context) {
-    return new Promise((resolve) => {
-      wizard.edit(
-        image,
-        { submit: resolve, cancel: () => resolve(undefined) },
-        context,
-      );
-    });
+  function edit(image, sourceDocumentReference) {
+    return imageEditor.edit(editorInstance(sourceDocumentReference), image);
   }
 
   describe("insert", () => {
@@ -104,9 +111,7 @@ describe("DefaultImageWizard", () => {
         resourceReference: reference,
       };
 
-      const result = await new Promise((resolve) => {
-        wizard.insert({ submit: resolve, cancel: () => resolve(undefined) });
-      });
+      const result = await imageEditor.insert(editorInstance());
 
       expect(capturedOptions.isInsert).toBe(true);
       expect(result.url).toBe("catURL");
@@ -115,21 +120,14 @@ describe("DefaultImageWizard", () => {
       expect(result.previewWidth).toBeUndefined();
     });
 
-    it("notifies when the image insertion is cancelled", async () => {
+    it("reports nothing when the image insertion is cancelled", async () => {
       // The legacy wizard rejects when the user closes it.
       global.define("xwiki-wysiwyg-image-wizard", () => (options) => {
         capturedOptions = options;
         return Promise.reject(new Error("cancelled"));
       });
 
-      const cancelled = await new Promise((resolve) => {
-        wizard.insert({
-          submit: () => resolve(false),
-          cancel: () => resolve(true),
-        });
-      });
-
-      expect(cancelled).toBe(true);
+      expect(await imageEditor.insert(editorInstance())).toBeUndefined();
     });
   });
 
@@ -202,7 +200,7 @@ describe("DefaultImageWizard", () => {
     expect(result.reference).toBe(newReference);
   });
 
-  describe("edited document", () => {
+  describe("source document", () => {
     const attachReference = {
       type: "attach",
       typed: false,
@@ -220,40 +218,22 @@ describe("DefaultImageWizard", () => {
       );
     });
 
-    it("resolves the image references relative to the specified edited document", async () => {
-      await edit(
-        {},
-        {
-          documentReference: Model.resolve(
-            "wiki:Other.Page",
-            EntityType.DOCUMENT,
-          ),
-        },
-      );
+    it("resolves the image references relative to the source document, when specified", async () => {
+      await edit({}, "wiki:Other.Page");
 
       expect(Model.serialize(capturedOptions.currentDocument)).toBe(
         "wiki:Other.Page",
       );
-      // The image preview is computed for the edited document, which the image reference is relative to.
+      // The image preview is computed for the source document, which the image reference is relative to.
       expect(capturedOptions.getImageResourceURL(attachReference, {})).toMatch(
         /^\/xwiki\/bin\/get\/Other\/Page\?.*reference=cat.png/,
       );
     });
 
-    it("passes the edited document when inserting an image", async () => {
+    it("passes the source document when inserting an image", async () => {
       resolvedImageData = { src: "catURL", resourceReference: attachReference };
 
-      await new Promise((resolve) => {
-        wizard.insert(
-          { submit: resolve, cancel: () => resolve(undefined) },
-          {
-            documentReference: Model.resolve(
-              "wiki:Other.Page",
-              EntityType.DOCUMENT,
-            ),
-          },
-        );
-      });
+      await imageEditor.insert(editorInstance("wiki:Other.Page"));
 
       expect(Model.serialize(capturedOptions.currentDocument)).toBe(
         "wiki:Other.Page",
@@ -262,8 +242,8 @@ describe("DefaultImageWizard", () => {
   });
 
   describe("upload", () => {
-    async function upload(context) {
-      await edit({}, context);
+    async function upload(sourceDocumentReference) {
+      await edit({}, sourceDocumentReference);
       const callback = {
         onSuccess: vi.fn(),
         onError: vi.fn(),
@@ -273,42 +253,49 @@ describe("DefaultImageWizard", () => {
       return callback;
     }
 
-    it("reports the reference of the uploaded attachment, attached to the edited document", async () => {
+    it("uploads the file with the file uploader, and reports the reference of the uploaded attachment, attached to the current document", async () => {
       // The storage identifies the uploaded attachment by its name, which can contain reference separators.
-      uploadedAttachments = [
-        {
-          reference: "cat@home.png",
-          href: "/xwiki/bin/download/Space/Page/cat%40home.png",
-        },
-      ];
+      fileUploader = {
+        upload: vi.fn(async () => ({ url: "catURL", name: "cat@home.png" })),
+      };
 
       const callback = await upload();
 
+      expect(fileUploader.upload).toHaveBeenCalledOnce();
+      expect(fileUploader.upload.mock.calls[0][1].name).toBe("cat.png");
       expect(callback.onSuccess).toHaveBeenCalledOnce();
       expect(Model.serialize(callback.onSuccess.mock.calls[0][0])).toBe(
         "wiki:Space.Page@cat\\@home.png",
       );
     });
 
-    it("uploads to the specified edited document", async () => {
-      uploadedAttachments = [{ reference: "cat.png" }];
+    it("reports the attachment of the source document, when specified", async () => {
+      fileUploader = {
+        upload: async () => ({ url: "catURL", name: "cat.png" }),
+      };
 
-      const callback = await upload({
-        documentReference: Model.resolve(
-          "wiki:Other.Page",
-          EntityType.DOCUMENT,
-        ),
-      });
+      const callback = await upload("wiki:Other.Page");
 
-      expect(uploadTarget).toBe("wiki:Other.Page");
       expect(Model.serialize(callback.onSuccess.mock.calls[0][0])).toBe(
         "wiki:Other.Page@cat.png",
       );
     });
 
-    it("aborts when the storage doesn't report the uploaded attachment", async () => {
-      uploadedAttachments = [undefined];
+    it("reports the failure of the upload", async () => {
+      const error = new Error("Failed to attach [cat.png].");
+      fileUploader = {
+        upload: async () => {
+          throw error;
+        },
+      };
 
+      const callback = await upload();
+
+      expect(callback.onSuccess).not.toHaveBeenCalled();
+      expect(callback.onError).toHaveBeenCalledWith(error);
+    });
+
+    it("aborts when the user can't upload files", async () => {
       const callback = await upload();
 
       expect(callback.onSuccess).not.toHaveBeenCalled();

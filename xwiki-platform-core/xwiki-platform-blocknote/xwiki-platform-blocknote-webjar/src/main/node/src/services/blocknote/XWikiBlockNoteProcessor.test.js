@@ -20,6 +20,7 @@
 import { DefaultBlockNoteIterator } from "./DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./XWikiBlockNoteProcessor";
 import { extractLinkId } from "./linkId";
+import { getMacroOutput } from "@xwiki/platform-editors-blocknote-react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 describe("XWikiBlockNoteProcessor", () => {
@@ -78,7 +79,7 @@ describe("XWikiBlockNoteProcessor", () => {
       const id = extractLinkId(link.href);
       expect(id).toBeTruthy();
       // The metadata is backed up, mapped to that synthetic id.
-      expect(document.getMetadata(id)).toEqual({
+      expect(document.metadata.get(id)).toEqual({
         xwikiReference: reference,
         xwikiParameters: { class: "myclass" },
         xwikiFreestanding: true,
@@ -295,11 +296,11 @@ describe("XWikiBlockNoteProcessor", () => {
       const loaded = document.content[0];
       expect(loaded.props.call).toBe(JSON.stringify(macro.props.call));
       expect(loaded.props).not.toHaveProperty("output");
-      expect(document.getMacroOutput("m1", loaded.props.call)).toEqual(
-        macro.props.output,
-      );
+      expect(
+        getMacroOutput(document.metadata, "m1", loaded.props.call),
+      ).toEqual(macro.props.output);
       // The output corresponds to a specific macro call.
-      expect(document.getMacroOutput("m1", "{}")).toBeUndefined();
+      expect(getMacroOutput(document.metadata, "m1", "{}")).toBeUndefined();
     });
 
     it("binds the output of a block macro without id to a generated block id", () => {
@@ -308,9 +309,9 @@ describe("XWikiBlockNoteProcessor", () => {
       const document = processor.load(JSON.stringify([macro]));
       const loaded = document.content[0];
       expect(loaded.id).toBeTruthy();
-      expect(document.getMacroOutput(loaded.id, loaded.props.call)).toEqual(
-        macro.props.output,
-      );
+      expect(
+        getMacroOutput(document.metadata, loaded.id, loaded.props.call),
+      ).toEqual(macro.props.output);
     });
 
     it("moves the output of an inline macro to the document metadata on load", () => {
@@ -321,7 +322,7 @@ describe("XWikiBlockNoteProcessor", () => {
       expect(loaded.props.call).toBe(JSON.stringify(inlineMacro.props.call));
       expect(loaded.props).not.toHaveProperty("output");
       expect(
-        document.getMacroOutput(loaded.props.id, loaded.props.call),
+        getMacroOutput(document.metadata, loaded.props.id, loaded.props.call),
       ).toEqual(inlineMacro.props.output);
     });
 
@@ -334,7 +335,8 @@ describe("XWikiBlockNoteProcessor", () => {
       const nestedMacro = call.content[0];
       expect(nestedMacro.props).not.toHaveProperty("output");
       expect(
-        document.getMacroOutput(
+        getMacroOutput(
+          document.metadata,
           nestedMacro.props.id,
           JSON.stringify(nestedMacro.props.call),
         ),

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { useMacroEditing } from "./macroEditor";
 import { BlockNoteEditor } from "@blocknote/core";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core/extensions";
 import {
@@ -211,61 +212,6 @@ type BlockNoteConcreteMacro = {
 };
 
 /**
- * Internal context required for macros execution
- *
- * @since 18.0.0RC1
- * @beta
- */
-type ContextForMacros = {
-  /**
-   * Request the opening of a UI to edit an existing macro call (e.g. a modal)
-   *
-   * When not provided, the actions to edit a macro call are hidden.
-   *
-   * @param invocation - The macro call being edited
-   * @param update - Calling this function will replace the edited macro call with the provided one
-   */
-  openParamsEditor?(
-    invocation: MacroBlockInvocation | InlineMacroInvocation,
-    update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void,
-  ): void;
-
-  /**
-   * Request the opening of a UI (e.g. modal) to insert a new block macro
-   *
-   * When not provided, the action to insert a macro is hidden.
-   *
-   * @param prefill - Information to prefill the modal with (ID, body, ...)
-   * @param insert - Insert the new macro, replacing the user-selected content (if any)
-   *
-   * @since 18.5.0RC1
-   * @beta
-   */
-  openInsertionEditor?(
-    prefill: MacroInsertionEditorPrefillData,
-    insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
-  ): void;
-
-  /**
-   * Retrieve the output of a server-rendered macro call (`xwikiMacroBlock` / `xwikiInlineMacro`). The output is not
-   * part of the edited content because it is rendered for the current user (it can contain information that only the
-   * current user is allowed to view) while the edited content can be shared with other users (realtime editing).
-   *
-   * When not provided, or when it doesn't return anything, the macro is displayed as a placeholder.
-   *
-   * @param id - identifies the macro call: the block id for a block macro, the `id` property for an inline macro or
-   *   for a macro nested in the parameters or content of another macro call
-   * @param call - the current macro call (JSON); no output should be returned if the macro call was modified after its
-   *   output was rendered
-   * @returns the macro output (an array of BlockNote-shaped nodes), or undefined if not available
-   *
-   * @since 18.10.0RC1
-   * @beta
-   */
-  getMacroOutput?(id: string, call: string): unknown[] | undefined;
-};
-
-/**
  * A macro call's parameter map: parameter name to primitive value.
  *
  * @since 18.6.0RC1
@@ -344,7 +290,6 @@ type InlineMacroInvocation = Omit<UniAstInlineMacroInvocation, "body"> & {
 // eslint-disable-next-line max-statements
 function adaptMacroForBlockNote(
   macro: MacroWithUnknownParamsType,
-  ctx: ContextForMacros,
   jsxConverter: UniAstToReactJsxConverter,
 ): BlockNoteConcreteMacro {
   const { id, name, params, defaultParameters } = macro.infos;
@@ -406,11 +351,13 @@ function adaptMacroForBlockNote(
     // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-742
     update: (newParams: Props<PropSchema>) => void,
   ): JSX.Element {
-    // When no params editor is available, no double-click handler is attached. The client-rendered macro is exposed to
-    // the params editor as a macro invocation, and the updated invocation's parameters are written back as block props.
-    const openParamsEditor = ctx.openParamsEditor
+    // When no macro editor is available, no double-click handler is attached. The client-rendered macro is exposed to
+    // the macro editor as a macro invocation, and the updated invocation's parameters are written back as block props.
+    // Called unconditionally, first thing in the render function of the macro spec, so it can use a React hook.
+    const macroEditing = useMacroEditing();
+    const openParamsEditor = macroEditing
       ? () =>
-          ctx.openParamsEditor!(
+          macroEditing.edit(
             macroToInvocation(macro, props, content),
             (updated) => update(updated.params as Props<PropSchema>),
           )
@@ -773,7 +720,6 @@ export {
 
 export type {
   BlockNoteConcreteMacro,
-  ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
   MacroCall,

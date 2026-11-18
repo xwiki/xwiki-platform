@@ -17,9 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { moveCaretTo } from "../../vue/caret";
+// @vitest-environment jsdom
+
+import { moveCaretTo } from "../../files/caret";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { EditorType } from "@xwiki/platform-editors-blocknote-react";
+import type { EditorType } from "../../blocknote";
 
 describe("moveCaretTo", () => {
   let editor: EditorType;

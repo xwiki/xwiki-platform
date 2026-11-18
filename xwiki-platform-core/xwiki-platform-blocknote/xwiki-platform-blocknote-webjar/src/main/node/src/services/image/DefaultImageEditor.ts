@@ -17,17 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AttachmentReference, Model } from "@xwiki/platform-xwiki-model-api";
+import {
+  canUploadFiles,
+  imageEditorName,
+  uploadFile,
+} from "@xwiki/platform-editors-blocknote-react";
+import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
+import { AttachmentReference } from "@xwiki/platform-xwiki-model-api";
 import { loadById } from "@xwiki/platform-xwiki-utils";
 import { Container, inject, injectable } from "inversify";
 import type {
-  ImageWithReference,
-  ImageWizard,
-  ImageWizardCallback,
-  ImageWizardContext,
-} from "./ImageWizard";
-import type { StorageProvider } from "@xwiki/platform-backend-api";
-import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
+  EditorInstance,
+  ImageEditionData,
+  ImageEditor,
+} from "@xwiki/platform-editors-blocknote-react";
 import type {
   ResourceReference,
   ResourceReferenceParser,
@@ -100,55 +103,62 @@ type XWikiWYSIWYGImageWizard = (options: {
 }) => Promise<ImageData>;
 
 /**
- * Default ImageWizard implementation, using the Bootstrap-based Image Wizard provided by xwiki-platform-wysiwyg-webjar.
+ * Default ImageEditor implementation, using the Bootstrap-based Image Wizard provided by xwiki-platform-wysiwyg-webjar:
+ * the images are uploaded to the source document of the edited content, and their references are relative to it.
  *
- * @since 18.3.0RC1
+ * @since 18.10.0RC1
  */
 @injectable("Singleton")
-export class DefaultImageWizard implements ImageWizard {
+export class DefaultImageEditor implements ImageEditor {
   public static bind(container: Container): void {
-    container.bind("ImageWizard").to(DefaultImageWizard).inSingletonScope();
+    container
+      .bind<ImageEditor>(imageEditorName)
+      .to(DefaultImageEditor)
+      .inSingletonScope();
   }
 
   constructor(
     @inject("ResourceReferenceParser")
     private readonly resourceReferenceParser: ResourceReferenceParser,
-    @inject("StorageProvider")
-    private readonly storageProvider: StorageProvider,
   ) {}
 
   public insert(
-    callback: ImageWizardCallback,
-    context?: ImageWizardContext,
-  ): void {
-    void this.showWizard(callback, undefined, context);
+    instance: EditorInstance,
+  ): Promise<ImageEditionData | undefined> {
+    return this.showWizard(instance);
   }
 
   public edit(
-    image: ImageWithReference,
-    callback: ImageWizardCallback,
-    context?: ImageWizardContext,
-  ): void {
-    void this.showWizard(callback, image, context);
+    instance: EditorInstance,
+    image: ImageEditionData,
+  ): Promise<ImageEditionData | undefined> {
+    return this.showWizard(instance, image);
   }
 
+  /**
+   * @param instance - the editor instance where the image is inserted or edited
+   * @param image - the edited image, undefined when inserting an image
+   * @returns the image chosen by the user, or undefined if the user canceled
+   */
   private async showWizard(
-    callback: ImageWizardCallback,
-    image?: ImageWithReference,
-    context?: ImageWizardContext,
-  ): Promise<void> {
-    // The image references are relative to the edited document, so the image previews are computed for it, and the
+    instance: EditorInstance,
+    image?: ImageEditionData,
+  ): Promise<ImageEditionData | undefined> {
+    // The image references are relative to the source document, so the image previews are computed for it, and the
     // images are uploaded to it.
-    const documentReference =
-      context?.documentReference ?? XWiki.currentDocument.documentReference;
-    const sourceDocument = context?.documentReference
-      ? new XWiki.Document(context.documentReference)
+    const { sourceDocumentReference } = instance.options;
+    const documentReference = sourceDocumentReference
+      ? toXWikiEntityReference(sourceDocumentReference)
+      : XWiki.currentDocument.documentReference;
+    const sourceDocument = sourceDocumentReference
+      ? new XWiki.Document(documentReference)
       : XWiki.currentDocument;
+    let imageData: ImageData;
     try {
       const imageWizard = await loadById<XWikiWYSIWYGImageWizard>(
         "xwiki-wysiwyg-image-wizard",
       );
-      const imageData = await imageWizard({
+      imageData = await imageWizard({
         captionAllowed: true,
         currentDocument: documentReference,
         getImageResourceURL: (resourceReference, extraParams) =>
@@ -157,12 +167,13 @@ export class DefaultImageWizard implements ImageWizard {
         isHTML5: true,
         isInsert: !image,
         upload: (file, uploadCallback) =>
-          this.upload(file, uploadCallback, documentReference),
+          this.upload(instance, file, uploadCallback, documentReference),
       });
-      callback.submit(this.getImageProperties(imageData, image?.reference));
     } catch {
-      callback.cancel();
+      // The Image Wizard rejects when the user closes it.
+      return undefined;
     }
+    return this.getImageProperties(imageData, image?.reference);
   }
 
   private getResourceURL(
@@ -195,9 +206,9 @@ export class DefaultImageWizard implements ImageWizard {
    * @param image - image properties supported by BlockNote
    * @returns image data expected by the Image Wizard
    */
-  private getImageData(image: ImageWithReference): Partial<ImageData> {
+  private getImageData(image: ImageEditionData): Partial<ImageData> {
     return {
-      alignment: editAlignment[image.textAlignment],
+      alignment: image.textAlignment && editAlignment[image.textAlignment],
       hasCaption: !!image.caption,
       resourceReference:
         image.reference ?? this.getImageResourceReference(image),
@@ -207,9 +218,11 @@ export class DefaultImageWizard implements ImageWizard {
   }
 
   private getImageResourceReference(
-    image: BlockOfType<"image">["props"],
+    image: ImageEditionData,
   ): ResourceReference {
-    return this.resourceReferenceParser.parse(image.url, { type: "attach" });
+    return this.resourceReferenceParser.parse(image.url ?? "", {
+      type: "attach",
+    });
   }
 
   /**
@@ -221,7 +234,7 @@ export class DefaultImageWizard implements ImageWizard {
   private getImageProperties(
     imageData: ImageData,
     oldReference?: ResourceReference,
-  ): Partial<ImageWithReference> {
+  ): ImageEditionData {
     const newReference = imageData.resourceReference;
     return {
       // The width is empty when the user doesn't set it (or removes it), in which case the image is displayed with its
@@ -247,31 +260,28 @@ export class DefaultImageWizard implements ImageWizard {
   }
 
   /**
-   * Uploads the given image file as an attachment of the edited document and notifies the Image Wizard about the upload
-   * status.
+   * Uploads the given image file with the file uploader of the editor instance (which attaches it to the edited
+   * document) and notifies the Image Wizard about the upload status.
    *
+   * @param instance - the editor instance where the image is inserted or edited
    * @param file - the image file to upload
    * @param callback - used to notify the Image Wizard about the upload progress
    * @param documentReference - the reference of the edited document
    */
   private async upload(
+    instance: EditorInstance,
     file: File,
     callback: UploadCallback,
     documentReference: XWikiEntityReference,
   ): Promise<void> {
+    if (!canUploadFiles(instance)) {
+      // The user can't upload files.
+      callback.onAbort();
+      return;
+    }
     try {
-      const result = await this.storageProvider
-        .get()
-        .saveAttachments(Model.serialize(documentReference), [file]);
-      // The storage identifies the uploaded attachment by its name.
-      const attachmentName = result?.[0]?.reference;
-      if (attachmentName) {
-        callback.onSuccess(
-          new AttachmentReference(attachmentName, documentReference),
-        );
-      } else {
-        callback.onAbort();
-      }
+      const { name } = await uploadFile(instance, file);
+      callback.onSuccess(new AttachmentReference(name, documentReference));
     } catch (error) {
       callback.onError(
         error instanceof Error ? error : new Error(String(error)),

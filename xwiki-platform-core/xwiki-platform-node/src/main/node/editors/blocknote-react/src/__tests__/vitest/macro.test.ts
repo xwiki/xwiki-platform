@@ -20,14 +20,18 @@
 // @vitest-environment jsdom
 
 import { createBlockNoteSchema } from "../../blocknote";
+import { setMacroOutput } from "../../blocknote/macroMetadata";
 import { MacroOutput } from "../../blocknote/macroOutput";
-import { MacrosContext } from "../../contexts";
+import { EditorInstanceContext } from "../../contexts";
+import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { BlockNoteEditor } from "@blocknote/core";
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { beforeAll, describe, expect, test } from "vitest";
-import type { ContextForMacros, MacroCall } from "../../blocknote/utils";
+import type { MacroCall } from "../../blocknote/utils";
+import type { EditorInstance } from "../../editorInstance";
+import type { BlockMetadataStore } from "../../misc/blockMetadata";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Nodes = any[];
@@ -37,15 +41,16 @@ function render(
   nodes: Nodes,
   call: MacroCall,
   inline = false,
-  macros: ContextForMacros | null = null,
+  metadata: BlockMetadataStore = createBlockMetadataStore(),
 ): HTMLElement {
   const container = document.createElement("div");
   const root = createRoot(container);
   flushSync(() => {
     root.render(
       createElement(
-        MacrosContext.Provider,
-        { value: macros },
+        EditorInstanceContext.Provider,
+        // The macro output only needs the metadata of the editor instance.
+        { value: { metadata } as EditorInstance },
         createElement(MacroOutput, { nodes, call, inline }),
       ),
     );
@@ -338,12 +343,8 @@ describe("MacroOutput (nested macro output lookup)", () => {
     },
   ];
   const editableOutput = [{ type: "xwikiEditable" }];
-  const outputLookup: ContextForMacros = {
-    getMacroOutput: (id, macroCall) =>
-      id === "nested-1" && macroCall === JSON.stringify(errorCall)
-        ? errorOutput
-        : undefined,
-  };
+  const metadata = createBlockMetadataStore();
+  setMacroOutput(metadata, "nested-1", JSON.stringify(errorCall), errorOutput);
 
   /** @returns an info macro call whose content holds an error macro call, without its output */
   function infoCallWithNestedError(nestedCall: MacroCall): MacroCall {
@@ -359,12 +360,12 @@ describe("MacroOutput (nested macro output lookup)", () => {
     };
   }
 
-  test("retrieves the output of a macro nested in the macro content through the macro context", () => {
+  test("retrieves the output of a macro nested in the macro content from the block metadata", () => {
     const container = render(
       editableOutput,
       infoCallWithNestedError(errorCall),
       false,
-      outputLookup,
+      metadata,
     );
 
     const nested = container.querySelector<HTMLElement>(
@@ -374,7 +375,7 @@ describe("MacroOutput (nested macro output lookup)", () => {
     expect(nested!.textContent).toBe("test");
   });
 
-  test("displays a placeholder for a nested macro without output when there is no macro context", () => {
+  test("displays a placeholder for a nested macro without output when its output is not in the block metadata", () => {
     const container = render(
       editableOutput,
       infoCallWithNestedError(errorCall),
@@ -390,7 +391,7 @@ describe("MacroOutput (nested macro output lookup)", () => {
       editableOutput,
       infoCallWithNestedError({ ...errorCall, content: "changed" }),
       false,
-      outputLookup,
+      metadata,
     );
 
     expect(

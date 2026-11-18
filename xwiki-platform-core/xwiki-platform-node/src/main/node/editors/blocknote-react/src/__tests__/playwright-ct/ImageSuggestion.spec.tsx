@@ -281,6 +281,32 @@ test("Only shows the browse and upload actions when the backend doesn't support 
   await expect(menuEl.locator(".bn-suggestion-menu-label")).toHaveCount(0);
 });
 
+test("Neither the image quick action nor the image selector offer to upload when uploading is disabled", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      linkSuggestServiceUnavailable={true}
+      upload={false}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await openImageQuickAction(page, editorEl);
+
+  // Only the browse action is offered.
+  const items = page.locator(".bn-suggestion-menu-item");
+  await expect(items).toHaveText(["blocknote.imageSuggestion.browse"]);
+
+  // The image selector it opens has no upload button either.
+  await items.first().click();
+  await expect(page.locator('[data-test="searchBoxInput"]')).toBeVisible();
+  await expect(
+    page.getByText("blocknote.imageSelector.uploadButton"),
+  ).not.toBeAttached();
+});
+
 test("Still shows the browse and upload actions when searching for images fails", async ({
   mount,
   page,
@@ -454,17 +480,20 @@ test("Clicking the browse action opens the full image selector where the suggest
   await expect(page.locator('[data-test="searchBoxInput"]')).toBeVisible();
 });
 
-test("The browse action uses the image insertion override, when specified, to insert an image", async ({
+test("The browse action uses the image editor, when bound, to insert an image", async ({
   mount,
   page,
+  // eslint-disable-next-line max-statements
 }) => {
   const reference = attachmentResourceReference("cat.png");
   const component = await mount(
     <ImageSuggestionForTest
-      imageInsertionResult={{
-        type: "insert",
-        props: { url: "https://example.com/images/700", previewWidth: 120 },
-        reference,
+      imageEditor={{
+        result: {
+          url: "https://example.com/images/700",
+          previewWidth: 120,
+          reference,
+        },
       }}
     />,
   );
@@ -473,29 +502,112 @@ test("The browse action uses the image insertion override, when specified, to in
   await openImageQuickAction(page, editorEl);
   await page.locator(".bn-suggestion-menu-item").nth(0).click();
 
-  // The image returned by the override is inserted, with all its properties, instead of opening the image selector.
+  // The image returned by the image editor is inserted, with all its properties, instead of opening the image selector.
   const image = editorEl.locator("img.bn-visual-media");
   await expect(image).toHaveAttribute("src", "https://example.com/images/700");
   await expect(image).toHaveCSS("width", "120px");
   await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
+  await expect(page.getByTestId("imageEditorCalls")).toHaveText(
+    JSON.stringify([{ action: "insert" }]),
+  );
   await expectSelectedImage(page, editorEl, reference);
 });
 
-test("Aborting the image insertion override inserts nothing", async ({
-  mount,
-  page,
-}) => {
-  const component = await mount(
-    <ImageSuggestionForTest imageInsertionResult={{ type: "aborted" }} />,
-  );
+test("Canceling the image editor inserts nothing", async ({ mount, page }) => {
+  const component = await mount(<ImageSuggestionForTest imageEditor={{}} />);
 
   const editorEl = component.locator(".bn-editor");
   await openImageQuickAction(page, editorEl);
   await page.locator(".bn-suggestion-menu-item").nth(0).click();
 
+  await expect(page.getByTestId("imageEditorCalls")).toHaveText(
+    JSON.stringify([{ action: "insert" }]),
+  );
   await expect(page.locator(".bn-suggestion-menu")).not.toBeAttached();
   await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
   await expect(editorEl.locator("img")).toHaveCount(0);
+  await expect(page.getByTestId("selectedImages")).toHaveText("[]");
+});
+
+test("The edit action of the image toolbar uses the image editor, when bound, to edit an image", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const oldReference = attachmentResourceReference("old.png");
+  const newReference = attachmentResourceReference("new.png");
+  const component = await mount(
+    <ImageSuggestionForTest
+      content={[
+        {
+          id: "some-image",
+          type: "image",
+          props: { url: "https://example.com/images/150" },
+          content: undefined,
+          children: [],
+        },
+      ]}
+      imageReferences={{ "some-image": oldReference }}
+      imageEditor={{
+        result: {
+          url: "https://example.com/images/600",
+          previewWidth: 80,
+          reference: newReference,
+        },
+      }}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.locator("img.bn-visual-media").click();
+  await page.getByLabel("blocknote.imageToolbar.buttons.edit").click();
+
+  // The image editor gets the edited image with its reference, as provided by the image metadata handler, and the image
+  // is updated with what it returns, instead of opening the image selector.
+  const image = editorEl.locator("img.bn-visual-media");
+  await expect(image).toHaveAttribute("src", "https://example.com/images/600");
+  await expect(image).toHaveCSS("width", "80px");
+  await expect(page.locator('[data-test="searchBoxInput"]')).not.toBeAttached();
+  const calls = JSON.parse(
+    (await page.getByTestId("imageEditorCalls").textContent())!,
+  );
+  expect(calls).toHaveLength(1);
+  expect(calls[0].action).toBe("edit");
+  expect(calls[0].image).toMatchObject({
+    url: "https://example.com/images/150",
+    reference: oldReference,
+  });
+  await expectSelectedImage(page, editorEl, newReference);
+});
+
+test("Canceling the image editor leaves the edited image unchanged", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <ImageSuggestionForTest
+      content={[
+        {
+          id: "some-image",
+          type: "image",
+          props: { url: "https://example.com/images/150" },
+          content: undefined,
+          children: [],
+        },
+      ]}
+      imageEditor={{}}
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.locator("img.bn-visual-media").click();
+  await page.getByLabel("blocknote.imageToolbar.buttons.edit").click();
+
+  await expect(page.getByTestId("imageEditorCalls")).toContainText('"edit"');
+  await expect(editorEl.locator("img.bn-visual-media")).toHaveAttribute(
+    "src",
+    "https://example.com/images/150",
+  );
   await expect(page.getByTestId("selectedImages")).toHaveText("[]");
 });
 

@@ -17,67 +17,58 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { getEditedLink, updateLink, useLinkEditing } from "./linkEditor";
+import { EditorInstanceContext } from "../../contexts";
 import { LinkToolbarExtension } from "@blocknote/core/extensions";
 import { useComponentsContext, useExtension } from "@blocknote/react";
+import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import {
   RiDeleteBin6Line,
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
-import type { LinkEditionData, LinkEditionHandler } from "./linkEdition";
-import type { LinkEditionHooks } from "./linkEditionHooks";
+import type { LinkEditionData } from "./linkEditor";
 import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {
   linkToolbarProps: LinkToolbarProps;
-  linkEditionHandler: LinkEditionHandler;
-  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   linkToolbarProps,
-  linkEditionHandler,
-  linkEditionHooks,
 }) => {
   const Components = useComponentsContext()!;
+  const instance = useContext(EditorInstanceContext)!;
+  const linkEditing = useLinkEditing();
   const { t } = useTranslation();
 
-  const { editLink, deleteLink } = useExtension(LinkToolbarExtension);
+  const { deleteLink } = useExtension(LinkToolbarExtension);
 
   return (
     <>
-      <Components.FormattingToolbar.Button
-        className="bn-button"
-        data-test="editLink"
-        label={t("blocknote.linkToolbar.buttons.edit")}
-        icon={<RiPencilLine />}
-        onClick={() => {
-          // The link data exactly as stored in the content. beforeEdit may transform what the link
-          // editor is pre-filled with (e.g. hide the synthetic id carried by the URL), but
-          // beforeUpdate needs the untransformed data to be able to recover that id, so keep it
-          // aside.
-          const previous: LinkEditionData = {
-            url: linkToolbarProps.url,
-            title: linkToolbarProps.text,
-          };
-
-          linkEditionHandler({
-            current: linkEditionHooks?.beforeEdit?.(previous) ?? previous,
-            mode: "editExisting",
-            onSubmit(linkData) {
-              const updatedLinkData =
-                linkEditionHooks?.beforeUpdate?.(linkData, previous) ??
-                linkData;
-              editLink(
-                updatedLinkData.url,
-                updatedLinkData.title,
-                linkToolbarProps.range.from,
-              );
-            },
-          });
-        }}
-      />
+      {/* Hidden when there's no link editor. */}
+      {linkEditing && (
+        <Components.FormattingToolbar.Button
+          className="bn-button"
+          data-test="editLink"
+          label={t("blocknote.linkToolbar.buttons.edit")}
+          icon={<RiPencilLine />}
+          onClick={async () => {
+            // The link data exactly as stored in the content. The link metadata handler may transform what the link
+            // editor is pre-filled with (e.g. hide the synthetic id carried by the URL), but it needs the
+            // untransformed data before the update to be able to recover that id, so keep it aside.
+            const previous: LinkEditionData = {
+              url: linkToolbarProps.url,
+              title: linkToolbarProps.text,
+            };
+            await linkEditing.edit(getEditedLink(instance, previous), (link) =>
+              updateLink(instance, link, previous, linkToolbarProps.range.from),
+            );
+            instance.editor.focus();
+          }}
+        />
+      )}
 
       <Components.FormattingToolbar.Button
         className="bn-button"

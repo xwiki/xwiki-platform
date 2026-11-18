@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { useMacroEditing } from "../../blocknote/macroEditor";
 import {
   MACRO_NAME_PREFIX,
   invocationToMacroCall,
@@ -28,16 +29,11 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiPencilFill } from "react-icons/ri";
 import type {
-  ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
   MacroCall,
   MacroCallParams,
 } from "../../blocknote/utils";
-
-export type CustomMacroEditButtonProps = {
-  ctxForMacros: ContextForMacros;
-};
 
 /** The invocation to edit for a selected macro block, and the writer that applies the wizard's result back to it. */
 type MacroEdit = {
@@ -88,9 +84,8 @@ function resolveMacroEdit(
   return null;
 }
 
-export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
-  ctxForMacros,
-}) => {
+export const CustomMacroEditButton: React.FC = () => {
+  const macroEditing = useMacroEditing();
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
 
@@ -102,10 +97,8 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
   const block = editor.getTextCursorPosition().block;
 
   const openMacroEditor = useMemo(() => {
-    // Hide the edit action when no params editor is available.
-    const openParamsEditor = ctxForMacros.openParamsEditor;
-
-    if (!openParamsEditor) {
+    // Hide the edit action when no macro editor is available.
+    if (!macroEditing) {
       return null;
     }
 
@@ -114,8 +107,8 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
       return null;
     }
 
-    return () => openParamsEditor(edit.invocation, edit.writeBack);
-  }, [block, ctxForMacros, editor]);
+    return () => macroEditing.edit(edit.invocation, edit.writeBack);
+  }, [block, macroEditing, editor]);
 
   return (
     openMacroEditor && (

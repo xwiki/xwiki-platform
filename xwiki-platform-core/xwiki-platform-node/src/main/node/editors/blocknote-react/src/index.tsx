@@ -72,27 +72,44 @@ export type {
   InlineContentType,
 } from "./blocknote";
 
+export type { EditorInstance } from "./editorInstance";
+
+export { createBlockMetadataStore } from "./misc/blockMetadata";
+
+export { getMacroOutput, setMacroOutput } from "./blocknote/macroMetadata";
+
+export type { BlockMetadata, BlockMetadataStore } from "./misc/blockMetadata";
+
 export type {
   EditorAppearance,
   EditorFeatures,
   EditorOptions,
-  ImageFeatureOptions,
-  LinkFeatureOptions,
   MacroFeatureOptions,
-  UploadOptions,
 } from "./editorOptions";
 
-export type {
-  ImageEditionOverrideFn,
-  ImageUpdateResult,
-} from "./components/images/CustomImageToolbar";
+export {
+  canUploadFiles,
+  fileUploadListenerName,
+  fileUploaderName,
+  uploadFile,
+} from "./files/fileUploader";
 
-export type { ImageEditionHooks } from "./components/images/imageEditionHooks";
+export type {
+  FileUploadListener,
+  FileUploader,
+  UploadedFile,
+} from "./files/fileUploader";
+
+export {
+  imageEditorName,
+  imageMetadataHandlerName,
+} from "./components/images/imageEditor";
 
 export type {
-  ImageInsertionOverrideFn,
-  ImageInsertionResult,
-} from "./components/images/imageInsertionOverride";
+  ImageEditionData,
+  ImageEditor,
+  ImageMetadataHandler,
+} from "./components/images/imageEditor";
 
 export {
   MACRO_NAME_PREFIX,
@@ -100,8 +117,11 @@ export {
   extractMacroRawContent,
 } from "./blocknote/utils";
 
+export { macroEditorName } from "./blocknote/macroEditor";
+
+export type { MacroEditor } from "./blocknote/macroEditor";
+
 export type {
-  ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
   MacroCall,
@@ -109,10 +129,13 @@ export type {
   MacroInsertionEditorPrefillData,
 } from "./blocknote/utils";
 
+export {
+  linkEditorName,
+  linkMetadataHandlerName,
+} from "./components/links/linkEditor";
+
 export type {
   LinkEditionData,
-  LinkEditionHandler,
-  LinkEditionHandlerProps,
-} from "./components/links/linkEdition";
-
-export type { LinkEditionHooks } from "./components/links/linkEditionHooks";
+  LinkEditor,
+  LinkMetadataHandler,
+} from "./components/links/linkEditor";

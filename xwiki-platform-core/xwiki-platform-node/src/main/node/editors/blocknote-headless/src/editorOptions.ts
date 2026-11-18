@@ -20,16 +20,15 @@
 import type {
   EditorFeatures,
   EditorOptions,
-  LinkFeatureOptions,
 } from "@xwiki/platform-editors-blocknote-react";
 
 /**
- * The options of the link feature, including those of the link modal shown by the Vue integration.
+ * The options of the link feature, i.e. of the link modal shown by the link editor of the Vue integration.
  *
  * @since 18.10.0RC1
  * @beta
  */
-type HeadlessLinkFeatureOptions = LinkFeatureOptions & {
+type HeadlessLinkFeatureOptions = {
   /**
    * The link target types (by type) that the link modal doesn't offer for new links, while still using them to edit
    * the links they handle. Unknown types are ignored.
@@ -45,7 +44,7 @@ type HeadlessLinkFeatureOptions = LinkFeatureOptions & {
  * @beta
  */
 type HeadlessEditorOptions = Omit<EditorOptions, "features"> & {
-  features?: Omit<EditorFeatures, "links"> & {
+  features?: EditorFeatures & {
     links?: HeadlessLinkFeatureOptions;
   };
 };

@@ -20,6 +20,7 @@
 import { codeBlocksFeature } from "./features/codeBlocks/codeBlocks";
 import { editorFeatureName } from "./features/editorFeature";
 import { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
+import { imagesFeature } from "./features/images/images";
 import type { EditorFeature } from "./features/editorFeature";
 import type { Container } from "inversify";
 
@@ -35,7 +36,11 @@ import type { Container } from "inversify";
  */
 export class ComponentInit {
   constructor(container: Container) {
-    for (const feature of [fileTransferFeature, codeBlocksFeature]) {
+    for (const feature of [
+      fileTransferFeature,
+      codeBlocksFeature,
+      imagesFeature,
+    ]) {
       container.bind<EditorFeature>(editorFeatureName).toConstantValue(feature);
     }
   }

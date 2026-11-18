@@ -106,6 +106,8 @@ export { codeBlocksFeature } from "./features/codeBlocks/codeBlocks";
 
 export { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
 
+export { imagesFeature } from "./features/images/images";
+
 export { editorFeatureName } from "./features/editorFeature";
 
 export type {
@@ -119,13 +121,13 @@ export type {
 export {
   imageEditorName,
   imageMetadataHandlerName,
-} from "./components/images/imageEditor";
+} from "./services/imageEditor";
 
 export type {
   ImageEditionData,
   ImageEditor,
   ImageMetadataHandler,
-} from "./components/images/imageEditor";
+} from "./services/imageEditor";
 
 export {
   MACRO_NAME_PREFIX,

@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { SearchBox } from "../../components/SearchBox";
 import { EditorInstanceContext } from "../../contexts";
 import { canUploadFiles } from "../../files/fileUploader";
 import { pickAndUploadFile, uploadedImage } from "../../files/uploadedFile";
-import { SearchBox } from "../SearchBox";
 import {
   Box,
   Breadcrumbs,
@@ -40,7 +40,7 @@ import {
 import { useCallback, useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
-import type { LinkSuggestion } from "../SearchBox";
+import type { LinkSuggestion } from "../../components/SearchBox";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type { ModelReferenceHandlerProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";

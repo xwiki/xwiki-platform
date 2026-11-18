@@ -20,8 +20,6 @@
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
 import { centerOnFirstLine } from "./SideMenu/centerOnFirstLine";
-import { FilePanel } from "./files/FilePanel";
-import { ImageSuggestionController } from "./images/ImageSuggestionController";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import { LinkSuggestionController } from "./links/LinkSuggestionController";
 import {
@@ -41,7 +39,6 @@ import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import "./BlockNoteViewWrapper.css";
 import {
-  FilePanelController,
   FormattingToolbar,
   FormattingToolbarController,
   LinkToolbarController,
@@ -330,10 +327,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           }
         />
 
-        {syntax.features.blocks.images.basicImages && (
-          <ImageSuggestionController maxSuggestions={5} />
-        )}
-
         {syntax.features.inlineContents.links.basicLinks && (
           <LinkSuggestionController
             maxSuggestions={8}
@@ -365,12 +358,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             <FormattingToolbar>
               <CustomLinkToolbar linkToolbarProps={props} />
             </FormattingToolbar>
-          )}
-        />
-
-        <FilePanelController
-          filePanel={({ blockId }) => (
-            <FilePanel blockId={blockId} editor={editor} />
           )}
         />
 

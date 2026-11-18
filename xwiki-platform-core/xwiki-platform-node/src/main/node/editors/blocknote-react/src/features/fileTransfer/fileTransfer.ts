@@ -19,10 +19,10 @@
  */
 import { moveCaretTo } from "./caret";
 import { withUniqueName } from "./uniqueFileName";
-import { updateImage } from "../../components/images/imageEditor";
 import { getLinkMetadataHandler } from "../../components/links/linkEditor";
 import { canUploadFiles, uploadFile } from "../../files/fileUploader";
 import { uploadedFileLink, uploadedImage } from "../../files/uploadedFile";
+import { updateImage } from "../../services/imageEditor";
 import { createExtension, createStore } from "@blocknote/core";
 import type { EditorPartialLink } from "../../blocknote";
 import type { LinkEditionData } from "../../components/links/linkEditor";

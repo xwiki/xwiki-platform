@@ -18,12 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
-import { insertImage, useImageEditing } from "./imageEditor";
+import { useImageEditing } from "./imageEditing";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
 import { EditorInstanceContext } from "../../contexts";
 import { canUploadFiles } from "../../files/fileUploader";
 import { pickAndUploadFile, uploadedImage } from "../../files/uploadedFile";
 import { toResourceReference } from "../../misc/resourceReference";
+import { insertImage } from "../../services/imageEditor";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
 import { Paper } from "@mantine/core";
 import {

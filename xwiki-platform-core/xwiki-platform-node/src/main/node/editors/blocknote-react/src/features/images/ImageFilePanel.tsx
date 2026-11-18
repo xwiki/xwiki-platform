@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
-import { updateImage } from "./imageEditor";
 import { EditorInstanceContext } from "../../contexts";
+import { updateImage } from "../../services/imageEditor";
 import { Paper } from "@mantine/core";
 import { useCallback, useContext } from "react";
 import type { BlockOfType } from "../../blocknote";

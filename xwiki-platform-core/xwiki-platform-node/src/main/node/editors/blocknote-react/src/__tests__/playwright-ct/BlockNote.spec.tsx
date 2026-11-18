@@ -86,6 +86,7 @@ test("Allowed syntax features should be available", async ({ mount, page }) => {
 
   expect(menuItemsText).toContain("Table");
   expect(menuItemsText).toContain("Quote");
+  expect(menuItemsText).toContain("Image");
 });
 
 test("Disallowed syntax features should be unavailable", async ({
@@ -96,6 +97,7 @@ test("Disallowed syntax features should be unavailable", async ({
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.blocks.tables.basicTables = false;
   syntax.features.blocks.quotes = false;
+  syntax.features.blocks.images.basicImages = false;
 
   const component = await mount(
     <BlockNoteForTest content={[]} options={{ syntax }} />,
@@ -121,6 +123,31 @@ test("Disallowed syntax features should be unavailable", async ({
 
   expect(menuItemsText).not.toContain("Table");
   expect(menuItemsText).not.toContain("Quote");
+  expect(menuItemsText).not.toContain("Image");
+});
+
+test("A disabled editor feature contributes nothing", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[]}
+      options={{ syntax: FULL_SYNTAX, features: { images: false } }}
+    />,
+  );
+
+  await component.locator(".bn-editor").press("/");
+
+  const slashMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+  await slashMenuEl.waitFor({ state: "attached" });
+  const menuItems = slashMenuEl.locator(
+    ".bn-suggestion-menu-item p:first-child",
+  );
+  await expect(menuItems.filter({ hasText: "Table" })).toHaveCount(1);
+  await expect(menuItems.filter({ hasText: /^Image$/ })).toHaveCount(0);
 });
 
 test("Macros can be inserted with the macro editor", async ({

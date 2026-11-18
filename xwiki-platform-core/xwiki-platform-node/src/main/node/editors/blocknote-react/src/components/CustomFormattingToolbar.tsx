@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CustomImageToolbar } from "./images/CustomImageToolbar";
 import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
 import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
 import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
@@ -111,13 +110,7 @@ function renderBlockToolbar(
   block: BlockType,
   blockToolbars: Record<string, (block: BlockType) => ReactNode>,
 ): ReactNode | undefined {
-  const blockToolbar = blockToolbars[block.type];
-  if (blockToolbar) {
-    return blockToolbar(block);
-  } else if (block.type === "image") {
-    return <CustomImageToolbar currentBlock={block} />;
-  }
-  return undefined;
+  return blockToolbars[block.type]?.(block);
 }
 
 export const CustomFormattingToolbar: React.FC<

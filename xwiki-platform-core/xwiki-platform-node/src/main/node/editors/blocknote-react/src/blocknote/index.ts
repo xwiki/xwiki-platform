@@ -20,7 +20,6 @@
 
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
-import { XWikiImageBlock } from "./imageBlock";
 import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
 import { XWikiRawBlock } from "./raw";
 import {
@@ -30,9 +29,9 @@ import {
   XWikiParametersStyle,
 } from "./styles";
 import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
-import { openImageSuggestionMenu } from "../components/images/imageSuggestionMenu";
 import { openLinkSuggestionMenu } from "../components/links/linkSuggestionMenu";
 import { XWikiCodeBlock } from "../features/codeBlocks/codeBlockSpec";
+import { XWikiImageBlock } from "../features/images/imageBlockSpec";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -246,12 +245,9 @@ function querySuggestionsMenuItems({
 
   let items = filterSuggestionItems(
     combineByGroup(
-      getDefaultReactSlashMenuItems(editor).map((item) =>
-        // The image quick action suggests images to insert, in addition to uploading or browsing
-        // images, instead of inserting an empty image block.
-        isLocale(item.title, ["image"])
-          ? { ...item, onItemClick: () => openImageSuggestionMenu(editor) }
-          : item,
+      // The "Image" item is contributed by the images feature, which has its own way of inserting images.
+      getDefaultReactSlashMenuItems(editor).filter(
+        (item) => !isLocale(item.title, ["image"]),
       ),
 
       // Block macros
@@ -324,10 +320,6 @@ function querySuggestionsMenuItems({
 
   if (!blocksSupport.tables.basicTables) {
     items = items.filter((item) => !isLocale(item.title, ["table"]));
-  }
-
-  if (!blocksSupport.images.basicImages) {
-    items = items.filter((item) => !isLocale(item.title, ["image"]));
   }
 
   if (!blocksSupport.dividers) {

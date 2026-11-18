@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageFilePanel } from "./ImageFilePanel";
-import { getEditedImage, updateImage, useImageEditing } from "./imageEditor";
+import { useImageEditing } from "./imageEditing";
 import { EditorInstanceContext } from "../../contexts";
+import { getEditedImage, updateImage } from "../../services/imageEditor";
 import { useComponentsContext, usePortalElement } from "@blocknote/react";
 import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";

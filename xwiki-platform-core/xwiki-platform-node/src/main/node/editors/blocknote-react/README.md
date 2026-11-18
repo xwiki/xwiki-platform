@@ -41,8 +41,8 @@ it, and the existing ones are checked against it.
    UI).
 5. **A feature's code lives in its own folder.** `src/features/<id>/` holds what only that feature uses (its BlockNote
    extensions, components, menu items) and exports the feature. What several features use (e.g. the `FileUploader`,
-   the metadata store, the editor services) lives outside `src/features/`. A feature folder never imports from another
-   feature folder.
+   the metadata store, the editor services in `src/services/`) lives outside `src/features/`. A feature folder never
+   imports from another feature folder.
 6. **The data that the BlockNote schema can't hold** (e.g. resource references, generated link labels, macro output)
    goes through the metadata store of the editor instance and the `*MetadataHandler` services (`beforeEdit`,
    `beforeUpdate`, `afterUpdate`). Features don't write integration-specific metadata themselves.
@@ -84,7 +84,7 @@ it, and the existing ones are checked against it.
 
 | Code | Deviation | Principles |
 |---|---|---|
-| Links, images, macros | wired directly by the editor, which also checks the syntax features, instead of being `EditorFeature`s, their code spread over `src/components`, `src/blocknote` and `src/misc` | 1, 2, 5 |
-| Code block spec | part of the static schema of the editor, which imports it from `src/features/codeBlocks` (the typed API derives from the schema), so its Ctrl+Alt+C shortcut (registered by BlockNote) works even when the syntax can't save code blocks | 1 |
+| Links, macros | wired directly by the editor, which also checks the syntax features, instead of being `EditorFeature`s, their code spread over `src/components`, `src/blocknote` and `src/misc` | 1, 2, 5 |
+| Image and code block specs | part of the static schema of the editor, which imports them from `src/features/images` and `src/features/codeBlocks` (the typed API derives from the schema), so the Ctrl+Alt+C shortcut of the code blocks (registered by BlockNote) works even when the syntax can't save code blocks | 1 |
 | `lang` option | changes a module-global translation instance | 10, 11 |
 | Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 6, 11 |

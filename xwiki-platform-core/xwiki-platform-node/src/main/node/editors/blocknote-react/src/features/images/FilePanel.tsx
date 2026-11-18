@@ -17,15 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ImageFilePanel } from "../images/ImageFilePanel";
-import type { EditorType } from "../../blocknote";
+import { ImageFilePanel } from "./ImageFilePanel";
+import { useEditor } from "../../hooks";
 
 export type FilePanelProps = {
-  editor: EditorType;
   blockId: string;
 };
 
-export const FilePanel: React.FC<FilePanelProps> = ({ blockId, editor }) => {
+export const FilePanel: React.FC<FilePanelProps> = ({ blockId }) => {
+  const editor = useEditor();
   const block = editor.getBlock(blockId);
 
   if (!block) {

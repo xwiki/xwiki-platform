@@ -74,6 +74,13 @@ type MacroFeatureOptions = {
  */
 interface EditorFeatures {
   /**
+   * The images are enabled when this is missing. `false` disables the actions to insert and edit images (the slash
+   * menu item, the image suggestions, the image toolbar), even when an `ImageEditor` is bound. The images already in
+   * the content are still displayed.
+   */
+  images?: false;
+
+  /**
    * The macros are enabled when this is missing. `false` disables them: no client-rendered macros, and no action to
    * insert or edit a macro, even when a `MacroEditor` is bound.
    */

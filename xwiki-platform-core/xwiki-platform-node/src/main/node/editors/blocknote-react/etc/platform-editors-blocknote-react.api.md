@@ -115,6 +115,7 @@ export const editorFeatureName = "EditorFeature";
 
 // @beta
 export interface EditorFeatures {
+    images?: false;
     macros?: MacroFeatureOptions | false;
 }
 
@@ -241,6 +242,9 @@ export interface ImageMetadataHandler {
 
 // @beta
 export const imageMetadataHandlerName = "ImageMetadataHandler";
+
+// @beta
+export const imagesFeature: EditorFeature;
 
 // @beta
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;

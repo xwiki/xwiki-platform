@@ -63,6 +63,10 @@ class OfficeAttachmentImporterTest
     private static final AttachmentReference ATTACHMENT_REFERENCE =
         new AttachmentReference("my.doc", new DocumentReference("wiki", "Some", "Page"));
 
+    private static final String ANNOTATED_XHTML = "annotatedxhtml/1.0";
+
+    private static final String BLOCKNOTE = "blocknote/1.0";
+
     @InjectMockComponents
     private OfficeAttachmentImporter officeAttachmentImporter;
 
@@ -105,10 +109,21 @@ class OfficeAttachmentImporterTest
     {
         XDOM xdom = mock(XDOM.class);
         when(officeMacroImporter.buildXDOM(ATTACHMENT_REFERENCE, false)).thenReturn(xdom);
-        when(officeMacroImporter.render(xdom)).thenReturn("foo");
+        when(officeMacroImporter.render(xdom, ANNOTATED_XHTML)).thenReturn("foo");
 
         Map<String, Object> parameters = Map.of("useOfficeViewer", "true");
         assertEquals("foo", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    @Test
+    void toHTMLWithOfficeViewerAndOutputSyntax() throws Exception
+    {
+        XDOM xdom = mock(XDOM.class);
+        when(officeMacroImporter.buildXDOM(ATTACHMENT_REFERENCE, false)).thenReturn(xdom);
+        when(officeMacroImporter.render(xdom, BLOCKNOTE)).thenReturn("[]");
+
+        Map<String, Object> parameters = Map.of("useOfficeViewer", "true", "outputSyntax", BLOCKNOTE);
+        assertEquals("[]", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
     }
 
     @Test
@@ -145,20 +160,31 @@ class OfficeAttachmentImporterTest
     @Test
     void toHTML() throws Exception
     {
-        when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
-        when(this.documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn("1.3");
-        when(this.officeServer.getState()).thenReturn(ServerState.CONNECTED);
-
-        InputStream attachmentContent = mock(InputStream.class);
-        when(this.documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
-
-        XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
-        when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
-            .thenReturn(xdomOfficeDocument);
-        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
-        when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
+        XDOMOfficeDocument xdomOfficeDocument = mockConvertibleAttachment();
+        when(xdomOfficeDocument.getContentAsString(ANNOTATED_XHTML)).thenReturn("test");
 
         Map<String, Object> parameters = Map.of("filterStyles", "true");
+        assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    @Test
+    void toHTMLWithOutputSyntax() throws Exception
+    {
+        XDOMOfficeDocument xdomOfficeDocument = mockConvertibleAttachment();
+        when(xdomOfficeDocument.getContentAsString(BLOCKNOTE)).thenReturn("[]");
+
+        Map<String, Object> parameters = Map.of("filterStyles", "true", "outputSyntax", BLOCKNOTE);
+        assertEquals("[]", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    @Test
+    void toHTMLWithBlankOutputSyntax() throws Exception
+    {
+        XDOMOfficeDocument xdomOfficeDocument = mockConvertibleAttachment();
+        when(xdomOfficeDocument.getContentAsString(ANNOTATED_XHTML)).thenReturn("test");
+
+        // This is what a caller passes when it builds the parameters from an unset request parameter.
+        Map<String, Object> parameters = Map.of("filterStyles", "true", "outputSyntax", " ");
         assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
     }
 
@@ -180,9 +206,25 @@ class OfficeAttachmentImporterTest
         when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
             .thenReturn(xdomOfficeDocument);
         when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
-        when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
+        when(xdomOfficeDocument.getContentAsString(ANNOTATED_XHTML)).thenReturn("test");
 
         Map<String, Object> parameters = Map.of("filterStyles", "true");
         assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    private XDOMOfficeDocument mockConvertibleAttachment() throws Exception
+    {
+        when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
+        when(this.documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn("1.3");
+        when(this.officeServer.getState()).thenReturn(ServerState.CONNECTED);
+
+        InputStream attachmentContent = mock(InputStream.class);
+        when(this.documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
+
+        XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
+        when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
+            .thenReturn(xdomOfficeDocument);
+        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
+        return xdomOfficeDocument;
     }
 }

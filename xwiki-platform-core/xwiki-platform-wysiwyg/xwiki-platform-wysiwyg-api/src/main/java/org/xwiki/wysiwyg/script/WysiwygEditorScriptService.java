@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.script;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,6 +50,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
@@ -537,13 +539,15 @@ public class WysiwygEditorScriptService implements ScriptService
     }
 
     /**
-     * Builds the annotated XHTML needed to import the specified office attachment in the WYSIWYG editor.
+     * Builds the content needed to import the specified office attachment in the WYSIWYG editor.
      *
      * @param attachmentReference the office attachment to import
      * @param parameters the import parameters; {@code filterStyles} controls whether styles are filtered when
      *     importing office text documents; {@code useOfficeViewer} controls whether the office viewer macro is used
-     *     instead of converting the content of the office file to wiki syntax
-     * @return the annotated XHTML needed to import the specified attachment into the content of the WYSIWYG editor
+     *     instead of converting the content of the office file to wiki syntax; {@code outputSyntax} (since
+     *     19.0.0RC1) is the identifier of the syntax the office content is converted to, annotated XHTML by default
+     * @return the content needed to import the specified attachment into the content of the WYSIWYG editor, in the
+     *     requested output syntax
      */
     public String importOfficeAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
     {
@@ -554,6 +558,27 @@ public class WysiwygEditorScriptService implements ScriptService
                 this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
+    }
+
+    /**
+     * Builds the content needed to import the specified office attachment in the WYSIWYG editor, in the specified
+     * syntax. It lets editors that do not edit annotated XHTML, such as BlockNote, import office files.
+     *
+     * @param attachmentReference the office attachment to import
+     * @param parameters the import parameters, see {@link #importOfficeAttachment(AttachmentReference, Map)}
+     * @param outputSyntax the identifier of the syntax the office content is converted to, for example
+     *     {@code blocknote/1.0}. Annotated XHTML is used when blank
+     * @return the content needed to import the specified attachment into the content of the WYSIWYG editor, in the
+     *     specified syntax
+     * @since 19.0.0RC1
+     */
+    @Unstable
+    public String importOfficeAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters,
+        String outputSyntax)
+    {
+        Map<String, Object> parametersWithOutputSyntax = new HashMap<>(parameters);
+        parametersWithOutputSyntax.put("outputSyntax", outputSyntax);
+        return importOfficeAttachment(attachmentReference, parametersWithOutputSyntax);
     }
 
     private Syntax getSyntax(String syntaxId)

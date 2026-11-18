@@ -28,11 +28,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.AdditionalAnswers;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
@@ -40,12 +43,18 @@ import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.OfficeDocument;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,6 +85,10 @@ class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
     @Named("openoffice")
     private HtmlCleaner htmlCleaner;
 
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
+
     /**
      * The {@link XDOMOfficeDocumentBuilder} component.
      */
@@ -85,6 +98,7 @@ class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
     void setUp() throws Exception
     {
         this.xdomOfficeDocumentBuilder = this.componentManager.getInstance(XDOMOfficeDocumentBuilder.class);
+        when(this.contextComponentManagerProvider.get()).thenReturn(this.componentManager);
     }
 
     /**
@@ -92,6 +106,47 @@ class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
      */
     @Test
     void xdomOfficeDocumentBuilding() throws Exception
+    {
+        XDOMOfficeDocument document = buildOfficeDocument();
+
+        assertEquals("xwiki:Main.Test", document.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
+        assertEquals("**Hello There**", document.getContentAsString());
+        assertEquals(0, document.getArtifactsMap().size());
+
+        verify(this.mockOfficeServer).getConverter();
+    }
+
+    /**
+     * The built document must look its renderers up in the context component manager. The root one only sees the
+     * syntaxes of core extensions, so it cannot convert an office file to a syntax that an installed extension
+     * provides, such as blocknote/1.0. See XWIKI-25463.
+     */
+    @Test
+    void xdomOfficeDocumentRendersWithTheContextComponentManager() throws Exception
+    {
+        // Behaves like the real component manager, except that it alone knows the renderer registered below. The
+        // document finds that renderer only if the builder passed it the context component manager.
+        ComponentManager contextComponentManager =
+            mock(ComponentManager.class, AdditionalAnswers.delegatesTo(this.componentManager));
+        BlockRenderer renderer = mock(BlockRenderer.class);
+        doAnswer(invocation -> {
+            invocation.<WikiPrinter>getArgument(1).print("rendered by the context component manager");
+            return null;
+        }).when(renderer).render(any(Block.class), any(WikiPrinter.class));
+        doReturn(renderer).when(contextComponentManager).getInstance(BlockRenderer.class, "test/1.0");
+        when(this.contextComponentManagerProvider.get()).thenReturn(contextComponentManager);
+
+        XDOMOfficeDocument document = buildOfficeDocument();
+
+        assertEquals("rendered by the context component manager", document.getContentAsString("test/1.0"));
+    }
+
+    /**
+     * Builds an office document from a stubbed converter, by-passing the office server.
+     *
+     * @return the built document
+     */
+    private XDOMOfficeDocument buildOfficeDocument() throws Exception
     {
         // Create & register a mock document converter to by-pass the office server.
         final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
@@ -119,12 +174,6 @@ class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
         when(this.mockDefaultStringEntityReferenceSerializer.serialize(documentReference)).thenReturn(
             "xwiki:Main.Test");
 
-        XDOMOfficeDocument document =
-            this.xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
-        assertEquals("xwiki:Main.Test", document.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
-        assertEquals("**Hello There**", document.getContentAsString());
-        assertEquals(0, document.getArtifactsMap().size());
-
-        verify(this.mockOfficeServer).getConverter();
+        return this.xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
     }
 }

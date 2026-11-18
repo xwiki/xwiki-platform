@@ -19,22 +19,40 @@
  */
 package org.xwiki.wysiwyg.internal.importer;
 
+import java.util.List;
+
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,6 +70,23 @@ class OfficeMacroImporterTest
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
+    @MockComponent
+    @Named("macro")
+    private Transformation macroTransformation;
+
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
+
+    private MutableRenderingContext renderingContext;
+
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        this.renderingContext = mock(MutableRenderingContext.class);
+        componentManager.registerComponent(RenderingContext.class, this.renderingContext);
+    }
+
     @Test
     void buildXDOM() throws Exception
     {
@@ -67,5 +102,27 @@ class OfficeMacroImporterTest
 
         // Verify we have the proper METADATA set
         assertEquals("xwiki/2.1", ((Syntax) xdom.getMetaData().getMetaData(MetaData.SYNTAX)).toIdString());
+    }
+
+    @Test
+    void renderWithOutputSyntax() throws Exception
+    {
+        ComponentManager contextComponentManager = mock(ComponentManager.class);
+        when(this.contextComponentManagerProvider.get()).thenReturn(contextComponentManager);
+        BlockRenderer blockNoteRenderer = mock(BlockRenderer.class);
+        when(contextComponentManager.getInstance(BlockRenderer.class, "blocknote/1.0"))
+            .thenReturn(blockNoteRenderer);
+        doAnswer(invocation -> {
+            invocation.<WikiPrinter>getArgument(1).print("[]");
+            return null;
+        }).when(blockNoteRenderer).render(any(XDOM.class), any(WikiPrinter.class));
+
+        XDOM xdom = new XDOM(List.of());
+
+        assertEquals("[]", this.officeMacroImporter.render(xdom, "blocknote/1.0"));
+
+        // The office macro must run before the renderer sees the XDOM, otherwise its output is missing.
+        verify(this.renderingContext).transformInContext(eq(this.macroTransformation),
+            any(TransformationContext.class), eq(xdom));
     }
 }

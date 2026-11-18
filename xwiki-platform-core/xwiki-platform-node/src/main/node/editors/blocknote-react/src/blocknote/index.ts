@@ -21,12 +21,7 @@
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
 import { XWikiRawBlock } from "./raw";
-import {
-  SubscriptStyle,
-  SuperscriptStyle,
-  VerbatimStyle,
-  XWikiParametersStyle,
-} from "./styles";
+import { VerbatimStyle, XWikiParametersStyle } from "./styles";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -58,7 +53,7 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
  *
  * Contains all the blocks usable inside the editor
  *
- * @param contributed - the block and inline content types added by the editing features, whose types are erased; they
+ * @param contributed - the block types, inline content types and text styles added by the editing features, whose types are erased; they
  *   replace the types of the same name (e.g. BlockNote's code block), whose types the typed API keeps
  * @returns The created schema
  */
@@ -88,10 +83,11 @@ function createBlockNoteSchema(contributed?: SchemaContribution) {
 
     styleSpecs: {
       ...defaultStyleSpecs,
-      subscript: SubscriptStyle,
-      superscript: SuperscriptStyle,
       xwikiVerbatim: VerbatimStyle,
       xwikiParameters: XWikiParametersStyle,
+
+      // The text styles added by the editing features, whose types are erased under an index signature.
+      ...Object.fromEntries(Object.entries(contributed?.styleSpecs ?? {})),
     },
   });
 

@@ -175,6 +175,25 @@ test("The links feature can be disabled", async ({ mount, page }) => {
   await expect(menuItems.filter({ hasText: /^Link$/ })).toHaveCount(0);
 });
 
+test("The formatting toolbar offers only the text styles that the syntax supports", async ({
+  mount,
+  page,
+}) => {
+  const syntax = structuredClone(FULL_SYNTAX);
+  syntax.features.inlineContents.textStyles.superscript = false;
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["Yeah"])}
+      options={{ syntax }}
+    />,
+  );
+
+  // Trigger the formatting toolbar.
+  await component.locator("p.bn-inline-content").dblclick();
+  await page.locator('button[data-test="subscript"]').waitFor();
+  await expect(page.locator('button[data-test="superscript"]')).toHaveCount(0);
+});
+
 test("Macros can be inserted with the macro editor", async ({
   mount,
   page,

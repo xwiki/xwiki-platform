@@ -116,6 +116,8 @@ export { linksFeature } from "./features/links/links";
 
 export { macrosFeature } from "./features/macros/macros";
 
+export { textStylesFeature } from "./features/textStyles/textStyles";
+
 export { editorFeatureName } from "./features/editorFeature";
 
 export type {

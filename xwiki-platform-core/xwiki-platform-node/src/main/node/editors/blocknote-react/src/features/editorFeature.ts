@@ -30,6 +30,7 @@ import type {
   CustomInlineContentConfig,
   ExtensionFactoryInstance,
   InlineContentSpec,
+  StyleSpecs,
 } from "@blocknote/core";
 import type {
   BlockTypeSelectItem,
@@ -126,6 +127,11 @@ type SchemaContribution = {
     string,
     InlineContentSpec<CustomInlineContentConfig>
   >;
+
+  /**
+   * The specifications of the text styles to add, keyed by style.
+   */
+  styleSpecs?: StyleSpecs;
 };
 
 /**
@@ -273,6 +279,40 @@ function keepFirstReplacements(items: SlashMenuItem[]): SlashMenuItem[] {
 }
 
 /**
+ * Merges the types that the editing features add to the schema.
+ *
+ * @param contributions - the contributions of the editing features
+ * @returns the merged types
+ */
+function mergeSchemas(
+  contributions: FeatureContribution[],
+): Required<SchemaContribution> {
+  const schema: Required<SchemaContribution> = {
+    blockSpecs: {},
+    inlineContentSpecs: {},
+    styleSpecs: {},
+  };
+  for (const contribution of contributions) {
+    mergeRecord(
+      schema.blockSpecs,
+      contribution.schema?.blockSpecs,
+      "block type",
+    );
+    mergeRecord(
+      schema.inlineContentSpecs,
+      contribution.schema?.inlineContentSpecs,
+      "inline content type",
+    );
+    mergeRecord(
+      schema.styleSpecs,
+      contribution.schema?.styleSpecs,
+      "text style",
+    );
+  }
+  return schema;
+}
+
+/**
  * Merges the contributions of the editing features.
  *
  * @param contributions - the contributions of the editing features
@@ -281,18 +321,9 @@ function keepFirstReplacements(items: SlashMenuItem[]): SlashMenuItem[] {
 function mergeContributions(
   contributions: FeatureContribution[],
 ): MergedContributions {
-  const blockSpecs: BlockSpecs = {};
-  const inlineContentSpecs: Required<SchemaContribution>["inlineContentSpecs"] =
-    {};
   const blockNoteOptions: Record<string, unknown> = {};
   const blockToolbars: Record<string, (block: BlockType) => ReactNode> = {};
   for (const contribution of contributions) {
-    mergeRecord(blockSpecs, contribution.schema?.blockSpecs, "block type");
-    mergeRecord(
-      inlineContentSpecs,
-      contribution.schema?.inlineContentSpecs,
-      "inline content type",
-    );
     mergeRecord(
       blockNoteOptions,
       contribution.blockNoteOptions,
@@ -305,7 +336,7 @@ function mergeContributions(
     );
   }
   return {
-    schema: { blockSpecs, inlineContentSpecs },
+    schema: mergeSchemas(contributions),
     blockNoteExtensions: contributions.flatMap(
       (contribution) => contribution.blockNoteExtensions ?? [],
     ),

@@ -38,6 +38,7 @@ import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
+import { StyleSpecs } from '@blocknote/core';
 import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 
 // @beta
@@ -116,6 +117,7 @@ export interface EditorFeatures {
     images?: false;
     links?: object | false;
     macros?: MacroFeatureOptions | false;
+    textStyles?: false;
 }
 
 // @beta
@@ -351,6 +353,7 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 export type SchemaContribution = {
     blockSpecs?: BlockSpecs;
     inlineContentSpecs?: Record<string, InlineContentSpec<CustomInlineContentConfig>>;
+    styleSpecs?: StyleSpecs;
 };
 
 // @beta
@@ -360,6 +363,9 @@ export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: s
 export type SlashMenuItem = DefaultReactSuggestionItem & {
     key?: string;
 };
+
+// @beta
+export const textStylesFeature: EditorFeature;
 
 // @beta
 export type UploadedFile = {

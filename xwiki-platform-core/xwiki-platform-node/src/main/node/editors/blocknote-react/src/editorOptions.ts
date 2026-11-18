@@ -110,6 +110,12 @@ interface EditorFeatures {
    * bound.
    */
   macros?: MacroFeatureOptions | false;
+
+  /**
+   * The subscript and superscript text styles are enabled when this is missing (and the syntax supports them). `false`
+   * removes them from the editor, with their toolbar buttons: content using them can't be edited.
+   */
+  textStyles?: false;
 }
 
 /**

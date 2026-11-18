@@ -233,7 +233,11 @@ describe("contributeFeatures", () => {
   test("merges nothing when the features contribute nothing", () => {
     const merged = contributeFeatures(context([feature("nothing")]));
 
-    expect(merged.schema).toEqual({ blockSpecs: {}, inlineContentSpecs: {} });
+    expect(merged.schema).toEqual({
+      blockSpecs: {},
+      inlineContentSpecs: {},
+      styleSpecs: {},
+    });
     expect(merged.blockNoteExtensions).toEqual([]);
     expect(merged.blockNoteOptions).toEqual({});
     expect(merged.slashMenuItems()).toEqual([]);

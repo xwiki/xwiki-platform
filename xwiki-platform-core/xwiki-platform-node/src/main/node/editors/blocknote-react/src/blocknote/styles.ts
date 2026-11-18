@@ -22,42 +22,6 @@ import { applyXWikiParameters } from "./parameters";
 import { createStyleSpec } from "@blocknote/core";
 
 /**
- * BlockNote style spec for subscript text.
- * Renders as a `<sub>` HTML element.
- *
- * @since 18.6.0RC1
- * @beta
- */
-const SubscriptStyle = createStyleSpec(
-  { type: "subscript", propSchema: "boolean" },
-  {
-    render: () => {
-      const sub = document.createElement("sub");
-      return { dom: sub, contentDOM: sub };
-    },
-    parse: (element) => (element.tagName === "SUB" ? true : undefined),
-  },
-);
-
-/**
- * BlockNote style spec for superscript text.
- * Renders as a `<sup>` HTML element.
- *
- * @since 18.6.0RC1
- * @beta
- */
-const SuperscriptStyle = createStyleSpec(
-  { type: "superscript", propSchema: "boolean" },
-  {
-    render: () => {
-      const sup = document.createElement("sup");
-      return { dom: sup, contentDOM: sup };
-    },
-    parse: (element) => (element.tagName === "SUP" ? true : undefined),
-  },
-);
-
-/**
  * BlockNote style spec for verbatim (no-wiki-syntax) inline text.
  * Renders as a `<span>` with the CSS class `xwiki-verbatim`.
  *
@@ -100,9 +64,4 @@ const XWikiParametersStyle = createStyleSpec(
   },
 );
 
-export {
-  SubscriptStyle,
-  SuperscriptStyle,
-  VerbatimStyle,
-  XWikiParametersStyle,
-};
+export { VerbatimStyle, XWikiParametersStyle };

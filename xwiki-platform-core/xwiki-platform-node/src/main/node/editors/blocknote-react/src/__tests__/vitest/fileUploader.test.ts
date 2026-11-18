@@ -20,9 +20,9 @@
 // @vitest-environment jsdom
 
 import {
+  canUploadFiles,
   fileUploadListenerName,
   fileUploaderName,
-  getFileUploader,
   uploadFile,
 } from "../../files/fileUploader";
 import {
@@ -195,27 +195,32 @@ function selectFile(): File {
   return file;
 }
 
-describe("getFileUploader", () => {
-  test("returns the bound file uploader", () => {
+describe("canUploadFiles", () => {
+  test("is true when a file uploader is bound, which is the one used", async () => {
     const fileUploader = mock<FileUploader>();
-    const { instance } = buildInstance({ fileUploader });
+    fileUploader.upload.mockResolvedValue({ url: UPLOADED_URL, name: "a.png" });
+    const { instance, attachmentsService } = buildInstance({ fileUploader });
+    const file = buildFile();
 
-    expect(getFileUploader(instance)).toBe(fileUploader);
+    expect(canUploadFiles(instance)).toBe(true);
+    await uploadFile(instance, file);
+    expect(fileUploader.upload).toHaveBeenCalledWith(instance, file);
+    expect(attachmentsService.upload).not.toHaveBeenCalled();
   });
 
-  test("returns nothing when uploading is disabled, even when a file uploader is bound", () => {
+  test("is false when uploading is disabled, even when a file uploader is bound", () => {
     const { instance } = buildInstance({
       upload: false,
       fileUploader: mock<FileUploader>(),
     });
 
-    expect(getFileUploader(instance)).toBeUndefined();
+    expect(canUploadFiles(instance)).toBe(false);
   });
 
-  test("returns nothing when there's nothing to store the files with", () => {
+  test("is false when there's nothing to store the files with", () => {
     const { instance } = buildInstance({ attachmentsService: false });
 
-    expect(getFileUploader(instance)).toBeUndefined();
+    expect(canUploadFiles(instance)).toBe(false);
   });
 });
 
@@ -227,9 +232,7 @@ describe("the default file uploader", () => {
     const file = buildFile();
 
     // The name is the one of the attachment, rather than the one of the uploaded file.
-    await expect(
-      getFileUploader(instance)!.upload(instance, file),
-    ).resolves.toEqual({
+    await expect(uploadFile(instance, file)).resolves.toEqual({
       url: UPLOADED_URL,
       name: "uploaded.png",
       reference: "Edited.Page@uploaded.png",
@@ -241,9 +244,9 @@ describe("the default file uploader", () => {
     const { instance, attachmentsService } = buildInstance();
     const file = buildFile();
 
-    await expect(
-      getFileUploader(instance)!.upload(instance, file),
-    ).resolves.toMatchObject({ reference: "Current.Page@uploaded.png" });
+    await expect(uploadFile(instance, file)).resolves.toMatchObject({
+      reference: "Current.Page@uploaded.png",
+    });
     expect(attachmentsService.upload).toHaveBeenCalledWith(CURRENT_PAGE, [
       file,
     ]);
@@ -252,9 +255,7 @@ describe("the default file uploader", () => {
   test("returns no reference when the attachment reference can't be serialized", async () => {
     const { instance } = buildInstance({ serializeReferences: false });
 
-    await expect(
-      getFileUploader(instance)!.upload(instance, buildFile()),
-    ).resolves.toEqual({
+    await expect(uploadFile(instance, buildFile())).resolves.toEqual({
       url: UPLOADED_URL,
       name: "uploaded.png",
       reference: undefined,
@@ -264,9 +265,9 @@ describe("the default file uploader", () => {
   test("rejects when the upload fails", async () => {
     const { instance } = buildInstance({ failUpload: true });
 
-    await expect(
-      getFileUploader(instance)!.upload(instance, buildFile()),
-    ).rejects.toThrow("Upload failed");
+    await expect(uploadFile(instance, buildFile())).rejects.toThrow(
+      "Upload failed",
+    );
   });
 });
 

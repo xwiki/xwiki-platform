@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { getFileUploader, uploadFile } from "./fileUploader";
+import { canUploadFiles, uploadFile } from "./fileUploader";
 import { suggestedLinkData } from "../components/links/suggestedLink";
 import { pickFile } from "../misc/filePicker";
 import { toResourceReference } from "../misc/resourceReference";
@@ -88,7 +88,7 @@ async function pickAndUploadFile(
   accept: string | undefined,
   failureMessage: string,
 ): Promise<UploadedFile | undefined> {
-  const file = getFileUploader(instance) && (await pickFile(accept));
+  const file = canUploadFiles(instance) && (await pickFile(accept));
   if (!file) {
     return undefined;
   }

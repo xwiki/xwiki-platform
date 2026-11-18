@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { moveCaretTo } from "./caret";
-import { getFileUploader, uploadFile } from "./fileUploader";
+import { canUploadFiles, uploadFile } from "./fileUploader";
 import { withUniqueName } from "./uniqueFileName";
 import { uploadedFileLink, uploadedImage } from "./uploadedFile";
 import { updateImage } from "../components/images/imageEditor";
@@ -281,7 +281,7 @@ function updateBlock(
  * @returns what the feature contributes to the editor instance
  */
 function contributeFileTransfer(context: FeatureContext): FeatureContribution {
-  if (!getFileUploader(context)) {
+  if (!canUploadFiles(context)) {
     return {};
   }
   const { getInstance } = context;

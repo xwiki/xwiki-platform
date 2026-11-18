@@ -156,13 +156,12 @@ const defaultFileUploader: FileUploader = {
 
 /**
  * Looks up the file uploader of an editor instance: the one bound in its service container, or a default one attaching
- * the files with the `AttachmentsService`.
+ * the files with the `AttachmentsService`. Private, so that the files are always uploaded with {@link uploadFile},
+ * which tells the {@link FileUploadListener}s.
  *
  * @param instance - the editor instance, or what is known about it before its editor is created
  * @returns the file uploader of the given editor instance, or undefined when the user can't upload files: uploading is
  *   disabled by the `upload` option, or there's nothing to store the files with
- * @since 18.10.0RC1
- * @beta
  */
 function getFileUploader(
   instance: Pick<EditorInstance, "options" | "serviceContainer">,
@@ -176,6 +175,20 @@ function getFileUploader(
     return defaultFileUploader;
   }
   return undefined;
+}
+
+/**
+ * Tells whether the user can upload files in an editor instance, e.g. to offer the upload actions only when they can.
+ *
+ * @param instance - the editor instance, or what is known about it before its editor is created
+ * @returns false when uploading is disabled by the `upload` option, or when there's nothing to store the files with
+ * @since 18.10.0RC1
+ * @beta
+ */
+function canUploadFiles(
+  instance: Pick<EditorInstance, "options" | "serviceContainer">,
+): boolean {
+  return getFileUploader(instance) !== undefined;
 }
 
 /**
@@ -240,10 +253,5 @@ async function uploadFile(
   return uploadedFile;
 }
 
-export {
-  fileUploadListenerName,
-  fileUploaderName,
-  getFileUploader,
-  uploadFile,
-};
+export { canUploadFiles, fileUploadListenerName, fileUploaderName, uploadFile };
 export type { FileUploadListener, FileUploader, UploadedFile };

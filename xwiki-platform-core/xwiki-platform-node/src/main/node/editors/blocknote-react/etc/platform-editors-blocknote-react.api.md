@@ -74,6 +74,9 @@ export type BlockType = Block<EditorBlockSchema, EditorInlineContentSchema, Edit
 export function buildMacroRawContent(content: string): InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>;
 
 // @beta
+export function canUploadFiles(instance: Pick<EditorInstance, "options" | "serviceContainer">): boolean;
+
+// @beta
 export function createBlockMetadataStore(): BlockMetadataStore;
 
 // @beta
@@ -162,9 +165,6 @@ export interface FileUploadListener {
 
 // @beta
 export const fileUploadListenerName = "FileUploadListener";
-
-// @beta
-export function getFileUploader(instance: Pick<EditorInstance, "options" | "serviceContainer">): FileUploader | undefined;
 
 // @beta
 export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;

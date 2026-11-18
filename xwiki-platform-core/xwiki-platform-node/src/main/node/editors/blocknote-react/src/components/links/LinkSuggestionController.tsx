@@ -21,7 +21,7 @@ import { insertLink, useLinkEditing } from "./linkEditor";
 import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
 import { suggestedLinkData } from "./suggestedLink";
 import { EditorInstanceContext } from "../../contexts";
-import { getFileUploader } from "../../files/fileUploader";
+import { canUploadFiles } from "../../files/fileUploader";
 import { pickAndUploadFile, uploadedFileLink } from "../../files/uploadedFile";
 import { SuggestionMenuController } from "@blocknote/react";
 import {
@@ -186,7 +186,7 @@ function useLinkInsertion() {
 
   const uploadFile = useMemo(
     () =>
-      getFileUploader(instance) &&
+      canUploadFiles(instance) &&
       (async () => {
         const uploadedFile = await pickAndUploadFile(
           instance,

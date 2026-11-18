@@ -88,9 +88,9 @@ export type {
 } from "./editorOptions";
 
 export {
+  canUploadFiles,
   fileUploadListenerName,
   fileUploaderName,
-  getFileUploader,
   uploadFile,
 } from "./files/fileUploader";
 

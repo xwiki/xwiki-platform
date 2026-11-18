@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import {
-  getFileUploader,
+  canUploadFiles,
   imageEditorName,
   uploadFile,
 } from "@xwiki/platform-editors-blocknote-react";
@@ -274,7 +274,7 @@ export class DefaultImageEditor implements ImageEditor {
     callback: UploadCallback,
     documentReference: XWikiEntityReference,
   ): Promise<void> {
-    if (!getFileUploader(instance)) {
+    if (!canUploadFiles(instance)) {
       // The user can't upload files.
       callback.onAbort();
       return;

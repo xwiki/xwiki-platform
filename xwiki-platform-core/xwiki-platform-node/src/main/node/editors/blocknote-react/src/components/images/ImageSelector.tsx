@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { EditorInstanceContext } from "../../contexts";
-import { getFileUploader } from "../../files/fileUploader";
+import { canUploadFiles } from "../../files/fileUploader";
 import { pickAndUploadFile, uploadedImage } from "../../files/uploadedFile";
 import { SearchBox } from "../SearchBox";
 import {
@@ -143,7 +143,7 @@ export function ImageSelector({
   return (
     <Box>
       {/* Offered only when the user can upload files. */}
-      {getFileUploader(instance) && (
+      {canUploadFiles(instance) && (
         <>
           <Button variant="default" onClick={uploadImage}>
             {t("blocknote.imageSelector.uploadButton")}

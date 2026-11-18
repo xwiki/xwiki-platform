@@ -21,7 +21,7 @@ import { ImageSelector } from "./ImageSelector";
 import { insertImage, useImageEditing } from "./imageEditor";
 import { IMAGE_SUGGESTION_TRIGGER } from "./imageSuggestionMenu";
 import { EditorInstanceContext } from "../../contexts";
-import { getFileUploader } from "../../files/fileUploader";
+import { canUploadFiles } from "../../files/fileUploader";
 import { pickAndUploadFile, uploadedImage } from "../../files/uploadedFile";
 import { toResourceReference } from "../../misc/resourceReference";
 import { PositionPopover, SuggestionMenuController } from "@blocknote/react";
@@ -206,7 +206,7 @@ function useImageInsertion() {
 
   const uploadImage = useMemo(
     () =>
-      getFileUploader(instance) &&
+      canUploadFiles(instance) &&
       (async () => {
         const uploadedFile = await pickAndUploadFile(
           instance,

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { editorFeatureName } from "./features/editorFeature";
-import { fileTransferFeature } from "./files/fileTransfer";
+import { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
 import type { EditorFeature } from "./features/editorFeature";
 import type { Container } from "inversify";
 

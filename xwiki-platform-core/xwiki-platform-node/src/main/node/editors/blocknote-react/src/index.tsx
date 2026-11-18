@@ -102,7 +102,7 @@ export type {
 
 export { ComponentInit } from "./componentInit";
 
-export { fileTransferFeature } from "./files/fileTransfer";
+export { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
 
 export { editorFeatureName } from "./features/editorFeature";
 

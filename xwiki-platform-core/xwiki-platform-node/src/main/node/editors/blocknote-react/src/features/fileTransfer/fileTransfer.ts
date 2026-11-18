@@ -18,21 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { moveCaretTo } from "./caret";
-import { canUploadFiles, uploadFile } from "./fileUploader";
 import { withUniqueName } from "./uniqueFileName";
-import { uploadedFileLink, uploadedImage } from "./uploadedFile";
-import { updateImage } from "../components/images/imageEditor";
-import { getLinkMetadataHandler } from "../components/links/linkEditor";
+import { updateImage } from "../../components/images/imageEditor";
+import { getLinkMetadataHandler } from "../../components/links/linkEditor";
+import { canUploadFiles, uploadFile } from "../../files/fileUploader";
+import { uploadedFileLink, uploadedImage } from "../../files/uploadedFile";
 import { createExtension, createStore } from "@blocknote/core";
-import type { EditorPartialLink } from "../blocknote";
-import type { LinkEditionData } from "../components/links/linkEditor";
-import type { EditorInstance } from "../editorInstance";
+import type { EditorPartialLink } from "../../blocknote";
+import type { LinkEditionData } from "../../components/links/linkEditor";
+import type { EditorInstance } from "../../editorInstance";
+import type { UploadedFile } from "../../files/fileUploader";
 import type {
   EditorFeature,
   FeatureContext,
   FeatureContribution,
-} from "../features/editorFeature";
-import type { UploadedFile } from "./fileUploader";
+} from "../editorFeature";
 import type { ExtensionOptions } from "@blocknote/core";
 
 /**

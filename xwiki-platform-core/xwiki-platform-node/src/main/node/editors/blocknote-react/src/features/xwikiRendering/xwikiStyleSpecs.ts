@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { applyXWikiParameters } from "./parameters";
+import { applyXWikiParameters } from "../../blocknote/parameters";
 import { createStyleSpec } from "@blocknote/core";
 
 /**

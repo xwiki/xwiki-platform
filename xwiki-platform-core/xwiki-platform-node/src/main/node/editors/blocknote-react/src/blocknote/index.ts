@@ -18,10 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefinitionListItemBlock } from "./definitionList";
-import { XWikiGroupBlock } from "./group";
-import { XWikiRawBlock } from "./raw";
-import { VerbatimStyle, XWikiParametersStyle } from "./styles";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -61,9 +57,6 @@ function createBlockNoteSchema(contributed?: SchemaContribution) {
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
-      xwikiDefinitionListItem: DefinitionListItemBlock(),
-      xwikiGroup: XWikiGroupBlock(),
-      xwikiRaw: XWikiRawBlock(),
 
       // The block types added by the editing features, whose types are erased under an index signature. They replace
       // the types of the same name (e.g. BlockNote's code block and image), the typed API keeping the types of these.
@@ -83,8 +76,6 @@ function createBlockNoteSchema(contributed?: SchemaContribution) {
 
     styleSpecs: {
       ...defaultStyleSpecs,
-      xwikiVerbatim: VerbatimStyle,
-      xwikiParameters: XWikiParametersStyle,
 
       // The text styles added by the editing features, whose types are erased under an index signature.
       ...Object.fromEntries(Object.entries(contributed?.styleSpecs ?? {})),

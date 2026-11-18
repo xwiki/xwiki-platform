@@ -116,6 +116,13 @@ interface EditorFeatures {
    * removes them from the editor, with their toolbar buttons: content using them can't be edited.
    */
   textStyles?: false;
+
+  /**
+   * The block types and text styles produced by the XWiki rendering (definition list items, groups, raw content,
+   * verbatim text, XWiki parameters) are in the editor when this is missing and the integration binds the
+   * `xwikiRenderingFeature`. `false` removes them: content holding them can't be edited.
+   */
+  xwikiRendering?: false;
 }
 
 /**

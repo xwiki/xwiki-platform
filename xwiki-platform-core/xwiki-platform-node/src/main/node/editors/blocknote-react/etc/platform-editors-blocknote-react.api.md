@@ -118,6 +118,7 @@ export interface EditorFeatures {
     links?: object | false;
     macros?: MacroFeatureOptions | false;
     textStyles?: false;
+    xwikiRendering?: false;
 }
 
 // @beta
@@ -376,6 +377,9 @@ export type UploadedFile = {
 
 // @beta
 export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
+
+// @beta
+export const xwikiRenderingFeature: EditorFeature;
 
 // (No @packageDocumentation comment for this package)
 

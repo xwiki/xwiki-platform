@@ -117,6 +117,7 @@ export { linksFeature } from "./features/links/links";
 export { macrosFeature } from "./features/macros/macros";
 
 export { textStylesFeature } from "./features/textStyles/textStyles";
+export { xwikiRenderingFeature } from "./features/xwikiRendering/xwikiRendering";
 
 export { editorFeatureName } from "./features/editorFeature";
 

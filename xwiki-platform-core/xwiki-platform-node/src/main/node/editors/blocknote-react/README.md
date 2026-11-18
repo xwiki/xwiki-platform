@@ -24,8 +24,10 @@ it, and the existing ones are checked against it.
    under `editorFeatureName`, for all the editor instances or for one of them. The editor has no feature of its own:
    the generic ones are bound by the `ComponentInit` of this package, which the integrations call (an integration that
    doesn't gets an editor without them, silently). The generic features are also exported, so that an integration can
-   bind only some of them, in another order, or replace one of them with its own. The editor collects what the features contribute and applies it;
-   it doesn't name or special-case any feature.
+   bind only some of them, in another order, or replace one of them with its own. The features that only some
+   integrations need are exported without being bound (e.g. `xwikiRenderingFeature`, for the content converted by the
+   XWiki rendering, bound by the WebJar). The editor collects what the features contribute and applies it; it doesn't
+   name or special-case any feature.
    `features.<id>: false` disables a feature, and a feature contributes nothing when the syntax of the edited content
    can't save what it adds.
 2. **A feature contributes, it doesn't patch.** A feature can contribute block and inline content types to the schema

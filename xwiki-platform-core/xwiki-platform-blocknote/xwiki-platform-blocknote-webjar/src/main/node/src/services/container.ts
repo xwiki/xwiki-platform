@@ -36,7 +36,11 @@ import { ComponentInit as BackendXWikiComponentList } from "@xwiki/platform-back
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as DocumentXWikiComponentList } from "@xwiki/platform-document-xwiki";
-import { ComponentInit as BlockNoteReactComponentInit } from "@xwiki/platform-editors-blocknote-react";
+import {
+  ComponentInit as BlockNoteReactComponentInit,
+  editorFeatureName,
+  xwikiRenderingFeature,
+} from "@xwiki/platform-editors-blocknote-react";
 import { ComponentInit as LinkSuggestComponentList } from "@xwiki/platform-link-suggest-api";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as LinkTypeComponentInit } from "@xwiki/platform-link-type-api";
@@ -51,6 +55,7 @@ import { ComponentInit as ModelRemoteURLXWikiComponentList } from "@xwiki/platfo
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
+import type { EditorFeature } from "@xwiki/platform-editors-blocknote-react";
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -83,8 +88,12 @@ new LinkTypeComponentInit(container);
 new LinkTypeDefaultComponentInit(container);
 new LinkTypeUIComponentInit(container);
 
-// The generic editing features of the BlockNote editor.
+// The generic editing features of the BlockNote editor, then the block types and text styles of the content converted
+// by the XWiki rendering.
 new BlockNoteReactComponentInit(container);
+container
+  .bind<EditorFeature>(editorFeatureName)
+  .toConstantValue(xwikiRenderingFeature);
 
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);

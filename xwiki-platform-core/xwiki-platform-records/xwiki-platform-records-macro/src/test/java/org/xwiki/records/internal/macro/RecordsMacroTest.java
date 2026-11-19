@@ -56,6 +56,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.records.macro.RecordsLocation;
 import org.xwiki.records.macro.RecordsMacroParameters;
+import org.xwiki.records.macro.RecordsTemplateProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -349,6 +350,32 @@ class RecordsMacroTest
 
         assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=Clients.Archive",
             execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeCreatesEntriesFromTheTemplateProviderTheAuthorPicked() throws Exception
+    {
+        RecordsTemplateProvider templateProvider =
+            new RecordsTemplateProvider(new DocumentReference("xwiki", "Clients", "ProjectTemplateProvider"));
+        when(this.entityReferenceSerializer.serialize(templateProvider)).thenReturn("Clients.ProjectTemplateProvider");
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("uuid");
+        parameters.setTemplateProvider(templateProvider);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=Clients.Projects"
+            + "&newRowTemplateProvider=Clients.ProjectTemplateProvider", execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeIgnoresTheTemplateProviderWithoutACreationStrategy() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setTemplateProvider(
+            new RecordsTemplateProvider(new DocumentReference("xwiki", "Clients", "ProjectTemplateProvider")));
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true", execute(parameters).getSourceParameters());
     }
 
     @Test

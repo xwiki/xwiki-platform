@@ -130,6 +130,11 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     static final String NEW_ROW_LOCATION_PARAMETER = "newRowLocation";
 
     /**
+     * The source parameter naming the template provider new entries are created from.
+     */
+    static final String NEW_ROW_TEMPLATE_PROVIDER_PARAMETER = "newRowTemplateProvider";
+
+    /**
      * The identifier prefix of the page metadata properties, which the default column list leaves out.
      */
     private static final String METADATA_PREFIX = "doc.";
@@ -604,6 +609,10 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
                 sourceParameters.put(NAMING_STRATEGY_PARAMETER, strategy);
                 sourceParameters.put(NEW_ROW_LOCATION_PARAMETER,
                     this.entityReferenceSerializer.serialize(getNewEntriesLocation(parameters, context)));
+                if (parameters.getTemplateProvider() != null) {
+                    sourceParameters.put(NEW_ROW_TEMPLATE_PROVIDER_PARAMETER,
+                        this.entityReferenceSerializer.serialize(parameters.getTemplateProvider()));
+                }
             }
         }
 

@@ -53,6 +53,8 @@ public class RecordsMacroEditModal extends MacroDialogEditModal
 
     private static final String LOCATION_PARAMETER = "newEntriesLocation";
 
+    private static final String TEMPLATE_PROVIDER_PARAMETER = "templateProvider";
+
     /**
      * Creates a page object whose {@link #clickSubmit()} lets the editor that opened the modal wait for the result of
      * the submission, which only that editor knows (e.g. CKEditor refreshes its content to render the macro).
@@ -218,6 +220,19 @@ public class RecordsMacroEditModal extends MacroDialogEditModal
     public String getNewEntriesLocation()
     {
         return getMacroParameter(LOCATION_PARAMETER);
+    }
+
+    /**
+     * Picks the template the entries created from the table start from. The Editing tab must be the one shown.
+     *
+     * @param label the label of the choice, as the dropdown shows it
+     * @return the current page object
+     * @since 18.10.0RC1
+     */
+    public RecordsMacroEditModal setTemplateProvider(String label)
+    {
+        new Select(getMacroParameterInput(TEMPLATE_PROVIDER_PARAMETER)).selectByVisibleText(label);
+        return this;
     }
 
     /**

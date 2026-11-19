@@ -19,6 +19,7 @@
  */
 package org.xwiki.pagetemplate.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,8 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -36,6 +39,9 @@ import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.pagetemplate.TemplateProvider;
 import org.xwiki.pagetemplate.TemplateProviderException;
 import org.xwiki.pagetemplate.TemplateProviderManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -73,6 +79,12 @@ public class DefaultTemplateProviderManager implements TemplateProviderManager
 
     private static final String CURRENT = "current";
 
+    /**
+     * Leaves out the page new template providers are created from, which holds a template provider object too.
+     */
+    private static final String TEMPLATE_PROVIDERS_QUERY = "from doc.object(XWiki.TemplateProviderClass) as provider "
+        + "where doc.fullName <> 'XWiki.TemplateProviderTemplate' order by doc.fullName";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -83,6 +95,12 @@ public class DefaultTemplateProviderManager implements TemplateProviderManager
     @Inject
     @Named(CURRENT)
     private SpaceReferenceResolver<String> spaceReferenceResolver;
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public Optional<TemplateProvider> getTemplateProvider(DocumentReference reference)
@@ -118,6 +136,29 @@ public class DefaultTemplateProviderManager implements TemplateProviderManager
             object.getIntValue(CREATION_RESTRICTIONS_ARE_SUGGESTIONS, 0) == 1);
 
         return Optional.of(templateProvider);
+    }
+
+    @Override
+    public List<TemplateProvider> getTemplateProviders() throws TemplateProviderException
+    {
+        List<String> names;
+        try {
+            names = this.queryManager.createQuery(TEMPLATE_PROVIDERS_QUERY, Query.XWQL).execute();
+        } catch (QueryException e) {
+            throw new TemplateProviderException("Failed to find the template providers.", e);
+        }
+
+        List<TemplateProvider> templateProviders = new ArrayList<>();
+        for (String name : names) {
+            DocumentReference reference = this.documentReferenceResolver.resolve(name);
+            try {
+                getTemplateProvider(reference).ifPresent(templateProviders::add);
+            } catch (TemplateProviderException e) {
+                this.logger.warn("Failed to load the template provider [{}]. Root cause is [{}].", reference,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+        return templateProviders;
     }
 
     private String getString(BaseObject object, String property)

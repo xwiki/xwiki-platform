@@ -94,6 +94,13 @@
       <artifactId>xwiki-platform-livedata-livetable</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Lists the template providers in the template picker. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-pagetemplate-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- The Live Data component the script loaded by the Live Data renderer requires. -->
     <dependency>
       <groupId>${project.groupId}</groupId>

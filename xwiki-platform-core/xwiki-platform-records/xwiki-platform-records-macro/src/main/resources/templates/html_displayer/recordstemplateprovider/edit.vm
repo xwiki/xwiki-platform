@@ -1,0 +1,42 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the template provider picker of a Records table: a dropdown listing the template providers the current user
+## can view, after a choice for the template provider named after the object type and a choice for no template.
+#set ($translationPrefix = 'rendering.macro.records.parameter.templateProvider.')
+<select
+  #foreach ($parameter in $displayer.parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
+>
+  <option value="">$escapetool.xml($services.localization.render("${translationPrefix}default"))</option>
+  ## RecordsTemplateProvider#NONE, which the live table source reads as the absence of a template provider.
+  <option value="XWiki.NoTemplateProvider">$escapetool.xml($services.localization.render(
+    "${translationPrefix}none"))</option>
+  #foreach ($templateProvider in $services.templateProvider.templateProviders)
+    ## Named as the create page names it, or by its page title when it has no name.
+    #if ("$!templateProvider.name" != '')
+      #set ($label = $services.localization.render($templateProvider.name))
+    #else
+      #set ($label = $xwiki.getDocument($templateProvider.reference).plainTitle)
+    #end
+    <option value="$escapetool.xml($services.model.serialize($templateProvider.reference, 'local'))"
+      >$escapetool.xml($label)</option>
+  #end
+</select>

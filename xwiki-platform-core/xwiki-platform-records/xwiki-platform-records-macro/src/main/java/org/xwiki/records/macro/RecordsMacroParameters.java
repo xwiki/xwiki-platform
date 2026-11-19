@@ -71,7 +71,7 @@ import org.xwiki.stability.Unstable;
  * {@link RecordsCreationStrategy} its creation strategy dropdown; all six resolve to a template under
  * {@code templates/html_displayer}. Everything else relies on the displayer the Java type already has: a
  * {@link String} renders a text input, a {@code boolean} a checkbox, a {@link RecordsLocation} this module's location
- * picker.
+ * picker and a {@link RecordsTemplateProvider} its template provider dropdown.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -96,6 +96,8 @@ public class RecordsMacroParameters
     private String creationStrategy;
 
     private RecordsLocation newEntriesLocation;
+
+    private RecordsTemplateProvider templateProvider;
 
     private String id;
 
@@ -297,6 +299,28 @@ public class RecordsMacroParameters
     }
 
     /**
+     * @return the template provider new entries are created from, {@code null} for the one named after the data
+     *     type, or {@link RecordsTemplateProvider#NONE} for no template
+     */
+    public RecordsTemplateProvider getTemplateProvider()
+    {
+        return this.templateProvider;
+    }
+
+    /**
+     * @param templateProvider the template provider new entries are created from, {@code null} for the one named
+     *     after the data type, or {@link RecordsTemplateProvider#NONE} for no template
+     */
+    @PropertyName("Template")
+    @PropertyDescription("The template the entries created from the table start from.")
+    @PropertyGroup("editing")
+    @PropertyOrder(10)
+    public void setTemplateProvider(RecordsTemplateProvider templateProvider)
+    {
+        this.templateProvider = templateProvider;
+    }
+
+    /**
      * @return the identifier of this table
      */
     public String getId()
@@ -311,7 +335,7 @@ public class RecordsMacroParameters
     @PropertyDescription("Identifier for this table, needed only when one page holds more than one.")
     @PropertyGroup("advanced")
     @PropertyAdvanced
-    @PropertyOrder(10)
+    @PropertyOrder(11)
     public void setId(String id)
     {
         this.id = id;

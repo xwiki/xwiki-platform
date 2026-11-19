@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.distribution.internal;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,6 +31,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener.DocumentStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
@@ -104,6 +106,9 @@ public class DistributionInternalScriptService implements ScriptService
 
     @Inject
     private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private OrphanedExtensionsResolver orphanedExtensionsResolver;
 
     /**
      * @param <T> the type of the object
@@ -260,6 +265,16 @@ public class DistributionInternalScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    /**
+     * @return the extensions installed as dependencies in the current wiki and which are not needed anymore by any
+     *         other extension
+     * @since 19.0.0RC1
+     */
+    public List<InstalledExtension> getOrphanedExtensions()
+    {
+        return safe(this.orphanedExtensionsResolver.getOrphanedExtensions(this.xcontextProvider.get().getWikiId()));
     }
 
     /**

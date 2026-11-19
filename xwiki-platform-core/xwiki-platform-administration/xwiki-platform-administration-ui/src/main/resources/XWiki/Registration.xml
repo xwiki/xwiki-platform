@@ -87,6 +87,9 @@
    * Each field may have:
    *   label - this String will be written above the field.
    *
+   *   skipLabelFor - If true, the label is not bound to an element with the field name as id. Use it when the field
+   *                  html has no such element.
+   *
    *   tag - the HTML tag which will be created, default is &lt;input&gt;, may also be a non form tag such as &lt;img&gt;
    *
    *   params - a Map, each key value pair will be in the html tag. eg: {"size" : "30"} becomes &lt;input size=30...
@@ -94,7 +97,8 @@
    *   validate a Map describing how to validate the field, validation is done in javascript then redone in velocity
    *   |        for security and because not everyone has javascript.
    *   |
-   *   +-mandatory (Optional) - Will fail if the field is not filled in.
+   *   +-mandatory (Optional) - Will fail if the field is not filled in. For an html field, it only marks the field as
+   *   |                        required: the field needs its own programmaticValidation to reject an empty value.
    *   | +-failureMessage (Required) - The message to display if the field is not filled in.
    *   | +-noscript (Optional) - will not be checked by javascript
    *   |

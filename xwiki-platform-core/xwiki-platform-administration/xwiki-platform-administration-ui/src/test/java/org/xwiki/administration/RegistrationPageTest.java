@@ -22,8 +22,9 @@ package org.xwiki.administration;
 import java.text.MessageFormat;
 import java.util.Collection;
 
-import javax.inject.Named;
 import javax.script.ScriptContext;
+
+import jakarta.inject.Named;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -284,6 +285,10 @@ class RegistrationPageTest extends PageTest
         Element captchaLabel = getCaptchaField(result).previousElementSibling();
         assertNotNull(captchaLabel);
         assertNotNull(captchaLabel.selectFirst(".xRequired"));
+        // No element has the CAPTCHA field name as id, so the label is not bound to it.
+        assertFalse(captchaLabel.selectFirst("label").hasAttr("for"));
+        // The CAPTCHA answer can only be checked on the server.
+        assertFalse(result.select("#register script").html().contains("captcha_placeholder"));
     }
 
     @Test

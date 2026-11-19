@@ -175,9 +175,9 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         #if ($field.error &&
           $field.error == $!validation.failureMessage &&
           $!failureMessageParams.get("class")!='')
-          #set($extraValidationClass = $extraValidationClass + ' ' + $!failureMessageParams.get("class"))
+          #set ($extraValidationClass = $extraValidationClass + ' ' + $!failureMessageParams.get("class"))
         #elseif ($field.params.value)
-          #set($extraValidationClass = $extraValidationClass + ' LV_valid')##
+          #set ($extraValidationClass = $extraValidationClass + ' LV_valid')##
         #end
         <span class="LV_validation_message $extraValidationClass" aria-live="polite" ##
           ## Add the proper attributes to the validation string if it's a failure on initialisation
@@ -194,36 +194,36 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           ## Add the proper content to the validation string if it's a failure on initialisation
           ## If it's a regex validation, we also want to make sure to keep it shown at all times, we still put the
           ## message. Note that the class displaying the state of this validation will change though.
-          #if($field.error && $field.error == $!validation.failureMessage ||
+          #if ($field.error && $field.error == $!validation.failureMessage ||
             $!extraValidationClass.toString().contains('regex'))
-            $!validation.failureMessage
+            $escapetool.xml($!validation.failureMessage)
           #end
         </span>
       #end
-      #set($extraValidationClass = '')
+      #set ($extraValidationClass = '')
       #if ($field.validate.mandatory)
-        #set($extraValidationClass = 'mandatory')
-        #set($validation = $field.validate.mandatory)
+        #set ($extraValidationClass = 'mandatory')
+        #set ($validation = $field.validate.mandatory)
         $validationContainer
       #end
       #if ($field.validate.mustMatch)
-        #set($extraValidationClass = 'must-match')
-        #set($validation = $field.validate.mustMatch)
+        #set ($extraValidationClass = 'must-match')
+        #set ($validation = $field.validate.mustMatch)
         $validationContainer
       #end
       #if ($field.validate.programmaticValidation)
-        #set($extraValidationClass = 'programmatic-validation')
-        #set($validation = $field.validate.programmaticValidation)
+        #set ($extraValidationClass = 'programmatic-validation')
+        #set ($validation = $field.validate.programmaticValidation)
         $validationContainer
       #end
       #if ($field.validate.regex)
-        #set($extraValidationClass = 'regex')
-        #set($validation = $field.validate.regex)
+        #set ($extraValidationClass = 'regex')
+        #set ($validation = $field.validate.regex)
         $validationContainer
       #end
       #foreach ($regex in $field.validate.regexes)
-        #set($extraValidationClass = 'regex-'+ $foreach.count)
-        #set($validation = $regex)
+        #set ($extraValidationClass = 'regex-' + $foreach.count)
+        #set ($validation = $regex)
         $validationContainer
       #end
       </dd>

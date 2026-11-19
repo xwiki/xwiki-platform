@@ -63,10 +63,10 @@
         }
 
         &:hover, &.current-group {
-          background-color: var(--navbar-default-link-hover-bg);
+          background-color: var(--navbar-default-link-active-bg);
 
           a {
-            color: var(--navbar-default-link-hover-color);
+            color: var(--navbar-default-link-active-color);
           }
         }
 

@@ -19,6 +19,9 @@
  */
 package org.xwiki.wiki.test.ui;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -27,6 +30,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.platform.notifications.test.po.NotificationsContainerElement;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.SubWikiTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -42,6 +46,7 @@ import org.xwiki.wiki.test.po.DeleteWikiPage;
 import org.xwiki.wiki.test.po.JoinWikiPage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
 import org.xwiki.wiki.test.po.WikiUsersAdministrationSectionPage;
+import org.xwiki.wiki.test.po.WikisUserProfilePage;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.UserScope;
 
@@ -75,6 +80,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
+        // We need it to record the events displayed by the activity of a wiki in the user profile.
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
         // These extensions are needed when creating the subwiki or it'll fail with some NPE.
@@ -332,5 +341,48 @@ class SubWikiIT
         loginPage.loginAs(userName, password);
         assertTrue(new ViewPage().isAuthenticated());
         setup.forceGuestUser();
+    }
+
+    /**
+     * The activity of a wiki, shown from the "Wikis" section of the profile of one of its members, lists each event
+     * once and lets the user expand and collapse the events it groups. Relies on {@link #joinOpenWiki(TestUtils)}
+     * having made {@code JoinWikiUser} a member of the subwiki.
+     */
+    @Test
+    @Order(5)
+    void showWikiActivityFromUserProfile(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String userName = "JoinWikiUser";
+        String pageTitle = "Wiki activity page";
+        setup.login(userName, "JoinWikiUserPassword");
+        // Edit the page twice so that the activity groups the two edits in one entry.
+        DocumentReference pageReference =
+            testReference.replaceParent(testReference.getWikiReference(), new WikiReference(SUBWIKI_NAME));
+        setup.createPage(pageReference, "first", pageTitle);
+        setup.createPage(pageReference, "second", pageTitle);
+        setup.createPage(pageReference, "third", pageTitle);
+
+        NotificationsContainerElement activity = WikisUserProfilePage.gotoPage(userName).showActivity(SUBWIKI_NAME,
+            element -> getNotificationIndexes(element, pageTitle).size() == 2);
+        List<Integer> indexes = getNotificationIndexes(activity, pageTitle);
+        assertEquals(List.of("update", "create"),
+            indexes.stream().map(activity::getNotificationType).toList());
+
+        int updateIndex = indexes.get(0);
+        assertFalse(activity.isNotificationDetailsDisplayed(updateIndex));
+        activity.toggleNotificationDetails(updateIndex);
+        assertTrue(activity.isNotificationDetailsDisplayed(updateIndex));
+        activity.toggleNotificationDetails(updateIndex);
+        assertFalse(activity.isNotificationDetailsDisplayed(updateIndex));
+
+        // The events are listed once.
+        assertEquals(indexes, getNotificationIndexes(activity, pageTitle));
+        setup.forceGuestUser();
+    }
+
+    private List<Integer> getNotificationIndexes(NotificationsContainerElement activity, String pageTitle)
+    {
+        return IntStream.range(0, activity.getNotificationsListCount())
+            .filter(index -> activity.getNotificationPage(index).startsWith(pageTitle)).boxed().toList();
     }
 }

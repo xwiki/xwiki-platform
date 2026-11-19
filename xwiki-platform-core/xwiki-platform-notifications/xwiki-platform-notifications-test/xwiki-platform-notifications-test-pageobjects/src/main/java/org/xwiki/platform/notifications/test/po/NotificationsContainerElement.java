@@ -44,6 +44,10 @@ public class NotificationsContainerElement extends BaseElement
 
     private static final By LOADING_OLDER = By.cssSelector(".notifications-macro-load-more.loading");
 
+    private static final By NOTIFICATION_DETAILS = By.className("notification-event-details");
+
+    private static final By TOGGLE_NOTIFICATION_DETAILS = By.className("toggle-notification-event-details");
+
     /**
      * Maximum number of page reloads performed while waiting for the expected number of notifications. Events are
      * processed asynchronously, so the macro might not display all of them right after a page has been saved.
@@ -291,6 +295,32 @@ public class NotificationsContainerElement extends BaseElement
 
         return this.getNotifications().get(notificationNumber).getAttribute("class")
             .contains("notification-event-unread");
+    }
+
+    /**
+     * @param notificationNumber index of the notification in the list
+     * @return {@code true} if the details of the notification (the list of the events it groups) are displayed
+     * @since 18.10.0
+     */
+    public boolean isNotificationDetailsDisplayed(int notificationNumber)
+    {
+        checkNotificationNumber(notificationNumber);
+
+        return getNotifications().get(notificationNumber).findElement(NOTIFICATION_DETAILS).isDisplayed();
+    }
+
+    /**
+     * Show or hide the details of a notification (the list of the events it groups), and wait for them to be shown or
+     * hidden.
+     *
+     * @param notificationNumber index of the notification in the list
+     * @since 18.10.0
+     */
+    public void toggleNotificationDetails(int notificationNumber)
+    {
+        boolean displayed = isNotificationDetailsDisplayed(notificationNumber);
+        getNotifications().get(notificationNumber).findElement(TOGGLE_NOTIFICATION_DETAILS).click();
+        getDriver().waitUntilCondition(driver -> isNotificationDetailsDisplayed(notificationNumber) != displayed);
     }
 
     /**

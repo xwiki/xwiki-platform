@@ -46,8 +46,11 @@
   border-radius: var(--bn-border-radius);
 }
 
-/* Fallback shown when the macro has produced no output yet. */
+/*
+ * Fallback shown when the macro has produced no output yet. Only the italic style marks it as a placeholder: the text
+ * color is inherited from the edited content, because the greys of the BlockNote theme have a contrast ratio below
+ * the 4.5:1 that WCAG requires for text.
+ */
 .xwiki-macro-placeholder {
-  color: var(--bn-colors-side-menu, #888);
   font-style: italic;
 }

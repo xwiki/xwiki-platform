@@ -74,6 +74,9 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
     @Inject
     private TemplateManager templateManager;
 
+    @Inject
+    private ScriptContextIsolator scriptContextIsolator;
+
     private Semaphore semaphore;
 
     @Override
@@ -86,39 +89,14 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
     public String compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
         boolean useLESS, String skin) throws LESSCompilerException
     {
-        StringWriter source = new StringWriter();
-
         try {
             semaphore.acquire();
 
-            // Resolve the LESS resource only once so that the evaluated content and its author always match.
-            TemplateContent templateContent = getTemplateContent(lessResourceReference, includeSkinStyle, skin);
-
-            if (includeSkinStyle) {
-                // Add the import line to the LESS resource.
-                // We import this file to be able to use variables and mix-ins defined in it.
-                // But we don't want it in the output.
-                source.write(String.format("@import (reference) \"%s\";%s", MAIN_SKIN_STYLE_FILENAME,
-                    System.lineSeparator()));
-            }
-
-            // Get the content of the LESS resource
-            source.write(templateContent.getContent());
-
-            // Parse the LESS content with Velocity
-            String lessCode = source.toString();
-            if (useVelocity) {
-                lessCode = evaluate(lessResourceReference.toString(), lessCode, skin,
-                    templateContent.getAuthorReference(), templateContent.getDocumentReference());
-            }
-
-            // Compile the LESS code
-            if (useLESS) {
-                return less4JCompiler.compile(lessCode, skin, lessConfiguration.isGenerateInlineSourceMaps());
-            }
-
-            // Otherwise return the raw LESS code
-            return lessCode;
+            // The result is cached per resource, skin and color theme, so it must not depend on the Velocity variables
+            // set earlier in the request, for example by the compilation of another LESS resource: the main skin style
+            // initializes some of its variables only when they are not set yet.
+            return this.scriptContextIsolator
+                .call(() -> compile(lessResourceReference, includeSkinStyle, useVelocity, useLESS, skin));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
 
@@ -129,6 +107,41 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
         } finally {
             semaphore.release();
         }
+    }
+
+    private String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        boolean useLESS, String skin) throws Exception
+    {
+        StringWriter source = new StringWriter();
+
+        // Resolve the LESS resource only once so that the evaluated content and its author always match.
+        TemplateContent templateContent = getTemplateContent(lessResourceReference, includeSkinStyle, skin);
+
+        if (includeSkinStyle) {
+            // Add the import line to the LESS resource.
+            // We import this file to be able to use variables and mix-ins defined in it.
+            // But we don't want it in the output.
+            source.write(String.format("@import (reference) \"%s\";%s", MAIN_SKIN_STYLE_FILENAME,
+                System.lineSeparator()));
+        }
+
+        // Get the content of the LESS resource
+        source.write(templateContent.getContent());
+
+        // Parse the LESS content with Velocity
+        String lessCode = source.toString();
+        if (useVelocity) {
+            lessCode = evaluate(lessResourceReference.toString(), lessCode, skin,
+                templateContent.getAuthorReference(), templateContent.getDocumentReference());
+        }
+
+        // Compile the LESS code
+        if (useLESS) {
+            return less4JCompiler.compile(lessCode, skin, lessConfiguration.isGenerateInlineSourceMaps());
+        }
+
+        // Otherwise return the raw LESS code
+        return lessCode;
     }
 
     private TemplateContent getTemplateContent(LESSResourceReference lessResourceReference, boolean includeSkinStyle,

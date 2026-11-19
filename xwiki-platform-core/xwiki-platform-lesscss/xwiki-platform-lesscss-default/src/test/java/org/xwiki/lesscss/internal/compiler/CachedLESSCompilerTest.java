@@ -20,6 +20,7 @@
 package org.xwiki.lesscss.internal.compiler;
 
 import java.io.Writer;
+import java.util.concurrent.Callable;
 
 import javax.inject.Provider;
 
@@ -56,6 +57,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -86,6 +88,9 @@ class CachedLESSCompilerTest
     @MockComponent
     private TemplateManager templateManager;
 
+    @MockComponent
+    private ScriptContextIsolator scriptContextIsolator;
+
     private XWikiContext xcontext;
 
     private XWiki xwiki;
@@ -102,7 +107,7 @@ class CachedLESSCompilerTest
     }
 
     @BeforeEach
-    void beforeEach()
+    void beforeEach() throws Exception
     {
         this.xcontext = mock(XWikiContext.class);
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
@@ -113,6 +118,10 @@ class CachedLESSCompilerTest
         when(this.xwiki.getSkin(this.xcontext)).thenReturn("skin");
 
         this.template = mock(Template.class);
+
+        // Run the compilation as it is, the isolation of the script contexts being tested on its own.
+        when(this.scriptContextIsolator.call(any()))
+            .thenAnswer(invocation -> invocation.<Callable<?>>getArgument(0).call());
     }
 
     void mockTemplateExecution(LESSResourceReference resource, String input, String result) throws Exception
@@ -304,6 +313,16 @@ class CachedLESSCompilerTest
             + "Some LESS content", "rendered", null, null);
 
         assertEquals("rendered", this.cachedCompiler.compute(resource, true, true, false, "skin"));
+    }
+
+    @Test
+    void computeInIsolatedScriptContexts() throws Exception
+    {
+        // The call-through answer of beforeEach would run on a when(), so stub with doReturn instead.
+        doReturn("isolated output").when(this.scriptContextIsolator).call(any());
+        LESSResourceReference resource = mockSkinFile("skin", "Some LESS content");
+
+        assertEquals("isolated output", this.cachedCompiler.compute(resource, false, false, true, "skin"));
     }
 
     private LESSSkinFileResourceReference mockSkinFile(String skin, String content) throws Exception

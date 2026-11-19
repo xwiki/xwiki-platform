@@ -2909,14 +2909,15 @@ $string##
 #end
 
 #**
- * Outputs a link to the home page of a wiki, displaying the wiki pretty name (or its identifier when it has none).
+ * Outputs a link to the home page of the wiki targeted by a namespace (as used by extensions, jobs or logs), displaying
+ * the wiki pretty name (or its identifier when it has none).
  *
- * @param $namespace the wiki namespace (e.g. {@code wiki:xwiki}) or identifier
+ * @param $namespace the wiki namespace (e.g. {@code wiki:xwiki}); a wiki identifier is also accepted
  * @since 18.10.0RC1
  * @since 18.4.9
  * @since 17.10.16
  *#
-#macro (wikiHomePageLink $namespace)
+#macro (wikiNamespaceHomePageLink $namespace)
 #set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
 #set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
 #set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))

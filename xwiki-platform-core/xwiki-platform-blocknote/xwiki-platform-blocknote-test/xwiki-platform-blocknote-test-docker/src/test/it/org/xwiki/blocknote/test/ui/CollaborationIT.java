@@ -1211,13 +1211,14 @@ class CollaborationIT extends AbstractBlockNoteIT
         //
 
         // Start fresh, with content holding information that BlockNote can't represent (the block parameters, the link
-        // reference and the verbatim flag of the code block): it is kept outside the edited content and has to be
-        // shared with the users that join the collaboration session, since any of them can save the content.
+        // reference and parameters, e.g. to open the link in a new tab, and the verbatim flag of the code block): it is
+        // kept outside the edited content and has to be shared with the users that join the collaboration session,
+        // since any of them can save the content.
         loginAsJohn(setup);
         setup.deletePage(testReference);
         String source = """
             (% class="box" %)
-            one [[two>>doc:Sandbox.WebHome]] three
+            one [[two>>doc:Sandbox.WebHome||rel="__blank"]] three
 
             {{{
             not **bold**
@@ -1249,7 +1250,7 @@ class CollaborationIT extends AbstractBlockNoteIT
         // The changes are saved without losing the information that BlockNote can't represent.
         assertEquals("""
             (% class="box" %)
-            one [[two>>doc:Sandbox.WebHome]] three four
+            one [[two>>doc:Sandbox.WebHome||rel="__blank"]] three four
 
             {{{
             not **bold**

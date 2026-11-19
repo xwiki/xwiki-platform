@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/* Same layout as .col-xs-12.col-sm-3 for the menu and .col-xs-12.col-sm-9 for the content. */
-.admin-menu, .admin-category, #admin-page-content {
+/* Same layout as .col-xs-12.col-sm-3 for the menu and .col-xs-12.col-sm-9 for the content.
+   The syntax help page reuses the administration layout. */
+.admin-menu, .admin-category, #admin-page-content,
+.syntax-menu, #syntax-page-content {
   position: relative;
   float: left;
   width: 100%;
@@ -30,25 +32,26 @@
 
 /* 768px stands for @screen-sm-min. */
 @media (min-width: 768px) {
-  .admin-menu {
+  .admin-menu, .syntax-menu {
     width: 25%;
   }
 
-  .admin-category, #admin-page-content {
+  .admin-category, #admin-page-content, #syntax-page-content {
     width: 75%;
   }
 }
 
 /* 1200px stands for @screen-lg-min. */
 @media (min-width: 1200px) {
-  .admin-menu {
+  .admin-menu, .syntax-menu {
     max-width: 300px;
   }
 }
 
 /* 480px stands for @screen-xs-min. */
 @media (max-width: 480px) {
-  .admin-menu, .admin-category, #admin-page-content {
+  .admin-menu, .admin-category, #admin-page-content,
+  .syntax-menu, #syntax-page-content {
     padding-right: 0;
     padding-left: 0;
   }
@@ -56,6 +59,13 @@
 
 /* Allow scrolling for containers that take a lot of space, like Rights or Livetables. */
 #admin-page-content #xwikieditcontent,
-#admin-page-content .xwiki-livetable-container {
+#admin-page-content .xwiki-livetable-container,
+#syntax-page-content #xwikieditcontent,
+#syntax-page-content .xwiki-livetable-container {
   overflow: auto;
+}
+
+/* Cancel the left margin that the syntax help page sets for its menu. */
+.skin-flamingo #syntax-page-content {
+  margin-left: 0;
 }

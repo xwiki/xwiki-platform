@@ -366,7 +366,10 @@ function ts_makeSortable(table) {
     var cell = firstRow.cells[i];
     var txt = ts_getInnerText(cell);
     if (cell.className != "unsortable" && cell.className.indexOf("unsortable") == -1) {
-      cell.innerHTML = '<a href="#" class="sortHeader" onclick="ts_resortTable(this);return false;">' + txt + '<span class="sortarrow"><img border="0" src="'+ image_path + image_none + '" alt="&#x21F5;"/></span></a>';
+      // The sort arrows are UI images, not page content, so they must not get the image lightbox. Moreover, sorting
+      // replaces the arrow image, which would leave its lightbox popover stuck on the screen. The attribute is set on
+      // the span because only its content is replaced when sorting.
+      cell.innerHTML = '<a href="#" class="sortHeader" onclick="ts_resortTable(this);return false;">' + txt + '<span class="sortarrow" data-xwiki-lightbox="false"><img border="0" src="'+ image_path + image_none + '" alt="&#x21F5;"/></span></a>';
     }
   }
   alternate(table);

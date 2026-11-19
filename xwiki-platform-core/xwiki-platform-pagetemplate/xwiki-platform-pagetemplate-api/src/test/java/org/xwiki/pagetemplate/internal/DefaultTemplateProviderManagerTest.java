@@ -27,6 +27,7 @@ import jakarta.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -38,6 +39,8 @@ import org.xwiki.pagetemplate.TemplateProviderException;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -77,6 +80,9 @@ class DefaultTemplateProviderManagerTest
     private static final SpaceReference MOVIES_SPACE = new SpaceReference("Movies", new WikiReference("wiki"));
 
     private static final SpaceReference SANDBOX_SPACE = new SpaceReference("Sandbox", new WikiReference("wiki"));
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private DefaultTemplateProviderManager manager;
@@ -224,6 +230,26 @@ class DefaultTemplateProviderManagerTest
 
         assertEquals(List.of(PROVIDER_REFERENCE),
             templateProviders.stream().map(TemplateProvider::getReference).toList());
+    }
+
+    @Test
+    void getTemplateProvidersSkipsTheOnesThatFailToLoad() throws Exception
+    {
+        DocumentReference brokenReference = new DocumentReference("wiki", "Sandbox", "Broken");
+        when(this.query.execute()).thenReturn(List.of("Sandbox.Broken", "Movies.Code.MoviesTemplateProvider"));
+        when(this.documentReferenceResolver.resolve("Sandbox.Broken")).thenReturn(brokenReference);
+        when(this.documentReferenceResolver.resolve("Movies.Code.MoviesTemplateProvider"))
+            .thenReturn(PROVIDER_REFERENCE);
+        when(this.xwiki.getDocument(brokenReference, this.xcontext)).thenThrow(new XWikiException());
+        when(this.document.getXObject(TemplateProviderClassDocumentInitializer.CLASS_REFERENCE))
+            .thenReturn(this.object);
+
+        List<TemplateProvider> templateProviders = this.manager.getTemplateProviders();
+
+        assertEquals(List.of(PROVIDER_REFERENCE),
+            templateProviders.stream().map(TemplateProvider::getReference).toList());
+        assertEquals("Failed to load the template provider [wiki:Sandbox.Broken]. Root cause is "
+            + "[XWikiException: Error number 0 in 0].", this.logCapture.getMessage(0));
     }
 
     @Test

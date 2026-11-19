@@ -29,6 +29,8 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -97,6 +99,9 @@ public class DefaultTemplateProviderManager implements TemplateProviderManager
     @Inject
     private QueryManager queryManager;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Optional<TemplateProvider> getTemplateProvider(DocumentReference reference)
         throws TemplateProviderException
@@ -145,7 +150,13 @@ public class DefaultTemplateProviderManager implements TemplateProviderManager
 
         List<TemplateProvider> templateProviders = new ArrayList<>();
         for (String name : names) {
-            getTemplateProvider(this.documentReferenceResolver.resolve(name)).ifPresent(templateProviders::add);
+            DocumentReference reference = this.documentReferenceResolver.resolve(name);
+            try {
+                getTemplateProvider(reference).ifPresent(templateProviders::add);
+            } catch (TemplateProviderException e) {
+                this.logger.warn("Failed to load the template provider [{}]. Root cause is [{}].", reference,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
         }
         return templateProviders;
     }

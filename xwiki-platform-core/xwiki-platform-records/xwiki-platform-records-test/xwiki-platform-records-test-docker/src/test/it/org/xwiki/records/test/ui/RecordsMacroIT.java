@@ -230,23 +230,29 @@ class RecordsMacroIT extends AbstractCKEditorIT
     {
         setup.loginAsSuperAdmin();
 
-        // The live table source leaves this template out of the entries, since it is named after the object type.
         SpaceReference space = testReference.getLastSpaceReference();
         DocumentReference classReference = new DocumentReference("NoteClass", space);
         DocumentReference templateReference = new DocumentReference("NoteTemplate", space);
         DocumentReference templateProviderReference = new DocumentReference("NoteTemplateProvider", space);
-        setup.rest().delete(classReference);
+        DocumentReference urgentTemplateReference = new DocumentReference("UrgentNoteTemplate", space);
+        DocumentReference urgentTemplateProviderReference = new DocumentReference("UrgentNoteTemplateProvider", space);
+        // Removes what a previous run left, since the notes would be listed and the templates get a second object.
+        for (String name : List.of("First note", "Second note", "Third note")) {
+            setup.rest().delete(new DocumentReference(name, space));
+        }
+        for (DocumentReference reference : List.of(classReference, templateReference, templateProviderReference,
+            urgentTemplateReference, urgentTemplateProviderReference)) {
+            setup.rest().delete(reference);
+        }
         setup.addClassProperty(classReference, STATUS, "String");
         String className = setup.serializeReference(classReference.getLocalDocumentReference());
+        // The live table source leaves this template out of the entries, since it is named after the object type.
         setup.addObject(templateReference, className, STATUS, "todo");
         setup.addObject(templateProviderReference, "XWiki.TemplateProviderClass", "template",
             setup.serializeReference(templateReference.getLocalDocumentReference()));
         // A provider not named after the object type, which only the dropdown can pick, by its name. Its template is
         // listed as an entry, since only the template named after the object type is left out.
-        DocumentReference urgentTemplateReference = new DocumentReference("UrgentNoteTemplate", space);
-        DocumentReference urgentTemplateProviderReference = new DocumentReference("UrgentNoteTemplateProvider", space);
         setup.addObject(urgentTemplateReference, className, STATUS, "urgent");
-        setup.rest().delete(urgentTemplateProviderReference);
         setup.addObject(urgentTemplateProviderReference, "XWiki.TemplateProviderClass", "name", "Urgent note",
             "template", setup.serializeReference(urgentTemplateReference.getLocalDocumentReference()));
         String macroCall = "{{records class=\"%s\" id=\"%s\" properties=\"doc.title,%s\" allowEditMode=\"true\" "

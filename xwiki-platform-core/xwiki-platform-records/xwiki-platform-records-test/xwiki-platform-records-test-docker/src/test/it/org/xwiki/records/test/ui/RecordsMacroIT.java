@@ -37,6 +37,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,7 +70,7 @@ class RecordsMacroIT extends AbstractCKEditorIT
     private static final String TITLE_STRATEGY = "Use user-submitted title as page name";
 
     private static final String TEMPLATE_PROVIDER_STRATEGY =
-        "Use template provider naming logic (creation restrictions override \"New entries location\")";
+        "Use template provider naming logic (creation restrictions override the new entries location)";
 
     private static final String TITLE_COLUMN = "Title";
 
@@ -145,9 +146,9 @@ class RecordsMacroIT extends AbstractCKEditorIT
 
     /**
      * Entries can only be created in edit mode, so the creation strategy can only be picked while the edit mode is
-     * allowed. A saved strategy is kept when the dialog opens, even one that is no longer installed. A strategy needs
-     * the columns it names the new pages after. The entries created from the table go to the location picked in the
-     * dialog.
+     * allowed. A strategy that is no longer installed turns creation off with a warning, and is kept when the dialog
+     * opens. A strategy needs the columns it names the new pages after. The entries created from the table go to the
+     * location picked in the dialog.
      */
     @Test
     @Order(2)
@@ -161,6 +162,16 @@ class RecordsMacroIT extends AbstractCKEditorIT
         String className = setup.serializeReference(classReference.getLocalDocumentReference());
         SpaceReference location = new SpaceReference("Tasks", testReference.getLastSpaceReference());
         setup.createPage(new DocumentReference("WebHome", location), "", "Tasks");
+
+        // A strategy that is not installed turns creation off, and the readers are told why. This table is on a page of
+        // its own because edit() deletes the test page with its children, the location among them, when it exists.
+        DocumentReference unknownStrategyPage = new DocumentReference("UnknownStrategy",
+            testReference.getLastSpaceReference());
+        ViewPage viewPage = setup.createPage(unknownStrategyPage, """
+            {{records class="%s" id="%s" properties="%s" allowEditMode="true" creationStrategy="missing"/}}"""
+            .formatted(className, LIVE_DATA_ID, STATUS));
+        assertThat(viewPage.getContent(), containsString(
+            "Entries cannot be created from this table because the creation strategy missing is not installed."));
 
         edit(setup, testReference, """
             {{records class="%s" id="%s" properties="%s" creationStrategy="missing"/}}"""
@@ -230,15 +241,14 @@ class RecordsMacroIT extends AbstractCKEditorIT
         setup.addObject(templateReference, className, STATUS, "todo");
         setup.addObject(templateProviderReference, "XWiki.TemplateProviderClass", "template",
             setup.serializeReference(templateReference.getLocalDocumentReference()));
-        // A provider not named after the object type, which only the dropdown can pick, by its title. Its template is
+        // A provider not named after the object type, which only the dropdown can pick, by its name. Its template is
         // listed as an entry, since only the template named after the object type is left out.
         DocumentReference urgentTemplateReference = new DocumentReference("UrgentNoteTemplate", space);
         DocumentReference urgentTemplateProviderReference = new DocumentReference("UrgentNoteTemplateProvider", space);
         setup.addObject(urgentTemplateReference, className, STATUS, "urgent");
         setup.rest().delete(urgentTemplateProviderReference);
-        setup.createPage(urgentTemplateProviderReference, "", "Urgent note");
-        setup.addObject(urgentTemplateProviderReference, "XWiki.TemplateProviderClass", "template",
-            setup.serializeReference(urgentTemplateReference.getLocalDocumentReference()));
+        setup.addObject(urgentTemplateProviderReference, "XWiki.TemplateProviderClass", "name", "Urgent note",
+            "template", setup.serializeReference(urgentTemplateReference.getLocalDocumentReference()));
         String macroCall = "{{records class=\"%s\" id=\"%s\" properties=\"doc.title,%s\" allowEditMode=\"true\" "
             + "creationStrategy=\"title\"/}}";
 

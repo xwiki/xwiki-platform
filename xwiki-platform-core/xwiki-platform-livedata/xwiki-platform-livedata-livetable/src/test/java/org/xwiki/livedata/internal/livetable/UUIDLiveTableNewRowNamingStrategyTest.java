@@ -29,6 +29,7 @@ import javax.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
@@ -60,6 +61,9 @@ class UUIDLiveTableNewRowNamingStrategyTest
 
     @InjectMockComponents
     private UUIDLiveTableNewRowNamingStrategy strategy;
+
+    @MockComponent
+    private ContextualLocalizationManager l10n;
 
     @MockComponent
     @Named("current")
@@ -159,5 +163,14 @@ class UUIDLiveTableNewRowNamingStrategyTest
     void getNewEntryLocationWithMissingLocation()
     {
         assertEquals(Optional.empty(), this.strategy.getNewEntryLocation(Map.of()));
+    }
+
+    @Test
+    void getDescription()
+    {
+        when(this.l10n.getTranslationPlain("livedata.liveTable.newRowNamingStrategy.uuid.description"))
+            .thenReturn("Random name");
+
+        assertEquals("Random name", this.strategy.getDescription());
     }
 }

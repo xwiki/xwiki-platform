@@ -41,11 +41,16 @@ import com.xpn.xwiki.XWikiException;
  * @since 18.7.0RC1
  */
 @Component
-@Named("uuid")
+@Named(UUIDLiveTableNewRowNamingStrategy.HINT)
 @Singleton
 @Unstable
 public class UUIDLiveTableNewRowNamingStrategy extends AbstractLocationLiveTableNewRowNamingStrategy
 {
+    /**
+     * The hint of this strategy.
+     */
+    public static final String HINT = "uuid";
+
     @Inject
     private ModelBridge modelBridge;
 
@@ -59,5 +64,11 @@ public class UUIDLiveTableNewRowNamingStrategy extends AbstractLocationLiveTable
             throw new LiveDataException(String.format("The page [%s] already exists.", candidate));
         }
         return candidate;
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return getDescription(HINT);
     }
 }

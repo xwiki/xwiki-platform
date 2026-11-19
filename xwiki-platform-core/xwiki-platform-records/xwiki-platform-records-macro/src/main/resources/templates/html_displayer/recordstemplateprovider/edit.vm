@@ -20,18 +20,6 @@
 ## Displays the template provider picker of a Records table: a dropdown listing the template providers the current user
 ## can view, after a choice for the template provider named after the object type and a choice for no template.
 #set ($translationPrefix = 'rendering.macro.records.parameter.templateProvider.')
-#set ($templateProviders = [])
-#set ($where = "where doc.fullName <> 'XWiki.TemplateProviderTemplate' order by doc.fullName")
-#set ($query = "from doc.object(XWiki.TemplateProviderClass) as provider $where")
-#foreach ($templateProvider in $services.query.xwql($query).execute())
-  #set ($reference = $services.model.resolveDocument($templateProvider))
-  #if ($services.security.authorization.hasAccess('view', $reference))
-    #set ($discard = $templateProviders.add({
-      'value': $templateProvider,
-      'label': $xwiki.getDocument($reference).plainTitle
-    }))
-  #end
-#end
 <select
   #foreach ($parameter in $displayer.parameters.entrySet())
     $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
@@ -41,7 +29,14 @@
   ## RecordsTemplateProvider#NONE, which the live table source reads as the absence of a template provider.
   <option value="XWiki.NoTemplateProvider">$escapetool.xml($services.localization.render(
     "${translationPrefix}none"))</option>
-  #foreach ($templateProvider in $templateProviders)
-    <option value="$escapetool.xml($templateProvider.value)">$escapetool.xml($templateProvider.label)</option>
+  #foreach ($templateProvider in $services.templateProvider.templateProviders)
+    ## Named as the create page names it, or by its page title when it has no name.
+    #if ("$!templateProvider.name" != '')
+      #set ($label = $services.localization.render($templateProvider.name))
+    #else
+      #set ($label = $xwiki.getDocument($templateProvider.reference).plainTitle)
+    #end
+    <option value="$escapetool.xml($services.model.serialize($templateProvider.reference, 'local'))"
+      >$escapetool.xml($label)</option>
   #end
 </select>

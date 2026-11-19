@@ -35,6 +35,9 @@ import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.pagetemplate.TemplateProvider;
 import org.xwiki.pagetemplate.TemplateProviderException;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -53,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -87,6 +92,12 @@ class DefaultTemplateProviderManagerTest
     @Named("current")
     private SpaceReferenceResolver<String> spaceReferenceResolver;
 
+    @MockComponent
+    private QueryManager queryManager;
+
+    @Mock
+    private Query query;
+
     @Mock
     private XWikiContext xcontext;
 
@@ -113,6 +124,7 @@ class DefaultTemplateProviderManagerTest
             .thenReturn(TEMPLATE_REFERENCE);
         when(this.spaceReferenceResolver.resolve("Movies", PROVIDER_REFERENCE)).thenReturn(MOVIES_SPACE);
         when(this.spaceReferenceResolver.resolve("Sandbox", PROVIDER_REFERENCE)).thenReturn(SANDBOX_SPACE);
+        when(this.queryManager.createQuery(anyString(), eq(Query.XWQL))).thenReturn(this.query);
     }
 
     @Test
@@ -193,6 +205,37 @@ class DefaultTemplateProviderManagerTest
 
         assertEquals("Failed to load template provider [wiki:Movies.Code.MoviesTemplateProvider].",
             exception.getMessage());
+        assertSame(cause, exception.getCause());
+    }
+
+    @Test
+    void getTemplateProvidersSkipsThePagesThatNoLongerHoldOne() throws Exception
+    {
+        DocumentReference removedReference = new DocumentReference("wiki", "Sandbox", "Removed");
+        when(this.query.execute()).thenReturn(List.of("Movies.Code.MoviesTemplateProvider", "Sandbox.Removed"));
+        when(this.documentReferenceResolver.resolve("Movies.Code.MoviesTemplateProvider"))
+            .thenReturn(PROVIDER_REFERENCE);
+        when(this.documentReferenceResolver.resolve("Sandbox.Removed")).thenReturn(removedReference);
+        when(this.document.getXObject(TemplateProviderClassDocumentInitializer.CLASS_REFERENCE))
+            .thenReturn(this.object);
+        when(this.xwiki.getDocument(removedReference, this.xcontext)).thenReturn(mock(XWikiDocument.class));
+
+        List<TemplateProvider> templateProviders = this.manager.getTemplateProviders();
+
+        assertEquals(List.of(PROVIDER_REFERENCE),
+            templateProviders.stream().map(TemplateProvider::getReference).toList());
+    }
+
+    @Test
+    void getTemplateProvidersWhenTheQueryFails() throws Exception
+    {
+        QueryException cause = new QueryException("failed", this.query, null);
+        when(this.query.execute()).thenThrow(cause);
+
+        TemplateProviderException exception =
+            assertThrows(TemplateProviderException.class, () -> this.manager.getTemplateProviders());
+
+        assertEquals("Failed to find the template providers.", exception.getMessage());
         assertSame(cause, exception.getCause());
     }
 }

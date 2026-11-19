@@ -543,7 +543,7 @@ ${escapetool.xml($name)}##
 #if ("$!namespace" == '' && $namespace != '')
 $services.localization.render('extensions.info.globalNamespace')##
 #elseif ($namespace.startsWith('wiki:'))
-#wikiHomePageLink($namespace)##
+#wikiNamespaceHomePageLink($namespace)##
 #else
 $namespace##
 #end
@@ -619,7 +619,7 @@ $namespace##
     <span class="extension-name">${dependencyName}</span><span
           class="extension-version">$!escapetool.xml($dependencyVersion)</span>
     #if ($extensionNamespace.startsWith('wiki:'))
-      <span class="extension-namespace">$services.localization.render('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
+      <span class="extension-namespace">$services.localization.render('extensions.info.dependency.wiki', ["#wikiNamespaceHomePageLink($extensionNamespace)"])</span>
     #end
     #if ("$!dependencyStatusMessage" != '')
       <span class="extension-status">$escapetool.xml($dependencyStatusMessage)</span>
@@ -1640,15 +1640,11 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   </span>
 #end
 
+#**
+ * @deprecated since 18.10.0RC1, 18.4.9 and 17.10.16, use #wikiNamespaceHomePageLink instead
+ *#
 #macro (wikiHomePageLink $namespace)
-#set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
-#set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
-#set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
-#set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
-#if ("$!wikiPrettyName.trim()" == '')
-#set ($wikiPrettyName = $wikiName)
-#end
-<a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a>##
+#wikiNamespaceHomePageLink($namespace)##
 #end
 
 #macro (isShowingExtensionDetails $extension $_showDetails)

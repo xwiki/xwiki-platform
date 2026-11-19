@@ -101,6 +101,35 @@ const componentStore = {
       return store[kind][key];
     }
   },
+
+  /**
+   * Return a component synchronously, when it is already loaded.
+   * A component is loaded once a call to {@link componentStore.load} has resolved it. Callers can then render it
+   * right away, instead of waiting for a promise that would delay the rendering to a later tick.
+   *
+   * @param kind - the kind of the component (e.g., "displayer")
+   * @param key - the id of the component
+   * @returns the loaded component, or undefined when it is not registered or not loaded yet
+   * @since 18.10.0RC1
+   */
+  get(kind: string, key: string): Component | undefined {
+    const component = store[kind]?.[key];
+    return typeof component === "function" ? undefined : component;
+  },
+
+  /**
+   * Tell whether a component is registered, loaded or not.
+   * Unlike {@link componentStore.load}, a call for a component that is not registered yet does not wait for its
+   * registration.
+   *
+   * @param kind - the kind of the component (e.g., "displayer")
+   * @param key - the id of the component
+   * @returns true when a component is registered for this kind and id
+   * @since 18.10.0RC1
+   */
+  isRegistered(kind: string, key: string): boolean {
+    return store[kind]?.[key] !== undefined;
+  },
 };
 
 export { componentStore };

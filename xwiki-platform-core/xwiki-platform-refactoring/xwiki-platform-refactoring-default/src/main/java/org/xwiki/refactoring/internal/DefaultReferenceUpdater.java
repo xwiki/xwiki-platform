@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -130,28 +131,21 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     }
 
     /**
-     * HACK: Save the given document without changing the content author because the document may loose or win
-     * programming and script rights as a consequence and this is not the intent of this operation. Even though the
-     * document content field was modified, the change is purely syntactic; the semantic is not affected so it's not
-     * clear whether the content author deserves to be updated or not (even without the side effects).
+     * HACK: Prepare the given document to be saved without changing the content author because the document may loose
+     * or win programming and script rights as a consequence and this is not the intent of this operation. Even though
+     * the document content field was modified, the change is purely syntactic; the semantic is not affected so it's
+     * not clear whether the content author deserves to be updated or not (even without the side effects).
      * 
      * @param document the document to be saved
-     * @param commentTranslationKey the revision comment translation key
-     * @throws XWikiException if saving the document fails
      */
-    private void saveDocumentPreservingAuthors(XWikiDocument document, String commentTranslationKey)
-        throws XWikiException
+    private void preserveAuthors(XWikiDocument document)
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
         // Preserve the content author.
         document.setContentDirty(false);
         // Make sure the version is incremented.
         document.setMetaDataDirty(true);
         document.getAuthors().setOriginalMetadataAuthor(
             this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE));
-        Locale defaultLocale = this.localizationManager.getDefaultLocale();
-        String comment = this.localizationManager.getTranslationPlain(commentTranslationKey, defaultLocale);
-        xcontext.getWiki().saveDocument(document, comment, true, xcontext);
     }
 
     private boolean renameLinks(XWikiDocument document, boolean relative, RenameLambda renameLambda)
@@ -214,21 +208,16 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         }
     }
 
-    private void maybeSaveDocumentPreservingAuthors(XWikiDocument documentToModify, boolean modified,
-        DocumentReference currentDocumentReference, boolean relative, EntityReference oldTarget,
-        EntityReference newTarget) throws XWikiException
+    private void logUpdate(XWikiDocument document, boolean modified, boolean relative, EntityReference oldTarget,
+        EntityReference newTarget)
     {
+        DocumentReference currentDocumentReference = document.getDocumentReference();
         if (modified) {
             if (relative) {
-                saveDocumentPreservingAuthors(documentToModify,
-                    "refactoring.referenceUpdater.saveMessage.relativeLink");
-
                 info("Updated the relative links from [{}].", currentDocumentReference);
             } else {
-                saveDocumentPreservingAuthors(documentToModify, "refactoring.referenceUpdater.saveMessage.backlinks");
-
                 info("The links from [{}] that were targeting [{}] have been updated to target [{}].",
-                    documentToModify.getDocumentReferenceWithLocale(), oldTarget, newTarget);
+                    document.getDocumentReferenceWithLocale(), oldTarget, newTarget);
             }
         } else {
             if (relative) {
@@ -239,8 +228,32 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         }
     }
 
-    private void renameLinks(XWikiDocument document, EntityReference oldTarget, EntityReference newTarget,
-        XWikiContext xcontext, boolean relative, RenameLambda renameLambda) throws XWikiException
+    private void renameLinks(DocumentReference documentReference, EntityReference oldTarget,
+        EntityReference newTarget, XWikiContext xcontext, boolean relative, RenameLambda renameLambda)
+        throws XWikiException
+    {
+        String commentTranslationKey = relative ? "refactoring.referenceUpdater.saveMessage.relativeLink"
+            : "refactoring.referenceUpdater.saveMessage.backlinks";
+        Locale defaultLocale = this.localizationManager.getDefaultLocale();
+        String comment = this.localizationManager.getTranslationPlain(commentTranslationKey, defaultLocale);
+
+        MutableBoolean modified = new MutableBoolean();
+        // Update the latest version of the document, so that the links are also renamed when the document is saved
+        // concurrently, without losing the concurrent changes.
+        XWikiDocument document = xcontext.getWiki().updateDocument(documentReference, documentToModify -> {
+            modified.setValue(
+                !documentToModify.isNew() && renameLinks(documentToModify, xcontext, relative, renameLambda));
+            if (modified.isTrue()) {
+                preserveAuthors(documentToModify);
+            }
+            return modified.booleanValue();
+        }, comment, true, xcontext);
+
+        logUpdate(document, modified.booleanValue(), relative, oldTarget, newTarget);
+    }
+
+    private boolean renameLinks(XWikiDocument document, XWikiContext xcontext, boolean relative,
+        RenameLambda renameLambda) throws XWikiException
     {
         DocumentReference currentDocumentReference = document.getDocumentReference();
 
@@ -252,7 +265,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
                 "We can't rename the links from [{}] because there is no renderer available for its syntax [{}].",
                 currentDocumentReference, document.getSyntax());
 
-            return;
+            return false;
         }
 
         // Load the renderer
@@ -264,31 +277,22 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
                 "We can't rename the links from [{}] because the renderer for syntax [{}] cannot be loaded.",
                 currentDocumentReference, document.getSyntax(), e);
 
-            return;
-        }
-
-        // Avoid modifying the cached document
-        XWikiDocument documentToModify;
-        if (document.isCached()) {
-            documentToModify = document.clone();
-        } else {
-            documentToModify = document;
+            return false;
         }
 
         // Document content
-        boolean modified = renameLinks(documentToModify, relative, renameLambda);
+        boolean modified = renameLinks(document, relative, renameLambda);
 
         // XObjects properties
-        for (List<BaseObject> xobjects : documentToModify.getXObjects().values()) {
+        for (List<BaseObject> xobjects : document.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
                 if (xobject != null) {
-                    modified |= renameLinks(xobject, documentToModify, renderer, xcontext, relative, renameLambda);
+                    modified |= renameLinks(xobject, document, renderer, xcontext, relative, renameLambda);
                 }
             }
         }
 
-        maybeSaveDocumentPreservingAuthors(documentToModify, modified, currentDocumentReference, relative, oldTarget,
-            newTarget);
+        return modified;
     }
 
     private void renameLinks(DocumentReference documentReference, DocumentReference oldLinkTarget,
@@ -311,40 +315,52 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     private void internalRenameLinks(DocumentReference documentReference, EntityReference oldLinkTarget,
         EntityReference newLinkTarget, boolean relative, RenameLambda renameLambda)
     {
-        boolean popLevelProgress = false;
         XWikiContext xcontext = this.xcontextProvider.get();
         String previousWikiId = xcontext.getWikiId();
         try {
             xcontext.setWikiId(documentReference.getWikiReference().getName());
-            XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-            List<Locale> locales = document.getTranslationLocales(xcontext);
+            List<Locale> locales;
+            try {
+                locales = xcontext.getWiki().getDocument(documentReference, xcontext).getTranslationLocales(xcontext);
+            } catch (XWikiException e) {
+                this.logger.error("Failed to load the document [{}] to rename the links that target [{}].",
+                    documentReference, oldLinkTarget, e);
+                return;
+            }
 
             this.progressManager.pushLevelProgress(1 + locales.size(), this);
-            popLevelProgress = true;
+            try {
+                // Update the default locale instance.
+                renameLinksStep(documentReference, oldLinkTarget, newLinkTarget, xcontext, relative, renameLambda);
 
-            // Update the default locale instance.
-            this.progressManager.startStep(this);
-            renameLinks(document, oldLinkTarget, newLinkTarget, xcontext, relative, renameLambda);
-            this.progressManager.endStep(this);
-
-            // Update the translations.
-            if (documentReference.getLocale() == null) {
-                for (Locale locale : locales) {
-                    this.progressManager.startStep(this);
-                    renameLinks(document.getTranslatedDocument(locale, xcontext), oldLinkTarget, newLinkTarget,
-                        xcontext, relative, renameLambda);
-                    this.progressManager.endStep(this);
+                // Update the translations.
+                if (documentReference.getLocale() == null) {
+                    for (Locale locale : locales) {
+                        renameLinksStep(new DocumentReference(documentReference, locale), oldLinkTarget,
+                            newLinkTarget, xcontext, relative, renameLambda);
+                    }
                 }
+            } finally {
+                this.progressManager.popLevelProgress(this);
             }
+        } finally {
+            xcontext.setWikiId(previousWikiId);
+        }
+    }
+
+    private void renameLinksStep(DocumentReference documentReference, EntityReference oldLinkTarget,
+        EntityReference newLinkTarget, XWikiContext xcontext, boolean relative, RenameLambda renameLambda)
+    {
+        this.progressManager.startStep(this);
+        // Each locale is updated independently so that a locale that fails to be updated doesn't prevent the update
+        // of the other locales.
+        try {
+            renameLinks(documentReference, oldLinkTarget, newLinkTarget, xcontext, relative, renameLambda);
         } catch (XWikiException e) {
             this.logger.error("Failed to rename the links that target [{}] from [{}].", oldLinkTarget,
                 documentReference, e);
-        } finally {
-            if (popLevelProgress) {
-                this.progressManager.popLevelProgress(this);
-            }
-            xcontext.setWikiId(previousWikiId);
         }
+        this.progressManager.endStep(this);
     }
 
     private DocumentReference toDocumentReference(EntityReference entityReference)

@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.function.FailablePredicate;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -57,6 +58,7 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultWikiUserManager implements WikiUserManager
 {
     private static final LocalDocumentReference GROUPCLASS_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
@@ -111,10 +113,14 @@ public class DefaultWikiUserManager implements WikiUserManager
         return null;
     }
 
+    private DocumentReference getMembersGroupReference(String wikiId)
+    {
+        return new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "XWikiAllGroup");
+    }
+
     private XWikiDocument getMembersGroupDocument(String wikiId) throws WikiUserManagerException
     {
-        // Reference to the document
-        DocumentReference memberGroupReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "XWikiAllGroup");
+        DocumentReference memberGroupReference = getMembersGroupReference(wikiId);
 
         // Get the document
         try {
@@ -127,30 +133,63 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
     }
 
-    private void saveGroupDocument(XWikiDocument document, String message) throws WikiUserManagerException
+    /**
+     * Applies the given update to the latest version of the member group document and saves it. Several requests can
+     * modify the group at the same time (e.g. users joining the wiki), so the update is applied again to the newer
+     * version of the group when another request saved it in the meantime.
+     *
+     * @param wikiId the wiki whose member group to update
+     * @param update modifies the given copy of the group document, and returns {@code false} when there is nothing to
+     *     save; it can be called several times
+     * @param message the comment of the save
+     */
+    private void updateGroupDocument(String wikiId, FailablePredicate<XWikiDocument, XWikiException> update,
+        String message) throws WikiUserManagerException
     {
-        // Get the XWiki objects
         XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
 
-        // The document should be hidden
-        document.setHidden(true);
-
-        // The document must have a creator
-        if (document.getCreatorReference() == null) {
-            document.setCreatorReference(xcontext.getUserReference());
-        }
-        // The document must have an author
-        if (document.getAuthorReference() == null) {
-            document.setAuthorReference(xcontext.getUserReference());
-        }
-
-        // Save the document
         try {
-            xwiki.saveDocument(document, message, xcontext);
+            xwiki.updateDocument(getMembersGroupReference(wikiId), document -> {
+                if (!update.test(document)) {
+                    return false;
+                }
+
+                // The document should be hidden
+                document.setHidden(true);
+
+                // The document must have a creator
+                if (document.getCreatorReference() == null) {
+                    document.setCreatorReference(xcontext.getUserReference());
+                }
+                // The document must have an author
+                if (document.getAuthorReference() == null) {
+                    document.setAuthorReference(xcontext.getUserReference());
+                }
+
+                return true;
+            }, message, false, xcontext);
         } catch (XWikiException e) {
             throw new WikiUserManagerException("Fail to save the member group", e);
         }
+    }
+
+    private List<String> getGroupMembers(XWikiDocument groupDoc)
+    {
+        List<String> members = new ArrayList<>();
+        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
+        if (memberObjects != null) {
+            for (BaseObject object : memberObjects) {
+                if (object == null) {
+                    continue;
+                }
+                String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
+                if (!member.isEmpty() && !members.contains(member)) {
+                    members.add(member);
+                }
+            }
+        }
+        return members;
     }
 
     @Override
@@ -168,17 +207,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
 
         // Get the other members from the wiki AllGroup
-        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
-        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
-        if (memberObjects != null) {
-            for (BaseObject object : memberObjects) {
-                if (object == null) {
-                    continue;
-                }
-                String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
-                if (!member.isEmpty() && !members.contains(member)) {
-                    members.add(member);
-                }
+        for (String member : getGroupMembers(getMembersGroupDocument(wikiId))) {
+            if (!members.contains(member)) {
+                members.add(member);
             }
         }
 
@@ -191,17 +222,43 @@ public class DefaultWikiUserManager implements WikiUserManager
         return getMembers(wikiId).contains(userId);
     }
 
-    private void addMemberObject(XWikiDocument groupDoc, String userId)
-        throws WikiUserManagerException
+    private void addMemberObject(XWikiDocument groupDoc, String userId) throws XWikiException
     {
-        try {
-            XWikiContext xcontext = xcontextProvider.get();
-            int objectNumber = groupDoc.createXObject(GROUPCLASS_REFERENCE, xcontext);
-            BaseObject object = groupDoc.getXObject(GROUPCLASS_REFERENCE, objectNumber);
-            object.set(GROUP_CLASS_MEMBER_FIELD, userId, xcontext);
-        } catch (XWikiException e) {
-            throw new WikiUserManagerException("Fail to add a member to the group", e);
+        XWikiContext xcontext = xcontextProvider.get();
+        int objectNumber = groupDoc.createXObject(GROUPCLASS_REFERENCE, xcontext);
+        BaseObject object = groupDoc.getXObject(GROUPCLASS_REFERENCE, objectNumber);
+        object.set(GROUP_CLASS_MEMBER_FIELD, userId, xcontext);
+    }
+
+    /**
+     * Adds the given users to the given copy of the member group document.
+     *
+     * @return {@code true} if a user has been added, {@code false} if they were all members already
+     */
+    private boolean addMemberObjects(XWikiDocument groupDoc, Collection<String> userIds, Collection<String> members)
+        throws XWikiException
+    {
+        List<String> newMembers = new ArrayList<>();
+        for (String userId : userIds) {
+            if (!members.contains(userId) && !newMembers.contains(userId)) {
+                newMembers.add(userId);
+            }
         }
+        if (newMembers.isEmpty()) {
+            return false;
+        }
+
+        // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
+        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
+        if (memberObjects == null || memberObjects.isEmpty()) {
+            addMemberObject(groupDoc, "");
+        }
+
+        for (String userId : newMembers) {
+            addMemberObject(groupDoc, userId);
+        }
+
+        return true;
     }
 
     @Override
@@ -213,24 +270,9 @@ public class DefaultWikiUserManager implements WikiUserManager
             return;
         }
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Add a member object
-        // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
-        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
-        if (memberObjects == null || memberObjects.isEmpty()) {
-            addMemberObject(groupDoc, "");
-        }
-
-        // Add the user
-        addMemberObject(groupDoc, userId);
-
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("Add [%s] to the group.", userId));
+        // The user can have been added to the latest version of the group by another request.
+        updateGroupDocument(wikiId, groupDoc -> addMemberObjects(groupDoc, List.of(userId), getGroupMembers(groupDoc)),
+            String.format("Add [%s] to the group.", userId));
     }
 
     @Override
@@ -238,100 +280,55 @@ public class DefaultWikiUserManager implements WikiUserManager
     {
         Collection<String> members = getMembers(wikiId);
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+        updateGroupDocument(wikiId, groupDoc -> {
+            // The users can have been added to the latest version of the group by another request.
+            List<String> currentMembers = new ArrayList<>(members);
+            currentMembers.addAll(getGroupMembers(groupDoc));
+            return addMemberObjects(groupDoc, userIds, currentMembers);
+        }, "Add members to the group.");
+    }
 
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
-        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
-        if (memberObjects == null || memberObjects.isEmpty()) {
-            addMemberObject(groupDoc, "");
+    /**
+     * Removes the member objects of the given users from the given copy of the member group document.
+     *
+     * @return {@code false} if the group has no member object, {@code true} otherwise
+     */
+    private boolean removeMemberObjects(XWikiDocument groupDoc, Collection<String> userIds)
+    {
+        // Get the member objects
+        List<BaseObject> objects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
+        if (objects == null) {
+            return false;
         }
 
-        // Add members
-        for (String userId : userIds) {
-            if (!members.contains(userId)) {
-                // Add a member object
-                addMemberObject(groupDoc, userId);
+        // Get the member objects to remove
+        List<BaseObject> objectsToRemove = new ArrayList<>();
+        for (BaseObject object : objects) {
+            if (object != null && userIds.contains(object.getStringValue(GROUP_CLASS_MEMBER_FIELD))) {
+                objectsToRemove.add(object);
             }
         }
 
-        // Save the document
-        saveGroupDocument(groupDoc, "Add members to the group.");
+        // Remove them
+        for (BaseObject object : objectsToRemove) {
+            groupDoc.removeXObject(object);
+        }
+
+        return true;
     }
 
     @Override
     public void removeMember(String userId, String wikiId) throws WikiUserManagerException
     {
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Get the member objects
-        List<BaseObject> objects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
-        if (objects != null) {
-
-            // Get the member objects to remove
-            List<BaseObject> objectsToRemove = new ArrayList<>();
-            for (BaseObject object : objects) {
-                if (object == null) {
-                    continue;
-                }
-                String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
-                if (userId.equals(member)) {
-                    objectsToRemove.add(object);
-                }
-            }
-
-            // Remove them
-            for (BaseObject object : objectsToRemove) {
-                groupDoc.removeXObject(object);
-            }
-
-            // Save the document
-            saveGroupDocument(groupDoc, String.format("Remove [%s] from the group.", userId));
-        }
+        updateGroupDocument(wikiId, groupDoc -> removeMemberObjects(groupDoc, List.of(userId)),
+            String.format("Remove [%s] from the group.", userId));
     }
 
     @Override
     public void removeMembers(Collection<String> userIds, String wikiId) throws WikiUserManagerException
     {
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Get the member objects
-        List<BaseObject> objects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
-        if (objects != null) {
-
-            // Get the member objects to remove
-            List<BaseObject> objectsToRemove = new ArrayList<>();
-            for (String userId: userIds) {
-                for (BaseObject object : objects) {
-                    if (object == null) {
-                        continue;
-                    }
-                    String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
-                    if (userId.equals(member)) {
-                        objectsToRemove.add(object);
-                    }
-                }
-            }
-
-            // Remove them
-            for (BaseObject object : objectsToRemove) {
-                groupDoc.removeXObject(object);
-            }
-
-            // Save the document
-            saveGroupDocument(groupDoc, "Remove some users from the group.");
-        }
+        updateGroupDocument(wikiId, groupDoc -> removeMemberObjects(groupDoc, userIds),
+            "Remove some users from the group.");
     }
 
     private MemberCandidacy readCandidacyFromObject(BaseObject object, String wikiId)
@@ -446,15 +443,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         MemberCandidacy candidacy = new MemberCandidacy(wikiId, userId, MemberCandidacy.CandidateType.REQUEST);
         candidacy.setUserComment(message);
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
         // Add a candidacy object
-        XWikiContext xcontext = xcontextProvider.get();
-        try {
+        updateGroupDocument(wikiId, groupDoc -> {
+            XWikiContext xcontext = xcontextProvider.get();
             int objectNumber = groupDoc.createXObject(WikiCandidateMemberClassInitializer.REFERENCE, xcontext);
             candidacy.setId(objectNumber);
             BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, objectNumber);
@@ -467,12 +458,8 @@ public class DefaultWikiUserManager implements WikiUserManager
                     candidacy.getDateOfCreation());
             object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE,
                     candidacy.getType().name().toLowerCase());
-        } catch (XWikiException e) {
-            throw new WikiUserManagerException("Failed to create a new join request.", e);
-        }
-
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("[%s] asks to join the wiki.", userId));
+            return true;
+        }, String.format("[%s] asks to join the wiki.", userId));
 
         return candidacy;
     }
@@ -496,6 +483,26 @@ public class DefaultWikiUserManager implements WikiUserManager
         removeMember(userId, wikiId);
     }
 
+    /**
+     * Copies the values set by the administrator who closed the given join request to its object in the given copy of
+     * the member group document.
+     */
+    private void closeRequest(XWikiDocument groupDoc, MemberCandidacy request)
+    {
+        // Get the candidacy object
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, request.getId());
+
+        // Set the new values
+        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN, request.getAdminId());
+        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_COMMENT, request.getAdminComment());
+        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_PRIVATE_COMMENT,
+                request.getAdminPrivateComment());
+        object.setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE,
+                request.getDateOfClosure());
+        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_STATUS,
+                request.getStatus().name().toLowerCase());
+    }
+
     @Override
     public void acceptRequest(MemberCandidacy request, String message, String privateComment)
         throws WikiUserManagerException
@@ -513,27 +520,10 @@ public class DefaultWikiUserManager implements WikiUserManager
         request.setStatus(MemberCandidacy.Status.ACCEPTED);
         request.setDateOfClosure(new Date());
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Get the candidacy object
-        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, request.getId());
-
-        // Set the new values
-        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN, request.getAdminId());
-        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_COMMENT, request.getAdminComment());
-        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_PRIVATE_COMMENT,
-                request.getAdminPrivateComment());
-        object.setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE,
-                request.getDateOfClosure());
-        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_STATUS,
-                request.getStatus().name().toLowerCase());
-
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("Accept join request from user [%s]", request.getUserId()));
+        updateGroupDocument(request.getWikiId(), groupDoc -> {
+            closeRequest(groupDoc, request);
+            return true;
+        }, String.format("Accept join request from user [%s]", request.getUserId()));
     }
 
     @Override
@@ -550,46 +540,23 @@ public class DefaultWikiUserManager implements WikiUserManager
         request.setStatus(MemberCandidacy.Status.REJECTED);
         request.setDateOfClosure(new Date());
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Get the candidacy object
-        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, request.getId());
-
-        // Set the new values
-        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN, request.getAdminId());
-        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_COMMENT, request.getAdminComment());
-        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_PRIVATE_COMMENT,
-                request.getAdminPrivateComment());
-        object.setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE,
-                request.getDateOfClosure());
-        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_STATUS,
-                request.getStatus().name().toLowerCase());
-
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("Reject join request from user [%s]", request.getUserId()));
+        updateGroupDocument(request.getWikiId(), groupDoc -> {
+            closeRequest(groupDoc, request);
+            return true;
+        }, String.format("Reject join request from user [%s]", request.getUserId()));
     }
 
     @Override
     public void cancelCandidacy(MemberCandidacy candidacy) throws WikiUserManagerException
     {
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(candidacy.getWikiId());
+        updateGroupDocument(candidacy.getWikiId(), groupDoc -> {
+            // Get the candidacy object
+            BaseObject object =
+                groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, candidacy.getId());
 
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Get the candidacy object
-        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, candidacy.getId());
-
-        // Remove the candidacy, if any
-        if (object != null) {
-            groupDoc.removeXObject(object);
-            saveGroupDocument(groupDoc, String.format("Candidacy [%d] is canceled.", candidacy.getId()));
-        }
+            // Remove the candidacy, if any
+            return object != null && groupDoc.removeXObject(object);
+        }, String.format("Candidacy [%d] is canceled.", candidacy.getId()));
     }
 
     @Override
@@ -603,14 +570,8 @@ public class DefaultWikiUserManager implements WikiUserManager
         candidacy.setUserComment(message);
         candidacy.setAdminId(documentReferenceSerializer.serialize(xcontext.getUserReference()));
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
         // Add a candidacy object
-        try {
+        updateGroupDocument(wikiId, groupDoc -> {
             int objectNumber = groupDoc.createXObject(WikiCandidateMemberClassInitializer.REFERENCE, xcontext);
             candidacy.setId(objectNumber);
             BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, objectNumber);
@@ -623,14 +584,26 @@ public class DefaultWikiUserManager implements WikiUserManager
                     candidacy.getDateOfCreation());
             object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE,
                     candidacy.getType().name().toLowerCase());
-        } catch (XWikiException e) {
-            throw new WikiUserManagerException("Failed to create a new invitation object.", e);
-        }
-
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("[%s] is invited to join the wiki.", userId));
+            return true;
+        }, String.format("[%s] is invited to join the wiki.", userId));
 
         return candidacy;
+    }
+
+    /**
+     * Copies the values set by the user who answered the given invitation to its object in the given copy of the
+     * member group document.
+     */
+    private void closeInvitation(XWikiDocument groupDoc, MemberCandidacy invitation)
+    {
+        // Get the candidacy object
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, invitation.getId());
+
+        // Set the new values
+        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_USER_COMMENT, invitation.getUserComment());
+        object.setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE, invitation.getDateOfClosure());
+        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_STATUS,
+                invitation.getStatus().name().toLowerCase());
     }
 
     @Override
@@ -644,23 +617,10 @@ public class DefaultWikiUserManager implements WikiUserManager
         invitation.setStatus(MemberCandidacy.Status.ACCEPTED);
         invitation.setDateOfClosure(new Date());
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(invitation.getWikiId());
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Get the candidacy object
-        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, invitation.getId());
-
-        // Set the new values
-        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_USER_COMMENT, invitation.getUserComment());
-        object.setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE, invitation.getDateOfClosure());
-        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_STATUS,
-                invitation.getStatus().name().toLowerCase());
-
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("User [%s] has accepted to join the wiki. ", invitation.getUserId()));
+        updateGroupDocument(invitation.getWikiId(), groupDoc -> {
+            closeInvitation(groupDoc, invitation);
+            return true;
+        }, String.format("User [%s] has accepted to join the wiki. ", invitation.getUserId()));
     }
 
     @Override
@@ -671,23 +631,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         invitation.setStatus(MemberCandidacy.Status.REJECTED);
         invitation.setDateOfClosure(new Date());
 
-        // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(invitation.getWikiId());
-
-        // Avoid modifying the cached document
-        groupDoc = groupDoc.clone();
-
-        // Get the candidacy object
-        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, invitation.getId());
-
-        // Set the new values
-        object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_USER_COMMENT, invitation.getUserComment());
-        object.setDateValue(WikiCandidateMemberClassInitializer.FIELD_DATE_OF_CLOSURE, invitation.getDateOfClosure());
-        object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_STATUS,
-                invitation.getStatus().name().toLowerCase());
-
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("User [%s] has rejected the invitation to join the wiki.",
-                invitation.getUserId()));
+        updateGroupDocument(invitation.getWikiId(), groupDoc -> {
+            closeInvitation(groupDoc, invitation);
+            return true;
+        }, String.format("User [%s] has rejected the invitation to join the wiki.", invitation.getUserId()));
     }
 }

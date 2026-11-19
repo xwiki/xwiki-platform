@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -76,11 +77,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.function.FailablePredicate;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
@@ -177,6 +180,7 @@ import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
@@ -304,6 +308,19 @@ public class XWiki implements EventListener
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
+
+    /**
+     * The number of times {@link #updateDocument} applies the modification before giving up when the document keeps
+     * being saved concurrently.
+     */
+    private static final int UPDATE_DOCUMENT_ATTEMPTS = 5;
+
+    /**
+     * The documents whose save is being notified to the listeners in the current thread: the original document the
+     * listeners see (the version before the save) mapped to the version that was saved. See
+     * {@link #saveDocument(XWikiDocument, String, boolean, boolean, XWikiContext)}.
+     */
+    private final ThreadLocal<Map<XWikiDocument, XWikiDocument>> notifiedSavedVersions = new ThreadLocal<>();
 
     /** Frequently used Document reference, the class which holds virtual wiki definitions. */
     private static final DocumentReference VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE =
@@ -1996,6 +2013,13 @@ public class XWiki implements EventListener
         // Also for document indicated as new make sure the previous document is accurate.
         if (originalDocument == null || document.isNew()) {
             XWikiDocument existing = getDocument(document.getDocumentReferenceWithLocale(), context);
+            if (originalDocument != null && originalDocument.isNew() && !existing.isNew()
+                && getStoreConfiguration().isRevisionCheckEnabled()) {
+                // The document didn't exist when it was loaded, and was created by another request since then. Saving
+                // it would replace the created document, so let the caller load it again and re-apply its changes.
+                throw new DocumentRevisionConflictException(document.getDocumentReferenceWithLocale(), null,
+                    existing.getVersion());
+            }
             // Switch the original document only if we actually find an existing document or if there is no original
             // document in the first place
             if (originalDocument == null || !existing.isNew()) {
@@ -2084,6 +2108,50 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Loads the stored document, modifies it and saves it. When the document is saved concurrently by another request
+     * (see {@link DocumentRevisionConflictException}), the modification is applied again to the newly stored document,
+     * so that neither modification is lost. Use this instead of loading, modifying and saving a document yourself
+     * whenever the modification can be applied again to a newer version of the document, e.g. adding an attachment or
+     * a group member.
+     *
+     * @param documentReference the reference of the document to update, with the locale of the translation to update
+     * @param update modifies the given copy of the stored document (a new document if it doesn't exist) and returns
+     *     {@code true} if the document needs to be saved, {@code false} to leave it unchanged; it may be called several
+     *     times, with a newer copy each time
+     * @param comment the comment of the saved version
+     * @param isMinorEdit {@code true} if the saved version is a minor edit
+     * @param context the XWiki context
+     * @return the saved document, or a copy of the stored document if {@code update} returned {@code false}
+     * @throws DocumentRevisionConflictException if the document was still saved concurrently after several attempts
+     * @throws XWikiException if loading, modifying or saving the document failed
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public XWikiDocument updateDocument(DocumentReference documentReference,
+        FailablePredicate<XWikiDocument, XWikiException> update, String comment, boolean isMinorEdit,
+        XWikiContext context) throws XWikiException
+    {
+        for (int attempt = 1;; attempt++) {
+            // Copy the document because the stored one can be shared through the document cache.
+            XWikiDocument document = getDocument(documentReference, context).clone();
+            if (!update.test(document)) {
+                return document;
+            }
+
+            try {
+                saveDocument(document, comment, isMinorEdit, context);
+                return document;
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt >= UPDATE_DOCUMENT_ATTEMPTS) {
+                    throw e;
+                }
+                LOGGER.debug("Document [{}] was saved concurrently, updating the stored document again.",
+                    documentReference);
+            }
+        }
+    }
+
+    /**
      * Save the passed document in the store.
      * <p>
      * If document is not new and metadata and content dirty flags are false, the version/history won't be incremented
@@ -2103,8 +2171,8 @@ public class XWiki implements EventListener
      * @since 18.4.5
      * @since 18.8.0RC1
      */
-    public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, boolean modifiedByContextUser,
-        XWikiContext context) throws XWikiException
+    public void saveDocument(@NonNull XWikiDocument document, String comment, boolean isMinorEdit,
+        boolean modifiedByContextUser, XWikiContext context) throws XWikiException
     {
         String currentWiki = context.getWikiId();
 
@@ -2115,6 +2183,15 @@ public class XWiki implements EventListener
             // Remember the dirty flags statuses so that they can be restored if needed
             boolean metadataDirty = document.isMetaDataDirty();
             boolean contentDirty = document.isContentDirty();
+
+            // A listener notified about the save of a document can save this document again, or a copy of it. Its
+            // original document is then the version before the first save, which the listeners compare with, but the
+            // document is based on the version that was saved.
+            XWikiDocument notifiedOriginalDocument = document.getOriginalDocument();
+            XWikiDocument savedVersion = getNotifiedSavedVersion(notifiedOriginalDocument);
+            if (savedVersion != null) {
+                document.setOriginalDocument(savedVersion);
+            }
 
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
@@ -2154,6 +2231,13 @@ public class XWiki implements EventListener
             // back to send notifications.
             XWikiDocument newOriginal = document.getOriginalDocument();
 
+            Map<XWikiDocument, XWikiDocument> savedVersions = getOrCreateNotifiedSavedVersions();
+            if (savedVersion != null) {
+                // Further copies saved by the listeners are based on this version.
+                savedVersions.put(notifiedOriginalDocument, newOriginal);
+            }
+            XWikiDocument previousSavedVersion = savedVersions.put(originalDocument, newOriginal);
+
             try {
                 document.setOriginalDocument(originalDocument);
 
@@ -2170,10 +2254,49 @@ public class XWiki implements EventListener
                 LOGGER.error("Failed to send document save notification for document [{}]",
                     getDefaultEntityReferenceSerializer().serialize(document.getDocumentReference()), ex);
             } finally {
-                document.setOriginalDocument(newOriginal);
+                restoreNotifiedSavedVersion(savedVersions, originalDocument, previousSavedVersion);
+
+                // Unless a listener saved this document again, which already set its new original document.
+                if (document.getOriginalDocument() == originalDocument) {
+                    document.setOriginalDocument(newOriginal);
+                }
             }
         } finally {
             context.setWikiId(currentWiki);
+        }
+    }
+
+    private XWikiDocument getNotifiedSavedVersion(XWikiDocument notifiedOriginalDocument)
+    {
+        Map<XWikiDocument, XWikiDocument> savedVersions = this.notifiedSavedVersions.get();
+
+        return savedVersions != null && notifiedOriginalDocument != null
+            ? savedVersions.get(notifiedOriginalDocument) : null;
+    }
+
+    private Map<XWikiDocument, XWikiDocument> getOrCreateNotifiedSavedVersions()
+    {
+        Map<XWikiDocument, XWikiDocument> savedVersions = this.notifiedSavedVersions.get();
+        if (savedVersions == null) {
+            savedVersions = new IdentityHashMap<>();
+            this.notifiedSavedVersions.set(savedVersions);
+        }
+
+        return savedVersions;
+    }
+
+    private void restoreNotifiedSavedVersion(Map<XWikiDocument, XWikiDocument> savedVersions,
+        XWikiDocument originalDocument, XWikiDocument previousSavedVersion)
+    {
+        if (previousSavedVersion != null) {
+            savedVersions.put(originalDocument, previousSavedVersion);
+        } else {
+            savedVersions.remove(originalDocument);
+        }
+
+        // Don't keep the map in threads that are reused (e.g. by the servlet container).
+        if (savedVersions.isEmpty()) {
+            this.notifiedSavedVersions.remove();
         }
     }
 
@@ -4372,21 +4495,21 @@ public class XWiki implements EventListener
 
     protected void addUserToGroup(String userName, String groupName, XWikiContext context) throws XWikiException
     {
-        XWikiDocument groupDoc = getDocument(groupName, context);
-
+        DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(groupName);
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
 
-        // Make sure the user is not already part of the group
-        if (groupDoc.getXObject(groupClassReference, "member", userName, false) == null) {
-            XWikiDocument modifiedDocument = groupDoc.clone();
-            BaseObject memberObject =
-                modifiedDocument.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()),
-                    context);
+        // Users can be added concurrently to the same group, e.g. when they register at the same time.
+        updateDocument(groupReference, groupDoc -> {
+            // Make sure the user is not already part of the group
+            if (groupDoc.getXObject(groupClassReference, "member", userName, false) != null) {
+                return false;
+            }
 
+            BaseObject memberObject = groupDoc
+                .newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
             memberObject.setStringValue("member", userName);
-
-            saveDocument(modifiedDocument, localizePlainOrKey("core.comment.addedUserToGroup"), context);
-        }
+            return true;
+        }, localizePlainOrKey("core.comment.addedUserToGroup"), false, context);
     }
 
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)

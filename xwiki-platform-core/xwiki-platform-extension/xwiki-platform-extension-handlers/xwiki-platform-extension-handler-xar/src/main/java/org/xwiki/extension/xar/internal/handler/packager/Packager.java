@@ -58,6 +58,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -98,6 +99,12 @@ public class Packager
 
     private static final TranslationMarker LOG_DELETEDDOCUMENT_FAILURE =
         new TranslationMarker("extension.xar.log.delete.document.failure");
+
+    /**
+     * The number of times a document is merged and saved again when it keeps being saved concurrently by other
+     * requests.
+     */
+    private static final int SAVE_ATTEMPTS = 5;
 
     @Inject
     @Named("explicit")
@@ -155,7 +162,7 @@ public class Packager
     }
 
     private void importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, XarException, XWikiException
+        PackageConfiguration configuration) throws IOException, XarException
     {
         try (FileInputStream fis = new FileInputStream(xarFile)) {
             importXARToWiki(comment, fis, wikiReference, configuration);
@@ -163,7 +170,7 @@ public class Packager
     }
 
     private void importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, XarException, XWikiException
+        PackageConfiguration configuration) throws IOException, XarException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(xarInputStream);
 
@@ -199,10 +206,8 @@ public class Packager
     }
 
     private void importDocumentToWiki(String comment, WikiReference wikiReference, InputStream inputStream,
-        PackageConfiguration configuration, String name) throws XWikiException, XarException, IOException
+        PackageConfiguration configuration, String name) throws XarException, IOException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
         XWikiDocument nextDocument;
         try {
             nextDocument = getXWikiDocument(inputStream, wikiReference);
@@ -213,8 +218,6 @@ public class Packager
         }
 
         DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
-        XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
-        currentDocument.loadAttachmentsContentSafe(xcontext);
         XWikiDocument previousDocument;
         XarExtensionPlan xarExtensionPlan = configuration.getXarExtensionPlan();
         if (xarExtensionPlan != null) {
@@ -229,7 +232,7 @@ public class Packager
         }
 
         try {
-            this.importer.importDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
+            importDocument(comment, previousDocument, nextDocument, configuration);
 
             if (configuration.isVerbose()) {
                 this.logger.info(LOG_INSTALLDOCUMENT_SUCCESS_END, "Done installing document [{}]",
@@ -239,6 +242,33 @@ public class Packager
             if (configuration.isVerbose()) {
                 this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END, "Failed to install document [{}]",
                     nextDocument.getDocumentReferenceWithLocale(), e);
+            }
+        }
+    }
+
+    private void importDocument(String comment, XWikiDocument previousDocument, XWikiDocument nextDocument,
+        PackageConfiguration configuration) throws Exception
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
+
+        // A user can save the document while it is merged, e.g. while the conflict question waits for an answer. The
+        // merge result is then refused when saving it, because it would overwrite that save, so the document is merged
+        // again with the version saved by the user (asking again in case of conflict).
+        for (int attempt = 1;; attempt++) {
+            XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
+            currentDocument.loadAttachmentsContentSafe(xcontext);
+
+            try {
+                this.importer.importDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
+
+                return;
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt >= SAVE_ATTEMPTS) {
+                    throw e;
+                }
+
+                this.logger.debug("Document [{}] was saved concurrently, merging it again.", reference);
             }
         }
     }
@@ -434,22 +464,7 @@ public class Packager
             XWikiDocument document = getXWikiDocument(documentReference, extension);
 
             if (document != null) {
-                XWikiContext xcontext = this.xcontextProvider.get();
-
-                // Get database document
-                XWikiDocument databaseDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
-
-                // Override data of database document with extension document
-                databaseDocument.apply(document);
-                // Make sure new version will have the right author
-                databaseDocument.setAuthor(this.userResolver.resolve(xcontext.getUserReference()));
-                // Force generating a new version, even if there is no change
-                databaseDocument.setMetaDataDirty(true);
-                databaseDocument.setContentDirty(true);
-
-                // Save
-                xcontext.getWiki().saveDocument(databaseDocument, "Reset document from extension [" + extension + "]",
-                    false, true, xcontext);
+                reset(documentReference, document, "Reset document from extension [" + extension + "]");
             } else {
                 throw new XarExtensionException("Can't find any document with reference [" + documentReference
                     + "] in extension [" + extension.getId() + "]");
@@ -458,6 +473,27 @@ public class Packager
             throw new XarExtensionException(
                 "Can't find any installed extension associated with the document reference [" + reference + "]");
         }
+    }
+
+    private void reset(DocumentReference documentReference, XWikiDocument extensionDocument, String comment)
+        throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        // Get database document, cloned since the stored document can be shared through the document cache
+        XWikiDocument databaseDocument = xcontext.getWiki().getDocument(documentReference, xcontext).clone();
+
+        // Override data of database document with extension document
+        databaseDocument.apply(extensionDocument);
+        // Make sure new version will have the right author
+        databaseDocument.setAuthor(this.userResolver.resolve(xcontext.getUserReference()));
+        // Force generating a new version, even if there is no change
+        databaseDocument.setMetaDataDirty(true);
+        databaseDocument.setContentDirty(true);
+
+        // Save. The reset isn't applied again if the document is saved concurrently: the user decided to discard the
+        // changes of the version they saw, not the ones saved since.
+        xcontext.getWiki().saveDocument(databaseDocument, comment, false, true, xcontext);
     }
 
     public List<DocumentReference> getDocumentReferences(Collection<XarEntry> pages, PackageConfiguration configuration)

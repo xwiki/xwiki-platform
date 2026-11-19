@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -49,6 +50,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -88,6 +90,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -166,6 +169,7 @@ class DefaultModelBridgeTest
         when(xwiki.getRecycleBinStore()).thenReturn(this.recycleBin);
         when(xwiki.getStore()).thenReturn(this.store);
         when(xwiki.getRightService()).thenReturn(this.xWikiRightService);
+        when(this.xwiki.updateDocument(any(), any(), any(), anyBoolean(), any())).thenCallRealMethod();
 
         Provider<XWikiContext> xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
@@ -349,7 +353,7 @@ class DefaultModelBridgeTest
         verify(oldDocument.getAuthors()).setEffectiveMetadataAuthor(userReference);
         verify(oldDocument.getAuthors()).setOriginalMetadataAuthor(userReference);
         verify(oldDocument).setHidden(true);
-        verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", this.xcontext);
+        verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", false, this.xcontext);
         assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
     }
 
@@ -380,8 +384,45 @@ class DefaultModelBridgeTest
         verify(oldDocument.getAuthors(), never()).setEffectiveMetadataAuthor(userReference);
         verify(oldDocument.getAuthors()).setOriginalMetadataAuthor(userReference);
         verify(oldDocument).setHidden(true);
-        verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", this.xcontext);
+        verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", false, this.xcontext);
         assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+    }
+
+    @Test
+    void createRedirectAfterConcurrentSave() throws Exception
+    {
+        DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
+        DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
+
+        EntityReferenceSerializer<String> serializer =
+            this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        when(serializer.serialize(newReference)).thenReturn("wiki:Space.New");
+
+        XWikiDocument staleDocument = mockRedirectDocument();
+        XWikiDocument latestDocument = mockRedirectDocument();
+        when(this.xwiki.getDocument(oldReference, this.xcontext)).thenReturn(staleDocument, latestDocument);
+        doThrow(new DocumentRevisionConflictException(oldReference, "1.1", "2.1")).when(this.xwiki)
+            .saveDocument(staleDocument, "Create automatic redirect.", false, this.xcontext);
+
+        this.modelBridge.createRedirect(oldReference, newReference);
+
+        verify(latestDocument).setHidden(true);
+        verify(latestDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
+            .setStringValue("location", "wiki:Space.New");
+        verify(this.xwiki).saveDocument(latestDocument, "Create automatic redirect.", false, this.xcontext);
+        assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+    }
+
+    private XWikiDocument mockRedirectDocument() throws XWikiException
+    {
+        XWikiDocument document = mock();
+        when(document.clone()).thenReturn(document);
+        BaseObject redirectObject = mock();
+        when(document.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
+            .thenReturn(redirectObject);
+        DocumentAuthors authors = mock();
+        when(document.getAuthors()).thenReturn(authors);
+        return document;
     }
 
     @Test
@@ -430,9 +471,11 @@ class DefaultModelBridgeTest
 
         XWikiDocument child1Document = mock(XWikiDocument.class);
         when(child1Document.clone()).thenReturn(child1Document);
+        when(child1Document.getParentReference()).thenReturn(oldParentReference);
         when(this.xcontext.getWiki().getDocument(child1Reference, this.xcontext)).thenReturn(child1Document);
         XWikiDocument child2Document = mock(XWikiDocument.class);
         when(child2Document.clone()).thenReturn(child2Document);
+        when(child2Document.getParentReference()).thenReturn(oldParentReference);
         when(this.xcontext.getWiki().getDocument(child2Reference, this.xcontext)).thenReturn(child2Document);
 
         this.modelBridge.updateParentField(oldParentReference, newParentReference);
@@ -443,7 +486,7 @@ class DefaultModelBridgeTest
         verify(this.xcontext.getWiki()).saveDocument(child1Document, "Updated parent field.", true, this.xcontext);
 
         verify(child2Document).setParentReference(newParentReference);
-        verify(this.xcontext.getWiki()).saveDocument(child1Document, "Updated parent field.", true, this.xcontext);
+        verify(this.xcontext.getWiki()).saveDocument(child2Document, "Updated parent field.", true, this.xcontext);
 
         assertLog(Level.INFO, "Document parent fields updated from [{}] to [{}] for [{}] documents.",
             oldParentReference, newParentReference, 2);
@@ -471,6 +514,75 @@ class DefaultModelBridgeTest
     }
 
     @Test
+    void updateParentFieldsAfterConcurrentSave() throws Exception
+    {
+        DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
+        DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
+        DocumentReference childReference = new DocumentReference("wiki", "Space", "Child");
+        mockChildren(oldParentReference, childReference);
+
+        XWikiDocument staleChildDocument = mockChild(oldParentReference);
+        XWikiDocument latestChildDocument = mockChild(oldParentReference);
+        when(this.xwiki.getDocument(childReference, this.xcontext)).thenReturn(staleChildDocument,
+            latestChildDocument);
+        doThrow(new DocumentRevisionConflictException(childReference, "1.1", "2.1")).when(this.xwiki)
+            .saveDocument(staleChildDocument, "Updated parent field.", true, this.xcontext);
+
+        assertTrue(this.modelBridge.updateParentField(oldParentReference, newParentReference));
+
+        verify(latestChildDocument).setParentReference(newParentReference);
+        verify(this.xwiki).saveDocument(latestChildDocument, "Updated parent field.", true, this.xcontext);
+        assertLog(Level.INFO, "Document parent fields updated from [{}] to [{}] for [{}] documents.",
+            oldParentReference, newParentReference, 1);
+    }
+
+    @Test
+    void updateParentFieldsContinuesAfterFailure() throws Exception
+    {
+        DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
+        DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
+        DocumentReference child1Reference = new DocumentReference("wiki", "Space", "Child1");
+        DocumentReference child2Reference = new DocumentReference("wiki", "Space", "Child2");
+        DocumentReference child3Reference = new DocumentReference("wiki", "Space", "Child3");
+        mockChildren(oldParentReference, child1Reference, child2Reference, child3Reference);
+
+        XWikiDocument child1Document = mockChild(oldParentReference);
+        when(this.xwiki.getDocument(child1Reference, this.xcontext)).thenReturn(child1Document);
+        doThrow(new XWikiException()).when(this.xwiki).saveDocument(child1Document, "Updated parent field.", true, this.xcontext);
+        // The parent of the second child was changed after the children were listed.
+        XWikiDocument child2Document = mockChild(new DocumentReference("wiki", "Space", "Other"));
+        when(this.xwiki.getDocument(child2Reference, this.xcontext)).thenReturn(child2Document);
+        XWikiDocument child3Document = mockChild(oldParentReference);
+        when(this.xwiki.getDocument(child3Reference, this.xcontext)).thenReturn(child3Document);
+
+        assertFalse(this.modelBridge.updateParentField(oldParentReference, newParentReference));
+
+        verify(child2Document, never()).setParentReference(any(EntityReference.class));
+        verify(this.xwiki, never()).saveDocument(child2Document, "Updated parent field.", true, this.xcontext);
+        verify(child3Document).setParentReference(newParentReference);
+        verify(this.xwiki).saveDocument(child3Document, "Updated parent field.", true, this.xcontext);
+        assertLog(Level.ERROR, "Failed to update the parent field of [{}] from [{}] to [{}].", child1Reference,
+            oldParentReference, newParentReference);
+        verify(this.progressManager).popLevelProgress(this.modelBridge);
+    }
+
+    private void mockChildren(DocumentReference parentReference, DocumentReference... childReferences)
+        throws XWikiException
+    {
+        XWikiDocument parentDocument = mock();
+        when(this.xwiki.getDocument(parentReference, this.xcontext)).thenReturn(parentDocument);
+        when(parentDocument.getChildrenReferences(this.xcontext)).thenReturn(List.of(childReferences));
+    }
+
+    private XWikiDocument mockChild(DocumentReference parentReference)
+    {
+        XWikiDocument childDocument = mock();
+        when(childDocument.clone()).thenReturn(childDocument);
+        when(childDocument.getParentReference()).thenReturn(parentReference);
+        return childDocument;
+    }
+
+    @Test
     void updateTitle() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
@@ -492,6 +604,45 @@ class DefaultModelBridgeTest
         verify(this.xcontext.getWiki()).saveDocument(clonedDocument, "Update document after refactoring.", true,
             xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
+    }
+
+    @Test
+    void updateTitleAfterConcurrentSave() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("Path", "To"), "Page");
+        XWikiDocument staleDocument = mock();
+        when(staleDocument.clone()).thenReturn(staleDocument);
+        XWikiDocument latestDocument = mock();
+        when(latestDocument.clone()).thenReturn(latestDocument);
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(staleDocument, latestDocument);
+        doThrow(new DocumentRevisionConflictException(documentReference, "1.1", "2.1")).when(this.xwiki)
+            .saveDocument(staleDocument, "Update document after refactoring.", true, this.xcontext);
+
+        ParentChildConfiguration parentChildConfiguration =
+            this.componentManager.getInstance(ParentChildConfiguration.class);
+        when(parentChildConfiguration.isParentChildMechanismEnabled()).thenReturn(true);
+
+        this.modelBridge.update(documentReference, Map.of("title", "foo"));
+
+        verify(latestDocument).setTitle("foo");
+        verify(this.xwiki).saveDocument(latestDocument, "Update document after refactoring.", true, this.xcontext);
+        assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
+    }
+
+    @Test
+    void dontUpdateDeletedDocument() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("Path", "To"), "Page");
+        XWikiDocument document = mock();
+        when(document.clone()).thenReturn(document);
+        when(document.isNew()).thenReturn(true);
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
+
+        this.modelBridge.update(documentReference, Map.of("title", "foo"));
+
+        verify(document, never()).setTitle(any());
+        verify(this.xwiki, never()).saveDocument(any(XWikiDocument.class), anyString(), anyBoolean(),
+            any(XWikiContext.class));
     }
 
     @Test
@@ -523,6 +674,7 @@ class DefaultModelBridgeTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(document);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
 
         DocumentReference parentReference = new DocumentReference("subwiki", Arrays.asList("Path", "To"), "WebHome");
@@ -549,6 +701,7 @@ class DefaultModelBridgeTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "Foo"), "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(document);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
 
         DocumentReference parentReference = new DocumentReference("wiki", Arrays.asList("Path"), "WebHome");
@@ -624,6 +777,7 @@ class DefaultModelBridgeTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(document);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 

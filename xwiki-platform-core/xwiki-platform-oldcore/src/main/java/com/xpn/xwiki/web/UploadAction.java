@@ -41,6 +41,7 @@ import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.DocumentRevisionConflictException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -76,6 +77,11 @@ public class UploadAction extends XWikiAction
 
     private static final String MESSAGE = "message";
 
+    /**
+     * The number of times a file is attached again when the document keeps being saved concurrently.
+     */
+    private static final int SAVE_ATTEMPTS = 5;
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -99,17 +105,7 @@ public class UploadAction extends XWikiAction
 
         // We need to clone the document before we modify it because the cached storage gives the same instance to other
         // requests (until the cache is invalidated).
-        XWikiDocument doc = context.getDoc().clone();
-
-        // It is possible to submit an attachment to a new document (the WYSIWYG content editor does it for instance).
-        // Let's make sure the new document is created with the right (default) language.
-        if (doc.isNew()) {
-            doc.setLocale(Locale.ROOT);
-            if (doc.getDefaultLocale() == Locale.ROOT) {
-                doc.setDefaultLocale(
-                    LocaleUtils.toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
-            }
-        }
+        XWikiDocument doc = initializeNewDocumentLocale(context.getDoc().clone(), context);
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
@@ -137,7 +133,7 @@ public class UploadAction extends XWikiAction
 
         for (Entry<String, String> file : fileNames.entrySet()) {
             try {
-                uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
+                doc = uploadAttachmentWithRetry(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
                 this.logger.warn("Failed to save uploaded file [{}]", file.getKey(), ex);
                 failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
@@ -169,6 +165,48 @@ public class UploadAction extends XWikiAction
         }
         sendRedirect(response, redirect);
         return false;
+    }
+
+    private XWikiDocument initializeNewDocumentLocale(XWikiDocument doc, XWikiContext context)
+    {
+        // It is possible to submit an attachment to a new document (the WYSIWYG content editor does it for instance).
+        // Let's make sure the new document is created with the right (default) language.
+        if (doc.isNew()) {
+            doc.setLocale(Locale.ROOT);
+            if (doc.getDefaultLocale() == Locale.ROOT) {
+                doc.setDefaultLocale(
+                    LocaleUtils.toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
+            }
+        }
+
+        return doc;
+    }
+
+    /**
+     * Attaches a file to the document and saves it, attaching it again to the newly saved version when the document
+     * was saved concurrently, e.g. by another upload.
+     *
+     * @return the saved document, on which the next files are attached
+     */
+    private XWikiDocument uploadAttachmentWithRetry(String fieldName, String filename, FileUploadPlugin fileupload,
+        XWikiDocument doc, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument document = doc;
+        for (int attempt = 1;; attempt++) {
+            try {
+                uploadAttachment(fieldName, filename, fileupload, document, context);
+
+                return document;
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt >= SAVE_ATTEMPTS) {
+                    throw e;
+                }
+                this.logger.debug("Document [{}] was saved concurrently, attaching [{}] again.",
+                    document.getDocumentReference(), filename);
+                document = initializeNewDocumentLocale(
+                    context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context).clone(), context);
+            }
+        }
     }
 
     /**

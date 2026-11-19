@@ -38,6 +38,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -86,6 +87,27 @@ class XWikiGroupServiceImplTest
         this.oldcore.getSpyXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
 
         this.oldcore.getXWikiContext().setWikiId("wiki");
+    }
+
+    @Test
+    void removeUserOrGroupFromAllGroupsAfterConcurrentSave() throws Exception
+    {
+        this.oldcore.checkDocumentRevision(true);
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        // The group as found by the search, loaded before another member is added concurrently.
+        XWikiDocument foundGroup = this.oldcore.getSpyXWiki().getDocument(this.group.getDocumentReference(), xcontext);
+        when(this.oldcore.getMockStore().searchDocuments(anyString(), anyList(), any(XWikiContext.class)))
+            .thenReturn(List.of(foundGroup));
+        XWikiDocument concurrentGroup = foundGroup.clone();
+        concurrentGroup.newXObject(new DocumentReference("wiki", "XWiki", "XWikiGroups"), xcontext)
+            .setStringValue("member", this.userWithSpaces.getFullName());
+        this.oldcore.getSpyXWiki().saveDocument(concurrentGroup, xcontext);
+
+        this.groupService.removeUserOrGroupFromAllGroups("wiki", "XWiki", "user", xcontext);
+
+        // The member is removed from the version saved concurrently, which keeps the other member.
+        assertEquals(List.of(this.userWithSpaces.getFullName()),
+            this.groupService.listMemberForGroup(this.group.getFullName(), xcontext));
     }
 
     @Test

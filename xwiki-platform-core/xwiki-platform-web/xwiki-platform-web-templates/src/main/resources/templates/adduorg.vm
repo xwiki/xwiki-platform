@@ -19,34 +19,51 @@
 ## ---------------------------------------------------------------------------
 #set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
 #if ($services.csrf.isTokenValid($request.form_token))
-  #set ($dirty = false)
-  #set ($ignoredGroups = [])
-  #foreach ($name in $request.getParameterValues('name'))
-    ## Verify if the user or group is already in the target group.
-    #if ($name.trim() == '')
-      #set ($accept = false)
-    #else
-      #set ($candidateDoc = $xwiki.getDocument($name))
-      #set ($isGroup = $candidateDoc.getObject('XWiki.XWikiGroups'))
-      #if ($isGroup)
-        #set ($accept = $services.user.group.canAddGroupAsMember($candidateDoc.getDocumentReference(),
-          $doc.getDocumentReference()))
+  ## Several requests can add members to the same group at the same time. The save is refused when another request
+  ## saved the group after we loaded it, so we load the group again and add the members again.
+  #set ($saved = false)
+  #foreach ($attempt in [1..5])
+    #set ($group = $xwiki.getDocument($doc.documentReference))
+    #set ($dirty = false)
+    #set ($ignoredGroups = [])
+    #foreach ($name in $request.getParameterValues('name'))
+      ## Verify if the user or group is already in the target group.
+      #if ($name.trim() == '')
+        #set ($accept = false)
       #else
-        #set ($accept = !$doc.getObject('XWiki.XWikiGroups', 'member', $name))
+        #set ($candidateDoc = $xwiki.getDocument($name))
+        #set ($isGroup = $candidateDoc.getObject('XWiki.XWikiGroups'))
+        #if ($isGroup)
+          #set ($accept = $services.user.group.canAddGroupAsMember($candidateDoc.getDocumentReference(),
+            $group.getDocumentReference()))
+        #else
+          #set ($accept = !$group.getObject('XWiki.XWikiGroups', 'member', $name))
+        #end
+      #end
+      #if ($accept)
+        #set ($obj = $group.newObject('XWiki.XWikiGroups'))
+        #set ($discard = $obj.set('member', $name))
+        #set ($dirty = true)
+      #elseif($name != '' && $isGroup)
+        #set ($discard = $ignoredGroups.add($name))
       #end
     #end
-    #if ($accept)
-      #set ($obj = $doc.newObject('XWiki.XWikiGroups'))
-      #set ($discard = $obj.set('member', $name))
-      #set ($dirty = true)
-    #elseif($name != '' && $isGroup)
-      #set ($discard = $ignoredGroups.add($name))
+    #set ($saveException = $NULL)
+    #if ($dirty)
+      #try('saveException')
+        #set ($discard = $group.save())
+      #end
+    #end
+    #if ("$!saveException" == '')
+      #set ($saved = true)
+      #break
+    #elseif (!$services.merge.isDocumentRevisionConflict($saveException))
+      #break
     #end
   #end
-  #if ($dirty)
-    #set ($discard = $doc.save())
-  #end
-  #if (!$isAjaxRequest)
+  #if (!$saved)
+    $response.sendError(500, $exceptiontool.getRootCauseMessage($saveException))
+  #elseif (!$isAjaxRequest)
     $response.sendRedirect($doc.getURL())
   #else
     #set ($hasIgnored = !$ignoredGroups.isEmpty())

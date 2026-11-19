@@ -36,7 +36,7 @@
     <xwiki.extension.name>Ratings API</xwiki.extension.name>
     <!-- Needs to be installed on root to be able to use Solr Store -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
-    <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
       org.xwiki.contrib.ratings:application-ratings-api

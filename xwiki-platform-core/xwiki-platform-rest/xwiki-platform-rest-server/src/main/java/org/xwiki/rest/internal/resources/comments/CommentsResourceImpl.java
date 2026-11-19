@@ -36,6 +36,7 @@ import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.Comments;
 import org.xwiki.rest.resources.comments.CommentResource;
 import org.xwiki.rest.resources.comments.CommentsResource;
+import org.xwiki.store.DocumentRevisionConflictException;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -47,6 +48,14 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.comments.CommentsResourceImpl")
 public class CommentsResourceImpl extends XWikiResource implements CommentsResource
 {
+    private static final String COMMENTS_CLASS_NAME = "XWiki.XWikiComments";
+
+    /**
+     * The number of times a comment is added to the latest version of the document when the document keeps being
+     * saved concurrently.
+     */
+    private static final int SAVE_ATTEMPTS = 5;
+
     @Override
     public Comments getComments(String wikiName, String spaceName, String pageName, Integer start, Integer number,
             Boolean withPrettyNames) throws XWikiRestException
@@ -80,46 +89,72 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
     {
         try {
             List<String> spaces = parseSpaceSegments(spaceName);
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, true, true);
 
-            Document doc = documentInfo.getDocument();
+            for (int attempt = 1;; attempt++) {
+                // Load the document at each attempt so that the comment is added to the latest version.
+                DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, true, true);
+                Document doc = documentInfo.getDocument();
 
-            String commentsClassName = "XWiki.XWikiComments";
-            int id = doc.createNewObject(commentsClassName);
-            com.xpn.xwiki.api.Object commentObject = doc.getObject(commentsClassName, id);
-            commentObject.set("author", Utils.getXWikiUser(componentManager));
-            commentObject.set("date", new Date());
+                // Without a highlight or a text, there's no comment to add.
+                if (comment.getHighlight() == null && comment.getText() == null) {
+                    return null;
+                }
 
-            boolean save = false;
+                com.xpn.xwiki.api.Object commentObject = addComment(doc, comment);
 
-            if (comment.getHighlight() != null) {
-                commentObject.set("highlight", comment.getHighlight());
-                save = true;
-            }
+                if (!save(doc, attempt)) {
+                    continue;
+                }
 
-            if (comment.getText() != null) {
-                commentObject.set("comment", comment.getText());
-                save = true;
-            }
-
-            if (comment.getReplyTo() != null) {
-                commentObject.set("replyto", comment.getReplyTo());
-            }
-
-            if (save) {
-                doc.save();
-
-                Comment createdComment = DomainObjectFactory
-                        .createComment(objectFactory, uriInfo.getBaseUri(), doc, commentObject,
-                                Utils.getXWikiApi(componentManager), false);
+                Comment createdComment = DomainObjectFactory.createComment(objectFactory, uriInfo.getBaseUri(), doc,
+                    commentObject, Utils.getXWikiApi(componentManager), false);
 
                 return Response.created(Utils.createURI(uriInfo.getBaseUri(), CommentResource.class, wikiName,
-                    spaces, pageName, id)).entity(createdComment).build();
+                    spaces, pageName, commentObject.getNumber())).entity(createdComment).build();
             }
-
-            return null;
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }
+    }
+
+    /**
+     * @return {@code false} if the document was saved by another request since it was loaded: adding a comment doesn't
+     *         depend on the other changes, so it can be added again to the newly saved version
+     */
+    private boolean save(Document doc, int attempt) throws XWikiException
+    {
+        try {
+            doc.save();
+
+            return true;
+        } catch (DocumentRevisionConflictException e) {
+            if (attempt >= SAVE_ATTEMPTS) {
+                throw e;
+            }
+
+            return false;
+        }
+    }
+
+    private com.xpn.xwiki.api.Object addComment(Document doc, Comment comment) throws XWikiException
+    {
+        int id = doc.createNewObject(COMMENTS_CLASS_NAME);
+        com.xpn.xwiki.api.Object commentObject = doc.getObject(COMMENTS_CLASS_NAME, id);
+        commentObject.set("author", Utils.getXWikiUser(componentManager));
+        commentObject.set("date", new Date());
+
+        if (comment.getHighlight() != null) {
+            commentObject.set("highlight", comment.getHighlight());
+        }
+
+        if (comment.getText() != null) {
+            commentObject.set("comment", comment.getText());
+        }
+
+        if (comment.getReplyTo() != null) {
+            commentObject.set("replyto", comment.getReplyTo());
+        }
+
+        return commentObject;
     }
 }

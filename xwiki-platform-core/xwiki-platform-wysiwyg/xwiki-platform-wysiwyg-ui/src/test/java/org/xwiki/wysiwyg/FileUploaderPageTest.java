@@ -21,10 +21,12 @@ package org.xwiki.wysiwyg;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.script.ScriptContext;
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang3.function.FailableRunnable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -38,6 +40,9 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentException;
+import org.xwiki.store.merge.MergeConflictDecisionsManager;
+import org.xwiki.store.merge.MergeManager;
+import org.xwiki.store.merge.MergeScriptService;
 import org.xwiki.store.script.TemporaryAttachmentsScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
@@ -45,8 +50,11 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
 import com.xpn.xwiki.render.ScriptXWikiServletRequest;
@@ -54,9 +62,17 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -73,7 +89,8 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     DocumentReferenceConverter.class,
     EntityReferenceConverter.class,
-    ModelScriptService.class
+    ModelScriptService.class,
+    MergeScriptService.class
 })
 class FileUploaderPageTest extends PageTest
 {
@@ -99,6 +116,8 @@ class FileUploaderPageTest extends PageTest
         this.componentManager.registerComponent(ScriptService.class, "csrf", this.csrfScriptService);
         this.componentManager.registerComponent(ScriptService.class, "temporaryAttachments",
             this.temporaryAttachmentsScriptService);
+        this.componentManager.registerMockComponent(MergeManager.class);
+        this.componentManager.registerMockComponent(MergeConflictDecisionsManager.class);
         // Make all the csrf tokens valid by default.
         when(this.csrfScriptService.isTokenValid(any())).thenReturn(true);
         setOutputSyntax(Syntax.PLAIN_1_0);
@@ -264,5 +283,81 @@ class FileUploaderPageTest extends PageTest
             spy((ScriptXWikiServletRequest) this.scriptContext.getAttribute("request"));
         this.scriptContext.setAttribute("request", requestSpy, GLOBAL_SCOPE);
         when(requestSpy.getHeader("X-XWiki-Temporary-Attachment-Support")).thenReturn(Boolean.toString(status));
+    }
+
+    private DocumentReference mockOldUpload(String fileName, byte[] content) throws Exception
+    {
+        this.context.setAction("get");
+        setAttachmentSupportStatus(false);
+
+        FileUploadPluginApi fileUploadPluginApi = mock();
+        when(fileUploadPluginApi.getFileName("upload")).thenReturn(fileName);
+        when(fileUploadPluginApi.getFileItemData("upload")).thenReturn(content);
+        doReturn(fileUploadPluginApi).when(this.xwiki).getPluginApi(eq("fileupload"), any());
+
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any(), any())).thenReturn(true);
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), any(), any())).thenReturn(true);
+        this.oldcore.checkDocumentRevision(true);
+
+        DocumentReference targetReference = new DocumentReference("xwiki", "Space", "Target");
+        this.request.put("document", "Space.Target");
+        return targetReference;
+    }
+
+    /**
+     * Runs the given action right after the given document is loaded for the first time, i.e. after the upload request
+     * got its copy of the document and before it saves it.
+     */
+    private void afterFirstLoad(DocumentReference reference, FailableRunnable<XWikiException> action)
+        throws XWikiException
+    {
+        AtomicBoolean loaded = new AtomicBoolean();
+        doAnswer(invocation -> {
+            Object document = invocation.callRealMethod();
+            if (loaded.compareAndSet(false, true)) {
+                action.run();
+            }
+            return document;
+        }).when(this.xwiki).getDocument(eq(reference), any(XWikiContext.class));
+    }
+
+    @Test
+    void uploadToDocumentCreatedConcurrently() throws Exception
+    {
+        DocumentReference targetReference = mockOldUpload("test.txt", new byte[] { 1, 2, 3 });
+        // Another user uploads a file to the same new document while this upload is in progress.
+        afterFirstLoad(targetReference, () -> {
+            XWikiDocument concurrentDocument = this.xwiki.getDocument(targetReference, this.context).clone();
+            concurrentDocument.setTitle("concurrent");
+            this.xwiki.saveDocument(concurrentDocument, this.context);
+        });
+
+        JsonNode json = renderJSONPage(this.documentReference);
+
+        assertEquals(1, json.get("uploaded").asInt(), json.toString());
+        assertEquals("test.txt", json.get("fileName").asText());
+        XWikiDocument targetDocument = this.xwiki.getDocument(targetReference, this.context);
+        // Both changes are kept.
+        assertEquals("concurrent", targetDocument.getTitle());
+        assertNotNull(targetDocument.getAttachment("test.txt"));
+    }
+
+    @Test
+    void uploadFailingToSave() throws Exception
+    {
+        DocumentReference targetReference = mockOldUpload("test.txt", new byte[] { 1, 2, 3 });
+        doThrow(new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+            XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, "Not allowed")).when(this.xwiki)
+            .saveDocument(argThat(document -> targetReference.equals(document.getDocumentReference())), anyString(),
+                anyBoolean(), anyBoolean(), any(XWikiContext.class));
+
+        JsonNode json = renderJSONPage(this.documentReference);
+
+        assertEquals(0, json.get("uploaded").asInt());
+        assertEquals(500, json.get("error").get("number").asInt());
+        assertTrue(json.get("error").get("message").asText().contains("Not allowed"),
+            json.get("error").get("message").asText());
+        assertTrue(this.xwiki.getDocument(targetReference, this.context).isNew());
     }
 }

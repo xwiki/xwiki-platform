@@ -33,6 +33,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
@@ -251,32 +252,31 @@ public class DefaultModelBridge implements ModelBridge
     public void createRedirect(DocumentReference oldReference, DocumentReference newReference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        UserReference currentUser =
+            this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE);
+        String location = this.defaultEntityReferenceSerializer.serialize(newReference);
         try {
-            XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
+            // Update the latest version of the document, so that a concurrent save isn't lost (and doesn't make the
+            // redirect fail).
+            xcontext.getWiki().updateDocument(oldReference, oldDocument -> {
+                // Configure the document authors
+                if (oldDocument.isNew()) {
+                    oldDocument.getAuthors().setCreator(currentUser);
+                    oldDocument.getAuthors().setContentAuthor(currentUser);
+                    oldDocument.getAuthors().setEffectiveMetadataAuthor(currentUser);
+                }
+                oldDocument.getAuthors().setOriginalMetadataAuthor(currentUser);
 
-            // Avoid modifying the cached document
-            oldDocument = oldDocument.clone();
+                // Add the redirect object
+                BaseObject redirectObjet =
+                    oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, xcontext);
+                redirectObjet.setStringValue("location", location);
 
-            // Configure the document authors
-            UserReference currentUser =
-                this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE);
-            if (oldDocument.isNew()) {
-                oldDocument.getAuthors().setCreator(currentUser);
-                oldDocument.getAuthors().setContentAuthor(currentUser);
-                oldDocument.getAuthors().setEffectiveMetadataAuthor(currentUser);
-            }
-            oldDocument.getAuthors().setOriginalMetadataAuthor(currentUser);
+                // Make sure the redirect page is hidden by default
+                oldDocument.setHidden(true);
 
-            // Add the redirect object
-            BaseObject redirectObjet = oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, xcontext);
-            String location = this.defaultEntityReferenceSerializer.serialize(newReference);
-            redirectObjet.setStringValue("location", location);
-
-            // Make sure the redirect page is hidden by default
-            oldDocument.setHidden(true);
-
-            // Save the redirect page
-            xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);
+                return true;
+            }, "Create automatic redirect.", false, xcontext);
             this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
         } catch (XWikiException e) {
             this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference, e);
@@ -357,50 +357,67 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext context = xcontextProvider.get();
         XWiki wiki = context.getWiki();
 
-        boolean popLevelProgress = false;
+        List<DocumentReference> childReferences;
         try {
             // Note: This operation could have been done in Hibernate (using the Store API) in one single update query.
             // However, due to XWiki's document cache, it`s better in the end to use the Document API and update each
             // child document individually.
             XWikiDocument oldParentDocument = wiki.getDocument(oldParentReference, context);
 
-            List<DocumentReference> childReferences = oldParentDocument.getChildrenReferences(context);
-
-            if (!childReferences.isEmpty()) {
-                this.progressManager.pushLevelProgress(childReferences.size(), this);
-                popLevelProgress = true;
-            }
-
-            for (DocumentReference childReference : childReferences) {
-                this.progressManager.startStep(this);
-
-                XWikiDocument childDocument = wiki.getDocument(childReference, context);
-
-                // Avoid modifying the cached document
-                childDocument = childDocument.clone();
-
-                childDocument.setParentReference(newParentReference);
-
-                wiki.saveDocument(childDocument, "Updated parent field.", true, context);
-
-                this.progressManager.endStep(this);
-            }
-
-            if (!childReferences.isEmpty()) {
-                this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.",
-                    oldParentReference, newParentReference, childReferences.size());
-            }
+            childReferences = oldParentDocument.getChildrenReferences(context);
         } catch (Exception e) {
             this.logger.error("Failed to update the document parent fields from [{}] to [{}].", oldParentReference,
                 newParentReference, e);
             return false;
-        } finally {
-            if (popLevelProgress) {
-                this.progressManager.popLevelProgress(this);
-            }
         }
 
-        return true;
+        if (childReferences.isEmpty()) {
+            return true;
+        }
+
+        boolean success = true;
+        this.progressManager.pushLevelProgress(childReferences.size(), this);
+        try {
+            for (DocumentReference childReference : childReferences) {
+                this.progressManager.startStep(this);
+                // Each child is updated independently so that a child that fails to be updated doesn't prevent the
+                // update of the other children.
+                success &= updateParentField(childReference, oldParentReference, newParentReference, wiki, context);
+                this.progressManager.endStep(this);
+            }
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+
+        if (success) {
+            this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.",
+                oldParentReference, newParentReference, childReferences.size());
+        }
+
+        return success;
+    }
+
+    private boolean updateParentField(DocumentReference childReference, DocumentReference oldParentReference,
+        DocumentReference newParentReference, XWiki wiki, XWikiContext context)
+    {
+        try {
+            // Update the latest version of the child so that a concurrent save isn't lost. The child is left
+            // unchanged if it was deleted or if its parent was changed in the meantime.
+            wiki.updateDocument(childReference, childDocument -> {
+                if (childDocument.isNew() || !oldParentReference.equals(childDocument.getParentReference())) {
+                    return false;
+                }
+
+                childDocument.setParentReference(newParentReference);
+                return true;
+            }, "Updated parent field.", true, context);
+
+            return true;
+        } catch (Exception e) {
+            this.logger.error("Failed to update the parent field of [{}] from [{}] to [{}].", childReference,
+                oldParentReference, newParentReference, e);
+            return false;
+        }
     }
 
     @Override
@@ -417,70 +434,69 @@ public class DefaultModelBridge implements ModelBridge
     {
         try {
             XWikiContext context = xcontextProvider.get();
-            XWiki wiki = context.getWiki();
-            XWikiDocument document = wiki.getDocument(documentReference, context);
-            boolean save = false;
+            MutableBoolean saved = new MutableBoolean();
+            // Update the latest version of the document so that a concurrent save isn't lost.
+            context.getWiki().updateDocument(documentReference, document -> {
+                saved.setValue(!document.isNew() && update(document, documentReference, parameters));
+                return saved.booleanValue();
+            }, "Update document after refactoring.", true, context);
 
-            String title = parameters.get("title");
-            if (title != null && !title.equals(document.getTitle())) {
-                // Avoid modifying the cached document
-                if (!save) {
-                    document = document.clone();
-                }
-
-                document.setTitle(title);
-                save = true;
-            }
-
-            // Some old applications still rely on the parent/child links between documents.
-            // For the retro-compatibility, we synchronize the "parent" field of the document with the (real)
-            // hierarchical parent.
-            //
-            // But if the user has voluntary enabled the legacy "parent/child" mechanism for the breadcrumbs, we keep
-            // the old behaviour when location and parent/child mechanism were not linked.
-            //
-            // More information: https://jira.xwiki.org/browse/XWIKI-13493
-            if (!parentChildConfiguration.isParentChildMechanismEnabled()) {
-
-                // we compute the new hierarchical parent
-                DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
-
-                // we compute a relative reference for the hierarchical parent
-                String hierarchicalParentSerialized =
-                    this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference);
-                EntityReference relativeHierarchicalReference = this.relativeStringEntityReferenceResolver
-                    .resolve(hierarchicalParentSerialized, EntityType.DOCUMENT);
-
-                // we can rely on the current document parent ref, as after the copy the encoded parent is not changed.
-                EntityReference newDocumentParentRef = document.getRelativeParentReference();
-
-                // all cases are supported:
-                //   1. if we move on a same wiki but on a different space: the relative ref are different, the
-                //      parent will be updated
-                //   2. if we move on a same wiki, same space: the relative ref are the same, we keep the parent
-                //   3. if we move on a different wiki, different space: we don't care about the wiki, we are in the
-                //      same case as 1
-                //   4. if we move on a different wiki, same space: actually we can keep the old parent relative
-                //      reference, as it's relative of the document reference. So the parent reference will be well
-                //      computed with the already existing relative reference.
-                if (!relativeHierarchicalReference.equals(newDocumentParentRef)) {
-                    // Avoid modifying the cached document
-                    if (!save) {
-                        document = document.clone();
-                    }
-
-                    document.setParentReference(relativeHierarchicalReference);
-                    save = true;
-                }
-            }
-
-            if (save) {
-                wiki.saveDocument(document, "Update document after refactoring.", true, context);
+            if (saved.isTrue()) {
                 this.logger.info("Document [{}] has been updated.", documentReference);
             }
         } catch (Exception e) {
             this.logger.error("Failed to update the document [{}] after refactoring.", documentReference, e);
         }
+    }
+
+    private boolean update(XWikiDocument document, DocumentReference documentReference, Map<String, String> parameters)
+    {
+        boolean modified = false;
+
+        String title = parameters.get("title");
+        if (title != null && !title.equals(document.getTitle())) {
+            document.setTitle(title);
+            modified = true;
+        }
+
+        // Some old applications still rely on the parent/child links between documents.
+        // For the retro-compatibility, we synchronize the "parent" field of the document with the (real)
+        // hierarchical parent.
+        //
+        // But if the user has voluntary enabled the legacy "parent/child" mechanism for the breadcrumbs, we keep
+        // the old behaviour when location and parent/child mechanism were not linked.
+        //
+        // More information: https://jira.xwiki.org/browse/XWIKI-13493
+        if (!parentChildConfiguration.isParentChildMechanismEnabled()) {
+
+            // we compute the new hierarchical parent
+            DocumentReference hierarchicalParent = getHierarchicalParent(documentReference);
+
+            // we compute a relative reference for the hierarchical parent
+            String hierarchicalParentSerialized =
+                this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference);
+            EntityReference relativeHierarchicalReference = this.relativeStringEntityReferenceResolver
+                .resolve(hierarchicalParentSerialized, EntityType.DOCUMENT);
+
+            // we can rely on the current document parent ref, as after the copy the encoded parent is not changed.
+            EntityReference newDocumentParentRef = document.getRelativeParentReference();
+
+            // all cases are supported:
+            //   1. if we move on a same wiki but on a different space: the relative ref are different, the
+            //      parent will be updated
+            //   2. if we move on a same wiki, same space: the relative ref are the same, we keep the parent
+            //   3. if we move on a different wiki, different space: we don't care about the wiki, we are in the
+            //      same case as 1
+            //   4. if we move on a different wiki, same space: actually we can keep the old parent relative
+            //      reference, as it's relative of the document reference. So the parent reference will be well
+            //      computed with the already existing relative reference.
+            if (!relativeHierarchicalReference.equals(newDocumentParentRef)) {
+                document.setParentReference(relativeHierarchicalReference);
+                modified = true;
+            }
+        }
+
+        return modified;
     }
 
     private DocumentReference getHierarchicalParent(DocumentReference documentReference)

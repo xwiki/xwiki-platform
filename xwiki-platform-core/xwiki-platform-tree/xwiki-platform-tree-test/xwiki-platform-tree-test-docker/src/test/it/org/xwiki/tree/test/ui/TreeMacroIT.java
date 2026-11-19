@@ -19,13 +19,17 @@
  */
 package org.xwiki.tree.test.ui;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.ScreenshotComparator;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
@@ -41,7 +45,60 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class TreeMacroIT
 {
+    /**
+     * Verify the layout of the trees, on a large and on a small screen: the default and the large sizes with their
+     * icons and edges, and the compact layout without icons nor edges, each with an opened, a selected, a disabled and
+     * a closed node. It runs first, so that the mouse pointer is still at the center of the screen, away from the
+     * trees.
+     */
     @Test
+    @Order(1)
+    void treeLayout(TestUtils setup, TestReference testReference, ScreenshotComparator screenshots) throws IOException
+    {
+        setup.loginAsSuperAdmin();
+        String nodes = """
+            {{html}}
+            <ul>
+              <li data-jstree='{"opened":true}'>Chapter 1
+                <ul>
+                  <li data-jstree='{"selected":true}'>Section 1.1</li>
+                  <li data-jstree='{"disabled":true}'>Section 1.2</li>
+                </ul>
+              </li>
+              <li>Chapter 2
+                <ul>
+                  <li>Section 2.1</li>
+                </ul>
+              </li>
+            </ul>
+            {{/html}}""";
+        ViewPage viewPage = setup.createPage(testReference, String.format("""
+            {{tree}}
+            %1$s
+            {{/tree}}
+
+            {{tree class="xtree jstree-xwiki-large"}}
+            %1$s
+            {{/tree}}
+
+            {{tree icons="false" edges="false"}}
+            %1$s
+            {{/tree}}""", nodes), "Tree Layout");
+        List<TreeElement> trees = TreeElement.getTreesInPageContent();
+        assertEquals(3, trees.size());
+        trees.forEach(TreeElement::waitForIt);
+
+        screenshots.assertMatches("trees", viewPage.getContentContainer());
+        setup.setBrowserWindowWidth(700);
+        try {
+            screenshots.assertMatches("treesSmallScreen", viewPage.getContentContainer());
+        } finally {
+            setup.maximizeBrowserWindow();
+        }
+    }
+
+    @Test
+    @Order(2)
     void displayTreeWithNodesDefinedInWikiSyntax(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
@@ -68,6 +125,7 @@ class TreeMacroIT
     }
 
     @Test
+    @Order(3)
     void displayTwoTreesWithTheSameNodes(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();

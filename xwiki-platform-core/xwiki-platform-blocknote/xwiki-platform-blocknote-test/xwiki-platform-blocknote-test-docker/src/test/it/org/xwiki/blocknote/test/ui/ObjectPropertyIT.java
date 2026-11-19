@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * BlockNote field editing its own content even though they all take part in the same realtime collaboration session.
  *
  * @version $Id$
- * @since 19.0.0RC1
+ * @since 18.10.0RC1
  */
 class ObjectPropertyIT extends AbstractBlockNoteIT
 {

@@ -70,7 +70,7 @@ public class AbstractUserProfilePage extends ViewPage
 
     /**
      * @return the names of the groups displayed in the menu, in display order
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public List<String> getMenuGroups()
     {
@@ -82,7 +82,7 @@ public class AbstractUserProfilePage extends ViewPage
     /**
      * @param groupName the name of a menu group
      * @return the names of the categories of the given menu group, in display order, even when the group is collapsed
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public List<String> getCategoriesInGroup(String groupName)
     {
@@ -92,7 +92,7 @@ public class AbstractUserProfilePage extends ViewPage
 
     /**
      * @return the names of the menu groups that are expanded
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public List<String> getExpandedMenuGroups()
     {
@@ -106,7 +106,7 @@ public class AbstractUserProfilePage extends ViewPage
      * Open a category of the user profile, expanding its menu group first when it's collapsed.
      *
      * @param categoryId the identifier of the category, e.g. {@code preferences}
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public void openCategory(String categoryId)
     {
@@ -124,7 +124,7 @@ public class AbstractUserProfilePage extends ViewPage
 
     /**
      * @return the identifier of the category currently displayed
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public String getCurrentCategory()
     {
@@ -135,7 +135,7 @@ public class AbstractUserProfilePage extends ViewPage
     /**
      * Go back in the browser history to the previously opened category and wait for it to be displayed.
      *
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public void goBackToPreviousCategory()
     {

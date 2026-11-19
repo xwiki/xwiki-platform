@@ -19,6 +19,7 @@
  */
 package org.xwiki.pagetemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
@@ -43,4 +44,14 @@ public interface TemplateProviderManager
      * @throws TemplateProviderException if the document fails to load
      */
     Optional<TemplateProvider> getTemplateProvider(DocumentReference reference) throws TemplateProviderException;
+
+    /**
+     * Lists the template providers of the current wiki, without checking the current user's rights on them. The
+     * {@code XWiki.TemplateProviderTemplate} page, which new template providers are created from, is not one, and a
+     * template provider that fails to load is left out.
+     *
+     * @return the template providers of the current wiki, ordered by the full name of their document
+     * @throws TemplateProviderException if the template providers cannot be found
+     */
+    List<TemplateProvider> getTemplateProviders() throws TemplateProviderException;
 }

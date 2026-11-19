@@ -48,11 +48,16 @@ import com.xpn.xwiki.XWikiException;
  * @since 18.10.0RC1
  */
 @Component
-@Named("title")
+@Named(TitleLiveTableNewRowNamingStrategy.HINT)
 @Singleton
 @Unstable
 public class TitleLiveTableNewRowNamingStrategy extends AbstractLocationLiveTableNewRowNamingStrategy
 {
+    /**
+     * The hint of this strategy.
+     */
+    public static final String HINT = "title";
+
     /**
      * The property the new entries are named after.
      */
@@ -128,5 +133,11 @@ public class TitleLiveTableNewRowNamingStrategy extends AbstractLocationLiveTabl
             return nameStrategy.transform(name);
         }
         return name;
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return getDescription(HINT);
     }
 }

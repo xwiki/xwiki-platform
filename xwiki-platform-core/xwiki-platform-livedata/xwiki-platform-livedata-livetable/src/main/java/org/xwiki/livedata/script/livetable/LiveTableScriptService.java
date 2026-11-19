@@ -21,7 +21,6 @@ package org.xwiki.livedata.script.livetable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
@@ -101,18 +100,18 @@ public class LiveTableScriptService implements ScriptService
     }
 
     /**
-     * Lists the naming strategies for newly created pages through Live Data, including the set of properties
-     * required for each when no source parameter is given. A strategy that cannot be loaded is left out.
+     * Lists the naming strategies for newly created pages through Live Data, with their description and the
+     * properties each requires when no source parameter is given. A strategy that cannot be loaded is left out.
      *
-     * @return the properties each installed strategy needs, by strategy hint
+     * @return the installed strategies, by strategy hint
      * @since 18.10.0RC1
      */
     @Unstable
-    public Map<String, Set<String>> getNewRowNamingStrategies()
+    public Map<String, NewRowNamingStrategyDescriptor> getNewRowNamingStrategies()
     {
-        Map<String, Set<String>> strategies = new TreeMap<>();
-        this.namingStrategyManager.getAll()
-            .forEach((hint, strategy) -> strategies.put(hint, strategy.getMandatoryProperties(Map.of())));
+        Map<String, NewRowNamingStrategyDescriptor> strategies = new TreeMap<>();
+        this.namingStrategyManager.getAll().forEach((hint, strategy) -> strategies.put(hint,
+            new NewRowNamingStrategyDescriptor(strategy.getDescription(), strategy.getMandatoryProperties(Map.of()))));
         return strategies;
     }
 }

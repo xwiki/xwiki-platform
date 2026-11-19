@@ -86,4 +86,15 @@ public interface LiveTableNewRowNamingStrategy
     {
         return Set.of();
     }
+
+    /**
+     * Describes how this strategy names new entries, for the authors picking one.
+     *
+     * @return the description, in the current locale, or {@code null} when the strategy has none
+     * @since 18.10.0RC1
+     */
+    default String getDescription()
+    {
+        return null;
+    }
 }

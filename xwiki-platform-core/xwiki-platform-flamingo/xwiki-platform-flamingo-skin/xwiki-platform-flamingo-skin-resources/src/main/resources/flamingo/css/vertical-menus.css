@@ -35,18 +35,21 @@
       /* Rounded up to a whole pixel, to keep the size the text had with LESS. */
       font-size: round(up, var(--font-size-small), 1px);
 
-      .group {
-        /* Expanded from the Bootstrap list-group-item mixin, keeping only the rules that apply to the menu markup.
-           Use a CSS mixin instead once they are supported, see https://drafts.csswg.org/css-mixins-1/ */
+      /* Expanded from the Bootstrap list-group-item mixin, keeping only the rules that apply to the menu markup.
+         The :last-child rules stay in each block, so that the :first-child reset of the items can override them.
+         Use a CSS mixin instead once they are supported, see https://drafts.csswg.org/css-mixins-1/ */
+      .group, ul li {
         position: relative;
-        display: block;
         margin-bottom: -1px;
         border: 1px solid var(--list-group-border);
+      }
+
+      .group {
+        display: block;
         padding: 5px 30px;
         text-transform: uppercase;
         font-weight: 700;
         background-color: var(--navbar-default-bg);
-        background-repeat: no-repeat;
 
         &:first-child {
           border-top-left-radius: var(--border-radius-base);
@@ -62,7 +65,7 @@
         &:hover, &.current-group {
           background-color: var(--navbar-default-link-hover-bg);
 
-          & a {
+          a {
             color: var(--navbar-default-link-hover-color);
           }
         }
@@ -76,11 +79,6 @@
         margin-left: 0;
 
         li {
-          /* Expanded from the Bootstrap list-group-item mixin, keeping only the rules that apply to the menu markup.
-             Use a CSS mixin instead once they are supported, see https://drafts.csswg.org/css-mixins-1/ */
-          position: relative;
-          margin-bottom: -1px;
-          border: 1px solid var(--list-group-border);
           padding: 0;
           background-color: var(--xwiki-page-content-bg);
 

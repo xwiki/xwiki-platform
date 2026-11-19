@@ -173,6 +173,7 @@ export function initWrapper(displayer, { props, logic, editBus, mocks }) {
               },
               whenSaved: () => Promise.resolve(),
               onAnyEvent: () => {},
+              offAnyEvent: () => {},
               ...editBus,
             };
           },

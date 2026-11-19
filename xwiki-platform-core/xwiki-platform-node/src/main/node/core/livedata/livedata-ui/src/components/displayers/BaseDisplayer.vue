@@ -345,9 +345,14 @@ export default {
   },
   mounted() {
     // We need to listen on the edit bus event because isEditable is not reactive.
-    this.logic.getEditBus().onAnyEvent(() => {
+    this.editBusListener = () => {
       this.duringEditing = !this.logic.getEditBus().isEditable();
-    });
+    };
+    this.logic.getEditBus().onAnyEvent(this.editBusListener);
+  },
+  beforeUnmount() {
+    // The edit bus outlives the cells, so a listener left behind keeps the cell alive and keeps being called.
+    this.logic.getEditBus().offAnyEvent(this.editBusListener);
   },
   watch: {
     isEditorShown: {

@@ -439,7 +439,7 @@ public class ModelBridge
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
         if (!document.isNew()) {
-            xcontext.getWiki().deleteDocument(document, xcontext);
+            xcontext.getWiki().deleteDocument(document, true, true, xcontext);
         }
     }
 }

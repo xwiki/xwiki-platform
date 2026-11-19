@@ -270,7 +270,9 @@ public class DistributionInternalScriptService implements ScriptService
     /**
      * @return the extensions installed as dependencies in the current wiki and which are not needed anymore by any
      *         other extension
-     * @since 19.0.0RC1
+     * @since 18.10.0RC1
+     * @since 18.4.9
+     * @since 17.10.16
      */
     public List<InstalledExtension> getOrphanedExtensions()
     {

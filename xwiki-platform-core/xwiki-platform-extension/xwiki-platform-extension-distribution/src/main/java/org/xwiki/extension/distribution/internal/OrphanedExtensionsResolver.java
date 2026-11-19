@@ -39,7 +39,9 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * Find the extensions which were installed as dependencies and are not needed anymore by any other extension.
  *
  * @version $Id$
- * @since 19.0.0RC1
+ * @since 18.10.0RC1
+ * @since 18.4.9
+ * @since 17.10.16
  */
 @Component(roles = OrphanedExtensionsResolver.class)
 @Singleton

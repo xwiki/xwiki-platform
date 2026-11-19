@@ -18,5 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import config from "@xwiki/platform-tool-eslintconfig";
+import { defineConfig } from "eslint/config";
 
-export default config;
+export default defineConfig([
+  config,
+  {
+    rules: {
+      // The ?raw suffix asks Vite for the content of a file as a string, which the import resolver doesn't support.
+      "import-x/no-unresolved": ["error", { ignore: ["\\?raw$"] }],
+    },
+  },
+]);

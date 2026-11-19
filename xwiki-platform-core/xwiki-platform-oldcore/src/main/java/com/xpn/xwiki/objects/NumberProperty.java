@@ -20,8 +20,8 @@
 package com.xpn.xwiki.objects;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Objects;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.util.ReflectionUtils;
 
@@ -104,12 +104,11 @@ public abstract class NumberProperty<N extends Number> extends BaseProperty
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null) {
+        if (!(obj instanceof NumberProperty numberProperty)) {
             return false;
         }
 
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(getValue(), ((NumberProperty) obj).getValue())
-            .isEquals();
+        return super.equals(obj) && Objects.equals(getValue(), numberProperty.getValue());
     }
 
     @Override

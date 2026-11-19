@@ -274,10 +274,10 @@
       = Description =
     #end
     #if ($isViewMode &amp;&amp; "$!website" == '')
-      ## Make sure to resolve reference based on the right document
-      {{context transformationContext="document" restricted=true}}
-        $doc.getValue('description')
-      {{/context}}
+      ## Make sure to resolve reference based on the right document. The value is passed through the source parameter
+      ## so that it's parsed on its own, as the content of the context macro.
+      #set ($extensionDescription = $doc.getValue('description'))
+      {{context transformationContext="document" restricted=true source="script:extensionDescription"/}}
     #elseif (!$isViewMode)
       (((
       $doc.display('description')
@@ -316,9 +316,7 @@
         $extension.display('installation', 'edit')
         )))
       #elseif ($extraInstallation != '')
-        {{context transformationContext="document" restricted=true}}
-          $extraInstallation
-        {{/context}}
+        {{context transformationContext="document" restricted=true source="script:extraInstallation"/}}
       #end
     #end
 

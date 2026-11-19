@@ -198,5 +198,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Wiki script service -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

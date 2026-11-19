@@ -19,7 +19,8 @@
  */
 
 /* Same layout as .col-xs-12.col-sm-3 for the menu and .col-xs-12.col-sm-9 for the content.
-   The syntax help page reuses the administration layout. */
+   The XWiki Syntax help page has no layout of its own and reuses the administration one, see XWIKI-10675.
+   XWIKI-25804 is about giving it its own layout, which will remove the syntax help selectors from this file. */
 .admin-menu, .admin-category, #admin-page-content,
 .syntax-menu, #syntax-page-content {
   position: relative;

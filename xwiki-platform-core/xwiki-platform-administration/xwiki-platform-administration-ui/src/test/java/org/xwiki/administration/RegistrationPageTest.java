@@ -22,12 +22,17 @@ package org.xwiki.administration;
 import java.text.MessageFormat;
 import java.util.Collection;
 
+import javax.inject.Named;
 import javax.script.ScriptContext;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.captcha.Captcha;
+import org.xwiki.captcha.CaptchaConfiguration;
+import org.xwiki.captcha.script.CaptchaScriptService;
+import org.xwiki.captcha.script.internal.CaptchaScriptSafeProvider;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.localization.script.LocalizationScriptService;
@@ -77,6 +82,8 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @SecurityScriptServiceComponentList
 @ComponentList({
+    CaptchaScriptSafeProvider.class,
+    CaptchaScriptService.class,
     CSRFTokenScriptService.class,
     ErrorMessageMacro.class,
     InfoMessageMacro.class,
@@ -94,11 +101,20 @@ class RegistrationPageTest extends PageTest
 
     private static final String USER_NAME = "JaneDoe";
 
+    private static final String CAPTCHA_NAME = "test";
+
     @MockComponent
     private CSRFToken csrfToken;
 
     @MockComponent
     private RegistrationConfiguration registrationConfiguration;
+
+    @MockComponent
+    private CaptchaConfiguration captchaConfiguration;
+
+    @MockComponent
+    @Named(CAPTCHA_NAME)
+    private Captcha captcha;
 
     @BeforeEach
     void setUp() throws Exception
@@ -284,11 +300,24 @@ class RegistrationPageTest extends PageTest
         assertEquals("core.captcha.captchaAnswerIsWrong", captchaError.ownText());
     }
 
+    @Test
+    void rightCaptchaAnswerRegistersTheUser() throws Exception
+    {
+        enableCaptcha(true);
+        putRegistrationRequest("Jane", "Doe");
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        assertNotNull(result.selectFirst(".box.infomessage"));
+        assertNull(result.selectFirst(".LV_validation_message.LV_invalid"));
+    }
+
     private void enableCaptcha(boolean validAnswer) throws Exception
     {
         when(this.registrationConfiguration.isCaptchaRequired()).thenReturn(true);
-        this.componentManager.registerComponent(ScriptService.class, "captcha",
-            new TestCaptchaScriptService(validAnswer));
+        when(this.captchaConfiguration.getDefaultName()).thenReturn(CAPTCHA_NAME);
+        when(this.captcha.display(any())).thenReturn("<input type=\"text\" name=\"captchaAnswer\" value=\"\" />");
+        when(this.captcha.isValid(any())).thenReturn(validAnswer);
     }
 
     private Element getCaptchaField(Document result)
@@ -301,55 +330,5 @@ class RegistrationPageTest extends PageTest
     private RegistrationScriptService getRegistrationScriptService() throws Exception
     {
         return this.componentManager.getInstance(ScriptService.class, "security.registration");
-    }
-
-    /**
-     * Stands for the CAPTCHA script service, whose module is not a dependency of this one.
-     */
-    public static class TestCaptchaScriptService implements ScriptService
-    {
-        private final TestCaptcha captcha;
-
-        TestCaptchaScriptService(boolean validAnswer)
-        {
-            this.captcha = new TestCaptcha(validAnswer);
-        }
-
-        /**
-         * @return the default CAPTCHA
-         */
-        public TestCaptcha getDefault()
-        {
-            return this.captcha;
-        }
-    }
-
-    /**
-     * Stands for a CAPTCHA implementation.
-     */
-    public static class TestCaptcha
-    {
-        private final boolean validAnswer;
-
-        TestCaptcha(boolean validAnswer)
-        {
-            this.validAnswer = validAnswer;
-        }
-
-        /**
-         * @return the CAPTCHA HTML
-         */
-        public String display()
-        {
-            return "<input type=\"text\" name=\"captchaAnswer\" value=\"\" />";
-        }
-
-        /**
-         * @return whether the submitted answer is right
-         */
-        public boolean isValid()
-        {
-            return this.validAnswer;
-        }
     }
 }

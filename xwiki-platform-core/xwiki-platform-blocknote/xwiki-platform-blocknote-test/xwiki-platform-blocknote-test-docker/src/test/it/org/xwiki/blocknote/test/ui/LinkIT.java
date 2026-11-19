@@ -195,9 +195,13 @@ class LinkIT extends AbstractBlockNoteIT
         // Select the word "second" using the keyboard.
         textArea.click().select(6, 6);
 
-        // Create a link targeting a page from the selection. Search by title since suggestions are matched (and
+        // Create a link targeting a page from the selection. The page search box is pre-filled with the selected text,
+        // so that the matching pages are suggested right away. Search by title since suggestions are matched (and
         // rendered) using the page title, not its reference.
-        editor.getToolBar().createLink().setPageTargetAndSubmit("Page Link Target", "Page Link Target");
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        assertEquals("Page", linkModal.getTargetType());
+        assertEquals("second", linkModal.getTarget());
+        linkModal.setPageTargetAndSubmit("Page Link Target", "Page Link Target");
 
         // Save and check the source: the link is inserted on the selected word, without touching the rest of the line.
         page.save();
@@ -697,8 +701,11 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the bold word using the keyboard, then create a link from the selection, changing its display text.
+        // The page search box, pre-filled with the selected text, is focused, which lists the matching pages: close
+        // these suggestions, which cover the link options.
         textArea.click().select(6, 6);
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
         linkModal.setDisplayText("2nd");
         linkModal.setTargetAndSubmit("https://xwiki.org");
 
@@ -770,9 +777,11 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard, then create a link from the selection, emptying its display
-        // text: the selection is replaced with the label generated from the link target.
+        // text: the selection is replaced with the label generated from the link target. Close first the suggestions
+        // of the page search box, pre-filled with the selected text, which cover the link options.
         textArea.click().select(6, 6);
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
         linkModal.setDisplayText("");
         linkModal.setTargetAndSubmit("https://xwiki.org");
         textArea.waitUntilTextIs("first https://xwiki.org third");
@@ -795,10 +804,12 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
-        // Select the word "second" using the keyboard, then create a link from the selection, leaving the page
-        // reference empty and setting only the anchor.
+        // Select the word "second" using the keyboard, then create a link from the selection, emptying the page
+        // reference (pre-filled with the selected text) and setting only the anchor.
         textArea.click().select(6, 6);
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
+        linkModal.setTarget("");
         linkModal.setAnchor("HSection");
         linkModal.submit();
 
@@ -863,9 +874,13 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.waitUntilLinkIsPresent("createLinkToCurrentPage");
 
         // Select the word "second" of the first paragraph using the keyboard, then create another link to the current
-        // page from the selection, leaving the page reference, the query string and the anchor empty.
+        // page from the selection, emptying the page reference (pre-filled with the selected text) and leaving the query
+        // string and the anchor empty.
         textArea.clickBlock(0).select(6, 6);
-        editor.getToolBar().createLink().submit();
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
+        linkModal.setTarget("");
+        linkModal.submit();
         textArea.waitUntilLinkIsPresent("second");
 
         // Save and check the source: both links have an empty reference, which designates the current page, and the

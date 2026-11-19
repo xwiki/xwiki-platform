@@ -124,7 +124,7 @@ test("A canceled link edition leaves the link unchanged", async ({
   ).not.toBeAttached();
 });
 
-test("The create link button opens the link editor prefilled with the selected text", async ({
+test("The create link button opens the link editor prefilled with the selected text, as label and target", async ({
   mount,
   page,
 }) => {
@@ -140,8 +140,17 @@ test("The create link button opens the link editor prefilled with the selected t
   await selectFirstWord(editorEl, page);
   await page.locator('button[data-test="createLink"]').click();
 
+  // The link target is the page named after the selected text, so that the link editor can suggest the matching pages.
   await expect(page.locator('[data-test="linkEditorInput"]')).toHaveText(
-    JSON.stringify({ title: "First" }),
+    JSON.stringify({
+      title: "First",
+      reference: {
+        type: "doc",
+        typed: false,
+        reference: "First",
+        parameters: {},
+      },
+    }),
   );
   // The selected text is replaced with the label of the inserted link.
   await expect(editorEl.locator('a[href="https://example.org/"]')).toHaveText(

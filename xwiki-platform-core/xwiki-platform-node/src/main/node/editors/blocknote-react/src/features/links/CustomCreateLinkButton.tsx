@@ -19,6 +19,7 @@
  */
 import { useLinkEditing } from "./linkEditing";
 import { EditorInstanceContext } from "../../contexts";
+import { linkTargetPrefill } from "../../misc/linkTargetPrefill";
 import { selectionHasInlineContent } from "../../selection";
 import { insertLink } from "../../services/linkEditor";
 import { formatKeyboardShortcut } from "@blocknote/core";
@@ -54,9 +55,11 @@ export const CustomCreateLinkButton: React.FC = () => {
         // The display text is pre-filled with the text selected when the link editor is opened, which also tells, on
         // submit, whether the user changed it. When the link label differs from the selected text, the selection is
         // replaced with the new label, keeping the formatting shared by the whole selection, like typing over it does.
+        // The link target is pre-filled from the selected text too (see linkTargetPrefill).
         const selectedText = instance.editor.getSelectedText();
-        await linkEditing.insert({ title: selectedText }, (link) =>
-          insertLink(instance, link, selectedText),
+        await linkEditing.insert(
+          { title: selectedText, ...linkTargetPrefill(selectedText) },
+          (link) => insertLink(instance, link, selectedText),
         );
         instance.editor.focus();
       }}

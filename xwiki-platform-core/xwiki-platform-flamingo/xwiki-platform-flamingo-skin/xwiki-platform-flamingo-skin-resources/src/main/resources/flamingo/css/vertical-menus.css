@@ -32,7 +32,8 @@
 
     li {
       display: block;
-      /* Rounded up to a whole pixel, to keep the size the text had with LESS. */
+      /* --font-size-small is not a whole number of pixels, while the Bootstrap small font size is rounded up to one.
+         Round it up the same way, so that the menu text has the size of the other small text. */
       font-size: round(up, var(--font-size-small), 1px);
 
       /* Expanded from the Bootstrap list-group-item mixin, keeping only the rules that apply to the menu markup.

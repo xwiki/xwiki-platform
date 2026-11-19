@@ -45,7 +45,9 @@ import org.xwiki.rendering.internal.macro.context.ContextMacroDocument;
 import org.xwiki.rendering.internal.macro.groovy.GroovyMacro;
 import org.xwiki.rendering.internal.macro.message.InfoMessageMacro;
 import org.xwiki.rendering.internal.macro.script.PermissionCheckerListener;
+import org.xwiki.rendering.internal.macro.script.source.ScriptMacroContentWikiSourceFactory;
 import org.xwiki.rendering.internal.macro.source.DefaultMacroWikiContentSourceFactory;
+import org.xwiki.rendering.internal.macro.source.MacroContentSourceReferenceConverter;
 import org.xwiki.rendering.internal.macro.toc.DefaultTocEntriesResolver;
 import org.xwiki.rendering.internal.macro.toc.DefaultTocTreeBuilderFactory;
 import org.xwiki.rendering.internal.macro.toc.TocMacro;
@@ -66,6 +68,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -91,6 +94,8 @@ import static org.mockito.Mockito.when;
     DefaultGroovyConfiguration.class,
     DefaultLoggerManager.class,
     DefaultMacroWikiContentSourceFactory.class,
+    MacroContentSourceReferenceConverter.class,
+    ScriptMacroContentWikiSourceFactory.class,
     DefaultObservationManager.class,
     DefaultTocEntriesResolver.class,
     DefaultTocTreeBuilderFactory.class,
@@ -242,6 +247,33 @@ class ExtensionSheetPageTest extends PageTest
         assertEquals("Extension imported from repository %s".formatted(this.testString),
             document.select("span.infomessage").text());
         assertEquals("http://example.com]]MARKER", document.select("span.infomessage a").attr("href"));
+    }
+
+    /**
+     * The description and the installation instructions are executed in a restricted context, which their value must
+     * not be able to close.
+     */
+    @Test
+    void descriptionAndInstallationCannotLeaveTheRestrictedContext() throws Exception
+    {
+        BaseObject extensionObject = this.testPageDocument.getXObject(EXTENSION_CLASS);
+        String closingValue = """
+            {{/context}}
+
+            DISPLAYED
+
+            {{async}}{{groovy}}println("%s"){{/groovy}}{{/async}}""";
+        extensionObject.setLargeStringValue("description", closingValue.formatted("DESCRIPTION_EXECUTED"));
+        extensionObject.setLargeStringValue("installation", closingValue.formatted("INSTALLATION_EXECUTED"));
+
+        this.context.setDoc(this.testPageDocument);
+        Document document = renderHTMLPage(this.extensionSheetDocument);
+
+        String text = document.text();
+        assertFalse(text.contains("DESCRIPTION_EXECUTED"), text);
+        assertFalse(text.contains("INSTALLATION_EXECUTED"), text);
+        // The rest of the values is displayed.
+        assertEquals(2, StringUtils.countMatches(text, "DISPLAYED"), text);
     }
 
     /**

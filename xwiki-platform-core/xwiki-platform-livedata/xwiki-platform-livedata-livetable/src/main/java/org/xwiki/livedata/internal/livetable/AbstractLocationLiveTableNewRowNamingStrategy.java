@@ -30,6 +30,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -46,6 +47,8 @@ public abstract class AbstractLocationLiveTableNewRowNamingStrategy implements L
 {
     private static final String NEW_ROW_LOCATION_PARAMETER_KEY = "newRowLocation";
 
+    private static final String DESCRIPTION_TRANSLATION_KEY = "livedata.liveTable.newRowNamingStrategy.%s.description";
+
     @Inject
     @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
@@ -55,6 +58,9 @@ public abstract class AbstractLocationLiveTableNewRowNamingStrategy implements L
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private ContextualLocalizationManager l10n;
 
     @Override
     public boolean isCreationAllowed(Map<String, Object> parameters)
@@ -80,6 +86,15 @@ public abstract class AbstractLocationLiveTableNewRowNamingStrategy implements L
                 ExceptionUtils.getRootCauseMessage(e));
             return Optional.empty();
         }
+    }
+
+    /**
+     * @param hint the hint of the strategy
+     * @return the translated description of the strategy with the given hint, or {@code null} when it has none
+     */
+    protected String getDescription(String hint)
+    {
+        return this.l10n.getTranslationPlain(String.format(DESCRIPTION_TRANSLATION_KEY, hint));
     }
 
     /**

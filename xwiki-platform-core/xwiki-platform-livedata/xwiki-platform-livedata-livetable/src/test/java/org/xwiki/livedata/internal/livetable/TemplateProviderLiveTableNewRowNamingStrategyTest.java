@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -79,6 +80,9 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
 
     @InjectMockComponents
     private TemplateProviderLiveTableNewRowNamingStrategy strategy;
+
+    @MockComponent
+    private ContextualLocalizationManager l10n;
 
     @MockComponent
     private NewRowTemplateProviderResolver templateProviderResolver;
@@ -257,5 +261,14 @@ class TemplateProviderLiveTableNewRowNamingStrategyTest
         assertFalse(this.strategy.isCreationAllowed(PARAMETERS));
         assertEquals("Adding entries is disabled because their location could not be resolved: "
             + "[LiveDataException: Error]", this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void getDescription()
+    {
+        when(this.l10n.getTranslationPlain("livedata.liveTable.newRowNamingStrategy.templateProvider.description"))
+            .thenReturn("Name from the template provider");
+
+        assertEquals("Name from the template provider", this.strategy.getDescription());
     }
 }

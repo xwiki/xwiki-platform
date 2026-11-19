@@ -286,6 +286,8 @@
     ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
     ## mandatory test is misleading.
     ## Also, not filled back in if there is an error ('noReturn').
+    ## The mandatory validation only marks the field as required, the empty answer is rejected by the programmatic
+    ## validation.
     #set($field =
       {'name' : 'captcha_placeholder',
         'label' : $services.localization.render('core.captcha.label'),
@@ -294,6 +296,10 @@
         'html'  : "&lt;span class='xHint'&gt;$escapetool.xml($services.localization.render('core.captcha.instruction'))
           &lt;/span&gt; $!{services.captcha.default.display()}",
         'validate' : {
+          'mandatory' : {
+            'failureMessage' : $services.localization.render('core.validation.required.message'),
+            'noscript' : true
+          },
           'programmaticValidation' : {
             'code' : '#if (!$services.captcha.default.isValid())failed#end',
             'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong')

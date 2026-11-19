@@ -258,8 +258,98 @@ class RegistrationPageTest extends PageTest
         assertFalse(result.contains("id=\"register\""));
     }
 
+    @Test
+    void captchaIsMarkedAsRequired() throws Exception
+    {
+        enableCaptcha(true);
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        Element captchaLabel = getCaptchaField(result).previousElementSibling();
+        assertNotNull(captchaLabel);
+        assertNotNull(captchaLabel.selectFirst(".xRequired"));
+    }
+
+    @Test
+    void wrongCaptchaAnswerIsDisplayed() throws Exception
+    {
+        enableCaptcha(false);
+        putRegistrationRequest("Jane", "Doe");
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        assertNull(result.selectFirst(".box.infomessage"));
+        Element captchaError = getCaptchaField(result).selectFirst(".LV_validation_message.LV_invalid");
+        assertNotNull(captchaError);
+        assertEquals("core.captcha.captchaAnswerIsWrong", captchaError.ownText());
+    }
+
+    private void enableCaptcha(boolean validAnswer) throws Exception
+    {
+        when(this.registrationConfiguration.isCaptchaRequired()).thenReturn(true);
+        this.componentManager.registerComponent(ScriptService.class, "captcha",
+            new TestCaptchaScriptService(validAnswer));
+    }
+
+    private Element getCaptchaField(Document result)
+    {
+        Element captchaAnswer = result.selectFirst("dd input[name=captchaAnswer]");
+        assertNotNull(captchaAnswer);
+        return captchaAnswer.parent();
+    }
+
     private RegistrationScriptService getRegistrationScriptService() throws Exception
     {
         return this.componentManager.getInstance(ScriptService.class, "security.registration");
+    }
+
+    /**
+     * Stands for the CAPTCHA script service, whose module is not a dependency of this one.
+     */
+    public static class TestCaptchaScriptService implements ScriptService
+    {
+        private final TestCaptcha captcha;
+
+        TestCaptchaScriptService(boolean validAnswer)
+        {
+            this.captcha = new TestCaptcha(validAnswer);
+        }
+
+        /**
+         * @return the default CAPTCHA
+         */
+        public TestCaptcha getDefault()
+        {
+            return this.captcha;
+        }
+    }
+
+    /**
+     * Stands for a CAPTCHA implementation.
+     */
+    public static class TestCaptcha
+    {
+        private final boolean validAnswer;
+
+        TestCaptcha(boolean validAnswer)
+        {
+            this.validAnswer = validAnswer;
+        }
+
+        /**
+         * @return the CAPTCHA HTML
+         */
+        public String display()
+        {
+            return "<input type=\"text\" name=\"captchaAnswer\" value=\"\" />";
+        }
+
+        /**
+         * @return whether the submitted answer is right
+         */
+        public boolean isValid()
+        {
+            return this.validAnswer;
+        }
     }
 }

@@ -128,7 +128,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       #set ($fieldName = $field.name)
       #if ($field.label)
         #set ($label = $field.label)
-        <dt><label for="$fieldName">$label
+        <dt><label#if (!$field.skipLabelFor) for="$fieldName"#end>$label
         #if ($field.validate.mandatory)
           <span ##
           #foreach ($entry in $fieldMandatoryStar.entrySet())
@@ -141,7 +141,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       #end
       ## If the field define its own html content, then use it directly.
       #if ($field.get('type') == 'html')
-        <dd>$field.get('html')</dd>
+        <dd>$field.get('html')
       #else
         ## If no tag then default tag is <input>
         #if ($field.tag)
@@ -162,70 +162,71 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #end
         #end
         />
-        ## We initialize the validation messages containers.
-        ## Since the improvements for XWIKI-22121, we want icons in there. It's way easier to define those in the
-        ## template directly.
-        ## We want to match each use of this template to each of the `add` method for the live validation object.
-        ## If there's not already a container, the livevalidation will create it itself. However, this fallback will not
-        ## support icons.
-        #define ($validationContainer)
-          ## Add the proper classes to the validation string if it's a failure on initialisation
-          #if ($field.error &&
-            $field.error == $!validation.failureMessage &&
-            $!failureMessageParams.get("class")!='')
-            #set($extraValidationClass = $extraValidationClass + ' ' + $!failureMessageParams.get("class"))
-          #elseif ($field.params.value)
-            #set($extraValidationClass = $extraValidationClass + ' LV_valid')##
-          #end
-          <span class="LV_validation_message $extraValidationClass" aria-live="polite" ##
-            ## Add the proper attributes to the validation string if it's a failure on initialisation
-            #if ($field.error &&
-              $field.error == $!validation.failureMessage)
-              #foreach ($entry in $failureMessageParams.entrySet())
-                #if ($entry.key!='class')
-                  $entry.key="$entry.value" ##
-                #end
-              #end
-            #end>
-            <span class="LV_validation_message_valid_icon">$services.icon.renderHTML('accept')</span> ##
-            <span class="LV_validation_message_invalid_icon">$services.icon.renderHTML('cross')</span> ##
-            ## Add the proper content to the validation string if it's a failure on initialisation
-            ## If it's a regex validation, we also want to make sure to keep it shown at all times, we still put the
-            ## message. Note that the class displaying the state of this validation will change though.
-            #if($field.error && $field.error == $!validation.failureMessage ||
-              $!extraValidationClass.toString().contains('regex'))
-              $!validation.failureMessage
-            #end
-          </span>
-        #end
-        #set($extraValidationClass = '')
-        #if ($field.validate.mandatory)
-          #set($extraValidationClass = 'mandatory')
-          #set($validation = $field.validate.mandatory)
-          $validationContainer
-        #end
-        #if ($field.validate.mustMatch)
-          #set($extraValidationClass = 'must-match')
-          #set($validation = $field.validate.mustMatch)
-          $validationContainer
-        #end
-        #if ($field.validate.programmaticValidation)
-          #set($extraValidationClass = 'programmatic-validation')
-          #set($validation = $field.validate.programmaticValidation)
-          $validationContainer
-        #end
-        #if ($field.validate.regex)
-          #set($extraValidationClass = 'regex')
-          #set($validation = $field.validate.regex)
-          $validationContainer
-        #end
-        #foreach ($regex in $field.validate.regexes)
-          #set($extraValidationClass = 'regex-'+ $foreach.count)
-          #set($validation = $regex)
-          $validationContainer
-        #end
-        </dd>
       #end
+      ## We initialize the validation messages containers.
+      ## Fields with their own html content get them too, so that their server side validation errors are displayed.
+      ## Since the improvements for XWIKI-22121, we want icons in there. It's way easier to define those in the
+      ## template directly.
+      ## We want to match each use of this template to each of the `add` method for the live validation object.
+      ## If there's not already a container, the livevalidation will create it itself. However, this fallback will not
+      ## support icons.
+      #define ($validationContainer)
+        ## Add the proper classes to the validation string if it's a failure on initialisation
+        #if ($field.error &&
+          $field.error == $!validation.failureMessage &&
+          $!failureMessageParams.get("class")!='')
+          #set($extraValidationClass = $extraValidationClass + ' ' + $!failureMessageParams.get("class"))
+        #elseif ($field.params.value)
+          #set($extraValidationClass = $extraValidationClass + ' LV_valid')##
+        #end
+        <span class="LV_validation_message $extraValidationClass" aria-live="polite" ##
+          ## Add the proper attributes to the validation string if it's a failure on initialisation
+          #if ($field.error &&
+            $field.error == $!validation.failureMessage)
+            #foreach ($entry in $failureMessageParams.entrySet())
+              #if ($entry.key!='class')
+                $entry.key="$entry.value" ##
+              #end
+            #end
+          #end>
+          <span class="LV_validation_message_valid_icon">$services.icon.renderHTML('accept')</span> ##
+          <span class="LV_validation_message_invalid_icon">$services.icon.renderHTML('cross')</span> ##
+          ## Add the proper content to the validation string if it's a failure on initialisation
+          ## If it's a regex validation, we also want to make sure to keep it shown at all times, we still put the
+          ## message. Note that the class displaying the state of this validation will change though.
+          #if($field.error && $field.error == $!validation.failureMessage ||
+            $!extraValidationClass.toString().contains('regex'))
+            $!validation.failureMessage
+          #end
+        </span>
+      #end
+      #set($extraValidationClass = '')
+      #if ($field.validate.mandatory)
+        #set($extraValidationClass = 'mandatory')
+        #set($validation = $field.validate.mandatory)
+        $validationContainer
+      #end
+      #if ($field.validate.mustMatch)
+        #set($extraValidationClass = 'must-match')
+        #set($validation = $field.validate.mustMatch)
+        $validationContainer
+      #end
+      #if ($field.validate.programmaticValidation)
+        #set($extraValidationClass = 'programmatic-validation')
+        #set($validation = $field.validate.programmaticValidation)
+        $validationContainer
+      #end
+      #if ($field.validate.regex)
+        #set($extraValidationClass = 'regex')
+        #set($validation = $field.validate.regex)
+        $validationContainer
+      #end
+      #foreach ($regex in $field.validate.regexes)
+        #set($extraValidationClass = 'regex-'+ $foreach.count)
+        #set($validation = $regex)
+        $validationContainer
+      #end
+      </dd>
     #else
       $services.localization.render('xe.admin.registration.fieldWithNoName')
     #end

@@ -4,6 +4,7 @@ org.xwiki.extension.distribution.internal.DistributionConfiguration
 org.xwiki.extension.distribution.internal.DistributionInitializerListener
 org.xwiki.extension.distribution.internal.DistributionInternalScriptService
 org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener
+org.xwiki.extension.distribution.internal.OrphanedExtensionsResolver
 org.xwiki.extension.distribution.internal.WikiDistributionWikiEventListener
 org.xwiki.extension.distribution.internal.job.DefaultDistributionJob
 org.xwiki.extension.distribution.internal.job.step.CleanExtensionsDistributionStep

@@ -2910,7 +2910,8 @@ $string##
 
 #**
  * Outputs a link to the home page of the wiki targeted by a namespace (as used by extensions, jobs or logs), displaying
- * the wiki pretty name (or its identifier when it has none).
+ * the wiki pretty name (or its identifier when it has none). Only the wiki identifier is displayed when the wiki does
+ * not exist.
  *
  * @param $namespace the wiki namespace (e.g. {@code wiki:xwiki}); a wiki identifier is also accepted
  * @since 18.10.0RC1
@@ -2918,14 +2919,13 @@ $string##
  * @since 17.10.16
  *#
 #macro (wikiNamespaceHomePageLink $namespace)
-#set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
-#set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
-#set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
-#set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
-#if ("$!wikiPrettyName.trim()" == '')
-#set ($wikiPrettyName = $wikiName)
+#set ($wikiId = $stringtool.removeStart($namespace, 'wiki:'))
+#set ($wikiDescriptor = $services.wiki.getById($wikiId))
+#if ($wikiDescriptor)
+<a href="$escapetool.xml($xwiki.getURL($wikiDescriptor.mainPageReference))">$escapetool.xml($stringtool.defaultIfBlank($wikiDescriptor.prettyName, $wikiId))</a>##
+#else
+$escapetool.xml($wikiId)##
 #end
-<a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a>##
 #end
 
 #**

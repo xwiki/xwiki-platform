@@ -19,22 +19,27 @@
  */
 package org.xwiki.web;
 
+import javax.inject.Named;
 import javax.script.ScriptContext;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.script.WikiManagerScriptService;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.syntax.Syntax.PLAIN_1_0;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
@@ -44,17 +49,23 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
  * @version $Id$
  */
 @XWikiSyntax21ComponentList
-@ComponentList({
-    TemplateMacro.class,
-    ModelScriptService.class
-})
+@ComponentList(TemplateMacro.class)
 class LoggingMacrosPageTest extends PageTest
 {
+    @MockComponent(classToMock = WikiManagerScriptService.class)
+    @Named(WikiManagerScriptService.ROLEHINT)
+    private ScriptService wikiScriptService;
+
     @Test
-    void printLogMessageWithWikiNamespace() throws Exception
+    void printLogMessageWithWikiNamespaces() throws Exception
     {
-        LogEvent log = new LogEvent(LogLevel.INFO, "Uninstalled extension on namespace [{}]",
-            new Object[] {"wiki:xwiki"}, null);
+        WikiDescriptor wikiDescriptor = new WikiDescriptor("xwiki", "localhost");
+        wikiDescriptor.setPrettyName("My Wiki");
+        wikiDescriptor.setMainPageReference(new DocumentReference("xwiki", "Home", "WebHome"));
+        when(((WikiManagerScriptService) this.wikiScriptService).getById("xwiki")).thenReturn(wikiDescriptor);
+
+        LogEvent log = new LogEvent(LogLevel.INFO, "Uninstalled extension on namespaces [{}] and [{}]",
+            new Object[] {"wiki:xwiki", "wiki:deletedwiki"}, null);
         this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class)
             .getCurrentScriptContext().setAttribute("log", log, ScriptContext.GLOBAL_SCOPE);
 
@@ -67,7 +78,8 @@ class LoggingMacrosPageTest extends PageTest
             #printLogMessage($log)
             {{/velocity}}""");
 
-        assertEquals("Uninstalled extension on namespace [<a href=\"/xwiki/bin/view/Main/\">xwiki</a>]",
-            document.getRenderedContent(PLAIN_1_0, this.context).trim());
+        // The link targets the home page configured for the wiki, and a wiki which does not exist is not linked.
+        assertEquals("Uninstalled extension on namespaces [<a href=\"/xwiki/bin/view/Home/\">My Wiki</a>] and "
+            + "[deletedwiki]", document.getRenderedContent(PLAIN_1_0, this.context).trim());
     }
 }

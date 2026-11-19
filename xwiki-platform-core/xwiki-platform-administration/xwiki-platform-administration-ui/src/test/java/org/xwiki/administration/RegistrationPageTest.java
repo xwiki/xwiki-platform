@@ -329,7 +329,7 @@ class RegistrationPageTest extends PageTest
     {
         Element captchaAnswer = result.selectFirst("dd input[name=captchaAnswer]");
         assertNotNull(captchaAnswer);
-        return captchaAnswer.parent();
+        return captchaAnswer.closest("dd");
     }
 
     private RegistrationScriptService getRegistrationScriptService() throws Exception

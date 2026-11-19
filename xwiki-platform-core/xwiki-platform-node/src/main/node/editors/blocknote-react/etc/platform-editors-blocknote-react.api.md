@@ -30,6 +30,7 @@ import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
 import { MacroBlockInvocation as MacroBlockInvocation_2 } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
+import { Map as Map_2 } from 'yjs';
 import { PartialLink } from '@blocknote/core';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -45,9 +46,18 @@ import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 export type BlockMetadata = Record<string, unknown>;
 
 // @beta
+export type BlockMetadataKey = {
+    name: string;
+    shared?: boolean;
+};
+
+// @beta
 export interface BlockMetadataStore {
+    connect(sharedMetadata: SharedBlockMetadata, options: {
+        initialize: boolean;
+    }): () => void;
     get(id: string): Readonly<BlockMetadata> | undefined;
-    set(id: string, key: string, value: unknown): void;
+    set(id: string, key: BlockMetadataKey, value: unknown): void;
 }
 
 // @beta
@@ -359,6 +369,9 @@ export type SchemaContribution = {
 
 // @beta
 export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
+
+// @beta
+export type SharedBlockMetadata = Map_2<Map_2<unknown>>;
 
 // @beta
 export type SlashMenuItem = DefaultReactSuggestionItem & {

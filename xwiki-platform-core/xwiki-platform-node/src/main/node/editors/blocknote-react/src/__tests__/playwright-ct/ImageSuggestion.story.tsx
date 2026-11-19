@@ -31,6 +31,7 @@ import { useMemo, useState } from "react";
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
 // the Vite pipeline used to bundle this story) can't parse.
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
+import type { BlockMetadataKey } from "../../misc/blockMetadata";
 import type {
   ImageEditionData,
   ImageEditor,
@@ -39,6 +40,9 @@ import type {
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+
+// The image metadata entry holding the image reference.
+const REFERENCE: BlockMetadataKey = { name: "reference" };
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
 
@@ -104,7 +108,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   const metadata = useMemo(() => {
     const store = createBlockMetadataStore();
     Object.entries(imageReferences ?? {}).forEach(([id, reference]) =>
-      store.set(id, "reference", reference),
+      store.set(id, REFERENCE, reference),
     );
     return store;
   }, []);
@@ -122,7 +126,7 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
             | undefined,
         }),
         afterUpdate: (instance, block, reference) => {
-          instance.metadata.set(block.id, "reference", reference);
+          instance.metadata.set(block.id, REFERENCE, reference);
           setSelectedImages((images) => [
             ...images,
             { blockId: block.id, url: block.props.url, reference },

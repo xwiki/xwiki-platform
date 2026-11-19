@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { toRelativeAttachmentResourceReference } from "../blocknote/attachmentResourceReference";
+import { XWIKI_REFERENCE } from "../blocknote/metadataKeys";
 import { imageMetadataHandlerName } from "@xwiki/platform-editors-blocknote-react";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
 import { Container, injectable } from "inversify";
@@ -28,11 +29,6 @@ import type {
   ImageMetadataHandler,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
-
-/**
- * The key of the image metadata holding the XWiki resource reference of the image.
- */
-const REFERENCE_KEY = "xwikiReference";
 
 /**
  * Default ImageMetadataHandler implementation: the XWiki resource reference of an image is kept as block metadata
@@ -57,7 +53,7 @@ export class DefaultImageMetadataHandler implements ImageMetadataHandler {
     // The image editor gets the reference of the image, because the user may select a different image.
     return {
       ...block.props,
-      reference: instance.metadata.get(block.id)?.[REFERENCE_KEY] as
+      reference: instance.metadata.get(block.id)?.[XWIKI_REFERENCE.name] as
         | ResourceReference
         | undefined,
     };
@@ -71,7 +67,7 @@ export class DefaultImageMetadataHandler implements ImageMetadataHandler {
     // An image known only by its URL is saved with that URL, so we drop the reference of the previous image source.
     instance.metadata.set(
       block.id,
-      REFERENCE_KEY,
+      XWIKI_REFERENCE,
       reference?.type === "attach"
         ? this.toImageAttachmentReference(instance, reference)
         : reference,

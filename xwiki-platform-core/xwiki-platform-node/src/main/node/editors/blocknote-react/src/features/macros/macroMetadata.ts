@@ -17,11 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { BlockMetadataStore } from "../../misc/blockMetadata";
+import type {
+  BlockMetadataKey,
+  BlockMetadataStore,
+} from "../../misc/blockMetadata";
 
-// The metadata entries holding the output of a macro call, and the macro call it was rendered for.
-const MACRO_CALL = "macroCall";
-const MACRO_OUTPUT = "macroOutput";
+// The metadata entries holding the output of a macro call, and the macro call it was rendered for. They are private
+// because the macro output is rendered for the current user.
+const MACRO_CALL: BlockMetadataKey = { name: "macroCall" };
+const MACRO_OUTPUT: BlockMetadataKey = { name: "macroOutput" };
 
 /**
  * Associates a server-rendered macro output with a macro call. The macro output is kept outside the edited content
@@ -65,8 +69,8 @@ function getMacroOutput(
   call: string,
 ): unknown[] | undefined {
   const macroMetadata = id ? metadata?.get(id) : undefined;
-  return macroMetadata?.[MACRO_CALL] === call
-    ? (macroMetadata[MACRO_OUTPUT] as unknown[])
+  return macroMetadata?.[MACRO_CALL.name] === call
+    ? (macroMetadata[MACRO_OUTPUT.name] as unknown[])
     : undefined;
 }
 

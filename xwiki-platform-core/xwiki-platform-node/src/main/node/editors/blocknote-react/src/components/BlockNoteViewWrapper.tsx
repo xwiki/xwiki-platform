@@ -46,6 +46,7 @@ import { useTranslation } from "react-i18next";
 import type { BlockType, EditorSchema, EditorType } from "../blocknote";
 import type { EditorInstance } from "../editorInstance";
 import type { EditorOptions } from "../editorOptions";
+import type { SharedBlockMetadata } from "../misc/blockMetadata";
 import type { CollaborationOptions } from "@blocknote/core/yjs";
 
 /**
@@ -245,27 +246,46 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     setInstance?.(instance);
   }, [setInstance, instance]);
 
+  // The shared metadata entries of the edited content are kept in the shared document, next to the content, so that
+  // all the session participants see the same metadata for the same ids (the private entries stay with each user).
+  const sharedMetadata = collaboration?.doc.getMap(`${name}:metadata`) as
+    | SharedBlockMetadata
+    | undefined;
+
   // When realtime collaboration is enabled, the first user joining the session must set the initial content. The rest
   // of the participants will retrieve the editor content from the realtime server. We know who is the first user
   // joining the session by checking whether the name of the editor instance is in the map of the loaded contents
   // (shared across all session participants), because each editor instance taking part in the session has its own
   // initial content.
-  if (collaboration) {
+  if (collaboration && sharedMetadata) {
     const initialContentLoaded = collaboration.doc.getMap<boolean>(
       "initialContentLoaded",
     );
     if (!initialContentLoaded.get(name!)) {
       // This is the first user joining the realtime collaboration session with this editor instance.
-      initialContentLoaded.set(name!, true);
       console.debug(
         "Setting initial content for realtime collaboration session.",
         content,
       );
-      // Initialize the realtime collaboration session with the provided content.
-      const fragment = collaboration.doc.getXmlFragment(name!);
-      blocksToYXmlFragment(editor, content, fragment);
+      // Initialize the realtime collaboration session with the provided content and its shared metadata, at once, so
+      // that the other participants never get the content without its metadata.
+      collaboration.doc.transact(() => {
+        initialContentLoaded.set(name!, true);
+        const fragment = collaboration.doc.getXmlFragment(name!);
+        blocksToYXmlFragment(editor, content, fragment);
+        metadata.connect(sharedMetadata, { initialize: true });
+      });
     }
   }
+
+  // The participants that join a session already initialized use the shared metadata of the session, because they
+  // edit the content of the session (with its ids), not the content they loaded. Connecting is done only once per
+  // shared metadata, so this doesn't affect the participant that initialized the session.
+  useEffect(
+    () =>
+      sharedMetadata && metadata.connect(sharedMetadata, { initialize: false }),
+    [metadata, sharedMetadata],
+  );
 
   // Renders the editor instance using a React component.
   return (

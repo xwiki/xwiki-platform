@@ -19,6 +19,7 @@
  */
 import { DefaultLinkMetadataHandler } from "./DefaultLinkMetadataHandler";
 import { extractLinkId, injectLinkId } from "./linkId";
+import { XWIKI_GENERATED_LABEL, XWIKI_REFERENCE } from "./metadataKeys";
 import { createBlockMetadataStore } from "@xwiki/platform-editors-blocknote-react";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -40,10 +41,10 @@ describe("DefaultLinkMetadataHandler", () => {
   function linkWithGeneratedLabel() {
     instance.metadata.set(
       "alice",
-      "xwikiReference",
+      XWIKI_REFERENCE,
       pageReference("Users.Alice"),
     );
-    instance.metadata.set("alice", "xwikiGeneratedLabel", "Alice");
+    instance.metadata.set("alice", XWIKI_GENERATED_LABEL, "Alice");
     return injectLinkId("/xwiki/bin/view/Users/Alice", "alice");
   }
 

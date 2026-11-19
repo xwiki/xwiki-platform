@@ -19,6 +19,7 @@
  */
 import { editedLinkResourceReference } from "./editedLinkResourceReference";
 import { extractLinkId, injectLinkId, stripLinkId } from "./linkId";
+import { XWIKI_GENERATED_LABEL, XWIKI_REFERENCE } from "./metadataKeys";
 import { linkMetadataHandlerName } from "@xwiki/platform-editors-blocknote-react";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
 import { Container, injectable } from "inversify";
@@ -97,7 +98,7 @@ export class DefaultLinkMetadataHandler implements LinkMetadataHandler {
       const { sourceDocumentReference } = instance.options;
       metadata.set(
         id,
-        "xwikiReference",
+        XWIKI_REFERENCE,
         editedLinkResourceReference(
           metadata.get(id)?.xwikiReference as ResourceReference | undefined,
           linkData.reference,
@@ -111,7 +112,7 @@ export class DefaultLinkMetadataHandler implements LinkMetadataHandler {
     // by the user is saved, even when it's the same as the generated one.
     metadata.set(
       id,
-      "xwikiGeneratedLabel",
+      XWIKI_GENERATED_LABEL,
       linkData.generatedTitle ? linkData.title : undefined,
     );
     return { ...linkData, url: injectLinkId(stripLinkId(linkData.url), id) };

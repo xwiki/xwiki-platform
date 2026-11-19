@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DefaultImageMetadataHandler } from "./DefaultImageMetadataHandler";
+import { XWIKI_REFERENCE } from "../blocknote/metadataKeys";
 import { createBlockMetadataStore } from "@xwiki/platform-editors-blocknote-react";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
@@ -46,7 +47,7 @@ describe("DefaultImageMetadataHandler", () => {
 
   it("edits the image with its stored reference", () => {
     const reference = { type: "attach", typed: false, reference: "cat.png" };
-    instance.metadata.set("image", "xwikiReference", reference);
+    instance.metadata.set("image", XWIKI_REFERENCE, reference);
 
     expect(handler.beforeEdit(instance, block)).toEqual({
       url: "catURL",
@@ -112,7 +113,7 @@ describe("DefaultImageMetadataHandler", () => {
   });
 
   it("drops the reference of the previous image when the new one is known only by its URL", () => {
-    instance.metadata.set("image", "xwikiReference", {
+    instance.metadata.set("image", XWIKI_REFERENCE, {
       type: "attach",
       reference: "cat.png",
     });

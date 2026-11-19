@@ -81,7 +81,12 @@ export {
   setMacroOutput,
 } from "./features/macros/macroMetadata";
 
-export type { BlockMetadata, BlockMetadataStore } from "./misc/blockMetadata";
+export type {
+  BlockMetadata,
+  BlockMetadataKey,
+  BlockMetadataStore,
+  SharedBlockMetadata,
+} from "./misc/blockMetadata";
 
 export type {
   CodeBlocksFeatureOptions,

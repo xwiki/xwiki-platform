@@ -1643,17 +1643,6 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   </span>
 #end
 
-#macro (wikiHomePageLink $namespace)
-#set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
-#set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
-#set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
-#set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
-#if ("$!wikiPrettyName.trim()" == '')
-#set ($wikiPrettyName = $wikiName)
-#end
-<a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a>##
-#end
-
 #macro (isShowingExtensionDetails $extension $_showDetails)
   ## Show the extension details if this extension has been explicitly requested.
   #set ($return = "$!request.hideExtensionDetails" != 'true' && $request.extensionId == $extension.id.id

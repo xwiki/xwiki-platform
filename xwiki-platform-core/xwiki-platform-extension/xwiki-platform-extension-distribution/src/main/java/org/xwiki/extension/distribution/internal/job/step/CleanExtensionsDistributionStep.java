@@ -44,6 +44,9 @@ public class CleanExtensionsDistributionStep extends AbstractExtensionDistributi
     public static final String ID = "extension.clean";
 
     @Inject
+    // The steps are serialized with the job status (see the org.xwiki.job.annotation.Serializable annotation on
+    // AbstractDistributionStep), which skips the transient fields.
+    @SuppressWarnings("java:S2065")
     private transient OrphanedExtensionsResolver orphanedExtensionsResolver;
 
     /**

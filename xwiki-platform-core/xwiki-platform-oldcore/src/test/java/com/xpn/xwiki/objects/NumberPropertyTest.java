@@ -133,6 +133,28 @@ class NumberPropertyTest
         assertFalse(nullValueProperty.equals(notNullValueProperty));
     }
 
+    /**
+     * Comparing with a property of another type, for example when the type of a class field changed, should not fail.
+     */
+    @Test
+    @SuppressWarnings("java:S5785")
+    void equalsWithPropertyOfAnotherType()
+    {
+        BaseObject object = new BaseObject();
+
+        IntegerProperty integerProperty = new IntegerProperty();
+        integerProperty.setName("field");
+        integerProperty.setObject(object);
+        integerProperty.setValue(1);
+
+        StringProperty stringProperty = new StringProperty();
+        stringProperty.setName("field");
+        stringProperty.setObject(object);
+        stringProperty.setValue("1");
+
+        assertFalse(integerProperty.equals(stringProperty));
+    }
+
     @Test
     void testHashCode()
     {

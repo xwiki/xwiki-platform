@@ -268,9 +268,14 @@
 
 ## Gets the history records of the selected source (local history or history file).
 ##
-## @param $all whether to get all the records (needed e.g. to look for the selected records, which may come from
-##   several pages) or only one page of records, starting from the "offsetRecordId" request parameter. History files
-##   are always read entirely.
+## The records are returned in the $records global variable and the page size in the $limit global variable ($NULL
+## when the records are not paged, i.e. for a history file). These two variables are not set in the $macro scope on
+## purpose, because the calling code reads them.
+##
+## @param $all (@since 18.10.0RC1) whether to get all the records of the local history (needed e.g. to look for the
+##   selected records, which may come from several pages) or only one page of records, starting after the record
+##   specified by the "offsetRecordId" request parameter. The "offsetRecordId" request parameter is ignored when
+##   getting all the records. History files are always read entirely.
 #macro (getExtensionHistoryRecords $all)
   #if ("$!request.source" != '')
     ## History File
@@ -288,17 +293,26 @@
     #set ($macro.jobTypes = ['install', 'uninstall', 'repairxar'])
     ## The page size, used to display the records and to decide if there are more records to load.
     #set ($limit = 10)
-    ## A negative limit means no limit.
+    #set ($macro.offsetRecordId = $request.offsetRecordId)
     #set ($macro.fetchLimit = $limit)
     #if ($all)
-      #set ($macro.fetchLimit = -1)
+      ## Start from the most recent record. The limit is the maximum number of records to return, so we use the largest
+      ## value (Integer.MAX_VALUE) to get all the records without relying on a special value.
+      #set ($macro.offsetRecordId = $NULL)
+      #set ($macro.fetchLimit = 2147483647)
     #end
     #set ($macro.recordsFilter = $services.extension.history.records)
-    #set ($records = $macro.recordsFilter.fromThisWiki().ofType($macro.jobTypes).list($request.offsetRecordId,
+    #set ($records = $macro.recordsFilter.fromThisWiki().ofType($macro.jobTypes).list($macro.offsetRecordId,
       $macro.fetchLimit))
   #end
 #end
 
+## Gets the history records selected in the request (the "extensionHistoryRecord" request parameter), looking for them in
+## the entire history of the selected source.
+##
+## The selected records are returned in the $selectedRecords global variable. This macro also sets the $records and
+## $limit global variables (see #getExtensionHistoryRecords). These variables are not set in the $macro scope on purpose,
+## because the calling code reads them.
 #macro (getSelectedExtensionHistoryRecords)
   #set ($macro.selectedRecordIds = $request.getParameterValues('extensionHistoryRecord'))
   #if ($macro.selectedRecordIds && $macro.selectedRecordIds.size() > 0)

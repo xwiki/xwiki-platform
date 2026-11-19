@@ -20,7 +20,7 @@
 import LiveDataAdvancedPanelExtension from "./LiveDataAdvancedPanelExtension.vue";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
-import { nextTick } from "vue";
+import { nextTick, reactive } from "vue";
 
 /**
  * Vue Component initializer for LiveDataAdvancedPanelExtension component.
@@ -51,13 +51,14 @@ function initWrapper({ container }) {
       },
     },
     props: {
-      panel: {
+      // The Live Data logic keeps its panels in a deep reactive array, so the component receives a reactive panel.
+      panel: reactive({
         id: "extensionPanel",
         title: "Test Panel",
         container: container,
         component: "LiveDataAdvancedPanelExtension",
         icon: "camera",
-      },
+      }),
     },
     stubs: { XWikiIcon: true },
   });

@@ -120,7 +120,7 @@ Caused by: #printThrowable($throwable.cause true)
         ## Assume the argument is a job id.
         #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
       #elseif ($argument.class.name == 'java.lang.String' && $argument.startsWith('wiki:'))
-        #set ($message = "$message#wikiHomePageLink($argument)")
+        #set ($message = "$message#wikiNamespaceHomePageLink($argument)")
       #elseif ($objecttool.instanceOf($argument, 'org.xwiki.diff.Delta'))
         #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
       #else

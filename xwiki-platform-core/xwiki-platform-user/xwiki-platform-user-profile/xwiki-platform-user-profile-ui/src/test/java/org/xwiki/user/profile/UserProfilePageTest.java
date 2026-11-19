@@ -103,7 +103,7 @@ class UserProfilePageTest extends PageTest
 
     private static final String MENU_EXTENSION_POINT = "org.xwiki.plaftorm.user.profile.menu";
 
-    private static final String MENU_GROUP_EXTENSION_POINT = "org.xwiki.platform.user.profile.menu.group";
+    private static final String MENU_GROUP_EXTENSION_POINT = "org.xwiki.platform.user.profile.menuGroup";
 
     private static final String MENU_ITEM_SELECTOR = "#user-profile-menu .list-group-item";
 
@@ -233,8 +233,12 @@ class UserProfilePageTest extends PageTest
         // Replace the default groups, which include the "other" group, with a single group.
         unregisterUIX(this.menuGroupsPage);
         registerUIX("profileGroup", MENU_GROUP_EXTENSION_POINT, "id=profile\npriority=100");
+        // A group without an id is ignored, so its items have no group either.
+        registerUIX("groupWithoutId", MENU_GROUP_EXTENSION_POINT, "priority=50");
         registerUIX("profileItem", MENU_EXTENSION_POINT, "id=first\ngroup=profile\npriority=10");
         registerUIX("itemWithoutGroup", MENU_EXTENSION_POINT, "id=noGroup\npriority=40");
+        registerUIX("itemOfGroupWithoutId", MENU_EXTENSION_POINT,
+            "id=groupWithoutIdItem\ngroup=test.groupWithoutId\npriority=60");
         createUser(new HashMap<>());
 
         Document dom = renderSheet(USER_SHEET);
@@ -246,6 +250,9 @@ class UserProfilePageTest extends PageTest
             + " there's no [other] group to fall back on.";
         verify(this.logger).warn(message, "preferences", "settings");
         verify(this.logger).warn(message, "noGroup", null);
+        verify(this.logger).warn(message, "groupWithoutIdItem", "test.groupWithoutId");
+        verify(this.logger).warn("The user profile menu group [{}] is not displayed because it has no [id] parameter.",
+            "test.groupWithoutId");
     }
 
     private List<String> getMenuGroups(Document dom)

@@ -2586,7 +2586,7 @@ $displayName##
  *        'name'     : the text displayed for the item; optional, defaults to
  *                     $services.localization.render("$!{translationPrefix}${item.id}")
  *        'icon'     : the name of an icon from the current icon theme, displayed before the name; optional
- *        'url'      : the target of the item link; optional
+ *        'url'      : the target of the item link; optional, the link has no target when the URL is not safe
  *        'cssClass' : a specific css class for the item, for custom styling; optional
  *
  * @param $menu the menu object, in the format described above
@@ -2626,9 +2626,13 @@ $displayName##
               #if ("$!options.crtItemId" != '' && $item.id == $options.crtItemId)
                 #set ($isActiveItem = true)
               #end
+              #set ($escapedItemUrl = '')
+              #if ("$!item.url" != '')
+                #getSanitizedURLAttributeValue('a' 'href' $item.url '' $escapedItemUrl)
+              #end
               <a class="list-group-item#if ($isActiveItem) active#end $!escapetool.xml($item.cssClass)" ##
                 id="vertical-menu-$escapetool.xml($item.id)" data-id="$escapetool.xml($item.id)" ##
-                #if ("$!item.url" != '')href="$escapetool.xml($item.url)" #end##
+                #if ("$!escapedItemUrl" != '')href="$escapedItemUrl" #end##
                 #if ($isActiveItem)aria-current="page"#end>##
                 #_verticalNavigationAccordionLabel($item $options)</a>
             #end

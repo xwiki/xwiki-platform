@@ -44,6 +44,8 @@ public class AbstractUserProfilePage extends ViewPage
 
     private static final String ARIA_EXPANDED = "aria-expanded";
 
+    private static final String DATA_ID = "data-id";
+
     private final String username;
 
     public AbstractUserProfilePage(String username)
@@ -115,7 +117,7 @@ public class AbstractUserProfilePage extends ViewPage
             .findElement(By.cssSelector(MENU_GROUP_HEADING_SELECTOR));
         if (!"true".equals(heading.getDomAttribute(ARIA_EXPANDED))) {
             heading.click();
-            getDriver().waitUntilCondition(driver -> item.isDisplayed());
+            waitForMenuGroupExpanded(item);
         }
         item.click();
         WebElement pane = getDriver().findElement(By.id(categoryId + "Pane"));
@@ -123,26 +125,31 @@ public class AbstractUserProfilePage extends ViewPage
     }
 
     /**
-     * @return the identifier of the category currently displayed
+     * @return the name of the category currently displayed
      * @since 19.0.0RC1
      */
     public String getCurrentCategory()
     {
-        return getDriver().findElement(By.cssSelector("#user-profile-menu " + MENU_ITEM_SELECTOR + ".active"))
-            .getDomAttribute("data-id");
+        return getTextContent(getCurrentMenuItem());
     }
 
     /**
-     * Go back in the browser history to the previously opened category and wait for it to be displayed.
+     * Go back in the browser history to the previously opened category and wait for it to be displayed, with its menu
+     * group expanded.
      *
      * @since 19.0.0RC1
      */
     public void goBackToPreviousCategory()
     {
-        String currentCategory = getCurrentCategory();
+        String currentCategoryId = getCurrentMenuItem().getDomAttribute(DATA_ID);
         getDriver().navigate().back();
-        getDriver().waitUntilCondition(driver -> !currentCategory.equals(getCurrentCategory())
-            && driver.findElement(By.id(getCurrentCategory() + "Pane")).isDisplayed());
+        getDriver().waitUntilCondition(driver -> {
+            WebElement item = getCurrentMenuItem();
+            String categoryId = item.getDomAttribute(DATA_ID);
+            return !currentCategoryId.equals(categoryId)
+                && driver.findElement(By.id(categoryId + "Pane")).isDisplayed();
+        });
+        waitForMenuGroupExpanded(getCurrentMenuItem());
     }
 
     public ProfileUserProfilePage switchToProfile()
@@ -155,6 +162,25 @@ public class AbstractUserProfilePage extends ViewPage
     {
         openCategory("preferences");
         return new PreferencesUserProfilePage(getUsername());
+    }
+
+    private WebElement getCurrentMenuItem()
+    {
+        return getDriver().findElement(By.cssSelector("#user-profile-menu " + MENU_ITEM_SELECTOR + ".active"));
+    }
+
+    /**
+     * Wait until the menu group holding the given item is expanded and the collapse animations of the menu are over,
+     * since the menu ignores the clicks on its group headings during these animations.
+     */
+    private void waitForMenuGroupExpanded(WebElement item)
+    {
+        String groupBodyId = item.findElement(By.xpath("ancestor::section[contains(@class, 'panel-collapse')][1]"))
+            .getDomAttribute("id");
+        By expandedGroupBody = By.cssSelector("#" + groupBodyId + ".in");
+        By animatedGroupBody = By.cssSelector("#user-profile-menu .collapsing");
+        getDriver().waitUntilCondition(driver -> !getDriver().findElementsWithoutWaiting(expandedGroupBody).isEmpty()
+            && getDriver().findElementsWithoutWaiting(animatedGroupBody).isEmpty());
     }
 
     private List<WebElement> getMenuGroupElements()

@@ -513,14 +513,26 @@ class MacrosTest extends PageTest
         this.oldcore.getMocker().registerComponent(ScriptService.class, "icon", iconManagerScriptService);
         when(iconManagerScriptService.renderHTML(any(String.class)))
             .then(invocation -> "<i>" + invocation.getArgument(0) + "</i>");
+        // The item URLs are checked with the URL security and HTML script services.
+        SecurityScriptService securityScriptService = mock(SecurityScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "security", securityScriptService);
+        URLSecurityScriptService urlSecurityScriptService = mock(URLSecurityScriptService.class);
+        when(securityScriptService.get("url")).thenReturn(urlSecurityScriptService);
+        HTMLScriptService htmlScriptService = mock(HTMLScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "html", htmlScriptService);
+        String safeUrl = "?category=a&x=y";
+        when(urlSecurityScriptService.parseToSafeURI(safeUrl)).thenReturn(new URI(safeUrl));
+        when(htmlScriptService.isAttributeSafe("a", "href", safeUrl)).thenReturn(true);
+        String unsafeUrl = "javascript:alert(1)";
+        when(urlSecurityScriptService.parseToSafeURI(unsafeUrl)).thenReturn(null);
 
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
         velocityContext.put("menu", List.of(
             Map.of("id", "first", "name", "<b>First</b>{{/html}}", "icon", "user", "children", List.of(
-                Map.of("id", "a", "name", "A", "url", "?category=a&x=y"),
+                Map.of("id", "a", "name", "A", "url", safeUrl),
                 Map.of("id", "b", "name", "B", "cssClass", "custom"))),
             Map.of("id", "second", "name", "Second", "children", List.of(
-                Map.of("id", "c", "name", "<em>C</em>", "icon", "wrench")))));
+                Map.of("id", "c", "name", "<em>C</em>", "icon", "wrench", "url", unsafeUrl)))));
 
         StringWriter writer = new StringWriter();
         this.velocityManager.evaluate(writer, "verticalNavigationAccordion", new StringReader(
@@ -544,8 +556,10 @@ class MacrosTest extends PageTest
         Elements items = nav.select(".list-group > a.list-group-item");
         assertEquals(List.of("a", "b", "c"), items.eachAttr("data-id"));
         assertEquals(List.of("vertical-menu-a", "vertical-menu-b", "vertical-menu-c"), items.eachAttr("id"));
-        assertEquals("?category=a&x=y", items.get(0).attr("href"));
+        assertEquals(safeUrl, items.get(0).attr("href"));
         assertFalse(items.get(1).hasAttr("href"));
+        // The link isn't written when its URL isn't safe.
+        assertFalse(items.get(2).hasAttr("href"));
         assertTrue(items.get(1).hasClass("custom"));
         assertEquals("<em>C</em>", items.get(2).ownText().trim());
         assertEquals("wrench", items.get(2).selectFirst("i").text());

@@ -166,10 +166,10 @@
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.platform.user.profile.menu.group</extensionPointId>
+      <extensionPointId>org.xwiki.platform.user.profile.menuGroup</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.group.profile</name>
+      <name>org.xwiki.platform.user.profile.menuGroup.profile</name>
     </property>
     <property>
       <parameters>id=profile
@@ -309,10 +309,10 @@ priority=100</parameters>
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.platform.user.profile.menu.group</extensionPointId>
+      <extensionPointId>org.xwiki.platform.user.profile.menuGroup</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.group.activity</name>
+      <name>org.xwiki.platform.user.profile.menuGroup.activity</name>
     </property>
     <property>
       <parameters>id=activity
@@ -452,10 +452,10 @@ priority=200</parameters>
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.platform.user.profile.menu.group</extensionPointId>
+      <extensionPointId>org.xwiki.platform.user.profile.menuGroup</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.group.settings</name>
+      <name>org.xwiki.platform.user.profile.menuGroup.settings</name>
     </property>
     <property>
       <parameters>id=settings
@@ -595,10 +595,10 @@ priority=300</parameters>
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.platform.user.profile.menu.group</extensionPointId>
+      <extensionPointId>org.xwiki.platform.user.profile.menuGroup</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.group.other</name>
+      <name>org.xwiki.platform.user.profile.menuGroup.other</name>
     </property>
     <property>
       <parameters>id=other

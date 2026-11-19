@@ -45,17 +45,19 @@
 #########################
 ## Setting the menu groups
 #########################
-## Load the groups of the user menu from the 'org.xwiki.platform.user.profile.menu.group' UIXP.
+## Load the groups of the user menu from the 'org.xwiki.platform.user.profile.menuGroup' UIXP.
 #set ($userMenu = [])
 #set ($groupsById = {})
-#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.user.profile.menu.group', {'sortByParameter': 'priority'}))
+#set ($groupExtensions = $services.uix.getExtensions('org.xwiki.platform.user.profile.menuGroup',
+  {'sortByParameter': 'priority'}))
+#foreach ($uix in $groupExtensions)
   #set ($groupId = "$!uix.parameters.id")
   #if ($groupId == '')
-    ## When no id is explicitly provided, we use the id of the UIX.
-    #set ($groupId = $uix.id)
-  #end
+    ## The group id is used to build the identifiers of the accordion, so it has to be provided explicitly.
+    #set ($message = "The user profile menu group [{}] is not displayed because it has no [id] parameter.")
+    #set ($discard = $services.logging.getLogger('XWiki.XWikiUserSheet').warn($message, $uix.id))
   ## When several groups have the same id, the one with the lowest priority wins.
-  #if (!$groupsById.containsKey($groupId))
+  #elseif (!$groupsById.containsKey($groupId))
     #set ($group = {
       'id': $groupId,
       'name': $services.localization.render("platform.core.profile.menu.group.$groupId"),

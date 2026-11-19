@@ -324,6 +324,34 @@ test("The link editor action opens the link editor, and inserts the link it subm
   ]);
 });
 
+test("The link editor action prefills the link target with the text typed in the link suggestion menu", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(<LinkSuggestionForTest />);
+
+  const editorEl = component.locator(".bn-editor");
+  await editorEl.click();
+  await page.keyboard.type("[[Procedure");
+  await page.locator(".bn-suggestion-menu-item", { hasText: LINK_TO }).click();
+
+  // The link target is the page named after the typed text, e.g. to link to a page that none of the suggestions
+  // match. The display text is left empty, so that the link label is generated from the target.
+  expect(
+    JSON.parse((await page.getByTestId("linkEditorInput").textContent()) ?? ""),
+  ).toEqual({
+    action: "insert",
+    prefill: {
+      reference: {
+        type: "doc",
+        typed: false,
+        reference: "Procedure",
+        parameters: {},
+      },
+    },
+  });
+});
+
 test("Canceling the link editor inserts nothing", async ({ mount, page }) => {
   const component = await mount(<LinkSuggestionForTest />);
 

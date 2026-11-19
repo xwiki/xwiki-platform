@@ -77,7 +77,7 @@
       editor.config['xwiki-office'] = $.extend({
         enabled: false,
         importer: editor.config.sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.OfficeImporter',
+          sheet: 'XWiki.WYSIWYG.OfficeImporter',
           language: editor.getContentLocale()
         }))
       }, editor.config['xwiki-office']);

@@ -1146,6 +1146,60 @@ class CollaborationIT extends AbstractBlockNoteIT
         assertEquals("Hello superadmin!\nWelcome superadmin\nend", firstEditPage.clickDone().getContent());
     }
 
+    @Test
+    @Order(14)
+    void editDifferentPagesInTheSameBrowser(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        DocumentReference firstPage = testReference;
+        DocumentReference secondPage = new DocumentReference("Other", testReference.getLastSpaceReference());
+
+        // Start fresh, as John: the previous tests may leave a user logged in who has no preferred editor.
+        loginAsJohn(setup);
+        setup.deletePage(firstPage);
+        setup.deletePage(secondPage);
+        setup.createPage(firstPage, "First page", "");
+        setup.createPage(secondPage, "Second page", "");
+
+        //
+        // First Tab
+        //
+
+        BlockNoteInplaceEditPage firstEditPage = BlockNoteInplaceEditPage.gotoPage(firstPage).editInplace();
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.waitUntilTextIs("First page");
+
+        //
+        // Second Tab
+        //
+
+        // Use the same host as the first tab: the tabs of the same browser can communicate directly only if they have
+        // the same origin, and we want to verify that they don't exchange the content of different pages.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(setup.getCurrentExecutor().getBrowserHost());
+        BlockNoteStandaloneEditPage secondEditPage = BlockNoteStandaloneEditPage.gotoPage(secondPage);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        // The second page is edited alone, with its own content.
+        secondTextArea.waitUntilTextIs("Second page");
+        assertTrue(secondEditPage.getToolbar().isEditingAlone());
+        secondTextArea.appendParagraph("Typed in the second tab").waitUntilTextContains("second tab");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.appendParagraph("Typed in the first tab").waitUntilTextContains("first tab");
+        assertTrue(firstEditPage.getToolbar().isEditingAlone());
+        assertEquals("First page\nTyped in the first tab", firstEditPage.done().getContent());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        assertEquals("Second page\nTyped in the second tab", secondEditPage.clickDone().getContent());
+    }
+
     private void assertMacroOutputNotShared(String text)
     {
         // We can't simply check that the text doesn't contain "superadmin" because the text includes the labels of the

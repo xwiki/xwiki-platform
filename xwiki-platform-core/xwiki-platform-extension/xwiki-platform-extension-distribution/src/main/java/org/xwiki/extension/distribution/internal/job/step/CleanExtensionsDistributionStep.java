@@ -19,18 +19,13 @@
  */
 package org.xwiki.extension.distribution.internal.job.step;
 
-import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.distribution.internal.OrphanedExtensionsResolver;
 
 /**
  * Step in charge of cleaning orphaned extension dependencies.
@@ -49,10 +44,10 @@ public class CleanExtensionsDistributionStep extends AbstractExtensionDistributi
     public static final String ID = "extension.clean";
 
     @Inject
-    private transient InstalledExtensionRepository installedRepository;
-
-    @Inject
-    private transient Logger logger;
+    // The steps are serialized with the job status (see the org.xwiki.job.annotation.Serializable annotation on
+    // AbstractDistributionStep), which skips the transient fields.
+    @SuppressWarnings("java:S2065")
+    private transient OrphanedExtensionsResolver orphanedExtensionsResolver;
 
     /**
      * Set the step id.
@@ -68,39 +63,10 @@ public class CleanExtensionsDistributionStep extends AbstractExtensionDistributi
         if (getState() == null) {
             setState(State.COMPLETED);
 
-            // Check in the current namespace
-            if (containsOrphanExtension(getNamespace().toString())) {
+            // Check in the current wiki
+            if (!this.orphanedExtensionsResolver.getOrphanedExtensions(getWiki()).isEmpty()) {
                 setState(null);
             }
         }
-    }
-
-    private boolean containsOrphanExtension(String namespace)
-    {
-        Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions(namespace);
-
-        for (InstalledExtension installedExtension : installedExtensions) {
-            if (installedExtension.isDependency(namespace)) {
-                try {
-                    // Check in root namespace when on main wiki
-                    if (installedExtension.isInstalled(null)) {
-                        if (isMainWiki() && this.installedRepository
-                            .getBackwardDependencies(installedExtension.getId(), true).isEmpty()) {
-                            return true;
-                        }
-                    } else {
-                        if (this.installedRepository
-                            .getBackwardDependencies(installedExtension.getId().getId(), namespace, true).isEmpty()) {
-                            return true;
-                        }
-                    }
-                } catch (ResolveException e) {
-                    this.logger.warn("Failed to resolve backward dependencies for extension id [{}] on namespace [{}]",
-                        installedExtension.getId().getId(), namespace);
-                }
-            }
-        }
-
-        return false;
     }
 }

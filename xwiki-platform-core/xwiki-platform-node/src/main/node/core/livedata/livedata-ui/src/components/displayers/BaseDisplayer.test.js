@@ -20,9 +20,10 @@
 import BaseDisplayer from "./BaseDisplayer.vue";
 import { initWrapper } from "./displayerTestsHelper";
 import flushPromises from "flush-promises";
-import { fake, restore, stub } from "sinon";
+import { fake, restore } from "sinon";
 import { afterEach, describe, expect, it } from "vitest";
-import { nextTick, ref } from "vue";
+import { h, nextTick, ref } from "vue";
+import { Tippy } from "vue-tippy";
 
 /**
  * Waits for the next animation frame, so that the focus settling logic of
@@ -42,6 +43,18 @@ async function flushAnimationFrame() {
  */
 function cell(wrapper) {
   return wrapper.find(".displayer-actions-popover");
+}
+
+/**
+ * Hovers a cell and waits for its actions popover.
+ *
+ * @param cellWrapper - the cell element to hover
+ * @returns the actions popover of the cell
+ */
+async function hover(cellWrapper) {
+  await cellWrapper.trigger("mouseenter");
+  await flushPromises();
+  return cellWrapper.element._tippy;
 }
 
 /**
@@ -88,6 +101,52 @@ function initRowCreatingItsEntry() {
     whenSaved,
     completeCreation: () => completeCreation(),
   };
+}
+
+/**
+ * Initializes a list of cells displaying the same entry, and counts the updates of all the mounted components.
+ *
+ * @param count - the number of cells to display
+ * @param logic - a mock of `Logic.js` (merged with the defaults of `initWrapper`)
+ * @returns the wrapper of the list, the cell elements, and the number of component updates so far
+ */
+function initCells(count, { logic } = {}) {
+  let updates = 0;
+  const cells = {
+    props: ["entry", "propertyId"],
+    render() {
+      return Array.from({ length: count }, (_, index) =>
+        h(BaseDisplayer, {
+          key: index,
+          entry: this.entry,
+          propertyId: this.propertyId,
+        }),
+      );
+    },
+  };
+  const wrapper = initWrapper(cells, {
+    logic: { isEditMode: () => false, ...logic },
+    mixins: [
+      {
+        updated() {
+          updates++;
+        },
+      },
+    ],
+  });
+  return {
+    wrapper,
+    cells: wrapper.findAll(".displayer-actions-popover"),
+    updates: () => updates,
+  };
+}
+
+/**
+ * @param cells - the cell elements to check
+ * @returns the cells that have an actions popover
+ */
+function cellsWithPopover(cells) {
+  return cells.filter((cell) => cell.element._tippy);
 }
 
 describe("BaseDisplayer.vue", () => {
@@ -237,15 +296,14 @@ describe("BaseDisplayer.vue", () => {
       const wrapper = initEditModeWrapper({
         logic: { isEditMode: () => isEditMode.value },
       });
+      const popover = await hover(cell(wrapper));
 
-      expect(wrapper.vm.$refs.tippy.$props.trigger).toBe(
-        "mouseenter focus manual",
-      );
+      expect(popover.props.trigger).toBe("mouseenter focus manual");
 
       isEditMode.value = true;
       await nextTick();
 
-      expect(wrapper.vm.$refs.tippy.$props.trigger).toBe("manual");
+      expect(popover.props.trigger).toBe("manual");
     });
 
     it("Disables the actions popover in edit mode", async () => {
@@ -253,16 +311,15 @@ describe("BaseDisplayer.vue", () => {
       const wrapper = initEditModeWrapper({
         logic: { isEditMode: () => isEditMode.value },
       });
-      const disable = stub(wrapper.vm.$refs.tippy.tippy, "disable");
-      const enable = stub(wrapper.vm.$refs.tippy.tippy, "enable");
+      const { state } = await hover(cell(wrapper));
 
       isEditMode.value = true;
       await nextTick();
-      expect(disable.calledOnce).toBe(true);
+      expect(state.isEnabled).toBe(false);
 
       isEditMode.value = false;
       await nextTick();
-      expect(enable.calledOnce).toBe(true);
+      expect(state.isEnabled).toBe(true);
     });
 
     it("Switches to edit when the cell is focused in edit mode", async () => {
@@ -469,5 +526,90 @@ describe("BaseDisplayer.vue", () => {
 
       expect(wrapper.emitted().saveEdit).toBeUndefined();
     });
+  });
+});
+
+// Displaying a page of the Live Data must stay cheap: the actions popover of a cell is only created once the
+// user interacts with that cell.
+describe("Actions popover", () => {
+  afterEach(function () {
+    restore();
+  });
+
+  it("Is not created for the displayed cells", async () => {
+    const { wrapper, cells, updates } = initCells(5);
+    await flushPromises();
+
+    expect(cells).toHaveLength(5);
+    expect(cellsWithPopover(cells)).toHaveLength(0);
+    expect(wrapper.findAllComponents(Tippy)).toHaveLength(0);
+    expect(updates()).toBe(0);
+    expect(wrapper.find(".displayer-action-list").exists()).toBe(false);
+  });
+
+  it("Is created and shown when the cell is hovered", async () => {
+    const { cells } = initCells(5);
+
+    await cells[1].trigger("mouseenter", { clientX: 10, clientY: 10 });
+    await flushPromises();
+
+    expect(cellsWithPopover(cells)).toEqual([cells[1]]);
+    const popover = cells[1].element._tippy;
+    expect(popover.state.isVisible).toBe(true);
+    expect(
+      popover.popper.querySelector(
+        ".displayer-action-list span[title='livedata.displayer.actions.edit']",
+      ),
+    ).not.toBeNull();
+  });
+
+  it("Is created and shown when the cell is focused", async () => {
+    const { cells } = initCells(5);
+
+    cells[2].element.focus();
+    await flushPromises();
+
+    expect(cellsWithPopover(cells)).toEqual([cells[2]]);
+    const popover = cells[2].element._tippy;
+    expect(popover.state.isVisible).toBe(true);
+    expect(
+      popover.popper.querySelector(
+        ".displayer-action-list span[title='livedata.displayer.actions.edit']",
+      ),
+    ).not.toBeNull();
+  });
+
+  it("Is created only once", async () => {
+    const { cells } = initCells(1);
+
+    await cells[0].trigger("mouseenter");
+    await flushPromises();
+    const popover = cells[0].element._tippy;
+    await cells[0].trigger("mouseleave");
+    await cells[0].trigger("mouseenter");
+    await flushPromises();
+
+    expect(cells[0].element._tippy).toBe(popover);
+  });
+
+  it("Is not created when the cell cannot be edited", async () => {
+    const { cells } = initCells(1, { logic: { isEditable: () => false } });
+
+    await cells[0].trigger("mouseenter");
+    cells[0].element.focus();
+    await flushPromises();
+
+    expect(cellsWithPopover(cells)).toHaveLength(0);
+  });
+
+  it("Is destroyed when the cell is unmounted", async () => {
+    const { wrapper, cells } = initCells(1);
+    await cells[0].trigger("mouseenter");
+    await flushPromises();
+    const popover = cells[0].element._tippy;
+
+    wrapper.unmount();
+
+    expect(popover.state.isDestroyed).toBe(true);
   });
 });

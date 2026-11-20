@@ -147,11 +147,28 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         }
     }
 
+    /**
+     * Reads the stored average rating in order to modify it and save it with {@link #saveAverageRating(AverageRating)}.
+     * An implementation storing the average rating in a versioned container (e.g. a document) can return an average
+     * rating that remembers the version it was read from, and save it on top of that version, so that the save fails
+     * (see {@link #isConcurrentModification(RatingsException)}) if the stored average rating was modified concurrently
+     * after it was read, instead of overwriting that modification with a value computed from the old one.
+     *
+     * @param entityReference the reference of the rated entity
+     * @return the stored average rating, to be modified and saved
+     * @throws RatingsException if the average rating can't be read
+     * @since 18.10.0RC1
+     */
+    protected AverageRating getAverageRatingForUpdate(EntityReference entityReference) throws RatingsException
+    {
+        return getAverageRating(entityReference);
+    }
+
     @Override
     public AverageRating addVote(EntityReference entityReference, int newVote) throws RatingsException
     {
         return retryOnConcurrentModification(() -> {
-            AverageRating averageRating = getAverageRating(entityReference);
+            AverageRating averageRating = getAverageRatingForUpdate(entityReference);
             int oldTotalVote = averageRating.getNbVotes();
             float oldAverageVote = averageRating.getAverageVote();
             averageRating.addRating(newVote);
@@ -163,7 +180,7 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
     public AverageRating removeVote(EntityReference entityReference, int oldVote) throws RatingsException
     {
         return retryOnConcurrentModification(() -> {
-            AverageRating averageRating = getAverageRating(entityReference);
+            AverageRating averageRating = getAverageRatingForUpdate(entityReference);
             int oldTotalVote = averageRating.getNbVotes();
             float oldAverageVote = averageRating.getAverageVote();
             averageRating.removeRating(oldVote);
@@ -176,7 +193,7 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         throws RatingsException
     {
         return retryOnConcurrentModification(() -> {
-            AverageRating averageRating = getAverageRating(entityReference);
+            AverageRating averageRating = getAverageRatingForUpdate(entityReference);
             int oldTotalVote = averageRating.getNbVotes();
             float oldAverageVote = averageRating.getAverageVote();
             averageRating.updateRating(oldVote, newVote);
@@ -189,6 +206,8 @@ public abstract class AbstractAverageRatingManager implements AverageRatingManag
         throws RatingsException
     {
         return retryOnConcurrentModification(() -> {
+            // The new values don't depend on the stored ones, which are only read for the events: the reset wins over
+            // a concurrent modification.
             AverageRating averageRating = getAverageRating(entityReference);
             int oldTotalVote = averageRating.getNbVotes();
             float oldAverageVote = averageRating.getAverageVote();

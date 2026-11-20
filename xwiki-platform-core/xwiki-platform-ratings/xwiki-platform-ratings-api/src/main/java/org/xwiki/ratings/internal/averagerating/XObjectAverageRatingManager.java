@@ -65,6 +65,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XObjectAverageRatingManager extends AbstractAverageRatingManager
 {
+    private static final String GET_ERROR_MESSAGE = "Error while trying to get average rating from reference [%s]";
+
     private static final String MOVE_ERROR_MESSAGE = "Error while moving the average ratings from [%s] to [%s]";
 
     @Inject
@@ -94,20 +96,74 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         return ExceptionUtils.indexOfType(exception, DocumentRevisionConflictException.class) >= 0;
     }
 
+    /**
+     * An average rating read from a copy of the document holding it. Updating the average rating saves this copy, so
+     * that the save is refused if the document was saved after the average rating was read, e.g. by a concurrent vote,
+     * instead of overwriting it with an average computed from the votes before it.
+     */
+    private static final class DocumentAverageRating extends DefaultAverageRating
+    {
+        private final transient XWikiDocument document;
+
+        DocumentAverageRating(AverageRating averageRating, XWikiDocument document)
+        {
+            super(averageRating);
+
+            this.document = document;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            // The document the average rating was read from isn't part of the average rating.
+            return super.equals(o);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return super.hashCode();
+        }
+    }
+
     @Override
     public AverageRating getAverageRating(EntityReference entityReference) throws RatingsException
     {
         try {
-            BaseObject baseObject = this.retrieveAverageRatingXObject(entityReference);
-
-            if (baseObject == null) {
-                return this.createAverageRating(entityReference, this.computeAverageRatingId(entityReference));
-            } else {
-                return this.transformXObjectToAverageRating(baseObject, entityReference);
-            }
+            return getAverageRating(entityReference, getDocument(entityReference));
         } catch (Exception e) {
             throw new RatingsException(
-                String.format("Error while trying to get average rating from reference [%s]", entityReference), e);
+                String.format(GET_ERROR_MESSAGE, entityReference), e);
+        }
+    }
+
+    @Override
+    protected AverageRating getAverageRatingForUpdate(EntityReference entityReference) throws RatingsException
+    {
+        try {
+            // Avoid modifying the cached document
+            XWikiDocument document = getDocument(entityReference).clone();
+
+            return new DocumentAverageRating(getAverageRating(entityReference, document), document);
+        } catch (Exception e) {
+            throw new RatingsException(
+                String.format(GET_ERROR_MESSAGE, entityReference), e);
+        }
+    }
+
+    private XWikiDocument getDocument(EntityReference entityReference) throws Exception
+    {
+        return (XWikiDocument) this.documentAccessBridge.getDocumentInstance(entityReference);
+    }
+
+    private AverageRating getAverageRating(EntityReference entityReference, XWikiDocument document)
+    {
+        BaseObject baseObject = this.retrieveAverageRatingXObject(document);
+
+        if (baseObject == null) {
+            return this.createAverageRating(entityReference, this.computeAverageRatingId(entityReference));
+        } else {
+            return this.transformXObjectToAverageRating(baseObject, entityReference);
         }
     }
 
@@ -260,14 +316,6 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         return averageRating;
     }
 
-    private BaseObject retrieveAverageRatingXObject(EntityReference entityReference) throws Exception
-    {
-        DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
-        XWikiDocument actualDoc = (XWikiDocument) documentInstance;
-
-        return retrieveAverageRatingXObject(actualDoc);
-    }
-
     private BaseObject retrieveAverageRatingXObject(XWikiDocument actualDoc)
     {
         String serializedReference =
@@ -323,11 +371,14 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     {
         try {
             EntityReference entityReference = averageRating.getReference();
-            DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
-            XWikiDocument actualDoc = (XWikiDocument) documentInstance;
-
-            // Avoid modifying the cached document
-            actualDoc = actualDoc.clone();
+            XWikiDocument actualDoc;
+            if (averageRating instanceof DocumentAverageRating documentAverageRating) {
+                // Save the document the average rating was computed from.
+                actualDoc = documentAverageRating.document;
+            } else {
+                // Avoid modifying the cached document
+                actualDoc = getDocument(entityReference).clone();
+            }
 
             BaseObject baseObject = this.retrieveAverageRatingXObject(actualDoc);
             XWikiContext context = this.contextProvider.get();

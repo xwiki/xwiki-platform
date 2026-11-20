@@ -62,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -539,7 +540,7 @@ class XObjectAverageRatingManagerTest
         XWikiDocument staleDocument = staleObject.getOwnerDocument();
         XWikiDocument storedDocument = storedObject.getOwnerDocument();
         when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference)))
-            .thenReturn(staleDocument, staleDocument, storedDocument);
+            .thenReturn(staleDocument, storedDocument);
 
         AverageRating averageRating = this.averageRatingManager.addVote(reference, 4);
 
@@ -549,6 +550,80 @@ class XObjectAverageRatingManagerTest
         verify(storedObject).setIntValue(AverageRatingQueryField.TOTAL_VOTE.getFieldName(), 4);
         verify(storedObject).setFloatValue(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), 4f);
         verify(this.xwiki).saveDocument(storedDocument, "comment", true, this.context);
+    }
+
+    @Test
+    void addVoteSavesTheDocumentItWasComputedFrom() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("xwiki", "XWiki", "Foo");
+        when(this.ratingsManager.getIdentifier()).thenReturn("managerId");
+        when(this.ratingsManager.getScale()).thenReturn(5);
+        when(this.contextProvider.get()).thenReturn(this.context);
+        when(this.context.getWiki()).thenReturn(this.xwiki);
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.update.comment"))
+            .thenReturn("comment");
+        when(this.entityReferenceConverter.convert(String.class, reference)).thenReturn("xwiki:XWiki.Foo");
+        // A concurrent vote is saved after the average rating is read: loading the document again would give the
+        // newer version, on top of which saving an average computed from the read version passes the revision check
+        // and loses the concurrent vote.
+        BaseObject readObject = mockAverageRatingDocument(reference, 2, 3);
+        BaseObject newerObject = mockAverageRatingDocument(reference, 3, 4);
+        XWikiDocument readDocument = readObject.getOwnerDocument();
+        XWikiDocument newerDocument = newerObject.getOwnerDocument();
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference)))
+            .thenReturn(readDocument, newerDocument);
+
+        AverageRating averageRating = this.averageRatingManager.addVote(reference, 4);
+
+        assertEquals(3, averageRating.getNbVotes());
+        verify(readObject).setIntValue(AverageRatingQueryField.TOTAL_VOTE.getFieldName(), 3);
+        // The document the average was computed from is saved, so that the store refuses it if it is outdated.
+        verify(this.xwiki).saveDocument(readDocument, "comment", true, this.context);
+        verify(this.xwiki, never()).saveDocument(eq(newerDocument), anyString(), anyBoolean(), any());
+        verify(this.documentAccessBridge).getDocumentInstance(new EntityReference(reference));
+    }
+
+    @Test
+    void resetAverageRating() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("xwiki", "XWiki", "Foo");
+        when(this.ratingsManager.getIdentifier()).thenReturn("managerId");
+        when(this.ratingsManager.getScale()).thenReturn(5);
+        when(this.contextProvider.get()).thenReturn(this.context);
+        when(this.context.getWiki()).thenReturn(this.xwiki);
+        when(this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.update.comment"))
+            .thenReturn("comment");
+        when(this.entityReferenceConverter.convert(String.class, reference)).thenReturn("xwiki:XWiki.Foo");
+        // A vote is saved after the reset read the stored average rating.
+        XWikiDocument readDocument = mockAverageRatingDocument(reference, 2, 3).getOwnerDocument();
+        BaseObject latestObject = mockAverageRatingDocument(reference, 3, 4);
+        XWikiDocument latestDocument = latestObject.getOwnerDocument();
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference)))
+            .thenReturn(readDocument, latestDocument);
+
+        AverageRating averageRating = this.averageRatingManager.resetAverageRating(reference, 1, 10);
+
+        // The reset values don't depend on the stored ones, so they are saved on the latest version.
+        assertEquals(10, averageRating.getNbVotes());
+        verify(latestObject).setIntValue(AverageRatingQueryField.TOTAL_VOTE.getFieldName(), 10);
+        verify(latestObject).setFloatValue(AverageRatingQueryField.AVERAGE_VOTE.getFieldName(), 1f);
+        verify(this.xwiki).saveDocument(latestDocument, "comment", true, this.context);
+    }
+
+    @Test
+    void addVoteWhenLoadingFails() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("xwiki", "XWiki", "Foo");
+        Exception failure = new Exception("Failed to load");
+        when(this.documentAccessBridge.getDocumentInstance(new EntityReference(reference))).thenThrow(failure);
+
+        RatingsException exception =
+            assertThrows(RatingsException.class, () -> this.averageRatingManager.addVote(reference, 1));
+
+        assertEquals("Error while trying to get average rating from reference [xwiki:XWiki.Foo]",
+            exception.getMessage());
+        assertEquals(failure, exception.getCause());
+        verify(this.xwiki, never()).saveDocument(any(), anyString(), anyBoolean(), any());
     }
 
     @Test

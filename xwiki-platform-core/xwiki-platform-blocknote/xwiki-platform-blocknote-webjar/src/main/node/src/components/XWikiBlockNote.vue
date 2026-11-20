@@ -108,6 +108,7 @@ import {
 import type { Logic } from "../services/Logic";
 import type { TemporaryUploads } from "../services/attachments/temporaryUploads";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
+import type { UserScope } from "../services/mentions/DefaultUserSuggester";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -148,6 +149,7 @@ const {
   uploadDisabled = false,
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
+  userScope = undefined,
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
   startupFocus = undefined,
@@ -173,6 +175,9 @@ const {
 
   // The URL of the collaboration server used for real-time editing. If not specified, real-time editing is disabled.
   collaborationURL?: string;
+
+  // The user scope of the wiki, which says whether its local users, the global ones, or both can be mentioned.
+  userScope?: UserScope;
 
   // The reference of the XWiki document whose field is being edited using BlockNote. This is required for real-time
   // collaboration in order to join the corresponding collaboration session. It is also used to contextualize some of
@@ -320,6 +325,10 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
         // links, to keep the link type selector short. Existing path and UNC path links are still edited with their
         // own link type.
         excludedTargetTypes: ["path", "unc"],
+      },
+      mentions: {
+        // Which users can be mentioned on this wiki, as configured for the wiki the edited document belongs to.
+        userScope,
       },
     },
   };

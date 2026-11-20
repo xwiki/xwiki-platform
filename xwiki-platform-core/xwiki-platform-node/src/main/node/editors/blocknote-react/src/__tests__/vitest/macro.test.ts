@@ -28,8 +28,8 @@ import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { describe, expect, test } from "vitest";
 import type { EditorInstance } from "../../editorInstance";
-import type { MacroCall } from "../../features/macros/utils";
 import type { BlockMetadataStore } from "../../misc/blockMetadata";
+import type { MacroCall } from "../../misc/macroInvocation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Nodes = any[];

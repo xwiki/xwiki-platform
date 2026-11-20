@@ -112,6 +112,14 @@ interface EditorFeatures {
   macros?: MacroFeatureOptions | false;
 
   /**
+   * The user mentions are enabled when this is missing. `false` disables the mention menu, even when the services it
+   * needs are bound. The mentions already in the content are still displayed. The options of the mentions feature are
+   * those of the `UserSuggester` and the `MentionInserter`, declared by the integration binding them (e.g. the XWiki
+   * WebJar declares the user scope of the wiki).
+   */
+  mentions?: object | false;
+
+  /**
    * The subscript and superscript text styles are enabled when this is missing (and the syntax supports them). `false`
    * removes them from the editor, with their toolbar buttons: content using them can't be edited.
    */

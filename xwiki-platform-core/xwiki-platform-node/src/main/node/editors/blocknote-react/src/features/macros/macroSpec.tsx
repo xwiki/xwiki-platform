@@ -21,16 +21,19 @@ import "./macro.css";
 import { useMacroEditing } from "./macroEditing";
 import { getMacroOutput } from "./macroMetadata";
 import { MacroOutput } from "./macroOutput";
-import { invocationToMacroCall, macroCallToInvocation } from "./utils";
 import { EditorInstanceContext } from "../../contexts";
+import {
+  invocationToMacroCall,
+  macroCallToInvocation,
+} from "../../misc/macroInvocation";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,
 } from "@blocknote/react";
 import { useContext } from "react";
 import type { BlockMetadataStore } from "../../misc/blockMetadata";
+import type { MacroCall } from "../../misc/macroInvocation";
 import type { OutputNode } from "./macroOutput";
-import type { MacroCall } from "./utils";
 
 /**
  * @param metadata - where the macro output is kept

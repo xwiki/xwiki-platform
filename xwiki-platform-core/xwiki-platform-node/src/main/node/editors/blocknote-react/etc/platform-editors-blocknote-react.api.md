@@ -127,6 +127,7 @@ export interface EditorFeatures {
     images?: false;
     links?: object | false;
     macros?: MacroFeatureOptions | false;
+    mentions?: object | false;
     textStyles?: false;
     xwikiRendering?: false;
 }
@@ -276,6 +277,9 @@ export type InlineMacroInvocation = Omit<InlineMacroInvocation_2, "body"> & {
 };
 
 // @beta
+export function insertMacroInvocation(editor: BlockNoteEditor<any, any, any>, invocation: MacroBlockInvocation | InlineMacroInvocation, selectedBlock?: any): void;
+
+// @beta
 export type LinkEditionData = {
     title: string;
     generatedTitle?: boolean;
@@ -356,6 +360,34 @@ export type MacroInsertionEditorPrefillData = {
 export const macrosFeature: EditorFeature;
 
 // @beta
+export type MentionableUser = {
+    reference: string;
+    label: string;
+    hint?: string;
+    icon?: {
+        url?: string;
+        cssClass?: string;
+    };
+};
+
+// @beta
+export interface MentionInserter {
+    canInsert(context: MentionInsertionContext): boolean;
+    insert(instance: EditorInstance, user: MentionableUser): void;
+}
+
+// @beta
+export const mentionInserterName = "MentionInserter";
+
+// @beta
+export type MentionInsertionContext = Pick<EditorInstance, "options"> & {
+    syntax: SyntaxConfig;
+};
+
+// @beta
+export const mentionsFeature: EditorFeature;
+
+// @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
 };
@@ -390,6 +422,14 @@ export type UploadedFile = {
 
 // @beta
 export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
+
+// @beta
+export interface UserSuggester {
+    suggestUsers(instance: EditorInstance, query: string): Promise<MentionableUser[]>;
+}
+
+// @beta
+export const userSuggesterName = "UserSuggester";
 
 // @beta
 export const xwikiRenderingFeature: EditorFeature;

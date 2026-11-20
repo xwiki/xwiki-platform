@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { useMacroEditing } from "./macroEditing";
-import { insertMacroInvocation } from "./utils";
 import { useEditor } from "../../hooks";
+import { insertMacroInvocation } from "../../misc/macroInvocation";
 import { useComponentsContext } from "@blocknote/react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";

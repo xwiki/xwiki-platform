@@ -73,6 +73,14 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- We need this for the mention macro inserted by the user mentions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- We need an implementation of the WebSocket API (using XWiki components) for realtime collaboration. -->
     <dependency>
       <groupId>${project.groupId}</groupId>

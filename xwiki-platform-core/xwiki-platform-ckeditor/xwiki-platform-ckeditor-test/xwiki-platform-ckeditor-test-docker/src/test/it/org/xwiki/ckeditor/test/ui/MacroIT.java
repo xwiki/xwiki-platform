@@ -226,11 +226,11 @@ class MacroIT extends AbstractCKEditorIT
     {
         WYSIWYGEditPage editPage = edit(setup, testReference, true);
 
-        // The Info Box is inserted directly, with a default message, and the caret is placed at the start of it.
+        // The Info Box is inserted directly, with an empty message showing a placeholder, and the caret is in it.
         this.editor.getToolBar().insertInfoBox();
-        assertThat(this.textArea.getText(), containsString("Type your information message here."));
-        this.textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        this.textArea.waitForNestedEditablePlaceholders("Type your information message here.");
         this.textArea.sendKeys("This is an info macro!");
+        this.textArea.waitForNestedEditablePlaceholders();
         assertThat(this.textArea.getText(), containsString("This is an info macro!"));
 
         // The editor keeps an empty paragraph after the inserted macro, so that the user can type after it.

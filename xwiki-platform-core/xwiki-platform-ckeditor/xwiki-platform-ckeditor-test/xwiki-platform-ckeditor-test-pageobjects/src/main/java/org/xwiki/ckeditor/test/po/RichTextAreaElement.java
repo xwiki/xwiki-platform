@@ -419,6 +419,25 @@ public class RichTextAreaElement extends BaseElement
         return this;
     }
 
+    /**
+     * Waits until the placeholders shown by the empty areas of the macros that are editable in place, such as the
+     * empty content of a message macro, are the expected ones.
+     *
+     * @param placeholders the expected placeholder texts, in the order of the edited content, none if no empty area
+     *            of a macro is expected to show a placeholder
+     * @return this rich text area element
+     * @since 19.0.0RC1
+     */
+    public RichTextAreaElement waitForNestedEditablePlaceholders(String... placeholders)
+    {
+        String placeholderAttribute = "data-xwiki-nested-editable-placeholder";
+        List<String> expectedPlaceholders = List.of(placeholders);
+        getDriver().waitUntilCondition(driver -> getFromEditedContent(() -> expectedPlaceholders.equals(
+            getRootEditableElement(false).findElements(By.cssSelector('[' + placeholderAttribute + ']')).stream()
+                .map(element -> element.getDomAttribute(placeholderAttribute)).toList())));
+        return this;
+    }
+
     protected <T> T getFromEditedContent(Supplier<T> supplier)
     {
         try {

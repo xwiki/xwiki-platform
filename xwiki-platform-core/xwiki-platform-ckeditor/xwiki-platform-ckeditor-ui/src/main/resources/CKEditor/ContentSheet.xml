@@ -235,6 +235,25 @@ a[data-linktype="create"]::after {
   content: attr(data-xwiki-focusedplaceholder);
 }
 
+[contenteditable="true"][data-xwiki-nested-editable-placeholder]::before {
+  /* Show the placeholder of the empty nested editable, focused or not, like the placeholder of an input. */
+  position: absolute;
+  color: var(--text-muted);
+  font-style: italic;
+  content: attr(data-xwiki-nested-editable-placeholder);
+  pointer-events: none;
+}
+
+[contenteditable="true"][data-xwiki-nested-editable-placeholder]:empty::before {
+  /* Keep the height of a nested editable that holds no line at all. */
+  position: static;
+}
+
+[data-xwiki-nested-editable-placeholder] [data-xwiki-focusedplaceholder]::before {
+  /* The placeholder of the nested editable replaces the generic one of its empty line. */
+  content: none;
+}
+
 .macro-placeholder {
   /* Hide the placeholder by default and show it only if the macro is editable. */
   display: none;

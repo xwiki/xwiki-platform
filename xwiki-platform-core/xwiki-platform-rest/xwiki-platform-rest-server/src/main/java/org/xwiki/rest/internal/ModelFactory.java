@@ -736,6 +736,8 @@ public class ModelFactory
         return pageSummary;
     }
 
+    // One parameter per query parameter of the REST page resources: the parameter list mirrors the resource API.
+    @SuppressWarnings("java:S107")
     public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
         Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiException
     {
@@ -743,6 +745,8 @@ public class ModelFactory
             withAttachments, List.of(), List.of());
     }
 
+    // One parameter per query parameter of the REST page resources: the parameter list mirrors the resource API.
+    @SuppressWarnings("java:S107")
     public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
         Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<Right> checkRights,
         List<String> supportedSyntaxes) throws XWikiException

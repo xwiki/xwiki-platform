@@ -89,6 +89,8 @@ public interface MailSender
      * @return 0 on success, -1 on failure. On failure the error message is stored in the XWiki context under the
      *         "error" key.
      */
+    // Published API of the mail sender plugin, also reachable from wiki scripts: the signature cannot change.
+    @SuppressWarnings("java:S107")
     int sendHtmlMessage(String from, String to, String cc, String bcc, String subject, String body, String alternative,
         List<Attachment> attachments);
 

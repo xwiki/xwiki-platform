@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.script.ScriptContext;
+import javax.script.SimpleScriptContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static com.xpn.xwiki.doc.XWikiDocument.CKEY_TDOC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -113,8 +115,7 @@ class RequiredRightsEditConfirmationCheckerTest
     @Mock
     private DocumentAuthors authors;
 
-    @Mock
-    private ScriptContext scriptContext;
+    private final ScriptContext scriptContext = new SimpleScriptContext();
 
     @Inject
     @Named("html/5.0")
@@ -176,6 +177,9 @@ class RequiredRightsEditConfirmationCheckerTest
             this.editConfirmationChecker.check());
         verify(this.templateManager)
             .executeNoException("security/requiredrights/requiredRightsEditConfirmationCheckerError.vm");
+        assertEquals("error message",
+            ((RequiredRightsException) this.scriptContext.getAttribute("exception", ScriptContext.ENGINE_SCOPE))
+                .getMessage());
     }
 
     @Test
@@ -209,5 +213,6 @@ class RequiredRightsEditConfirmationCheckerTest
         assertEquals(expected, check);
         verify(this.templateManager)
             .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");
+        assertSame(result, this.scriptContext.getAttribute("analysisResults", ScriptContext.ENGINE_SCOPE));
     }
 }

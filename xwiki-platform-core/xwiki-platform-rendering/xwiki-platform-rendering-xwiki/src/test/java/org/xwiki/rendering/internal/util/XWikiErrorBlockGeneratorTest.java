@@ -21,6 +21,8 @@ package org.xwiki.rendering.internal.util;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.script.ScriptContext;
 
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.logging.Message;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
@@ -128,6 +131,28 @@ class XWikiErrorBlockGeneratorTest
             new Exception("exception"));
 
         assertSame(xdom2.getChildren(), blocks);
+    }
+
+    @Test
+    void executeTemplateWithScriptVariableNamedLikeTheErrorBinding() throws Exception
+    {
+        this.scontext.setAttribute("renderingerror", "page value", ScriptContext.ENGINE_SCOPE);
+
+        Template template = mock(Template.class);
+        when(this.templateManager.getTemplate(ErrorBlockGenerator.CLASS_ATTRIBUTE_MESSAGE_VALUE + "/default.vm"))
+            .thenReturn(template);
+        XDOM xdom = new XDOM(List.of(new WordBlock("result")));
+        AtomicReference<Object> templateMessage = new AtomicReference<>();
+        when(this.templateManager.execute(template, false)).thenAnswer(invocation -> {
+            templateMessage.set(((Map<?, ?>) this.scontext.getAttribute("renderingerror")).get("message"));
+            return xdom;
+        });
+
+        this.errorGenerator.generateErrorBlocks(false, null, "message {}", null, "value");
+
+        // The template gets the error, and the script variable is restored afterwards.
+        assertEquals("message value.", ((Message) templateMessage.get()).getFormattedMessage());
+        assertEquals("page value", this.scontext.getAttribute("renderingerror"));
     }
 
     @Test

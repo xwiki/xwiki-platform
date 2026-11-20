@@ -281,13 +281,29 @@ public class CKEditorToolBar extends BaseElement
 
     protected void clickButton(String feature)
     {
+        maybeShowFloatingToolBar();
         getDriver().findElementWithoutWaiting(this.container, By.className("cke_button__" + feature)).click();
     }
 
     protected boolean hasButton(String feature, Predicate<WebElement> predicate)
     {
+        maybeShowFloatingToolBar();
         return getDriver().findElementsWithoutWaiting(this.container, By.className("cke_button__" + feature)).stream()
             .anyMatch(predicate);
+    }
+
+    /**
+     * The floating tool bar (e.g. of the page content) is shown only while the editor has the focus.
+     */
+    private void maybeShowFloatingToolBar()
+    {
+        if (!this.container.isDisplayed()) {
+            // The browser doesn't fire the focus event when the page doesn't have the focus (e.g. in a browser tab
+            // opened by the test), so we also tell the editor that it's focused.
+            getDriver().executeScript("const editor = CKEDITOR.instances[arguments[0]]; editor.focus();"
+                + " editor.focusManager.focus();", this.editor.getName());
+            getDriver().waitUntilCondition(driver -> this.container.isDisplayed());
+        }
     }
 
     /**

@@ -50,6 +50,8 @@
 {{/velocity}}
 
 {{velocity}}
+## Rendering the edited content as a full HTML page is deprecated since 18.10.0RC1, like the classic (iframe-based)
+## editor which needs it.
 #if ($doc.fullName == 'CKEditor.ContentSheet')
   This is the sheet used to obtain the content that is passed to the [[CKEditor&gt;&gt;http://ckeditor.com/]].
 #else
@@ -233,6 +235,11 @@ a[data-linktype="create"]::after {
   color: var(--text-muted);
   font-style: italic;
   content: attr(data-xwiki-focusedplaceholder);
+}
+
+/* Let the clicks go through the placeholder to the empty paragraph, so that the caret is placed in it. */
+[data-cke-editorplaceholder]::before {
+  pointer-events: none;
 }
 
 .macro-placeholder {

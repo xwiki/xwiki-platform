@@ -23,13 +23,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
-import org.xwiki.ckeditor.test.po.CKEditorConfigurationPane;
 import org.xwiki.flamingo.skin.test.po.CompactLocationPickerElement;
 import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.DocumentReference;
@@ -79,9 +77,6 @@ class MacroIT extends AbstractCKEditorIT
     @BeforeAll
     void beforeAll(TestUtils setup, TestConfiguration testConfiguration)
     {
-        setup.loginAsSuperAdmin();
-        CKEditorConfigurationPane.open().setLoadJavaScriptSkinExtensions(true).clickSave();
-
         createAndLoginStandardUser(setup);
     }
 
@@ -89,13 +84,6 @@ class MacroIT extends AbstractCKEditorIT
     void afterEach(TestUtils setup)
     {
         setup.maybeLeaveEditMode();
-    }
-
-    @AfterAll
-    void afterAll(TestUtils setup)
-    {
-        setup.loginAsSuperAdmin();
-        CKEditorConfigurationPane.open().setLoadJavaScriptSkinExtensions(false).clickSave();
     }
 
     @Test
@@ -405,5 +393,35 @@ class MacroIT extends AbstractCKEditorIT
         assertSourceContains(String.format("pages=\"Main.WebHome,%s\"", targetPageValue));
         assertSourceContains(String.format("tags=\"%s\"", targetTag));
         assertSourceContains(String.format("users=\"XWiki.alice,XWiki.%s\"", targetUser));
+    }
+
+    @Test
+    @Order(9)
+    void javaScriptMacroOutput(TestUtils setup, TestReference testReference)
+    {
+        // Creating a JavaScript skin extension requires script right.
+        setup.loginAsSuperAdmin();
+
+        LocalDocumentReference scriptReference =
+            new LocalDocumentReference("Script", testReference.getLastSpaceReference());
+        setup.createPage(scriptReference, "");
+        setup.addObject(scriptReference, "XWiki.JavaScriptExtension", "use", "onDemand", "code",
+            "require(['jquery'], function($) {\n"
+            + "  var update = function(container) {\n"
+            + "    $(container).find('.clientSideOutput').text('Output set by JavaScript');\n"
+            + "  };\n"
+            + "  $(document).on('xwiki:dom:updated', function(event, data) {\n"
+            + "    data.elements.forEach(update);\n"
+            + "  });\n"
+            + "  $(function() {\n"
+            + "    update(document.body);\n"
+            + "  });\n"
+            + "});");
+        String scriptName = setup.serializeLocalReference(scriptReference);
+        setup.createPage(testReference, String.format("{{velocity}}\n$xwiki.jsx.use('%s')\n"
+            + "{{html}}<p class=\"clientSideOutput\">Output set by Velocity</p>{{/html}}\n{{/velocity}}", scriptName));
+
+        edit(setup, testReference, false);
+        this.textArea.waitUntilContentContains("Output set by JavaScript");
     }
 }

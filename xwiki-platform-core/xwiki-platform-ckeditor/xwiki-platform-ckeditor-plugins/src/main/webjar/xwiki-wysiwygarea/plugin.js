@@ -73,16 +73,25 @@
     },
 
     overwriteWysiwygMode: function(editor) {
+      var inlineElement = editor.element;
+      // CKEditor doesn't edit a text area but a div that it adds next to it. We get this div from the editor
+      // container, which is set before the first contentDom event and replaced when leaving WYSIWYG.
+      editor.once('contentDom', function() {
+        if (inlineElement.is('textarea')) {
+          inlineElement = editor.container;
+        }
+      }, null, null, 1);
+
       editor.on('beforeModeUnload', function() {
         var contentsSpace;
         if (editor.mode === 'wysiwyg') {
           // Hide the content that is edited in-line when leaving the WYSIWYG mode and create a fake contents space
           // where the new mode (e.g. Source) will be injected (because the contents space is not available when editing
           // in-place).
-          contentsSpace = editor.element.getDocument().createElement('div');
+          contentsSpace = inlineElement.getDocument().createElement('div');
           // Copy the non-CKEditor related class names from the editor element (the content edited in-line) to ensure
           // consistent styles between WYSIWYG and the other editing modes (like Source).
-          var classNames = (editor.element.getAttribute('class') || '').split(/\s+/).filter(function(className) {
+          var classNames = (inlineElement.getAttribute('class') || '').split(/\s+/).filter(function(className) {
             return className.substring(0, 4) !== 'cke_';
           }).join(' ');
           contentsSpace.setAttributes({
@@ -92,14 +101,14 @@
           });
           // Initialize with the height of the WYSIWYG mode in order to prevent UI flickering when switching modes.
           contentsSpace.setStyles({
-            'min-height': editor.element.getSize('height', true) + 'px',
+            'min-height': inlineElement.getSize('height', true) + 'px',
             // Reserve the space and show it only after the new mode is ready.
             'visibility': 'hidden'
           });
           // Minimize UI flickering by reducing the number of redraws that have to be done.
-          editor.element.$.parentNode.replaceChild(contentsSpace.$, editor.element.$);
-          editor.element.hide();
-          editor.element.insertBefore(contentsSpace);
+          inlineElement.$.parentNode.replaceChild(contentsSpace.$, inlineElement.$);
+          inlineElement.hide();
+          inlineElement.insertBefore(contentsSpace);
           // Set the outermost element. This is needed in order to compute correctly the position where the notification
           // messages are shown.
           editor.container = editor.ui.contentsElement = contentsSpace;
@@ -131,14 +140,14 @@
         var contentsSpace = editor.ui.space('contents');
         // Use the height of the previous editing mode (e.g. while the conversion from Source to HTML takes place) in
         // order to reduce the UI flickering.
-        editor.element.remove().setStyle('min-height', contentsSpace.getSize('height', true) + 'px').show();
+        inlineElement.remove().setStyle('min-height', contentsSpace.getSize('height', true) + 'px').show();
         // Minimize UI flickering by reducing the number of redraws that have to be done.
-        contentsSpace.$.parentNode.replaceChild(editor.element.$, contentsSpace.$);
+        contentsSpace.$.parentNode.replaceChild(inlineElement.$, contentsSpace.$);
         // Enable in-line editing.
-        editor.editable(editor.element);
+        editor.editable(inlineElement);
         // The editable itself is the outermost element. This is needed in order to compute correctly the position where
         // the notification messages are shown.
-        editor.container = editor.ui.contentsElement = editor.element;
+        editor.container = editor.ui.contentsElement = inlineElement;
         // Notify the others that the editable is ready so they can register their event listeners. Note that the event
         // listeners are removed along with any custom data each time the edit mode is unloaded. This line ensures that
         // the editable is re-initialized whenever we switch (back) to WYSIWYG mode.
@@ -151,7 +160,7 @@
       editor.on('modeReady', function() {
         // Remove the height constraint once the mode is ready (it prevented UI flickeing while switching modes).
         if (editor.mode === 'wysiwyg') {
-          editor.element.removeStyle('min-height');
+          inlineElement.removeStyle('min-height');
         } else {
           editor.ui.space('contents').setStyles({
             'min-height': '',
@@ -160,9 +169,16 @@
         }
       });
 
-      // Show the content that is edited in-line when the editor is destroyed, in case the current mode is not WYSIWYG.
       editor.on('beforeDestroy', function() {
-        editor.element.show();
+        if (editor.element.is('textarea')) {
+          // CKEditor removes the div it added next to the text area only if it's still the editor container.
+          if (inlineElement !== editor.container) {
+            inlineElement.remove();
+          }
+        } else {
+          // Show the content that is edited in-line, in case the current mode is not WYSIWYG.
+          inlineElement.show();
+        }
       });
     }
   });

@@ -182,8 +182,9 @@ body {
       }
     }
 
-    // Main rule for the content
-    #xwikicontent a {
+    // Main rule for the content, also while it's edited in a form (.xwiki-content).
+    #xwikicontent a,
+    .xwiki-content a {
       .inline-link();
     }
 
@@ -202,7 +203,8 @@ body {
 
     /* UIs in content where we want to not underline by default.
       Those elements usually contain only links that are not inline (and a lot of links). */
-    #xwikicontent {
+    #xwikicontent,
+    .xwiki-content {
       & .xwiki-livetable-container, // Do not underline links in livetables
       & .xtree, // Do not underline links in livetables
       & .xwikitabbar, // Do not underline links in the tab bar. An example of this is the one containing document metadata at the bottom of ny doc.

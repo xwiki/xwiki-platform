@@ -364,6 +364,7 @@
             syntaxId: editor.config.sourceSyntax,
           };
           let output;
+          CKEDITOR.plugins.xwikiSelection.cacheSelection(editor);
           try {
             output = await macroWizard(input);
           } catch (e) {
@@ -828,7 +829,11 @@
       // remove the inplace editable elements only if the configuration allows to edit them in the macro config UI.
       if ((editor.config['xwiki-macro'] || {}).showInlineEditableParameters === true) {
         for (let item in widget.editables) {
-          widget.editables[item].$.remove();
+          const nestedEditable = widget.editables[item].$;
+          if (nestedEditable.contains(nestedEditable.ownerDocument.activeElement)) {
+            moveCaretBefore(editor, nestedEditable);
+          }
+          nestedEditable.remove();
         }
       }
     },
@@ -1052,6 +1057,19 @@
 
   function isElementVisible(element) {
     return element.offsetHeight > 0 && element.offsetWidth > 0;
+  }
+
+  // Removing the focused element moves the focus to the page body when the editor is in-line, out of the editing area,
+  // and the selection can't be restored afterwards. We keep the focus in the editing area, with the caret where the
+  // removal would put it.
+  function moveCaretBefore(editor, element) {
+    const range = element.ownerDocument.createRange();
+    range.setStartBefore(element);
+    range.collapse(true);
+    editor.editable().$.focus({preventScroll: true});
+    const selection = element.ownerDocument.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
 
   CKEDITOR.plugins.xwikiMacro = {

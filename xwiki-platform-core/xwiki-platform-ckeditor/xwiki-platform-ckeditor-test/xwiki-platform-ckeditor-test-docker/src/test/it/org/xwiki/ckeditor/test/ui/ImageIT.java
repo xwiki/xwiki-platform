@@ -47,7 +47,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -350,7 +349,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -366,7 +365,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -442,7 +441,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogSelectModal.clickSelect().clickInsert();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
         // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened. We
@@ -480,7 +479,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.switchToAdvancedTab().selectCenterAlignment();
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceReference("Main.WebHome").createLinkOfNewPage(true).submit();
 
@@ -494,7 +493,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         // Verify that the caption and alignment are still set.
@@ -505,7 +504,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.close();
 
         // Verify that the link is still set.
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
         assertEquals(List.of("xwiki:Main.WebHome"),
             linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions().getValues());
@@ -577,7 +576,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -619,7 +618,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -809,14 +808,14 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
 
         imageDialogEditModal.switchToStandardTab().setImageStyle("---");
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().setImageStyle("Bordered");
@@ -888,7 +887,7 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage wysiwygEditPage = wikiEditPage.editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector(".cke_editable img")).click());
 
         editor.getToolBar().clickNumberedList();
 
@@ -1144,8 +1143,6 @@ class ImageIT extends AbstractCKEditorIT
     }
 
     @Test
-    @IgnoreBrowser(value = "firefox", reason = "We couldn't make the drag & drop work in Firefox inside an iframe "
-        + "(the rich text area is implemented using an iframe for the standalone edit mode).")
     @Order(25)
     void moveImageWithinEditedContentWithDragAndDrop(TestUtils setup, TestReference testReference) throws Exception
     {

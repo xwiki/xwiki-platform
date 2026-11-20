@@ -68,7 +68,7 @@
     #else
       ## Returns a full HTML page, including the HEAD tag with the style sheets and possibly the JavaScript includes.
       ## This is needed when the edited content is loaded in an iframe, which is the case when CKEditor replaces a text
-      ## area (classical editor).
+      ## area (classical editor). Deprecated since 18.10.0RC1, like the classic editor.
       #set ($output = "#ckeditor_renderContentSheet($source)")
     #end
   #else
@@ -82,6 +82,13 @@
   #end
 #end
 
+#**
+ * Renders the edited content as a full HTML page, using CKEditor.ContentSheet.
+ *
+ * @param source the edited content
+ * @deprecated since 18.10.0RC1, only the deprecated classic (iframe-based) editor needs a full HTML page.
+ *     Use #ckeditor_getRenderedContent instead, which puts the HTML fragment in $html.
+ *###
 #macro (ckeditor_renderContentSheet $source)
   ## The $source variable is used inside the content sheet.
   #set ($output = $services.wysiwyg.render('CKEditor.ContentSheet'))
@@ -89,6 +96,15 @@
   $!output.replace('&amp;amp;#123;&amp;amp;#123;', '{{')##
 #end
 
+#**
+ * Renders the edited content as the HTML fragment edited by CKEditor, and puts it in the $html variable.
+ *
+ * @param source a map describing the edited content: 'documentReferenceWithLocale' (the edited document, used as the
+ *     context for rendering), 'syntax' (the syntax of the edited content), either 'content' (the edited content in
+ *     that syntax) or 'html' (the edited content as HTML, which may contain macro markers to render),
+ *     'sourceReference' (optional, the object property reference when editing an object property, used to determine
+ *     the author whose rights are used to render the content) and 'restricted' ('true' to render in restricted mode)
+ *###
 #macro (ckeditor_getRenderedContent $source)
   ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
@@ -122,6 +138,8 @@
 
 #macro (importCKEditorResources)
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
+  ## Custom styles for the edited content.
+  #set ($discard = $xwiki.ssx.use('CKEditor.ContentSheet'))
   ## Add the version of each JavaScript dependency of CKEditor Integration to the URL used to load the CKEditor in order
   ## to make sure the browser cache is invalidated when one of these versions changes (e.g. when we upgrade XWiki or one
   ## of these dependencies but the CKEditor version remains the same).
@@ -206,9 +224,9 @@
     #foreach ($entry in $parameters.attributes.entrySet())
       $entry.key="$!escapetool.xml($entry.value)"
     #end
-  ## We render the content sheet at the end because the edited content can overwrite the variables used by this macro.
-  #set ($content = "#ckeditor_renderContentSheet($source)")
-  &gt;$!escapetool.xml($content)&lt;/textarea&gt;
+  ## We render the edited content at the end because it can overwrite the variables used by this macro.
+  #ckeditor_getRenderedContent($source)
+  &gt;$!escapetool.xml($html)&lt;/textarea&gt;
 #end
 
 #macro (displayCKEditorConfigProperty $configDoc $propName $action)

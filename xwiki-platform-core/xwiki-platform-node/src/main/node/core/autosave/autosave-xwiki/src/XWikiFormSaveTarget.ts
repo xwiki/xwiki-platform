@@ -457,10 +457,17 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
       savePrevented = event.isDefaultPrevented();
     });
 
-    const restoreVersionSummary =
-      this.maybeSetAutoSaveVersionSummary(isAutoSave);
+    let restoreVersionSummary: (() => void) | undefined;
+    if (isAutoSave) {
+      // Set when the save starts, after the editors disabled the form fields of the edited content (e.g. output by
+      // macros), which can have the same name as the version summary field.
+      this.$(document).on("xwiki:actions:beforeSave.realtime-saver", () => {
+        restoreVersionSummary = this.maybeSetAutoSaveVersionSummary();
+      });
+    }
     button.click();
     this.$(button).off("xwiki:actions:save.realtime-saver");
+    this.$(document).off("xwiki:actions:beforeSave.realtime-saver");
     restoreVersionSummary?.();
 
     return savePrevented;
@@ -469,13 +476,14 @@ class XWikiFormSaveTarget extends SaveTarget<XWikiFormSaveContext> {
   /**
    * @returns a function restoring the version summary the user had typed, when it was replaced
    */
-  private maybeSetAutoSaveVersionSummary(
-    isAutoSave: boolean,
-  ): (() => void) | undefined {
-    const commentInput = this.getForm().querySelector<HTMLInputElement>(
-      'input[name="comment"]',
+  private maybeSetAutoSaveVersionSummary(): (() => void) | undefined {
+    const commentInput = [...this.getForm().elements].find(
+      (field): field is HTMLInputElement =>
+        field instanceof HTMLInputElement &&
+        field.name === "comment" &&
+        !field.matches(":disabled"),
     );
-    if (commentInput && isAutoSave && this.autoSaveVersionSummary) {
+    if (commentInput && this.autoSaveVersionSummary) {
       // Backup the version summary before setting the auto-save value.
       const versionSummary = commentInput.value;
       commentInput.value = this.autoSaveVersionSummary;

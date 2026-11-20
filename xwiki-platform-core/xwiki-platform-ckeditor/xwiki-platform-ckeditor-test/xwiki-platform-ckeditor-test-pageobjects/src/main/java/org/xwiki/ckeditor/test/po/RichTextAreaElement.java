@@ -74,6 +74,24 @@ public class RichTextAreaElement extends BaseElement
         }
     }
 
+    private static final String DRAG_AND_DROP_BY_SCRIPT = """
+        const [source, xOffset, yOffset] = arguments;
+        const sourceBox = source.getBoundingClientRect();
+        const startX = sourceBox.x + sourceBox.width / 2;
+        const startY = sourceBox.y + sourceBox.height / 2;
+        const x = startX + xOffset;
+        const y = startY + yOffset;
+        const dataTransfer = new DataTransfer();
+        const fire = (target, type, clientX, clientY) => target.dispatchEvent(new DragEvent(type,
+          {bubbles: true, cancelable: true, composed: true, clientX, clientY, dataTransfer}));
+        fire(source, 'dragstart', startX, startY);
+        const dropTarget = document.elementFromPoint(x, y);
+        fire(dropTarget, 'dragenter', x, y);
+        fire(dropTarget, 'dragover', x, y);
+        fire(dropTarget, 'drop', x, y);
+        fire(source, 'dragend', x, y);
+        """;
+
     /**
      * The CKEditor instance that owns this rich text area.
      */
@@ -884,21 +902,16 @@ public class RichTextAreaElement extends BaseElement
             WebElement targetImage = editedContent.getImages().get(imageIndex);
             WebElement dragHandle = targetImage
                 .findElement(By.xpath("./ancestor::*[@data-cke-widget-wrapper]//*[@data-cke-widget-drag-handler]"));
-            // This doesn't seem to work in Firefox, at least not for the standalone WYSIWYG edit mode, where the rich
-            // text area is implemented using an iframe. Here's what we tried:
-            // * pausing after each action (e.g. hover the image, pause 2s, click and hold the drag handle, pause 2s,
-            // and so on)
-            // * clicking the image before dragging it
-            // * clicking the rich text area before dragging the image
-            // * use the root editable element as the drop target, and consider the offsets relative to the top left
-            // corner of the rich text area
-            // * calling perform() after each action
-            // * switching to the top frame and dropping on the iframe element used by the rich text area
-            getDriver().createActions()
-                // Hover the image first to make sure the drag handle is visible.
-                .moveToElement(targetImage)
-                // We have to drag the image using the dedicated drag handle.
-                .dragAndDropBy(dragHandle, xOffset, yOffset).perform();
+            // Hover the image first to make sure the drag handle is visible.
+            getDriver().createActions().moveToElement(targetImage).perform();
+            // We have to drag the image using the dedicated drag handle.
+            if ("firefox".equals(getDriver().getCapabilities().getBrowserName())) {
+                // The Firefox WebDriver doesn't fire the drop event (Mozilla bug 1515879: HTML5 drag and drop doesn't
+                // work), so we fire the drag events ourselves, with the offsets relative to the drag handle center.
+                getDriver().executeScript(DRAG_AND_DROP_BY_SCRIPT, dragHandle, xOffset, yOffset);
+            } else {
+                getDriver().createActions().dragAndDropBy(dragHandle, xOffset, yOffset).perform();
+            }
         });
     }
 

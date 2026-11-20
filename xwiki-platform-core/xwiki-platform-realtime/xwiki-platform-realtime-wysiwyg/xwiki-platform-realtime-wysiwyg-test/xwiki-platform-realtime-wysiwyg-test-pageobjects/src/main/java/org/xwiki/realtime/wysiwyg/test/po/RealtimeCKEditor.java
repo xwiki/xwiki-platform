@@ -40,6 +40,12 @@ public class RealtimeCKEditor extends CKEditor
     }
 
     @Override
+    public RealtimeCKEditorToolBar getToolBar()
+    {
+        return new RealtimeCKEditorToolBar(this);
+    }
+
+    @Override
     public RealtimeRichTextAreaElement getRichTextArea()
     {
         return getRichTextArea(true);

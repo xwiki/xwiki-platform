@@ -130,12 +130,19 @@
       ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
       ## mandatory test is misleading.
       ## Also, not filled back in if there is an error ('noReturn').
+      ## The mandatory validation only marks the field as required, the answer is checked by the register action.
       #set($field =
         {'name' : 'captcha_placeholder',
           'label' : $services.localization.render('core.captcha.instruction'),
           'skipLabelFor' : true,
           'type'  : 'html',
           'html'  : "$!{services.captcha.default.display()}",
+          'validate' : {
+            'mandatory' : {
+              'failureMessage' : $services.localization.render('core.validation.required.message'),
+              'noscript' : true
+            }
+          },
           'noReturn' : true
       })
       #set($discard = $fields.add($field))

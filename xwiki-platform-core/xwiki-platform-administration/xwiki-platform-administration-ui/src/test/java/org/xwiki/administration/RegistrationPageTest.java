@@ -24,10 +24,16 @@ import java.util.Collection;
 
 import javax.script.ScriptContext;
 
+import jakarta.inject.Named;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.captcha.Captcha;
+import org.xwiki.captcha.CaptchaConfiguration;
+import org.xwiki.captcha.script.CaptchaScriptService;
+import org.xwiki.captcha.script.internal.CaptchaScriptSafeProvider;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.localization.script.LocalizationScriptService;
@@ -77,6 +83,8 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @SecurityScriptServiceComponentList
 @ComponentList({
+    CaptchaScriptSafeProvider.class,
+    CaptchaScriptService.class,
     CSRFTokenScriptService.class,
     ErrorMessageMacro.class,
     InfoMessageMacro.class,
@@ -94,11 +102,20 @@ class RegistrationPageTest extends PageTest
 
     private static final String USER_NAME = "JaneDoe";
 
+    private static final String CAPTCHA_NAME = "test";
+
     @MockComponent
     private CSRFToken csrfToken;
 
     @MockComponent
     private RegistrationConfiguration registrationConfiguration;
+
+    @MockComponent
+    private CaptchaConfiguration captchaConfiguration;
+
+    @MockComponent
+    @Named(CAPTCHA_NAME)
+    private Captcha captcha;
 
     @BeforeEach
     void setUp() throws Exception
@@ -256,6 +273,63 @@ class RegistrationPageTest extends PageTest
 
         assertTrue(this.context.hasDroppedPermissions());
         assertFalse(result.contains("id=\"register\""));
+    }
+
+    @Test
+    void captchaIsMarkedAsRequired() throws Exception
+    {
+        enableCaptcha(true);
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        Element captchaLabel = getCaptchaField(result).previousElementSibling();
+        assertNotNull(captchaLabel);
+        assertNotNull(captchaLabel.selectFirst(".xRequired"));
+        // No element has the CAPTCHA field name as id, so the label is not bound to it.
+        assertFalse(captchaLabel.selectFirst("label").hasAttr("for"));
+        // The CAPTCHA answer can only be checked on the server.
+        assertFalse(result.select("#register script").html().contains("captcha_placeholder"));
+    }
+
+    @Test
+    void wrongCaptchaAnswerIsDisplayed() throws Exception
+    {
+        enableCaptcha(false);
+        putRegistrationRequest("Jane", "Doe");
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        assertNull(result.selectFirst(".box.infomessage"));
+        Element captchaError = getCaptchaField(result).selectFirst(".LV_validation_message.LV_invalid");
+        assertNotNull(captchaError);
+        assertEquals("core.captcha.captchaAnswerIsWrong", captchaError.ownText());
+    }
+
+    @Test
+    void rightCaptchaAnswerRegistersTheUser() throws Exception
+    {
+        enableCaptcha(true);
+        putRegistrationRequest("Jane", "Doe");
+
+        Document result = renderHTMLPage(REGISTRATION);
+
+        assertNotNull(result.selectFirst(".box.infomessage"));
+        assertNull(result.selectFirst(".LV_validation_message.LV_invalid"));
+    }
+
+    private void enableCaptcha(boolean validAnswer) throws Exception
+    {
+        when(this.registrationConfiguration.isCaptchaRequired()).thenReturn(true);
+        when(this.captchaConfiguration.getDefaultName()).thenReturn(CAPTCHA_NAME);
+        when(this.captcha.display(any())).thenReturn("<input type=\"text\" name=\"captchaAnswer\" value=\"\" />");
+        when(this.captcha.isValid(any())).thenReturn(validAnswer);
+    }
+
+    private Element getCaptchaField(Document result)
+    {
+        Element captchaAnswer = result.selectFirst("dd input[name=captchaAnswer]");
+        assertNotNull(captchaAnswer);
+        return captchaAnswer.closest("dd");
     }
 
     private RegistrationScriptService getRegistrationScriptService() throws Exception

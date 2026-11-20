@@ -9,6 +9,7 @@ org.xwiki.lesscss.internal.colortheme.DefaultColorThemeReferenceFactory
 org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler
 org.xwiki.lesscss.internal.compiler.CachedLESSCompiler
 org.xwiki.lesscss.internal.compiler.DefaultLESSCompiler
+org.xwiki.lesscss.internal.compiler.ScriptContextIsolator
 org.xwiki.lesscss.internal.listeners.ColorThemeListener
 org.xwiki.lesscss.internal.listeners.LESSExportActionListener
 org.xwiki.lesscss.internal.listeners.SkinListener

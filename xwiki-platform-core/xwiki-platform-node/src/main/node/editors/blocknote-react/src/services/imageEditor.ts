@@ -104,7 +104,9 @@ interface ImageMetadataHandler {
   /**
    * Called right after an image is written into the content, either as a new image block or as the new source or
    * properties of an existing image block, whatever the UI used (image suggestions, image selector, upload, or the
-   * {@link ImageEditor}).
+   * {@link ImageEditor}). It is called in the same transaction as the image change, so that the changes it makes to the
+   * content (e.g. to the metadata of the image block, see `setBlockMetadata`) are undone together with the image
+   * change.
    *
    * @param instance - the editor instance holding the image
    * @param block - the image block, as written into the content
@@ -144,11 +146,13 @@ function insertImage(
   props: Partial<BlockOfType<"image">["props"]>,
   reference?: ResourceReference,
 ): void {
-  const block = insertOrUpdateBlockForSlashMenu(instance.editor, {
-    type: "image",
-    props,
-  }) as BlockOfType<"image">;
-  getImageMetadataHandler(instance)?.afterUpdate(instance, block, reference);
+  instance.editor.transact(() => {
+    const block = insertOrUpdateBlockForSlashMenu(instance.editor, {
+      type: "image",
+      props,
+    }) as BlockOfType<"image">;
+    getImageMetadataHandler(instance)?.afterUpdate(instance, block, reference);
+  });
 }
 
 /**
@@ -165,10 +169,16 @@ function updateImage(
   props: Partial<BlockOfType<"image">["props"]>,
   reference?: ResourceReference,
 ): void {
-  const updated = instance.editor.updateBlock(block, {
-    props,
-  }) as BlockOfType<"image">;
-  getImageMetadataHandler(instance)?.afterUpdate(instance, updated, reference);
+  instance.editor.transact(() => {
+    const updated = instance.editor.updateBlock(block, {
+      props,
+    }) as BlockOfType<"image">;
+    getImageMetadataHandler(instance)?.afterUpdate(
+      instance,
+      updated,
+      reference,
+    );
+  });
 }
 
 /**

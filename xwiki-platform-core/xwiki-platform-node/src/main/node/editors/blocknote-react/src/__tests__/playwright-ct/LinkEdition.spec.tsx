@@ -23,8 +23,8 @@ import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockType } from "../../blocknote";
 import type { Locator, Page } from "@playwright/test";
 
-// The url of the edited link carries a synthetic id, like the XWiki integration does to bind a link
-// to the metadata it can't store in the BlockNote schema.
+// The url of the edited link carries a query parameter, like the XWiki integration does to keep the
+// metadata of the link that the BlockNote schema can't hold.
 const LINK_URL = "https://xwiki.org/?id=42";
 
 test("beforeEdit transforms the link data used to pre-fill the link editor", async ({
@@ -73,7 +73,7 @@ test("beforeUpdate receives the submitted link data and the previous one, as sto
 
   // beforeUpdate gets the link data submitted by the link editor, together with the link data as it
   // is stored in the content: not the one transformed by beforeEdit, so that the integration can
-  // recover from it the metadata (e.g. a synthetic id) it hides from the link editor.
+  // recover from it the metadata it hides from the link editor.
   await expect(page.locator('[data-test="beforeUpdateInput"]')).toHaveText(
     JSON.stringify({
       linkData: submit,

@@ -103,7 +103,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
      */
     private static final class DocumentAverageRating extends DefaultAverageRating
     {
-        private final transient XWikiDocument document;
+        private final XWikiDocument document;
 
         DocumentAverageRating(AverageRating averageRating, XWikiDocument document)
         {

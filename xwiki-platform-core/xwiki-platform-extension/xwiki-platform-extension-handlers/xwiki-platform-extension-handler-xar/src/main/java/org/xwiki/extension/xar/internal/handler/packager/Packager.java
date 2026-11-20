@@ -209,8 +209,6 @@ public class Packager
     private void importDocumentToWiki(String comment, WikiReference wikiReference, InputStream inputStream,
         PackageConfiguration configuration, String name) throws XWikiException, XarException, IOException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
         XWikiDocument nextDocument;
         try {
             nextDocument = getXWikiDocument(inputStream, wikiReference);
@@ -232,6 +230,15 @@ public class Packager
         if (configuration.isVerbose()) {
             this.logger.info(LOG_INSTALLDOCUMENT_BEGIN, "Installing document [{}]", reference);
         }
+
+        importDocument(comment, previousDocument, nextDocument, configuration);
+    }
+
+    private void importDocument(String comment, XWikiDocument previousDocument, XWikiDocument nextDocument,
+        PackageConfiguration configuration) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
 
         // A user can save the document while it is merged, e.g. while the conflict question waits for an answer. The
         // merge result is then refused when saving it, because it would overwrite that save, so the document is merged
@@ -268,6 +275,8 @@ public class Packager
         }
     }
 
+    // The root cause message is computed only to log it, once, when the import of the document failed.
+    @SuppressWarnings("java:S2629")
     private void logConcurrentSaveFailure(DocumentReference reference, PackageConfiguration configuration,
         DocumentRevisionConflictException e)
     {

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -180,8 +181,9 @@ public class CommentAddAction extends XWikiAction
     protected boolean saveCommentedDocument(FailablePredicate<XWikiDocument, XWikiException> modification,
         String comment, XWikiContext context) throws XWikiException
     {
-        // Avoid modifying the cached document, which would keep the modification if the save fails.
-        XWikiDocument document = context.getDoc().clone();
+        // The comment actions are always executed on a current document. Avoid modifying the cached document, which
+        // would keep the modification if the save fails.
+        XWikiDocument document = Objects.requireNonNull(context.getDoc()).clone();
         for (int attempt = 1;; attempt++) {
             if (!modification.test(document)) {
                 return false;

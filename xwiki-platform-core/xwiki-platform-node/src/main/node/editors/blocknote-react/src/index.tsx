@@ -77,6 +77,18 @@ export type { EditorInstance } from "./editorInstance";
 export { createBlockMetadataStore } from "./misc/blockMetadata";
 
 export {
+  LINK_METADATA_PARAM,
+  METADATA_PROP,
+  getBlockMetadata,
+  getLinkMetadata,
+  parseMetadata,
+  setBlockMetadata,
+  setLinkMetadata,
+  stringifyMetadata,
+  stripLinkMetadata,
+} from "./misc/contentMetadata";
+
+export {
   getMacroOutput,
   setMacroOutput,
 } from "./features/macros/macroMetadata";
@@ -85,7 +97,7 @@ export type {
   BlockMetadata,
   BlockMetadataKey,
   BlockMetadataStore,
-  SharedBlockMetadata,
+  PastedMetadataContext,
 } from "./misc/blockMetadata";
 
 export type {
@@ -123,6 +135,16 @@ export { macrosFeature } from "./features/macros/macros";
 
 export { textStylesFeature } from "./features/textStyles/textStyles";
 export { xwikiRenderingFeature } from "./features/xwikiRendering/xwikiRendering";
+export {
+  XWIKI_FREESTANDING,
+  XWIKI_GENERATED_LABEL,
+  XWIKI_LEADING_NEW_LINE,
+  XWIKI_METADATA_KEYS,
+  XWIKI_PARAMETERS,
+  XWIKI_REFERENCE,
+  XWIKI_TRAILING_NEW_LINE,
+  XWIKI_VERBATIM,
+} from "./features/xwikiRendering/metadataKeys";
 
 export { editorFeatureName } from "./features/editorFeature";
 

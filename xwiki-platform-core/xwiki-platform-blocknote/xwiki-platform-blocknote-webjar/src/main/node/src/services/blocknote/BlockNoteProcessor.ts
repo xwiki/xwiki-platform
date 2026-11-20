@@ -24,12 +24,12 @@ import type {
 } from "@xwiki/platform-editors-blocknote-react";
 
 /**
- * Encapsulates the BlockNote content and the metadata that couldn't be stored in the BlockNote schema.
+ * Encapsulates the BlockNote content and its private metadata (which must not be part of the content).
  */
 class BlockNoteDocument {
   /**
-   * The metadata associated to the BlockNote content, by block ID (or by the ID injected in a link, or by macro ID).
-   * It is passed to the editor, which reads from it the output of the macros.
+   * The private metadata of the BlockNote content (the output of the macros, rendered for the current user), by block
+   * id or by macro id. It is passed to the editor, which reads from it the output of the macros.
    */
   public readonly metadata: BlockMetadataStore = createBlockMetadataStore();
 

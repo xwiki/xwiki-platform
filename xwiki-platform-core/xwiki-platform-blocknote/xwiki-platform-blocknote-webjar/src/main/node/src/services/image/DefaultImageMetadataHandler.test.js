@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DefaultImageMetadataHandler } from "./DefaultImageMetadataHandler";
-import { XWIKI_REFERENCE } from "../blocknote/metadataKeys";
-import { createBlockMetadataStore } from "@xwiki/platform-editors-blocknote-react";
+import {
+  getBlockMetadata,
+  stringifyMetadata,
+} from "@xwiki/platform-editors-blocknote-react";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -27,27 +29,37 @@ import { beforeEach, describe, expect, it } from "vitest";
 // eslint-disable-next-line max-statements
 describe("DefaultImageMetadataHandler", () => {
   const handler = new DefaultImageMetadataHandler();
-  const block = {
-    id: "image",
-    type: "image",
-    props: { url: "catURL", previewWidth: 100 },
-  };
+  let block;
   let instance;
 
   beforeEach(() => {
+    block = {
+      id: "image",
+      type: "image",
+      props: { url: "catURL", previewWidth: 100, metadata: "" },
+    };
     instance = {
       options: {
         sourceDocumentReference: toCristalEntityReference(
           Model.resolve("wiki:Space.Page", EntityType.DOCUMENT),
         ),
       },
-      metadata: createBlockMetadataStore(),
+      // The part of the editor used to change the metadata of the image block.
+      editor: {
+        getBlock: (id) => (id === block.id ? block : undefined),
+        updateBlock: (_, { props }) => {
+          block = { ...block, props: { ...block.props, ...props } };
+          return block;
+        },
+      },
     };
   });
 
+  const storedReference = () => getBlockMetadata(block).xwikiReference;
+
   it("edits the image with its stored reference", () => {
     const reference = { type: "attach", typed: false, reference: "cat.png" };
-    instance.metadata.set("image", XWIKI_REFERENCE, reference);
+    block.props.metadata = stringifyMetadata({ xwikiReference: reference });
 
     expect(handler.beforeEdit(instance, block)).toEqual({
       url: "catURL",
@@ -67,7 +79,7 @@ describe("DefaultImageMetadataHandler", () => {
       reference: "wiki:Space.Page@cat.png",
     });
 
-    expect(instance.metadata.get("image").xwikiReference).toEqual({
+    expect(storedReference()).toEqual({
       type: "attach",
       typed: false,
       reference: "cat.png",
@@ -81,7 +93,7 @@ describe("DefaultImageMetadataHandler", () => {
       reference: "wiki:Other.Page@cat.png",
     });
 
-    expect(instance.metadata.get("image").xwikiReference).toEqual({
+    expect(storedReference()).toEqual({
       type: "attach",
       typed: false,
       reference: "Other.Page@cat.png",
@@ -97,7 +109,7 @@ describe("DefaultImageMetadataHandler", () => {
       reference: "wiki:Space.Page@cat.png",
     });
 
-    expect(instance.metadata.get("image").xwikiReference).toEqual({
+    expect(storedReference()).toEqual({
       type: "attach",
       typed: false,
       reference: "wiki:Space.Page@cat.png",
@@ -109,17 +121,19 @@ describe("DefaultImageMetadataHandler", () => {
 
     handler.afterUpdate(instance, block, reference);
 
-    expect(instance.metadata.get("image").xwikiReference).toBe(reference);
+    expect(storedReference()).toEqual(reference);
   });
 
-  it("drops the reference of the previous image when the new one is known only by its URL", () => {
-    instance.metadata.set("image", XWIKI_REFERENCE, {
-      type: "attach",
-      reference: "cat.png",
+  it("drops the reference of the previous image when the new one is known only by its URL, keeping the rest", () => {
+    block.props.metadata = stringifyMetadata({
+      xwikiReference: { type: "attach", reference: "cat.png" },
+      xwikiParameters: { class: "border" },
     });
 
     handler.afterUpdate(instance, block);
 
-    expect(instance.metadata.get("image")).toBeUndefined();
+    expect(getBlockMetadata(block)).toEqual({
+      xwikiParameters: { class: "border" },
+    });
   });
 });

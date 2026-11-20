@@ -893,4 +893,29 @@ class LinkIT extends AbstractBlockNoteIT
         page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
         page.getContentEditor().getRichTextArea().waitUntilLinkIsPresent("createLinkToCurrentPage");
     }
+
+    @Test
+    @Order(26)
+    void undoLinkEdit(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh, with a link to the page created by editPageLink (which also created the page we switch the link
+        // to, and waited for it to be indexed).
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[second>>doc:OldPageLinkTarget]] third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Change the target page of the link, then undo the change.
+        textArea.click().moveCaretTo(8);
+        editor.getToolBar().editLink().setPageTargetAndSubmit("New Page Link Target", "New Page Link Target");
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+
+        // Save and check the source: the link points to its initial target, whose reference (stored outside of the
+        // link label and URL) was restored with the link.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>doc:OldPageLinkTarget]] third", wikiEditor.getContent());
+    }
 }

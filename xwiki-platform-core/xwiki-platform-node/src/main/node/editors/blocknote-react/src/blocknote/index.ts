@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { addMetadataProp } from "../misc/contentMetadata";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -55,13 +56,15 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
  */
 function createBlockNoteSchema(contributed?: SchemaContribution) {
   const blockNoteSchema = BlockNoteSchema.create({
-    blockSpecs: {
+    // All the block types can hold metadata (see setBlockMetadata). The typed API doesn't know about the metadata
+    // property, which is accessed through dedicated functions.
+    blockSpecs: addMetadataProp({
       ...defaultBlockSpecs,
 
       // The block types added by the editing features, whose types are erased under an index signature. They replace
       // the types of the same name (e.g. BlockNote's code block and image), the typed API keeping the types of these.
       ...Object.fromEntries(Object.entries(contributed?.blockSpecs ?? {})),
-    },
+    }),
 
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,

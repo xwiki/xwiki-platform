@@ -47,11 +47,7 @@ describe("getMacroOutput", () => {
 
   test("keeps the other metadata of the macro block", () => {
     const metadata = createBlockMetadataStore();
-    metadata.set(
-      "m1",
-      { name: "xwikiParameters", shared: true },
-      { class: "box" },
-    );
+    metadata.set("m1", { name: "xwikiParameters" }, { class: "box" });
     setMacroOutput(metadata, "m1", call, output);
 
     expect(metadata.get("m1")).toEqual({

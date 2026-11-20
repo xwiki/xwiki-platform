@@ -219,11 +219,11 @@ type EditorOptions = {
   upload?: boolean;
 
   /**
-   * Where to keep the data about the blocks of the edited content that isn't part of the content (e.g. the output of
-   * the macros, rendered for the current user). An integration specifies it when it fills it before the editor is
-   * created (e.g. with what it extracted while loading the content) or reads it after (e.g. to save the content). A
-   * store is created for the editor instance otherwise. When editing in realtime, the store is connected to the
-   * collaboration session, so that its shared entries (see `BlockMetadataKey.shared`) are those of the session.
+   * Where to keep the private data about the blocks of the edited content, which isn't part of the content (e.g. the
+   * output of the macros, rendered for the current user). An integration specifies it when it fills it before the
+   * editor is created (e.g. with what it extracted while loading the content) or reads it after. A store is created for
+   * the editor instance otherwise. The data that must follow the content is kept in the content (see
+   * `setBlockMetadata`).
    */
   metadata?: BlockMetadataStore;
 

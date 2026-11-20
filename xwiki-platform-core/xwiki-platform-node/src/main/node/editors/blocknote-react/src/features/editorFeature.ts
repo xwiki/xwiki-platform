@@ -24,6 +24,7 @@ import type {
   EditorStyleSchema,
 } from "../blocknote";
 import type { EditorInstance } from "../editorInstance";
+import type { BlockMetadataKey } from "../misc/blockMetadata";
 import type {
   BlockNoteEditorOptions,
   BlockSpecs,
@@ -181,6 +182,13 @@ type FeatureContribution = {
   blockNoteOptions?: ContributedBlockNoteOptions;
 
   /**
+   * The keys of the metadata entries that the feature keeps in the edited content (see `setBlockMetadata` and
+   * `setLinkMetadata`), so that the editor knows which pasted entries to keep (see `BlockMetadataKey.filterPasted`).
+   * The pasted entries without a key are dropped.
+   */
+  metadataKeys?: BlockMetadataKey[];
+
+  /**
    * @returns the items to add to the slash menu, which the editor filters with the query typed by the user; an item
    *   with the key of a BlockNote default item replaces it (two features can't replace the same item)
    */
@@ -233,6 +241,7 @@ type MergedContributions = {
   schema: Required<SchemaContribution>;
   blockNoteExtensions: ExtensionFactoryInstance[];
   blockNoteOptions: ContributedBlockNoteOptions;
+  metadataKeys: BlockMetadataKey[];
   slashMenuItems: () => SlashMenuItem[];
   formattingToolbar: Required<FormattingToolbarContribution>;
   components: ReactNode[];
@@ -341,6 +350,9 @@ function mergeContributions(
       (contribution) => contribution.blockNoteExtensions ?? [],
     ),
     blockNoteOptions,
+    metadataKeys: contributions.flatMap(
+      (contribution) => contribution.metadataKeys ?? [],
+    ),
     slashMenuItems: () =>
       keepFirstReplacements(
         contributions.flatMap(

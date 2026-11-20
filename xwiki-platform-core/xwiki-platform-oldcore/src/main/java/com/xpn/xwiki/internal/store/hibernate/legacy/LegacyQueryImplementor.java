@@ -91,7 +91,7 @@ public final class LegacyQueryImplementor<R> implements InvocationHandler
      * @param <R> query result type
      * @param delegate the actual query
      * @return the query converting the positional parameters
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     @SuppressWarnings("unchecked")
     public static <R> QueryImplementor<R> wrap(QueryImplementor<R> delegate)

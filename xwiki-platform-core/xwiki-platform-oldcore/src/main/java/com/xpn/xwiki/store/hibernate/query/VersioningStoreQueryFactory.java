@@ -160,7 +160,7 @@ public final class VersioningStoreQueryFactory<T>
      * @return the created query
      * @deprecated use {@link #createDeleteArchiveQuery(Session, long)} instead
      */
-    @Deprecated(since = "18.10.0RC1")
+    @Deprecated(since = "19.0.0RC1")
     public static Query<?> getDeleteArchiveQuery(Session session, final long id)
     {
         return session.createQuery(DELETE_ARCHIVE_STATEMENT).setParameter(FIELD_DOCID, id);
@@ -172,7 +172,7 @@ public final class VersioningStoreQueryFactory<T>
      * @param session the hibernate session
      * @param id the id of the document
      * @return the created query
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     @Unstable
     public static MutationQuery createDeleteArchiveQuery(Session session, final long id)

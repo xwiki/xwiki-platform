@@ -43,7 +43,7 @@ import org.hibernate.persister.entity.EntityPersister;
  * {@code update} and {@code saveOrUpdate} expects the passed instance itself to be managed after the call.
  *
  * @version $Id$
- * @since 18.10.0RC1
+ * @since 19.0.0RC1
  */
 public final class LegacySessionOperations
 {

@@ -31,7 +31,7 @@ import org.hibernate.type.Type;
  * {@link Type}s.
  *
  * @version $Id$
- * @since 18.10.0RC1
+ * @since 19.0.0RC1
  */
 public final class LegacyQueries
 {

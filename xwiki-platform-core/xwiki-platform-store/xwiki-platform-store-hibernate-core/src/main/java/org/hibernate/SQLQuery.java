@@ -30,10 +30,10 @@ import org.xwiki.store.hibernate.internal.legacy.LegacyQueries;
  *
  * @param <T> the query result type
  * @version $Id$
- * @since 18.10.0RC1
+ * @since 19.0.0RC1
  * @deprecated use {@link NativeQuery} instead
  */
-@Deprecated(since = "18.10.0RC1")
+@Deprecated(since = "19.0.0RC1")
 public interface SQLQuery<T> extends Query<T>
 {
     private NativeQuery<T> nativeQuery()

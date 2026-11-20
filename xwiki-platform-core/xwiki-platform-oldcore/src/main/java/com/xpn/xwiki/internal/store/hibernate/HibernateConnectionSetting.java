@@ -35,7 +35,7 @@ import org.hibernate.cfg.JdbcSettings;
  * ({@code connection.*}).
  *
  * @version $Id$
- * @since 18.10.0RC1
+ * @since 19.0.0RC1
  */
 // The deprecated names are still supported by Hibernate and used by existing configurations
 @SuppressWarnings("deprecation")

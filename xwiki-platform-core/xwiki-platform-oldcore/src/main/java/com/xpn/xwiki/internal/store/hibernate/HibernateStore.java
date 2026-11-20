@@ -1257,7 +1257,7 @@ public class HibernateStore implements Disposable, Initializable
     /**
      * @param column the column
      * @return the length of the column, or the Hibernate default length if none is explicitly set
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public static int getLength(Column column)
     {

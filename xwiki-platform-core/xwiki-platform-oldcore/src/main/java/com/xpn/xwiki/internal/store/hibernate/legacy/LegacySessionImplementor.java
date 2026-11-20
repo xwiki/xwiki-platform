@@ -130,7 +130,7 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
      * @param statement the statement to parse
      * @return true if the statement might contain legacy paths to the identifier of the properties of the XWiki
      *         objects ({@code prop.id.id} or {@code prop.id.name})
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public static boolean containsLegacyPropertyIdentifier(String statement)
     {

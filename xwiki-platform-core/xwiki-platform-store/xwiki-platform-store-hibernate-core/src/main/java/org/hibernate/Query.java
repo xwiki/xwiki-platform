@@ -43,10 +43,10 @@ import org.xwiki.store.hibernate.internal.legacy.LegacyQueries;
  *
  * @param <R> the query result type
  * @version $Id$
- * @since 18.10.0RC1
+ * @since 19.0.0RC1
  * @deprecated use {@link org.hibernate.query.Query} instead
  */
-@Deprecated(since = "18.10.0RC1")
+@Deprecated(since = "19.0.0RC1")
 public interface Query<R> extends TypedQuery<R>
 {
     private org.hibernate.query.Query<R> hibernateQuery()

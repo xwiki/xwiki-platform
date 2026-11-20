@@ -30,8 +30,8 @@ import javax.inject.Named;
 
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.query.NamedNativeQueryDefinition;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.query.NativeQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,6 +70,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -310,7 +311,7 @@ class HqlQueryExecutorTest
 
         Session session = mock(Session.class);
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.getNamedQuery(query.getStatement())).thenReturn(sqlQuery);
+        when(session.createNamedQuery(query.getStatement(), Object.class)).thenReturn(sqlQuery);
         when(sqlQuery.getQueryString()).thenReturn("foo");
 
         // Add a Query Filter to verify it's called and can change the statement
@@ -320,18 +321,16 @@ class HqlQueryExecutorTest
         when(filter.filterQuery(any(Query.class))).then(returnsFirstArg());
 
         NativeQuery finalQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("bar")).thenReturn(finalQuery);
+        when(session.createNativeQuery("bar", "someResultSet", Object.class)).thenReturn(finalQuery);
 
-        NamedSQLQueryDefinition definition = mock(NamedSQLQueryDefinition.class);
-        when(definition.getResultSetRef()).thenReturn("someResultSet");
-        when(definition.getName()).thenReturn(query.getStatement());
+        NamedNativeQueryDefinition<?> definition = mock(NamedNativeQueryDefinition.class);
+        when(definition.getResultSetMappingName()).thenReturn("someResultSet");
+        when(definition.getRegistrationName()).thenReturn(query.getStatement());
 
-        when(this.hibernateStore.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement()))
-            .thenReturn(definition);
+        when(this.hibernateStore.getConfigurationMetadata().getNamedNativeQueryMapping(query.getStatement()))
+            .thenAnswer(i -> definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
-
-        verify(finalQuery).setResultSetMapping(definition.getResultSetRef());
     }
 
     @Test
@@ -359,7 +358,7 @@ class HqlQueryExecutorTest
         this.executor.createHibernateQuery(session, query);
 
         // The test is here!
-        verify(session).createQuery("select doc.fullName from XWikiDocument doc where doc.space='Main3'");
+        verify(session).createQuery("select doc.fullName from XWikiDocument doc where doc.space='Main3'", Object.class);
     }
 
     @Test
@@ -376,7 +375,7 @@ class HqlQueryExecutorTest
         when(this.contextComponentMannager.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
 
         org.hibernate.query.Query queryMock = mock(org.hibernate.query.Query.class);
-        when(session.createQuery(anyString())).thenReturn(queryMock);
+        when(session.createQuery(anyString(), eq(Object.class))).thenReturn(queryMock);
 
         this.executor.createHibernateQuery(session, query);
 

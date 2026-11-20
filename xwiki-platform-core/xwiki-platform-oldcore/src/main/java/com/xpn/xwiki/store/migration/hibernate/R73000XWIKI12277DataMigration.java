@@ -117,8 +117,8 @@ public class R73000XWIKI12277DataMigration extends AbstractHibernateDataMigratio
         terminalProperty.setObject(object);
 
         // Save the new property.
-        session.saveOrUpdate(terminalProperty);
+        session.merge(terminalProperty);
         // Delete the old property.
-        session.delete(typeProperty);
+        session.remove(typeProperty);
     }
 }

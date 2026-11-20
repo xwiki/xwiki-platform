@@ -27,11 +27,11 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.HibernateException;
@@ -282,7 +282,8 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
                 XWikiDeletedDocument trashdoc = createXWikiDeletedDocument(doc, deleter, date, contentStore, batchId);
 
                 // Hibernate store.
-                long index = ((Number) session.save(trashdoc)).longValue();
+                session.persist(trashdoc);
+                long index = trashdoc.getId();
 
                 // External store
                 if (contentStore != null) {
@@ -335,7 +336,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         boolean bTransaction) throws XWikiException
     {
         return executeRead(context, session -> {
-            XWikiDeletedDocument deletedDocument = session.get(XWikiDeletedDocument.class, Long.valueOf(index));
+            XWikiDeletedDocument deletedDocument = session.find(XWikiDeletedDocument.class, index);
 
             if (deletedDocument != null && resolve) {
                 deletedDocument = resolveDeletedDocumentContent(deletedDocument, false);
@@ -427,7 +428,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             XWikiDeletedDocument deletedDocument = getDeletedDocument(index, context, false, bTransaction);
 
             // Delete metadata
-            session.delete(deletedDocument);
+            session.remove(deletedDocument);
 
             // Delete content
             deleteDeletedDocumentContent(deletedDocument, bTransaction);

@@ -28,9 +28,9 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.MutationQuery;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -107,8 +107,9 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                         // XWD_ARCHIVE column had a not null constraint and since this column has disappeared in 1.2
                         // and after, the hibernate update script will not have modified the nullability of it...
                         // (see https://jira.xwiki.org/browse/XWIKI-2074).
-                        rs = session.createSQLQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc"
-                            + " where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION").list();
+                        rs = session.createNativeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc"
+                            + " where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION",
+                            Object[].class).list();
                     } catch (HibernateException e) {
                         // most likely there is no XWD_ARCHIVE column, so migration is not needed
                         // is there easier way to find what column is not exist?
@@ -120,8 +121,8 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                     Transaction originalTransaction = versioningStore.getTransaction(context);
                     versioningStore.setSession(null, context);
                     versioningStore.setTransaction(null, context);
-                    SQLQuery deleteStatement =
-                            session.createSQLQuery("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
+                    MutationQuery deleteStatement =
+                        session.createNativeMutationQuery("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
                     for (Object[] result : rs) {
                         R4359XWIKI1459DataMigration.this.logger.info("Updating document [{}]...", result[2].toString());
@@ -148,7 +149,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                                     "Empty revision found for document [{}]. Ignoring non-fatal error.",
                                     result[2].toString());
                         }
-                        deleteStatement.setLong(1, docId);
+                        deleteStatement.setParameter(1, docId);
                         deleteStatement.executeUpdate();
                     }
                     versioningStore.setSession(session, context);

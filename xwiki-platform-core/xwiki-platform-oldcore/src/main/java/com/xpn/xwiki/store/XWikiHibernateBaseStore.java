@@ -28,6 +28,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import jakarta.persistence.GenerationType;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -339,7 +341,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
         // There's no issue when in database mode, only in schema mode.
         if (isInSchemaMode()) {
             Dialect dialect = this.store.getDialect();
-            if ("sequence".equals(dialect.getNativeIdentifierGeneratorStrategy())) {
+            if (dialect.getNativeValueGenerationStrategy() == GenerationType.SEQUENCE) {
                 // We create the sequence only if it's not already in the SQL to execute as otherwise we would get an
                 // error that the sequence already exists ("relation "hibernate_sequence" already exists").
                 boolean hasSequence = false;
@@ -360,7 +362,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                         // Ignore errors in the log during the creation of the sequence since we know it can fail and we
                         // don't want to show false positives to the user.
                         this.loggerManager.pushLogListener(null);
-                        session.createSQLQuery(sequenceSQL).executeUpdate();
+                        session.createNativeMutationQuery(sequenceSQL).executeUpdate();
                     } catch (HibernateException e) {
                         // Sequence failed to be created, we assume it already exists and that's why an exception was
                         // raised!
@@ -400,7 +402,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
             for (String element : createSQL) {
                 sql = element;
                 LOGGER.debug("Update Schema sql: [{}]", sql);
-                session.createSQLQuery(sql).executeUpdate();
+                session.createNativeMutationQuery(sql).executeUpdate();
             }
             session.getTransaction().commit();
         } catch (Exception e) {

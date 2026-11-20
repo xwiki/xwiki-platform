@@ -218,6 +218,12 @@
                 <column name="XWP_NAME" index="PROP_NAME" />
             </key-property>
         </composite-id>
+        <!-- The class name stored in XWP_CLASSTYPE identifies the type of the property, which is needed since
+             LargeStringProperty and StringListProperty share the same table. The column is written through the
+             classType property. -->
+        <discriminator type="string" insert="false">
+            <column name="XWP_CLASSTYPE" length="255" not-null="false" />
+        </discriminator>
         <property name="classType" type="string" column="XWP_CLASSTYPE" length="255" />
 
         <joined-subclass name="com.xpn.xwiki.objects.IntegerProperty" table="xwikiintegers">

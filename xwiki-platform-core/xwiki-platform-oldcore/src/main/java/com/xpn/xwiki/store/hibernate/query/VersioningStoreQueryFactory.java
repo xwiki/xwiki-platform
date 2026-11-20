@@ -23,14 +23,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 
 import org.hibernate.Session;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.criteria.impl.Range;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
@@ -55,6 +57,9 @@ public final class VersioningStoreQueryFactory<T>
     private static final String FIELD_DIFF = "diff";
 
     private static final String FIELD_DOCID = "docId";
+
+    private static final String DELETE_ARCHIVE_STATEMENT =
+        "delete from " + XWikiRCSNodeInfo.class.getName() + " where id." + FIELD_DOCID + "=:" + FIELD_DOCID;
 
     private static final String FIELD_VERSION1 = "version1";
 
@@ -153,14 +158,26 @@ public final class VersioningStoreQueryFactory<T>
      * @param session the hibernate session
      * @param id the id of the document
      * @return the created query
+     * @deprecated use {@link #createDeleteArchiveQuery(Session, long)} instead
      */
+    @Deprecated(since = "18.10.0RC1")
     public static Query<?> getDeleteArchiveQuery(Session session, final long id)
     {
-        return
-            session
-                .createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id." + FIELD_DOCID + '=' + ':'
-                    + FIELD_DOCID)
-                .setParameter(FIELD_DOCID, id);
+        return session.createQuery(DELETE_ARCHIVE_STATEMENT).setParameter(FIELD_DOCID, id);
+    }
+
+    /**
+     * Returns a query to completely delete the archive for a given document.
+     *
+     * @param session the hibernate session
+     * @param id the id of the document
+     * @return the created query
+     * @since 18.10.0RC1
+     */
+    @Unstable
+    public static MutationQuery createDeleteArchiveQuery(Session session, final long id)
+    {
+        return session.createMutationQuery(DELETE_ARCHIVE_STATEMENT).setParameter(FIELD_DOCID, id);
     }
 
     /**

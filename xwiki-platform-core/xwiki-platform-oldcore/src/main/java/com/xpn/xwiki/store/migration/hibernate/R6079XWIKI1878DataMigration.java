@@ -131,7 +131,7 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
                         patch.setDiff(false);
                         fixedNodeContent.setPatch(patch);
 
-                        session.update(fixedNodeContent);
+                        session.merge(fixedNodeContent);
                     }
 
                     versioningStore.setSession(session, context);

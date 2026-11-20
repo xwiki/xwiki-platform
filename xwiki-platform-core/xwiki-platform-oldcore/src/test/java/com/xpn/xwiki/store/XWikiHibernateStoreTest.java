@@ -30,12 +30,16 @@ import java.util.Optional;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.Metamodel;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.query.NativeQuery;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,6 +91,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.inOrder;
@@ -268,8 +273,9 @@ class XWikiHibernateStoreTest
         verify(observationManager).addListener(eventListenerCaptor.capture());
         assertEquals("deleteLocksOnLogoutListener", eventListenerCaptor.getValue().getName());
 
-        Query query = mock(Query.class);
-        when(session.createQuery("delete from XWikiLock as lock where lock.userName=:userName")).thenReturn(query);
+        MutationQuery query = mock(MutationQuery.class);
+        when(session.createMutationQuery("delete from XWikiLock as lock where lock.userName=:userName"))
+            .thenReturn(query);
         when(xcontext.getUserReference()).thenReturn(new DocumentReference("xwiki", "XWiki", "LoggerOutter"));
         when(xcontext.getUser()).thenReturn("XWiki.LoggerOutter");
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
@@ -287,14 +293,14 @@ class XWikiHibernateStoreTest
     void loadLock() throws Exception
     {
         XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
-        when(this.session.get(XWikiLock.class, 13L)).thenReturn(lock);
+        when(this.session.find(XWikiLock.class, 13L)).thenReturn(lock);
 
         assertSame(lock, this.store.loadLock(13L, this.xcontext, true));
 
         // The lock is read with a single statement, so that it can't be removed concurrently between checking that it
         // exists and loading it.
         verify(this.session, never()).createQuery(any(String.class), any(Class.class));
-        verify(this.session, never()).load(any(Object.class), any());
+        verify(this.session, never()).load(any(Object.class), any(Object.class));
     }
 
     @Test
@@ -306,15 +312,15 @@ class XWikiHibernateStoreTest
     @Test
     void deleteLock() throws Exception
     {
-        Query query = mock(Query.class);
-        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        MutationQuery query = mock(MutationQuery.class);
+        when(this.session.createMutationQuery(DELETE_LOCK_QUERY)).thenReturn(query);
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
 
         this.store.deleteLock(new XWikiLock(13L, "XWiki.Alice"), this.xcontext, true);
 
         // A bulk delete is used, rather than deleting the entity, so that removing a lock that has been removed in the
         // mean time is a no-op.
-        verify(this.session, never()).delete(any());
+        verify(this.session, never()).remove(any());
         verify(query).setParameter("docId", 13L);
         verify(query).executeUpdate();
         verify(this.hibernateStore).endTransaction(true);
@@ -323,8 +329,8 @@ class XWikiHibernateStoreTest
     @Test
     void saveLock() throws Exception
     {
-        Query query = mock(Query.class);
-        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        MutationQuery query = mock(MutationQuery.class);
+        when(this.session.createMutationQuery(DELETE_LOCK_QUERY)).thenReturn(query);
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
 
         XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
@@ -334,10 +340,10 @@ class XWikiHibernateStoreTest
         // it has been removed in the mean time.
         InOrder inOrder = inOrder(query, this.session);
         inOrder.verify(query).executeUpdate();
-        inOrder.verify(this.session).save(lock);
+        inOrder.verify(this.session).persist(lock);
 
         verify(query).setParameter("docId", 13L);
-        verify(this.session, never()).update(any());
+        verify(this.session, never()).merge(any());
         verify(this.hibernateStore).endTransaction(true);
     }
 
@@ -347,14 +353,14 @@ class XWikiHibernateStoreTest
         Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
-        when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
-        NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(dialect.getNativeValueGenerationStrategy()).thenReturn(GenerationType.SEQUENCE);
+        MutationQuery sqlQuery = mock(MutationQuery.class);
+        when(sessionMock.createNativeMutationQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", sessionMock);
 
-        verify(sessionMock).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock).createNativeMutationQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery).executeUpdate();
     }
 
@@ -367,15 +373,15 @@ class XWikiHibernateStoreTest
         Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
-        when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
-        NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(dialect.getNativeValueGenerationStrategy()).thenReturn(GenerationType.SEQUENCE);
+        MutationQuery sqlQuery = mock(MutationQuery.class);
+        when(sessionMock.createNativeMutationQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(
             new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", sessionMock);
 
-        verify(sessionMock, never()).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock, never()).createNativeMutationQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery, never()).executeUpdate();
     }
 
@@ -413,29 +419,30 @@ class XWikiHibernateStoreTest
 
         Query<String> oldClassTypeQuery = mock(Query.class);
         when(session.createQuery(
-            "select prop.classType from BaseProperty as prop " + "where prop.id.id = :id and prop.id.name= :name",
+            "select prop.classType from BaseProperty as prop " + "where prop.id = :id and prop.name= :name",
             String.class)).thenReturn(oldClassTypeQuery);
         // The old value has a different type (String -> TextArea).
         when(oldClassTypeQuery.uniqueResult()).thenReturn(StringProperty.class.getName());
 
         // The old property must be loaded from the corresponding table.
-        Query oldPropertyQuery = mock(Query.class);
-        when(session.createQuery("select prop from " + StringProperty.class.getName()
-            + " as prop where prop.id.id = :id and prop.id.name= :name")).thenReturn(oldPropertyQuery);
-        BaseProperty oldProperty = mock(BaseProperty.class);
-        when(oldPropertyQuery.uniqueResult()).thenReturn(oldProperty);
+        Metamodel metamodel = mock(Metamodel.class);
+        when(session.getMetamodel()).thenReturn(metamodel);
+        EntityType entityType = mock(EntityType.class);
+        when(metamodel.entity(StringProperty.class.getName())).thenReturn(entityType);
+        when(entityType.getJavaType()).thenReturn(StringProperty.class);
+        StringProperty oldProperty = new StringProperty();
+        // A property is its own identifier
+        when(session.find(eq(StringProperty.class), argThat((StringProperty identifier) ->
+            identifier.getId() == propertyId && propertyName.equals(identifier.getName())))).thenReturn(oldProperty);
 
         store.saveXWikiCollection(object, xcontext, false);
 
         verify(oldClassTypeQuery).setParameter("id", propertyId);
         verify(oldClassTypeQuery).setParameter("name", propertyName);
 
-        verify(oldPropertyQuery).setParameter("id", propertyId);
-        verify(oldPropertyQuery).setParameter("name", propertyName);
-
         // Delete the old property value and then save the new one.
-        verify(session).delete(oldProperty);
-        verify(session).save(property);
+        verify(session).remove(oldProperty);
+        verify(session).persist(property);
     }
 
     @Test
@@ -447,8 +454,8 @@ class XWikiHibernateStoreTest
         when(doc.getFullName()).thenReturn(fullName);
 
         Query query = mock(Query.class);
-        when(session.createQuery("select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName"))
-            .thenReturn(query);
+        when(session.createQuery("select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName",
+            String.class)).thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
@@ -470,7 +477,7 @@ class XWikiHibernateStoreTest
         Query query = mock(Query.class);
         String statement = "select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName"
             + " and doc.language=:language";
-        when(session.createQuery(statement)).thenReturn(query);
+        when(session.createQuery(statement, String.class)).thenReturn(query);
         when(query.list()).thenReturn(Collections.singletonList(fullName));
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
@@ -583,8 +590,8 @@ class XWikiHibernateStoreTest
         XWikiDocument document = new XWikiDocument(new DocumentReference(WIKI_NAME, "space", "document"));
 
         Query queryDocument = mock();
-        when(this.session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id"))
-            .thenReturn(queryDocument);
+        when(this.session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id",
+            Long.class)).thenReturn(queryDocument);
         when(queryDocument.uniqueResult()).thenReturn(null);
 
         LocalDocumentReference classReference = new LocalDocumentReference("space", "class");
@@ -602,8 +609,8 @@ class XWikiHibernateStoreTest
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
-        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, never()).update("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, never()).merge("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again of the same document
 
@@ -612,8 +619,8 @@ class XWikiHibernateStoreTest
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
-        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, never()).update("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, never()).merge("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Indicate that the xobject was modified
 
@@ -621,15 +628,15 @@ class XWikiHibernateStoreTest
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
-        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session).update("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).merge("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again with no change
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
-        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session).update("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).merge("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again but with disabled tracking
 
@@ -637,7 +644,7 @@ class XWikiHibernateStoreTest
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
-        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, times(2)).update("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, times(2)).merge("com.xpn.xwiki.objects.BaseObject", object1);
     }
 }

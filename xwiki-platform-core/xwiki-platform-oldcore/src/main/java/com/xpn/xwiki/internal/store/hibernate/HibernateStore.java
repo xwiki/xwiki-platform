@@ -30,7 +30,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +42,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import jakarta.persistence.GenerationType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -64,6 +65,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
@@ -334,12 +336,10 @@ public class HibernateStore implements Disposable, Initializable
      */
     private void replaceVariables(Configuration hibernateConfiguration)
     {
-        String newURL = resolveURL(hibernateConfiguration.getProperty(org.hibernate.cfg.AvailableSettings.URL));
-        if (newURL != null) {
-            // Set the new URL
-            hibernateConfiguration.setProperty(org.hibernate.cfg.AvailableSettings.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
-        }
+        HibernateConnectionSetting.URL.transform(hibernateConfiguration::getProperty, (name, newURL) -> {
+            hibernateConfiguration.setProperty(name, newURL);
+            this.logger.debug("Resolved Hibernate property [{}] to [{}]", name, newURL);
+        }, this::resolveURL);
     }
 
     /**
@@ -351,13 +351,11 @@ public class HibernateStore implements Disposable, Initializable
      */
     private void replaceVariables(LoadedConfig hibernateConfiguration)
     {
-        Map values = hibernateConfiguration.getConfigurationValues();
-        String newURL = resolveURL((String) values.get(org.hibernate.cfg.AvailableSettings.URL));
-        if (newURL != null) {
-            // Set the new URL
-            values.put(org.hibernate.cfg.AvailableSettings.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
-        }
+        Map<String, Object> values = hibernateConfiguration.getConfigurationValues();
+        HibernateConnectionSetting.URL.transform(values::get, (name, newURL) -> {
+            values.put(name, newURL);
+            this.logger.debug("Resolved Hibernate property [{}] to [{}]", name, newURL);
+        }, this::resolveURL);
     }
 
     /**
@@ -453,10 +451,7 @@ public class HibernateStore implements Disposable, Initializable
             } else {
                 // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
                 // driver
-                String connectionURL = this.configuration.getProperty("hibernate.connection.url");
-                if (connectionURL == null) {
-                    connectionURL = this.configuration.getProperty("connection.url");
-                }
+                String connectionURL = HibernateConnectionSetting.URL.get(this.configuration::getProperty);
                 this.databaseProductCache = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
             }
         }
@@ -986,10 +981,10 @@ public class HibernateStore implements Disposable, Initializable
         createSequenceIfMissing(wikiId);
     }
 
-    private <T, E> T executeNative(String sqlString, Function<NativeQuery<E>, T> function)
+    private <T, E> T executeNative(String sqlString, Class<E> resultClass, Function<NativeQuery<E>, T> function)
     {
         try (Session session = getSessionFactory().openSession()) {
-            NativeQuery<E> query = session.createNativeQuery(sqlString);
+            NativeQuery<E> query = session.createNativeQuery(sqlString, resultClass);
 
             return function.apply(query);
         }
@@ -1031,9 +1026,10 @@ public class HibernateStore implements Disposable, Initializable
 
     private List<String> getOracleSequences(String schemaName)
     {
-        return this.<List<String>, String>executeNative(String
-            .format("select SEQUENCE_NAME from all_sequences where SEQUENCE_OWNER = '%s'", schemaName.toUpperCase()),
-            NativeQuery::getResultList);
+        return executeNative(
+            String.format("select SEQUENCE_NAME from all_sequences where SEQUENCE_OWNER = '%s'",
+                schemaName.toUpperCase()),
+            String.class, NativeQuery::getResultList);
     }
 
     /**
@@ -1050,7 +1046,8 @@ public class HibernateStore implements Disposable, Initializable
     private void createSequenceIfMissing(String wikiId)
     {
         // There's no issue with catalog based databases, only with schemas.
-        if (!getAdapter().isCatalog() && "sequence".equals(getDialect().getNativeIdentifierGeneratorStrategy())) {
+        if (!getAdapter().isCatalog()
+            && getDialect().getNativeValueGenerationStrategy() == GenerationType.SEQUENCE) {
             String schemaName = getAdapter().getDatabaseFromWikiName(wikiId);
 
             boolean ignoreError = false;
@@ -1093,7 +1090,7 @@ public class HibernateStore implements Disposable, Initializable
             // Try to create the Hibernate sequence
             try (Session session = getSessionFactory().openSession()) {
                 Transaction transaction = session.beginTransaction();
-                session.createNativeQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
+                session.createNativeMutationQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
                     .executeUpdate();
                 transaction.commit();
             } catch (Exception e) {
@@ -1141,11 +1138,7 @@ public class HibernateStore implements Disposable, Initializable
             // (org.hibernate.mapping.PersistentClass#getProperty does not support composite ids) is fixed
             KeyValue identifier = persistentClass.getIdentifier();
             if (identifier instanceof org.hibernate.mapping.Component component) {
-                Iterator<Property> it = component.getPropertyIterator();
-
-                while (it.hasNext()) {
-                    Property property = it.next();
-
+                for (Property property : component.getProperties()) {
                     if (property.getName().equals(propertyName)) {
                         return getConfiguredColumnName(property);
                     }
@@ -1164,7 +1157,7 @@ public class HibernateStore implements Disposable, Initializable
      */
     public String getConfiguredColumnName(Property property)
     {
-        Column column = (Column) property.getColumnIterator().next();
+        Column column = property.getColumns().get(0);
 
         return getConfiguredColumnName(column);
     }
@@ -1261,14 +1254,26 @@ public class HibernateStore implements Disposable, Initializable
         return result;
     }
 
+    /**
+     * @param column the column
+     * @return the length of the column, or the Hibernate default length if none is explicitly set
+     * @since 18.10.0RC1
+     */
+    public static int getLength(Column column)
+    {
+        Long length = column.getLength();
+
+        return length != null ? length.intValue() : (int) Size.DEFAULT_LENGTH;
+    }
+
     public int getLimitSize(Class<?> entityType, String propertyName)
     {
         int result = metadataTableOrColumn(entityType, propertyName, -1, resultSet -> resultSet.getInt("COLUMN_SIZE"));
 
         if (result == -1) {
             PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
-            Column column2 = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            result = column2.getLength();
+            Column column2 = persistentClass.getProperty(propertyName).getColumns().get(0);
+            result = getLength(column2);
             this.logger.warn(
                 "Error while getting the size limit for entity [{}] and propertyName [{}]. "
                     + "The length value set by hibernate [{}] will be used.",

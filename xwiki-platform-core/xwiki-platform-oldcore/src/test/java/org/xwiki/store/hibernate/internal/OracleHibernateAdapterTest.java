@@ -125,7 +125,8 @@ class OracleHibernateAdapterTest
         Session session = mock(Session.class);
         NativeQuery<String> query = mock(NativeQuery.class);
         when(session.createNativeQuery(
-            "SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED' AND owner = :owner"))
+            "SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED' AND owner = :owner",
+            String.class))
                 .thenReturn(query);
         when(query.list()).thenReturn(List.of("xwikircs", "XWikiDoc"));
 
@@ -142,7 +143,8 @@ class OracleHibernateAdapterTest
 
         Session session = mock(Session.class);
         NativeQuery<String> query = mock(NativeQuery.class);
-        when(session.createNativeQuery("SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED'"))
+        when(session.createNativeQuery("SELECT DISTINCT table_name FROM all_tables WHERE compression = 'ENABLED'",
+            String.class))
             .thenReturn(query);
         when(query.list()).thenReturn(List.of("XWIKIRCS"));
 

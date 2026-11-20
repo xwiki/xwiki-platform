@@ -51,8 +51,6 @@ import com.xpn.xwiki.api.Util;
 @Singleton
 public class UsersParameterHandler
 {
-    private static final String FIELD_SEPARATOR = ",";
-
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -76,10 +74,9 @@ public class UsersParameterHandler
     public void handleUsersParameter(String users, NotificationParameters parameters) throws Exception
     {
         if (StringUtils.isNotBlank(users)) {
-            String[] userArray = users.split(FIELD_SEPARATOR);
             List<String> userList = new ArrayList<>();
-            for (int i = 0; i < userArray.length; ++i) {
-                String user = Util.getStandardUsername(userArray[i].trim(), true);
+            for (String userValue : DefaultNotificationParametersFactory.splitListParameter(users)) {
+                String user = Util.getStandardUsername(userValue, true);
                 DocumentReference userReference = currentDocumentReferenceResolver.resolve(user);
                 if (documentAccessBridge.exists(userReference)) {
                     userList.add(entityReferenceSerializer.serialize(userReference));

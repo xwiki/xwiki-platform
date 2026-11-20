@@ -403,6 +403,43 @@ class DefaultNotificationParametersFactoryTest
         )));
     }
 
+    @Test
+    void createNotificationParametersWithQuotedValues() throws Exception
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
+        NotificationParameters expectedNotificationParameters = new NotificationParameters();
+        expectedNotificationParameters.format = NotificationFormat.ALERT;
+        expectedNotificationParameters.preferences = List.of(
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(1))
+        );
+        expectedNotificationParameters.filters = Set.of(
+            this.ownEventFilter,
+            this.minorEventFilter,
+            this.systemEventFilter,
+            this.readEventFilter,
+            this.scopeFilter
+        );
+
+        DefaultNotificationFilterPreference filterPreference0 = getFilterPreference("SPACE", 0);
+        filterPreference0.setPage("mywiki@@My, Space");
+        DefaultNotificationFilterPreference filterPreference1 = getFilterPreference("SPACE", 1);
+        filterPreference1.setPage("mywiki@@Other Space");
+        expectedNotificationParameters.filterPreferences = List.of(
+            new ScopeNotificationFilterPreference(filterPreference0, this.entityReferenceResolver),
+            new ScopeNotificationFilterPreference(filterPreference1, this.entityReferenceResolver),
+            new TagNotificationFilterPreference("my tag", "mywiki"),
+            new TagNotificationFilterPreference("say \"hi\"", "mywiki")
+        );
+
+        // The values are quoted the way the macro editor writes them, except for the last space, which holds no comma.
+        assertEquals(expectedNotificationParameters, this.parametersFactory.createNotificationParameters(Map.of(
+            ParametersKey.USE_USER_PREFERENCES, "false",
+            ParametersKey.SPACES, "\"My, Space\", Other Space",
+            ParametersKey.TAGS, "\"my tag\",\"say \\\"hi\\\"\""
+        )));
+    }
+
     private DefaultNotificationFilterPreference getFilterPreference(String property, int number)
     {
         DefaultNotificationFilterPreference filterPreference = new DefaultNotificationFilterPreference();

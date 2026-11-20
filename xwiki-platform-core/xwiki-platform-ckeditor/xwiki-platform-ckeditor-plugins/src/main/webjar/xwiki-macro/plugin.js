@@ -35,6 +35,9 @@
 
   const nestedEditableTypeAttribute = 'data-xwiki-non-generated-content';
   const nestedEditableNameAttribute = 'data-xwiki-parameter-name';
+  const nestedEditablePlaceholderAttribute = 'data-xwiki-nested-editable-placeholder';
+  // The elements a nested editable can hold while it still looks empty to the user.
+  const emptyNestedEditableElements = ['p', 'br', 'span'];
 
   var getNestedEditableType = function(nestedEditable) {
     var nestedEditableType;
@@ -392,6 +395,13 @@
           if (!macroCall.name) {
             return;
           }
+          // An inline macro has no nested editable, so it gets its content upfront.
+          if (macroCall.contentIfInline !== undefined) {
+            if (macroCall.inline && macroPlugin.isInsertedInline(editor)) {
+              macroCall.content = macroCall.contentIfInline;
+            }
+            delete macroCall.contentIfInline;
+          }
 
           macroPlugin.onceAfterRefresh(editor, () => {
             editor.fire('afterCommandExec', {name: this.name, command: this});
@@ -593,6 +603,7 @@
       });
 
       this.toggleMacroPlaceholderOnDOMUpdate(editor);
+      this.initNestedEditablePlaceholders(editor);
     },
 
     // Setup the balloon tool bar for the nested editables, after the balloontoolbar plugin has been fully initialized.
@@ -945,7 +956,106 @@
           disallowedContent: nestedEditableConfig.disallowedContent,
           pathName: nestedEditableName
         });
+        this.keepEmptyNestedEditableDataEmpty(widget.editables[nestedEditableName]);
+        this.updateNestedEditablePlaceholder(editor, widget, nestedEditableName);
       }
+    },
+
+    keepEmptyNestedEditableDataEmpty: function(nestedEditable) {
+      // The editor keeps an empty line in an empty nested editable, which would be saved as a line holding a
+      // non-breaking space.
+      const getData = nestedEditable.getData;
+      const macroPlugin = this;
+      nestedEditable.getData = function(...args) {
+        return macroPlugin.isNestedEditableEmpty(this) ? '' : getData.apply(this, args);
+      };
+    },
+
+    /**
+     * Shows a placeholder text on the empty nested editables, focused or not, like the placeholder of an input. The
+     * text is taken from the {@code nestedEditablePlaceholders} configuration, which maps a macro name to a map from
+     * nested editable name to translation key. The {@code $content} nested editables of the macros missing from this
+     * configuration get a generic text.
+     *
+     * @param {CKEDITOR.editor} editor - the editor instance
+     */
+    initNestedEditablePlaceholders: function(editor) {
+      const config = editor.config['xwiki-macro'];
+      config.nestedEditablePlaceholders = Object.assign({
+        info: {$content: 'xwiki-macro.nestedEditablePlaceholder.info.$content'},
+        success: {$content: 'xwiki-macro.nestedEditablePlaceholder.success.$content'},
+        warning: {$content: 'xwiki-macro.nestedEditablePlaceholder.warning.$content'},
+        error: {$content: 'xwiki-macro.nestedEditablePlaceholder.error.$content'}
+      }, config.nestedEditablePlaceholders);
+
+      // Keep the placeholder out of the saved content and of the Source mode. The second parameter applies the filter
+      // also when the editor is read-only, which happens while it is put in loading state.
+      editor.dataProcessor?.htmlFilter?.addRules({
+        elements: {
+          $: function(element) {
+            if (element.attributes[nestedEditablePlaceholderAttribute] !== undefined) {
+              delete element.attributes[nestedEditablePlaceholderAttribute];
+              delete element.attributes['aria-placeholder'];
+            }
+          }
+        }
+      }, {applyToAll: true});
+
+      // Only the nested editable being edited can become empty or stop being empty.
+      editor.on('change', () => {
+        const widget = editor.widgets.widgetHoldingFocusedEditable;
+        if (widget?.name === 'xwiki-macro') {
+          Object.keys(widget.editables).forEach(name => this.updateNestedEditablePlaceholder(editor, widget, name));
+        }
+      });
+    },
+
+    updateNestedEditablePlaceholder: function(editor, widget, nestedEditableName) {
+      const nestedEditable = widget.editables[nestedEditableName];
+      const placeholder = this.isNestedEditableEmpty(nestedEditable) &&
+        this.getNestedEditablePlaceholder(editor, widget, nestedEditableName);
+      if (placeholder === (nestedEditable.getAttribute(nestedEditablePlaceholderAttribute) || false)) {
+        return;
+      }
+      // The placeholder is not a change of the edited content, so it must not create an entry in the Undo history.
+      editor.fire('lockSnapshot');
+      if (placeholder) {
+        nestedEditable.setAttributes({
+          [nestedEditablePlaceholderAttribute]: placeholder,
+          'aria-placeholder': placeholder
+        });
+      } else {
+        nestedEditable.removeAttributes([nestedEditablePlaceholderAttribute, 'aria-placeholder']);
+      }
+      editor.fire('unlockSnapshot');
+    },
+
+    getNestedEditablePlaceholder: function(editor, widget, nestedEditableName) {
+      const macroName = this.parseMacroCall(widget.element.getAttribute('data-macro')).name;
+      const placeholders = editor.config['xwiki-macro'].nestedEditablePlaceholders[macroName] || {};
+      let translationKey = placeholders[nestedEditableName];
+      if (!translationKey && nestedEditableName === '$content') {
+        translationKey = 'xwiki-macro.nestedEditablePlaceholder.$content';
+      }
+      return translationKey && editor.localization.get(translationKey);
+    },
+
+    isNestedEditableEmpty: function(nestedEditable) {
+      return !/\S/.test(nestedEditable.$.textContent.replace(/\u200B/g, '')) &&
+        !nestedEditable.$.querySelector(`:not(${emptyNestedEditableElements.join(', ')})`);
+    },
+
+    /**
+     * The macro inserted at the caret stays inline only if it shares its block with other content. A macro alone in a
+     * paragraph is rendered as a block.
+     *
+     * @param {CKEDITOR.editor} editor - the editor instance
+     * @return {boolean} whether the macro inserted at the caret stays inline
+     */
+    isInsertedInline: function(editor) {
+      const block = editor.elementPath()?.block;
+      return block?.getName() !== 'p' || /\S/.test(block.getText().replace(/\u200B/g, '')) ||
+        !!block.$.querySelector(':not(br)');
     },
 
     // The passed element is of type CKEDITOR.dom.element (unlike the element passed to Widget#upcast which is of type

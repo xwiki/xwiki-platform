@@ -205,7 +205,7 @@ class RecordsMacroIT extends AbstractCKEditorIT
         assertSourceContains("newEntriesLocation=\"%s\"".formatted(savedLocation));
 
         // The picked location is shown again when the dialog is reopened.
-        macroEditModal = editMacro().openTab(EDITING_TAB);
+        macroEditModal = editSelectedMacro().openTab(EDITING_TAB);
         assertEquals(savedLocation, macroEditModal.getNewEntriesLocation());
         macroEditModal.clickCancel();
 
@@ -336,6 +336,14 @@ class RecordsMacroIT extends AbstractCKEditorIT
         // The caret goes to the paragraph after the macro, from where moving left selects the macro.
         this.textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.END));
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
+        return editSelectedMacro();
+    }
+
+    /**
+     * Opens the dialog of the macro that is already selected, as it is right after its dialog was submitted.
+     */
+    private RecordsMacroEditModal editSelectedMacro()
+    {
         this.textArea.waitUntilWidgetSelected();
         this.textArea.sendKeys(Keys.ENTER);
         return new RecordsMacroEditModal(this::submitAndWaitForContentRefresh).waitUntilReady()

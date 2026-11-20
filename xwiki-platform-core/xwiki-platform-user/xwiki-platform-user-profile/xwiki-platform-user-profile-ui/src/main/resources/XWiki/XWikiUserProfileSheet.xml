@@ -734,6 +734,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     <property>
       <parameters>id=profile
 icon=user
+group=profile
 priority=10</parameters>
     </property>
     <property>

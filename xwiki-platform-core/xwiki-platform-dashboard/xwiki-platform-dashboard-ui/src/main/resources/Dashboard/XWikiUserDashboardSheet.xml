@@ -314,8 +314,9 @@
     </property>
     <property>
       <parameters>id=dashboard
-glyphicon=th
+icon=th
 isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasDashboard)true#{else}false#end
+group=activity
 priority=80</parameters>
     </property>
     <property>

@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -35,11 +34,17 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AbstractUserProfilePage extends ViewPage
 {
-    @FindBy(xpath = "//a[@href='?category=profile']")
-    private WebElement profileCategory;
+    private static final String MENU_GROUP_SELECTOR = "#user-profile-menu > .panel";
 
-    @FindBy(xpath = "//a[@href='?category=preferences']")
-    private WebElement preferencesCategory;
+    private static final String MENU_GROUP_HEADING_SELECTOR = ".panel-heading";
+
+    private static final String MENU_ITEM_SELECTOR = ".list-group-item[data-id]";
+
+    private static final String TEXT_CONTENT = "textContent";
+
+    private static final String ARIA_EXPANDED = "aria-expanded";
+
+    private static final String DATA_ID = "data-id";
 
     private final String username;
 
@@ -56,24 +61,144 @@ public class AbstractUserProfilePage extends ViewPage
     /**
      * Retrieve the list of menu categories available. Note that if a category is not displayed in the menu, then it
      * cannot be displayed at all.
-     * @return the list of menu items available.
+     * @return the list of menu items available, including the ones of the collapsed menu groups
      * @since 13.2RC1
      */
     public List<String> getAvailableCategories()
     {
-        return getDriver().findElementsWithoutWaiting(By.className("category-tab"))
-            .stream().map(WebElement::getText).collect(Collectors.toList());
+        return getDriver().findElementsWithoutWaiting(By.cssSelector("#user-profile-menu " + MENU_ITEM_SELECTOR))
+            .stream().map(AbstractUserProfilePage::getTextContent).collect(Collectors.toList());
+    }
+
+    /**
+     * @return the names of the groups displayed in the menu, in display order
+     * @since 19.0.0RC1
+     */
+    public List<String> getMenuGroups()
+    {
+        return getMenuGroupElements().stream()
+            .map(group -> getTextContent(group.findElement(By.cssSelector(MENU_GROUP_HEADING_SELECTOR))))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * @param groupName the name of a menu group
+     * @return the names of the categories of the given menu group, in display order, even when the group is collapsed
+     * @since 19.0.0RC1
+     */
+    public List<String> getCategoriesInGroup(String groupName)
+    {
+        return getMenuGroupElement(groupName).findElements(By.cssSelector(MENU_ITEM_SELECTOR)).stream()
+            .map(AbstractUserProfilePage::getTextContent).collect(Collectors.toList());
+    }
+
+    /**
+     * @return the names of the menu groups that are expanded
+     * @since 19.0.0RC1
+     */
+    public List<String> getExpandedMenuGroups()
+    {
+        return getMenuGroupElements().stream()
+            .map(group -> group.findElement(By.cssSelector(MENU_GROUP_HEADING_SELECTOR)))
+            .filter(heading -> "true".equals(heading.getDomAttribute(ARIA_EXPANDED)))
+            .map(AbstractUserProfilePage::getTextContent).collect(Collectors.toList());
+    }
+
+    /**
+     * Open a category of the user profile, expanding its menu group first when it's collapsed.
+     *
+     * @param categoryId the identifier of the category, e.g. {@code preferences}
+     * @since 19.0.0RC1
+     */
+    public void openCategory(String categoryId)
+    {
+        WebElement item = getDriver().findElement(By.id("vertical-menu-" + categoryId));
+        WebElement heading = item.findElement(By.xpath("ancestor::div[contains(@class, 'panel')][1]"))
+            .findElement(By.cssSelector(MENU_GROUP_HEADING_SELECTOR));
+        if (!"true".equals(heading.getDomAttribute(ARIA_EXPANDED))) {
+            heading.click();
+            waitForMenuGroupExpanded(item);
+        }
+        item.click();
+        WebElement pane = getDriver().findElement(By.id(categoryId + "Pane"));
+        getDriver().waitUntilCondition(driver -> pane.isDisplayed());
+    }
+
+    /**
+     * @return the name of the category currently displayed
+     * @since 19.0.0RC1
+     */
+    public String getCurrentCategory()
+    {
+        return getTextContent(getCurrentMenuItem());
+    }
+
+    /**
+     * Go back in the browser history to the previously opened category and wait for it to be displayed, with its menu
+     * group expanded.
+     *
+     * @since 19.0.0RC1
+     */
+    public void goBackToPreviousCategory()
+    {
+        String currentCategoryId = getCurrentMenuItem().getDomAttribute(DATA_ID);
+        getDriver().navigate().back();
+        getDriver().waitUntilCondition(driver -> {
+            WebElement item = getCurrentMenuItem();
+            String categoryId = item.getDomAttribute(DATA_ID);
+            return !currentCategoryId.equals(categoryId)
+                && driver.findElement(By.id(categoryId + "Pane")).isDisplayed();
+        });
+        waitForMenuGroupExpanded(getCurrentMenuItem());
     }
 
     public ProfileUserProfilePage switchToProfile()
     {
-        this.profileCategory.click();
+        openCategory("profile");
         return new ProfileUserProfilePage(getUsername());
     }
 
     public PreferencesUserProfilePage switchToPreferences()
     {
-        this.preferencesCategory.click();
+        openCategory("preferences");
         return new PreferencesUserProfilePage(getUsername());
+    }
+
+    private WebElement getCurrentMenuItem()
+    {
+        return getDriver().findElement(By.cssSelector("#user-profile-menu " + MENU_ITEM_SELECTOR + ".active"));
+    }
+
+    /**
+     * Wait until the menu group holding the given item is expanded and the collapse animations of the menu are over,
+     * since the menu ignores the clicks on its group headings during these animations.
+     */
+    private void waitForMenuGroupExpanded(WebElement item)
+    {
+        String groupBodyId = item.findElement(By.xpath("ancestor::section[contains(@class, 'panel-collapse')][1]"))
+            .getDomAttribute("id");
+        By expandedGroupBody = By.cssSelector("#" + groupBodyId + ".in");
+        By animatedGroupBody = By.cssSelector("#user-profile-menu .collapsing");
+        getDriver().waitUntilCondition(driver -> !getDriver().findElementsWithoutWaiting(expandedGroupBody).isEmpty()
+            && getDriver().findElementsWithoutWaiting(animatedGroupBody).isEmpty());
+    }
+
+    private List<WebElement> getMenuGroupElements()
+    {
+        return getDriver().findElementsWithoutWaiting(By.cssSelector(MENU_GROUP_SELECTOR));
+    }
+
+    private WebElement getMenuGroupElement(String groupName)
+    {
+        return getMenuGroupElements().stream()
+            .filter(group -> groupName.equals(getTextContent(group.findElement(By.cssSelector(
+                MENU_GROUP_HEADING_SELECTOR)))))
+            .findFirst().orElseThrow(() -> new IllegalArgumentException("No menu group named " + groupName));
+    }
+
+    private static String getTextContent(WebElement element)
+    {
+        // Use the text content because the items of the collapsed groups are hidden, so their visible text is empty.
+        return element.getDomProperty(TEXT_CONTENT).trim();
     }
 }

@@ -19,6 +19,7 @@
  */
 import { DefinitionListItemBlock } from "./definitionListItemBlockSpec";
 import { XWikiGroupBlock } from "./groupBlockSpec";
+import { XWIKI_METADATA_KEYS } from "./metadataKeys";
 import { XWikiRawBlock } from "./rawBlockSpec";
 import { VerbatimStyle, XWikiParametersStyle } from "./xwikiStyleSpecs";
 import type { EditorFeature, FeatureContribution } from "../editorFeature";
@@ -26,9 +27,10 @@ import type { EditorFeature, FeatureContribution } from "../editorFeature";
 /**
  * The block types and text styles that the XWiki rendering produces when converting content to BlockNote's format
  * (definition list items, groups, raw content, verbatim text and the XWiki parameters kept on the text), so that the
- * editor can load such content. None of them can be inserted from the editor UI. The syntax configuration has no
- * capability for them, so the feature always contributes them; the integrations whose content comes from the XWiki
- * rendering bind it (it isn't bound by the `ComponentInit` of this package).
+ * editor can load such content, and the metadata entries it keeps in the content (see `XWIKI_METADATA_KEYS`). None of
+ * them can be inserted from the editor UI. The syntax configuration has no capability for them, so the feature always
+ * contributes them; the integrations whose content comes from the XWiki rendering bind it (it isn't bound by the
+ * `ComponentInit` of this package).
  *
  * @since 18.10.0RC1
  * @beta
@@ -48,6 +50,7 @@ const xwikiRenderingFeature: EditorFeature = {
           xwikiParameters: XWikiParametersStyle,
         },
       },
+      metadataKeys: [...XWIKI_METADATA_KEYS],
     };
   },
 };

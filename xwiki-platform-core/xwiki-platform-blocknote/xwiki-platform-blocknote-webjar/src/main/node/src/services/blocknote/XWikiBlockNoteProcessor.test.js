@@ -19,8 +19,12 @@
  */
 import { DefaultBlockNoteIterator } from "./DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./XWikiBlockNoteProcessor";
-import { extractLinkId } from "./linkId";
-import { getMacroOutput } from "@xwiki/platform-editors-blocknote-react";
+import {
+  getLinkMetadata,
+  getMacroOutput,
+  parseMetadata,
+  stripLinkMetadata,
+} from "@xwiki/platform-editors-blocknote-react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 describe("XWikiBlockNoteProcessor", () => {
@@ -55,7 +59,7 @@ describe("XWikiBlockNoteProcessor", () => {
   }
 
   describe("load", () => {
-    it("backs up the link metadata and binds it to a synthetic id in the href", () => {
+    it("moves the link metadata to the link URL", () => {
       const reference = {
         type: "doc",
         typed: true,
@@ -75,11 +79,8 @@ describe("XWikiBlockNoteProcessor", () => {
       const link = firstLink(document.content);
       // The BlockNote link schema has no props: they must be removed.
       expect(link.props).toBeUndefined();
-      // A synthetic id is injected in the href.
-      const id = extractLinkId(link.href);
-      expect(id).toBeTruthy();
-      // The metadata is backed up, mapped to that synthetic id.
-      expect(document.metadata.get(id)).toEqual({
+      expect(stripLinkMetadata(link.href)).toBe("/xwiki/bin/view/Space/Page");
+      expect(getLinkMetadata(link.href)).toEqual({
         xwikiReference: reference,
         xwikiParameters: { class: "myclass" },
         xwikiFreestanding: true,
@@ -95,12 +96,35 @@ describe("XWikiBlockNoteProcessor", () => {
       ]);
     });
 
-    it("does not inject a synthetic id when the link has no metadata", () => {
+    it("leaves the URL of a link without metadata untouched", () => {
       const document = processor.load(JSON.stringify(documentWithLink({})));
       const link = firstLink(document.content);
       expect(link.props).toBeUndefined();
-      expect(extractLinkId(link.href)).toBeUndefined();
       expect(link.href).toBe("/xwiki/bin/view/Space/Page");
+    });
+
+    it("moves the block metadata to the metadata property of the block", () => {
+      const document = processor.load(
+        JSON.stringify([
+          {
+            id: "p1",
+            type: "paragraph",
+            props: {
+              textAlignment: "center",
+              xwikiParameters: { class: "box" },
+            },
+            content: "text",
+            children: [],
+          },
+        ]),
+      );
+
+      const { props } = document.content[0];
+      expect(props.textAlignment).toBe("center");
+      expect(props).not.toHaveProperty("xwikiParameters");
+      expect(parseMetadata(props.metadata)).toEqual({
+        xwikiParameters: { class: "box" },
+      });
     });
   });
 
@@ -143,6 +167,33 @@ describe("XWikiBlockNoteProcessor", () => {
       const link = firstLink(saved);
       expect(link.props).toEqual(linkProps);
       expect(link.href).toBe("/xwiki/bin/view/Space/Page");
+    });
+
+    it("restores the block metadata, and drops the empty metadata property", () => {
+      const document = processor.load(
+        JSON.stringify([
+          {
+            id: "p1",
+            type: "paragraph",
+            props: { xwikiParameters: { class: "box" } },
+            content: "text",
+            children: [],
+          },
+          {
+            id: "p2",
+            type: "paragraph",
+            props: {},
+            content: "text",
+            children: [],
+          },
+        ]),
+      );
+      // The editor gives the default value to the metadata property of the blocks without metadata.
+      document.content[1].props.metadata = "";
+
+      const saved = JSON.parse(processor.save(document));
+      expect(saved[0].props).toEqual({ xwikiParameters: { class: "box" } });
+      expect(saved[1].props).toEqual({});
     });
 
     it("leaves a link without metadata unchanged", () => {
@@ -346,6 +397,8 @@ describe("XWikiBlockNoteProcessor", () => {
     it("restores the call object of a block macro on save round-trip, without the output", () => {
       const macro = blockMacro();
       const document = processor.load(JSON.stringify([macro]));
+      // The editor gives the default value to the metadata property of the macro blocks.
+      document.content[0].props.metadata = "";
       const saved = JSON.parse(processor.save(document));
       expect(saved[0].props).toEqual({ call: macro.props.call });
     });
@@ -381,7 +434,7 @@ describe("XWikiBlockNoteProcessor", () => {
       };
     }
 
-    it("backs up the verbatim and new line flags on load and restores them on save", () => {
+    it("moves the verbatim and new line flags to the block metadata on load and restores them on save", () => {
       const props = {
         language: "java",
         xwikiLeadingNewLine: false,
@@ -390,7 +443,13 @@ describe("XWikiBlockNoteProcessor", () => {
       };
       const document = processor.load(JSON.stringify([codeBlock(props)]));
       // The BlockNote code block schema doesn't support these props.
-      expect(document.content[0].props).toEqual({ language: "java" });
+      const { metadata, ...loaded } = document.content[0].props;
+      expect(loaded).toEqual({ language: "java" });
+      expect(parseMetadata(metadata)).toEqual({
+        xwikiLeadingNewLine: false,
+        xwikiTrailingNewLine: false,
+        xwikiVerbatim: true,
+      });
 
       const saved = JSON.parse(processor.save(document));
       expect(saved[0].props).toEqual(props);

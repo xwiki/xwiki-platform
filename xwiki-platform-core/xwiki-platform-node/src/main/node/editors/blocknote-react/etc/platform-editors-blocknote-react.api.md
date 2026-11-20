@@ -30,7 +30,6 @@ import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
 import { MacroBlockInvocation as MacroBlockInvocation_2 } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
-import { Map as Map_2 } from 'yjs';
 import { PartialLink } from '@blocknote/core';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -48,14 +47,11 @@ export type BlockMetadata = Record<string, unknown>;
 // @beta
 export type BlockMetadataKey = {
     name: string;
-    shared?: boolean;
+    filterPasted?: (value: unknown, context: PastedMetadataContext) => unknown;
 };
 
 // @beta
 export interface BlockMetadataStore {
-    connect(sharedMetadata: SharedBlockMetadata, options: {
-        initialize: boolean;
-    }): () => void;
     get(id: string): Readonly<BlockMetadata> | undefined;
     set(id: string, key: BlockMetadataKey, value: unknown): void;
 }
@@ -198,6 +194,7 @@ export type FeatureContribution = {
     schema?: SchemaContribution;
     blockNoteExtensions?: ExtensionFactoryInstance[];
     blockNoteOptions?: ContributedBlockNoteOptions;
+    metadataKeys?: BlockMetadataKey[];
     slashMenuItems?: () => SlashMenuItem[];
     formattingToolbar?: FormattingToolbarContribution;
     components?: ReactNode;
@@ -229,6 +226,12 @@ export type FormattingToolbarContribution = {
     blockTypeSelectItems?: BlockTypeSelectItem[];
     blockToolbars?: Record<string, (block: BlockType) => ReactNode>;
 };
+
+// @beta
+export function getBlockMetadata(block: Pick<BlockType, "props">): BlockMetadata;
+
+// @beta
+export function getLinkMetadata(href: string): BlockMetadata;
 
 // @beta
 export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
@@ -274,6 +277,9 @@ export type InlineMacroInvocation = Omit<InlineMacroInvocation_2, "body"> & {
         type: "none";
     };
 };
+
+// @beta
+export const LINK_METADATA_PARAM = "__xwikiMetadata";
 
 // @beta
 export type LinkEditionData = {
@@ -356,8 +362,19 @@ export type MacroInsertionEditorPrefillData = {
 export const macrosFeature: EditorFeature;
 
 // @beta
+export const METADATA_PROP = "metadata";
+
+// @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
+};
+
+// @beta
+export function parseMetadata(value: unknown): BlockMetadata;
+
+// @beta
+export type PastedMetadataContext = {
+    url?: string;
 };
 
 // @beta
@@ -368,15 +385,24 @@ export type SchemaContribution = {
 };
 
 // @beta
-export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
+export function setBlockMetadata(editor: EditorType, block: BlockType | string, key: BlockMetadataKey, value: unknown): void;
 
 // @beta
-export type SharedBlockMetadata = Map_2<Map_2<unknown>>;
+export function setLinkMetadata(href: string, metadata: BlockMetadata): string;
+
+// @beta
+export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
 
 // @beta
 export type SlashMenuItem = DefaultReactSuggestionItem & {
     key?: string;
 };
+
+// @beta
+export function stringifyMetadata(metadata: BlockMetadata): string;
+
+// @beta
+export function stripLinkMetadata(href: string): string;
 
 // @beta
 export const textStylesFeature: EditorFeature;
@@ -390,6 +416,30 @@ export type UploadedFile = {
 
 // @beta
 export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
+
+// @beta
+export const XWIKI_FREESTANDING: BlockMetadataKey;
+
+// @beta
+export const XWIKI_GENERATED_LABEL: BlockMetadataKey;
+
+// @beta
+export const XWIKI_LEADING_NEW_LINE: BlockMetadataKey;
+
+// @beta
+export const XWIKI_METADATA_KEYS: readonly BlockMetadataKey[];
+
+// @beta
+export const XWIKI_PARAMETERS: BlockMetadataKey;
+
+// @beta
+export const XWIKI_REFERENCE: BlockMetadataKey;
+
+// @beta
+export const XWIKI_TRAILING_NEW_LINE: BlockMetadataKey;
+
+// @beta
+export const XWIKI_VERBATIM: BlockMetadataKey;
 
 // @beta
 export const xwikiRenderingFeature: EditorFeature;

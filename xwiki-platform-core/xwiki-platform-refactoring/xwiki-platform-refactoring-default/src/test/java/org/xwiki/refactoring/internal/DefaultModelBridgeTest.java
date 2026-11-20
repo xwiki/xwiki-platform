@@ -363,33 +363,23 @@ class DefaultModelBridgeTest
         DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
 
-        XWikiDocument oldDocument = mock(XWikiDocument.class);
-        when(oldDocument.clone()).thenReturn(oldDocument);
-        when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
-        BaseObject baseObjectMock2 = mock(BaseObject.class);
-        when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .thenReturn(baseObjectMock2);
-        DocumentAuthors documentAuthorsMock = mock();
-        when(oldDocument.getAuthors()).thenReturn(documentAuthorsMock);
-        when(oldDocument.isNew()).thenReturn(false);
-
-        UserReference userReference = mock();
-        when(this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
-            .thenReturn(userReference);
+        // A document was created at the old location since the document was moved.
+        XWikiDocument oldDocument = mockRedirectDocument();
+        when(this.xwiki.getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
 
         this.modelBridge.createRedirect(oldReference, newReference);
 
-        verify(oldDocument.getAuthors(), never()).setCreator(userReference);
-        verify(oldDocument.getAuthors(), never()).setContentAuthor(userReference);
-        verify(oldDocument.getAuthors(), never()).setEffectiveMetadataAuthor(userReference);
-        verify(oldDocument.getAuthors()).setOriginalMetadataAuthor(userReference);
-        verify(oldDocument).setHidden(true);
-        verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", false, this.xcontext);
-        assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+        // It isn't turned into a redirect.
+        verify(oldDocument, never()).newXObject(any(EntityReference.class), any());
+        verify(oldDocument, never()).setHidden(anyBoolean());
+        verify(this.xwiki, never()).saveDocument(any(), any(), anyBoolean(), any());
+        assertLog(Level.WARN,
+            "No automatic redirect from [{}] to [{}]: a document was created at [{}] since it was moved or deleted.",
+            oldReference, newReference, oldReference);
     }
 
     @Test
-    void createRedirectAfterConcurrentSave() throws Exception
+    void createRedirectOnDocumentCreatedConcurrently() throws Exception
     {
         DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
@@ -399,18 +389,21 @@ class DefaultModelBridgeTest
         when(serializer.serialize(newReference)).thenReturn("wiki:Space.New");
 
         XWikiDocument staleDocument = mockRedirectDocument();
+        when(staleDocument.isNew()).thenReturn(true);
+        // Another user creates a document at the old location while the redirect is saved.
         XWikiDocument latestDocument = mockRedirectDocument();
         when(this.xwiki.getDocument(oldReference, this.xcontext)).thenReturn(staleDocument, latestDocument);
-        doThrow(new DocumentRevisionConflictException(oldReference, "1.1", "2.1")).when(this.xwiki)
+        doThrow(new DocumentRevisionConflictException(oldReference, null, "1.1")).when(this.xwiki)
             .saveDocument(staleDocument, "Create automatic redirect.", false, this.xcontext);
 
         this.modelBridge.createRedirect(oldReference, newReference);
 
-        verify(latestDocument).setHidden(true);
-        verify(latestDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .setStringValue("location", "wiki:Space.New");
-        verify(this.xwiki).saveDocument(latestDocument, "Create automatic redirect.", false, this.xcontext);
-        assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+        // The created document isn't turned into a redirect.
+        verify(latestDocument, never()).setHidden(anyBoolean());
+        verify(this.xwiki, never()).saveDocument(latestDocument, "Create automatic redirect.", false, this.xcontext);
+        assertLog(Level.WARN,
+            "No automatic redirect from [{}] to [{}]: a document was created at [{}] since it was moved or deleted.",
+            oldReference, newReference, oldReference);
     }
 
     private XWikiDocument mockRedirectDocument() throws XWikiException
@@ -561,9 +554,32 @@ class DefaultModelBridgeTest
         verify(this.xwiki, never()).saveDocument(child2Document, "Updated parent field.", true, this.xcontext);
         verify(child3Document).setParentReference(newParentReference);
         verify(this.xwiki).saveDocument(child3Document, "Updated parent field.", true, this.xcontext);
-        assertLog(Level.ERROR, "Failed to update the parent field of [{}] from [{}] to [{}].", child1Reference,
+        assertLog(0, Level.ERROR, "Failed to update the parent field of [{}] from [{}] to [{}].", child1Reference,
             oldParentReference, newParentReference);
+        // Only the saved documents are counted.
+        assertLog(1, Level.INFO, "Document parent fields updated from [{}] to [{}] for [{}] documents.",
+            oldParentReference, newParentReference, 1);
         verify(this.progressManager).popLevelProgress(this.modelBridge);
+    }
+
+    @Test
+    void updateParentFieldsFromReferenceWithLocale() throws Exception
+    {
+        DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
+        DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
+        DocumentReference childReference = new DocumentReference("wiki", "Space", "Child");
+        DocumentReference oldParentReferenceWithLocale = new DocumentReference(oldParentReference, Locale.ROOT);
+        mockChildren(oldParentReferenceWithLocale, childReference);
+        XWikiDocument childDocument = mockChild(oldParentReference);
+        when(this.xwiki.getDocument(childReference, this.xcontext)).thenReturn(childDocument);
+
+        assertTrue(this.modelBridge.updateParentField(oldParentReferenceWithLocale, newParentReference));
+
+        // The parent field, which has no locale, matches the parent reference with a locale.
+        verify(childDocument).setParentReference(newParentReference);
+        verify(this.xwiki).saveDocument(childDocument, "Updated parent field.", true, this.xcontext);
+        assertLog(Level.INFO, "Document parent fields updated from [{}] to [{}] for [{}] documents.",
+            oldParentReferenceWithLocale, newParentReference, 1);
     }
 
     private void mockChildren(DocumentReference parentReference, DocumentReference... childReferences)

@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -255,16 +257,22 @@ public class DefaultModelBridge implements ModelBridge
         UserReference currentUser =
             this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE);
         String location = this.defaultEntityReferenceSerializer.serialize(newReference);
+        AtomicBoolean created = new AtomicBoolean();
         try {
             // Update the latest version of the document, so that a concurrent save isn't lost (and doesn't make the
             // redirect fail).
             xcontext.getWiki().updateDocument(oldReference, oldDocument -> {
-                // Configure the document authors
-                if (oldDocument.isNew()) {
-                    oldDocument.getAuthors().setCreator(currentUser);
-                    oldDocument.getAuthors().setContentAuthor(currentUser);
-                    oldDocument.getAuthors().setEffectiveMetadataAuthor(currentUser);
+                // The old document was moved or deleted: a document existing at its location was created since then,
+                // e.g. by another user, and turning it into a redirect would hide it.
+                created.set(oldDocument.isNew());
+                if (!created.get()) {
+                    return false;
                 }
+
+                // Configure the document authors
+                oldDocument.getAuthors().setCreator(currentUser);
+                oldDocument.getAuthors().setContentAuthor(currentUser);
+                oldDocument.getAuthors().setEffectiveMetadataAuthor(currentUser);
                 oldDocument.getAuthors().setOriginalMetadataAuthor(currentUser);
 
                 // Add the redirect object
@@ -277,7 +285,12 @@ public class DefaultModelBridge implements ModelBridge
 
                 return true;
             }, "Create automatic redirect.", false, xcontext);
-            this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+            if (created.get()) {
+                this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+            } else {
+                this.logger.warn("No automatic redirect from [{}] to [{}]: a document was created at [{}] since it was"
+                    + " moved or deleted.", oldReference, newReference, oldReference);
+            }
         } catch (XWikiException e) {
             this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference, e);
         }
@@ -376,47 +389,60 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         boolean success = true;
+        int updatedCount = 0;
         this.progressManager.pushLevelProgress(childReferences.size(), this);
         try {
             for (DocumentReference childReference : childReferences) {
                 this.progressManager.startStep(this);
                 // Each child is updated independently so that a child that fails to be updated doesn't prevent the
                 // update of the other children.
-                success &= updateParentField(childReference, oldParentReference, newParentReference, wiki, context);
+                ParentFieldUpdate update =
+                    updateParentField(childReference, oldParentReference, newParentReference, wiki, context);
+                success &= update != ParentFieldUpdate.FAILED;
+                if (update == ParentFieldUpdate.UPDATED) {
+                    updatedCount++;
+                }
                 this.progressManager.endStep(this);
             }
         } finally {
             this.progressManager.popLevelProgress(this);
         }
 
-        if (success) {
-            this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.",
-                oldParentReference, newParentReference, childReferences.size());
-        }
+        this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.", oldParentReference,
+            newParentReference, updatedCount);
 
         return success;
     }
 
-    private boolean updateParentField(DocumentReference childReference, DocumentReference oldParentReference,
-        DocumentReference newParentReference, XWiki wiki, XWikiContext context)
+    private enum ParentFieldUpdate
     {
+        UPDATED,
+        SKIPPED,
+        FAILED
+    }
+
+    private ParentFieldUpdate updateParentField(DocumentReference childReference,
+        DocumentReference oldParentReference, DocumentReference newParentReference, XWiki wiki, XWikiContext context)
+    {
+        // The parent field doesn't hold a locale.
+        DocumentReference oldParent = new DocumentReference(oldParentReference, (Locale) null);
+        AtomicBoolean updated = new AtomicBoolean();
         try {
             // Update the latest version of the child so that a concurrent save isn't lost. The child is left
             // unchanged if it was deleted or if its parent was changed in the meantime.
             wiki.updateDocument(childReference, childDocument -> {
-                if (childDocument.isNew() || !oldParentReference.equals(childDocument.getParentReference())) {
-                    return false;
+                updated.set(!childDocument.isNew() && oldParent.equals(childDocument.getParentReference()));
+                if (updated.get()) {
+                    childDocument.setParentReference(newParentReference);
                 }
-
-                childDocument.setParentReference(newParentReference);
-                return true;
+                return updated.get();
             }, "Updated parent field.", true, context);
 
-            return true;
+            return updated.get() ? ParentFieldUpdate.UPDATED : ParentFieldUpdate.SKIPPED;
         } catch (Exception e) {
             this.logger.error("Failed to update the parent field of [{}] from [{}] to [{}].", childReference,
                 oldParentReference, newParentReference, e);
-            return false;
+            return ParentFieldUpdate.FAILED;
         }
     }
 

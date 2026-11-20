@@ -42,7 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         // XWiki.SuggestSolrMacros, which requires programming right. These pages are authored by a user that has
         // programming right in a normal wiki, but the test wiki blocks programming right by default, so we need to
         // explicitly exclude them.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)",
+
+        // Registering a user copies its notification filter preferences, stored through a Hibernate mapping that
+        // has to be added to hibernate.cfg.xml.
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
@@ -54,7 +58,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         "org.xwiki.platform:xwiki-platform-extension-index",
 
         // Solr search is used to get suggestions for the link and image quick actions.
-        "org.xwiki.platform:xwiki-platform-search-solr-query"
+        "org.xwiki.platform:xwiki-platform-search-solr-query",
+
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an extension, so it
+        // has to be in WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+
+        // Saving a mention records an event, whose converter delegates to the default RecordableEventConverter. It
+        // has to load from the same class loader as the untyped event it instantiates, whose constructor is
+        // package-private and which comes from xwiki-platform-eventstream-api, in WEB-INF/lib.
+        "org.xwiki.platform:xwiki-platform-eventstream-default",
+
+        // Creating the subwiki of MentionIT runs the wiki creation job, which SubWikiIT gets from the main wiki UI
+        // XAR that we don't install here.
+        "org.xwiki.platform:xwiki-platform-wiki-creationjob",
+
+        // The base configuration of the editor reads the user scope of the wiki from $services.wiki.user, and a
+        // template is evaluated outside of any extension namespace, so that script service has to be core.
+        "org.xwiki.platform:xwiki-platform-wiki-script",
+        "org.xwiki.platform:xwiki-platform-wiki-user-default",
+        "org.xwiki.platform:xwiki-platform-wiki-user-script"
     },
     servletEngineNetworkAliases = AbstractBlockNoteIT.XWIKI_ALIAS
 )

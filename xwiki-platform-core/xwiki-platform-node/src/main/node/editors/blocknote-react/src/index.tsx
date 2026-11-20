@@ -121,6 +121,8 @@ export { linksFeature } from "./features/links/links";
 
 export { macrosFeature } from "./features/macros/macros";
 
+export { mentionsFeature } from "./features/mentions/mentions";
+
 export { textStylesFeature } from "./features/textStyles/textStyles";
 export { xwikiRenderingFeature } from "./features/xwikiRendering/xwikiRendering";
 
@@ -153,6 +155,15 @@ export {
   extractMacroRawContent,
 } from "./features/macros/utils";
 
+export { mentionInserterName, userSuggesterName } from "./services/mentions";
+
+export type {
+  MentionInserter,
+  MentionInsertionContext,
+  MentionableUser,
+  UserSuggester,
+} from "./services/mentions";
+
 export { macroEditorName } from "./services/macroEditor";
 
 export type {
@@ -163,7 +174,9 @@ export type {
   MacroInsertionEditorPrefillData,
 } from "./services/macroEditor";
 
-export type { MacroCall } from "./features/macros/utils";
+export { insertMacroInvocation } from "./misc/macroInvocation";
+
+export type { MacroCall } from "./misc/macroInvocation";
 
 export { linkEditorName, linkMetadataHandlerName } from "./services/linkEditor";
 

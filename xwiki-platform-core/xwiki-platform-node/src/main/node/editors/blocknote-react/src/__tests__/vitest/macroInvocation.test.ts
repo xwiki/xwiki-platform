@@ -21,7 +21,7 @@ import {
   insertMacroInvocation,
   invocationToMacroCall,
   macroCallToInvocation,
-} from "../../features/macros/utils";
+} from "../../misc/macroInvocation";
 import { describe, expect, test, vi } from "vitest";
 import type {
   InlineMacroInvocation,

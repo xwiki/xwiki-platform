@@ -30,8 +30,19 @@
 ## handled at the same time. The save is refused when another request saved the document after we loaded it, so we load
 ## the document again and apply the change again.
 #set ($saved = false)
+#set ($saveException = $NULL)
 #foreach ($attempt in [1..5])
-  #set ($document = $xwiki.getDocument($doc.documentReference))
+  #if ($attempt == 1)
+    #set ($document = $doc)
+  #else
+    ## Load the document saved concurrently. Don't save it if it couldn't be loaded (no view right, or a store error
+    ## that gives an empty new document), because saving it would replace the stored document.
+    #set ($document = $xwiki.getDocument($doc.documentReference))
+    #if ($objecttool.isNull($document) || ($document.isNew() && !$doc.isNew()))
+      #set ($saveException = $NULL)
+      #break
+    #end
+  #end
   ## found allow or deny for the user or group
   #set ($founda = false)
   #set ($foundd = false)
@@ -156,6 +167,14 @@
 #if ($saved)
 SUCCESS
 #else
-  $response.sendError(500, $exceptiontool.getRootCauseMessage($saveException))
+  ## Log the cause instead of sending it to the client.
+  #if ("$!saveException" != '')
+    #set ($discard = $services.logging.getLogger('saverights.vm').warn('Failed to save [{}]',
+      $doc.documentReference, $saveException))
+  #else
+    #set ($discard = $services.logging.getLogger('saverights.vm').warn(
+      'Failed to save [{}]: it could not be loaded again after a concurrent save', $doc.documentReference))
+  #end
+  $response.sendError(500, 'Failed to save the document.')
 #end
 #end

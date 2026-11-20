@@ -38,62 +38,82 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro (createAttachment $fileName)
-  #set ($documentReference = $doc.documentReference)
+  #set ($document = $doc)
   #if ("$!request.document" != '')
-    #set ($documentReference = $services.model.resolveDocument($request.document))
+    #set ($document = $xwiki.getDocument($request.document))
   #end
-  ## FIXME: Get the file content as an input stream instead of a byte array, but for this we need to expose
-  ## getFileItemInputStream in the public API of the fileupload plugin (or use a script service).
-  #set ($bytes = $xwiki.fileupload.getFileItemData('upload'))
-  #if (!$bytes)
-    ## Empty file (unfortunately getFileItemData returns null instead of an empty byte array).
-    #set ($bytes = [])
-  #end
-  ## Another request can save the document after we load it, e.g. when two users editing the document together upload
-  ## files at the same time. The save is then refused, so we load the document again and add the attachment again.
-  #set ($uploaded = false)
-  #set ($forbidden = false)
-  #foreach ($attempt in [1..5])
-    #set ($document = $xwiki.getDocument($documentReference))
-    #if (!$document || !$document.hasAccessLevel('edit'))
-      #set ($forbidden = true)
-      #break
+  #if ($document &amp;&amp; $document.hasAccessLevel('edit'))
+    ## FIXME: Get the file content as an input stream instead of a byte array, but for this we need to expose
+    ## getFileItemInputStream in the public API of the fileupload plugin (or use a script service).
+    #set ($bytes = $xwiki.fileupload.getFileItemData('upload'))
+    #if (!$bytes)
+      ## Empty file (unfortunately getFileItemData returns null instead of an empty byte array).
+      #set ($bytes = [])
     #end
-    ## If the attachment is uploaded to a new document then make sure we create the document with the right default
-    ## locale. See CKEDITOR-316: Document translations are created when uploading a file from the WYSIWYG editor in a
-    ## multi-language wiki. The following code replicates the behavior of the Upload action, but it has the desired
-    ## effect only on XWiki 11.9+
-    #if ($document.isNew())
-      #set ($rootLocale = $services.localization.toLocale(''))
-      #set ($discard = $document.setLocale($rootLocale))
-      #if ($rootLocale.equals($document.getDefaultLocale()))
-        #set ($discard = $document.setDefaultLocale($xwiki.getLocalePreference()))
-      #end
-      ## We also need to make sure the new document is created with the right syntax (e.g. the one coming from the
-      ## template used to create the document rather than the default wiki syntax).
-      #if ("$!request.syntax" != '')
-        #set ($discard = $document.setSyntaxId($request.syntax))
-      #end
-    #end
-    #set ($discard = $document.addAttachment($fileName, $bytes))
+    ## Another request can save the document after we load it, e.g. when two users editing the document together
+    ## upload files at the same time. The save is then refused, so we load the document again and add the attachment
+    ## again.
+    #set ($documentReference = $document.documentReference)
+    #set ($initiallyNew = $document.isNew())
+    #set ($uploaded = false)
     #set ($saveException = $NULL)
-    #set ($comment = $services.localization.render('core.comment.uploadAttachmentComment', [$fileName]))
-    #try('saveException')
-      #set ($discard = $document.save($comment))
+    #foreach ($attempt in [1..5])
+      #if ($attempt &gt; 1)
+        ## Load the document saved concurrently. Don't save it if it couldn't be loaded (no view right, or a store
+        ## error that gives an empty new document), because saving it would replace the stored document.
+        #set ($document = $xwiki.getDocument($documentReference))
+        #set ($loaded = !$objecttool.isNull($document) &amp;&amp; (!$document.isNew() || $initiallyNew))
+        #if (!$loaded || !$document.hasAccessLevel('edit'))
+          #set ($saveException = $NULL)
+          #break
+        #end
+      #end
+      ## If the attachment is uploaded to a new document then make sure we create the document with the right
+      ## default locale. See CKEDITOR-316: Document translations are created when uploading a file from the WYSIWYG
+      ## editor in a multi-language wiki. The following code replicates the behavior of the Upload action, but it has
+      ## the desired effect only on XWiki 11.9+
+      #if ($document.isNew())
+        #set ($rootLocale = $services.localization.toLocale(''))
+        #set ($discard = $document.setLocale($rootLocale))
+        #if ($rootLocale.equals($document.getDefaultLocale()))
+          #set ($discard = $document.setDefaultLocale($xwiki.getLocalePreference()))
+        #end
+        ## We also need to make sure the new document is created with the right syntax (e.g. the one coming from
+        ## the template used to create the document rather than the default wiki syntax).
+        #if ("$!request.syntax" != '')
+          #set ($discard = $document.setSyntaxId($request.syntax))
+        #end
+      #end
+      #set ($discard = $document.addAttachment($fileName, $bytes))
+      #set ($saveException = $NULL)
+      #set ($comment = $services.localization.render('core.comment.uploadAttachmentComment', [$fileName]))
+      #try('saveException')
+        #set ($discard = $document.save($comment))
+      #end
+      #if ("$!saveException" == '')
+        #set ($uploaded = true)
+        #break
+      #elseif (!$services.merge.isDocumentRevisionConflict($saveException))
+        #break
+      #end
     #end
-    #if ("$!saveException" == '')
-      #set ($uploaded = true)
-      #break
-    #elseif (!$services.merge.isDocumentRevisionConflict($saveException))
-      #break
+    #if ($uploaded)
+      #sendSuccess($document $document.getAttachment($fileName))
+    #else
+      ## Log the cause instead of sending it to the client.
+      #if ("$!saveException" != '')
+        #set ($discard = $services.logging.getLogger('XWiki.WYSIWYG.FileUploader').warn(
+          'Failed to upload [{}] to [{}]', $fileName, $documentReference, $saveException))
+      #else
+        #set ($discard = $services.logging.getLogger('XWiki.WYSIWYG.FileUploader').warn(
+          'Failed to upload [{}] to [{}]: it could not be loaded again after a concurrent save', $fileName,
+          $documentReference))
+      #end
+      #sendError(500 'Failed to save the document.')
     #end
-  #end
-  #if ($uploaded)
-    #sendSuccess($document $document.getAttachment($fileName))
-  #elseif ($forbidden)
-    #sendError(403 'You are not allowed to perform this action.')
   #else
-    #sendError(500 $exceptiontool.getRootCauseMessage($saveException))
+    ## Forbidden
+    #sendError(403 'You are not allowed to perform this action.')
   #end
 #end
 

@@ -26,25 +26,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.store.merge.MergeScriptService;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.page.PageTest;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -53,8 +59,12 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -77,6 +87,9 @@ class SaverightsPageTest extends PageTest
     private static final DocumentReference PREFERENCES_REFERENCE =
         new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
 
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @Mock
     private CSRFTokenScriptService csrfScriptService;
 
@@ -89,6 +102,8 @@ class SaverightsPageTest extends PageTest
         this.componentManager.registerComponent(ScriptService.class, "csrf", this.csrfScriptService);
         this.componentManager.registerMockComponent(MergeManager.class);
         this.componentManager.registerMockComponent(MergeConflictDecisionsManager.class);
+        StoreConfiguration storeConfiguration = this.componentManager.registerMockComponent(StoreConfiguration.class);
+        when(storeConfiguration.isRevisionCheckEnabled()).thenReturn(true);
         when(this.csrfScriptService.isTokenValid(any())).thenReturn(true);
 
         when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
@@ -184,5 +199,74 @@ class SaverightsPageTest extends PageTest
 
         assertFalse(this.templateManager.render(TEMPLATE_NAME).contains("SUCCESS"));
         assertEquals(List.of("XWiki.Alice:view"), getStoredRules());
+    }
+
+    @Test
+    void saveRightWhenAlwaysSavedConcurrently() throws Exception
+    {
+        this.context.setDoc(this.xwiki.getDocument(PREFERENCES_REFERENCE, this.context));
+        doThrow(new DocumentRevisionConflictException(PREFERENCES_REFERENCE, "1.1", "2.1")).when(this.xwiki)
+            .saveDocument(argThat(document -> PREFERENCES_REFERENCE.equals(document.getDocumentReference())),
+                anyString(), anyBoolean(), anyBoolean(), any(XWikiContext.class));
+        XWikiServletResponseStub response = spy(this.response);
+        this.context.setResponse(response);
+        clearInvocations(this.xwiki);
+
+        this.request.put("fullname", "XWiki.Bob");
+        this.request.put("right", "edit");
+        this.request.put("action", "allow");
+
+        assertFalse(this.templateManager.render(TEMPLATE_NAME).contains("SUCCESS"));
+
+        // The request is applied 5 times, then the failure is reported without its details.
+        verify(this.xwiki, times(5)).saveDocument(
+            argThat(document -> PREFERENCES_REFERENCE.equals(document.getDocumentReference())), anyString(),
+            anyBoolean(), anyBoolean(), any(XWikiContext.class));
+        verify(response).sendError(500, "Failed to save the document.");
+        assertEquals(List.of("XWiki.Alice:view"), getStoredRules());
+    }
+
+    @Test
+    void saveRightWhenReloadFails() throws Exception
+    {
+        this.context.setDoc(this.xwiki.getDocument(PREFERENCES_REFERENCE, this.context));
+        saveConcurrently(preferences -> addRule(preferences, "XWiki.Bob", "view"));
+        // Loading the preferences again after the conflicting save fails, which gives an empty new document to the script.
+        AtomicBoolean failLoading = new AtomicBoolean();
+        doAnswer(invocation -> {
+            if (failLoading.get()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Failed to load");
+            }
+            return invocation.callRealMethod();
+        }).when(this.xwiki).getDocument(eq(PREFERENCES_REFERENCE), any(XWikiContext.class));
+        doAnswer(invocation -> {
+            try {
+                return invocation.callRealMethod();
+            } finally {
+                failLoading.set(true);
+            }
+        }).when(this.xwiki).saveDocument(argThat(document -> PREFERENCES_REFERENCE.equals(document.getDocumentReference())),
+            anyString(), anyBoolean(), anyBoolean(), any(XWikiContext.class));
+        XWikiServletResponseStub response = spy(this.response);
+        this.context.setResponse(response);
+
+        this.request.put("fullname", "XWiki.Carol");
+        this.request.put("right", "edit");
+        this.request.put("action", "allow");
+        clearInvocations(this.xwiki);
+
+        String output = this.templateManager.render(TEMPLATE_NAME);
+        failLoading.set(false);
+        assertEquals("Failed to access document [xwiki:XWiki.XWikiPreferences]. Root reason: [XWikiException: Error number 3202 in 3:"
+            + " Failed to load]", this.logCapture.getMessage(0));
+
+        assertFalse(output.contains("SUCCESS"));
+        verify(response).sendError(500, "Failed to save the document.");
+        // The empty document isn't saved over the stored preferences: only the first attempt saves.
+        verify(this.xwiki).saveDocument(
+            argThat(document -> PREFERENCES_REFERENCE.equals(document.getDocumentReference())), anyString(),
+            anyBoolean(), anyBoolean(), any(XWikiContext.class));
+        assertEquals(List.of("XWiki.Alice:view", "XWiki.Bob:view"), getStoredRules());
     }
 }

@@ -22,8 +22,19 @@
 ## Several requests can remove members from the same group at the same time. The save is refused when another request
 ## saved the group after we loaded it, so we load the group again and remove the member again.
 #set ($saved = false)
+#set ($saveException = $NULL)
 #foreach ($attempt in [1..5])
-  #set ($group = $xwiki.getDocument($doc.documentReference))
+  #if ($attempt == 1)
+    #set ($group = $doc)
+  #else
+    ## Load the group saved concurrently. Don't save it if it couldn't be loaded (no view right, or a store error
+    ## that gives an empty new document), because saving it would replace the stored group.
+    #set ($group = $xwiki.getDocument($doc.documentReference))
+    #if ($objecttool.isNull($group) || ($group.isNew() && !$doc.isNew()))
+      #set ($saveException = $NULL)
+      #break
+    #end
+  #end
   #set ($obj = $group.getObject("XWiki.XWikiGroups", "member", $fullname))
   #set ($discard = $group.removeObject($obj))
   ## add a new empty group object so the group does not disappear
@@ -44,7 +55,15 @@
   #end
 #end
 #if (!$saved)
-  $response.sendError(500, $exceptiontool.getRootCauseMessage($saveException))
+  ## Log the cause instead of sending it to the client.
+  #if ("$!saveException" != '')
+    #set ($discard = $services.logging.getLogger('deletegroupmember.vm').warn('Failed to save [{}]',
+      $doc.documentReference, $saveException))
+  #else
+    #set ($discard = $services.logging.getLogger('deletegroupmember.vm').warn(
+      'Failed to save [{}]: it could not be loaded again after a concurrent save', $doc.documentReference))
+  #end
+  $response.sendError(500, 'Failed to save the document.')
 #else
 #if ($addedEmptyGroup)
   added empty group

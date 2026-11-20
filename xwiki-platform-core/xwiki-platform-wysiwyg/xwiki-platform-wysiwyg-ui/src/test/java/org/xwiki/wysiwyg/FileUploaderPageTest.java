@@ -39,6 +39,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeManager;
@@ -74,7 +75,10 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -356,8 +360,41 @@ class FileUploaderPageTest extends PageTest
 
         assertEquals(0, json.get("uploaded").asInt());
         assertEquals(500, json.get("error").get("number").asInt());
-        assertTrue(json.get("error").get("message").asText().contains("Not allowed"),
-            json.get("error").get("message").asText());
+        // The cause of the failure isn't sent to the client.
+        assertEquals("Failed to save the document.", json.get("error").get("message").asText());
         assertTrue(this.xwiki.getDocument(targetReference, this.context).isNew());
+    }
+
+    @Test
+    void uploadWhenAlwaysSavedConcurrently() throws Exception
+    {
+        DocumentReference targetReference = mockOldUpload("test.txt", new byte[] { 1, 2, 3 });
+        doThrow(new DocumentRevisionConflictException(targetReference, null, "1.1")).when(this.xwiki)
+            .saveDocument(argThat(document -> targetReference.equals(document.getDocumentReference())), anyString(),
+                anyBoolean(), anyBoolean(), any(XWikiContext.class));
+
+        JsonNode json = renderJSONPage(this.documentReference);
+
+        assertEquals(0, json.get("uploaded").asInt());
+        assertEquals(500, json.get("error").get("number").asInt());
+        assertEquals("Failed to save the document.", json.get("error").get("message").asText());
+        verify(this.xwiki, times(5)).saveDocument(
+            argThat(document -> targetReference.equals(document.getDocumentReference())), anyString(),
+            anyBoolean(), anyBoolean(), any(XWikiContext.class));
+    }
+
+    @Test
+    void uploadWithoutEditRight() throws Exception
+    {
+        mockOldUpload("test.txt", new byte[] { 1, 2, 3 });
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(false);
+        FileUploadPluginApi fileUploadPluginApi = (FileUploadPluginApi) this.xwiki.getPluginApi("fileupload",
+            this.context);
+
+        JsonNode json = renderJSONPage(this.documentReference);
+
+        assertEquals(403, json.get("error").get("number").asInt());
+        // The uploaded file isn't read into memory for a request that can't save it.
+        verify(fileUploadPluginApi, never()).getFileItemData(any());
     }
 }

@@ -32,6 +32,7 @@ import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.store.merge.MergeScriptService;
@@ -44,11 +45,21 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -172,5 +183,28 @@ class AdduorgPageTest extends PageTest
 
         // The member isn't added twice.
         assertEquals(List.of("", ALICE, BOB, CAROL), getStoredMembers());
+    }
+
+    @Test
+    void addMemberWhenAlwaysSavedConcurrently() throws Exception
+    {
+        this.context.setDoc(this.xwiki.getDocument(GROUP_REFERENCE, this.context));
+        doThrow(new DocumentRevisionConflictException(GROUP_REFERENCE, "1.1", "2.1")).when(this.xwiki)
+            .saveDocument(argThat(document -> GROUP_REFERENCE.equals(document.getDocumentReference())), anyString(),
+                anyBoolean(), anyBoolean(), any(XWikiContext.class));
+        XWikiServletResponseStub response = spy(this.response);
+        this.context.setResponse(response);
+        clearInvocations(this.xwiki);
+        this.request.put("name", BOB);
+
+        this.templateManager.render(TEMPLATE_NAME);
+
+        // The request is applied 5 times, then the failure is reported without its details.
+        verify(this.xwiki, times(5)).saveDocument(
+            argThat(document -> GROUP_REFERENCE.equals(document.getDocumentReference())), anyString(),
+            anyBoolean(), anyBoolean(), any(XWikiContext.class));
+        verify(response).sendError(500, "Failed to save the document.");
+        verify(response, never()).sendRedirect(any());
+        assertEquals(List.of("", ALICE), getStoredMembers());
     }
 }

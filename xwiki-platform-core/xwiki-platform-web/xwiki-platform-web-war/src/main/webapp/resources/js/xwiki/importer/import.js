@@ -200,7 +200,7 @@ var XWiki = (function(XWiki){
                link.rel = "stylesheet";
                link.href = url;
               document.getElementsByTagName("head")[0].appendChild(link);
-             })("$services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css', {'evaluate': true})");
+             })("$services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css')");
 
             // Insert the package tree
             require(['xwiki-tree'], this.initXTree.bind(this));

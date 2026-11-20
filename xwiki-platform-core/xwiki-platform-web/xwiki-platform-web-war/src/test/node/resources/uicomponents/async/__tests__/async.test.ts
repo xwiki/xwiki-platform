@@ -18,20 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import ASYNC_SOURCE from "@webapp/resources/uicomponents/async/async.js?raw";
 import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import jquery from "jquery";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import type { RequireJSMock } from "@xwiki/platform-test-requirejs";
-
-const ASYNC_SOURCE = readFileSync(
-  resolve(
-    import.meta.dirname,
-    "../../../../../../main/webapp/resources/uicomponents/async/async.js",
-  ),
-  "utf-8",
-);
 
 let requirejs: RequireJSMock;
 let updatedElements: Element[][];

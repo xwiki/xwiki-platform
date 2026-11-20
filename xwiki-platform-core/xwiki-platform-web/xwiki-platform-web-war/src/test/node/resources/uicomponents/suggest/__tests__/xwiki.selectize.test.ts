@@ -18,21 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import SELECTIZE_SOURCE from "@webapp/resources/uicomponents/suggest/xwiki.selectize.js?raw";
 import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import jquery from "jquery";
 import TomSelect from "tom-select";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import type { RequireJSMock } from "@xwiki/platform-test-requirejs";
-
-const SELECTIZE_SOURCE = readFileSync(
-  resolve(
-    import.meta.dirname,
-    "../../../../../../main/webapp/resources/uicomponents/suggest/xwiki.selectize.js",
-  ),
-  "utf-8",
-);
 
 type Option = { value: string; label: string };
 type Settings = {

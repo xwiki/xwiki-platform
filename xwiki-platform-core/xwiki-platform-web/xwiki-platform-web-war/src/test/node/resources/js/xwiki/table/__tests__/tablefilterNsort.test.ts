@@ -17,17 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import TABLE_FILTER_N_SORT_SOURCE from "@webapp/resources/js/xwiki/table/tablefilterNsort.js?raw";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
-const TABLE_FILTER_N_SORT_SOURCE = readFileSync(
-  resolve(
-    import.meta.dirname,
-    "../../../../../../../main/webapp/resources/js/xwiki/table/tablefilterNsort.js",
-  ),
-  "utf-8",
-);
 
 // The functions the script declares in the global scope.
 declare function ts_resortTable(link: Element): void;

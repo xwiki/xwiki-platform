@@ -18,22 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { useMacroEditing } from "./macroEditing";
+import { MACRO_NAME_PREFIX } from "./utils";
+import { useEditor } from "../../hooks";
 import {
-  MACRO_NAME_PREFIX,
   invocationToMacroCall,
   macroCallToInvocation,
-} from "./utils";
-import { useEditor } from "../../hooks";
+} from "../../misc/macroInvocation";
 import { useComponentsContext } from "@blocknote/react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiPencilFill } from "react-icons/ri";
+import type { MacroCall } from "../../misc/macroInvocation";
 import type {
   InlineMacroInvocation,
   MacroBlockInvocation,
   MacroCallParams,
 } from "../../services/macroEditor";
-import type { MacroCall } from "./utils";
 
 /** The invocation to edit for a selected macro block, and the writer that applies the wizard's result back to it. */
 type MacroEdit = {

@@ -22,7 +22,7 @@ import { applyXWikiParameters } from "../../blocknote/parameters";
 import { EditorInstanceContext } from "../../contexts";
 import { Fragment, createElement, useContext } from "react";
 import type { BlockMetadataStore } from "../../misc/blockMetadata";
-import type { MacroCall } from "./utils";
+import type { MacroCall } from "../../misc/macroInvocation";
 import type { CSSProperties, ReactNode } from "react";
 
 /**

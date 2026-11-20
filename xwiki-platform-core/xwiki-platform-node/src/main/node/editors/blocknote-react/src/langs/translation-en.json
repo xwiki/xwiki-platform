@@ -14,6 +14,7 @@
   "blocknote.slashMenu.link.group": "Links",
   "blocknote.slashMenu.link.title": "Link",
   "blocknote.slashMenu.link.subtext": "Insert a link",
+  "blocknote.mentionMenu.group": "Users",
   "blocknote.toolbar.subscript": "Subscript",
   "blocknote.toolbar.superscript": "Superscript",
   "blocknote.imageSelector.uploadButton": "Upload",

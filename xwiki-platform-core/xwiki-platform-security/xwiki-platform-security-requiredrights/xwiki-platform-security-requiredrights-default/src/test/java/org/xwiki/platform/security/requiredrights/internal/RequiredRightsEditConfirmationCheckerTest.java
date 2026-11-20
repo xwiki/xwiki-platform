@@ -31,6 +31,7 @@ import javax.script.SimpleScriptContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -50,6 +51,8 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -81,6 +84,9 @@ class RequiredRightsEditConfirmationCheckerTest
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Space", "Page");
 
     private static final XDOM XDOM = new XDOM(List.of());
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private RequiredRightsEditConfirmationChecker editConfirmationChecker;
@@ -177,9 +183,10 @@ class RequiredRightsEditConfirmationCheckerTest
             this.editConfirmationChecker.check());
         verify(this.templateManager)
             .executeNoException("security/requiredrights/requiredRightsEditConfirmationCheckerError.vm");
-        assertEquals("error message",
-            ((RequiredRightsException) this.scriptContext.getAttribute("exception", ScriptContext.ENGINE_SCOPE))
-                .getMessage());
+        assertEquals("error message", ((RequiredRightsException) this.scriptContext
+            .getAttribute("requiredRightsException", ScriptContext.ENGINE_SCOPE)).getMessage());
+        assertEquals("Failed to analyze the required rights of [xwiki:Space.Page]. "
+            + "Root cause is [RequiredRightsException: error message].", this.logCapture.getMessage(0));
     }
 
     @Test

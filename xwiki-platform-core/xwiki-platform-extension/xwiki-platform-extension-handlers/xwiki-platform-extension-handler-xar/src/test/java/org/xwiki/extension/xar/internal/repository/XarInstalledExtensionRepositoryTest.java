@@ -20,12 +20,17 @@
 package org.xwiki.extension.xar.internal.repository;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.search.SearchException;
@@ -95,5 +100,35 @@ public class XarInstalledExtensionRepositoryTest
             .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page", Locale.ROOT)));
         assertEquals(0, this.installedExtensionRepository
             .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page", Locale.ENGLISH)).size());
+    }
+
+    @Test
+    public void getBackwardDependenciesOfXarExtension() throws Exception
+    {
+        ExtensionId xarExtensionId = new ExtensionId("xarinstalledextension", "1.0");
+        InstalledExtensionRepository defaultRepository = this.mocker.getInstance(InstalledExtensionRepository.class);
+        InstalledExtension otherExtension =
+            defaultRepository.getInstalledExtension(new ExtensionId("otherinstalledextension", "1.0"));
+
+        // The only backward dependency is optional
+        assertEquals(List.of(),
+            this.installedExtensionRepository.getBackwardDependencies(xarExtensionId.getId(), null, false));
+        assertEquals(List.of(otherExtension),
+            this.installedExtensionRepository.getBackwardDependencies(xarExtensionId.getId(), null, true));
+
+        assertEquals(Map.of(), this.installedExtensionRepository.getBackwardDependencies(xarExtensionId, false));
+        Map<String, Collection<InstalledExtension>> expected = new HashMap<>();
+        expected.put(null, List.of(otherExtension));
+        assertEquals(expected, this.installedExtensionRepository.getBackwardDependencies(xarExtensionId, true));
+    }
+
+    @Test
+    public void getBackwardDependenciesOfNonXarExtension() throws ResolveException
+    {
+        ExtensionId otherExtensionId = new ExtensionId("otherinstalledextension", "1.0");
+
+        assertEquals(List.of(),
+            this.installedExtensionRepository.getBackwardDependencies(otherExtensionId.getId(), null, true));
+        assertEquals(Map.of(), this.installedExtensionRepository.getBackwardDependencies(otherExtensionId, true));
     }
 }

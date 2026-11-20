@@ -337,7 +337,8 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
         return XarExtensionHandler.TYPE.equals(extension.getType())
-            ? this.installedRepository.getBackwardDependencies(id, namespace, withOptional) : null;
+            ? this.installedRepository.getBackwardDependencies(id, namespace, withOptional)
+            : List.of();
     }
 
     @Override
@@ -347,6 +348,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
         return XarExtensionHandler.TYPE.equals(extension.getType())
-            ? this.installedRepository.getBackwardDependencies(extensionId) : null;
+            ? this.installedRepository.getBackwardDependencies(extensionId, withOptional)
+            : Map.of();
     }
 }

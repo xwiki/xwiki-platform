@@ -88,11 +88,15 @@
 import { temporaryUploadsName } from "../services/attachments/temporaryUploads";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
+import { XWikiMacroRenderer } from "../services/macros/XWikiMacroRenderer";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { fileUploadListenerName } from "@xwiki/platform-editors-blocknote-react";
+import {
+  fileUploadListenerName,
+  macroRendererName,
+} from "@xwiki/platform-editors-blocknote-react";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
@@ -107,6 +111,7 @@ import {
 } from "vue";
 import type { Logic } from "../services/Logic";
 import type { TemporaryUploads } from "../services/attachments/temporaryUploads";
+import type { BlockNoteIterator } from "../services/blocknote/BlockNoteIterator";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
@@ -119,6 +124,7 @@ import type {
   BlockType,
   EditorLanguage,
   FileUploadListener,
+  MacroRenderer,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
@@ -151,6 +157,7 @@ const {
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
   startupFocus = undefined,
+  restricted = false,
 } = defineProps<{
   // The key used to submit the edited content.
   name?: string;
@@ -187,6 +194,10 @@ const {
 
   // Whether to focus the editor when it's created. It's a string when it comes from an HTML attribute.
   startupFocus?: boolean | string;
+
+  // Whether the edited content is executed in a restricted context (e.g. a comment), where some macros are not executed.
+  // It's a string when it comes from an HTML attribute.
+  restricted?: boolean | string;
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
@@ -264,6 +275,19 @@ onBeforeMount(async () => {
       );
     }
   }
+
+  // The macro calls are rendered with the rights of the realtime collaboration session participants, when joined.
+  editorContainer.bind<MacroRenderer>(macroRendererName).toConstantValue(
+    new XWikiMacroRenderer(
+      blockNoteProcessor,
+      container.get<BlockNoteIterator>("BlockNoteIterator"),
+      {
+        restricted: restricted === true || restricted === "true",
+        locale: actualLocale,
+        collaboration: collaborationKey.value,
+      },
+    ),
+  );
 
   editorOptions.value = createEditorOptions(label);
   isLoading.value = false;

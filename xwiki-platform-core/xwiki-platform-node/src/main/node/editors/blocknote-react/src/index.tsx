@@ -165,6 +165,14 @@ export type {
 
 export type { MacroCall } from "./features/macros/utils";
 
+export { getMacroCalls } from "./features/macros/macroOutputUpdate";
+
+export type { MacroCallEntry } from "./features/macros/macroOutputUpdate";
+
+export { macroRendererName } from "./services/macroRenderer";
+
+export type { MacroRenderer } from "./services/macroRenderer";
+
 export { linkEditorName, linkMetadataHandlerName } from "./services/linkEditor";
 
 export type {

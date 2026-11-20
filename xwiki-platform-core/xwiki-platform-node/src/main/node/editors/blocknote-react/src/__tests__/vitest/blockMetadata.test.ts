@@ -218,3 +218,18 @@ describe("createBlockMetadataStore", () => {
     expect(bob.get("p1")).toEqual({ xwikiReference: "Some.Page" });
   });
 });
+
+describe("BlockMetadataStore.subscribe", () => {
+  test("tells the listeners which block's metadata was set, until they stop listening", () => {
+    const store = createBlockMetadataStore();
+    const changes: string[] = [];
+    const stop = store.subscribe((id) => changes.push(id));
+
+    store.set("b1", OUTPUT, ["output"]);
+    store.set("b2", REFERENCE, "doc:Page");
+    stop();
+    store.set("b3", OUTPUT, ["output"]);
+
+    expect(changes).toEqual(["b1", "b2"]);
+  });
+});

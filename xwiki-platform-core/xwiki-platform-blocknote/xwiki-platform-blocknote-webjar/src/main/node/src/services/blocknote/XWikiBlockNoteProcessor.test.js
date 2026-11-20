@@ -23,6 +23,71 @@ import { extractLinkId } from "./linkId";
 import { getMacroOutput } from "@xwiki/platform-editors-blocknote-react";
 import { beforeEach, describe, expect, it } from "vitest";
 
+// A block macro node with an object call and an array output.
+function blockMacro() {
+  return {
+    id: "m1",
+    type: "xwikiMacroBlock",
+    props: {
+      call: { name: "info", parameters: { title: "Note" }, content: "hi" },
+      output: [{ type: "paragraph", props: {}, content: "hi", children: [] }],
+    },
+    children: [],
+  };
+}
+
+// A paragraph holding an inline macro (with an object call and an inline content output) between two text runs.
+function documentWithInlineMacro() {
+  return [
+    {
+      id: "p1",
+      type: "paragraph",
+      props: {},
+      content: [
+        { type: "text", text: "first ", styles: {} },
+        {
+          type: "xwikiInlineMacro",
+          props: {
+            call: {
+              name: "success",
+              parameters: { title: "OK" },
+              content: "done",
+            },
+            output: [{ type: "text", text: "done", styles: {} }],
+          },
+        },
+        { type: "text", text: " line", styles: {} },
+      ],
+      children: [],
+    },
+  ];
+}
+
+// A block macro whose content holds a nested macro call, with its own output (the content is editable in-place).
+function blockMacroWithNestedMacro() {
+  return {
+    id: "m2",
+    type: "xwikiMacroBlock",
+    props: {
+      call: {
+        name: "info",
+        parameters: {},
+        content: [
+          {
+            type: "xwikiMacroBlock",
+            props: {
+              call: { name: "velocity", parameters: {}, content: "$x" },
+              output: [{ type: "paragraph", content: "secret" }],
+            },
+          },
+        ],
+      },
+      output: [{ type: "xwikiEditable" }],
+    },
+    children: [],
+  };
+}
+
 describe("XWikiBlockNoteProcessor", () => {
   let processor;
 
@@ -223,73 +288,6 @@ describe("XWikiBlockNoteProcessor", () => {
   });
 
   describe("macros", () => {
-    // A block macro node with an object call and an array output.
-    function blockMacro() {
-      return {
-        id: "m1",
-        type: "xwikiMacroBlock",
-        props: {
-          call: { name: "info", parameters: { title: "Note" }, content: "hi" },
-          output: [
-            { type: "paragraph", props: {}, content: "hi", children: [] },
-          ],
-        },
-        children: [],
-      };
-    }
-
-    // A paragraph holding an inline macro (with an object call and an inline content output) between two text runs.
-    function documentWithInlineMacro() {
-      return [
-        {
-          id: "p1",
-          type: "paragraph",
-          props: {},
-          content: [
-            { type: "text", text: "first ", styles: {} },
-            {
-              type: "xwikiInlineMacro",
-              props: {
-                call: {
-                  name: "success",
-                  parameters: { title: "OK" },
-                  content: "done",
-                },
-                output: [{ type: "text", text: "done", styles: {} }],
-              },
-            },
-            { type: "text", text: " line", styles: {} },
-          ],
-          children: [],
-        },
-      ];
-    }
-
-    // A block macro whose content holds a nested macro call, with its own output (the content is editable in-place).
-    function blockMacroWithNestedMacro() {
-      return {
-        id: "m2",
-        type: "xwikiMacroBlock",
-        props: {
-          call: {
-            name: "info",
-            parameters: {},
-            content: [
-              {
-                type: "xwikiMacroBlock",
-                props: {
-                  call: { name: "velocity", parameters: {}, content: "$x" },
-                  output: [{ type: "paragraph", content: "secret" }],
-                },
-              },
-            ],
-          },
-          output: [{ type: "xwikiEditable" }],
-        },
-        children: [],
-      };
-    }
-
     it("moves the output of a block macro to the document metadata on load", () => {
       const macro = blockMacro();
       const document = processor.load(JSON.stringify([macro]));
@@ -366,6 +364,60 @@ describe("XWikiBlockNoteProcessor", () => {
       const saved = JSON.parse(processor.save(document));
       expect(saved[0].props.call.content[0].props).toEqual({
         call: { name: "velocity", parameters: {}, content: "$x" },
+      });
+    });
+
+    // What the edited content needs to be rendered again, after its macro calls are modified.
+    describe("rendering", () => {
+      it("remembers that a macro without output was rendered, and gives an id to the macros not rendered", () => {
+        const macro = blockMacro();
+        macro.props.output = [];
+        const doc = documentWithInlineMacro();
+        delete doc[0].content[1].props.output;
+        const document = processor.load(JSON.stringify([macro, ...doc]));
+        // An empty output is kept, so that the macro call isn't rendered again.
+        const loadedMacro = document.content[0];
+        expect(
+          getMacroOutput(document.metadata, "m1", loadedMacro.props.call),
+        ).toEqual([]);
+        // A macro call that wasn't rendered gets an id nevertheless, to keep its output once it's rendered.
+        const inlineMacro = document.content[1].content[1];
+        expect(inlineMacro.props.id).toBeTruthy();
+        expect(
+          getMacroOutput(
+            document.metadata,
+            inlineMacro.props.id,
+            inlineMacro.props.call,
+          ),
+        ).toBeUndefined();
+      });
+
+      it("keeps the id of each macro call as a macro parameter, when asked", () => {
+        const doc = documentWithInlineMacro();
+        const document = processor.load(
+          JSON.stringify([...doc, blockMacroWithNestedMacro()]),
+        );
+        const inlineMacroId = document.content[0].content[1].props.id;
+        const nestedMacroId = JSON.parse(document.content[1].props.call)
+          .content[0].props.id;
+        const saved = JSON.parse(processor.save(document, { macroIds: true }));
+        expect(saved[0].content[1].props).toEqual({
+          call: {
+            name: "success",
+            parameters: { title: "OK", xwikiBlockNoteMacroId: inlineMacroId },
+            content: "done",
+          },
+        });
+        expect(saved[1].props.call.parameters).toEqual({
+          xwikiBlockNoteMacroId: "m2",
+        });
+        expect(saved[1].props.call.content[0].props).toEqual({
+          call: {
+            name: "velocity",
+            parameters: { xwikiBlockNoteMacroId: nestedMacroId },
+            content: "$x",
+          },
+        });
       });
     });
   });

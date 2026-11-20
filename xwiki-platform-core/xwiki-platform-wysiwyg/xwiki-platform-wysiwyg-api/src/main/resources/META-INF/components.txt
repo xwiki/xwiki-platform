@@ -7,6 +7,7 @@ org.xwiki.wysiwyg.internal.cleaner.NestedAnchorsFilter
 org.xwiki.wysiwyg.internal.cleaner.StandAloneMacroFilter
 org.xwiki.wysiwyg.internal.converter.DefaultHTMLConverter
 org.xwiki.wysiwyg.internal.converter.DefaultRequestParameterConverter
+org.xwiki.wysiwyg.internal.converter.EditedContentRefresher
 org.xwiki.wysiwyg.internal.converter.HTMLRequestParameterConverter
 org.xwiki.wysiwyg.internal.filter.http.MutableHttpServletRequestFactory
 org.xwiki.wysiwyg.internal.importer.OfficeAttachmentImporter

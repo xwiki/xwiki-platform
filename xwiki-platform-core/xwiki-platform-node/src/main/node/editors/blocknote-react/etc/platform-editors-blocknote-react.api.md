@@ -58,6 +58,7 @@ export interface BlockMetadataStore {
     }): () => void;
     get(id: string): Readonly<BlockMetadata> | undefined;
     set(id: string, key: BlockMetadataKey, value: unknown): void;
+    subscribe(listener: (id: string) => void): () => void;
 }
 
 // @beta
@@ -231,6 +232,9 @@ export type FormattingToolbarContribution = {
 };
 
 // @beta
+export function getMacroCalls(content: unknown): MacroCallEntry[];
+
+// @beta
 export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
 
 // @beta
@@ -328,6 +332,12 @@ export type MacroCall = {
 };
 
 // @beta
+export type MacroCallEntry = {
+    id: string;
+    call: string;
+};
+
+// @beta
 export type MacroCallParams = Record<string, boolean | number | string>;
 
 // @beta
@@ -351,6 +361,14 @@ export type MacroInsertionEditorPrefillData = {
     params: MacroCallParams | null;
     body: MacroBlockInvocation["body"] | InlineMacroInvocation["body"] | null;
 };
+
+// @beta
+export interface MacroRenderer {
+    render(instance: EditorInstance): Promise<void>;
+}
+
+// @beta
+export const macroRendererName = "MacroRenderer";
 
 // @beta
 export const macrosFeature: EditorFeature;

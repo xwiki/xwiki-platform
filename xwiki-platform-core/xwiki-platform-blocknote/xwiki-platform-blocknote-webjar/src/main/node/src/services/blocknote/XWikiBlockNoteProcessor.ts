@@ -20,6 +20,11 @@
 import { BlockNoteDocument } from "./BlockNoteProcessor";
 import { extractLinkId, injectLinkId, stripLinkId } from "./linkId";
 import {
+  MACRO_ID_PARAMETER,
+  isMacroNode,
+  visitNestedMacros,
+} from "./macroNodes";
+import {
   XWIKI_FREESTANDING,
   XWIKI_GENERATED_LABEL,
   XWIKI_LEADING_NEW_LINE,
@@ -32,11 +37,8 @@ import { setMacroOutput } from "@xwiki/platform-editors-blocknote-react";
 import { Container, inject, injectable } from "inversify";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
-import type { BlockNoteProcessor } from "./BlockNoteProcessor";
-import type {
-  BlockMetadataKey,
-  BlockType,
-} from "@xwiki/platform-editors-blocknote-react";
+import type { BlockNoteProcessor, SaveOptions } from "./BlockNoteProcessor";
+import type { BlockMetadataKey } from "@xwiki/platform-editors-blocknote-react";
 
 /**
  * XWik specific implementation of a BlockNoteProcessor.
@@ -106,7 +108,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     blockNoteDocument: BlockNoteDocument,
   ): boolean {
     if (typeof node === "object") {
-      if (this.isMacroNode(node)) {
+      if (isMacroNode(node)) {
         this.loadMacro(node as Record<string, unknown>, blockNoteDocument);
         return true;
       } else if (node.type === "link") {
@@ -131,17 +133,6 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
-   * @param node - the node to test
-   * @returns `true` if the given node is a macro node (block or inline macro). The inline macro type is compared as a
-   *   string because it is not part of the (statically-typed) inline content schema: it is registered through an index
-   *   signature on the editor side so that it doesn't tighten the schema, so its literal type is not available here.
-   */
-  private isMacroNode(node: object): boolean {
-    const type = (node as { type?: unknown }).type;
-    return type === "xwikiMacroBlock" || type === "xwikiInlineMacro";
-  }
-
-  /**
    * Pre-processes a macro node (block or inline macro):
    * <ul>
    * <li>By default, BlockNote supports only primitive values for block and inline content properties, so the macro call
@@ -163,7 +154,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     nested = false,
   ): void {
     const props = macroNode.props as Record<string, unknown>;
-    this.visitNestedMacros(props.call, (nestedMacro) =>
+    visitNestedMacros(this.iterator, props.call, (nestedMacro) =>
       this.loadMacro(nestedMacro, blockNoteDocument, true),
     );
     const call = JSON.stringify(props.call);
@@ -171,15 +162,13 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       props.call = call;
     }
 
+    // Every macro call gets an id, so that its output can be kept once it's rendered (again).
+    const id = this.getMacroId(macroNode, nested);
     const output = props.output;
     delete props.output;
-    if (Array.isArray(output) && output.length) {
-      setMacroOutput(
-        blockNoteDocument.metadata,
-        this.getMacroId(macroNode, nested),
-        call,
-        output,
-      );
+    // An empty output is kept as well, to remember that the macro call was rendered.
+    if (Array.isArray(output)) {
+      setMacroOutput(blockNoteDocument.metadata, id, call, output);
     }
   }
 
@@ -201,42 +190,6 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     const props = macroNode.props as Record<string, unknown>;
     props.id = uuidv4();
     return props.id as string;
-  }
-
-  /**
-   * Calls the given function for each macro node found in the parameters or the content of the given macro call (the
-   * parameters and the content that are editable in-place are BlockNote fragments that can contain macro calls). The
-   * macros nested in the found macros are not visited.
-   *
-   * @param call - the macro call object
-   * @param visit - the function to call for each nested macro node
-   */
-  private visitNestedMacros(
-    call: unknown,
-    visit: (macroNode: Record<string, unknown>) => void,
-  ): void {
-    if (call === null || typeof call !== "object") {
-      return;
-    }
-    const { parameters, content } = call as {
-      parameters?: Record<string, unknown>;
-      content?: unknown;
-    };
-    [...Object.values(parameters ?? {}), content]
-      .filter((value) => value !== null && typeof value === "object")
-      .forEach((fragment) => {
-        const nodes = Array.isArray(fragment) ? fragment : [fragment];
-        // A fragment can also hold inline content, which the iterator handles as well.
-        this.iterator.iterate(nodes as BlockType[], {
-          visit: (node) => {
-            if (typeof node === "object" && this.isMacroNode(node)) {
-              visit(node as Record<string, unknown>);
-              return true;
-            }
-            return false;
-          },
-        });
-      });
   }
 
   /**
@@ -377,10 +330,13 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     }
   }
 
-  public save(blockNoteDocument: BlockNoteDocument): string {
+  public save(
+    blockNoteDocument: BlockNoteDocument,
+    options: SaveOptions = {},
+  ): string {
     const blockNoteContentCopy = structuredClone(blockNoteDocument.content);
     this.iterator.iterate(blockNoteContentCopy, {
-      visit: (node) => this.saveNode(node, blockNoteDocument),
+      visit: (node) => this.saveNode(node, blockNoteDocument, options),
     });
     return JSON.stringify(blockNoteContentCopy);
   }
@@ -388,10 +344,11 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   private saveNode(
     node: NodeType,
     blockNoteDocument: BlockNoteDocument,
+    options: SaveOptions,
   ): boolean {
     if (typeof node === "object") {
-      if (this.isMacroNode(node)) {
-        this.saveMacro(node as { props?: unknown });
+      if (isMacroNode(node)) {
+        this.saveMacro(node as Record<string, unknown>, options);
         return true;
       } else if (node.type === "link") {
         this.restoreLinkMetadata(node, blockNoteDocument);
@@ -431,16 +388,42 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
    *
    * @param macroNode - the macro node to post-process
    */
-  private saveMacro(macroNode: { props?: unknown }): void {
+  private saveMacro(
+    macroNode: Record<string, unknown>,
+    options: SaveOptions,
+    nested = false,
+  ): void {
     const props = macroNode.props as Record<string, unknown>;
     if (typeof props.call === "string") {
       props.call = JSON.parse(props.call);
     }
+    if (options.macroIds) {
+      this.addMacroIdParameter(macroNode, nested);
+    }
     // The id used to look up the macro output.
     delete props.id;
-    this.visitNestedMacros(props.call, (nestedMacro) =>
-      this.saveMacro(nestedMacro),
+    visitNestedMacros(this.iterator, props.call, (nestedMacro) =>
+      this.saveMacro(nestedMacro, options, true),
     );
+  }
+
+  /**
+   * Adds the id of the given macro call to its parameters (see {@link MACRO_ID_PARAMETER}).
+   *
+   * @param macroNode - the macro node, whose call is an object
+   * @param nested - whether the macro is nested in the parameters or content of another macro call
+   */
+  private addMacroIdParameter(
+    macroNode: Record<string, unknown>,
+    nested: boolean,
+  ): void {
+    const props = macroNode.props as Record<string, unknown>;
+    const id =
+      !nested && macroNode.type === "xwikiMacroBlock" ? macroNode.id : props.id;
+    const call = props.call as { parameters?: Record<string, unknown> } | null;
+    if (typeof id === "string" && id && call && typeof call === "object") {
+      call.parameters = { ...call.parameters, [MACRO_ID_PARAMETER]: id };
+    }
   }
 
   /**

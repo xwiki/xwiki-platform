@@ -90,6 +90,19 @@ interface BlockMetadataStore {
   set(id: string, key: BlockMetadataKey, value: unknown): void;
 
   /**
+   * Listens to the changes made with {@link BlockMetadataStore.set}, e.g. to display a block again when its metadata
+   * changes. The changes made by the other users editing the same content in realtime are not reported: they reach the
+   * shared metadata directly.
+   *
+   * @param listener - called with the id of the block (or of the link, or of the macro call) whose metadata was set
+   * @returns a function that stops listening
+   *
+   * @since 18.10.0RC1
+   * @beta
+   */
+  subscribe(listener: (id: string) => void): () => void;
+
+  /**
    * Keeps the shared metadata entries in the given shared metadata, so that they are shared with the other users
    * editing the same content in realtime. The private entries stay in this store. Connecting again to the same shared
    * metadata does nothing.
@@ -169,6 +182,8 @@ class DefaultBlockMetadataStore implements BlockMetadataStore {
 
   private sharedEntries: SharedEntries = new LocalEntries();
 
+  private readonly listeners = new Set<(id: string) => void>();
+
   public get(id: string): Readonly<BlockMetadata> | undefined {
     const privateMetadata = this.privateEntries.get(id);
     const sharedMetadata = this.sharedEntries.get(id);
@@ -184,6 +199,17 @@ class DefaultBlockMetadataStore implements BlockMetadataStore {
       key.name,
       value,
     );
+    // Copy the listeners, so that a listener can stop listening while being notified.
+    [...this.listeners].forEach((listener) => listener(id));
+  }
+
+  public subscribe(listener: (id: string) => void): () => void {
+    // Wrapped, so that subscribing the same function twice requires stopping twice.
+    const wrapper = (id: string) => listener(id);
+    this.listeners.add(wrapper);
+    return () => {
+      this.listeners.delete(wrapper);
+    };
   }
 
   public connect(

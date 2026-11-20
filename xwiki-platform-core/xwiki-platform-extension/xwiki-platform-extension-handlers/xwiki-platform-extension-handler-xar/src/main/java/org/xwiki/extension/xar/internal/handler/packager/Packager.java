@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -162,7 +163,7 @@ public class Packager
     }
 
     private void importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, XarException
+        PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
         try (FileInputStream fis = new FileInputStream(xarFile)) {
             importXARToWiki(comment, fis, wikiReference, configuration);
@@ -170,7 +171,7 @@ public class Packager
     }
 
     private void importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
-        PackageConfiguration configuration) throws IOException, XarException
+        PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(xarInputStream);
 
@@ -206,8 +207,10 @@ public class Packager
     }
 
     private void importDocumentToWiki(String comment, WikiReference wikiReference, InputStream inputStream,
-        PackageConfiguration configuration, String name) throws XarException, IOException
+        PackageConfiguration configuration, String name) throws XWikiException, XarException, IOException
     {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
         XWikiDocument nextDocument;
         try {
             nextDocument = getXWikiDocument(inputStream, wikiReference);
@@ -227,49 +230,55 @@ public class Packager
         }
 
         if (configuration.isVerbose()) {
-            this.logger.info(LOG_INSTALLDOCUMENT_BEGIN, "Installing document [{}]",
-                nextDocument.getDocumentReferenceWithLocale());
+            this.logger.info(LOG_INSTALLDOCUMENT_BEGIN, "Installing document [{}]", reference);
         }
-
-        try {
-            importDocument(comment, previousDocument, nextDocument, configuration);
-
-            if (configuration.isVerbose()) {
-                this.logger.info(LOG_INSTALLDOCUMENT_SUCCESS_END, "Done installing document [{}]",
-                    nextDocument.getDocumentReferenceWithLocale());
-            }
-        } catch (Exception e) {
-            if (configuration.isVerbose()) {
-                this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END, "Failed to install document [{}]",
-                    nextDocument.getDocumentReferenceWithLocale(), e);
-            }
-        }
-    }
-
-    private void importDocument(String comment, XWikiDocument previousDocument, XWikiDocument nextDocument,
-        PackageConfiguration configuration) throws Exception
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
 
         // A user can save the document while it is merged, e.g. while the conflict question waits for an answer. The
         // merge result is then refused when saving it, because it would overwrite that save, so the document is merged
         // again with the version saved by the user (asking again in case of conflict).
         for (int attempt = 1;; attempt++) {
+            // Failing to load the document fails the whole import: it's not specific to this document.
             XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
             currentDocument.loadAttachmentsContentSafe(xcontext);
 
             try {
                 this.importer.importDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
 
-                return;
-            } catch (DocumentRevisionConflictException e) {
-                if (attempt >= SAVE_ATTEMPTS) {
-                    throw e;
+                if (configuration.isVerbose()) {
+                    this.logger.info(LOG_INSTALLDOCUMENT_SUCCESS_END, "Done installing document [{}]", reference);
                 }
 
-                this.logger.debug("Document [{}] was saved concurrently, merging it again.", reference);
+                return;
+            } catch (DocumentRevisionConflictException e) {
+                if (attempt < SAVE_ATTEMPTS) {
+                    this.logger.debug("Document [{}] was saved concurrently, merging it again.", reference);
+                } else {
+                    logConcurrentSaveFailure(reference, configuration, e);
+
+                    return;
+                }
+            } catch (Exception e) {
+                if (configuration.isVerbose()) {
+                    this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END, "Failed to install document [{}]", reference,
+                        e);
+                }
+
+                return;
             }
+        }
+    }
+
+    private void logConcurrentSaveFailure(DocumentReference reference, PackageConfiguration configuration,
+        DocumentRevisionConflictException e)
+    {
+        // Logged even when the import isn't verbose: the extension is installed without this version of the document.
+        if (configuration.isVerbose()) {
+            this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END,
+                "Failed to install document [{}] because it kept being saved concurrently", reference, e);
+        } else {
+            this.logger.warn(
+                "Failed to install document [{}] because it kept being saved concurrently. Root cause: [{}]",
+                reference, ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

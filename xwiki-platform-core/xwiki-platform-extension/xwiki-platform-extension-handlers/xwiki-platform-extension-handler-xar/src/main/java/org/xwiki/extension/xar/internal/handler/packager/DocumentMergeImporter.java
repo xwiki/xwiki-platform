@@ -20,6 +20,7 @@
 package org.xwiki.extension.xar.internal.handler.packager;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,12 +33,14 @@ import org.xwiki.extension.xar.XWikiDocumentMerger;
 import org.xwiki.extension.xar.XWikiDocumentMergerConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarEntryType;
 import org.xwiki.xar.XarEntryType.UpgradeType;
 import org.xwiki.xar.XarEntryTypeResolver;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -142,6 +145,8 @@ public class DocumentMergeImporter
         XWikiDocument currentDocument = mergedDocument;
         if (currentDocument == null) {
             currentDocument = xcontext.getWiki().getDocument(document.getDocumentReferenceWithLocale(), xcontext);
+        } else {
+            checkStoredDocument(mergedDocument, xcontext);
         }
 
         if (!currentDocument.isNew()) {
@@ -173,6 +178,26 @@ public class DocumentMergeImporter
         setDocumentAuthor(currentDocument, document, configuration);
 
         saveDocumentSetContextUser(currentDocument, comment);
+    }
+
+    /**
+     * Makes sure that the document wasn't created, modified or deleted since the merge was computed, e.g. while the
+     * conflict question waited for an answer, so that the document is merged again instead of overwriting that change.
+     * This doesn't depend on the store refusing outdated saves, which only catches the changes made between this check
+     * and the save.
+     *
+     * @param mergedDocument the document from the database the merge was computed from
+     * @throws DocumentRevisionConflictException if the stored document isn't the one the merge was computed from
+     */
+    private void checkStoredDocument(XWikiDocument mergedDocument, XWikiContext xcontext) throws XWikiException
+    {
+        DocumentReference reference = mergedDocument.getDocumentReferenceWithLocale();
+        XWikiDocument storedDocument = xcontext.getWiki().getDocument(reference, xcontext);
+        String mergedVersion = mergedDocument.isNew() ? null : mergedDocument.getVersion();
+        String storedVersion = storedDocument.isNew() ? null : storedDocument.getVersion();
+        if (!Objects.equals(mergedVersion, storedVersion)) {
+            throw new DocumentRevisionConflictException(reference, mergedVersion, storedVersion);
+        }
     }
 
     private void setDocumentAuthor(XWikiDocument currentDocument, XWikiDocument document,

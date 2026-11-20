@@ -23,10 +23,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,15 +63,18 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.DocumentRevisionConflictException;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
@@ -88,9 +93,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -838,6 +846,153 @@ class XarExtensionHandlerTest
         page = this.oldcore.getSpyXWiki().getDocument(pageReference, getXWikiContext());
         assertEquals("content", page.getContent());
         assertEquals(this.contextUser, page.getAuthorReference());
+    }
+
+    /**
+     * @return a request upgrading the extension on the wiki, asking about deleted pages and successful merges
+     */
+    private InstallRequest createAskingUpgradeRequest()
+    {
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.setProperty("user.reference", this.contextUser);
+        installRequest.addExtension(this.localXarExtensiontId2);
+        installRequest.addNamespace("wiki:wiki");
+        installRequest.setInteractive(true);
+        installRequest.setProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_SUCCESS,
+            ConflictQuestion.GlobalAction.ASK);
+        installRequest.setProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_CURRENT_DELETED,
+            ConflictQuestion.GlobalAction.ASK);
+        return installRequest;
+    }
+
+    private void saveConcurrently(Consumer<XWikiDocument> change)
+    {
+        try {
+            XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext()).clone();
+            change.accept(page);
+            this.oldcore.getSpyXWiki().saveDocument(page, getXWikiContext());
+        } catch (XWikiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addXObject(XWikiDocument document, LocalDocumentReference classReference)
+    {
+        try {
+            document.newXObject(classReference, getXWikiContext());
+        } catch (XWikiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void upgradeOnWikiWithPageCreatedWhileAskingWithoutRevisionCheck() throws Throwable
+    {
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+        this.oldcore.getSpyXWiki().deleteDocument(
+            this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext()), getXWikiContext());
+        List<ConflictQuestion> pageQuestions = new ArrayList<>();
+
+        // Without the store refusing outdated saves, the importer still notices that the page was created after the
+        // merge.
+        StoreConfiguration storeConfiguration = spy(this.componentManager.<StoreConfiguration>getInstance(
+            StoreConfiguration.class));
+        doReturn(false).when(storeConfiguration).isRevisionCheckEnabled();
+        this.componentManager.registerComponent(StoreConfiguration.class, storeConfiguration);
+        Job installJob = installAnsweringQuestions(createAskingUpgradeRequest(), question -> {
+            if (question.getNextDocument().getDocumentReference().equals(PAGE_REFERENCE)) {
+                if (question.getCurrentDocument() == null) {
+                    // The user creates the page again while asked whether to restore it, and the answer is to
+                    // restore it.
+                    saveConcurrently(page -> {
+                        page.setSyntax(Syntax.XWIKI_2_0);
+                        page.setContent("content");
+                        addXObject(page, CONCURRENT_CLASS);
+                    });
+                    question.setGlobalAction(ConflictQuestion.GlobalAction.NEXT);
+                } else {
+                    question.setGlobalAction(ConflictQuestion.GlobalAction.MERGED);
+                }
+                pageQuestions.add(question);
+            }
+        });
+
+        assertEquals(List.of(), installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN));
+        // The page created by the user is merged again, and upgraded instead of being replaced.
+        assertEquals(2, pageQuestions.size());
+        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext());
+        assertEquals("content 2", page.getContent());
+        assertNotNull(page.getXObject(CONCURRENT_CLASS));
+    }
+
+    @Test
+    void upgradeOnWikiWithPageAlwaysSavedWhileAsking() throws Throwable
+    {
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+        saveConcurrently(page -> addXObject(page, CUSTOM_CLASS));
+
+        this.oldcore.checkDocumentRevision(true);
+        List<ConflictQuestion> pageQuestions = new ArrayList<>();
+        Job installJob = installAnsweringQuestions(createAskingUpgradeRequest(), question -> {
+            if (question.getCurrentDocument().getDocumentReference().equals(PAGE_REFERENCE)) {
+                saveConcurrently(page -> addXObject(page, CONCURRENT_CLASS));
+                question.setGlobalAction(ConflictQuestion.GlobalAction.MERGED);
+                pageQuestions.add(question);
+            }
+        });
+
+        // The page is merged 5 times, then left as saved by the user, and the failure is logged.
+        assertEquals(5, pageQuestions.size());
+        List<LogEvent> errors = installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
+        assertEquals(1, errors.size());
+        assertEquals("Failed to install document [wiki:space.page()] because it kept being saved concurrently",
+            errors.get(0).getFormattedMessage());
+        XWikiDocument page = this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext());
+        assertEquals("content", page.getContent());
+        assertEquals(5, page.getXObjects(CONCURRENT_CLASS).size());
+    }
+
+    @Test
+    void upgradeOnWikiFailingToLoadPage() throws Throwable
+    {
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        XWikiException loadFailure = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+            XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Failed to load");
+        doThrow(loadFailure).when(this.oldcore.getSpyXWiki()).getDocument(
+            argThat((DocumentReference reference) -> reference != null
+                && PAGE_REFERENCE.equals(new DocumentReference(reference, (Locale) null))),
+            any(XWikiContext.class));
+
+        // Failing to load a document fails the whole upgrade instead of silently skipping the document.
+        Throwable failure = assertThrows(Throwable.class, () -> install(this.localXarExtensiontId2, "wiki", null));
+        assertTrue(ExceptionUtils.getThrowableList(failure).contains(loadFailure), failure::toString);
+    }
+
+    @Test
+    void resetWithContextUserWhenSavedConcurrently() throws Throwable
+    {
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+        saveConcurrently(page -> page.setContent("modified content"));
+
+        this.oldcore.checkDocumentRevision(true);
+        DocumentReference pageReference = new DocumentReference(PAGE_REFERENCE, Locale.ROOT);
+        // The page is saved again after the reset loaded it.
+        AtomicBoolean loaded = new AtomicBoolean();
+        doAnswer(invocation -> {
+            Object document = invocation.callRealMethod();
+            if (loaded.compareAndSet(false, true)) {
+                saveConcurrently(page -> page.setContent("modified again"));
+            }
+            return document;
+        }).when(this.oldcore.getSpyXWiki()).getDocument(eq(pageReference), any(XWikiContext.class));
+        Packager packager = this.componentManager.getInstance(Packager.class);
+
+        // The reset discards the version the user saw, not the one saved since, so it fails.
+        assertThrows(DocumentRevisionConflictException.class, () -> packager.resetWithContextUser(pageReference));
+
+        assertEquals("modified again",
+            this.oldcore.getSpyXWiki().getDocument(PAGE_REFERENCE, getXWikiContext()).getContent());
     }
 
     @Test

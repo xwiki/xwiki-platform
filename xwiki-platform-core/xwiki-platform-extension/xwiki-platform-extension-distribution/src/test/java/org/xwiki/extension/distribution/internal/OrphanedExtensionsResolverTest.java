@@ -135,6 +135,17 @@ class OrphanedExtensionsResolverTest
     }
 
     @Test
+    void getOrphanedExtensionsWhenBackwardDependenciesAreUnknown() throws ResolveException
+    {
+        when(this.installedRepository.getBackwardDependencies(this.rootOrphan.getId(), true)).thenReturn(null);
+        when(this.installedRepository.getBackwardDependencies(this.wikiOrphan.getId().getId(), SUB_NAMESPACE, true))
+            .thenReturn(null);
+
+        assertEquals(List.of(), this.resolver.getOrphanedExtensions(MAIN_WIKI));
+        assertEquals(List.of(), this.resolver.getOrphanedExtensions(SUB_WIKI));
+    }
+
+    @Test
     void getOrphanedExtensionsWhenBackwardDependenciesCannotBeResolved() throws ResolveException
     {
         when(this.installedRepository.getBackwardDependencies(this.wikiOrphan.getId().getId(), SUB_NAMESPACE, true))

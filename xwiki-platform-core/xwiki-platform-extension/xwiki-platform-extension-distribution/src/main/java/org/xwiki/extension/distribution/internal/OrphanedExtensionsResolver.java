@@ -20,7 +20,9 @@
 package org.xwiki.extension.distribution.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -82,13 +84,23 @@ public class OrphanedExtensionsResolver
 
     private boolean isOrphaned(InstalledExtension installedExtension, String namespace, boolean mainWiki)
     {
+        // The repository API does not forbid a null result (the XAR repository returns null for an extension it does
+        // not handle): an unknown answer is never a reason to propose an uninstall, so it means "not orphaned".
         try {
             if (installedExtension.isInstalled(null)) {
-                return mainWiki
-                    && this.installedRepository.getBackwardDependencies(installedExtension.getId(), true).isEmpty();
+                if (!mainWiki) {
+                    return false;
+                }
+
+                Map<String, Collection<InstalledExtension>> backwardDependencies =
+                    this.installedRepository.getBackwardDependencies(installedExtension.getId(), true);
+
+                return backwardDependencies != null && backwardDependencies.isEmpty();
             } else {
-                return this.installedRepository
-                    .getBackwardDependencies(installedExtension.getId().getId(), namespace, true).isEmpty();
+                Collection<InstalledExtension> backwardDependencies = this.installedRepository
+                    .getBackwardDependencies(installedExtension.getId().getId(), namespace, true);
+
+                return backwardDependencies != null && backwardDependencies.isEmpty();
             }
         } catch (ResolveException e) {
             this.logger.warn(

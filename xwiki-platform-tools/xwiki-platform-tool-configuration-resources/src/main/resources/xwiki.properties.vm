@@ -1220,7 +1220,8 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# Without this check, when two requests (possibly on different cluster nodes) save the same document at the same
 #-# time, the last save silently overwrites the changes of the other one. The code saving a document can then load the
 #-# document again and re-apply its changes. Disable this check only if an extension relies on overwriting documents
-#-# saved concurrently and fails because of the refused saves.
+#-# saved concurrently and fails because of the refused saves. Disabling it only stops refusing these saves: the code
+#-# that applies its changes again after a refused save behaves as if no save was ever refused.
 #-#
 #-# The default is:
 # store.revisionCheck.enabled = true

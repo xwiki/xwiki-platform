@@ -2112,7 +2112,8 @@ public class XWiki implements EventListener
      * (see {@link DocumentRevisionConflictException}), the modification is applied again to the newly stored document,
      * so that neither modification is lost. Use this instead of loading, modifying and saving a document yourself
      * whenever the modification can be applied again to a newer version of the document, e.g. adding an attachment or
-     * a group member.
+     * a group member. Note that the listeners of the events sent before saving a document (e.g.
+     * {@code DocumentUpdatingEvent}) are called for each attempt.
      *
      * @param documentReference the reference of the document to update, with the locale of the translation to update
      * @param update modifies the given copy of the stored document (a new document if it doesn't exist) and returns

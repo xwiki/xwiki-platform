@@ -456,6 +456,27 @@ class SaveActionTest
     }
 
     @Test
+    void saveConflictingWithConcurrentSaveWithoutConflictChecking() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        when(mockDocument.getDocumentReference()).thenReturn(documentReference);
+        when(this.xWiki.getDocument(documentReference, this.context)).thenReturn(mockDocument);
+        when(mockClonedDocument.getComment()).thenReturn("My Changes");
+        when(mockForm.getTemplate()).thenReturn("");
+        context.put("ajax", true);
+        // The editor doesn't handle merge conflicts.
+        this.oldcore.getConfigurationSource().setProperty("edit.conflictChecking.enabled", false);
+        DocumentRevisionConflictException conflict =
+            new DocumentRevisionConflictException(documentReference, "1.2", "1.3");
+        doThrow(conflict).when(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
+
+        // The failure isn't answered as a merge conflict.
+        assertSame(conflict, assertThrows(DocumentRevisionConflictException.class,
+            () -> saveAction.save(this.context)));
+        verify(this.mockResponse, never()).setStatus(409);
+    }
+
+    @Test
     void saveConflictingWithConcurrentSaveWithoutAjax() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");

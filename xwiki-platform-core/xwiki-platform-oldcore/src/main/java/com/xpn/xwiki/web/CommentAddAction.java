@@ -180,7 +180,8 @@ public class CommentAddAction extends XWikiAction
     protected boolean saveCommentedDocument(FailablePredicate<XWikiDocument, XWikiException> modification,
         String comment, XWikiContext context) throws XWikiException
     {
-        XWikiDocument document = context.getDoc();
+        // Avoid modifying the cached document, which would keep the modification if the save fails.
+        XWikiDocument document = context.getDoc().clone();
         for (int attempt = 1;; attempt++) {
             if (!modification.test(document)) {
                 return false;

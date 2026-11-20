@@ -138,6 +138,7 @@ public class MergeScriptService implements ScriptService
      * stored document) before saving it again, e.g.:
      *
      * <pre>{@code
+     * #set ($saved = false)
      * #foreach ($attempt in [1..5])
      *   #set ($document = $xwiki.getDocument($reference))
      *   ## Modify the document.
@@ -145,11 +146,20 @@ public class MergeScriptService implements ScriptService
      *   #try('saveException')
      *     $document.save()
      *   #end
-     *   #if ("$!saveException" == '' || !$services.merge.isDocumentRevisionConflict($saveException))
+     *   #if ("$!saveException" == '')
+     *     #set ($saved = true)
+     *     #break
+     *   #elseif (!$services.merge.isDocumentRevisionConflict($saveException))
      *     #break
      *   #end
      * #end
+     * #if (!$saved)
+     *   ## The document couldn't be saved: report the failure, e.g. with $response.sendError(500, '...').
+     * #end
      * }</pre>
+     * <p>
+     * Note that {@code $xwiki.getDocument} returns an empty new document when the document can't be loaded (and
+     * {@code null} without view right), which must not be saved over the stored document.
      *
      * @param exception the exception thrown when saving a document, possibly wrapped in other exceptions (e.g. the
      *     exception caught by the Velocity {@code #try} directive)

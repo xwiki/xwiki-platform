@@ -194,6 +194,29 @@ class DefaultWikiUserManagerTest
     }
 
     @Test
+    void addMembersAlreadyMembers() throws Exception
+    {
+        saveGroup("", ALICE, BOB);
+        String version = this.xwiki.getDocument(GROUP_REFERENCE, this.xcontext).getVersion();
+
+        this.wikiUserManager.addMembers(List.of(ALICE, BOB, ALICE), WIKI_ID);
+
+        // The group isn't saved when there is nobody to add.
+        assertEquals(List.of("", ALICE, BOB), getStoredGroupMembers());
+        assertEquals(version, this.xwiki.getDocument(GROUP_REFERENCE, this.xcontext).getVersion());
+    }
+
+    @Test
+    void addMembersWithDuplicates() throws Exception
+    {
+        saveGroup("", ALICE);
+
+        this.wikiUserManager.addMembers(List.of(BOB, CAROL, BOB), WIKI_ID);
+
+        assertEquals(List.of("", ALICE, BOB, CAROL), getStoredGroupMembers());
+    }
+
+    @Test
     void removeMemberAfterConcurrentSave() throws Exception
     {
         saveGroup("", ALICE, BOB);

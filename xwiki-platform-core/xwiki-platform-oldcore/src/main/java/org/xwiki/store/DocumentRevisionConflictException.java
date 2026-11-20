@@ -30,7 +30,12 @@ import com.xpn.xwiki.XWikiException;
  * Thrown when a document can't be saved because it isn't based on the revision currently stored: the document was
  * created, modified or deleted by another request (possibly on another cluster node) after it was loaded. Saving it
  * anyway would overwrite the changes of the other request, so the caller should load the document again, re-apply its
- * changes and save it again.
+ * changes and save it again (see {@link com.xpn.xwiki.XWiki#updateDocument}).
+ * <p>
+ * The conflict is detected by the store, after the listeners of the events sent before saving the document (e.g.
+ * {@code DocumentUpdatingEvent}, {@code DocumentCreatingEvent} or {@code UserUpdatingDocumentEvent}) were called, and
+ * before the events sent after saving it. So when the save is attempted again, these listeners are called again for
+ * the new attempt.
  *
  * @version $Id$
  * @since 18.10.0RC1

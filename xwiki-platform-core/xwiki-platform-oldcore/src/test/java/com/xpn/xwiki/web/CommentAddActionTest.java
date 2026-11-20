@@ -31,6 +31,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -40,9 +41,15 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -116,5 +123,22 @@ class CommentAddActionTest
         BaseObject commentObject = storedDocument.getXObject(XWikiDocument.COMMENTSCLASS_REFERENCE);
         assertEquals("new comment", commentObject.getLargeStringValue("comment"));
         assertEquals(storedDocument.getVersion(), xcontext.getDoc().getVersion());
+    }
+
+    @Test
+    void addCommentFailingToSave() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        this.oldcore.getSpyXWiki().saveDocument(new XWikiDocument(DOCUMENT_REFERENCE), xcontext);
+        XWikiDocument loadedDocument = this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, xcontext);
+        xcontext.setDoc(loadedDocument);
+        XWikiException failure = new XWikiException();
+        doThrow(failure).when(this.oldcore.getSpyXWiki()).saveDocument(any(XWikiDocument.class), anyString(),
+            anyBoolean(), anyBoolean(), any(XWikiContext.class));
+
+        assertSame(failure, assertThrows(XWikiException.class, () -> this.commentAddAction.action(xcontext)));
+
+        // The loaded document, which can be shared through the document cache, isn't modified.
+        assertNull(loadedDocument.getXObject(XWikiDocument.COMMENTSCLASS_REFERENCE));
     }
 }

@@ -503,8 +503,9 @@ public class SaveAction extends EditAction
             context.getWiki().saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
         } catch (DocumentRevisionConflictException e) {
             // The document was saved by another request after this request loaded it, again and again. The editor
-            // waiting for the result of an asynchronous save can let the user resolve the conflict.
-            if (lastAttempt && Boolean.TRUE.equals(Utils.isAjaxRequest(context))) {
+            // waiting for the result of an asynchronous save can let the user resolve the conflict, unless the merge
+            // conflict handling is disabled.
+            if (lastAttempt && isConflictCheckEnabled() && Boolean.TRUE.equals(Utils.isAjaxRequest(context))) {
                 answerConcurrentSaveConflict(context, originalDoc, tdoc);
                 return false;
             }

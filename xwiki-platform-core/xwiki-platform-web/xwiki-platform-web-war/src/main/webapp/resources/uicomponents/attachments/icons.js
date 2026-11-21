@@ -84,11 +84,26 @@
       }
     };
 
+    var getFallbackIcon = function (attachment) {
+      var data = attachment.data || {};
+      var mimeType = typeof data.mimeType === 'string' ? data.mimeType : '';
+      var fileName = data.name || attachment.label || '';
+      return getIcon(mimeType, fileName);
+    };
+
     var loadAttachmentIcon = function (attachment) {
       return new Promise((resolve) => {
         if (attachment.icon.iconSetType === 'IMAGE') {
           var image = new Image();
           image.onload = function () {
+            resolve(attachment);
+          };
+          image.onerror = function () {
+            // The browser failed to load or decode the image (e.g. a corrupted image or an image format the browser
+            // doesn't support, such as TIFF, or JPEG XL in browsers that don't decode it yet). Fall back on the icon
+            // associated with the attachment media type, which doesn't need to be loaded, instead of showing a broken
+            // image.
+            attachment.icon = getFallbackIcon(attachment);
             resolve(attachment);
           };
           image.src = attachment.icon.url;

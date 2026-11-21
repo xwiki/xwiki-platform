@@ -22,5 +22,5 @@
 #template("display_macros.vm")
 #initRequiredSkinExtensions()
 #set ($message = $services.localization.render('security.requiredRights.configurationChecker.exception'))
-#displayException($escapetool.xml($message) $exception)
+#displayException($escapetool.xml($message) $requiredRightsException)
 #sendRequiredSkinExtensions()

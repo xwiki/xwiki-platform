@@ -31,10 +31,34 @@ class BlockNoteDocument {
    * The metadata associated to the BlockNote content, by block ID (or by the ID injected in a link, or by macro ID).
    * It is passed to the editor, which reads from it the output of the macros.
    */
-  public readonly metadata: BlockMetadataStore = createBlockMetadataStore();
+  public readonly metadata: BlockMetadataStore;
 
-  constructor(public content: BlockType[]) {}
+  /**
+   * @param content - the BlockNote content
+   * @param metadata - the metadata associated to the given content, e.g. the metadata of the editor instance whose
+   *   content is serialized; a new metadata store is created if not specified
+   */
+  constructor(
+    public content: BlockType[],
+    metadata?: BlockMetadataStore,
+  ) {
+    this.metadata = metadata ?? createBlockMetadataStore();
+  }
 }
+
+/**
+ * How to serialize a BlockNote document.
+ *
+ * @since 18.10.0RC1
+ */
+type SaveOptions = {
+  /**
+   * Whether to keep the id of each macro call (used to look up its output), as a macro parameter, so that the output of
+   * the macro calls rendered server-side can be associated with them. The content serialized this way is meant to be
+   * rendered, not saved.
+   */
+  macroIds?: boolean;
+};
 
 /**
  * Processes the BlockNote content before it is loaded in the editor and before it is submitted to be saved server-side.
@@ -56,9 +80,10 @@ interface BlockNoteProcessor {
    * Serializes the given BlockNote document in the BlockNote JSON format that can be saved server-side.
    *
    * @param blockNoteDocument - the BlockNote document to be serialized to JSON
+   * @param options - how to serialize the given BlockNote document (since 18.10.0RC1)
    * @returns the JSON serialization of the given BlockNote document
    */
-  save(blockNoteDocument: BlockNoteDocument): string;
+  save(blockNoteDocument: BlockNoteDocument, options?: SaveOptions): string;
 }
 
-export { BlockNoteDocument, type BlockNoteProcessor };
+export { BlockNoteDocument, type BlockNoteProcessor, type SaveOptions };

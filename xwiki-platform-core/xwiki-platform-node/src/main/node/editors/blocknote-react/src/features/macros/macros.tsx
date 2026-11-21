@@ -20,6 +20,7 @@
 import { CustomInsertMacroButton } from "./CustomInsertMacroButton";
 import { CustomMacroEditButton } from "./CustomMacroEditButton";
 import { getMacroEditing } from "./macroEditing";
+import { MacroOutputUpdate } from "./macroOutputUpdate";
 import { XWikiInlineMacro, XWikiMacroBlock } from "./macroSpec";
 import {
   MACRO_NAME_PREFIX,
@@ -166,8 +167,9 @@ function macroSlashMenuItems(
  * Displays, inserts and edits macro calls: the server-rendered macro calls and the client-rendered macros
  * (`features.macros.list`), added to the schema of the editor, the slash menu items and block type select items of the
  * client-rendered macros, and the actions to insert and edit macro calls with the `MacroEditor` bound in the service
- * container (the "Macro" slash menu item and the toolbar buttons), hidden without one. Nothing is contributed when the
- * syntax of the edited content doesn't support macros.
+ * container (the "Macro" slash menu item and the toolbar buttons), hidden without one. The output of the server-rendered
+ * macro calls is kept up to date with the `MacroRenderer` bound in the service container, if any. Nothing is
+ * contributed when the syntax of the edited content doesn't support macros.
  *
  * @since 18.10.0RC1
  * @beta
@@ -205,6 +207,8 @@ const macrosFeature: EditorFeature = {
           (macro) => macro.dropdownTransformItem,
         ),
       },
+      // Renders the macro calls whose output is missing or out of date, when a MacroRenderer is bound.
+      components: <MacroOutputUpdate />,
     };
   },
 };

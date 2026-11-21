@@ -1,0 +1,51 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Executes the macro calls of the content edited with BlockNote, so that the editor can show the output of the macro
+## calls that were inserted or modified, by the current user or by the other users editing the same content in realtime.
+## All the macro calls are executed because the output of a macro call can depend on the rest of the content. The
+## request is sent to the document where the edited content is saved, which is the context of the macro calls. When it
+## indicates a realtime collaboration session (the "collaboration" request parameter), the content is executed with the
+## rights of the session participant with the least script rights among those that changed the content.
+## ---------------------------------------------------------------------------
+#if ($request.method != 'POST' || !$services.csrf.isTokenValid($request.form_token))
+  #set ($discard = $response.sendError(403, 'A valid form token is required.'))
+#else
+  ## The syntax used to save the edited content, which is normally the syntax of the edited document.
+  #set ($syntax = $NULL)
+  #if ("$!request.syntax" != '')
+    #set ($syntax = $services.rendering.resolveSyntax($request.syntax))
+  #end
+  #if (!$syntax)
+    #set ($syntax = $tdoc.syntax)
+  #end
+  ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
+  #set ($discard = $xcontext.setDisplayMode('view'))
+  #set ($editorSyntax = $services.rendering.resolveSyntax('blocknote/1.0'))
+  #set ($restricted = $request.restricted == 'true')
+  #try('refreshException')
+    #set ($output = $services.wysiwyg.refresh("$!request.content", $editorSyntax, $syntax, $doc.documentReference,
+      $restricted))
+  #end
+  #if ($refreshException || !$output)
+    #set ($discard = $response.sendError(500, 'Failed to execute the macro calls of the edited content.'))
+  #else
+    #rawResponse($output 'application/json')
+  #end
+#end

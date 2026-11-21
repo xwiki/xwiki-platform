@@ -19,7 +19,7 @@
  */
 import "./macro.css";
 import { useMacroEditing } from "./macroEditing";
-import { getMacroOutput } from "./macroMetadata";
+import { useMacroOutput } from "./macroMetadata";
 import { MacroOutput } from "./macroOutput";
 import { invocationToMacroCall, macroCallToInvocation } from "./utils";
 import { EditorInstanceContext } from "../../contexts";
@@ -36,14 +36,15 @@ import type { MacroCall } from "./utils";
  * @param metadata - where the macro output is kept
  * @param id - identifies the macro call (the block id or the `id` property)
  * @param call - the current macro call (JSON)
- * @returns the server-rendered output of the specified macro call, or an empty array if not available
+ * @returns the server-rendered output of the specified macro call, or an empty array if not available; the calling
+ *   component is displayed again when the output is set
  */
-function getOutput(
+function useOutput(
   metadata: BlockMetadataStore | undefined,
   id: string,
   call: string,
 ): OutputNode[] {
-  return (getMacroOutput(metadata, id, call) ?? []) as OutputNode[];
+  return (useMacroOutput(metadata, id, call) ?? []) as OutputNode[];
 }
 
 /**
@@ -76,7 +77,7 @@ const XWikiMacroBlock = createReactBlockSpec(
     render: ({ block, editor }) => {
       const call = JSON.parse(block.props.call) as MacroCall;
       const macroEditing = useMacroEditing();
-      const output = getOutput(
+      const output = useOutput(
         useContext(EditorInstanceContext)?.metadata,
         block.id,
         block.props.call,
@@ -141,7 +142,7 @@ const XWikiInlineMacro = createReactInlineContentSpec(
     render: ({ inlineContent, updateInlineContent }) => {
       const call = JSON.parse(inlineContent.props.call) as MacroCall;
       const macroEditing = useMacroEditing();
-      const output = getOutput(
+      const output = useOutput(
         useContext(EditorInstanceContext)?.metadata,
         inlineContent.props.id,
         inlineContent.props.call,

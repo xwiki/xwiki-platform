@@ -635,11 +635,26 @@ function insertMacroInvocation(
       insertOrUpdateBlockForSlashMenu(editor, block);
     }
   } else {
+    // Inline content has no id that BlockNote preserves, so the id used to keep the macro output is a property.
+    const inlineMacro = {
+      type: "xwikiInlineMacro",
+      props: { ...props, id: generateId() },
+    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    editor.insertInlineContent([{ type: "xwikiInlineMacro", props } as any], {
+    editor.insertInlineContent([inlineMacro as any], {
       updateSelection: true,
     });
   }
+}
+
+/**
+ * @returns a random identifier, e.g. for a macro call whose output has to be kept
+ */
+function generateId(): string {
+  // crypto.randomUUID() is available only in secure contexts (HTTPS), unlike crypto.getRandomValues().
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
 }
 
 export {

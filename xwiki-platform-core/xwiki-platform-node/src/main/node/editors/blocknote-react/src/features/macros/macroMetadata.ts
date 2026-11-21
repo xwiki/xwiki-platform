@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { useCallback, useSyncExternalStore } from "react";
 import type {
   BlockMetadataKey,
   BlockMetadataStore,
@@ -74,4 +75,36 @@ function getMacroOutput(
     : undefined;
 }
 
-export { getMacroOutput, setMacroOutput };
+/**
+ * Gets the server-rendered output of a macro call, like {@link getMacroOutput}, and displays the calling component again
+ * when the output of the macro call is set (e.g. once the macro call is rendered again, after being modified).
+ *
+ * @param metadata - where the macro output is kept
+ * @param id - identifies the macro call (see {@link setMacroOutput})
+ * @param call - the current macro call (JSON)
+ * @returns the output of the specified macro call, or undefined if the macro call doesn't have an output or if it was
+ *   modified since its output was rendered
+ */
+function useMacroOutput(
+  metadata: BlockMetadataStore | undefined,
+  id: string,
+  call: string,
+): unknown[] | undefined {
+  const subscribe = useCallback(
+    (onOutputChange: () => void) =>
+      metadata && id
+        ? metadata.subscribe((changedId) => {
+            if (changedId === id) {
+              onOutputChange();
+            }
+          })
+        : () => {},
+    [metadata, id],
+  );
+  // The output is kept as is in the metadata store, so it is the same object as long as it isn't set again.
+  return useSyncExternalStore(subscribe, () =>
+    getMacroOutput(metadata, id, call),
+  );
+}
+
+export { getMacroOutput, setMacroOutput, useMacroOutput };

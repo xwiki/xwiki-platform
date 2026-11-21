@@ -125,7 +125,7 @@ catalog:
   "@vitejs/plugin-react": 6.3.0
   "@vitejs/plugin-vue": 6.0.11
   "@vitest/eslint-plugin": 1.6.28
-  "@vue/compiler-dom": 3.5.45
+  "@vue/compiler-dom": 3.5.46
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.9.0
   "@vue/test-utils": 2.6.0

@@ -22,6 +22,7 @@ package org.xwiki.observation.remote;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide configuration for remote observation manager.
@@ -55,5 +56,16 @@ public interface RemoteObservationManagerConfiguration
     default String getId()
     {
         return null;
+    }
+
+    /**
+     * @return the name of the cluster to join: members using the same network (or the same discovery mechanism) but a
+     *         different cluster name don't see each other. The default is {@code event}.
+     * @since 18.9.0RC1
+     */
+    @Unstable
+    default String getClusterName()
+    {
+        return "event";
     }
 }

@@ -562,10 +562,10 @@ Get the actual notifications.
     background-color: var(--navbar-default-bg);
     color: var(--navbar-default-link-color);
     border: 0;
-    padding: 10px 15px;
+    padding: 10px calc(var(--grid-gutter-width) / 2);
 
-    @media (min-width: 768px) {
-      padding: 15px 15px;
+    @media (min-width: 768px) { /* @grid-float-breakpoint */
+      padding: calc((var(--navbar-height) - 1lh) / 2) calc(var(--grid-gutter-width) / 2);
     }
     &amp;:hover,
     &amp;:focus {
@@ -785,13 +785,8 @@ Get the actual notifications.
   #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    ## We make sure to use the color theme of the document where this UIX is used.
-    #set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
-    #if ("$!colorTheme" != '')
-    #set ($colorTheme = $services.model.resolveDocument($colorTheme, $doc.documentReference))
-    #end
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro', {'colorTheme': $colorTheme}))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX', {'colorTheme': $colorTheme}))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     {{html clean="false"}} ## We need the clean false to avoid getting a supplementary ul element.
     &lt;li class="notification-uix loading"&gt;&lt;/li&gt;
     {{/html}}

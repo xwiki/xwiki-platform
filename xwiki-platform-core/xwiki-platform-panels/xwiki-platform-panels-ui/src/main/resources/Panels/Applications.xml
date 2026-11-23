@@ -164,7 +164,6 @@
     </property>
     <property>
       <async_context>
-        <value>doc.reference</value>
         <value>icon.theme</value>
         <value>locale</value>
         <value>request.wiki</value>
@@ -227,12 +226,7 @@
 {{/velocity}}
 
 {{velocity}}
-## We make sure to use the color theme of the document where this UIX is used.
-#set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
-#if ("$!colorTheme" != '')
-  #set ($colorTheme = $services.model.resolveDocument($colorTheme, $doc.documentReference))
-#end
-#set ($discard = $xwiki.ssx.use('Panels.Applications', {'colorTheme': $colorTheme}))
+#set ($discard = $xwiki.ssx.use('Panels.Applications'))
 #set ($discard = $xwiki.jsx.use('Panels.Applications'))
 
 #panelheader($services.localization.render('panels.applications.title'))
@@ -559,7 +553,7 @@ require(['scriptaculous/effects'], function() {
   padding: 0;
   margin: 10px 0 0 0;
   border: 0;
-  color: @link-color;
+  color: var(--link-color);
   box-shadow: none;
   background-color: transparent;
   width: 100%;
@@ -569,7 +563,7 @@ require(['scriptaculous/effects'], function() {
 
 .applicationPanelMoreButton:hover,
 .applicationPanelMoreButton:focus {
-  color: @link-hover-color;
+  background-color: var(--nav-link-hover-bg);
 }
 
 .applicationPanelMoreButton .application-label {
@@ -707,7 +701,7 @@ require(['scriptaculous/effects'], function() {
 </code>
     </property>
     <property>
-      <contentType>LESS</contentType>
+      <contentType/>
     </property>
     <property>
       <name>Applications Panel</name>

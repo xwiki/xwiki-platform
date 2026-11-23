@@ -31,6 +31,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.DrawerMenu;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.tree.test.po.TreeElement;
 
 /**
  * Verify the styles of the skin by comparing screenshots of the page with reference screenshots committed in the test
@@ -92,11 +93,25 @@ class SkinVisualIT
     }
 
     /**
+     * Verify the layout of the panels: the title, the lists and the definition lists of a panel, a collapsible panel
+     * with an expanded body, a panel with a radio button and a tree inside the navigation panel, with a current node
+     * and long node labels. It runs before the tests that move the mouse pointer, so that no tree node is hovered.
+     */
+    @Test
+    @Order(3)
+    void panels(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Panels"));
+        TreeElement.getTreesInPageContent().forEach(TreeElement::waitForIt);
+        screenshots.assertMatches("panels", viewPage.getContentContainer());
+    }
+
+    /**
      * Verify the layout of the drawer menu: the brand with the current user, the category headers, the menu items and
      * the separators.
      */
     @Test
-    @Order(3)
+    @Order(4)
     void drawer(TestUtils setup, ScreenshotComparator screenshots) throws IOException
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Headings"));
@@ -111,7 +126,7 @@ class SkinVisualIT
      * table and in the advanced panels, are always displayed.
      */
     @Test
-    @Order(4)
+    @Order(5)
     void liveDataSmallScreen(TestUtils setup, ScreenshotComparator screenshots) throws IOException
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "LiveData"));

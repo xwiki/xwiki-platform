@@ -58,6 +58,8 @@ require(['jquery', 'bootstrap'], function($) {
    ** an accessible name 
    ** The content to display inside.
   In addition, the drawer can contain a `.drawer-close` button that will close the drawer on click.
+  The opener, the container and the close button can also declare the popover attributes, so that the drawer can still be
+  opened and closed when this script doesn't run. The script removes them in order to show the drawer as a modal dialog.
   It's expected for the drawer containers not to be nested in each other, this might lead to inconsistencies 
   when closing them with the ESC key, and inconsistencies on the behavior of subitems in different drawers.
   For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
@@ -69,6 +71,9 @@ require(['jquery'], function($) {
       let drawerOpener = $(this);
       let drawerId = drawerOpener.attr('aria-controls');
       let drawerContainer = $(document.getElementById(drawerId));
+      // The popover attributes are only a fallback for when this script doesn't run.
+      drawerOpener.removeAttr('popovertarget');
+      drawerContainer.removeAttr('popover').find('[popovertarget]').removeAttr('popovertarget popovertargetaction');
 
       let openDrawer = () => drawerContainer.trigger('drawer' + index + '.opened');
       let closeDrawer = () => drawerContainer.trigger('drawer' + index + '.closed');

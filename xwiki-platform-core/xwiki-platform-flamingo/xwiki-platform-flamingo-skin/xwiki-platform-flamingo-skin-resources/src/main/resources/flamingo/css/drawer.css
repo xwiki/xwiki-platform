@@ -53,7 +53,8 @@
     transition: opacity .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
   }
 
-  &[open]:not(.drawer-transitioning) {
+  /* The drawer is either shown as a modal dialog by the script, or as a popover when the script is not running. */
+  &[open]:not(.drawer-transitioning), &:popover-open {
     margin-right: 0;
 
     &::backdrop {

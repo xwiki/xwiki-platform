@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>18.10.0-rc-1</version>
+    <version>18.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-core-shaded</artifactId>
   <name>XWiki Platform - Search - Solr - Core Shaded</name>

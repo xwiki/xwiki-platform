@@ -2130,6 +2130,20 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("one");
         assertEquals(SaveStatus.UNSAVED, firstEditPage.getToolbar().getSaveStatus());
 
+        // Leave the page again, same way, but come back using the browser's Back button. The browser may restore the
+        // edit page from its back/forward cache, in which case the edit page must have left the editing session when
+        // hidden, and must reload itself when restored.
+        firstEditPage = firstEditPage.leaveAndGoBack(() -> new ViewPage().getBreadcrumb()
+            .clickPathElement(testReference.getLastSpaceReference().getName()));
+        firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
+
+        // Verify that the unsaved changes have been restored, and that the edit page we left is not a participant of
+        // the editing session anymore.
+        firstTextArea.waitForOwnNotificationInfoMessage("Unsaved changes restored");
+        firstTextArea.waitUntilTextContains("one");
+        assertEquals(SaveStatus.UNSAVED, firstEditPage.getToolbar().getSaveStatus());
+        assertTrue(firstEditPage.getToolbar().waitUntilConnected().isEditingAlone());
+
         // Cancel the unsaved changes.
         setup.leaveEditMode();
 

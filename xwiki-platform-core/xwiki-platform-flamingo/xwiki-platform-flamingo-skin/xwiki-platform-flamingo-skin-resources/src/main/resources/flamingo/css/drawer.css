@@ -64,6 +64,15 @@
     }
   }
 
+  /* Slide the drawer out before closing it, in the browsers that can't keep it in the top layer while it closes. */
+  &[open].drawer-closing {
+    margin-right: calc(-1 * var(--xwiki-drawer-width));
+
+    &::backdrop {
+      opacity: 0;
+    }
+  }
+
   .drawer-menu {
     position: relative;
     margin: 0;

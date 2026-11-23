@@ -50,7 +50,8 @@ require(['jquery', 'bootstrap'], function($) {
   Keep the drawer openers in sync with their drawer.
   The browser opens and closes the drawers on its own, so that they work even when this script doesn't run:
   * A drawer is a dialog with the class 'drawer-nav', a unique id, an accessible name and the attribute closedby="any",
-    so that the Escape key and a click outside of it close it. It can contain a close button with command="close".
+    so that the Escape key and a click outside of it close it. It can contain a close button with
+    command="request-close".
   * Its opener is a button with the class 'drawer-opener', commandfor set to the id of the drawer and
     command="show-modal".
   For an example, see #tmDrawerActivator and #tmDrawer.
@@ -63,12 +64,26 @@ document.querySelectorAll('.drawer-opener').forEach(drawerOpener => {
   drawerOpener.addEventListener('click', () => drawerOpener.setAttribute('aria-expanded', 'true'));
   drawer.addEventListener('close', () => drawerOpener.setAttribute('aria-expanded', 'false'));
   // Some keyboard shortcuts listened on the whole page cancel the Escape key before the browser can close the drawer,
-  // so we close it before they are called.
+  // so we ask the drawer to close before they are called.
   drawer.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
-      drawer.close();
+      event.preventDefault();
+      drawer.requestClose();
     }
   });
+  // Some browsers can't keep the drawer displayed while it closes, so we wait for it to slide out before closing it.
+  if (!CSS.supports('overlay', 'auto')) {
+    drawer.addEventListener('cancel', async event => {
+      event.preventDefault();
+      if (drawer.classList.contains('drawer-closing')) {
+        return;
+      }
+      drawer.classList.add('drawer-closing');
+      await Promise.allSettled(drawer.getAnimations().map(animation => animation.finished));
+      drawer.classList.remove('drawer-closing');
+      drawer.close();
+    });
+  }
   // Close the drawer on a click outside of it in the browsers that don't support the closedby attribute yet.
   if (!('closedBy' in HTMLDialogElement.prototype)) {
     drawer.addEventListener('click', event => {
@@ -76,7 +91,7 @@ document.querySelectorAll('.drawer-opener').forEach(drawerOpener => {
       const outside = event.clientX < drawerZone.left || event.clientX > drawerZone.right ||
         event.clientY < drawerZone.top || event.clientY > drawerZone.bottom;
       if (event.target === drawer && outside) {
-        drawer.close();
+        drawer.requestClose();
       }
     });
   }

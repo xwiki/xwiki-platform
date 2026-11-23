@@ -155,11 +155,12 @@
             -->
             <revapi.differences>
               <justification>
-                These differences are inherited from jakarta.servlet.ServletRequest, which changed in Servlet 6.0. The
-                MutableJakartaServletRequest implementations extend the Servlet API request wrapper or the Javax to
-                Jakarta bridge, which provide the new methods, and the removed one was deprecated since Servlet 2.1.
+                These differences are inherited from jakarta.servlet.ServletRequest, which changed in Servlet 6.0, and
+                the upgrade to Jakarta EE 10 is worth this breakage. An implementation of MutableJakartaServletRequest
+                that does not extend a Servlet API request wrapper has to implement the new methods, and code calling
+                getRealPath on it has to use ServletContext#getRealPath instead.
               </justification>
-              <criticality>allowed</criticality>
+              <criticality>highlight</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>

@@ -446,32 +446,18 @@ class MacroIT extends AbstractCKEditorIT
         String draftMacroCall = "{{locations locations=\"~\"{Draft}~\"\"/}}";
         assertSourceEquals("before\n\n" + draftMacroCall + "\n\nafter");
 
-        // A location quoted because it holds a comma, followed by a location holding a whitespace, typed without the
-        // quotes. The braces wrapping the whole value are removed by the macro.
-        setSource(
-            "before\n\n" + draftMacroCall + "\n\n{{locations locations=\"{'Space.My, Page',My Space}\"/}}\n\nafter");
-
-        this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
-        macroEditModal = this.textArea.editSelectedMacro();
-        SuggestInputElement locationPicker = macroEditModal.getMacroParameterSuggestInput("locations");
-        assertEquals(List.of("Space.My, Page", "My Space"), locationPicker.getValues());
-
-        // A location holding double quotes, which are escaped with a backslash inside the quoted value.
-        locationPicker.sendKeys("Say \"Hi\"").selectTypedText();
-        macroEditModal.clickSubmit();
-
-        String source = "before\n\n" + draftMacroCall
-            + "\n\n{{locations locations=\"~\"Space.My, Page~\",~\"My Space~\",~\"Say \\~\"Hi\\~\"~\"\"/}}\n\nafter";
-        assertSourceEquals(source);
-
-        // The values written by the dialog are read back as they were selected. The source is set again to place the
-        // caret like before.
-        setSource(source);
+        // Locations written by hand inside braces, which the macro removes: one in single quotes because it holds a
+        // comma, one holding a whitespace without quotes and one in double quotes, holding double quotes escaped with a
+        // backslash. The dialog reads them as the macro does, and puts them all in double quotes when submitted.
+        setSource("before\n\n" + draftMacroCall
+            + "\n\n{{locations locations=\"{'Space.My, Page',My Space,~\"Say \\~\"Hi\\~\"~\"}\"/}}\n\nafter");
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
         macroEditModal = this.textArea.editSelectedMacro();
         assertEquals(List.of("Space.My, Page", "My Space", "Say \"Hi\""),
             macroEditModal.getMacroParameterSuggestInput("locations").getValues());
         macroEditModal.clickSubmit();
+        assertSourceEquals("before\n\n" + draftMacroCall
+            + "\n\n{{locations locations=\"~\"Space.My, Page~\",~\"My Space~\",~\"Say \\~\"Hi\\~\"~\"\"/}}\n\nafter");
 
         ViewPage viewPage = editPage.clickSaveAndView();
         assertEquals("before\n{Draft}\nSpace.My, Page\nMy Space\nSay \"Hi\"\nafter", viewPage.getContent());

@@ -21,7 +21,7 @@
 ##
 ## Display the drawer
 ##
-<dialog class="drawer-nav" id="tmDrawer" popover
+<dialog class="drawer-nav" id="tmDrawer" closedby="any"
 aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.label'))">
   <ul class="drawer-menu">
     ##
@@ -57,7 +57,7 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
         ##
         #displayDrawerUIX('org.xwiki.plaftorm.drawer.header')
       </div>
-      <button class="btn btn-primary drawer-close" popovertarget="tmDrawer" popovertargetaction="hide" title="$escapetool.xml($services.localization.render('core.menu.drawer.close.title'))">$services.icon.renderHTML('cross')</button>
+      <button type="button" class="btn btn-primary drawer-close" commandfor="tmDrawer" command="close" title="$escapetool.xml($services.localization.render('core.menu.drawer.close.title'))">$services.icon.renderHTML('cross')</button>
     </li>
     ##
     ## Display the content of the drawer

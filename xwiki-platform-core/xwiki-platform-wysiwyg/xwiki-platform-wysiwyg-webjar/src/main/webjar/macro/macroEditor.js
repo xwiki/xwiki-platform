@@ -77,24 +77,10 @@ define('xwiki-wysiwyg-macro-collection-parameter', [], function() {
       '"' + value.replaceAll('\\', '\\\\').replaceAll('"', '\\"') + '"' : value).join(',');
   };
 
-  /**
-   * Matches one value of a collection parameter. Each match is one of three alternatives, tried in this order:
-   * <ul>
-   *   <li>{@code \s*"((?:\\.|[^"\\])*)"?} matches a value put in double quotes, the whitespaces before it included.
-   *     Its content is captured by the first group: any number of either a backslash followed by any character, which
-   *     is an escaped character, or a character that is neither a double quote nor a backslash. The closing double
-   *     quote is optional, so that a value missing it runs up to the end of the text, like the macro reads it.</li>
-   *   <li>{@code \s*'((?:\\.|[^'\\])*)'?} does the same for a value put in single quotes, captured by the second
-   *     group.</li>
-   *   <li>{@code ([^,]+)} matches a value without quotes, captured by the third group: everything up to the next
-   *     comma. Whitespaces and quotes inside it are kept, so that a value typed by hand like {@code My Space} or
-   *     {@code O'Brien} stays whole.</li>
-   * </ul>
-   * The commas separating the values are matched by none of the alternatives, so they are skipped between two
-   * matches. A quoted value ends at its closing quote, so a text following it before the next comma, like the
-   * {@code b} of {@code "a"b}, is matched as another value without quotes, as the macro does. The whitespaces between
-   * a closing quote and the next comma are matched the same way, as a value that becomes empty once trimmed.
-   */
+  // Matches one value of a collection parameter: a value in double quotes, a value in single quotes or a value without
+  // quotes, captured by the first, second and third group. This is the same pattern as LIST_VALUE_PATTERN in
+  // org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory, which explains it in detail. Keep
+  // the two patterns in sync.
   const collectionValuePattern = /\s*"((?:\\.|[^"\\])*)"?|\s*'((?:\\.|[^'\\])*)'?|([^,]+)/g;
 
   /**

@@ -19,10 +19,6 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -31,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -83,6 +81,37 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 public class DefaultNotificationParametersFactory
 {
     private static final String FIELD_SEPARATOR = ",";
+
+    /**
+     * Matches one value of a parameter holding a list. Each match is one of three alternatives, tried in this order:
+     * <ul>
+     * <li>{@code \s*"((?:\\.|[^"\\])*)"?} matches a value put in double quotes, the whitespaces before it included. Its
+     * content is captured by the first group: any number of either a backslash followed by any character, which is an
+     * escaped character, or a character that is neither a double quote nor a backslash. The closing double quote is
+     * optional, so that a value missing it runs up to the end of the text, like the macro reads it.</li>
+     * <li>{@code \s*'((?:\\.|[^'\\])*)'?} does the same for a value put in single quotes, captured by the second
+     * group.</li>
+     * <li>{@code ([^,]+)} matches a value without quotes, captured by the third group: everything up to the next comma.
+     * Whitespaces and quotes inside it are kept, so that a value typed by hand like {@code My Space} or
+     * {@code O'Brien} stays whole.</li>
+     * </ul>
+     * The commas separating the values are matched by none of the alternatives, so they are skipped between two
+     * matches. A quoted value ends at its closing quote, so a text following it before the next comma, like the
+     * {@code b} of {@code "a"b}, is matched as another value without quotes, as the macro does. The whitespaces between
+     * a closing quote and the next comma are matched the same way, as a value that becomes empty once trimmed.
+     * <p>
+     * The macro editor reads the values of the collection parameters with the same pattern, {@code
+     * collectionValuePattern} in the {@code macro/macroEditor.js} file of the WYSIWYG webjar, so that the values it
+     * writes and reads are read the same way here. Keep the two patterns in sync.
+     */
+    private static final Pattern LIST_VALUE_PATTERN =
+        Pattern.compile("\\s*\"((?:\\\\.|[^\"\\\\])*)\"?|\\s*'((?:\\\\.|[^'\\\\])*)'?|([^,]+)");
+
+    /**
+     * Matches a backslash followed by the character it escapes, captured by the first group, to remove the backslash
+     * from a value put in quotes.
+     */
+    private static final Pattern ESCAPED_CHARACTER_PATTERN = Pattern.compile("\\\\(.)");
 
     @Inject
     private DocumentReferenceResolver<String> stringDocumentReferenceResolver;
@@ -487,41 +516,41 @@ public class DefaultNotificationParametersFactory
     }
 
     /**
-     * Splits the value of a parameter holding a list on the commas that are not inside double quotes, the way the macro
-     * editor writes it. A backslash escapes the next character inside double quotes.
+     * Splits the value of a parameter holding a list the way the macro editor reads it: the braces wrapping the whole
+     * value are removed, then the value is split on the commas that are not inside double or single quotes, a
+     * backslash escaping the next character inside quotes. See {@link #LIST_VALUE_PATTERN}.
      * <p>
      * The standard {@code AbstractCollectionConverter} used for the macro parameters isn't used here because it also
-     * splits the values on whitespaces and reads single quotes. These parameters are also given unquoted, by
+     * splits the values on whitespaces and cuts a value at any quote. These parameters are also given unquoted, by
      * notifications macro calls saved in existing pages, by the RSS feed URLs readers are subscribed to and by the
      * clients of the REST API, so a value like {@code My Space} would become the two values {@code My} and
-     * {@code Space}, and an unquoted name holding an apostrophe would be cut at it. The notifications filtered on these
-     * values would no longer be displayed. The converter component is shared by all the macros, so it can't be
-     * configured to read only commas and double quotes for these parameters.
+     * {@code Space}, and a name like {@code O'Brien} would be cut at its apostrophe. The notifications filtered on
+     * these values would no longer be displayed. The converter component is shared by all the macros, so it can't be
+     * configured differently for these parameters.
      *
      * @param value the value of the parameter
      * @return the values it holds, trimmed, empty values excluded
      */
     static String[] splitListParameter(String value)
     {
-        List<String> values = new ArrayList<>();
-        if (StringUtils.isNotBlank(value)) {
-            StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(value));
-            tokenizer.resetSyntax();
-            tokenizer.wordChars(0, 255);
-            tokenizer.whitespaceChars(',', ',');
-            tokenizer.quoteChar('"');
-            try {
-                while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
-                    String token = StringUtils.trim(tokenizer.sval);
-                    if (StringUtils.isNotEmpty(token)) {
-                        values.add(token);
-                    }
-                }
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+        if (StringUtils.isBlank(value)) {
+            return new String[0];
         }
-        return values.toArray(new String[0]);
+        String text = value.trim();
+        if (text.startsWith("{") && text.endsWith("}")) {
+            text = text.substring(1, text.length() - 1);
+        }
+        return LIST_VALUE_PATTERN.matcher(text).results()
+            .map(DefaultNotificationParametersFactory::getListValue)
+            .map(String::trim)
+            .filter(StringUtils::isNotEmpty)
+            .toArray(String[]::new);
+    }
+
+    private static String getListValue(MatchResult match)
+    {
+        String quotedValue = match.group(1) != null ? match.group(1) : match.group(2);
+        return quotedValue != null ? ESCAPED_CHARACTER_PATTERN.matcher(quotedValue).replaceAll("$1") : match.group(3);
     }
 
     private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)

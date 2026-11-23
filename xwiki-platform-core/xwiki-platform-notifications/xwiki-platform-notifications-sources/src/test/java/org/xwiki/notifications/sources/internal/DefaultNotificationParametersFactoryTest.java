@@ -424,18 +424,22 @@ class DefaultNotificationParametersFactoryTest
         DefaultNotificationFilterPreference filterPreference0 = getFilterPreference("SPACE", 0);
         filterPreference0.setPage("mywiki@@My, Space");
         DefaultNotificationFilterPreference filterPreference1 = getFilterPreference("SPACE", 1);
-        filterPreference1.setPage("mywiki@@Other Space");
+        filterPreference1.setPage("mywiki@@Your, Space");
+        DefaultNotificationFilterPreference filterPreference2 = getFilterPreference("SPACE", 2);
+        filterPreference2.setPage("mywiki@@Other Space");
         expectedNotificationParameters.filterPreferences = List.of(
             new ScopeNotificationFilterPreference(filterPreference0, this.entityReferenceResolver),
             new ScopeNotificationFilterPreference(filterPreference1, this.entityReferenceResolver),
+            new ScopeNotificationFilterPreference(filterPreference2, this.entityReferenceResolver),
             new TagNotificationFilterPreference("my tag", "mywiki"),
             new TagNotificationFilterPreference("say \"hi\"", "mywiki")
         );
 
-        // The values are quoted the way the macro editor writes them, except for the last space, which holds no comma.
+        // The values are quoted the way the macro editor writes them, except for the spaces, written by hand inside
+        // braces, one of them in single quotes and the last one without quotes since it holds no comma.
         assertEquals(expectedNotificationParameters, this.parametersFactory.createNotificationParameters(Map.of(
             ParametersKey.USE_USER_PREFERENCES, "false",
-            ParametersKey.SPACES, "\"My, Space\", Other Space",
+            ParametersKey.SPACES, "{\"My, Space\", 'Your, Space', Other Space}",
             ParametersKey.TAGS, "\"my tag\",\"say \\\"hi\\\"\""
         )));
     }

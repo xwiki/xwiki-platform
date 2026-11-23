@@ -1848,6 +1848,21 @@ class PDFExportIT
         assertEquals(4, printPreview.getPrintPageCount());
     }
 
+    @Test
+    @Order(39)
+    void mediaQueryRangeSyntax(TestUtils setup) throws Exception
+    {
+        setup.login("John", "pass");
+        // The page has a style sheet using the range syntax of media queries, which Paged.js fails to parse.
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "MediaQueryRangeSyntax"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+        try (PDFDocument pdf = export(exportOptions)) {
+            // We should have 2 pages: cover page and one content page.
+            assertEquals(2, pdf.getNumberOfPages());
+            assertEquals("MediaQueryRangeSyntax\n2 / 2\nSome content.\n", pdf.getTextFromPage(1));
+        }
+    }
+
     private ViewPage gotoPageWithoutWCAG(TestUtils setup, LocalDocumentReference reference)
     {
         WCAGContext wcagContext = setup.getWCAGUtils().getWCAGContext();

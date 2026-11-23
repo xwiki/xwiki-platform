@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.query.QueryException;
-import org.xwiki.stability.Unstable;
 
 /**
  * A component in charge of validating a passed HQL statement.
@@ -53,6 +52,5 @@ public interface HQLStatementValidator
      * @since 17.3.0RC1
      * @since 16.10.6
      */
-    @Unstable
     void checkOrderBySafe(List<String> allowedPrefixes, String orderByValue) throws QueryException;
 }

@@ -73,9 +73,23 @@ describe("createXWikiWebSocketProvider", () => {
       vi.mocked(WebsocketProvider).mock.calls[0];
     expect(url).toBe("ws://localhost/xwiki/websocket/xwiki");
     expect(roomName).toBe("yjs");
-    expect(options).toEqual({
-      params: { room: "xwiki:Space.Page", locale: "fr" },
+    expect(options?.params).toEqual({
+      room: "xwiki:Space.Page",
+      locale: "fr",
     });
+  });
+
+  it("doesn't exchange updates with the other browser tabs, bypassing the server", () => {
+    createXWikiWebSocketProvider(
+      "ws://localhost/xwiki/websocket/xwiki/yjs",
+      "xwiki:Space.Page",
+      "fr",
+    );
+
+    // The browser tabs would share the same BroadcastChannel whatever document they edit, because the channel name
+    // doesn't include the query parameters that identify the room.
+    const [, , , options] = vi.mocked(WebsocketProvider).mock.calls[0];
+    expect(options?.disableBc).toBe(true);
   });
 
   it("removes the local awareness state when the page is hidden, until destroyed", () => {

@@ -24,11 +24,8 @@ import { expect, test } from "@playwright/experimental-ct-vue";
 
 test("BlockNote Headless mounts properly", async ({ mount }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: [],
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
+    content: [],
+    options: { syntax: FULL_SYNTAX },
   });
 
   await expect(component).toBeVisible();
@@ -37,11 +34,8 @@ test("BlockNote Headless mounts properly", async ({ mount }) => {
 
 test("BlockNote Headless shows with initial content", async ({ mount }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphs(["Hello,", "world!"]),
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
+    content: buildParagraphs(["Hello,", "world!"]),
+    options: { syntax: FULL_SYNTAX },
   });
 
   await expect(component).toBeVisible();

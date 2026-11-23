@@ -28,7 +28,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.stability.Unstable;
 
 /**
  * REST resource dedicated for manipulation of pinned pages.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.10.5
  * @since 16.4.7
  */
-@Unstable
 @Path("/wikis/{wikiName}{spaceName : (/spaces/[^/]+)*}/pinnedChildPages")
 public interface PinnedChildPagesResource
 {

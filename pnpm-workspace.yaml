@@ -108,7 +108,7 @@ catalog:
   "@oxc-project/runtime": 0.158.0
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
-  "@playwright/test": 1.64.1
+  "@playwright/test": 1.65.1
   "@tsconfig/node26": 26.0.2
   "@types/jquery": 4.0.1
   "@types/jsdom": 30.0.0
@@ -122,13 +122,13 @@ catalog:
   # TypeScript 7 ships only the native tsc binary, with no JavaScript API. It owns the tsc command, while the typescript
   # entry below provides the TypeScript 6 API that typescript-eslint, vue-tsc, Volar and the dts tooling require.
   "@typescript/native": npm:typescript@7.0.2
-  "@vitejs/plugin-react": 6.1.2
+  "@vitejs/plugin-react": 6.3.0
   "@vitejs/plugin-vue": 6.0.11
   "@vitest/eslint-plugin": 1.6.28
   "@vue/compiler-dom": 3.5.45
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.9.0
-  "@vue/test-utils": 2.5.1
+  "@vue/test-utils": 2.6.0
   "@vue/tsconfig": 0.9.1
   axe-core: 4.14.0
   bootstrap-icons: 1.13.2
@@ -148,7 +148,7 @@ catalog:
   eventemitter3: 5.0.4
   flush-promises: 1.0.2
   globals: 17.14.0
-  i18next: 26.4.4
+  i18next: 27.1.3
   inversify: 8.2.4
   jiti: 2.7.0
   jquery: 4.0.0
@@ -172,9 +172,9 @@ catalog:
   postcss-simple-vars: 7.0.1
   publint: 0.3.25
   qunit: 3.0.0
-  react: 19.3.0
-  react-dom: 19.3.0
-  react-i18next: 17.0.15
+  react: 19.3.1
+  react-dom: 19.3.1
+  react-i18next: 18.0.3
   react-icons: 5.7.0
   reflect-metadata: 0.2.2
   remark-parse: 11.0.0
@@ -190,8 +190,8 @@ catalog:
   vite: 8.3.4
   vite-plugin-css-injected-by-js: 5.0.3
   vite-plugin-dts: 4.5.4
-  vitest: 5.0.5
-  vitest-mock-extended: 5.1.1
+  vitest: 5.1.0
+  vitest-mock-extended: 6.0.1
   vue: 3.5.45
   vue-eslint-parser: 10.4.2
   vue-i18n: 11.4.20

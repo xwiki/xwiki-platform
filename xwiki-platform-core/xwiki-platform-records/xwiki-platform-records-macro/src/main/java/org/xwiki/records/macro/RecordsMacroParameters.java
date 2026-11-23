@@ -36,7 +36,7 @@ import org.xwiki.stability.Unstable;
  * The annotations are what the WYSIWYG macro dialog is built from, and the layout they produce is not a free choice.
  * {@code MacroDescriptorUIFactory} renders the mandatory nodes flat, above the tab strip, and turns the optional groups
  * into the tabs. {@code class} is mandatory and carries no group, so it is that flat field; the {@code columns},
- * {@code filterSort}, {@code display} and {@code advanced} groups become the tabs, in that order.
+ * {@code filterSort}, {@code display}, {@code editing} and {@code advanced} groups become the tabs, in that order.
  * <p>
  * Leaving {@code class} ungrouped is a choice rather than a requirement: a group holding a mandatory parameter is
  * itself mandatory and would be rendered in the same place, as a titled panel. It is ungrouped because it is currently
@@ -62,11 +62,16 @@ import org.xwiki.stability.Unstable;
  * allow editing, suppressing it is the default path, so honouring the parameter would silently downgrade the content
  * trust of every table authored by someone without script right and get the link displayers sanitized away.
  * <p>
+ * The edit mode and the creation of entries have no such problem: they are switched on through parameters of the
+ * {@code liveTable} source, not through the configuration.
+ * <p>
  * The display types are what select the parameter widgets. {@link RecordsDataType} names the XClass picker of the
  * object and class editors, {@link RecordsColumns} names this module's own field picker, {@link RecordsFilters} its
- * filter picker, {@link RecordsSort} its sort picker and {@link RecordsLayouts} its layout radio group; all five
- * resolve to a template under {@code templates/html_displayer}. Everything else relies on the displayer the Java type
- * already has: a {@link String} renders a text input.
+ * filter picker, {@link RecordsSort} its sort picker, {@link RecordsLayouts} its layout radio group and
+ * {@link RecordsCreationStrategy} its creation strategy dropdown; all six resolve to a template under
+ * {@code templates/html_displayer}. Everything else relies on the displayer the Java type already has: a
+ * {@link String} renders a text input, a {@code boolean} a checkbox, a {@link RecordsLocation} this module's location
+ * picker and a {@link RecordsTemplateProvider} its template provider dropdown.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -85,6 +90,14 @@ public class RecordsMacroParameters
     private String layouts = "table";
 
     private String description;
+
+    private boolean allowEditMode;
+
+    private String creationStrategy;
+
+    private RecordsLocation newEntriesLocation;
+
+    private RecordsTemplateProvider templateProvider;
 
     private String id;
 
@@ -219,6 +232,95 @@ public class RecordsMacroParameters
     }
 
     /**
+     * @return whether readers can switch the table to its edit mode
+     */
+    public boolean isAllowEditMode()
+    {
+        return this.allowEditMode;
+    }
+
+    /**
+     * @param allowEditMode whether readers can switch the table to its edit mode
+     */
+    @PropertyName("Allow edit mode")
+    @PropertyDescription("Lets readers switch the table to its edit mode; only the entries they can edit become "
+        + "editable.")
+    @PropertyGroup("editing")
+    @PropertyOrder(7)
+    public void setAllowEditMode(boolean allowEditMode)
+    {
+        this.allowEditMode = allowEditMode;
+    }
+
+    /**
+     * @return the hint of the row naming strategy new entries are created with, or {@code null} when entries cannot be
+     *     created from the table
+     */
+    public String getCreationStrategy()
+    {
+        return this.creationStrategy;
+    }
+
+    /**
+     * @param creationStrategy the hint of the row naming strategy new entries are created with, or {@code null} when
+     *     entries cannot be created from the table
+     */
+    @PropertyDisplayType(RecordsCreationStrategy.class)
+    @PropertyName("Creation strategy")
+    @PropertyDescription("How the pages of the entries created from the table are named. Creating entries requires "
+        + "the edit mode.")
+    @PropertyGroup("editing")
+    @PropertyOrder(8)
+    public void setCreationStrategy(String creationStrategy)
+    {
+        this.creationStrategy = creationStrategy;
+    }
+
+    /**
+     * @return the space new entries are created in, or {@code null} for the space of the page holding the table
+     */
+    public RecordsLocation getNewEntriesLocation()
+    {
+        return this.newEntriesLocation;
+    }
+
+    /**
+     * @param newEntriesLocation the space new entries are created in, or {@code null} for the space of the page
+     *     holding the table
+     */
+    @PropertyName("New entries location")
+    @PropertyDescription("Where the entries created from the table are put. Leave empty to put them under the page "
+        + "holding the table.")
+    @PropertyGroup("editing")
+    @PropertyOrder(9)
+    public void setNewEntriesLocation(RecordsLocation newEntriesLocation)
+    {
+        this.newEntriesLocation = newEntriesLocation;
+    }
+
+    /**
+     * @return the template provider new entries are created from, {@code null} for the one named after the data
+     *     type, or {@link RecordsTemplateProvider#NONE} for no template
+     */
+    public RecordsTemplateProvider getTemplateProvider()
+    {
+        return this.templateProvider;
+    }
+
+    /**
+     * @param templateProvider the template provider new entries are created from, {@code null} for the one named
+     *     after the data type, or {@link RecordsTemplateProvider#NONE} for no template
+     */
+    @PropertyName("Template")
+    @PropertyDescription("The template the entries created from the table start from.")
+    @PropertyGroup("editing")
+    @PropertyOrder(10)
+    public void setTemplateProvider(RecordsTemplateProvider templateProvider)
+    {
+        this.templateProvider = templateProvider;
+    }
+
+    /**
      * @return the identifier of this table
      */
     public String getId()
@@ -233,7 +335,7 @@ public class RecordsMacroParameters
     @PropertyDescription("Identifier for this table, needed only when one page holds more than one.")
     @PropertyGroup("advanced")
     @PropertyAdvanced
-    @PropertyOrder(7)
+    @PropertyOrder(11)
     public void setId(String id)
     {
         this.id = id;

@@ -39,8 +39,13 @@
   <content>{{template name="hierarchy_macros.vm" /}}
 
 {{velocity output='false'}}
-#set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
-#set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
+## The filter values matching these patterns are used as is in the filter query. A range bound is a single term (no
+## white space, quotes, escaping or brackets) so that the value can't contain any other clause, and it can't contain
+## the characters of local parameters (!, = and $) so that "{" followed by the bound can't start them. A wildcard value
+## can't specify a field, local parameters, nested groups, phrases or escaping so that it only matches the filtered
+## field.
+#set ($rangePattern = $regextool.compile('^[\[{]([^\s"\\\[\]{}()!=$]+) TO ([^\s"\\\[\]{}()!=$]+)[\]}]$'))
+#set ($wildcardPattern = $regextool.compile('^\([^:{}()"\\]*\*[^:{}()"\\]*\)$'))
 
 #macro (_displaySearchFormBegin)
   #set($void = $services.progress.startStep('#displaySearchForm'))
@@ -805,7 +810,8 @@
   ## Add the facets.
   #set ($prefixFacets = ['space_facet'])
   #foreach ($parameter in $request.parameterMap.entrySet())
-    #if ($parameter.key.startsWith('f_'))
+    ## Only plain field names are supported.
+    #if ($parameter.key.startsWith('f_') &amp;&amp; $services.query.solr.isFieldName($parameter.key.substring(2)))
       #set ($fieldName = $parameter.key.substring(2))
       #set ($escapedValues = [])
       #foreach ($value in $parameter.value)
@@ -844,11 +850,11 @@
 #end
 
 #macro (escapeFilterValue $value)
-## Check if the given value is a range.
+## Check if the given value is a range or a wildcard value, otherwise match it as a literal value.
 #if ($rangePattern.matcher($value).matches() || $wildcardPattern.matcher($value).matches())##
 $value##
 #else##
-"$stringtool.replaceEach($value, ['\', '"'], ['\\', '\"'])"##
+$services.query.solr.quote($value)##
 #end##
 #end
 
@@ -886,7 +892,8 @@ $value##
   ##
   ## Sort
   #set ($sort = $request.sort)
-  #if ("$!sort" == '')
+  ## Only plain field names are supported (the sort order is specified separately).
+  #if (!$services.query.solr.isFieldName($sort))
     #set ($sort = 'score')
   #end
   ## If at any point this default behavior is changed, be extra careful with "#sort-order-input" initialization.

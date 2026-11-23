@@ -63,6 +63,7 @@ async function load(
   className,
   extraParams,
   pendingValues,
+  template,
 ) {
   const [xcontext, $] = await loadById("xwiki-meta", "jquery");
   const parameters = {
@@ -82,14 +83,19 @@ async function load(
   // The values of a row whose entry does not exist yet are only held by the client, so the field is
   // rendered by the preview action, which applies them to the document the row would become without
   // saving anything. That action requires a POST carrying the CSRF token.
+  const data = {
+    ...parameters,
+    ...toFormFields(pendingValues, className),
+    form_token: xcontext.form_token,
+  };
+  // The preview action starts that document from the template, before applying the values.
+  if (template) {
+    data.template = template;
+  }
   return $.ajax({
     type: "POST",
     url: computeTargetURL(documentReference, "preview"),
-    data: {
-      ...parameters,
-      ...toFormFields(pendingValues, className),
-      form_token: xcontext.form_token,
-    },
+    data,
     // The wiki reads repeated parameters, not the indexed names jQuery produces by default, which
     // is how a property holding several values is sent.
     traditional: true,
@@ -126,6 +132,7 @@ function toFormFields(pendingValues, className) {
  * @param extraParams - optional extra request parameters (e.g. force and force_token to force an edit confirmation)
  * @param pendingValues - the values of a row whose entry does not exist yet, which the field is
  * rendered from, or undefined to render the field from the stored document
+ * @param template - the template the entry of that row is created from, if any
  * @returns the XObject property field html content in edit mode
  */
 function edit(
@@ -134,6 +141,7 @@ function edit(
   property,
   extraParams,
   pendingValues,
+  template,
 ) {
   return load(
     "edit",
@@ -142,6 +150,7 @@ function edit(
     className,
     extraParams,
     pendingValues,
+    template,
   );
 }
 
@@ -152,9 +161,10 @@ function edit(
  * @param property - the XObject property to display
  * @param pendingValues - the values of a row whose entry does not exist yet, which the field is
  * rendered from, or undefined to render the field from the stored document
+ * @param template - the template the entry of that row is created from, if any
  * @returns the XObject property field html content in view mode
  */
-function view(documentReference, className, property, pendingValues) {
+function view(documentReference, className, property, pendingValues, template) {
   return load(
     "view",
     documentReference,
@@ -162,6 +172,7 @@ function view(documentReference, className, property, pendingValues) {
     className,
     undefined,
     pendingValues,
+    template,
   );
 }
 

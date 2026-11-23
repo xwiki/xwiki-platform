@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-editors-blocknote-headless",
-  "version": "18.10.0-SNAPSHOT",
+  "version": "19.0.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -69,6 +69,7 @@
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-link-type-default": "workspace:*",
     "@xwiki/platform-link-type-ui": "workspace:*",
+    "@xwiki/platform-rendering-api": "workspace:*",
     "@xwiki/platform-syntaxes-config": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
@@ -81,7 +82,6 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "vitest-mock-extended": "catalog:",
     "vue": "catalog:",
     "vue-tsc": "catalog:"
   },

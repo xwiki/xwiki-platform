@@ -18,18 +18,13 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
-  <div class="xwiki-blocknote" ref="root" v-if="!isLoading">
+  <div class="xwiki-blocknote" v-if="!isLoading">
     <suspense>
       <BlocknoteEditor
-        v-if="editorContent"
+        v-if="editorContent && editorOptions"
         ref="editor"
-        :editor-props
-        :editor-content
-        :deps-container="container"
-        :excluded-link-target-types="excludedLinkTargetTypes"
-        :link-context
-        :macros
-        :collaboration
+        :options="editorOptions"
+        :content="editorContent"
         @instant-change="dirty = true"
         @debounced-change="updateValue"
         @local-instant-change="onLocalInstantChange"
@@ -56,7 +51,7 @@
       v-if="name"
       type="hidden"
       :name="name + '_inputSyntax'"
-      :value="inputSyntax"
+      :value="BLOCKNOTE_SYNTAX"
       :form
       :disabled
     />
@@ -90,20 +85,15 @@
 </template>
 
 <script setup lang="ts">
+import { temporaryUploadsName } from "../services/attachments/temporaryUploads";
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
-import { toRelativeAttachmentResourceReference } from "../services/blocknote/attachmentResourceReference";
-import { createFileUploader } from "../services/blocknote/createFileUploader";
-import { createLinkEditionHooks } from "../services/blocknote/linkEditionHooks";
-import {
-  ConnectionStatus,
-  collaborationManagerProviderName,
-} from "@xwiki/platform-collaboration-api";
+import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
+import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
+import { fileUploadListenerName } from "@xwiki/platform-editors-blocknote-react";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
-import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
 import {
@@ -116,28 +106,21 @@ import {
   watch,
 } from "vue";
 import type { Logic } from "../services/Logic";
+import type { TemporaryUploads } from "../services/attachments/temporaryUploads";
 import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
-import type { FileUploader } from "../services/blocknote/createFileUploader";
-import type { ImageWizard } from "../services/image/ImageWizard";
-import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
   CollaborationManagerProvider,
 } from "@xwiki/platform-collaboration-api";
 import type { FormCollaboration } from "@xwiki/platform-collaboration-xwiki";
+import type { HeadlessEditorOptions } from "@xwiki/platform-editors-blocknote-headless";
 import type {
-  BlockNoteViewWrapperProps,
   BlockType,
   EditorLanguage,
-  ImageEditionHooks,
-  ImageEditionOverrideFn,
-  ImageInsertionOverrideFn,
+  FileUploadListener,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkContext } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { ResourceReference } from "@xwiki/platform-rendering-api";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 import type { Ref } from "vue";
 
@@ -163,7 +146,6 @@ const {
   form = undefined,
   disabled = false,
   uploadDisabled = false,
-  inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
@@ -185,9 +167,6 @@ const {
   // Prevent the user from attaching files to the edited document, set when the edited content is restricted and the
   // user doesn't have edit right on the source document (e.g. when commenting a page they can't edit).
   uploadDisabled?: boolean;
-
-  // The syntax of the edited content, as expected by the editor.
-  inputSyntax?: string;
 
   // The syntax of the edited content, as expected by the back-end storage.
   outputSyntax?: string;
@@ -211,7 +190,7 @@ const {
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
-const editedDocumentReference =
+const sourceDocumentReference =
   Model.resolve(documentReference, EntityType.DOCUMENT) ?? undefined;
 
 //
@@ -226,127 +205,30 @@ let blockNoteDocument: BlockNoteDocument | undefined;
 // This is passed to the BlockNote editor component.
 const editorContent = ref();
 
+// The configuration of the BlockNote editor instance, set once the editor is ready to be created (e.g. once the
+// realtime collaboration session is joined). Shallow on purpose: the collaboration session it holds must stay raw.
+const editorOptions = shallowRef<HeadlessEditorOptions>();
+
 const defaultLabel = "Editor";
-
-const imageEdition: ImageEditionOverrideFn = (block, update) => {
-  const imageWizard: ImageWizard = container.get("ImageWizard");
-  // The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so we pass it to the image
-  // wizard and update it on submit, because the user may have selected a different image.
-  const reference = blockNoteDocument?.getMetadata(block.id)?.xwikiReference as
-    | ResourceReference
-    | undefined;
-  imageWizard.edit(
-    { ...block.props, reference },
-    {
-      submit: ({ reference: newReference, ...updatedProps }) => {
-        if (newReference) {
-          blockNoteDocument!.getMetadata(block.id, true)!.xwikiReference =
-            newReference;
-        }
-        update({ type: "update", updatedProps });
-      },
-      cancel: () => update({ type: "aborted" }),
-    },
-    { documentReference: editedDocumentReference },
-  );
-};
-
-const imageInsertion: ImageInsertionOverrideFn = (insert) => {
-  const imageWizard: ImageWizard = container.get("ImageWizard");
-  // The image wizard lets the user select the image to insert (among the existing images, or by uploading a new one)
-  // and set its properties. The resource reference of the selected image is stored by the image edition hooks.
-  imageWizard.insert(
-    {
-      submit: ({ reference, ...props }) =>
-        insert({ type: "insert", props, reference }),
-      cancel: () => insert({ type: "aborted" }),
-    },
-    { documentReference: editedDocumentReference },
-  );
-};
-
-const imageEditionHooks: ImageEditionHooks = {
-  // Runs right after an image is inserted or its source is changed (e.g. from the image suggestions or by uploading
-  // it). The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so that the image is
-  // saved with the reference provided by the server rather than with its URL, relative to the edited document. An image
-  // known only by its URL is saved with that URL, so we drop the reference of the previous image source.
-  afterUpdate: (block, reference) => {
-    const metadata = blockNoteDocument?.getMetadata(block.id, !!reference);
-    if (reference?.type === "attach") {
-      metadata!.xwikiReference = {
-        ...(editedDocumentReference
-          ? toRelativeAttachmentResourceReference(
-              reference,
-              editedDocumentReference,
-            )
-          : reference),
-        // Untyped, like the image references written by the WYSIWYG editors (an image points to an attachment by
-        // default).
-        typed: false,
-      };
-    } else if (reference) {
-      metadata!.xwikiReference = reference;
-    } else if (metadata) {
-      delete metadata.xwikiReference;
-    }
-  },
-};
-
-// The link modal resolves the references of the linked pages and attachments against the edited document, and saves them
-// relative to it, like the image references and like the WYSIWYG editors do, so that the links keep working when the
-// edited document is renamed or copied.
-const linkContext: LinkContext = {
-  sourceDocument: toCristalEntityReference(editedDocumentReference) as
-    | DocumentReference
-    | undefined,
-};
-
-// Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new links, to
-// keep the link type selector short. Existing path and UNC path links are still edited with their own link type.
-const excludedLinkTargetTypes = ["path", "unc"];
-
-const linkEdition = createLinkEditionHooks(
-  () => blockNoteDocument,
-  editedDocumentReference,
-);
 
 // The files uploaded to the temporary store, submitted with the edit form so that the save attaches them.
 const temporaryAttachments: Ref<Set<string>> = ref(new Set<string>());
 
-// Created only once the editor is in the DOM, because that is what the uploader listens on. See the watch below.
-let fileUploader: FileUploader | undefined;
-
-// BlockNote asks for an upload only from the editor, which exists just as long as the uploader does.
-const uploadFile = uploadDisabled
-  ? undefined
-  : (file: File, blockId?: string) => fileUploader!.upload(file, blockId);
-
-/**
- * @param eventTarget - where the uploader listens for the paste and drop events that tell it how a file reached the
- *   editor
- * @returns the uploader attaching the pasted and dropped files to the edited document
- */
-function newFileUploader(eventTarget: EventTarget): FileUploader {
-  return createFileUploader(container, {
-    eventTarget,
-    getDocumentReference: () => documentReference,
-    getBlockNoteDocument: () => blockNoteDocument,
-    getEditor: () => editorInstance.value?.getEditor(),
-    // A file in the temporary store is visible only to the session that uploaded it, and only a save made from that
-    // session attaches it to the document. In a realtime session any of the collaborators can be the one that saves,
-    // so we attach the file right away instead, like the CKEditor integration does. The same goes when the editor
-    // has no field name, because then nothing it holds is submitted and the file would never be attached.
-    isTemporaryUpload: () =>
-      !!name &&
-      collaboration.value?.connectionStatus.value !==
-        ConnectionStatus.Connected,
-    registerTemporaryAttachment: (fileName) => {
-      temporaryAttachments.value.add(fileName);
-    },
-    notifyUploadFailed: async (fileName, error) => {
-      console.error(`Failed to upload [${fileName}].`, error);
+// The services specific to this editor instance are bound in a child of the shared container.
+const editorContainer = new Container({ parent: container });
+// The files uploaded to the temporary store, which the save request has to ask for.
+editorContainer.bind<TemporaryUploads>(temporaryUploadsName).toConstantValue({
+  add: (fileName) => {
+    temporaryAttachments.value.add(fileName);
+  },
+});
+// Tell the user about the files that can't be uploaded (the editor logs the error itself).
+editorContainer
+  .bind<FileUploadListener>(fileUploadListenerName)
+  .toConstantValue({
+    onUploadFailed: async (_instance, file) => {
       try {
-        const message = await translate("upload.failed", undefined, fileName);
+        const message = await translate("upload.failed", undefined, file.name);
         XWiki.widgets.Notification.show(message, "error");
       } catch (notificationError) {
         // Nobody awaits this callback, so an error here would go unhandled.
@@ -354,59 +236,6 @@ function newFileUploader(eventTarget: EventTarget): FileUploader {
       }
     },
   });
-}
-
-const syntaxes = container.getAll<SyntaxConfig>(
-  SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
-);
-
-let syntax = syntaxes.find((conf) => conf.id === outputSyntax);
-
-if (!syntax) {
-  // Falling back to the minimal syntax disables most editor features (headings, tables, images,
-  // lists, macros, ...). Warn so that a missing / mismatched syntax config doesn't silently cripple
-  // the editor.
-  console.warn(
-    `No syntax configuration registered for '${outputSyntax}', falling back to the minimal ` +
-      "syntax: most editor features will be disabled.",
-  );
-  syntax = syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
-}
-
-if (!syntax) {
-  throw new Error(
-    "Document syntax is not supported, and minimal syntax is not available",
-  );
-}
-
-// This is passed to the BlockNote editor component.
-const editorProps = shallowRef<
-  InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
->({
-  blockNoteOptions: {
-    // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
-    // consistency between edit and view modes.
-    defaultStyles: false,
-    uploadFile,
-    // Put the caret at the start of the content when the editor is focused on creation.
-    autofocus:
-      startupFocus === true || startupFocus === "true" ? "start" : false,
-  },
-  theme: "light",
-  lang: (actualLocale || "en") as EditorLanguage,
-  // The images uploaded from the editor are attached to the edited document.
-  documentReference,
-  // Style the code blocks like the code macro output in view mode.
-  codeBlockClassName: "box code",
-  label: defaultLabel,
-  overrides: {
-    imageEdition,
-    imageEditionHooks,
-    imageInsertion,
-    linkEdition,
-  },
-  syntax,
-});
 
 // This is passed to the BlockNote editor component.
 // Shallow on purpose: a normal ref would hide the refs inside, leaving connectionStatus.value undefined.
@@ -421,7 +250,7 @@ onBeforeMount(async () => {
   blockNoteDocument = blockNoteProcessor.load(initialValue);
   editorContent.value = blockNoteDocument.content;
 
-  editorProps.value.label = await translate("editor.label", defaultLabel);
+  const label = await translate("editor.label", defaultLabel);
 
   if (collaborationURL && documentReference) {
     try {
@@ -436,8 +265,65 @@ onBeforeMount(async () => {
     }
   }
 
+  editorOptions.value = createEditorOptions(label);
   isLoading.value = false;
 });
+
+/**
+ * @param label - the accessible label of the editor
+ * @returns the configuration of the BlockNote editor instance
+ */
+function createEditorOptions(label: string): HeadlessEditorOptions {
+  return {
+    // The Inversify container used by the editor to get the services and components it needs.
+    serviceContainer: editorContainer,
+    // The name of the BlockNote field. It tells apart the BlockNote fields of the same form, and identifies the content
+    // they edit within the realtime collaboration session.
+    name,
+    // The images and the links are saved relative to the edited document, so that they keep working when the edited
+    // document is renamed or copied. The pasted and dropped files are attached to it.
+    sourceDocumentReference: toCristalEntityReference(
+      sourceDocumentReference,
+    ) as DocumentReference | undefined,
+    // The syntax of the edited content, which is normally the syntax of the source document. The editor offers only
+    // what this syntax supports, so that the edited content can be saved without losing anything.
+    syntax: outputSyntax,
+    // Translate the editor UI (menus, toolbars, placeholders) in the same language as the rest of the page.
+    lang: (actualLocale || "en") as EditorLanguage,
+    // The accessible name of the editing area, announced by the screen readers to tell which field is being edited.
+    label,
+    // Put the caret at the start of the content when the editor is focused on creation.
+    autofocus: startupFocus === true || startupFocus === "true",
+    appearance: {
+      // BlockNote follows by default the light or dark color scheme preferred by the user (as set in the operating
+      // system or the browser), but the editor UI has to match the XWiki skin, which doesn't follow that preference.
+      theme: "light",
+      // We want the edited content to be styled using the XWiki skin / color theme as much as possible, in order to
+      // have consistency between edit and view modes.
+      contentStyles: "host",
+    },
+    collaboration: collaboration.value,
+    // Whether the user can attach files to the edited document (by pasting or dropping them, or with the upload
+    // actions).
+    upload: !uploadDisabled,
+    // The data that the BlockNote schema can't hold, extracted from the loaded content and put back on save, and the
+    // output of the macros, kept outside the edited content (which is shared with the other users when editing in
+    // realtime) because it was rendered for the current user.
+    metadata: blockNoteDocument!.metadata,
+    features: {
+      codeBlocks: {
+        // Style the code blocks like the code macro output in view mode.
+        className: "box code",
+      },
+      links: {
+        // Path and UNC path links are rarely created from the editor, so the link modal doesn't offer them for new
+        // links, to keep the link type selector short. Existing path and UNC path links are still edited with their
+        // own link type.
+        excludedTargetTypes: ["path", "unc"],
+      },
+    },
+  };
+}
 
 /**
  * Join the realtime collaboration session for the edited XWiki document, using the collaboration server URL.
@@ -453,7 +339,7 @@ async function joinCollaborationSession(): Promise<void> {
       .get<CollaborationManagerProvider>(collaborationManagerProviderName)
       .get(),
     // The collaboration session is identified by the reference and the locale of the edited document.
-    document: getEditedDocument(),
+    document: getSourceDocument(),
     formId: form,
     autoSaveVersionSummary,
   });
@@ -463,7 +349,6 @@ async function joinCollaborationSession(): Promise<void> {
 }
 
 onUnmounted(async () => {
-  fileUploader?.dispose();
   // The realtime toolbar is removed and the auto-saver is stopped when the last editor leaves the session.
   try {
     (await formCollaboration)?.leave();
@@ -498,10 +383,10 @@ async function translate(
 }
 
 /**
- * @returns the document being edited, which the auto-saver keeps up to date with the versions the other clients
+ * @returns the source document (holding the edited content), which the auto-saver keeps up to date with the versions the other clients
  *   create, so that the next save doesn't run into a merge conflict
  */
-function getEditedDocument(): XWikiDocument {
+function getSourceDocument(): XWikiDocument {
   if (
     Model.serialize(xwikiMeta.documentReference) === documentReference &&
     actualLocale === xwikiMeta.locale
@@ -511,54 +396,10 @@ function getEditedDocument(): XWikiDocument {
     return XWikiDocument.currentDocument(xwikiMeta);
   }
   return new XWikiDocument({
-    documentReference: editedDocumentReference,
+    documentReference: sourceDocumentReference,
     language: actualLocale,
   });
 }
-
-// This is passed to the BlockNote editor component. Macros are inserted / edited directly as the server-rendered
-// xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
-// resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
-const macros: BlockNoteViewWrapperProps["macros"] = {
-  ctx: {
-    // The macro output is kept outside the edited content (which is shared with the other users when editing in
-    // realtime) because it was rendered for the current user.
-    getMacroOutput: (id, call) => blockNoteDocument?.getMacroOutput(id, call),
-
-    openParamsEditor: async (invocation, update) => {
-      try {
-        const macroWizard: BlockNoteMacroWizard = container.get(
-          "BlockNoteMacroWizard",
-        );
-        update(
-          await macroWizard.insertOrUpdate(invocation, {
-            syntax: outputSyntax,
-            inlineParametersSyntax: inputSyntax,
-          }),
-        );
-      } catch (error) {
-        if (error) {
-          console.error("Failed to edit the macro", error);
-        }
-      }
-    },
-
-    openInsertionEditor: async (prefill, insert) => {
-      try {
-        const macroWizard: BlockNoteMacroWizard = container.get(
-          "BlockNoteMacroWizard",
-        );
-        insert(
-          await macroWizard.insert(prefill.kind, prefill.params, prefill.body),
-        );
-      } catch (error) {
-        if (error) {
-          console.error("Failed to insert the macro", error);
-        }
-      }
-    },
-  },
-};
 
 //
 // Computed
@@ -566,16 +407,6 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
 const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
 const editorInstance =
   useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
-const root = useTemplateRef<HTMLElement>("root");
-
-// The editor is rendered only once its content is loaded, so it isn't in the DOM yet when this component is set up.
-// Watching its element rather than creating the uploader on mount also keeps the two in sync if it is ever re-created.
-watch(root, (element) => {
-  fileUploader?.dispose();
-  fileUploader =
-    element && !uploadDisabled ? newFileUploader(element) : undefined;
-});
-
 // Start the auto-save (and show the realtime toolbar) only once the editor is there, because the first client joining
 // a session loads the initial content into the shared document, and that is a local Yjs change: counting it would
 // make the session dirty and trigger an auto-save before anyone typed anything.
@@ -654,7 +485,7 @@ defineExpose({
 
     .bn-block-content[data-content-type="codeBlock"] {
       /* The code block is styled by the XWiki skin, like the code macro output in view mode, through the CSS classes
-        added to its pre element (see codeBlockClassName). */
+        added to its pre element (see features.codeBlocks.className). */
       background: transparent;
       border-radius: 0;
 

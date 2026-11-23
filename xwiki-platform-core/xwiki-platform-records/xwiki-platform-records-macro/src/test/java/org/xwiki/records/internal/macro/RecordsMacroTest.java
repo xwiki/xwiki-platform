@@ -23,12 +23,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -44,10 +46,17 @@ import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.records.macro.RecordsLocation;
 import org.xwiki.records.macro.RecordsMacroParameters;
+import org.xwiki.records.macro.RecordsTemplateProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -72,7 +81,9 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -90,6 +101,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -124,10 +136,19 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class RecordsMacroTest
 {
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     private static final DocumentReference DATA_TYPE =
         new DocumentReference("xwiki", List.of("Clients", "Code"), "ProjectClass");
 
     private static final String SERIALIZED_DATA_TYPE = "Clients.Code.ProjectClass";
+
+    private static final DocumentReference HOST_DOCUMENT =
+        new DocumentReference("xwiki", List.of("Clients", "Projects"), "WebHome");
+
+    private static final String SOURCE_PARAMETERS =
+        "className=Clients.Code.ProjectClass&translationPrefix=platform.index.";
 
     @InjectMockComponents
     private RecordsMacro macro;
@@ -158,6 +179,19 @@ class RecordsMacroTest
     private ContextualAuthorizationManager authorization;
 
     @MockComponent
+    @Named("macro")
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
+
+    @MockComponent
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
+
+    @Mock
+    private LiveTableNewRowNamingStrategy uuidStrategy;
+
+    @Mock
+    private LiveTableNewRowNamingStrategy titleStrategy;
+
+    @MockComponent
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
@@ -176,9 +210,17 @@ class RecordsMacroTest
         this.context = new MacroTransformationContext(new TransformationContext());
         // The document's generator: shared by every id the page builds, headings included.
         this.context.setXDOM(new XDOM(List.of(), new IdGenerator()));
+        MacroBlock macroBlock = new MacroBlock("records", Map.of(), false);
+        this.context.setCurrentMacroBlock(macroBlock);
         when(this.entityReferenceSerializer.serialize(DATA_TYPE)).thenReturn(SERIALIZED_DATA_TYPE);
         when(this.documentAccessBridge.exists(DATA_TYPE)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, DATA_TYPE)).thenReturn(true);
+        when(this.macroEntityReferenceResolver.resolve("", EntityType.DOCUMENT, macroBlock)).thenReturn(HOST_DOCUMENT);
+        when(this.entityReferenceSerializer.serialize(HOST_DOCUMENT.getLastSpaceReference()))
+            .thenReturn("Clients.Projects");
+        when(this.namingStrategyManager.get("uuid")).thenReturn(Optional.of(this.uuidStrategy));
+        when(this.namingStrategyManager.get("title")).thenReturn(Optional.of(this.titleStrategy));
+        when(this.titleStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title"));
         // Echoes the key and the arguments, which is what the tests assert on.
         when(this.localization.getTranslationPlain(any(String.class), any(Object[].class)))
             .thenAnswer(invocation -> invocation.getArgument(0) + Arrays.toString(
@@ -256,6 +298,174 @@ class RecordsMacroTest
 
         assertEquals("className=Space.A%26B%3DC&translationPrefix=platform.index.",
             liveDataParameters.getSourceParameters());
+    }
+
+    @Test
+    void executeShowsTheEditModeButtonWhenTheEditModeIsAllowed() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true", execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeCreatesEntriesUnderTheHostPageByDefault() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("uuid");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=Clients.Projects",
+            capture().getSourceParameters());
+        assertEquals(List.of(this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeCreatesEntriesNextToATerminalHostPageByDefault() throws Exception
+    {
+        DocumentReference terminalHost = new DocumentReference("xwiki", "Clients", "Projects");
+        when(this.macroEntityReferenceResolver.resolve("", EntityType.DOCUMENT, this.context.getCurrentMacroBlock()))
+            .thenReturn(terminalHost);
+        when(this.entityReferenceSerializer.serialize(terminalHost.getLastSpaceReference())).thenReturn("Clients");
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("uuid");
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=Clients",
+            execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeCreatesEntriesInTheLocationTheAuthorPicked() throws Exception
+    {
+        RecordsLocation location = new RecordsLocation(new SpaceReference("xwiki", "Clients", "Archive"));
+        when(this.entityReferenceSerializer.serialize(location)).thenReturn("Clients.Archive");
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("uuid");
+        parameters.setNewEntriesLocation(location);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=Clients.Archive",
+            execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeCreatesEntriesFromTheTemplateProviderTheAuthorPicked() throws Exception
+    {
+        RecordsTemplateProvider templateProvider =
+            new RecordsTemplateProvider(new DocumentReference("xwiki", "Clients", "ProjectTemplateProvider"));
+        when(this.entityReferenceSerializer.serialize(templateProvider)).thenReturn("Clients.ProjectTemplateProvider");
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("uuid");
+        parameters.setTemplateProvider(templateProvider);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=Clients.Projects"
+            + "&newRowTemplateProvider=Clients.ProjectTemplateProvider", execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeIgnoresTheTemplateProviderWithoutACreationStrategy() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setTemplateProvider(
+            new RecordsTemplateProvider(new DocumentReference("xwiki", "Clients", "ProjectTemplateProvider")));
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true", execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeCreatesEntriesNamedAfterTheTitleWhenTheDefaultColumnsDisplayIt() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("title");
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true&newRowNamingStrategy=title&newRowLocation=Clients.Projects",
+            execute(parameters).getSourceParameters());
+    }
+
+    @Test
+    void executeIgnoresTheCreationStrategyWithoutTheEditMode() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setCreationStrategy("uuid");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals(SOURCE_PARAMETERS, capture().getSourceParameters());
+        assertEquals(List.of(this.renderedBlock), blocks);
+        verifyNoInteractions(this.namingStrategyManager);
+    }
+
+    @Test
+    void executeDoesNotCreateEntriesWithAStrategyThatIsNotInstalledAndSaysSo() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("missing");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true", capture().getSourceParameters());
+        assertEquals(List.of(warning("rendering.macro.records.warning.creationStrategyUnknown[missing]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeDoesNotCreateEntriesWithAStrategyThatCannotBeLoadedAndSaysSo() throws Exception
+    {
+        when(this.namingStrategyManager.get("broken")).thenThrow(new LiveDataException("broken"));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("broken");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true", capture().getSourceParameters());
+        assertEquals(List.of(warning("rendering.macro.records.warning.creationStrategyUnknown[broken]"),
+            this.renderedBlock), blocks);
+        assertEquals("Failed to load the row naming strategy [broken]. Root cause is [LiveDataException: broken].",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void executeDoesNotCreateEntriesWhenAColumnTheStrategyNeedsIsNotDisplayedAndSaysSo() throws Exception
+    {
+        when(this.titleStrategy.getMandatoryProperties(any())).thenReturn(Set.of("doc.title", "email", "first_name"));
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setProperties("last_name, email");
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("title");
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals(SOURCE_PARAMETERS + "&hasEditMode=true", capture().getSourceParameters());
+        assertEquals(List.of(
+            warning("rendering.macro.records.warning.creationColumnsMissing[title, doc.title]"),
+            warning("rendering.macro.records.warning.creationColumnsMissing[title, first_name]"),
+            this.renderedBlock), blocks);
+    }
+
+    @Test
+    void executeHandsTheSourceParametersToTheStrategy() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setAllowEditMode(true);
+        parameters.setCreationStrategy("uuid");
+        // Only the source parameters set so far make the strategy need a column the table does not display.
+        when(this.uuidStrategy.getMandatoryProperties(Map.of("className", SERIALIZED_DATA_TYPE,
+            "translationPrefix", "platform.index.", "hasEditMode", "true")))
+            .thenReturn(Set.of("doc.name"));
+
+        List<Block> blocks = this.macro.execute(parameters, null, this.context);
+
+        assertEquals(List.of(warning("rendering.macro.records.warning.creationColumnsMissing[uuid, doc.name]"),
+            this.renderedBlock), blocks);
     }
 
     @Test

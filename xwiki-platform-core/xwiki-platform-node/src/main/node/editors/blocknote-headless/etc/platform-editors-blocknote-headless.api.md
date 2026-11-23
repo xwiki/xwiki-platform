@@ -4,31 +4,19 @@
 
 ```ts
 
-import { BlockNoteViewWrapperProps } from '@xwiki/platform-editors-blocknote-react';
 import { BlockType } from '@xwiki/platform-editors-blocknote-react';
-import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
-import { Container } from 'inversify';
-import { ContextForMacros } from '@xwiki/platform-editors-blocknote-react';
 import { DefineComponent } from 'vue';
+import { EditorFeatures } from '@xwiki/platform-editors-blocknote-react';
+import { EditorOptions } from '@xwiki/platform-editors-blocknote-react';
 import { EditorType } from '@xwiki/platform-editors-blocknote-react';
-import { LinkContext } from '@xwiki/platform-link-type-api';
-import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PublicProps } from 'vue';
 
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
-editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
-macros: {
-list?: MacroWithUnknownParamsType[];
-ctx: ContextForMacros;
-} | false;
-editorContent: BlockType[];
-collaboration?: Collaboration;
-depsContainer: Container;
-excludedLinkTargetTypes?: string[];
-linkContext?: LinkContext;
+options: HeadlessEditorOptions;
+content: BlockType[];
 }, {
 getContent: () => BlockType[];
 getEditor: () => EditorType | undefined;
@@ -37,33 +25,29 @@ getEditor: () => EditorType | undefined;
 "debounced-change": (content: BlockType[]) => any;
 "local-instant-change": () => any;
 }, string, PublicProps, Readonly<{
-editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
-macros: {
-list?: MacroWithUnknownParamsType[];
-ctx: ContextForMacros;
-} | false;
-editorContent: BlockType[];
-collaboration?: Collaboration;
-depsContainer: Container;
-excludedLinkTargetTypes?: string[];
-linkContext?: LinkContext;
+options: HeadlessEditorOptions;
+content: BlockType[];
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: BlockType[]) => any) | undefined;
 "onLocal-instant-change"?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
-}, any>;
-
-export { ContextForMacros }
+}, HTMLDivElement>;
 
 export { EditorType }
 
 // @beta
-export function moveCaretTo(editor: EditorType, coordinates: {
-    left: number;
-    top: number;
-}): boolean;
+export type HeadlessEditorOptions = Omit<EditorOptions, "features"> & {
+    features?: EditorFeatures & {
+        links?: HeadlessLinkFeatureOptions | false;
+    };
+};
+
+// @beta
+export type HeadlessLinkFeatureOptions = {
+    excludedTargetTypes?: string[];
+};
 
 // (No @packageDocumentation comment for this package)
 

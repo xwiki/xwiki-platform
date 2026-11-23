@@ -147,9 +147,15 @@ export default {
         throw new Error("Unknown location for the row that has no entry yet.");
       }
       this.isLoading = true;
-      const { documentName, className, property, pendingValues } =
+      const { documentName, className, property, pendingValues, template } =
         this.getFieldArguments();
-      return updateMethod(documentName, className, property, pendingValues);
+      return updateMethod(
+        documentName,
+        className,
+        property,
+        pendingValues,
+        template,
+      );
     },
 
     /**
@@ -166,7 +172,15 @@ export default {
         className: this.getClassName(),
         property: this.propertyId,
         pendingValues: isDraft ? this.getPendingValues() : undefined,
+        template: isDraft ? this.getTemplate() : undefined,
       };
+    },
+
+    /**
+     * @returns the template the entries are created from, if any
+     */
+    getTemplate() {
+      return this.logic.getActionDescriptor("addEntry")?.template;
     },
 
     /**
@@ -189,16 +203,16 @@ export default {
       const request = ++this.viewFieldRequest;
       // Only a row that has no entry yet needs this: the query results already hold the rendered
       // content of the entries. Without a location, there is no document to render the content against.
+      // A cell holding no value still displays the value the template gives it.
       if (
         !this.entry._new ||
         !this.entry._displayReference ||
-        this.value === undefined ||
-        this.value === ""
+        ((this.value === undefined || this.value === "") && !this.getTemplate())
       ) {
         this.viewField = undefined;
         return;
       }
-      const { documentName, className, property, pendingValues } =
+      const { documentName, className, property, pendingValues, template } =
         this.getFieldArguments();
       // When the rendering fails, the value held on the row is displayed as it is.
       const viewField = await view(
@@ -206,6 +220,7 @@ export default {
         className,
         property,
         pendingValues,
+        template,
       ).catch(() => undefined);
       if (request === this.viewFieldRequest) {
         this.viewField = viewField;
@@ -224,13 +239,14 @@ export default {
       const loadEditField = async (extraParams) => {
         try {
           return await this.update(
-            (documentName, className, property, pendingValues) =>
+            (documentName, className, property, pendingValues, template) =>
               edit(
                 documentName,
                 className,
                 property,
                 extraParams,
                 pendingValues,
+                template,
               ),
           );
         } catch (error) {

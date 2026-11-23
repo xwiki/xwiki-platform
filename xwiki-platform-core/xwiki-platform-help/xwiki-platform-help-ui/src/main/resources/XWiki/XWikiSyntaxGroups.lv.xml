@@ -50,7 +50,7 @@ Grupas var izmantot, lai ievietotu citu dokumentu iekļautu tekošajā dokument�
 {{{
 |=1. Virsraksts|=2. Virsraksts|=3. Virsraksts
 |1. šūna|(((
-= Iegults dokuments
+== Iegults dokuments
 
 Iegulta teksta rindkopa.
 
@@ -65,7 +65,7 @@ Nākošā rindkopa augšējā līmeņa dokumentā
 )))|(((
 |=1. Virsraksts|=2. Virsraksts|=3. Virsraksts
 |1. šūna|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Iegults dokuments&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Iegults dokuments&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Iegulta teksta rindkopa.
 

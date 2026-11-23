@@ -48,7 +48,7 @@ Gruppen können benutzt werden um ein Dokument "inline" direkt in ein anderes Do
 |((({{{
 |=Kopfzeile 1|=Kopfzeile 2|=Kopfzeile 3
 |Zelle Eins|(((
-= Eingebundenes Dokument =
+== Eingebundenes Dokument ==
 
 Ein eingebetteter Absatz.
 
@@ -62,7 +62,7 @@ Nächster Absatz im Dokument der obersten Ebene
 }}})))|(((
 |=Kopfzeile 1|=Kopfzeile 2|=Kopfzeile 3
 |Zelle Eins|(((
-{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Eingebettetes Dokument&lt;/span&gt;&lt;/h1&gt;{{/html}}
+{{html}}&lt;h2 id="HEmbeddeddocument"&gt;&lt;span&gt;Eingebettetes Dokument&lt;/span&gt;&lt;/h2&gt;{{/html}}
 
 Ein eingebetteter Absatz.
 

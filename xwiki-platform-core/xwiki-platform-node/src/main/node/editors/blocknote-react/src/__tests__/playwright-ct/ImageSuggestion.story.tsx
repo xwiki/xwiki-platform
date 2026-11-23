@@ -17,20 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import { createBlockMetadataStore } from "../../misc/blockMetadata";
+import {
+  imageEditorName,
+  imageMetadataHandlerName,
+} from "../../services/imageEditor";
+import { DocumentReference, SpaceReference } from "@xwiki/platform-model-api";
 import { useMemo, useState } from "react";
 // NOTE: `LinkType` is intentionally not imported here (not even type-only): the module also
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
 // the Vite pipeline used to bundle this story) can't parse.
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
-import type { ImageEditionHooks } from "../../components/images/imageEditionHooks";
+import type { BlockMetadataKey } from "../../misc/blockMetadata";
 import type {
-  ImageInsertionOverrideFn,
-  ImageInsertionResult,
-} from "../../components/images/imageInsertionOverride";
+  ImageEditionData,
+  ImageEditor,
+  ImageMetadataHandler,
+} from "../../services/imageEditor";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+
+// The image metadata entry holding the image reference.
+const REFERENCE: BlockMetadataKey = { name: "reference" };
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
 
@@ -53,23 +65,26 @@ export type ImageSuggestionForTestProps = {
   uploadedImageName?: string;
   // The reference of the edited document (the current document, "Some.Page", is edited when not set).
   documentReference?: string;
-  // When set, the image insertion is overridden, the override returning this result right away (the default image
-  // selector is used otherwise).
-  imageInsertionResult?: ImageInsertionResult;
+  // When set, an image editor is bound, returning the given result right away (undefined when the user cancels). The
+  // image selector of the editor is used otherwise.
+  imageEditor?: { result?: ImageEditionData };
+  // The resource references of the images of the initial content, by block id, as kept by the image metadata handler.
+  imageReferences?: Record<string, ResourceReference>;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
-  syntax?: BlockNoteViewWrapperProps["syntax"];
+  syntax?: SyntaxConfig;
+  // The upload option of the editor.
+  upload?: boolean;
 };
 
 /**
  * Renders the editor with a mocked LinkSuggestService feeding the image quick action's suggestions.
  *
- * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own
- * `vitest-mock-extended` container: test-prop functions get proxied back to Node when called from the
- * mounted component, which strips any mock methods off objects passed through them (see
- * `LinkEdition.story.tsx` for the same constraint). Building the container here, where the code
- * actually runs in the browser, keeps the mock intact.
+ * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own container of mocked
+ * services: test-prop functions get proxied back to Node when called from the mounted component, which strips any
+ * methods off objects passed through them (see `LinkEdition.story.tsx` for the same constraint). Building the
+ * container here, where the code actually runs in the browser, keeps the mocked services intact.
  */
 export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   images,
@@ -78,34 +93,61 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   uploadedImageURL,
   uploadedImageName,
   documentReference,
-  imageInsertionResult,
+  imageEditor,
+  imageReferences,
   content,
   syntax,
+  upload,
 }) => {
-  // The images selected by the user, as reported by the image edition hooks.
+  // The images selected by the user, as reported to the image metadata handler.
   const [selectedImages, setSelectedImages] = useState<unknown[]>([]);
-  // Stable, like the overrides of a real integration.
-  const imageInsertion = useMemo<ImageInsertionOverrideFn | undefined>(
-    () => imageInsertionResult && ((insert) => insert(imageInsertionResult)),
-    [],
-  );
+  // The calls to the image editor.
+  const [imageEditorCalls, setImageEditorCalls] = useState<unknown[]>([]);
 
-  // Stable, like the hooks of a real integration, so that the editor doesn't rebuild its menus on each selection.
-  const imageEditionHooks = useMemo<ImageEditionHooks>(
-    () => ({
-      afterUpdate: (block, reference) =>
-        setSelectedImages((images) => [
-          ...images,
-          { blockId: block.id, url: block.props.url, reference },
-        ]),
-    }),
-    [],
-  );
+  // Holds the references of the images, like the store of a real integration.
+  const metadata = useMemo(() => {
+    const store = createBlockMetadataStore();
+    Object.entries(imageReferences ?? {}).forEach(([id, reference]) =>
+      store.set(id, REFERENCE, reference),
+    );
+    return store;
+  }, []);
 
-  const depsContainer = useMemo(() => {
-    const container = depsContainerMock();
+  const serviceContainer = useMemo(() => {
+    const container = serviceContainerMock([syntax ?? FULL_SYNTAX]);
 
-    container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue(
+    container
+      .bind<ImageMetadataHandler>(imageMetadataHandlerName)
+      .toConstantValue({
+        beforeEdit: (instance, block) => ({
+          ...block.props,
+          reference: instance.metadata.get(block.id)?.reference as
+            | ResourceReference
+            | undefined,
+        }),
+        afterUpdate: (instance, block, reference) => {
+          instance.metadata.set(block.id, REFERENCE, reference);
+          setSelectedImages((images) => [
+            ...images,
+            { blockId: block.id, url: block.props.url, reference },
+          ]);
+        },
+      });
+
+    if (imageEditor) {
+      container.bind<ImageEditor>(imageEditorName).toConstantValue({
+        async insert() {
+          setImageEditorCalls((calls) => [...calls, { action: "insert" }]);
+          return imageEditor.result;
+        },
+        async edit(_instance, image) {
+          setImageEditorCalls((calls) => [...calls, { action: "edit", image }]);
+          return imageEditor.result;
+        },
+      });
+    }
+
+    container.rebind("LinkSuggestServiceProvider").toConstantValue(
       linkSuggestServiceUnavailable
         ? { get: () => undefined }
         : ({
@@ -129,10 +171,10 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     );
 
     // A page reference that the model reference parser of the mocked container understands.
-    container.get.calledWith("DocumentService").mockReturnValue({
+    container.rebind("DocumentService").toConstantValue({
       getCurrentDocumentReferenceString: () => ({ value: "Some.Page" }),
     });
-    container.get.calledWith("AttachmentsService").mockReturnValue({
+    container.rebind("AttachmentsService").toConstantValue({
       async upload() {
         if (!uploadedImageURL) {
           throw new Error("Failed to upload the file");
@@ -152,22 +194,23 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
     });
     // Parses and serializes the page and attachment references like XWiki does, in order to check that the uploaded
     // images are inserted with the reference of the uploaded attachment, on the page it was uploaded to.
-    container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+    container.rebind("ModelReferenceParserProvider").toConstantValue({
       get: () => ({
         parse: (page: string) => ({ name: page }),
         parseAsync: async (page: string) => ({ name: page }),
       }),
     });
-    container.get
-      .calledWith("ModelReferenceSerializerProvider")
-      .mockReturnValue({
-        get: () => ({
-          serialize: (reference: {
-            name: string;
-            document: { name: string };
-          }) => `attach:${reference.document.name}@${reference.name}`,
-        }),
-      });
+    container.rebind("ModelReferenceSerializerProvider").toConstantValue({
+      get: () => ({
+        serialize: (reference: {
+          name: string;
+          document?: { name: string };
+        }) =>
+          reference.document
+            ? `attach:${reference.document.name}@${reference.name}`
+            : reference.name,
+      }),
+    });
 
     return container;
   }, []);
@@ -175,20 +218,26 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   return (
     <>
       <BlockNoteViewWrapper
-        lang="en"
-        label="Some Label"
-        depsContainer={depsContainer}
-        documentReference={documentReference}
-        macros={false}
-        content={content ?? []}
-        syntax={syntax ?? FULL_SYNTAX}
-        linkEditionHandler={() => {
-          throw new Error("Link editor should not open for this test");
+        options={{
+          lang: "en",
+          label: "Some Label",
+          serviceContainer,
+          sourceDocumentReference:
+            documentReference === undefined
+              ? undefined
+              : // The mocked model reference serializer serializes a page reference as its name.
+                new DocumentReference(documentReference, new SpaceReference()),
+          syntax: (syntax ?? FULL_SYNTAX).id,
+          metadata,
+          upload,
         }}
-        overrides={{ imageEditionHooks, imageInsertion }}
+        content={content ?? []}
       />
       <output data-testid="selectedImages">
         {JSON.stringify(selectedImages)}
+      </output>
+      <output data-testid="imageEditorCalls">
+        {JSON.stringify(imageEditorCalls)}
       </output>
     </>
   );

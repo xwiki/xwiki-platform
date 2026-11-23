@@ -20,7 +20,6 @@
 package org.xwiki.livedata;
 
 import org.xwiki.livedata.internal.JSONMerge;
-import org.xwiki.stability.Unstable;
 
 /**
  * Abstract implementation of {@link LiveDataConfigurationResolver} taking a {@link LiveDataConfiguration}.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.4.4
  * @since 16.10.11
  */
-@Unstable
 public abstract class AbstractLiveDataConfigurationResolver implements
     LiveDataConfigurationResolver<LiveDataConfiguration>
 {

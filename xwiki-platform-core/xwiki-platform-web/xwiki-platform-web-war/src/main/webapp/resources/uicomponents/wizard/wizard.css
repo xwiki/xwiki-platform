@@ -1,13 +1,12 @@
-#template('colorThemeInit.vm')
 .wizard-header {
-  background-color: $theme.backgroundSecondaryColor;
-  border-bottom: 1px solid $theme.borderColor;
+  background-color: var(--xwiki-background-secondary-color);
+  border-bottom: 1px solid var(--xwiki-border-color);
   margin: 1em 0;
 }
 
 .wizard-header h1 {
   border-bottom: 0 none;
-  color: $theme.titleColor;
+  color: var(--headings-color);
   float: left;
   font-size: 1.5em;
   margin: 0;
@@ -30,9 +29,9 @@
 }
 
 .steps .number, .steps .number:hover, .steps .number:active {
-  background-color: $theme.menuBackgroundColor;
+  background-color: var(--navbar-default-bg);
   border-radius: 50%;
-  color: $theme.menuLinkColor;
+  color: var(--navbar-default-link-color);
   cursor: unset;
   box-shadow: none;
   display: inline-block;
@@ -46,14 +45,14 @@
 
 .steps .number.step-active {
   background-color: transparent;
-  border: 2px solid $theme.notificationSuccessColor;
-  color: $theme.notificationSuccessColor;
+  border: 2px solid var(--brand-success);
+  color: var(--brand-success);
 }
 
 .steps .number.step-done {
   background-color: transparent;
-  border: 2px solid $theme.textSecondaryColor;
-  color: $theme.textSecondaryColor;
+  border: 2px solid var(--text-muted);
+  color: var(--text-muted);
 }
 
 /** Flamingo specific adjustment */
@@ -63,15 +62,15 @@
 }
 
 .steps .name {
-  color: $theme.titleColor;
+  color: var(--headings-color);
 }
 
 .steps .name.step-active {
-  color: $theme.notificationSuccessColor;
+  color: var(--brand-success);
 }
 
 .steps .name.step-done {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
 }
 
 .steps.vertical {
@@ -92,8 +91,8 @@
 }
 
 .wizard-footer {
-  background-color: $theme.backgroundSecondaryColor;
-  border-top: 1px solid $theme.borderColor;
+  background-color: var(--xwiki-background-secondary-color);
+  border-top: 1px solid var(--xwiki-border-color);
   margin-top: 2em;
   padding: .5em 1em;
   position: relative;

@@ -19,19 +19,27 @@
  */
 import { BlockNoteForTest } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
+import {
+  linkEditorName,
+  linkMetadataHandlerName,
+} from "../../services/linkEditor";
 import { useState } from "react";
 import type { BlockType } from "../../blocknote";
-import type { LinkEditionData } from "../../components/links/linkEdition";
+import type {
+  LinkEditionData,
+  LinkEditor,
+  LinkMetadataHandler,
+} from "../../services/linkEditor";
 
 /**
- * Renders the editor with link edition hooks and a link editor defined natively (i.e. running in the
- * browser). They are declared here rather than passed as test props because Playwright component test
- * function props are proxied to Node, which breaks the synchronous return value the hooks rely on.
+ * Renders the editor with a link metadata handler and a link editor defined natively (i.e. running in the browser).
+ * They are declared here rather than passed as test props because Playwright component test function props are proxied
+ * to Node, which breaks the synchronous return value the link metadata handler relies on.
  *
- * The link editor is scripted: opening it immediately submits {@link submit} (or, when it is not set,
- * the link data it was pre-filled with).
+ * The link editor is scripted: opening it immediately submits {@link submit} (or, when it is not set, the edited link
+ * unchanged, or no link when creating one).
  */
-export const BlockNoteWithLinkEditionHooks: React.FC<{
+export const BlockNoteWithLinkMetadataHandler: React.FC<{
   content: BlockType[];
   // When set, beforeEdit returns the current link data with this title, to pre-fill the link editor.
   beforeEditTitle?: string;
@@ -39,7 +47,18 @@ export const BlockNoteWithLinkEditionHooks: React.FC<{
   submit?: LinkEditionData;
   // When set, beforeUpdate returns the submitted link data with this url, to change what is persisted.
   beforeUpdateUrl?: string;
-}> = ({ content, beforeEditTitle, submit, beforeUpdateUrl }) => {
+  // When set, the scripted link editor is canceled instead of submitting.
+  cancel?: boolean;
+  // When set, no link editor is bound.
+  noLinkEditor?: boolean;
+}> = ({
+  content,
+  beforeEditTitle,
+  submit,
+  beforeUpdateUrl,
+  cancel,
+  noLinkEditor,
+}) => {
   // The link data the scripted link editor was opened with, and the arguments beforeUpdate received,
   // rendered so that the tests can assert on them.
   const [editorInput, setEditorInput] = useState<string>();
@@ -55,26 +74,35 @@ export const BlockNoteWithLinkEditionHooks: React.FC<{
       )}
       <BlockNoteForTest
         content={content}
-        macros={false}
-        syntax={FULL_SYNTAX}
-        linkEditionHandler={({ current, onSubmit }) => {
-          setEditorInput(JSON.stringify(current));
-          onSubmit(submit ?? current);
+        bind={(container) => {
+          if (!noLinkEditor) {
+            container.bind<LinkEditor>(linkEditorName).toConstantValue({
+              async insert(_instance, prefill) {
+                setEditorInput(JSON.stringify(prefill));
+                return cancel ? undefined : submit;
+              },
+              async edit(_instance, link) {
+                setEditorInput(JSON.stringify(link));
+                return cancel ? undefined : (submit ?? link);
+              },
+            });
+          }
+          container
+            .bind<LinkMetadataHandler>(linkMetadataHandlerName)
+            .toConstantValue({
+              beforeEdit: (_instance, link) =>
+                beforeEditTitle === undefined
+                  ? link
+                  : { ...link, title: beforeEditTitle },
+              beforeUpdate: (_instance, link, previous) => {
+                setUpdateInput(JSON.stringify({ linkData: link, previous }));
+                return beforeUpdateUrl === undefined
+                  ? link
+                  : { ...link, url: beforeUpdateUrl };
+              },
+            });
         }}
-        overrides={{
-          linkEdition: {
-            beforeEdit:
-              beforeEditTitle === undefined
-                ? undefined
-                : (linkData) => ({ ...linkData, title: beforeEditTitle }),
-            beforeUpdate: (linkData, previous) => {
-              setUpdateInput(JSON.stringify({ linkData, previous }));
-              return beforeUpdateUrl === undefined
-                ? linkData
-                : { ...linkData, url: beforeUpdateUrl };
-            },
-          },
-        }}
+        options={{ syntax: FULL_SYNTAX }}
       />
     </>
   );

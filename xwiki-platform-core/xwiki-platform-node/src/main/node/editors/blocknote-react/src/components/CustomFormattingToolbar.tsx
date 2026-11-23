@@ -18,12 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CustomImageToolbar } from "./images/CustomImageToolbar";
-import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
-import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
-import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
-import { selectionHasInlineContent } from "../selection";
 import {
   AddCommentButton,
   AddTiptapCommentButton,
@@ -41,85 +36,45 @@ import {
   TextAlignButton,
   UnnestBlockButton,
   blockTypeSelectItems,
-  useBlockNoteEditor,
   useComponentsContext,
-  useEditorState,
 } from "@blocknote/react";
-import { useTranslation } from "react-i18next";
-import { RiSubscript, RiSuperscript } from "react-icons/ri";
-import type { ContextForMacros } from "../blocknote/utils";
-import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
-import type { ImageEditionHooks } from "./images/imageEditionHooks";
-import type { LinkEditionHandler } from "./links/linkEdition";
-import type { LinkEditionHooks } from "./links/linkEditionHooks";
+import type { BlockType } from "../blocknote";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
 } from "@blocknote/react";
-import type { JSX } from "react";
-
-const BooleanStyleButton: React.FC<{
-  style: string;
-  icon: React.ReactNode;
-  label: string;
-}> = ({ style, icon, label }) => {
-  const Components = useComponentsContext()!;
-  const editor = useBlockNoteEditor();
-  const state = useEditorState({
-    editor,
-    selector: ({ editor }) => {
-      if (!editor.isEditable) {
-        return undefined;
-      }
-      if (!selectionHasInlineContent(editor)) {
-        return undefined;
-      }
-      return { active: style in editor.getActiveStyles() };
-    },
-  });
-
-  if (state === undefined) {
-    return null;
-  }
-  return (
-    <Components.FormattingToolbar.Button
-      className="bn-button"
-      data-test={style}
-      onClick={() => {
-        editor.focus();
-        editor.toggleStyles({ [style]: true } as never);
-      }}
-      isSelected={state.active}
-      label={label}
-      mainTooltip={label}
-      icon={icon}
-    />
-  );
-};
+import type { JSX, ReactElement, ReactNode } from "react";
 
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
-  macros: { ctx: ContextForMacros } | false;
-  linkEditionHandler: LinkEditionHandler;
-  imageEditionOverrideFn?: ImageEditionOverrideFn;
-  imageEditionHooks?: ImageEditionHooks;
-  linkEditionHooks?: LinkEditionHooks;
+  /** The toolbar items contributed by the editing features. */
+  featureItems: ReactElement[];
+  /** The toolbars contributed by the editing features, replacing this one for the blocks of a given type. */
+  blockToolbars: Record<string, (block: BlockType) => ReactNode>;
 };
+
+/**
+ * @param block - the selected block
+ * @param blockToolbars - the toolbars replacing the formatting toolbar for the blocks of a given type
+ * @returns the toolbar replacing the formatting toolbar for the given block, if any
+ */
+function renderBlockToolbar(
+  block: BlockType,
+  blockToolbars: Record<string, (block: BlockType) => ReactNode>,
+): ReactNode | undefined {
+  return blockToolbars[block.type]?.(block);
+}
 
 export const CustomFormattingToolbar: React.FC<
   CustomFormattingToolbarProps
 > = ({
   formattingToolbarProps,
   additionalBlockTypes,
-  imageEditionOverrideFn,
-  imageEditionHooks,
-  linkEditionHooks,
-  macros,
-  linkEditionHandler,
+  featureItems,
+  blockToolbars,
 }) => {
   const Components = useComponentsContext()!;
-  const { t } = useTranslation();
 
   const editor = useEditor();
 
@@ -134,33 +89,19 @@ export const CustomFormattingToolbar: React.FC<
     <Components.FormattingToolbar.Root
       className={"bn-toolbar bn-formatting-toolbar"}
     >
-      {/* Display a custom toolbar for specific element types (e.g. images) */}
-      {currentBlock.type === "image" ? (
-        <CustomImageToolbar
-          currentBlock={currentBlock}
-          imageEditionOverrideFn={imageEditionOverrideFn}
-          imageEditionHooks={imageEditionHooks}
-        />
-      ) : (
-        // For others, simply show the "normal", default toolbar
+      {/* Display a custom toolbar for specific element types (e.g. images), and the "normal" toolbar for the others. */}
+      {renderBlockToolbar(currentBlock, blockToolbars) ??
         getDefaultFormattingToolbarItems(
           combinedBlockTypeSelectItems,
-          macros,
-          linkEditionHandler,
-          t,
-          linkEditionHooks,
-        )
-      )}
+          featureItems,
+        )}
     </Components.FormattingToolbar.Root>
   );
 };
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  macros: { ctx: ContextForMacros } | false,
-  linkEditorHandler: LinkEditionHandler,
-  t: (key: string) => string,
-  linkEditionHooks?: LinkEditionHooks,
+  featureItems: ReactElement[],
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -186,51 +127,15 @@ const getDefaultFormattingToolbarItems = (
       basicTextStyle={"strike"}
       key={"strikeStyleButton"}
     />,
-    <BooleanStyleButton
-      style="subscript"
-      icon={<RiSubscript />}
-      label={t("blocknote.toolbar.subscript")}
-      key={"subscriptStyleButton"}
-    />,
-    <BooleanStyleButton
-      style="superscript"
-      icon={<RiSuperscript />}
-      label={t("blocknote.toolbar.superscript")}
-      key={"superscriptStyleButton"}
-    />,
     <TextAlignButton textAlignment={"left"} key={"textAlignLeftButton"} />,
     <TextAlignButton textAlignment={"center"} key={"textAlignCenterButton"} />,
     <TextAlignButton textAlignment={"right"} key={"textAlignRightButton"} />,
     <ColorStyleButton key={"colorStyleButton"} />,
     <NestBlockButton key={"nestBlockButton"} />,
     <UnnestBlockButton key={"unnestBlockButton"} />,
-    // This button has the exact same appearance as the default creation link button
-    // But brings a custom popover to support XWiki references
-    <CustomCreateLinkButton
-      key={"createLinkButton"}
-      linkEditionHandler={linkEditorHandler}
-      linkEditionHooks={linkEditionHooks}
-    />,
+    ...featureItems,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
-  ].concat(
-    macros
-      ? [
-          <CustomMacroEditButton
-            key={"macroEditButton"}
-            ctxForMacros={macros.ctx}
-          />,
-          // Hide the insert action when no insertion editor is available.
-          ...(macros.ctx.openInsertionEditor
-            ? [
-                <CustomInsertMacroButton
-                  key={"insertMacroButton"}
-                  openEditor={macros.ctx.openInsertionEditor}
-                />,
-              ]
-            : []),
-        ]
-      : [],
-  );
+  ];
 
 export type { CustomFormattingToolbarProps };

@@ -19,11 +19,24 @@
  */
 import { BlockNoteDocument } from "./BlockNoteProcessor";
 import { extractLinkId, injectLinkId, stripLinkId } from "./linkId";
+import {
+  XWIKI_FREESTANDING,
+  XWIKI_GENERATED_LABEL,
+  XWIKI_LEADING_NEW_LINE,
+  XWIKI_PARAMETERS,
+  XWIKI_REFERENCE,
+  XWIKI_TRAILING_NEW_LINE,
+  XWIKI_VERBATIM,
+} from "./metadataKeys";
+import { setMacroOutput } from "@xwiki/platform-editors-blocknote-react";
 import { Container, inject, injectable } from "inversify";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
 import type { BlockNoteProcessor } from "./BlockNoteProcessor";
-import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
+import type {
+  BlockMetadataKey,
+  BlockType,
+} from "@xwiki/platform-editors-blocknote-react";
 
 /**
  * XWik specific implementation of a BlockNoteProcessor.
@@ -57,16 +70,14 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
 
   // The block metadata that can't be stored in the BlockNote schema and is backed up (mapped to the block id) so that
   // it survives the editing round-trip.
-  private static readonly KNOWN_METADATA: readonly string[] = [
-    "xwikiParameters",
-    "xwikiReference",
-    "xwikiFreestanding",
-    "xwikiGeneratedLabel",
-    // Whether the verbatim content of a code block starts or ends with a new line that is hidden in the code block.
-    "xwikiLeadingNewLine",
-    "xwikiTrailingNewLine",
-    // Whether a code block was produced from a verbatim block (otherwise it is saved as a code macro call).
-    "xwikiVerbatim",
+  private static readonly KNOWN_METADATA: readonly BlockMetadataKey[] = [
+    XWIKI_PARAMETERS,
+    XWIKI_REFERENCE,
+    XWIKI_FREESTANDING,
+    XWIKI_GENERATED_LABEL,
+    XWIKI_LEADING_NEW_LINE,
+    XWIKI_TRAILING_NEW_LINE,
+    XWIKI_VERBATIM,
   ];
 
   public static bind(container: Container): void {
@@ -163,7 +174,8 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     const output = props.output;
     delete props.output;
     if (Array.isArray(output) && output.length) {
-      blockNoteDocument.setMacroOutput(
+      setMacroOutput(
+        blockNoteDocument.metadata,
         this.getMacroId(macroNode, nested),
         call,
         output,
@@ -246,12 +258,11 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   ): void {
     const props = block.props as Record<string, unknown>;
     XWikiBlockNoteProcessor.KNOWN_METADATA.filter(
-      (key) => key in props,
+      (key) => key.name in props,
     ).forEach((key) => {
       block.id = block.id ?? uuidv4();
-      blockNoteDocument.getMetadata(block.id as string, true)![key] =
-        props[key];
-      delete props[key];
+      blockNoteDocument.metadata.set(block.id as string, key, props[key.name]);
+      delete props[key.name];
     });
   }
 
@@ -270,22 +281,21 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     blockNoteDocument: BlockNoteDocument,
   ): void {
     const props = (link.props ?? {}) as Record<string, unknown>;
-    const metadata: Record<string, unknown> = {};
-    XWikiBlockNoteProcessor.KNOWN_METADATA.filter(
-      (key) => key in props,
-    ).forEach((key) => {
-      metadata[key] = props[key];
-    });
-    if (Object.keys(metadata).length > 0) {
+    const keys = XWikiBlockNoteProcessor.KNOWN_METADATA.filter(
+      (key) => key.name in props,
+    );
+    if (keys.length > 0) {
       const id = uuidv4();
-      Object.assign(blockNoteDocument.getMetadata(id, true)!, metadata);
+      keys.forEach((key) =>
+        blockNoteDocument.metadata.set(id, key, props[key.name]),
+      );
       link.href = injectLinkId(link.href as string, id);
     }
     // The BlockNote link schema doesn't support props so we drop them (the metadata they held is
     // backed up above and restored on save).
     delete link.props;
 
-    this.showGeneratedLabel(link, metadata.xwikiGeneratedLabel);
+    this.showGeneratedLabel(link, props[XWIKI_GENERATED_LABEL.name]);
   }
 
   /**
@@ -444,7 +454,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     blockNoteDocument: BlockNoteDocument,
   ): void {
     if (typeof block.id === "string") {
-      const metadata = blockNoteDocument.getMetadata(block.id);
+      const metadata = blockNoteDocument.metadata.get(block.id);
       const props = block.props as Record<string, unknown>;
       Object.entries(metadata ?? {}).forEach(([key, value]) => {
         props[key] = value;
@@ -468,7 +478,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       typeof link.href === "string" ? extractLinkId(link.href) : undefined;
     if (id) {
       link.href = stripLinkId(link.href as string);
-      const metadata = blockNoteDocument.getMetadata(id);
+      const metadata = blockNoteDocument.metadata.get(id);
       if (metadata) {
         const props = { ...metadata };
         // Drop the generated label marker if the user changed the (originally generated) label, so that the modified

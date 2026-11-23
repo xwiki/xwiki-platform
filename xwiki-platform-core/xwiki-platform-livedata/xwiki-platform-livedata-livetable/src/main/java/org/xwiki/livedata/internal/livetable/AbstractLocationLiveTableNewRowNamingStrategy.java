@@ -26,16 +26,19 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
- * Base class for the {@link LiveTableNewRowNamingStrategy} implementations that create their entries in the space
- * given by the {@code newRowLocation} source parameter.
+ * Base class for the {@link LiveTableNewRowNamingStrategy} implementations that create their entries in a given
+ * space, by default the one given by the {@code newRowLocation} source parameter.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -44,6 +47,8 @@ public abstract class AbstractLocationLiveTableNewRowNamingStrategy implements L
 {
     private static final String NEW_ROW_LOCATION_PARAMETER_KEY = "newRowLocation";
 
+    private static final String DESCRIPTION_TRANSLATION_KEY = "livedata.liveTable.newRowNamingStrategy.%s.description";
+
     @Inject
     @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
@@ -51,18 +56,45 @@ public abstract class AbstractLocationLiveTableNewRowNamingStrategy implements L
     @Inject
     private ContextualAuthorizationManager authorization;
 
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private ContextualLocalizationManager l10n;
+
     @Override
     public boolean isCreationAllowed(Map<String, Object> parameters)
     {
-        return getLocation(parameters)
-            .map(location -> this.authorization.hasAccess(Right.EDIT, location))
-            .orElse(false);
+        try {
+            return getLocation(parameters)
+                .map(location -> this.authorization.hasAccess(Right.EDIT, location))
+                .orElse(false);
+        } catch (LiveDataException e) {
+            this.logger.warn("Adding entries is disabled because their location could not be resolved: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
+        }
     }
 
     @Override
     public Optional<SpaceReference> getNewEntryLocation(Map<String, Object> parameters)
     {
-        return getLocation(parameters);
+        try {
+            return getLocation(parameters);
+        } catch (LiveDataException e) {
+            this.logger.warn("Failed to find where new entries are created: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * @param hint the hint of the strategy
+     * @return the translated description of the strategy with the given hint, or {@code null} when it has none
+     */
+    protected String getDescription(String hint)
+    {
+        return this.l10n.getTranslationPlain(String.format(DESCRIPTION_TRANSLATION_KEY, hint));
     }
 
     /**
@@ -76,7 +108,14 @@ public abstract class AbstractLocationLiveTableNewRowNamingStrategy implements L
             .orElseThrow(() -> new LiveDataException("Missing location for row creation."));
     }
 
-    private Optional<SpaceReference> getLocation(Map<String, Object> parameters)
+    /**
+     * Finds where new entries go. This implementation reads the {@code newRowLocation} source parameter.
+     *
+     * @param parameters the live data source parameters
+     * @return the location of the new entries, or {@link Optional#empty()} when there is none
+     * @throws LiveDataException when the location cannot be resolved
+     */
+    protected Optional<SpaceReference> getLocation(Map<String, Object> parameters) throws LiveDataException
     {
         String location = (String) parameters.get(NEW_ROW_LOCATION_PARAMETER_KEY);
         if (StringUtils.isBlank(location)) {

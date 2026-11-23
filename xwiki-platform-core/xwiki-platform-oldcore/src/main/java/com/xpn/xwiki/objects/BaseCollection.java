@@ -1332,7 +1332,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * @since 17.2.1
      * @since 17.3.0RC1
      */
-    @Unstable
     public void setDirty(boolean dirty, boolean deep)
     {
         setDirty(dirty);

@@ -72,39 +72,103 @@ export type {
   InlineContentType,
 } from "./blocknote";
 
-export type { DefaultBlockNoteEditorOptions } from "./components/BlockNoteViewWrapper";
+export type { EditorInstance } from "./editorInstance";
+
+export { createBlockMetadataStore } from "./misc/blockMetadata";
+
+export {
+  getMacroOutput,
+  setMacroOutput,
+} from "./features/macros/macroMetadata";
 
 export type {
-  ImageEditionOverrideFn,
-  ImageUpdateResult,
-} from "./components/images/CustomImageToolbar";
-
-export type { ImageEditionHooks } from "./components/images/imageEditionHooks";
+  BlockMetadata,
+  BlockMetadataKey,
+  BlockMetadataStore,
+  SharedBlockMetadata,
+} from "./misc/blockMetadata";
 
 export type {
-  ImageInsertionOverrideFn,
-  ImageInsertionResult,
-} from "./components/images/imageInsertionOverride";
+  CodeBlocksFeatureOptions,
+  EditorAppearance,
+  EditorFeatures,
+  EditorOptions,
+  MacroFeatureOptions,
+} from "./editorOptions";
+
+export {
+  canUploadFiles,
+  fileUploadListenerName,
+  fileUploaderName,
+  uploadFile,
+} from "./files/fileUploader";
+
+export type {
+  FileUploadListener,
+  FileUploader,
+  UploadedFile,
+} from "./files/fileUploader";
+
+export { ComponentInit } from "./componentInit";
+
+export { codeBlocksFeature } from "./features/codeBlocks/codeBlocks";
+
+export { fileTransferFeature } from "./features/fileTransfer/fileTransfer";
+
+export { imagesFeature } from "./features/images/images";
+
+export { linksFeature } from "./features/links/links";
+
+export { macrosFeature } from "./features/macros/macros";
+
+export { textStylesFeature } from "./features/textStyles/textStyles";
+export { xwikiRenderingFeature } from "./features/xwikiRendering/xwikiRendering";
+
+export { editorFeatureName } from "./features/editorFeature";
+
+export type {
+  ContributedBlockNoteOptions,
+  EditorFeature,
+  FeatureContext,
+  FeatureContribution,
+  FormattingToolbarContribution,
+  SchemaContribution,
+  SlashMenuItem,
+} from "./features/editorFeature";
+
+export {
+  imageEditorName,
+  imageMetadataHandlerName,
+} from "./services/imageEditor";
+
+export type {
+  ImageEditionData,
+  ImageEditor,
+  ImageMetadataHandler,
+} from "./services/imageEditor";
 
 export {
   MACRO_NAME_PREFIX,
   buildMacroRawContent,
   extractMacroRawContent,
-} from "./blocknote/utils";
+} from "./features/macros/utils";
+
+export { macroEditorName } from "./services/macroEditor";
 
 export type {
-  ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
-  MacroCall,
   MacroCallParams,
+  MacroEditor,
   MacroInsertionEditorPrefillData,
-} from "./blocknote/utils";
+} from "./services/macroEditor";
+
+export type { MacroCall } from "./features/macros/utils";
+
+export { linkEditorName, linkMetadataHandlerName } from "./services/linkEditor";
 
 export type {
   LinkEditionData,
-  LinkEditionHandler,
-  LinkEditionHandlerProps,
-} from "./components/links/linkEdition";
-
-export type { LinkEditionHooks } from "./components/links/linkEditionHooks";
+  LinkEditor,
+  LinkMetadataHandler,
+} from "./services/linkEditor";

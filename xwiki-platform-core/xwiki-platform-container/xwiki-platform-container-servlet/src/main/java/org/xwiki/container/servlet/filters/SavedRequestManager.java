@@ -86,7 +86,6 @@ public final class SavedRequestManager
          * @param request the request that needs to be saved
          * @since 17.0.0RC1
          */
-        @Unstable
         public SavedRequest(HttpServletRequest request)
         {
             this.parameters = new HashMap<>(request.getParameterMap());
@@ -227,7 +226,6 @@ public final class SavedRequestManager
      * @return the identifier of the saved request
      * @since 17.0.0RC1
      */
-    @Unstable
     @SuppressWarnings("unchecked")
     public static String saveRequest(HttpServletRequest request)
     {
@@ -279,7 +277,6 @@ public final class SavedRequestManager
      *         request information
      * @since 17.0.0RC1
      */
-    @Unstable
     @SuppressWarnings("unchecked")
     public static String getOriginalUrl(HttpServletRequest request)
     {

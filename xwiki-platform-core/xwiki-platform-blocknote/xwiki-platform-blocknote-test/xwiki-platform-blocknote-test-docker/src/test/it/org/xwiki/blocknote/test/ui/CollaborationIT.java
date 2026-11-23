@@ -42,6 +42,7 @@ import org.xwiki.realtime.test.po.RealtimeEditToolbar;
 import org.xwiki.realtime.test.po.SaveStatus;
 import org.xwiki.realtime.test.po.SummaryModal;
 import org.xwiki.realtime.test.po.VersionElement;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.ui.TestUtils;
@@ -1144,6 +1145,118 @@ class CollaborationIT extends AbstractBlockNoteIT
         firstEditPage.getToolbar().waitUntilEditingAlone();
         // The macro calls are saved even though the macro output is not part of the edited content.
         assertEquals("Hello superadmin!\nWelcome superadmin\nend", firstEditPage.clickDone().getContent());
+    }
+
+    @Test
+    @Order(14)
+    void editDifferentPagesInTheSameBrowser(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        DocumentReference firstPage = testReference;
+        DocumentReference secondPage = new DocumentReference("Other", testReference.getLastSpaceReference());
+
+        // Start fresh, as John: the previous tests may leave a user logged in who has no preferred editor.
+        loginAsJohn(setup);
+        setup.deletePage(firstPage);
+        setup.deletePage(secondPage);
+        setup.createPage(firstPage, "First page", "");
+        setup.createPage(secondPage, "Second page", "");
+
+        //
+        // First Tab
+        //
+
+        BlockNoteInplaceEditPage firstEditPage = BlockNoteInplaceEditPage.gotoPage(firstPage).editInplace();
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.waitUntilTextIs("First page");
+
+        //
+        // Second Tab
+        //
+
+        // Use the same host as the first tab: the tabs of the same browser can communicate directly only if they have
+        // the same origin, and we want to verify that they don't exchange the content of different pages.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(setup.getCurrentExecutor().getBrowserHost());
+        BlockNoteStandaloneEditPage secondEditPage = BlockNoteStandaloneEditPage.gotoPage(secondPage);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        // The second page is edited alone, with its own content.
+        secondTextArea.waitUntilTextIs("Second page");
+        assertTrue(secondEditPage.getToolbar().isEditingAlone());
+        secondTextArea.appendParagraph("Typed in the second tab").waitUntilTextContains("second tab");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.appendParagraph("Typed in the first tab").waitUntilTextContains("first tab");
+        assertTrue(firstEditPage.getToolbar().isEditingAlone());
+        assertEquals("First page\nTyped in the first tab", firstEditPage.done().getContent());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        assertEquals("Second page\nTyped in the second tab", secondEditPage.clickDone().getContent());
+    }
+
+    @Test
+    @Order(15)
+    void saveSourceInformationFromJoinedSession(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup) throws Exception
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh, with content holding information that BlockNote can't represent (the block parameters, the link
+        // reference and parameters, e.g. to open the link in a new tab, and the verbatim flag of the code block): it is
+        // kept outside the edited content and has to be shared with the users that join the collaboration session,
+        // since any of them can save the content.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+        String source = """
+            (% class="box" %)
+            one [[two>>doc:Sandbox.WebHome||rel="__blank"]] three
+
+            {{{
+            not **bold**
+            }}}""";
+        setup.createPage(testReference, source, "");
+
+        BlockNoteRichTextArea firstTextArea =
+            BlockNoteInplaceEditPage.gotoPage(testReference).editInplace().getContentEditor().getRichTextArea();
+        firstTextArea.waitUntilTextContains("not **bold**");
+        // Change the paragraph that has parameters, so that the content of the session differs from the saved content.
+        firstTextArea.click();
+        firstTextArea.sendKeys(Keys.PAGE_UP, Keys.END, " four");
+        firstTextArea.waitUntilTextContains("three four");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsAlice(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSession(secondEditPage, setup);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        // Alice edits the content of the session, not the content she loaded.
+        secondTextArea.waitUntilTextContains("three four");
+        secondTextArea.appendParagraph("five").waitUntilTextContains("five");
+        secondEditPage.done();
+
+        // The changes are saved without losing the information that BlockNote can't represent.
+        assertEquals("""
+            (% class="box" %)
+            one [[two>>doc:Sandbox.WebHome||rel="__blank"]] three four
+
+            {{{
+            not **bold**
+            }}}
+
+            five""", setup.rest().<Page>get(testReference).getContent());
     }
 
     private void assertMacroOutputNotShared(String text)

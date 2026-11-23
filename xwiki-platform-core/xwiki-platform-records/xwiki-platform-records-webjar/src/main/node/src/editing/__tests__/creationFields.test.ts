@@ -1,0 +1,351 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import { setMessages } from "../../common/translations";
+import { updateCreationFields, wireCreationFields } from "../creationFields";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type TomSelect from "tom-select";
+
+/**
+ * The columns the fixture offers.
+ */
+const COLUMNS = ["doc.title", "doc.name", "status"];
+
+/**
+ * Builds the creation fields as the macro editor and the displayer templates render them.
+ *
+ * @param options - the state of the dialog
+ * @returns the dialog's form
+ */
+function givenDialog(
+  options: {
+    editMode?: boolean;
+    columns?: string[];
+    strategy?: string;
+  } = {},
+): HTMLFormElement {
+  const selected = (value: string) =>
+    (options.strategy ?? "") === value ? " selected" : "";
+  const column = (value: string) =>
+    `<option value="${value}"${options.columns?.includes(value) ? " selected" : ""}>${value}</option>`;
+  document.body.innerHTML = `
+    <form>
+      <select name="properties" multiple>
+        ${COLUMNS.map(column).join("")}
+      </select>
+      <input type="checkbox" name="allowEditMode" value="true"${options.editMode ? " checked" : ""} />
+      <input type="hidden" name="allowEditMode" value="false" />
+      <select name="creationStrategy">
+        <option value=""${selected("")}>Creation disabled</option>
+        <option value="title" data-required-columns="doc.title"${selected("title")}>Title</option>
+        <option value="uuid" data-required-columns=""${selected("uuid")}>UUID</option>
+      </select>
+      <div class="location-picker-compact">
+        <select name="newEntriesLocation"></select>
+        <button type="button">Browse</button>
+      </div>
+      <select name="templateProvider">
+        <option value="">Default template</option>
+      </select>
+    </form>`;
+  return document.querySelector("form")!;
+}
+
+function strategySelect(): HTMLSelectElement {
+  return document.querySelector<HTMLSelectElement>(
+    'select[name="creationStrategy"]',
+  )!;
+}
+
+function option(value: string): HTMLOptionElement {
+  return strategySelect().querySelector<HTMLOptionElement>(
+    `option[value="${value}"]`,
+  )!;
+}
+
+function columnsSelect(): HTMLSelectElement {
+  return document.querySelector<HTMLSelectElement>(
+    'select[name="properties"]',
+  )!;
+}
+
+/**
+ * Picks the given columns, as the enhanced picker does on the underlying select.
+ */
+function pickColumns(...columns: string[]): void {
+  Array.from(columnsSelect().options).forEach((option) => {
+    option.selected = columns.includes(option.value);
+  });
+}
+
+function locationSelect(): HTMLSelectElement {
+  return document.querySelector<HTMLSelectElement>(
+    'select[name="newEntriesLocation"]',
+  )!;
+}
+
+function templateProviderSelect(): HTMLSelectElement {
+  return document.querySelector<HTMLSelectElement>(
+    'select[name="templateProvider"]',
+  )!;
+}
+
+function locationButton(): HTMLButtonElement {
+  return document.querySelector<HTMLButtonElement>(
+    ".location-picker-compact button",
+  )!;
+}
+
+beforeEach(() => {
+  setMessages({
+    get: (key, ...args) => [`[${key}]`, ...args].join(" "),
+  });
+});
+
+afterEach(() => {
+  setMessages({ get: () => null });
+});
+
+/**
+ * Changes a field the way the author does, which the wired dialog listens to.
+ */
+function change(field: HTMLInputElement | HTMLSelectElement): void {
+  field.dispatchEvent(new Event("change"));
+}
+
+function givenWiredDialog(
+  options: Parameters<typeof givenDialog>[0] = {},
+): HTMLFormElement {
+  const scope = givenDialog(options);
+  wireCreationFields(scope, (field, handler) =>
+    field.addEventListener("change", handler),
+  );
+  return scope;
+}
+
+function allowEditMode(allowed = true): void {
+  const editMode = document.querySelector<HTMLInputElement>(
+    'input[type="checkbox"][name="allowEditMode"]',
+  )!;
+  editMode.checked = allowed;
+  change(editMode);
+}
+
+describe("updateCreationFields, following the edit mode", () => {
+  it("enables the strategy, then the location and template once one is picked", () => {
+    const scope = givenDialog({ editMode: true });
+
+    updateCreationFields(scope, false);
+    expect(strategySelect().disabled).toBe(false);
+    expect(locationSelect().disabled).toBe(true);
+    expect(templateProviderSelect().disabled).toBe(true);
+
+    strategySelect().value = "uuid";
+    updateCreationFields(scope, false);
+    expect(locationSelect().disabled).toBe(false);
+    expect(locationButton().disabled).toBe(false);
+    expect(templateProviderSelect().disabled).toBe(false);
+  });
+
+  it("enables and disables the enhanced location picker through its own API", () => {
+    const scope = givenDialog({ editMode: true, strategy: "uuid" });
+    const picker = { enable: vi.fn(), disable: vi.fn() };
+    locationSelect().selectize = picker as unknown as TomSelect;
+
+    updateCreationFields(scope, false);
+    expect(picker.enable).toHaveBeenCalled();
+
+    strategySelect().value = "";
+    updateCreationFields(scope, false);
+    expect(picker.disable).toHaveBeenCalled();
+  });
+
+  it("does nothing in a dialog without the creation strategy", () => {
+    document.body.innerHTML = `<form><select name="properties" multiple></select></form>`;
+
+    expect(() =>
+      updateCreationFields(document.querySelector("form")!, true),
+    ).not.toThrow();
+  });
+});
+
+describe("updateCreationFields, following the columns", () => {
+  it("offers the strategies needing the title or a field when no column is picked", () => {
+    const scope = givenDialog({ editMode: true });
+    option("uuid").dataset.requiredColumns = "status";
+
+    updateCreationFields(scope, false);
+
+    expect(option("title").disabled).toBe(false);
+    expect(option("uuid").disabled).toBe(false);
+  });
+
+  it("disables a strategy needing other page metadata when no column is picked", () => {
+    const scope = givenDialog({ editMode: true });
+    option("uuid").dataset.requiredColumns = "doc.name";
+
+    updateCreationFields(scope, false);
+
+    expect(option("uuid").disabled).toBe(true);
+  });
+
+  it("disables a strategy needing a column the table does not display, and says why below the dropdown", () => {
+    const scope = givenDialog({
+      editMode: true,
+      columns: ["status", "doc.name"],
+    });
+
+    updateCreationFields(scope, false);
+
+    expect(option("title").disabled).toBe(true);
+    expect(option("uuid").disabled).toBe(false);
+    expect(strategySelect().nextElementSibling?.textContent).toBe(
+      "[picker.creation.columnsMissing] Title [picker.metadata.doc.title]",
+    );
+  });
+
+  it("enables the strategy again once the column is displayed", () => {
+    const scope = givenDialog({ editMode: true, columns: ["status"] });
+    updateCreationFields(scope, false);
+
+    pickColumns("doc.title", "status");
+    updateCreationFields(scope, true);
+
+    expect(option("title").disabled).toBe(false);
+  });
+
+  it("keeps the saved strategy when the dialog opens, so that reopening it changes nothing", () => {
+    const scope = givenDialog({
+      editMode: true,
+      columns: ["status"],
+      strategy: "title",
+    });
+
+    updateCreationFields(scope, false);
+
+    // The macro editor does not save a disabled option.
+    expect(strategySelect().value).toBe("title");
+    expect(option("title").disabled).toBe(false);
+    expect(strategySelect().nextElementSibling?.textContent).toBe(
+      "[picker.creation.columnsMissing] Title [picker.metadata.doc.title]",
+    );
+  });
+
+  it("disables a saved strategy and its location when the dialog opens without the edit mode", () => {
+    const scope = givenDialog({ strategy: "uuid" });
+
+    updateCreationFields(scope, false);
+
+    expect(strategySelect().disabled).toBe(true);
+    expect(locationSelect().disabled).toBe(true);
+  });
+
+  it("turns creation off when the columns no longer allow the picked strategy", () => {
+    const scope = givenDialog({
+      editMode: true,
+      columns: ["status"],
+      strategy: "title",
+    });
+
+    updateCreationFields(scope, true);
+
+    expect(strategySelect().value).toBe("");
+    expect(locationSelect().disabled).toBe(true);
+  });
+});
+
+describe("updateCreationFields, explaining the disabled strategies", () => {
+  it("explains each missing column on its own line", () => {
+    const scope = givenDialog({ editMode: true, columns: ["doc.name"] });
+    option("title").dataset.requiredColumns = "doc.title,status";
+
+    updateCreationFields(scope, true);
+
+    const lines = [
+      "[picker.creation.columnsMissing] Title [picker.metadata.doc.title]",
+      "[picker.creation.columnsMissing] Title status",
+    ];
+    expect(strategySelect().nextElementSibling?.textContent).toBe(
+      lines.join(""),
+    );
+  });
+
+  it("removes the warning once the column is displayed, and shows none without the edit mode", () => {
+    const scope = givenDialog({ editMode: true, columns: ["status"] });
+    updateCreationFields(scope, true);
+    pickColumns("status", "doc.title");
+
+    updateCreationFields(scope, true);
+
+    expect(strategySelect().nextElementSibling?.matches(".box")).toBe(false);
+
+    const withoutEditMode = givenDialog({ columns: ["status"] });
+    updateCreationFields(withoutEditMode, true);
+
+    expect(strategySelect().nextElementSibling?.matches(".box")).toBe(false);
+  });
+});
+
+describe("wireCreationFields", () => {
+  it("enables the strategy once the edit mode is allowed", () => {
+    givenWiredDialog();
+    expect(strategySelect().disabled).toBe(true);
+
+    allowEditMode();
+
+    expect(strategySelect().disabled).toBe(false);
+  });
+
+  it("disables the strategy, the location and the template once the edit mode is turned off", () => {
+    givenWiredDialog({ editMode: true, strategy: "uuid" });
+
+    allowEditMode(false);
+
+    expect(strategySelect().disabled).toBe(true);
+    expect(locationSelect().disabled).toBe(true);
+    expect(locationButton().disabled).toBe(true);
+    expect(templateProviderSelect().disabled).toBe(true);
+  });
+
+  it("gives back the strategy picked before the edit mode was turned off once it is allowed again", () => {
+    givenWiredDialog({ editMode: true, strategy: "uuid" });
+    allowEditMode(false);
+
+    allowEditMode();
+
+    expect(strategySelect().disabled).toBe(false);
+    expect(strategySelect().value).toBe("uuid");
+    expect(locationSelect().disabled).toBe(false);
+  });
+
+  it("turns creation off when a column the picked strategy needs is removed", () => {
+    givenWiredDialog();
+    allowEditMode();
+    strategySelect().value = "title";
+    change(strategySelect());
+
+    pickColumns("status");
+    change(columnsSelect());
+
+    expect(strategySelect().value).toBe("");
+    expect(locationSelect().disabled).toBe(true);
+    expect(templateProviderSelect().disabled).toBe(true);
+  });
+});

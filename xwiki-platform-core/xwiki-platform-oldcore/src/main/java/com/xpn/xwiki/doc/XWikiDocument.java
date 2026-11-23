@@ -160,7 +160,6 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
@@ -2463,7 +2462,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 17.2.1
      * @since 17.3.0RC1
      */
-    @Unstable
     public void setDirty(boolean dirty, boolean deep)
     {
         setMetaDataDirty(dirty);
@@ -2490,7 +2488,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 16.10.4
      * @since 16.4.7
      */
-    @Unstable
     public boolean isChangeTracked()
     {
         return this.changeTracked;
@@ -2504,7 +2501,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 16.10.4
      * @since 16.4.7
      */
-    @Unstable
     public void setChangeTracked(boolean changeTracked)
     {
         this.changeTracked = changeTracked;
@@ -3752,7 +3748,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return the rendered field
      * @since 17.3.0RC1
      */
-    @Unstable
     public String display(String fieldname, String type, BaseObject obj, boolean isolated, boolean number,
         XWikiContext context)
     {
@@ -3838,7 +3833,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return the rendered field
      * @since 17.3.0RC1
      */
-    @Unstable
     public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolated, boolean number,
         XWikiContext context)
     {
@@ -3892,7 +3886,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return the rendered field
      * @since 17.3.0RC1
      */
-    @Unstable
     public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
         boolean isolated, boolean number, XWikiContext context)
     {

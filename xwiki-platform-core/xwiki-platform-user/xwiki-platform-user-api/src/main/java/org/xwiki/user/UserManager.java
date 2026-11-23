@@ -50,7 +50,6 @@ public interface UserManager
      * @throws UserException when failing to check if a user exist on the target wiki
      * @since 17.4.0RC1
      */
-    @Unstable
     default boolean hasUsers(WikiReference wiki) throws UserException
     {
         return false;

@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.inject.Named;
 
@@ -31,12 +33,16 @@ import org.mockito.ArgumentCaptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.livetable.LiveTableConfiguration;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategyManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,6 +62,9 @@ class LiveTableScriptServiceTest
 
     @MockComponent
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigurationResolver;
+
+    @MockComponent
+    private LiveTableNewRowNamingStrategyManager namingStrategyManager;
 
     @Test
     void getConfig() throws Exception
@@ -79,5 +88,25 @@ class LiveTableScriptServiceTest
         assertSame(columns, liveTableConfig.getColumns());
         assertSame(columnProperties, liveTableConfig.getColumnProperties());
         assertSame(options, liveTableConfig.getOptions());
+    }
+
+    @Test
+    void getNewRowNamingStrategies()
+    {
+        LiveTableNewRowNamingStrategy title = mock();
+        when(title.getMandatoryProperties(Map.of())).thenReturn(Set.of("doc.title"));
+        when(title.getDescription()).thenReturn("Use the title");
+        Map<String, LiveTableNewRowNamingStrategy> installed = new TreeMap<>();
+        installed.put("title", title);
+        installed.put("uuid", mock());
+        when(this.namingStrategyManager.getAll()).thenReturn(installed);
+
+        Map<String, NewRowNamingStrategyDescriptor> strategies = this.service.getNewRowNamingStrategies();
+
+        assertEquals(List.of("title", "uuid"), List.copyOf(strategies.keySet()));
+        assertEquals("Use the title", strategies.get("title").description());
+        assertEquals(Set.of("doc.title"), strategies.get("title").mandatoryProperties());
+        assertNull(strategies.get("uuid").description());
+        assertEquals(Set.of(), strategies.get("uuid").mandatoryProperties());
     }
 }

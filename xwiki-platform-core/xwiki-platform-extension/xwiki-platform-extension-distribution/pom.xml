@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>18.10.0-SNAPSHOT</version>
+    <version>19.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-distribution</artifactId>
   <name>XWiki Platform - Extension - Distribution</name>
   <packaging>jar</packaging>
   <description>Distribution Manager, allows upgrading the extensions in an entire farm after a platform upgrade.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.04</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

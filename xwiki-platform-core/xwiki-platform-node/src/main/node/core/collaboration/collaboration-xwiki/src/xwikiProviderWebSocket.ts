@@ -355,6 +355,13 @@ export function createXWikiWebSocketProvider(
     doc,
     {
       params: { room, locale },
+      // By default, the Yjs WebSocket provider also exchanges updates directly with the other tabs of the same browser
+      // (same origin), using a BroadcastChannel named after the endpoint URL and the room name, without the query
+      // parameters. The room name we pass is the last path segment of the endpoint URL, the same for all the edited
+      // documents, while the actual room (the edited document and its locale) is a query parameter. So all the tabs
+      // would share one channel, and editing a page in one tab would modify any other page edited in another tab.
+      // Each tab is connected to the server anyway, which relays the updates to the other clients of the same room.
+      disableBc: true,
     },
   );
   removeAwarenessOnPageHide(websocketProvider);

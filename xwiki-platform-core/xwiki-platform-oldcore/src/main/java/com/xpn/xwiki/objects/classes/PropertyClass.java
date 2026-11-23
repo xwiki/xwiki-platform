@@ -564,7 +564,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * @since 16.10.3
      * @since 16.4.7
      */
-    @Unstable
     protected String renderContentInContext(final String content, final String syntax,
         DocumentReference authorReference, DocumentReference secureDocument,
         boolean restricted, final XWikiContext context)

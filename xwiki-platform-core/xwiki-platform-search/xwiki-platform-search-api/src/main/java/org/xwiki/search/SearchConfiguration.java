@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Search configuration options.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.8.0RC1
  */
 @Role
-@Unstable
 public interface SearchConfiguration
 {
     /**

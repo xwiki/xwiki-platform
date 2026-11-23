@@ -36,6 +36,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.CaseUtils;
@@ -83,29 +84,34 @@ public class DefaultNotificationParametersFactory
     private static final String FIELD_SEPARATOR = ",";
 
     /**
-     * Matches one value of a parameter holding a list. Each match is one of three alternatives, tried in this order:
+     * Matches one value of a parameter holding a list. The whitespaces before the value are matched first by
+     * {@code \s*+}, then the value is matched by one of three alternatives, tried in this order:
      * <ul>
-     * <li>{@code \s*"((?:\\.|[^"\\])*)"?} matches a value put in double quotes, the whitespaces before it included. Its
-     * content is captured by the first group: any number of either a backslash followed by any character, which is an
-     * escaped character, or a character that is neither a double quote nor a backslash. The closing double quote is
-     * optional, so that a value missing it runs up to the end of the text, like the macro reads it.</li>
-     * <li>{@code \s*'((?:\\.|[^'\\])*)'?} does the same for a value put in single quotes, captured by the second
+     * <li>{@code "((?:\\.|[^"\\])*+)"} matches a value put in double quotes. Its content is captured by the first group:
+     * any number of either a backslash followed by any character, which is an escaped character, or a character that is
+     * neither a double quote nor a backslash.</li>
+     * <li>{@code '((?:\\.|[^'\\])*+)'} does the same for a value put in single quotes, captured by the second
      * group.</li>
      * <li>{@code ([^,]+)} matches a value without quotes, captured by the third group: everything up to the next comma.
      * Whitespaces and quotes inside it are kept, so that a value typed by hand like {@code My Space} or
-     * {@code O'Brien} stays whole.</li>
+     * {@code O'Brien} stays whole. A value starting with a quote that is never closed, like {@code '90s}, is matched
+     * here too, so that it is also kept whole.</li>
      * </ul>
      * The commas separating the values are matched by none of the alternatives, so they are skipped between two
      * matches. A quoted value ends at its closing quote, so a text following it before the next comma, like the
      * {@code b} of {@code "a"b}, is matched as another value without quotes, as the macro does. The whitespaces between
-     * a closing quote and the next comma are matched the same way, as a value that becomes empty once trimmed.
+     * a closing quote and the next comma are matched by {@code \s*+} alone, which isn't a value.
+     * <p>
+     * The quantifiers are possessive, with a {@code +} after them, so that the regular expression engine doesn't keep
+     * the positions it would need to backtrack, which would overflow the stack for a long quoted value. The
+     * alternatives can't match the same characters, so backtracking wouldn't find another match anyway.
      * <p>
      * The macro editor reads the values of the collection parameters with the same pattern, {@code
      * collectionValuePattern} in the {@code macro/macroEditor.js} file of the WYSIWYG webjar, so that the values it
      * writes and reads are read the same way here. Keep the two patterns in sync.
      */
     private static final Pattern LIST_VALUE_PATTERN =
-        Pattern.compile("\\s*\"((?:\\\\.|[^\"\\\\])*)\"?|\\s*'((?:\\\\.|[^'\\\\])*)'?|([^,]+)");
+        Pattern.compile("\\s*+(?:\"((?:\\\\.|[^\"\\\\])*+)\"|'((?:\\\\.|[^'\\\\])*+)'|([^,]+))");
 
     /**
      * Matches a backslash followed by the character it escapes, captured by the first group, to remove the backslash
@@ -549,7 +555,7 @@ public class DefaultNotificationParametersFactory
 
     private static String getListValue(MatchResult match)
     {
-        String quotedValue = match.group(1) != null ? match.group(1) : match.group(2);
+        String quotedValue = ObjectUtils.firstNonNull(match.group(1), match.group(2));
         return quotedValue != null ? ESCAPED_CHARACTER_PATTERN.matcher(quotedValue).replaceAll("$1") : match.group(3);
     }
 

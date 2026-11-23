@@ -79,9 +79,9 @@ define('xwiki-wysiwyg-macro-collection-parameter', [], function() {
 
   // Matches one value of a collection parameter: a value in double quotes, a value in single quotes or a value without
   // quotes, captured by the first, second and third group. This is the same pattern as LIST_VALUE_PATTERN in
-  // org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory, which explains it in detail. Keep
-  // the two patterns in sync.
-  const collectionValuePattern = /\s*"((?:\\.|[^"\\])*)"?|\s*'((?:\\.|[^'\\])*)'?|([^,]+)/g;
+  // org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory, which explains it in detail, except
+  // for the possessive quantifiers that JavaScript doesn't support. Keep the two patterns in sync.
+  const collectionValuePattern = /\s*(?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'|([^,]+))/g;
 
   /**
    * Splits the value of a collection parameter on the commas that are not inside quotes, after removing the braces

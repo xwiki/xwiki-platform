@@ -63,6 +63,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
@@ -442,6 +443,15 @@ class DefaultNotificationParametersFactoryTest
             ParametersKey.SPACES, "{\"My, Space\", 'Your, Space', Other Space}",
             ParametersKey.TAGS, "\"my tag\",\"say \\\"hi\\\"\""
         )));
+    }
+
+    @Test
+    void splitListParameterWithLongQuotedValue()
+    {
+        String value = "a\\\"".repeat(500000);
+
+        assertArrayEquals(new String[] { value.replace("\\", "") },
+            DefaultNotificationParametersFactory.splitListParameter('"' + value + '"'));
     }
 
     private DefaultNotificationFilterPreference getFilterPreference(String property, int number)

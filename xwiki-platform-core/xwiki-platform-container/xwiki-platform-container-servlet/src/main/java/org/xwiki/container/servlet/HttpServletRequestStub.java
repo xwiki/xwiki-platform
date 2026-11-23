@@ -36,12 +36,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -65,6 +67,8 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 public class HttpServletRequestStub implements HttpServletRequest
 {
+    private static final AtomicLong REQUEST_ID_COUNTER = new AtomicLong();
+
     /**
      * Builder for {@link HttpServletRequestStub}.
      * 
@@ -202,6 +206,8 @@ public class HttpServletRequestStub implements HttpServletRequest
     private StringBuffer requestURL;
 
     private String remoteAddr;
+
+    private final String requestId = "stub-" + REQUEST_ID_COUNTER.incrementAndGet();
 
     private boolean daemon = true;
 
@@ -540,9 +546,10 @@ public class HttpServletRequestStub implements HttpServletRequest
     }
 
     /**
-     * @deprecated
+     * @return {@code false}
+     * @deprecated this method was removed from the Servlet specification and is only kept for backward
+     *             compatibility, use {@link #isRequestedSessionIdFromURL()} instead
      */
-    @Override
     @Deprecated
     public boolean isRequestedSessionIdFromUrl()
     {
@@ -714,9 +721,11 @@ public class HttpServletRequestStub implements HttpServletRequest
     }
 
     /**
-     * @deprecated
+     * @param s the virtual path
+     * @return {@code null}
+     * @deprecated this method was removed from the Servlet specification and is only kept for backward
+     *             compatibility, use {@link jakarta.servlet.ServletContext#getRealPath(String)} instead
      */
-    @Override
     @Deprecated
     public String getRealPath(String s)
     {
@@ -849,5 +858,66 @@ public class HttpServletRequestStub implements HttpServletRequest
     public void setDaemon(boolean daemon)
     {
         this.daemon = daemon;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 19.0.0RC1
+     */
+    @Override
+    public String getRequestId()
+    {
+        return this.requestId;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 19.0.0RC1
+     */
+    @Override
+    public String getProtocolRequestId()
+    {
+        // This stub is not associated with any protocol request
+        return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 19.0.0RC1
+     */
+    @Override
+    public ServletConnection getServletConnection()
+    {
+        return new ServletConnection()
+        {
+            @Override
+            public String getConnectionId()
+            {
+                // This stub is not associated with any network connection so each request has its own
+                return getRequestId();
+            }
+
+            @Override
+            public String getProtocol()
+            {
+                return HttpServletRequestStub.this.getProtocol();
+            }
+
+            @Override
+            public String getProtocolConnectionId()
+            {
+                return "";
+            }
+
+            @Override
+            public boolean isSecure()
+            {
+                return HttpServletRequestStub.this.isSecure();
+            }
+        };
     }
 }

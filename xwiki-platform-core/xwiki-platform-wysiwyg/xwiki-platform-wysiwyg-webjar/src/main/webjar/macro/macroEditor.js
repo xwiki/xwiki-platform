@@ -53,10 +53,6 @@ define('xwiki-wysiwyg-macro-collection-parameter', [], function() {
       (collectionTypePrefixes.some(prefix => type.startsWith(prefix)) || type.endsWith('[]'));
   };
 
-  const isQuote = function(character) {
-    return character === '"' || character === "'";
-  };
-
   const isWhitespace = function(character) {
     return character.trim() === '';
   };
@@ -82,89 +78,43 @@ define('xwiki-wysiwyg-macro-collection-parameter', [], function() {
   };
 
   /**
-   * Reads the value put in quotes that starts at the given index, a backslash escaping the next character.
-   *
-   * @param text the text to read from
-   * @param start the index of the opening quote
-   * @return the value without its quotes and escaping, and the index following the closing quote
+   * Matches one value of a collection parameter. Each match is one of three alternatives, tried in this order:
+   * <ul>
+   *   <li>{@code \s*"((?:\\.|[^"\\])*)"?} matches a value put in double quotes, the whitespaces before it included.
+   *     Its content is captured by the first group: any number of either a backslash followed by any character, which
+   *     is an escaped character, or a character that is neither a double quote nor a backslash. The closing double
+   *     quote is optional, so that a value missing it runs up to the end of the text, like the macro reads it.</li>
+   *   <li>{@code \s*'((?:\\.|[^'\\])*)'?} does the same for a value put in single quotes, captured by the second
+   *     group.</li>
+   *   <li>{@code ([^,]+)} matches a value without quotes, captured by the third group: everything up to the next
+   *     comma. Whitespaces and quotes inside it are kept, so that a value typed by hand like {@code My Space} or
+   *     {@code O'Brien} stays whole.</li>
+   * </ul>
+   * The commas separating the values are matched by none of the alternatives, so they are skipped between two
+   * matches. A quoted value ends at its closing quote, so a text following it before the next comma, like the
+   * {@code b} of {@code "a"b}, is matched as another value without quotes, as the macro does. The whitespaces between
+   * a closing quote and the next comma are matched the same way, as a value that becomes empty once trimmed.
    */
-  const readQuotedValue = function(text, start) {
-    const quote = text[start];
-    let value = '';
-    let index = start + 1;
-    while (index < text.length && text[index] !== quote) {
-      if (text[index] === '\\' && index + 1 < text.length) {
-        index++;
-      }
-      value += text[index];
-      index++;
-    }
-    return {value, end: index + 1};
-  };
-
-  /**
-   * @return the index of the first character that isn't a whitespace, starting from the given index
-   */
-  const skipWhitespaces = function(text, start) {
-    let index = start;
-    while (index < text.length && isWhitespace(text[index])) {
-      index++;
-    }
-    return index;
-  };
-
-  /**
-   * Reads the value that starts at the given index. A value without quotes ends at the next comma. A value put in
-   * quotes ends at its closing quote, and the text that follows it before the next comma is read as another value.
-   *
-   * @param text the text to read from
-   * @param start the index where the value starts, whitespaces included
-   * @return the value, and the index where the next value starts or -1 when it is the last value
-   */
-  const readValue = function(text, start) {
-    const index = skipWhitespaces(text, start);
-    if (isQuote(text[index])) {
-      const quotedValue = readQuotedValue(text, index);
-      const next = skipWhitespaces(text, quotedValue.end);
-      if (next >= text.length) {
-        return {value: quotedValue.value, next: -1};
-      }
-      return {value: quotedValue.value, next: text[next] === ',' ? next + 1 : next};
-    }
-    const comma = text.indexOf(',', index);
-    return {
-      value: text.substring(index, comma < 0 ? text.length : comma).trim(),
-      next: comma < 0 ? -1 : comma + 1
-    };
-  };
-
-  /**
-   * @return the given text trimmed, without the braces wrapping it, like the macro reads it
-   */
-  const removeWrappingBraces = function(text) {
-    const trimmedText = text.trim();
-    return trimmedText.startsWith('{') && trimmedText.endsWith('}') ?
-      trimmedText.substring(1, trimmedText.length - 1) : trimmedText;
-  };
+  const collectionValuePattern = /\s*"((?:\\.|[^"\\])*)"?|\s*'((?:\\.|[^'\\])*)'?|([^,]+)/g;
 
   /**
    * Splits the value of a collection parameter on the commas that are not inside quotes, after removing the braces
    * wrapping it. A value can be put in double or single quotes, a backslash escaping the next character inside them.
    * Unlike the conversion done by the macro, the value isn't split on whitespaces, so that a value typed by hand with
    * whitespaces and without quotes is kept whole.
+   *
+   * @param collectionValue the value of the collection parameter, as written in the macro call
+   * @return the values it holds, without their quotes and escaping, trimmed when not quoted, empty values excluded
    */
   const splitCollectionValue = function(collectionValue) {
-    const text = removeWrappingBraces(collectionValue);
-    const values = [];
-    let start = 0;
-    do {
-      const value = readValue(text, start);
-      if (value.value !== '') {
-        values.push(value.value);
-      }
-      start = value.next;
-    } while (start >= 0);
-    return values;
+    let text = collectionValue.trim();
+    if (text.startsWith('{') && text.endsWith('}')) {
+      text = text.substring(1, text.length - 1);
+    }
+    return [...text.matchAll(collectionValuePattern)]
+      .map(([, doubleQuoted, singleQuoted, unquoted]) => unquoted === undefined ?
+        (doubleQuoted ?? singleQuoted).replace(/\\(.)/g, '$1') : unquoted.trim())
+      .filter(value => value !== '');
   };
 
   return {

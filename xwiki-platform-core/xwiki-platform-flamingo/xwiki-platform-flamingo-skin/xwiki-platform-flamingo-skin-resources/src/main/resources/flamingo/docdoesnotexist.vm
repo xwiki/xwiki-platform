@@ -66,6 +66,8 @@
     #set ($latestDeletedDocument = $deletedTerminalDocuments[0])
   #end
   #set ($canCreate = $hasEdit && !$isReadOnly)
+  ## The layout can hide the content menu, and the Create button replaces the edit menu.
+  #set ($displayCreateButton = $canCreate && $displayContentMenu && $displayEditMenu)
   #set ($displayRecycleBin = false)
   #if ($latestDeletedDocument)
     #set ($titleKey = 'core.viewers.content.deleted.title')
@@ -76,11 +78,11 @@
     #set ($titleKey = 'core.viewers.content.doesnotexist.title')
   #end
   <div class="row document-header">
-    <section class="document-info col-xs-12 #if ($canCreate)col-md-7#end"
+    <section class="document-info col-xs-12 #if ($displayCreateButton)col-md-7#end"
       aria-label="$escapetool.xml($services.localization.render('core.document.header.info.label'))">
       <div id="document-title"><h1>$escapetool.xml($services.localization.render($titleKey))</h1></div>
     </section>
-    #if ($canCreate)
+    #if ($displayCreateButton)
       <nav class="document-menu col-xs-12 col-md-5"
         aria-label="$escapetool.xml($services.localization.render('core.document.header.menu.nav.label'))">
         #_displayDocDoesNotExistCreateButton()

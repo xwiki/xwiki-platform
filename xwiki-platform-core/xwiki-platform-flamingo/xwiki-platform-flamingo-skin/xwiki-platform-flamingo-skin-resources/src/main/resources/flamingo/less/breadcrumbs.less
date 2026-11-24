@@ -74,6 +74,9 @@
     justify-content: center;
     min-width: ~"var(--target-size-minimum)";
     min-height: ~"var(--target-size-minimum)";
+    /* Center the targets on the text line. Aligning on the baseline would raise image icons, whose baseline is their
+    bottom edge. */
+    vertical-align: top;
     /* Keep the line height of the breadcrumb, the targets are taller than the text line. */
     margin-block: ~"calc(-1 * var(--breadcrumb-target-overflow))";
   }

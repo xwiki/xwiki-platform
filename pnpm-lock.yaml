@@ -142,8 +142,8 @@ catalogs:
       specifier: 2.6.1
       version: 2.6.1
     jquery:
-      specifier: 4.0.0
-      version: 4.0.0
+      specifier: 4.1.0
+      version: 4.1.0
     jsdom:
       specifier: 29.1.1
       version: 29.1.1
@@ -499,7 +499,7 @@ importers:
         version: 9.39.4(jiti@2.6.1)
       jquery:
         specifier: 'catalog:'
-        version: 4.0.0
+        version: 4.1.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -613,7 +613,7 @@ importers:
         version: 2.6.1
       jquery:
         specifier: 'catalog:'
-        version: 4.0.0
+        version: 4.1.0
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -1677,7 +1677,7 @@ importers:
         version: 1.0.2
       jquery:
         specifier: 'catalog:'
-        version: 4.0.0
+        version: 4.1.0
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -1744,7 +1744,7 @@ importers:
         version: 9.39.4(jiti@2.6.1)
       jquery:
         specifier: 'catalog:'
-        version: 4.0.0
+        version: 4.1.0
       sinon:
         specifier: 'catalog:'
         version: 21.1.2
@@ -5608,8 +5608,8 @@ packages:
   jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
 
-  jquery@4.0.0:
-    resolution: {integrity: sha512-TXCHVR3Lb6TZdtw1l3RTLf8RBWVGexdxL6AC8/e0xZKEpBflBsjh9/8LXw+dkNFuOyW9B7iB3O1sP7hS0Kiacg==}
+  jquery@4.1.0:
+    resolution: {integrity: sha512-tnN2N83S+xD3yhmdBP4nnJ1XOO0Fl586rG23FA5h/JAe8XN3W9a1zGwDMltBptn+UpcqEKicnO61+jQ0EiF2fw==}
 
   js-beautify@1.15.4:
     resolution: {integrity: sha512-9/KXeZUKKJwqCXUdBxFJ3vPh467OCckSBmYDwSK/EtV090K+iMJ7zx2S3HLVDIWFQdqMIsZWbnaGiba18aWhaA==}
@@ -10491,7 +10491,7 @@ snapshots:
 
   jju@1.4.0: {}
 
-  jquery@4.0.0: {}
+  jquery@4.1.0: {}
 
   js-beautify@1.15.4:
     dependencies:

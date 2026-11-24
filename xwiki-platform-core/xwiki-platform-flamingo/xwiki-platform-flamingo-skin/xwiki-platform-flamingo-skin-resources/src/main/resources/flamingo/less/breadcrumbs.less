@@ -30,14 +30,10 @@
       > .dropdown-toggle {
         color: @breadcrumb-color;
         cursor: pointer;
-        /* Match the separator padding */
-        margin: 2px;
-        margin-left: 5px;
         /* Remove default styles for buttons */
         background: transparent;
         border-color: transparent;
         padding: 0;
-        line-height: .5rem;
 
         &:hover, &:focus {
           color: @breadcrumb-active-color;
@@ -69,3 +65,25 @@
   }
 }
 
+/* Give the icon-only targets the minimum target size, without making their icon bigger. The first item of a hierarchy
+breadcrumb is the home icon link. */
+.breadcrumb > .wiki:first-child > a,
+.breadcrumb > li.dropdown > .dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: ~"var(--target-size-minimum)";
+  min-height: ~"var(--target-size-minimum)";
+  /* Keep the line height of the breadcrumb, the targets are taller than the text line. */
+  margin-top: -1.5px;
+  margin-bottom: -1.5px;
+}
+
+/* Leave room for the taller targets inside the items, which hide their overflow, without making the breadcrumb
+taller. */
+.breadcrumb > li {
+  padding-top: 1.5px;
+  padding-bottom: 1.5px;
+  margin-top: -1.5px;
+  margin-bottom: -1.5px;
+}

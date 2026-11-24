@@ -124,36 +124,27 @@
 #macro (_displayDocDoesNotExistCreateButton)
   #template('menus_macros.vm')
   #set ($extraAttributes = 'rel="nofollow"')
-  #set ($createLabel = $services.localization.render('core.viewers.content.doesnotexist.create'))
+  #set ($menuContent = '')
+  #if ($isAdvancedUser)
+    #define ($menuContent)
+      <dt class="dropdown-header sr-only">
+        $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
+      </dt>
+      <dd>
+        <ul>
+          #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
+            #submenuitem($doc.getURL('edit', 'editor=wysiwyg') $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil', $extraAttributes)
+          #end
+          #submenuitem($doc.getURL('edit', 'editor=wiki') $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench', $extraAttributes)
+          #submenuitem($doc.getURL('edit', 'editor=inline') $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list', $extraAttributes)
+          #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'bricks', $extraAttributes)
+          #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'box', $extraAttributes)
+        </ul>
+      </dd>
+    #end
+  #end
   <ul id="contentmenu" class="pull-right actionmenu">
-    <li class="btn-group" id="tmEdit">
-      <a class="btn btn-default" href="$doc.getURL('create')" title="$escapetool.xml($createLabel)" $extraAttributes>
-        $services.icon.renderHTML('add')
-        <span class="btn-label">$escapetool.xml($createLabel)</span>
-      </a>
-      #if ($isAdvancedUser)
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
-          <span class="caret"></span>
-          <span class="sr-only">$escapetool.xml($services.localization.render('core.menu.toggleDropdown'))</span>
-        </button>
-        <dl class="dropdown-menu dropdown-menu-right">
-          <dt class="dropdown-header sr-only">
-            $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
-          </dt>
-          <dd>
-            <ul>
-              #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
-                #submenuitem($doc.getURL('edit', 'editor=wysiwyg') $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil', $extraAttributes)
-              #end
-              #submenuitem($doc.getURL('edit', 'editor=wiki') $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench', $extraAttributes)
-              #submenuitem($doc.getURL('edit', 'editor=inline') $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list', $extraAttributes)
-              #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'bricks', $extraAttributes)
-              #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'box', $extraAttributes)
-            </ul>
-          </dd>
-        </dl>
-      #end
-    </li>
+    #displayMenu('tmEdit', 'add', $menuContent, 'core.viewers.content.doesnotexist.create', true, $doc.getURL('create'),
+      $extraAttributes, true)
   </ul>
 #end

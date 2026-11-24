@@ -371,12 +371,12 @@ export type MentionableUser = {
 };
 
 // @beta
-export interface MentionInserter {
-    insert(instance: EditorInstance, user: MentionableUser): void;
+export interface MentionRenderer {
+    render(user: MentionableUser): InlineMacroInvocation;
 }
 
 // @beta
-export const mentionInserterName = "MentionInserter";
+export const mentionRendererName = "MentionRenderer";
 
 // @beta
 export const mentionsFeature: EditorFeature;

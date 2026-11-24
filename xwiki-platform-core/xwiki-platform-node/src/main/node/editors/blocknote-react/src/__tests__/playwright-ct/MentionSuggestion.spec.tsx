@@ -45,6 +45,20 @@ async function getContent(page: Page) {
   return JSON.parse((await page.getByTestId("content").textContent()) || "[]");
 }
 
+/**
+ * @returns the inline contents of the first block, a macro call being reduced to the call it holds and a text to its
+ *   text, so that the assertions read as the content does
+ */
+async function getInlineContents(page: Page) {
+  const [paragraph] = await getContent(page);
+  return paragraph.content.map(
+    (content: { type: string; text?: string; props?: { call: string } }) =>
+      content.type === "xwikiInlineMacro"
+        ? JSON.parse(content.props!.call)
+        : content.text,
+  );
+}
+
 test("The mention menu suggests the users of the host application", async ({
   mount,
   page,
@@ -65,7 +79,7 @@ test("The mention menu suggests the users of the host application", async ({
   );
 });
 
-test("Picking a user hands it to the mention inserter", async ({
+test("Picking a user inserts the mention rendered for it", async ({
   mount,
   page,
 }) => {
@@ -77,11 +91,39 @@ test("Picking a user hands it to the mention inserter", async ({
   ).toContainText("Alice");
   await page.keyboard.press("Enter");
 
-  // The query typed after the trigger is replaced by what the inserter of the host application writes.
-  await expect(component.locator(".bn-editor")).toContainText("@XWiki.Alice");
-  const [paragraph] = await getContent(page);
-  expect(paragraph.content.map(({ text }: { text: string }) => text)).toEqual([
-    "@XWiki.Alice",
+  // The query typed after the trigger is replaced by the macro call the renderer of the host application returned,
+  // displayed as a placeholder until the server renders it.
+  await expect(component.locator(".bn-editor")).toContainText("macro:mention");
+  expect(await getInlineContents(page)).toEqual([
+    { name: "mention", parameters: { reference: "XWiki.Alice" } },
+    " ",
+  ]);
+});
+
+test("The Mention item of the slash menu opens the mention menu", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(<MentionSuggestionForTest users={USERS} />);
+  const editorEl = component.locator(".bn-editor");
+
+  await editorEl.click();
+  await page.keyboard.press("/");
+  await page.keyboard.type("mention");
+  await page
+    .locator(".bn-suggestion-menu-item", {
+      hasText: "blocknote.slashMenu.mention.title",
+    })
+    .click();
+
+  // The menu opens on an empty query, so it shows every user rather than waiting for one to be typed.
+  await expect(page.locator(".bn-suggestion-menu-item")).toHaveCount(2);
+  await page.keyboard.press("Enter");
+
+  // Neither the slash menu query nor the trigger that opened the mention menu is left in the content.
+  expect(await getInlineContents(page)).toEqual([
+    { name: "mention", parameters: { reference: "XWiki.Admin" } },
+    " ",
   ]);
 });
 
@@ -130,12 +172,12 @@ test("There is no mention menu without a user suggester", async ({
   await expect(page.locator(".bn-suggestion-menu")).toHaveCount(0);
 });
 
-test("There is no mention menu without a mention inserter", async ({
+test("There is no mention menu without a mention renderer", async ({
   mount,
   page,
 }) => {
   const component = await mount(
-    <MentionSuggestionForTest noMentionInserter users={USERS} />,
+    <MentionSuggestionForTest noMentionRenderer users={USERS} />,
   );
 
   await startMention(page, component.locator(".bn-editor"), "ali");

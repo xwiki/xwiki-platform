@@ -20,21 +20,28 @@
 // @vitest-environment jsdom
 
 import {
+  createBlockNoteSchema,
+  querySuggestionsMenuItems,
+} from "../../blocknote";
+import { insertMention } from "../../features/mentions/mentionInsertion";
+import {
   shouldOpenMentionMenu,
   toSuggestions,
 } from "../../features/mentions/mentionMenu";
 import { mentionsFeature } from "../../features/mentions/mentions";
 import {
-  mentionInserterName,
+  mentionRendererName,
   userSuggesterName,
 } from "../../services/mentions";
 import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
+import { BlockNoteEditor } from "@blocknote/core";
 import { Container } from "inversify";
-import { describe, expect, test, vi } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 import type { EditorInstance } from "../../editorInstance";
 import type { FeatureContext } from "../../features/editorFeature";
+import type { InlineMacroInvocation } from "../../services/macroEditor";
 import type {
-  MentionInserter,
+  MentionRenderer,
   MentionableUser,
   UserSuggester,
 } from "../../services/mentions";
@@ -49,36 +56,77 @@ const userSuggester: UserSuggester = {
   suggestUsers: async () => [user],
 };
 
+const invocation: InlineMacroInvocation = {
+  kind: "inline",
+  id: "mention",
+  params: { reference: user.reference },
+  body: { type: "none" },
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyEditor = BlockNoteEditor<any, any, any>;
+
+let editor: AnyEditor;
+
+beforeAll(() => {
+  editor = BlockNoteEditor.create({
+    schema: createBlockNoteSchema(),
+  }) as AnyEditor;
+});
+
 /**
  * @param suggester - whether a user suggester is bound, as a host application that can look users up does
- * @param inserter - whether a mention inserter is bound, as a host application that can write mentions does
+ * @param renderer - whether a mention renderer is bound, as a host application that can represent mentions does
  * @param mentions - whether the syntax of the edited content can save a mention
+ * @param macros - whether the syntax of the edited content can save an inline macro
  * @returns the context the mentions feature contributes to
  */
 function context({
   suggester = true,
-  inserter = true,
+  renderer = true,
   mentions = true,
-}: { suggester?: boolean; inserter?: boolean; mentions?: boolean } = {}) {
+  macros = true,
+}: {
+  suggester?: boolean;
+  renderer?: boolean;
+  mentions?: boolean;
+  macros?: boolean;
+} = {}) {
   const serviceContainer = new Container();
   if (suggester) {
     serviceContainer
       .bind<UserSuggester>(userSuggesterName)
       .toConstantValue(userSuggester);
   }
-  if (inserter) {
+  if (renderer) {
     serviceContainer
-      .bind<MentionInserter>(mentionInserterName)
-      .toConstantValue({ insert: vi.fn() });
+      .bind<MentionRenderer>(mentionRendererName)
+      .toConstantValue({ render: () => invocation });
   }
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.inlineContents.mentions = mentions;
+  syntax.features.inlineContents.macros = macros;
   return {
     serviceContainer,
     options: { features: {} },
     syntax,
+    // Identity stub: the keys are what the assertions below are tied to.
     t: (key: string) => key,
+    getInstance: () => ({ editor }) as EditorInstance,
   } as FeatureContext;
+}
+
+/**
+ * @param query - what the user typed after the slash
+ * @returns the "Mention" item of the slash menu, when the given query keeps it
+ */
+function findMentionItem(query = "") {
+  return querySuggestionsMenuItems({
+    editor,
+    query,
+    syntax: FULL_SYNTAX,
+    featureItems: mentionsFeature.contribute(context())!.slashMenuItems!(),
+  }).find((item) => item.title === "blocknote.slashMenu.mention.title");
 }
 
 /**
@@ -110,9 +158,9 @@ describe("mentionsFeature", () => {
     ).toBeUndefined();
   });
 
-  test("contributes nothing without a mention inserter", () => {
+  test("contributes nothing without a mention renderer", () => {
     expect(
-      mentionsFeature.contribute(context({ inserter: false })),
+      mentionsFeature.contribute(context({ renderer: false })),
     ).toBeUndefined();
   });
 
@@ -120,6 +168,29 @@ describe("mentionsFeature", () => {
     expect(
       mentionsFeature.contribute(context({ mentions: false })),
     ).toBeUndefined();
+  });
+
+  test("contributes nothing when the syntax can't save the inline macro a mention is inserted as", () => {
+    expect(
+      mentionsFeature.contribute(context({ macros: false })),
+    ).toBeUndefined();
+  });
+
+  test("adds a Mention entry to the slash menu", () => {
+    const mentionItem = findMentionItem();
+
+    expect(mentionItem).toBeDefined();
+    expect(mentionItem!.subtext).toBe("blocknote.slashMenu.mention.subtext");
+    expect(mentionItem!.aliases).toEqual(["mention", "user"]);
+    expect(mentionItem!.group).toBe("blocknote.slashMenu.mention.group");
+  });
+
+  test("the Mention entry survives a query matching its alias", () => {
+    expect(findMentionItem("user")).toBeDefined();
+  });
+
+  test("the Mention entry is filtered out by a query matching neither its title nor its aliases", () => {
+    expect(findMentionItem("table")).toBeUndefined();
   });
 });
 
@@ -142,21 +213,53 @@ describe("shouldOpenMentionMenu", () => {
   });
 });
 
+/**
+ * @returns an editor instance whose only ability is to record the inserted inline content
+ */
+function instanceInsertingInto(insertInlineContent: () => void) {
+  return { editor: { insertInlineContent } } as unknown as EditorInstance;
+}
+
 describe("toSuggestions", () => {
-  const inserter: MentionInserter = { insert: vi.fn() };
-  const instance = {} as EditorInstance;
+  const renderer: MentionRenderer = { render: vi.fn(() => invocation) };
+  const instance = instanceInsertingInto(vi.fn());
 
   test("labels the item with the user name and its hint", () => {
-    const items = toSuggestions(instance, inserter, [user], "Users");
+    const items = toSuggestions(instance, renderer, [user], "Users");
 
     expect(items[0].title).toBe("Administrator");
     expect(items[0].subtext).toBe("admin@example.com");
     expect(items[0].group).toBe("Users");
   });
 
-  test("hands the picked user to the mention inserter", () => {
-    toSuggestions(instance, inserter, [user], "Users")[0].onItemClick!();
+  test("hands the picked user to the mention renderer", () => {
+    toSuggestions(instance, renderer, [user], "Users")[0].onItemClick!();
 
-    expect(inserter.insert).toHaveBeenCalledWith(instance, user);
+    expect(renderer.render).toHaveBeenCalledWith(user);
+  });
+});
+
+describe("insertMention", () => {
+  const renderer: MentionRenderer = { render: () => invocation };
+
+  test("inserts the rendered macro call at the selection", () => {
+    const insertInlineContent = vi.fn();
+
+    insertMention(instanceInsertingInto(insertInlineContent), renderer, user);
+
+    const [content] = insertInlineContent.mock.calls[0];
+    expect(content[0].type).toBe("xwikiInlineMacro");
+    expect(JSON.parse(content[0].props.call)).toEqual({
+      name: "mention",
+      parameters: { reference: "XWiki.Admin" },
+    });
+  });
+
+  test("follows the macro call with a space, so that a lone mention stays inline", () => {
+    const insertInlineContent = vi.fn();
+
+    insertMention(instanceInsertingInto(insertInlineContent), renderer, user);
+
+    expect(insertInlineContent.mock.calls[1][0]).toBe(" ");
   });
 });

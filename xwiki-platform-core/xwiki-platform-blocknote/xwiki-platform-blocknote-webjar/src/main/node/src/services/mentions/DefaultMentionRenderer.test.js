@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import {
-  DefaultMentionInserter,
+  DefaultMentionRenderer,
   getMentionAnchor,
-} from "./DefaultMentionInserter";
-import { describe, expect, it, vi } from "vitest";
+} from "./DefaultMentionRenderer";
+import { describe, expect, it } from "vitest";
 
 const user = { reference: "XWiki.Alice", label: "Alice" };
 
@@ -39,26 +39,15 @@ describe("getMentionAnchor", () => {
   });
 });
 
-describe("DefaultMentionInserter", () => {
-  it("inserts a mention macro invocation for the mentioned user", () => {
-    const editor = { insertInlineContent: vi.fn() };
+describe("DefaultMentionRenderer", () => {
+  it("renders a call to the mention macro for the mentioned user", () => {
+    const invocation = new DefaultMentionRenderer().render(user);
 
-    new DefaultMentionInserter().insert({ editor }, user);
-
-    const [content] = editor.insertInlineContent.mock.calls[0];
-    const call = JSON.parse(content[0].props.call);
-    expect(content[0].type).toBe("xwikiInlineMacro");
-    expect(call.name).toBe("mention");
-    expect(call.parameters.reference).toBe("XWiki.Alice");
-    expect(call.parameters.style).toBe("FULL_NAME");
-    expect(call.parameters.anchor).toMatch(/^XWiki-Alice-[a-z0-9]{6}$/);
-  });
-
-  it("follows the macro call with a space, so that a lone mention stays inline", () => {
-    const editor = { insertInlineContent: vi.fn() };
-
-    new DefaultMentionInserter().insert({ editor }, user);
-
-    expect(editor.insertInlineContent.mock.calls[1][0]).toBe(" ");
+    expect(invocation.kind).toBe("inline");
+    expect(invocation.id).toBe("mention");
+    expect(invocation.params.reference).toBe("XWiki.Alice");
+    expect(invocation.params.style).toBe("FULL_NAME");
+    expect(invocation.params.anchor).toMatch(/^XWiki-Alice-[a-z0-9]{6}$/);
+    expect(invocation.body).toEqual({ type: "none" });
   });
 });

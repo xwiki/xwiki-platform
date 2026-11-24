@@ -18,9 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import "./mentionMenu.css";
+import { insertMention } from "./mentionInsertion";
+import { SuggestionMenu } from "@blocknote/core/extensions";
 import { createElement } from "react";
+import type { EditorType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
-import type { MentionInserter, MentionableUser } from "../../services/mentions";
+import type { MentionRenderer, MentionableUser } from "../../services/mentions";
 import type { SuggestionMenuOptions } from "@blocknote/core/extensions";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 
@@ -28,6 +31,20 @@ import type { DefaultReactSuggestionItem } from "@blocknote/react";
  * The character that opens the mention menu when typed.
  */
 const MENTION_TRIGGER = "@";
+
+/**
+ * Opens the mention menu at the cursor, showing the first suggested users right away (as opposed to typing the
+ * trigger, which needs a query).
+ *
+ * @param editor - the editor to open the menu in
+ */
+function openMentionMenu(editor: EditorType): void {
+  editor.getExtension(SuggestionMenu)?.openSuggestionMenu(MENTION_TRIGGER, {
+    // The trigger is inserted, then removed when the menu closes.
+    deleteTriggerCharacter: true,
+    ignoreQueryLength: true,
+  });
+}
 
 /**
  * A mention starts a word, so that the trigger typed inside an email address doesn't open the menu. The trigger is
@@ -46,14 +63,14 @@ const shouldOpenMentionMenu: NonNullable<
 
 /**
  * @param instance - the editor instance where the mention is inserted
- * @param inserter - what writes the picked user into the edited content
+ * @param renderer - what renders the picked user as the macro call standing for the mention
  * @param users - the suggested users
  * @param group - the label of the group of the suggestions, separating them from the other kinds of suggestions
  * @returns the menu items inserting a mention of the given users
  */
 function toSuggestions(
   instance: EditorInstance,
-  inserter: MentionInserter,
+  renderer: MentionRenderer,
   users: MentionableUser[],
   group: string,
 ): DefaultReactSuggestionItem[] {
@@ -68,8 +85,13 @@ function toSuggestions(
           className: "xwiki-mention-avatar",
         })
       : createElement("span", { className: user.icon?.cssClass }),
-    onItemClick: () => inserter.insert(instance, user),
+    onItemClick: () => insertMention(instance, renderer, user),
   }));
 }
 
-export { MENTION_TRIGGER, shouldOpenMentionMenu, toSuggestions };
+export {
+  MENTION_TRIGGER,
+  openMentionMenu,
+  shouldOpenMentionMenu,
+  toSuggestions,
+};

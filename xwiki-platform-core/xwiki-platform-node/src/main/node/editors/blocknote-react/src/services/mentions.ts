@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { EditorInstance } from "../editorInstance";
+import type { InlineMacroInvocation } from "./macroEditor";
 
 /**
  * The name under which the {@link UserSuggester} is bound in the service container.
@@ -28,12 +29,12 @@ import type { EditorInstance } from "../editorInstance";
 const userSuggesterName = "UserSuggester";
 
 /**
- * The name under which the {@link MentionInserter} is bound in the service container.
+ * The name under which the {@link MentionRenderer} is bound in the service container.
  *
  * @since 19.0.0RC1
  * @beta
  */
-const mentionInserterName = "MentionInserter";
+const mentionRendererName = "MentionRenderer";
 
 /**
  * A user that can be mentioned in the edited content.
@@ -43,7 +44,7 @@ const mentionInserterName = "MentionInserter";
  */
 type MentionableUser = {
   /**
-   * The reference of the user, in the form the {@link MentionInserter} writes into the content (e.g. "XWiki.Admin").
+   * The reference of the user, in the form the {@link MentionRenderer} writes into the content (e.g. "XWiki.Admin").
    */
   reference: string;
 
@@ -85,22 +86,22 @@ interface UserSuggester {
 }
 
 /**
- * Writes a mention of a user into the edited content. How a mention is represented is up to the backend that has to
- * save and render it, e.g. XWiki writes a call to its mention macro. The mention menu is available only when this is
- * bound in the service container, see {@link mentionInserterName}.
+ * Renders a mention of a user as an inline macro call, which the mentions feature then inserts into the edited content.
+ * The macro and its parameters are backend specific, e.g. XWiki calls its mention macro. The mention menu is available
+ * only when this is bound in the service container, see {@link mentionRendererName}.
  *
  * @since 19.0.0RC1
  * @beta
  */
-interface MentionInserter {
+interface MentionRenderer {
   /**
-   * Writes a mention of the given user at the selection of the given editor instance.
+   * Renders a mention of the given user, without inserting it.
    *
-   * @param instance - the editor instance to insert the mention into
    * @param user - the mentioned user
+   * @returns the macro call standing for the mention
    */
-  insert(instance: EditorInstance, user: MentionableUser): void;
+  render(user: MentionableUser): InlineMacroInvocation;
 }
 
-export { mentionInserterName, userSuggesterName };
-export type { MentionInserter, MentionableUser, UserSuggester };
+export { mentionRendererName, userSuggesterName };
+export type { MentionRenderer, MentionableUser, UserSuggester };

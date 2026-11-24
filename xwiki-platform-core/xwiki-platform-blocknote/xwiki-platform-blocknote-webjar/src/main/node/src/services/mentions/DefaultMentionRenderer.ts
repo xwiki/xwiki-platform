@@ -17,14 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  insertMacroInvocation,
-  mentionInserterName,
-} from "@xwiki/platform-editors-blocknote-react";
+import { mentionRendererName } from "@xwiki/platform-editors-blocknote-react";
 import { injectable } from "inversify";
 import type {
-  EditorInstance,
-  MentionInserter,
+  InlineMacroInvocation,
+  MentionRenderer,
   MentionableUser,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { Container } from "inversify";
@@ -43,22 +40,22 @@ function getMentionAnchor(reference: string): string {
 }
 
 /**
- * Writes a mention as a call to the XWiki mention macro, inserted as an inline macro so that it round-trips through
- * the XWiki syntax like any other server-rendered macro.
+ * Renders a mention as a call to the XWiki mention macro, so that it round-trips through the XWiki syntax like any
+ * other server-rendered macro.
  *
  * @since 19.0.0RC1
  */
 @injectable("Singleton")
-class DefaultMentionInserter implements MentionInserter {
+class DefaultMentionRenderer implements MentionRenderer {
   public static bind(container: Container): void {
     container
-      .bind<MentionInserter>(mentionInserterName)
-      .to(DefaultMentionInserter)
+      .bind<MentionRenderer>(mentionRendererName)
+      .to(DefaultMentionRenderer)
       .inSingletonScope();
   }
 
-  public insert(instance: EditorInstance, user: MentionableUser): void {
-    insertMacroInvocation(instance.editor, {
+  public render(user: MentionableUser): InlineMacroInvocation {
+    return {
       kind: "inline",
       id: "mention",
       params: {
@@ -67,11 +64,8 @@ class DefaultMentionInserter implements MentionInserter {
         anchor: getMentionAnchor(user.reference),
       },
       body: { type: "none" },
-    });
-    // A rendering macro is never inline-only, so a call alone in a paragraph is saved as a block macro. Same as the
-    // CKEditor mentions: a space after the call keeps the mention inline, and lets the user keep typing after it.
-    instance.editor.insertInlineContent(" ", { updateSelection: true });
+    };
   }
 }
 
-export { DefaultMentionInserter, getMentionAnchor };
+export { DefaultMentionRenderer, getMentionAnchor };

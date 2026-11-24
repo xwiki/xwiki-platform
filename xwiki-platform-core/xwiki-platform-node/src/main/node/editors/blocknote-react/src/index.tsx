@@ -155,10 +155,10 @@ export {
   extractMacroRawContent,
 } from "./features/macros/utils";
 
-export { mentionInserterName, userSuggesterName } from "./services/mentions";
+export { mentionRendererName, userSuggesterName } from "./services/mentions";
 
 export type {
-  MentionInserter,
+  MentionRenderer,
   MentionableUser,
   UserSuggester,
 } from "./services/mentions";

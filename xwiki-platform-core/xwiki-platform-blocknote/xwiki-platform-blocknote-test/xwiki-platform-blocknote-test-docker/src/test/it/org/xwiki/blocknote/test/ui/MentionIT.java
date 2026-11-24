@@ -64,6 +64,11 @@ class MentionIT extends AbstractBlockNoteIT
     private static final String QUERY = "joh";
 
     /**
+     * The title of the slash menu item opening the mention menu, as the editor translations spell it.
+     */
+    private static final String MENTION_ITEM = "Mention";
+
+    /**
      * The text the mention is inserted after, so that it isn't alone in its paragraph.
      */
     private static final String TEXT_BEFORE = "Hello ";
@@ -168,6 +173,30 @@ class MentionIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea =
             BlockNoteInplaceEditPage.gotoPage(testReference).editInplace().getContentEditor().getRichTextArea();
         assertEquals("paragraph", textArea.getBlockType(0));
+    }
+
+    @Test
+    @Order(6)
+    void insertMentionFromSlashMenu(TestUtils setup, TestReference testReference)
+    {
+        BlockNoteInplaceEditPage page = editFreshPage(setup, testReference);
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea().click();
+        textArea.sendKeys(TEXT_BEFORE);
+        // Same reason as in startMention(): the trigger has to reach the editor as a text input of its own.
+        textArea.sendKeys("/");
+        SlashMenu slashMenu = new SlashMenu();
+        textArea.sendKeys("mention");
+        slashMenu.waitForItemSelected(MENTION_ITEM);
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        // The item opens the mention menu with no query, so narrow it down the way the trigger path does.
+        SlashMenu mentionMenu = new SlashMenu();
+        textArea.sendKeys(QUERY);
+        mentionMenu.waitForItemTitles(List.of(GLOBAL_USER));
+
+        // The slash menu query is gone from the content, leaving the same mention the trigger path produces.
+        assertMentionSaved(page, mentionMenu, GLOBAL_USER, "XWiki\\.John", "XWiki-John");
     }
 
     /**

@@ -3558,3 +3558,90 @@ $!stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="fa
 {{translation key="$txkey"/}}##
 #end
 #end
+
+#**
+ * Get the deleted versions of the current document and, when the current document is the home page of a location, the
+ * deleted terminal documents of that location. E.g. for "A.B.WebHome" the deleted terminal documents are the deleted
+ * versions of "A.B": the user who deletes a terminal document and goes back to its location should see the page they
+ * have just deleted, and not an empty page because "A.B.WebHome" has never existed.
+ *
+ * @param $deletedDocuments the variable set to the deleted versions of the current document, most recent first
+ * @param $deletedTerminalDocuments the variable set to the deleted terminal documents of the current location, most
+ *   recent first, or to an empty list when the current document isn't the home page of a location
+ *#
+#macro (_getDeletedDocuments $deletedDocuments $deletedTerminalDocuments)
+  #set ($_documents = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.locale))
+  #set ($_terminalDocuments = [])
+  #if ($doc.documentReference.name == 'WebHome')
+    #set ($_terminalDocuments = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.locale))
+  #end
+  #set ($deletedDocuments = $NULL)
+  #setVariable("$deletedDocuments" $_documents)
+  #set ($deletedTerminalDocuments = $NULL)
+  #setVariable("$deletedTerminalDocuments" $_terminalDocuments)
+#end
+
+#*
+ * Display the given list of deleted documents
+ * @param $list the list to display
+ * @param $className the name of the css class to apply to the list
+ * @param $message (optional) the translation key for the message which introduces the list, no message when empty
+ *#
+#macro (displayDeletedDocuments $list $className $message)
+  #if($list && $list.size() > 0)
+    #set ($canDelete = $list[0].canDelete())
+    #set ($canRestore = $list[0].canUndelete())
+    #set ($canView = $list[0].canView())
+    <div class="recyclebin-list $!className">
+      #if ("$!message" != '')
+        <p class="recyclebin-message">$escapetool.xml($services.localization.render($message))</p>
+      #end
+      <table>
+       <thead>
+        <tr>
+         <th>$escapetool.xml($services.localization.render('core.recyclebin.deleter'))</th>
+         <th>$escapetool.xml($services.localization.render('core.recyclebin.deleteDate'))</th>
+         #if ($canRestore)
+           <th>$escapetool.xml($services.localization.render('core.recyclebin.batchId'))</th>
+         #end
+         <th colspan="2">$escapetool.xml($services.localization.render('core.recyclebin.actions'))</th>
+        </tr>
+       </thead>
+       <tbody>
+       #foreach($dd in $list)
+        <tr>
+         <td>$xwiki.getUserName($dd.getDeleter())</td>
+         <td>
+         #if ($canView)
+           <a class="link-view" href="$doc.getURL('view', $escapetool.url({'rev' : "deleted:${dd.getId()}"}))">
+             $xwiki.formatDate($dd.getDate())
+           </a>
+         #else
+           $xwiki.formatDate($dd.getDate())
+         #end
+         </td>
+         #if ($canRestore)
+           <td>#if("$!{dd.batchId}" != "")<a href="$xwiki.getURL($dd.fullName, 'undelete', "id=${dd.id}&amp;showBatch=true")">$!{dd.batchId}</a>#end</td>
+         #end
+         <td>
+           #if($canRestore)
+             <a href="$xwiki.getURL($dd.getFullName(), 'undelete', "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")" class="action-restore">
+               $escapetool.xml($services.localization.render('core.recyclebin.restore'))
+             </a>
+           #end
+         </td>
+         <td>
+          #if($canDelete)
+           <a href="$xwiki.getURL($dd.getFullName(), 'delete', "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")"
+            onclick="if (confirm('$escapetool.javascript($services.localization.render('core.recyclebin.completelyDeleteConfirm'))')) {this.href += '&amp;confirm=1'; return true;} return false;" class="action-delete">
+            $escapetool.xml($services.localization.render('core.recyclebin.delete'))
+           </a>
+          #end
+         </td>
+        </tr>
+       #end
+       </tbody>
+      </table>
+    </div>
+  #end
+#end

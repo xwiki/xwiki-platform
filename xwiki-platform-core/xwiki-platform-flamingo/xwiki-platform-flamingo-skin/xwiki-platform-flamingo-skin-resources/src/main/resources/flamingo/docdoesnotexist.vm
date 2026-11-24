@@ -52,18 +52,12 @@
 ## Display the "Page not found" or the "Page moved to recycle bin" message, depending on the recycle bin content.
 ##
 #macro (_displayDocDoesNotExist)
-  #set ($deletedDocuments = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.locale))
-  #set ($deletedDocumentsMessage = $NULL)
-  #set ($deletedTerminalDocuments = [])
-  #if ($doc.documentReference.name == 'WebHome')
-    ## Also look for deleted terminal pages sharing the same location, see recyclebinlist.vm.
-    #set ($deletedTerminalDocuments = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.locale))
-  #end
+  #_getDeletedDocuments($_deletedDocuments $_deletedTerminalDocuments)
   #set ($latestDeletedDocument = $NULL)
-  #if (!$deletedDocuments.isEmpty())
-    #set ($latestDeletedDocument = $deletedDocuments[0])
-  #elseif (!$deletedTerminalDocuments.isEmpty())
-    #set ($latestDeletedDocument = $deletedTerminalDocuments[0])
+  #if (!$_deletedDocuments.isEmpty())
+    #set ($latestDeletedDocument = $_deletedDocuments[0])
+  #elseif (!$_deletedTerminalDocuments.isEmpty())
+    #set ($latestDeletedDocument = $_deletedTerminalDocuments[0])
   #end
   #set ($canCreate = $hasEdit && !$isReadOnly)
   ## The layout can hide the content menu, and the Create button replaces the edit menu.
@@ -116,7 +110,8 @@
       </p>
     #end
     #if ($displayRecycleBin)
-      #template('recyclebinlist.vm')
+      #displayDeletedDocuments($_deletedDocuments, 'docs', '')
+      #displayDeletedDocuments($_deletedTerminalDocuments, 'terminal-docs', 'core.recyclebin.showListTerminalPagesMsg')
     #end
     ## UI Extensions, if any.
     #showExtensions()

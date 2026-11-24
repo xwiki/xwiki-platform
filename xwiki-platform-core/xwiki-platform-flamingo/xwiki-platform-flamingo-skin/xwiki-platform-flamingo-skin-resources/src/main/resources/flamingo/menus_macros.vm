@@ -242,6 +242,136 @@
   </li>
 #end
 
+#**
+ * Display UI extensions if the author of the UIX has the ADMIN right on the current wiki
+ *
+ * @param $name the name of the UI extension to display
+ * @param $staticExtensions (optional) an array of static extensions to display along with the regular uix.
+ *         e.g. [ { 'content': 'someHTMLcontent', 'order': 20000, 'separator': true } ]
+ * @param $count out parameter containing the number of entries displayed in the menu
+ * @since 7.3M1
+ *
+ * TODO: replace this macro to stop having "static extensions" but a mechanism to have real UI Extensions in templates.
+ *#
+#macro(displaySecureUIX $name $staticExtensions $count)
+  #set ($count = 0)
+  ## Add the static UIX to the list of UIX to display
+  #set ($extensions = [])
+  #set ($discard = $extensions.addAll($staticExtensions))
+  ## Add the dynamic UIX to the list of of UIX to display
+  #foreach($uix in $services.uix.getExtensions($name))
+    ## TODO: Is this check really needed? $services.uix.getExtensions() should already make sure the returned UI
+    ## extensions are safe for the current user (i.e. either registered by the current user at user scope, or registered
+    ## by a wiki administrator at wiki scope or by someone with programming right at global level). This is normally done
+    ## when the UI extension is registered. Forbidding the current user to use UI extensions registered by themselves at
+    ## user scope seems unnecessary. Moreover, this check seems to be targeted towards UI extensions implemented in wiki
+    ## pages, because for UI extensions implemented in Java it doesn't make sense.
+    #if (!$uix.documentReference || $services.security.authorization.hasAccess('admin', $uix.authorReference,
+        $services.wiki.currentWikiDescriptor.reference))
+      #set ($separator = ("$!uix.getParameters().separator" == 'true'))
+      #set ($order = $numbertool.toNumber($uix.getParameters().order).intValue())
+      #if ("$!order" == '')
+        ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
+        #set ($order = 0)
+      #end
+      #set ($uixMap = { 'content'  : $services.uix.render($uix, 'html/5.0'),
+                        'order'    : $order,
+                        'separator': $separator})
+      #set ($discard = $extensions.add($uixMap))
+    #end
+  #end
+  ## Display them, sorted by order
+  #set ($canHaveMenuSeparator = false)
+  #foreach($uix in $collectiontool.sort($extensions, 'order'))
+    ## Maybe display a menu separator
+    #if ("$!uix.separator" == 'true' && $canHaveMenuSeparator)
+      #xwikiactionmenuseparator()
+      #set ($canHaveMenuSeparator = false)
+    #end
+    #set ($content = $uix.content.toString())
+    $content
+    #if ($stringtool.isNotBlank($content))
+      #set ($canHaveMenuSeparator = true)
+      #set ($count = $count + 1)
+    #end
+  #end
+  #setVariable("$count", $count)
+#end
+
+#**
+ * Display the entries of the edit menu dropdown, i.e. the editors the current user can use on the current document,
+ * including the ones contributed to the {@code org.xwiki.plaftorm.editactions} UI extension point.
+ *
+ * @param $includeRights whether to include the entry used to edit the rights of the current document
+ *#
+#macro (_displayEditMenuContent $includeRights)
+  #set ($staticExtensions = [])
+  #if ($isAdvancedUser)
+    ##
+    ## WYSIWYG
+    ##
+    ## Check if the WYSIWYG supports the current document's syntax and if so add a menu entry to edit the current
+    ## document with the WYSIWYG editor.
+    #define ($editWYSIWYG)
+      #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
+        #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil', $extraAttributes)
+      #end
+    #end
+    #set ($discard = $staticExtensions.add( { 'content': $editWYSIWYG, 'order': 20000, 'separator': true}))
+    ##
+    ## WIKI EDITOR
+    ##
+    #define ($wikiEditor)
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench', $extraAttributes)
+    #end
+    #set ($discard = $staticExtensions.add( { 'content': $wikiEditor, 'order': 30000}))
+    ##
+    ## INLINE EDITOR
+    ##
+    #define ($inlineEditor)
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list', $extraAttributes)
+    #end
+    #set ($discard = $staticExtensions.add( { 'content': $inlineEditor, 'order': 40000}))
+    ##
+    ## RIGHTS
+    ##
+    ## The 'rights' editor is already present in the page administration. So we display it here only if we are not in 
+    ## a terminal document or if the user has not the admin right on the space (because right now the page 
+    ## administration is still combined with the space administration).
+    ## TODO: create a proprer 'page administration' and stop adding a right editor in this menu
+    #define ($rightsEditor)
+      #if ($includeRights && ($doc.documentReference.name != 'WebHome' || !$hasSpaceAdmin || !$isAdminAppInstalled))
+        #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock', $extraAttributes)
+      #end
+    #end
+    #set ($discard = $staticExtensions.add( { 'content': $rightsEditor, 'order': 50000, 'separator': true}))
+    ##
+    ## OBJECTS EDITOR
+    ##
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'bricks', $extraAttributes)", 'order': 60000}))
+    ##
+    ## CLASS EDITOR
+    ##
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'box', $extraAttributes)", 'order': 70000}))
+  #end
+  ##
+  ## Display all the extensions points, including the static ones
+  ##
+  #define ($editContent)#displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)#end
+  ## We need to check that the content is not empty to not generate an empty architecture around it.
+  #if ($stringtool.isNotBlank("$!editContent"))
+    ## Title for the dropdown content
+    <dt class="dropdown-header sr-only">
+      $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
+    </dt>
+    <dd>
+      <ul>
+        $editContent
+      </ul>
+    </dd>
+  #end
+#end
+
 #macro(xwikibutton $actionurl $linktext $id $class $icon)
   <a href="$actionurl" class="btn $!class" role="button" #if(!$stringtool.isBlank($id))id="$id"#end>#glyphicon($icon) $linktext</a>
 #end

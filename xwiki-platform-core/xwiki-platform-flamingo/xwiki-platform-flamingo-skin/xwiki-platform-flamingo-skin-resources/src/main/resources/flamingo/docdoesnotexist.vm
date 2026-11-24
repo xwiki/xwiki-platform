@@ -127,30 +127,8 @@
 #macro (_displayDocDoesNotExistCreateButton)
   #template('menus_macros.vm')
   #set ($extraAttributes = 'rel="nofollow"')
-  #set ($menuContent = '')
-  #if ($isAdvancedUser)
-    #define ($menuContent)
-      <dt class="dropdown-header sr-only">
-        $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
-      </dt>
-      <dd>
-        <ul>
-          #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
-            #submenuitem($doc.getURL('edit', 'editor=wysiwyg'), $services.localization.render('core.menu.edit.wysiwyg'),
-              'tmEditWysiwyg', '', 'pencil', $extraAttributes)
-          #end
-          #submenuitem($doc.getURL('edit', 'editor=wiki'), $services.localization.render('core.menu.edit.wiki'),
-            'tmEditWiki', '', 'wrench', $extraAttributes)
-          #submenuitem($doc.getURL('edit', 'editor=inline'), $services.localization.render('core.menu.edit.inline'),
-            'tmEditInline', '', 'list', $extraAttributes)
-          #submenuitem($doc.getURL('edit', 'editor=object'), $services.localization.render('core.menu.edit.object'),
-            'tmEditObject', '', 'bricks', $extraAttributes)
-          #submenuitem($doc.getURL('edit', 'editor=class'), $services.localization.render('core.menu.edit.class'),
-            'tmEditClass', '', 'box', $extraAttributes)
-        </ul>
-      </dd>
-    #end
-  #end
+  ## The rights of a missing page can't be edited without creating it.
+  #define ($menuContent)#_displayEditMenuContent(false)#end
   <ul id="contentmenu" class="pull-right actionmenu">
     #displayMenu('tmEdit', 'add', $menuContent, 'core.viewers.content.doesnotexist.create', true, $doc.getURL('create'),
       $extraAttributes, true)

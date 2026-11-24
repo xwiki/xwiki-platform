@@ -65,6 +65,14 @@
   }
 }
 
+/* less4j cannot parse a custom property declaration, so its name is interpolated. */
+@breadcrumb-target-overflow: ~"--breadcrumb-target-overflow";
+
+.breadcrumb {
+  /* How much the targets overflow the text line of the breadcrumb, above and below. */
+  @{breadcrumb-target-overflow}: ~"max(0px, calc((var(--target-size-minimum) - 1lh) / 2))";
+}
+
 /* Give the icon-only targets the minimum target size, without making their icon bigger. The first item of a hierarchy
 breadcrumb is the home icon link. */
 .breadcrumb > .wiki:first-child > a,
@@ -75,15 +83,15 @@ breadcrumb is the home icon link. */
   min-width: ~"var(--target-size-minimum)";
   min-height: ~"var(--target-size-minimum)";
   /* Keep the line height of the breadcrumb, the targets are taller than the text line. */
-  margin-top: -1.5px;
-  margin-bottom: -1.5px;
+  margin-top: ~"calc(-1 * var(--breadcrumb-target-overflow))";
+  margin-bottom: ~"calc(-1 * var(--breadcrumb-target-overflow))";
 }
 
 /* Leave room for the taller targets inside the items, which hide their overflow, without making the breadcrumb
 taller. */
 .breadcrumb > li {
-  padding-top: 1.5px;
-  padding-bottom: 1.5px;
-  margin-top: -1.5px;
-  margin-bottom: -1.5px;
+  padding-top: ~"var(--breadcrumb-target-overflow)";
+  padding-bottom: ~"var(--breadcrumb-target-overflow)";
+  margin-top: ~"calc(-1 * var(--breadcrumb-target-overflow))";
+  margin-bottom: ~"calc(-1 * var(--breadcrumb-target-overflow))";
 }

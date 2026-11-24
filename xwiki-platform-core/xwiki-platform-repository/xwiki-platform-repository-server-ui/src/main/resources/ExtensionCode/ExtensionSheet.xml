@@ -89,6 +89,11 @@
 #if ($extension)
   $doc.use("ExtensionCode.ExtensionClass")
   #if ($isViewMode)
+    ##------- Deprecated -----------------------
+    #if ($doc.getValue('deprecated') == 1)
+      {{warning cssClass="extensionDeprecated"}}{{translation key="repository.extension.sheet.deprecated"/}}{{/warning}}
+
+    #end
     ##------- Icon &amp; Summary -----------------
     (% class="extensionSummary" %)
     #set($icon = $doc.getValue("icon"))
@@ -263,6 +268,7 @@
 (#set($comment = '##'){{translation key="repository.extension.sheet.iconLocationSyntax"/}} ${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;$escapetool.xml($services.localization.render('repository.extension.sheet.iconLocationLinkText'))&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
     |{{translation key="repository.extension.sheet.showActiveInstalls"/}}|$doc.display('showInstalledCount')
     |{{translation key="repository.extension.sheet.supportPlans"/}}|$doc.display('supportPlans')
+    |{{translation key="repository.extension.sheet.deprecatedLabel"/}}|$doc.display('deprecated')
 
     #foreach($sheetExtension in $sheetExtensions)
       $doc.display('edit', 'view', $sheetExtension)

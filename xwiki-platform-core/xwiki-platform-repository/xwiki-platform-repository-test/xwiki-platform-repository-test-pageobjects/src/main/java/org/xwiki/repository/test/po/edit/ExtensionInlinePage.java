@@ -59,6 +59,9 @@ public class ExtensionInlinePage extends InlinePage
     @FindBy(id = "ExtensionCode.ExtensionClass_0_installation")
     private WebElement installationInput;
 
+    @FindBy(id = "ExtensionCode.ExtensionClass_0_deprecated")
+    private WebElement deprecatedCheckBox;
+
     public void setName(String name)
     {
         this.nameInput.clear();
@@ -127,6 +130,17 @@ public class ExtensionInlinePage extends InlinePage
     {
         this.installationInput.clear();
         this.installationInput.sendKeys(installation);
+    }
+
+    /**
+     * @param deprecated {@code true} to mark the extension as deprecated
+     * @since 18.10.0
+     */
+    public void setDeprecated(boolean deprecated)
+    {
+        if (this.deprecatedCheckBox.isSelected() != deprecated) {
+            this.deprecatedCheckBox.click();
+        }
     }
 
     @Override

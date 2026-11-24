@@ -70,6 +70,7 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -166,6 +167,7 @@ class RepositoryIT
         addSupportPlans();
         addExtension();
         validateDependenciesOfOldRevision();
+        validateDeprecation();
         ExtensionPage importedExtensionPage = importExtension();
         enableProxying(importedExtensionPage);
         validateSupport();
@@ -509,6 +511,40 @@ class RepositoryIT
 
         // Don't list this extension in the following steps.
         repositoryTestUtils.deleteExtension(extensionName);
+    }
+
+    /**
+     * A deprecated extension keeps its page but is not installable with the Extension Manager anymore.
+     */
+    private void validateDeprecation() throws Exception
+    {
+        String extensionId = this.baseExtension.getId().getId();
+
+        ExtensionPage extensionPage = setDeprecated(true);
+
+        assertTrue(extensionPage.isDeprecated());
+        assertFalse(extensionPage.isValidExtension());
+        Extensions extensions = this.setup.rest().getResource(Resources.EXTENSIONS, Map.of());
+        assertEquals(0, extensions.getTotalHits());
+        repositoryTestUtils.waitUntilReady();
+        assertNull(searchExtension(extensionId));
+
+        // Restore the extension for the following steps.
+        extensionPage = setDeprecated(false);
+
+        assertFalse(extensionPage.isDeprecated());
+        assertTrue(extensionPage.isValidExtension());
+        repositoryTestUtils.waitUntilReady();
+        assertNotNull(searchExtension(extensionId));
+    }
+
+    private ExtensionPage setDeprecated(boolean deprecated)
+    {
+        ExtensionPage.gotoPage(this.baseExtension.getName()).edit();
+        ExtensionInlinePage extensionEdit = new ExtensionInlinePage();
+        extensionEdit.setDeprecated(deprecated);
+
+        return extensionEdit.clickSaveAndView();
     }
 
     private ExtensionPage importExtension() throws Exception

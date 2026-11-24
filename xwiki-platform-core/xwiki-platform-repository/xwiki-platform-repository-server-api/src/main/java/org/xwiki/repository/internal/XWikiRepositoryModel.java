@@ -219,6 +219,11 @@ public final class XWikiRepositoryModel
      */
     public static final String PROP_EXTENSION_RECOMMENDED = "recommended";
 
+    /**
+     * @since 18.10.0
+     */
+    public static final String PROP_EXTENSION_DEPRECATED = "deprecated";
+
     public static final String PROP_EXTENSION_ALLOWEDNAMESPACES = "allowednamespaces";
 
     public static final String PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY = "allowednamespaces_empty";

@@ -26,6 +26,9 @@ const USERS = [
   { reference: "XWiki.Alice", label: "Alice", hint: "alice@example.com" },
 ];
 
+// The rest of the sentence the mention is inserted in front of, starting with the space that is already there.
+const TEXT_AFTER = " and you";
+
 /**
  * Types the mention trigger, then the given query. The trigger is pressed on its own because it opens the menu, which
  * the query then filters.
@@ -36,6 +39,19 @@ async function startMention(page: Page, editorEl: Locator, query = "") {
   if (query) {
     await page.keyboard.type(query);
   }
+}
+
+/**
+ * Types a sentence, then puts the caret back between its two words and types the space making room for the mention,
+ * so that the caret ends up right before the space the rest of the sentence starts with.
+ */
+async function makeRoomForMention(page: Page, editorEl: Locator) {
+  await editorEl.click();
+  await page.keyboard.type(`Hello${TEXT_AFTER}`);
+  for (let index = 0; index < TEXT_AFTER.length; index++) {
+    await page.keyboard.press("ArrowLeft");
+  }
+  await page.keyboard.type(" ");
 }
 
 /**
@@ -97,6 +113,28 @@ test("Picking a user inserts the mention built for it", async ({
   expect(await getInlineContents(page)).toEqual([
     { name: "mention", parameters: { reference: "XWiki.Alice" } },
     " ",
+  ]);
+});
+
+test("Picking a user adds no space when the caret is already followed by one", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(<MentionSuggestionForTest users={USERS} />);
+
+  await makeRoomForMention(page, component.locator(".bn-editor"));
+  await page.keyboard.press("@");
+  await page.keyboard.type("ali");
+  await expect(
+    page.locator('.bn-suggestion-menu-item[aria-selected="true"]'),
+  ).toContainText("Alice");
+  await page.keyboard.press("Enter");
+
+  // The mention is followed by the space that was already there, so the sentence doesn't end up with two.
+  expect(await getInlineContents(page)).toEqual([
+    "Hello ",
+    { name: "mention", parameters: { reference: "XWiki.Alice" } },
+    TEXT_AFTER,
   ]);
 });
 

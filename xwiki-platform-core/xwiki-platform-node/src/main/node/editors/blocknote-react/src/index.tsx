@@ -173,10 +173,7 @@ export type {
   MacroInsertionEditorPrefillData,
 } from "./services/macroEditor";
 
-export {
-  createInlineMacro,
-  insertMacroInvocation,
-} from "./misc/macroInvocation";
+export { createInlineMacro } from "./misc/macroInvocation";
 
 export type { MacroCall } from "./misc/macroInvocation";
 

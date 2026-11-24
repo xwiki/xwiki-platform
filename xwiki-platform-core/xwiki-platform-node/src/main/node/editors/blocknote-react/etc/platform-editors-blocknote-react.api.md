@@ -280,9 +280,6 @@ export type InlineMacroInvocation = Omit<InlineMacroInvocation_2, "body"> & {
 };
 
 // @beta
-export function insertMacroInvocation(editor: BlockNoteEditor<any, any, any>, invocation: MacroBlockInvocation | InlineMacroInvocation, selectedBlock?: any): void;
-
-// @beta
 export type LinkEditionData = {
     title: string;
     generatedTitle?: boolean;

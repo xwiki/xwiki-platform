@@ -31,14 +31,16 @@ import type { Container } from "inversify";
 
 /**
  * Computes the anchor identifying a mention, so that the notification sent for it can link back to it. Same scheme as
- * the CKEditor mentions, the mentioned reference followed by 6 random alphanumeric characters, so that two mentions
- * of the same user on the same page get different anchors.
+ * the CKEditor mentions, the mentioned reference followed by 6 random characters, so that two mentions of the same
+ * user on the same page get different anchors.
  *
  * @param reference - the reference of the mentioned user
  * @returns the anchor of the mention
  */
 function getMentionAnchor(reference: string): string {
-  const random = Math.random().toString(36).substring(2, 8).padEnd(6, "0");
+  const random = Array.from(crypto.getRandomValues(new Uint8Array(3)), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
   return `${reference.replaceAll(/[.:]/g, "-")}-${random}`;
 }
 

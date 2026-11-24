@@ -31,7 +31,7 @@
   ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
-    #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
+    #set ($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
     #template('contentheader.vm')
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
   #else
@@ -136,12 +136,17 @@
       <dd>
         <ul>
           #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
-            #submenuitem($doc.getURL('edit', 'editor=wysiwyg') $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil', $extraAttributes)
+            #submenuitem($doc.getURL('edit', 'editor=wysiwyg'), $services.localization.render('core.menu.edit.wysiwyg'),
+              'tmEditWysiwyg', '', 'pencil', $extraAttributes)
           #end
-          #submenuitem($doc.getURL('edit', 'editor=wiki') $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench', $extraAttributes)
-          #submenuitem($doc.getURL('edit', 'editor=inline') $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list', $extraAttributes)
-          #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'bricks', $extraAttributes)
-          #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'box', $extraAttributes)
+          #submenuitem($doc.getURL('edit', 'editor=wiki'), $services.localization.render('core.menu.edit.wiki'),
+            'tmEditWiki', '', 'wrench', $extraAttributes)
+          #submenuitem($doc.getURL('edit', 'editor=inline'), $services.localization.render('core.menu.edit.inline'),
+            'tmEditInline', '', 'list', $extraAttributes)
+          #submenuitem($doc.getURL('edit', 'editor=object'), $services.localization.render('core.menu.edit.object'),
+            'tmEditObject', '', 'bricks', $extraAttributes)
+          #submenuitem($doc.getURL('edit', 'editor=class'), $services.localization.render('core.menu.edit.class'),
+            'tmEditClass', '', 'box', $extraAttributes)
         </ul>
       </dd>
     #end

@@ -83,15 +83,12 @@ breadcrumb is the home icon link. */
   min-width: ~"var(--target-size-minimum)";
   min-height: ~"var(--target-size-minimum)";
   /* Keep the line height of the breadcrumb, the targets are taller than the text line. */
-  margin-top: ~"calc(-1 * var(--breadcrumb-target-overflow))";
-  margin-bottom: ~"calc(-1 * var(--breadcrumb-target-overflow))";
+  margin-block: ~"calc(-1 * var(--breadcrumb-target-overflow))";
 }
 
 /* Leave room for the taller targets inside the items, which hide their overflow, without making the breadcrumb
 taller. */
 .breadcrumb > li {
-  padding-top: ~"var(--breadcrumb-target-overflow)";
-  padding-bottom: ~"var(--breadcrumb-target-overflow)";
-  margin-top: ~"calc(-1 * var(--breadcrumb-target-overflow))";
-  margin-bottom: ~"calc(-1 * var(--breadcrumb-target-overflow))";
+  padding-block: ~"var(--breadcrumb-target-overflow)";
+  margin-block: ~"calc(-1 * var(--breadcrumb-target-overflow))";
 }

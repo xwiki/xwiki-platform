@@ -30,14 +30,28 @@ import org.openqa.selenium.support.FindBy;
  */
 public class DocumentDoesNotExistPage extends BasePage
 {
-    @FindBy(css = ".xwikimessage a")
-    private WebElement editThisPageToCreate;
+    @FindBy(css = "#contentmenu #tmEdit > a.btn")
+    private WebElement createButton;
 
     /**
-     * This function cannot return
+     * Clicks the button used to create the missing page.
+     *
+     * @since 19.0.0RC1
      */
+    public void clickCreate()
+    {
+        this.createButton.click();
+    }
+
+    /**
+     * Clicks the button used to create the missing page.
+     *
+     * @deprecated since 19.0.0RC1, use {@link #clickCreate()} instead, the missing page doesn't have an "edit this
+     *             page" link anymore
+     */
+    @Deprecated(since = "19.0.0RC1")
     public void clickEditThisPageToCreate()
     {
-        this.editThisPageToCreate.click();
+        clickCreate();
     }
 }

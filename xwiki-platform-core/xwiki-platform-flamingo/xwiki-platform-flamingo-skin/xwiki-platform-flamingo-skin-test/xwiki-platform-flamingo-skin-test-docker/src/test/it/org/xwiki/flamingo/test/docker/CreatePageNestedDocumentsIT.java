@@ -89,7 +89,7 @@ class CreatePageNestedDocumentsIT
 
             // It should not exist and we will create it.
             assertFalse(viewPage.exists(), String.format("Document [%s] already exists", pageReference));
-            new DocumentDoesNotExistPage().clickEditThisPageToCreate();
+            new DocumentDoesNotExistPage().clickCreate();
             new CreatePagePage().clickCreate();
             EditPage editPage = new EditPage();
             viewPage = editPage.clickSaveAndView();

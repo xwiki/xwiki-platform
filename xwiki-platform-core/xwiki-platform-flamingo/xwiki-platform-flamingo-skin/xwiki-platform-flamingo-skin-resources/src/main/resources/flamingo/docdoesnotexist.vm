@@ -53,21 +53,31 @@
 ##
 #macro (_displayDocDoesNotExist)
   #_getDeletedDocuments($_deletedDocuments $_deletedTerminalDocuments)
+  ## Look at the most recent entry of each list: the summary describes the most recent deletion, and the recycle bin
+  ## tables are useful only to the users who can view, restore or delete their entries, which each table checks on its
+  ## first entry.
   #set ($latestDeletedDocument = $NULL)
-  #if (!$_deletedDocuments.isEmpty())
-    #set ($latestDeletedDocument = $_deletedDocuments[0])
-  #elseif (!$_deletedTerminalDocuments.isEmpty())
-    #set ($latestDeletedDocument = $_deletedTerminalDocuments[0])
+  #set ($canRestore = false)
+  #set ($displayRecycleBin = false)
+  #foreach ($_deletedList in [$_deletedDocuments, $_deletedTerminalDocuments])
+    #if (!$_deletedList.isEmpty())
+      #set ($_deletedEntry = $_deletedList[0])
+      #if (!$latestDeletedDocument || $_deletedEntry.date.after($latestDeletedDocument.date))
+        #set ($latestDeletedDocument = $_deletedEntry)
+      #end
+      #if ($_deletedEntry.canUndelete())
+        #set ($canRestore = true)
+        #set ($displayRecycleBin = true)
+      #elseif ($_deletedEntry.canDelete() || $_deletedEntry.canView())
+        #set ($displayRecycleBin = true)
+      #end
+    #end
   #end
   #set ($canCreate = $hasEdit && !$isReadOnly)
   ## The layout can hide the content menu, and the Create button replaces the edit menu.
   #set ($displayCreateButton = $canCreate && $displayContentMenu && $displayEditMenu)
-  #set ($displayRecycleBin = false)
   #if ($latestDeletedDocument)
     #set ($titleKey = 'core.viewers.content.deleted.title')
-    ## The recycle bin table is useful only to the users who can view, restore or delete its entries.
-    #set ($canRestore = $latestDeletedDocument.canUndelete())
-    #set ($displayRecycleBin = $canRestore || $latestDeletedDocument.canDelete() || $latestDeletedDocument.canView())
   #else
     #set ($titleKey = 'core.viewers.content.doesnotexist.title')
   #end

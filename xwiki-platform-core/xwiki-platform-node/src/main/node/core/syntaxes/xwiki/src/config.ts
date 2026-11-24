@@ -98,6 +98,7 @@ export class XWikiSyntaxConfig implements SyntaxConfig {
         language: true,
       },
       macros: true,
+      mentions: true,
       rawHtml: true,
       textStyles: {
         bold: true,

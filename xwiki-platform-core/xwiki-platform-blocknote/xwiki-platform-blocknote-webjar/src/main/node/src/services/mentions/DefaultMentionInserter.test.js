@@ -25,18 +25,6 @@ import { describe, expect, it, vi } from "vitest";
 
 const user = { reference: "XWiki.Alice", label: "Alice" };
 
-/**
- * @param macros - the value of the `features.macros` option of the editor instance
- * @param inlineMacros - whether the syntax of the edited content supports inline macros
- * @returns the context the mentions feature asks the inserter about
- */
-function context(macros = undefined, inlineMacros = true) {
-  return {
-    options: { features: { macros } },
-    syntax: { features: { inlineContents: { macros: inlineMacros } } },
-  };
-}
-
 describe("getMentionAnchor", () => {
   it("replaces the reference separators and suffixes a 6 characters random part", () => {
     expect(getMentionAnchor("wiki:XWiki.Admin")).toMatch(
@@ -72,27 +60,5 @@ describe("DefaultMentionInserter", () => {
     new DefaultMentionInserter().insert({ editor }, user);
 
     expect(editor.insertInlineContent.mock.calls[1][0]).toBe(" ");
-  });
-
-  it.each([
-    [
-      "inserts a mention when the macros are enabled and the syntax saves inline macros",
-      context(),
-      true,
-    ],
-    [
-      "doesn't insert a mention when the macros are disabled",
-      context(false),
-      false,
-    ],
-    [
-      "doesn't insert a mention when the syntax can't save inline macros",
-      context(undefined, false),
-      false,
-    ],
-  ])("%s", (_label, insertionContext, expected) => {
-    expect(new DefaultMentionInserter().canInsert(insertionContext)).toBe(
-      expected,
-    );
   });
 });

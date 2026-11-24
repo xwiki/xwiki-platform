@@ -39,9 +39,8 @@ export type MentionSuggestionForTestProps = {
   noUserSuggester?: boolean;
   // When set, no mention inserter is bound, as with a backend that has no way to write a mention.
   noMentionInserter?: boolean;
-  // When set, the mention inserter can't write a mention in the edited content, e.g. because its syntax can't save
-  // one.
-  cannotInsert?: boolean;
+  // When set, the syntax of the edited content can't save a mention.
+  syntaxWithoutMentions?: boolean;
   // When set, looking the users up fails, as when the backend can't be reached.
   failingSuggestions?: boolean;
 };
@@ -61,14 +60,16 @@ export const MentionSuggestionForTest: React.FC<
   users,
   noUserSuggester,
   noMentionInserter,
-  cannotInsert,
+  syntaxWithoutMentions,
   failingSuggestions,
 }) => {
   // The edited content, rendered so that the tests can assert on it.
   const [content, setContent] = useState<string>();
 
   const serviceContainer = useMemo(() => {
-    const container = serviceContainerMock([FULL_SYNTAX]);
+    const syntax = structuredClone(FULL_SYNTAX);
+    syntax.features.inlineContents.mentions = !syntaxWithoutMentions;
+    const container = serviceContainerMock([syntax]);
     if (!noUserSuggester) {
       container.bind<UserSuggester>(userSuggesterName).toConstantValue({
         async suggestUsers(_instance, query) {
@@ -84,7 +85,6 @@ export const MentionSuggestionForTest: React.FC<
     }
     if (!noMentionInserter) {
       container.bind<MentionInserter>(mentionInserterName).toConstantValue({
-        canInsert: () => !cannotInsert,
         insert(instance, user) {
           instance.editor.insertInlineContent(`@${user.reference}`, {
             updateSelection: true,

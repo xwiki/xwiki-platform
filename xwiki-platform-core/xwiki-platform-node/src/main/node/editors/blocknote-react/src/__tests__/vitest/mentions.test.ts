@@ -52,14 +52,14 @@ const userSuggester: UserSuggester = {
 /**
  * @param suggester - whether a user suggester is bound, as a host application that can look users up does
  * @param inserter - whether a mention inserter is bound, as a host application that can write mentions does
- * @param canInsert - what the mention inserter answers when asked whether the edited content can hold a mention
+ * @param mentions - whether the syntax of the edited content can save a mention
  * @returns the context the mentions feature contributes to
  */
 function context({
   suggester = true,
   inserter = true,
-  canInsert = true,
-}: { suggester?: boolean; inserter?: boolean; canInsert?: boolean } = {}) {
+  mentions = true,
+}: { suggester?: boolean; inserter?: boolean; mentions?: boolean } = {}) {
   const serviceContainer = new Container();
   if (suggester) {
     serviceContainer
@@ -69,12 +69,14 @@ function context({
   if (inserter) {
     serviceContainer
       .bind<MentionInserter>(mentionInserterName)
-      .toConstantValue({ canInsert: () => canInsert, insert: vi.fn() });
+      .toConstantValue({ insert: vi.fn() });
   }
+  const syntax = structuredClone(FULL_SYNTAX);
+  syntax.features.inlineContents.mentions = mentions;
   return {
     serviceContainer,
     options: { features: {} },
-    syntax: FULL_SYNTAX,
+    syntax,
     t: (key: string) => key,
   } as FeatureContext;
 }
@@ -114,9 +116,9 @@ describe("mentionsFeature", () => {
     ).toBeUndefined();
   });
 
-  test("contributes nothing when the edited content can't hold a mention", () => {
+  test("contributes nothing when the syntax can't save a mention", () => {
     expect(
-      mentionsFeature.contribute(context({ canInsert: false })),
+      mentionsFeature.contribute(context({ mentions: false })),
     ).toBeUndefined();
   });
 });
@@ -141,7 +143,7 @@ describe("shouldOpenMentionMenu", () => {
 });
 
 describe("toSuggestions", () => {
-  const inserter: MentionInserter = { canInsert: () => true, insert: vi.fn() };
+  const inserter: MentionInserter = { insert: vi.fn() };
   const instance = {} as EditorInstance;
 
   test("labels the item with the user name and its hint", () => {

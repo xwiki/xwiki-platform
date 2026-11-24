@@ -687,6 +687,7 @@ const FULL_SYNTAX: SyntaxConfig = {
         language: true,
       },
       macros: true,
+      mentions: true,
       rawHtml: true,
       textStyles: {
         bold: true,

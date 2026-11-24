@@ -73,6 +73,7 @@ export type SyntaxAllowedFeatures = {
             language: boolean;
         };
         macros: boolean;
+        mentions: boolean;
         rawHtml: boolean;
         textStyles: {
             bold: boolean;

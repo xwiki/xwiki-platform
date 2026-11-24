@@ -159,7 +159,6 @@ export { mentionInserterName, userSuggesterName } from "./services/mentions";
 
 export type {
   MentionInserter,
-  MentionInsertionContext,
   MentionableUser,
   UserSuggester,
 } from "./services/mentions";

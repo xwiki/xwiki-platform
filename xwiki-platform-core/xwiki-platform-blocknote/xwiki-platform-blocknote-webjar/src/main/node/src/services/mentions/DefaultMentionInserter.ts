@@ -25,7 +25,6 @@ import { injectable } from "inversify";
 import type {
   EditorInstance,
   MentionInserter,
-  MentionInsertionContext,
   MentionableUser,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { Container } from "inversify";
@@ -56,15 +55,6 @@ class DefaultMentionInserter implements MentionInserter {
       .bind<MentionInserter>(mentionInserterName)
       .to(DefaultMentionInserter)
       .inSingletonScope();
-  }
-
-  public canInsert({ options, syntax }: MentionInsertionContext): boolean {
-    // A mention is a macro call, so it needs both the macros of the editor (which give the schema its inline macro
-    // type) and a syntax that can save an inline macro.
-    return (
-      options.features?.macros !== false &&
-      syntax.features.inlineContents.macros
-    );
   }
 
   public insert(instance: EditorInstance, user: MentionableUser): void {

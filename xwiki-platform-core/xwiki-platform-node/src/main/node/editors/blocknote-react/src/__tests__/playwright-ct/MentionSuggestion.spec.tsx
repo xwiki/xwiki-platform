@@ -143,12 +143,12 @@ test("There is no mention menu without a mention inserter", async ({
   await expect(page.locator(".bn-suggestion-menu")).toHaveCount(0);
 });
 
-test("There is no mention menu when the edited content can't hold a mention", async ({
+test("There is no mention menu when the syntax can't save a mention", async ({
   mount,
   page,
 }) => {
   const component = await mount(
-    <MentionSuggestionForTest cannotInsert users={USERS} />,
+    <MentionSuggestionForTest syntaxWithoutMentions users={USERS} />,
   );
 
   await startMention(page, component.locator(".bn-editor"), "ali");

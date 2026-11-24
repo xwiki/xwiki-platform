@@ -372,17 +372,11 @@ export type MentionableUser = {
 
 // @beta
 export interface MentionInserter {
-    canInsert(context: MentionInsertionContext): boolean;
     insert(instance: EditorInstance, user: MentionableUser): void;
 }
 
 // @beta
 export const mentionInserterName = "MentionInserter";
-
-// @beta
-export type MentionInsertionContext = Pick<EditorInstance, "options"> & {
-    syntax: SyntaxConfig;
-};
 
 // @beta
 export const mentionsFeature: EditorFeature;

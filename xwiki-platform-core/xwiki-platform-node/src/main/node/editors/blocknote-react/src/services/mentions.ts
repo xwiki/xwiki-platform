@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { EditorInstance } from "../editorInstance";
-import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 /**
  * The name under which the {@link UserSuggester} is bound in the service container.
@@ -86,20 +85,6 @@ interface UserSuggester {
 }
 
 /**
- * What a {@link MentionInserter} is told about an editor instance to say whether it can insert a mention in it. The
- * editor instance doesn't exist yet when the mentions feature asks, so this is what is known of it by then.
- *
- * @since 19.0.0RC1
- * @beta
- */
-type MentionInsertionContext = Pick<EditorInstance, "options"> & {
-  /**
-   * The configuration of the syntax of the edited content.
-   */
-  syntax: SyntaxConfig;
-};
-
-/**
  * Writes a mention of a user into the edited content. How a mention is represented is up to the backend that has to
  * save and render it, e.g. XWiki writes a call to its mention macro. The mention menu is available only when this is
  * bound in the service container, see {@link mentionInserterName}.
@@ -108,15 +93,6 @@ type MentionInsertionContext = Pick<EditorInstance, "options"> & {
  * @beta
  */
 interface MentionInserter {
-  /**
-   * Called before an editor instance is created, to leave out the mention menu where a mention couldn't be written
-   * (e.g. XWiki can't write one in a syntax that doesn't support inline macros).
-   *
-   * @param context - what is known of the editor instance being created
-   * @returns whether a mention can be inserted in that editor instance
-   */
-  canInsert(context: MentionInsertionContext): boolean;
-
   /**
    * Writes a mention of the given user at the selection of the given editor instance.
    *
@@ -127,9 +103,4 @@ interface MentionInserter {
 }
 
 export { mentionInserterName, userSuggesterName };
-export type {
-  MentionInserter,
-  MentionInsertionContext,
-  MentionableUser,
-  UserSuggester,
-};
+export type { MentionInserter, MentionableUser, UserSuggester };

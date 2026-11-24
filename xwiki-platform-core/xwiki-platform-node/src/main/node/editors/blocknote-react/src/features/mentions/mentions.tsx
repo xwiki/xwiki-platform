@@ -22,7 +22,6 @@ import {
   mentionInserterName,
   userSuggesterName,
 } from "../../services/mentions";
-import type { MentionInserter } from "../../services/mentions";
 import type {
   EditorFeature,
   FeatureContext,
@@ -33,26 +32,26 @@ import type {
  * Mentions a user in the edited content. The mention trigger opens a menu that suggests the users returned by the
  * `UserSuggester` bound in the service container. Picking one hands it to the `MentionInserter` bound there, which
  * writes it into the content. Looking a user up and representing a mention are each backend specific, so this feature
- * contributes nothing unless the host application binds both services and the inserter says it can write a mention in
- * the edited content.
+ * contributes nothing unless the host application binds both services and the syntax of the edited content can save a
+ * mention.
  *
  * @since 19.0.0RC1
  * @beta
  */
 const mentionsFeature: EditorFeature = {
   id: "mentions",
-  contribute(context: FeatureContext): FeatureContribution | undefined {
-    const { serviceContainer } = context;
+  contribute({
+    serviceContainer,
+    syntax,
+  }: FeatureContext): FeatureContribution | undefined {
     if (
+      !syntax.features.inlineContents.mentions ||
       !serviceContainer.isBound(userSuggesterName) ||
       !serviceContainer.isBound(mentionInserterName)
     ) {
       return undefined;
     }
-    const inserter = serviceContainer.get<MentionInserter>(mentionInserterName);
-    return inserter.canInsert(context)
-      ? { components: <MentionSuggestionController /> }
-      : undefined;
+    return { components: <MentionSuggestionController /> };
   },
 };
 

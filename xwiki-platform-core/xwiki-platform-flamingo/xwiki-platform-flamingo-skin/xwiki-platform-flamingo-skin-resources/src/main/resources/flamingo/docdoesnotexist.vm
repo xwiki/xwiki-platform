@@ -102,9 +102,12 @@
         $escapetool.xml($services.localization.render('core.viewers.content.deleted.hintNoCreate', [$pageTitle]))
       #end</p>
     #else
+      ## The deleter is displayed as a link, so it's inserted only once the rest of the message is escaped.
+      #set ($deleterPlaceholder = '__docdoesnotexist_deleter__')
+      #set ($deletedInfo = $services.localization.render('core.viewers.content.deleted.info',
+        [$pageTitle, $deleterPlaceholder, $xwiki.formatDate($latestDeletedDocument.date)]))
       <p class="docdoesnotexist-hint">
-        $services.localization.render('core.viewers.content.deleted.info', [$escapetool.xml($pageTitle),
-          $xwiki.getUserName($latestDeletedDocument.deleter), $escapetool.xml($xwiki.formatDate($latestDeletedDocument.date))])
+        $escapetool.xml($deletedInfo).replace($deleterPlaceholder, $xwiki.getUserName($latestDeletedDocument.deleter))
         #if ($canCreate)
           $escapetool.xml($services.localization.render('core.viewers.content.deleted.infoCreate'))
         #end

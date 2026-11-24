@@ -18,42 +18,44 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ### Show list of deleted documents
-#set($dds = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.locale))
-#displayDeletedDocuments($dds, 'docs')
-
-#if ($doc.documentReference.name == 'WebHome')
-  ## Also display the list of terminal documents sharing the same location.
-  ## eg. If the current document is: "A.B.WebHome", we should also display any deleted terminal page called "A.B".
-  ## This is important because when the user delete a terminal document and go back to the location, she should see
-  ## the page she have just deleted, and not an empty page because A.B.WebHome has never existed...
-  #set($dds = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.locale))
-  #displayDeletedDocuments($dds, 'terminal-docs', 'core.recyclebin.showListTerminalPagesMsg')
+## The calling template can provide the lists of deleted documents to display, e.g. when it needs them before.
+#if ("$!deletedDocuments" == '')
+  #set ($deletedDocuments = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.locale))
+  #set ($deletedDocumentsMessage = 'core.recyclebin.showlistmsg')
+  #set ($deletedTerminalDocuments = [])
+  #if ($doc.documentReference.name == 'WebHome')
+    ## Also display the list of terminal documents sharing the same location.
+    ## eg. If the current document is: "A.B.WebHome", we should also display any deleted terminal page called "A.B".
+    ## This is important because when the user delete a terminal document and go back to the location, she should see
+    ## the page she have just deleted, and not an empty page because A.B.WebHome has never existed...
+    #set ($deletedTerminalDocuments = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.locale))
+  #end
 #end
+#displayDeletedDocuments($deletedDocuments, 'docs', $deletedDocumentsMessage)
+#displayDeletedDocuments($deletedTerminalDocuments, 'terminal-docs', 'core.recyclebin.showListTerminalPagesMsg')
 
 #*
  * Display the given list of deleted documents
  * @param $list the list to display
  * @param $className the name of the css class to apply to the list
- * @param $message (optional) the translation key for the message which introduce the list
+ * @param $message (optional) the translation key for the message which introduces the list, no message when empty
  *#
 #macro (displayDeletedDocuments $list $className $message)
-  #if (!$message)
-    #set ($message = 'core.recyclebin.showlistmsg')
-  #end  
   #if($list && $list.size() > 0)
     #set ($canDelete = $list[0].canDelete())
     #set ($canRestore = $list[0].canUndelete())
     #set ($canView = $list[0].canView())
-    <hr />
-    <div class="centered $!className">
-      <p class="recyclebin-message">$escapetool.xml($services.localization.render($message))</p>
-      <table class="centered">
+    <div class="recyclebin-list $!className">
+      #if ("$!message" != '')
+        <p class="recyclebin-message">$escapetool.xml($services.localization.render($message))</p>
+      #end
+      <table>
        <thead>
         <tr>
-         <th>$escapetool.xml($services.localization.render('core.recyclebin.deleter'))</td>
-         <th>$escapetool.xml($services.localization.render('core.recyclebin.deleteDate'))</td>
+         <th>$escapetool.xml($services.localization.render('core.recyclebin.deleter'))</th>
+         <th>$escapetool.xml($services.localization.render('core.recyclebin.deleteDate'))</th>
          #if ($canRestore)
-           <th>$escapetool.xml($services.localization.render('core.recyclebin.batchId'))</td>
+           <th>$escapetool.xml($services.localization.render('core.recyclebin.batchId'))</th>
          #end
          <th colspan="2">$escapetool.xml($services.localization.render('core.recyclebin.actions'))</th>
         </tr>

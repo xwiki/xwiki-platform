@@ -30,22 +30,12 @@
   #template("hierarchy.vm")
   ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
-  #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
-  #template('contentheader.vm')
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
+    #template('contentheader.vm')
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
   #else
-    #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thispagedoesnotexist'))
-    ## Create link
-    #if($hasEdit)
-      #set($url = $doc.getURL("create", $editparams))
-      $services.localization.render('core.viewers.content.doesnotexists.edittocreate', [$url])
-    #end
-    ## UI Extensions, if any.
-    #showExtensions()
-    ## Recycle bin
-    #template("recyclebinlist.vm")
-    #xwikimessageboxend()
+    #_displayDocDoesNotExist()
   #end
   <div class="clearfloats"></div>
   </main>## mainContentArea
@@ -57,4 +47,113 @@
 ##
 #macro (showExtensions)
   $services.uix.renderExtensions('org.xwiki.platform.docdoesnotexist', 'html/5.0', {'sortByParameter': 'order'})
+#end
+##
+## Display the "Page not found" or the "Page moved to recycle bin" message, depending on the recycle bin content.
+##
+#macro (_displayDocDoesNotExist)
+  #set ($deletedDocuments = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.locale))
+  #set ($deletedDocumentsMessage = $NULL)
+  #set ($deletedTerminalDocuments = [])
+  #if ($doc.documentReference.name == 'WebHome')
+    ## Also look for deleted terminal pages sharing the same location, see recyclebinlist.vm.
+    #set ($deletedTerminalDocuments = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.locale))
+  #end
+  #set ($latestDeletedDocument = $NULL)
+  #if (!$deletedDocuments.isEmpty())
+    #set ($latestDeletedDocument = $deletedDocuments[0])
+  #elseif (!$deletedTerminalDocuments.isEmpty())
+    #set ($latestDeletedDocument = $deletedTerminalDocuments[0])
+  #end
+  #set ($canCreate = $hasEdit && !$isReadOnly)
+  #set ($displayRecycleBin = false)
+  #if ($latestDeletedDocument)
+    #set ($titleKey = 'core.viewers.content.deleted.title')
+    ## The recycle bin table is useful only to the users who can view, restore or delete its entries.
+    #set ($canRestore = $latestDeletedDocument.canUndelete())
+    #set ($displayRecycleBin = $canRestore || $latestDeletedDocument.canDelete() || $latestDeletedDocument.canView())
+  #else
+    #set ($titleKey = 'core.viewers.content.doesnotexist.title')
+  #end
+  <div class="row document-header">
+    <section class="document-info col-xs-12 #if ($canCreate)col-md-7#end"
+      aria-label="$escapetool.xml($services.localization.render('core.document.header.info.label'))">
+      <div id="document-title"><h1>$escapetool.xml($services.localization.render($titleKey))</h1></div>
+    </section>
+    #if ($canCreate)
+      <nav class="document-menu col-xs-12 col-md-5"
+        aria-label="$escapetool.xml($services.localization.render('core.document.header.menu.nav.label'))">
+        #_displayDocDoesNotExistCreateButton()
+      </nav>
+    #end
+  </div>
+  <div class="docdoesnotexist">
+    #set ($pageTitle = $doc.plainTitle)
+    #if (!$latestDeletedDocument)
+      <p class="docdoesnotexist-hint">#if ($canCreate)
+        $escapetool.xml($services.localization.render('core.viewers.content.doesnotexist.hint'))
+      #else
+        $escapetool.xml($services.localization.render('core.viewers.content.doesnotexist.hintNoCreate'))
+      #end</p>
+    #elseif ($displayRecycleBin && $canRestore)
+      <p class="docdoesnotexist-hint">#if ($canCreate)
+        $escapetool.xml($services.localization.render('core.viewers.content.deleted.hint', [$pageTitle]))
+      #else
+        $escapetool.xml($services.localization.render('core.viewers.content.deleted.hintNoCreate', [$pageTitle]))
+      #end</p>
+    #else
+      <p class="docdoesnotexist-hint">
+        $services.localization.render('core.viewers.content.deleted.info', [$escapetool.xml($pageTitle),
+          $xwiki.getUserName($latestDeletedDocument.deleter), $escapetool.xml($xwiki.formatDate($latestDeletedDocument.date))])
+        #if ($canCreate)
+          $escapetool.xml($services.localization.render('core.viewers.content.deleted.infoCreate'))
+        #end
+      </p>
+    #end
+    #if ($displayRecycleBin)
+      #template('recyclebinlist.vm')
+    #end
+    ## UI Extensions, if any.
+    #showExtensions()
+  </div>
+#end
+##
+## Display the split button used to create the missing page. Its dropdown lets advanced users pick the editor.
+## The ids are those of the regular edit menu so that the edit entries can be found at the same place.
+##
+#macro (_displayDocDoesNotExistCreateButton)
+  #template('menus_macros.vm')
+  #set ($extraAttributes = 'rel="nofollow"')
+  #set ($createLabel = $services.localization.render('core.viewers.content.doesnotexist.create'))
+  <ul id="contentmenu" class="pull-right actionmenu">
+    <li class="btn-group" id="tmEdit">
+      <a class="btn btn-default" href="$doc.getURL('create')" title="$escapetool.xml($createLabel)" $extraAttributes>
+        $services.icon.renderHTML('add')
+        <span class="btn-label">$escapetool.xml($createLabel)</span>
+      </a>
+      #if ($isAdvancedUser)
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">$escapetool.xml($services.localization.render('core.menu.toggleDropdown'))</span>
+        </button>
+        <dl class="dropdown-menu dropdown-menu-right">
+          <dt class="dropdown-header sr-only">
+            $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
+          </dt>
+          <dd>
+            <ul>
+              #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
+                #submenuitem($doc.getURL('edit', 'editor=wysiwyg') $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil', $extraAttributes)
+              #end
+              #submenuitem($doc.getURL('edit', 'editor=wiki') $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench', $extraAttributes)
+              #submenuitem($doc.getURL('edit', 'editor=inline') $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list', $extraAttributes)
+              #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'bricks', $extraAttributes)
+              #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'box', $extraAttributes)
+            </ul>
+          </dd>
+        </dl>
+      #end
+    </li>
+  </ul>
 #end

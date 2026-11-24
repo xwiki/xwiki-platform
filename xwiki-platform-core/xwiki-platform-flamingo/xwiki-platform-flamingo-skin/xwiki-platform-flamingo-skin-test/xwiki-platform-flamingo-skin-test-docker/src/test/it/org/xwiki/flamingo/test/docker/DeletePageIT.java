@@ -56,6 +56,8 @@ import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -78,7 +80,9 @@ class DeletePageIT
 
     private static final String LOGGED_USERNAME = "superadmin";
 
-    private static final String DOCUMENT_NOT_FOUND = "The requested page could not be found.";
+    private static final String PAGE_NOT_FOUND = "Page not found";
+
+    private static final String PAGE_DELETED = "Page moved to recycle bin";
 
     private static final String DELETE_ACTION = "delete";
 
@@ -107,7 +111,7 @@ class DeletePageIT
 
     @Test
     @Order(1)
-    void deleteOkWhenConfirming()
+    void deleteOkWhenConfirming(TestUtils setup, TestReference testReference)
     {
         ConfirmationPage confirmationPage = this.viewPage.deletePage();
         // This tests for regression of XWIKI-1388
@@ -124,7 +128,20 @@ class DeletePageIT
         List<DeletedPageEntry> deletedPagesEntries = deleteOutcome.getDeletedPagesEntries();
         assertEquals(1, deletedPagesEntries.size());
         assertEquals(LOGGED_USERNAME, deletedPagesEntries.get(0).getDeleter());
-        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+        assertEquals(PAGE_DELETED, deleteOutcome.getDocumentTitle());
+        String pageName = testReference.getLastSpaceReference().getName();
+        assertEquals(String.format("The page \"%s\" has been deleted. You can restore it using the table below or you"
+            + " can replace it by creating a new page.", pageName), deleteOutcome.getMessage());
+
+        // A guest can neither restore nor delete the page, so the recycle bin entries are summarized instead.
+        setup.forceGuestUser();
+        setup.gotoPage(testReference);
+        deleteOutcome = new DeletePageOutcomePage();
+        assertEquals(PAGE_DELETED, deleteOutcome.getDocumentTitle());
+        assertThat(deleteOutcome.getMessage(), startsWith(
+            String.format("The page \"%s\" was moved to the recycle bin by %s on ", pageName, LOGGED_USERNAME)));
+        assertTrue(deleteOutcome.getDeletedPagesEntries().isEmpty());
+        setup.loginAsSuperAdmin();
     }
 
     /**
@@ -509,7 +526,7 @@ class DeletePageIT
         List<DeletedPageEntry> deletedPagesEntries = deleteOutcome.getDeletedPagesEntries();
         assertEquals(1, deletedPagesEntries.size());
         assertEquals(LOGGED_USERNAME, deletedPagesEntries.get(0).getDeleter());
-        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+        assertEquals(PAGE_DELETED, deleteOutcome.getDocumentTitle());
     }
 
     /**
@@ -528,7 +545,8 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
         assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
-        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+        assertEquals(PAGE_NOT_FOUND, deleteOutcome.getDocumentTitle());
+        assertEquals("This page could not be found, but you can create it.", deleteOutcome.getMessage());
         ViewPage viewPage1 = new ViewPage();
         assertTrue(viewPage1.isNewDocument());
     }
@@ -731,7 +749,7 @@ class DeletePageIT
         // Ensure the translation has also been deleted
         setup.gotoPage(frenchXClassTranslation);
         deletePageOutcomePage = new DeletePageOutcomePage();
-        assertEquals("Impossible de trouver ce document.", deletePageOutcomePage.getMessage());
+        assertFalse(deletePageOutcomePage.exists());
     }
 
     /**
@@ -807,7 +825,7 @@ class DeletePageIT
         assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getDeletedPagesEntries().get(0).getDeleter());
-        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+        assertEquals(PAGE_DELETED, deleteOutcome.getDocumentTitle());
         assertEquals(backlinkDocContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
     }
 
@@ -857,6 +875,6 @@ class DeletePageIT
         parentPage = testUtils.gotoPage(parentReference);
         assertEquals("New target", parentPage.getDocumentTitle());
         ViewPage childPage = testUtils.gotoPage(childReference);
-        assertEquals("Child", childPage.getDocumentTitle());
+        assertEquals(PAGE_DELETED, childPage.getDocumentTitle());
     }
 }

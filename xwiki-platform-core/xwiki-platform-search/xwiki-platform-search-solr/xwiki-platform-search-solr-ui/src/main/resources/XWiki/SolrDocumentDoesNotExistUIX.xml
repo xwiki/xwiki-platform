@@ -282,8 +282,9 @@
 
   {{html clean='false'}}
   &lt;div class='docdoesnotexist-solr-container'&gt;
-    &lt;p&gt;&lt;b&gt;$services.localization.render('solr.uix.docdoesnotexist.title')&lt;/b&gt;&lt;/p&gt;
-    &lt;ul&gt;
+    &lt;h2&gt;$escapetool.xml($services.localization.render('solr.uix.docdoesnotexist.heading'))&lt;/h2&gt;
+    &lt;p&gt;$escapetool.xml($services.localization.render('solr.uix.docdoesnotexist.title'))&lt;/p&gt;
+    &lt;ul class="list-unstyled"&gt;
     #template('hierarchy_macros.vm')
     #foreach ($suggestionResult in $suggestionResults)
       #set ($suggestionResultsDocReference = $services.solr.resolveDocument($suggestionResult))

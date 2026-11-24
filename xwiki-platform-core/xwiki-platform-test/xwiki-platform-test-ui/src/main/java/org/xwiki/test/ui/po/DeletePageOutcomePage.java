@@ -36,13 +36,14 @@ import org.openqa.selenium.support.FindBy;
  */
 public class DeletePageOutcomePage extends ViewPage
 {
-    @FindBy(xpath = "//p[@class='xwikimessage']")
+    @FindBy(css = ".docdoesnotexist-hint")
     private WebElement message;
 
-    @FindBy(xpath = "//table[@class='centered']/tbody/tr/td[3]/a")
+    @FindBy(css = ".recyclebin-list.docs tbody td:nth-child(3) a")
     private WebElement batchLink;
 
     /**
+     * @return the message displayed under the title, explaining why the page is missing and what can be done about it
      * @since 4.0M2
      */
     public String getMessage()
@@ -72,7 +73,7 @@ public class DeletePageOutcomePage extends ViewPage
     {
         try {
             WebElement table =
-                getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.docs table"));
+                getDriver().findElementWithoutWaiting(By.cssSelector(".recyclebin-list.docs table"));
             return getDeletedEntries(table, false);
         } catch (NoSuchElementException e) {
             return Collections.emptyList();
@@ -86,7 +87,7 @@ public class DeletePageOutcomePage extends ViewPage
     {
         try {
             WebElement table =
-                getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.terminal-docs table"));
+                getDriver().findElementWithoutWaiting(By.cssSelector(".recyclebin-list.terminal-docs table"));
             return getDeletedEntries(table, true);
         } catch (NoSuchElementException e) {
             return Collections.emptyList();

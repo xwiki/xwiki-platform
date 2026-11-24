@@ -17,26 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { insertMacroInvocation } from "../../misc/macroInvocation";
+import type { EditorType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
-import type { MentionRenderer, MentionableUser } from "../../services/mentions";
+import type { MentionFactory, MentionableUser } from "../../services/mentions";
 
 /**
- * Inserts a mention of the given user at the selection, as rendered by the given renderer.
+ * @param editor - the editor holding the selection the mention is inserted at
+ * @returns whether the selection is already followed by a whitespace, which a mention then doesn't have to add
+ */
+function isFollowedByWhitespace(editor: EditorType): boolean {
+  const { $to } = editor.prosemirrorState.selection;
+  const following = $to.parent.textBetween(
+    $to.parentOffset,
+    Math.min($to.parentOffset + 1, $to.parent.content.size),
+  );
+  return /\s/.test(following);
+}
+
+/**
+ * Inserts a mention of the given user at the selection, as built by the given factory.
  *
  * @param instance - the editor instance to insert the mention into
- * @param renderer - what renders the user as the macro call standing for the mention
+ * @param factory - what builds the inline content standing for a mention of the user
  * @param user - the mentioned user
  */
 function insertMention(
   instance: EditorInstance,
-  renderer: MentionRenderer,
+  factory: MentionFactory,
   user: MentionableUser,
 ): void {
-  insertMacroInvocation(instance.editor, renderer.render(user));
-  // A rendering macro is never inline-only, so a call alone in a paragraph is saved as a block macro. Same as the
-  // CKEditor mentions: a space after the call keeps the mention inline, and lets the user keep typing after it.
-  instance.editor.insertInlineContent(" ", { updateSelection: true });
+  const { editor } = instance;
+  const mention = factory.createMention(user);
+  // A mention is followed by a space, so that the user can keep typing after it. In XWiki syntax it is also what
+  // keeps a mention alone in a paragraph from being saved as a block macro, a rendering macro never being inline-only.
+  const content = isFollowedByWhitespace(editor)
+    ? [mention]
+    : [mention, " " as const];
+  editor.insertInlineContent(content, { updateSelection: true });
 }
 
 export { insertMention };

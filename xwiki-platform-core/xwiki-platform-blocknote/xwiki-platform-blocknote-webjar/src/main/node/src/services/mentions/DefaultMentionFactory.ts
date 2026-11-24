@@ -17,11 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { mentionRendererName } from "@xwiki/platform-editors-blocknote-react";
+import {
+  createInlineMacro,
+  mentionFactoryName,
+} from "@xwiki/platform-editors-blocknote-react";
 import { injectable } from "inversify";
 import type {
-  InlineMacroInvocation,
-  MentionRenderer,
+  InlineContentType,
+  MentionFactory,
   MentionableUser,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { Container } from "inversify";
@@ -40,22 +43,22 @@ function getMentionAnchor(reference: string): string {
 }
 
 /**
- * Renders a mention as a call to the XWiki mention macro, so that it round-trips through the XWiki syntax like any
+ * Builds a mention as a call to the XWiki mention macro, so that it round-trips through the XWiki syntax like any
  * other server-rendered macro.
  *
  * @since 19.0.0RC1
  */
 @injectable("Singleton")
-class DefaultMentionRenderer implements MentionRenderer {
+class DefaultMentionFactory implements MentionFactory {
   public static bind(container: Container): void {
     container
-      .bind<MentionRenderer>(mentionRendererName)
-      .to(DefaultMentionRenderer)
+      .bind<MentionFactory>(mentionFactoryName)
+      .to(DefaultMentionFactory)
       .inSingletonScope();
   }
 
-  public render(user: MentionableUser): InlineMacroInvocation {
-    return {
+  public createMention(user: MentionableUser): InlineContentType {
+    return createInlineMacro({
       kind: "inline",
       id: "mention",
       params: {
@@ -64,8 +67,8 @@ class DefaultMentionRenderer implements MentionRenderer {
         anchor: getMentionAnchor(user.reference),
       },
       body: { type: "none" },
-    };
+    });
   }
 }
 
-export { DefaultMentionRenderer, getMentionAnchor };
+export { DefaultMentionFactory, getMentionAnchor };

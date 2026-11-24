@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import {
-  DefaultMentionRenderer,
+  DefaultMentionFactory,
   getMentionAnchor,
-} from "./DefaultMentionRenderer";
+} from "./DefaultMentionFactory";
 import { describe, expect, it } from "vitest";
 
 const user = { reference: "XWiki.Alice", label: "Alice" };
@@ -39,15 +39,15 @@ describe("getMentionAnchor", () => {
   });
 });
 
-describe("DefaultMentionRenderer", () => {
-  it("renders a call to the mention macro for the mentioned user", () => {
-    const invocation = new DefaultMentionRenderer().render(user);
+describe("DefaultMentionFactory", () => {
+  it("builds a call to the mention macro for the mentioned user", () => {
+    const mention = new DefaultMentionFactory().createMention(user);
 
-    expect(invocation.kind).toBe("inline");
-    expect(invocation.id).toBe("mention");
-    expect(invocation.params.reference).toBe("XWiki.Alice");
-    expect(invocation.params.style).toBe("FULL_NAME");
-    expect(invocation.params.anchor).toMatch(/^XWiki-Alice-[a-z0-9]{6}$/);
-    expect(invocation.body).toEqual({ type: "none" });
+    expect(mention.type).toBe("xwikiInlineMacro");
+    const call = JSON.parse(mention.props.call);
+    expect(call.name).toBe("mention");
+    expect(call.parameters.reference).toBe("XWiki.Alice");
+    expect(call.parameters.style).toBe("FULL_NAME");
+    expect(call.parameters.anchor).toMatch(/^XWiki-Alice-[a-z0-9]{6}$/);
   });
 });

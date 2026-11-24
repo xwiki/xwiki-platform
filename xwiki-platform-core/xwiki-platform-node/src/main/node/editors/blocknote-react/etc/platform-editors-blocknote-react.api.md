@@ -104,6 +104,9 @@ export type ContributedBlockNoteOptions = Partial<Pick<BlockNoteEditorOptions<Ed
 export function createBlockMetadataStore(): BlockMetadataStore;
 
 // @beta
+export function createInlineMacro(invocation: InlineMacroInvocation): InlineContentType;
+
+// @beta
 export type EditorAppearance = {
     theme?: "light" | "dark";
     contentStyles?: "editor" | "host";
@@ -371,12 +374,12 @@ export type MentionableUser = {
 };
 
 // @beta
-export interface MentionRenderer {
-    render(user: MentionableUser): InlineMacroInvocation;
+export interface MentionFactory {
+    createMention(user: MentionableUser): InlineContentType;
 }
 
 // @beta
-export const mentionRendererName = "MentionRenderer";
+export const mentionFactoryName = "MentionFactory";
 
 // @beta
 export const mentionsFeature: EditorFeature;

@@ -155,10 +155,10 @@ export {
   extractMacroRawContent,
 } from "./features/macros/utils";
 
-export { mentionRendererName, userSuggesterName } from "./services/mentions";
+export { mentionFactoryName, userSuggesterName } from "./services/mentions";
 
 export type {
-  MentionRenderer,
+  MentionFactory,
   MentionableUser,
   UserSuggester,
 } from "./services/mentions";
@@ -173,7 +173,10 @@ export type {
   MacroInsertionEditorPrefillData,
 } from "./services/macroEditor";
 
-export { insertMacroInvocation } from "./misc/macroInvocation";
+export {
+  createInlineMacro,
+  insertMacroInvocation,
+} from "./misc/macroInvocation";
 
 export type { MacroCall } from "./misc/macroInvocation";
 

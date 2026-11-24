@@ -94,6 +94,26 @@ function macroCallToInvocation(
 }
 
 /**
+ * Build a server-rendered macro call as the `xwikiInlineMacro` inline content the macro feature adds to the schema,
+ * without inserting it. The call is stored as the JSON `call` prop, and the macro has no output (it is displayed as a
+ * placeholder) until it is rendered server-side.
+ *
+ * @param invocation - the macro call to build
+ * @returns the inline content holding the given macro call
+ *
+ * @since 19.0.0RC1
+ * @beta
+ */
+function createInlineMacro(
+  invocation: InlineMacroInvocation,
+): InlineContentType {
+  const props = { call: JSON.stringify(invocationToMacroCall(invocation)) };
+  // NOTE: the schema is dynamically typed with macros, so the types are incorrect here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return { type: "xwikiInlineMacro", props } as any;
+}
+
+/**
  * Insert (or replace the given selected block with) a server-rendered macro represented by the `xwikiMacroBlock` /
  * `xwikiInlineMacro` specs that the macro feature adds to the schema. The call (name, parameters and body) is stored
  * as the JSON `call` prop. The inserted macro has no output (it is displayed as a placeholder) until it is rendered
@@ -109,10 +129,8 @@ function insertMacroInvocation(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selectedBlock?: any,
 ): void {
-  const props = {
-    call: JSON.stringify(invocationToMacroCall(invocation)),
-  };
   if (invocation.kind === "block") {
+    const props = { call: JSON.stringify(invocationToMacroCall(invocation)) };
     // NOTE: the schema is dynamically typed with macros, so the types are incorrect here.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const block = { type: "xwikiMacroBlock", props } as any;
@@ -123,12 +141,17 @@ function insertMacroInvocation(
     }
   } else {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    editor.insertInlineContent([{ type: "xwikiInlineMacro", props } as any], {
+    editor.insertInlineContent([createInlineMacro(invocation) as any], {
       updateSelection: true,
     });
   }
 }
 
-export { insertMacroInvocation, invocationToMacroCall, macroCallToInvocation };
+export {
+  createInlineMacro,
+  insertMacroInvocation,
+  invocationToMacroCall,
+  macroCallToInvocation,
+};
 
 export type { MacroCall };

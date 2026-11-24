@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { InlineContentType } from "../blocknote";
 import type { EditorInstance } from "../editorInstance";
-import type { InlineMacroInvocation } from "./macroEditor";
 
 /**
  * The name under which the {@link UserSuggester} is bound in the service container.
@@ -29,12 +29,12 @@ import type { InlineMacroInvocation } from "./macroEditor";
 const userSuggesterName = "UserSuggester";
 
 /**
- * The name under which the {@link MentionRenderer} is bound in the service container.
+ * The name under which the {@link MentionFactory} is bound in the service container.
  *
  * @since 19.0.0RC1
  * @beta
  */
-const mentionRendererName = "MentionRenderer";
+const mentionFactoryName = "MentionFactory";
 
 /**
  * A user that can be mentioned in the edited content.
@@ -44,7 +44,7 @@ const mentionRendererName = "MentionRenderer";
  */
 type MentionableUser = {
   /**
-   * The reference of the user, in the form the {@link MentionRenderer} writes into the content (e.g. "XWiki.Admin").
+   * The reference of the user, in the form a mention of them holds (e.g. "XWiki.Admin").
    */
   reference: string;
 
@@ -86,22 +86,23 @@ interface UserSuggester {
 }
 
 /**
- * Renders a mention of a user as an inline macro call, which the mentions feature then inserts into the edited content.
- * The macro and its parameters are backend specific, e.g. XWiki calls its mention macro. The mention menu is available
- * only when this is bound in the service container, see {@link mentionRendererName}.
+ * Builds the inline content standing for a mention of a user, which the mentions feature then inserts into the edited
+ * content. What a mention is depends on the backend that has to save and render it, e.g. XWiki builds a call to its
+ * mention macro with `createInlineMacro`. The mention menu is available only when this is bound in the service
+ * container, see {@link mentionFactoryName}.
  *
  * @since 19.0.0RC1
  * @beta
  */
-interface MentionRenderer {
+interface MentionFactory {
   /**
-   * Renders a mention of the given user, without inserting it.
+   * Builds a mention of the given user, without inserting it.
    *
    * @param user - the mentioned user
-   * @returns the macro call standing for the mention
+   * @returns the inline content representing a mention of the given user
    */
-  render(user: MentionableUser): InlineMacroInvocation;
+  createMention(user: MentionableUser): InlineContentType;
 }
 
-export { mentionRendererName, userSuggesterName };
-export type { MentionRenderer, MentionableUser, UserSuggester };
+export { mentionFactoryName, userSuggesterName };
+export type { MentionFactory, MentionableUser, UserSuggester };

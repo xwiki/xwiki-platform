@@ -114,7 +114,7 @@ interface EditorFeatures {
   /**
    * The user mentions are enabled when this is missing. `false` disables the mention menu, even when the services it
    * needs are bound. The mentions already in the content are still displayed. The options of the mentions feature are
-   * those of the `UserSuggester` and the `MentionRenderer`, declared by the integration binding them (e.g. the XWiki
+   * those of the `UserSuggester` and the `MentionFactory`, declared by the integration binding them (e.g. the XWiki
    * WebJar declares the user scope of the wiki).
    */
   mentions?: object | false;

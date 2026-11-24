@@ -19,10 +19,7 @@
  */
 import { MentionSuggestionController } from "./MentionSuggestionController";
 import { openMentionMenu } from "./mentionMenu";
-import {
-  mentionRendererName,
-  userSuggesterName,
-} from "../../services/mentions";
+import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
 import { createElement } from "react";
 import { RiAtLine } from "react-icons/ri";
 import type { EditorType } from "../../blocknote";
@@ -56,10 +53,9 @@ function mentionSlashMenuItem(
 /**
  * Mentions a user in the edited content. The mention trigger and the "Mention" item of the slash menu open a menu
  * that suggests the users returned by the `UserSuggester` bound in the service container. Picking one hands it to the
- * `MentionRenderer` bound there, and the macro call it returns is inserted at the selection. Looking a user up and
+ * `MentionFactory` bound there, and the inline content it returns is inserted at the selection. Looking a user up and
  * representing a mention are each backend specific, so this feature contributes nothing unless the host application
- * binds both services. A mention being inserted as an inline macro call, it also needs a syntax that can save both a
- * mention and an inline macro.
+ * binds both services and the syntax of the edited content can save a mention.
  *
  * @since 19.0.0RC1
  * @beta
@@ -72,14 +68,10 @@ const mentionsFeature: EditorFeature = {
     t,
     getInstance,
   }: FeatureContext): FeatureContribution | undefined {
-    const { mentions, macros } = syntax.features.inlineContents;
     if (
-      !mentions ||
-      // The rendered mention is inserted as an `xwikiInlineMacro`, which the macros feature puts in the schema only
-      // when the syntax supports macros.
-      !macros ||
+      !syntax.features.inlineContents.mentions ||
       !serviceContainer.isBound(userSuggesterName) ||
-      !serviceContainer.isBound(mentionRendererName)
+      !serviceContainer.isBound(mentionFactoryName)
     ) {
       return undefined;
     }

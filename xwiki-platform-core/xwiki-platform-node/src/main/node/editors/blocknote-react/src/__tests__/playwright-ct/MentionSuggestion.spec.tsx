@@ -79,7 +79,7 @@ test("The mention menu suggests the users of the host application", async ({
   );
 });
 
-test("Picking a user inserts the mention rendered for it", async ({
+test("Picking a user inserts the mention built for it", async ({
   mount,
   page,
 }) => {
@@ -91,7 +91,7 @@ test("Picking a user inserts the mention rendered for it", async ({
   ).toContainText("Alice");
   await page.keyboard.press("Enter");
 
-  // The query typed after the trigger is replaced by the macro call the renderer of the host application returned,
+  // The query typed after the trigger is replaced by the macro call the factory of the host application built,
   // displayed as a placeholder until the server renders it.
   await expect(component.locator(".bn-editor")).toContainText("macro:mention");
   expect(await getInlineContents(page)).toEqual([
@@ -172,12 +172,12 @@ test("There is no mention menu without a user suggester", async ({
   await expect(page.locator(".bn-suggestion-menu")).toHaveCount(0);
 });
 
-test("There is no mention menu without a mention renderer", async ({
+test("There is no mention menu without a mention factory", async ({
   mount,
   page,
 }) => {
   const component = await mount(
-    <MentionSuggestionForTest noMentionRenderer users={USERS} />,
+    <MentionSuggestionForTest noMentionFactory users={USERS} />,
   );
 
   await startMention(page, component.locator(".bn-editor"), "ali");

@@ -29,19 +29,16 @@ import {
   toSuggestions,
 } from "../../features/mentions/mentionMenu";
 import { mentionsFeature } from "../../features/mentions/mentions";
-import {
-  mentionRendererName,
-  userSuggesterName,
-} from "../../services/mentions";
+import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
 import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
 import { BlockNoteEditor } from "@blocknote/core";
 import { Container } from "inversify";
 import { beforeAll, describe, expect, test, vi } from "vitest";
+import type { InlineContentType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
 import type { FeatureContext } from "../../features/editorFeature";
-import type { InlineMacroInvocation } from "../../services/macroEditor";
 import type {
-  MentionRenderer,
+  MentionFactory,
   MentionableUser,
   UserSuggester,
 } from "../../services/mentions";
@@ -56,12 +53,15 @@ const userSuggester: UserSuggester = {
   suggestUsers: async () => [user],
 };
 
-const invocation: InlineMacroInvocation = {
-  kind: "inline",
-  id: "mention",
-  params: { reference: user.reference },
-  body: { type: "none" },
-};
+const mention = {
+  type: "xwikiInlineMacro",
+  props: {
+    call: JSON.stringify({
+      name: "mention",
+      parameters: { reference: user.reference },
+    }),
+  },
+} as unknown as InlineContentType;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyEditor = BlockNoteEditor<any, any, any>;
@@ -76,36 +76,28 @@ beforeAll(() => {
 
 /**
  * @param suggester - whether a user suggester is bound, as a host application that can look users up does
- * @param renderer - whether a mention renderer is bound, as a host application that can represent mentions does
+ * @param factory - whether a mention factory is bound, as a host application that can represent mentions does
  * @param mentions - whether the syntax of the edited content can save a mention
- * @param macros - whether the syntax of the edited content can save an inline macro
  * @returns the context the mentions feature contributes to
  */
 function context({
   suggester = true,
-  renderer = true,
+  factory = true,
   mentions = true,
-  macros = true,
-}: {
-  suggester?: boolean;
-  renderer?: boolean;
-  mentions?: boolean;
-  macros?: boolean;
-} = {}) {
+}: { suggester?: boolean; factory?: boolean; mentions?: boolean } = {}) {
   const serviceContainer = new Container();
   if (suggester) {
     serviceContainer
       .bind<UserSuggester>(userSuggesterName)
       .toConstantValue(userSuggester);
   }
-  if (renderer) {
+  if (factory) {
     serviceContainer
-      .bind<MentionRenderer>(mentionRendererName)
-      .toConstantValue({ render: () => invocation });
+      .bind<MentionFactory>(mentionFactoryName)
+      .toConstantValue({ createMention: () => mention });
   }
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.inlineContents.mentions = mentions;
-  syntax.features.inlineContents.macros = macros;
   return {
     serviceContainer,
     options: { features: {} },
@@ -158,21 +150,15 @@ describe("mentionsFeature", () => {
     ).toBeUndefined();
   });
 
-  test("contributes nothing without a mention renderer", () => {
+  test("contributes nothing without a mention factory", () => {
     expect(
-      mentionsFeature.contribute(context({ renderer: false })),
+      mentionsFeature.contribute(context({ factory: false })),
     ).toBeUndefined();
   });
 
   test("contributes nothing when the syntax can't save a mention", () => {
     expect(
       mentionsFeature.contribute(context({ mentions: false })),
-    ).toBeUndefined();
-  });
-
-  test("contributes nothing when the syntax can't save the inline macro a mention is inserted as", () => {
-    expect(
-      mentionsFeature.contribute(context({ macros: false })),
     ).toBeUndefined();
   });
 
@@ -214,52 +200,77 @@ describe("shouldOpenMentionMenu", () => {
 });
 
 /**
- * @returns an editor instance whose only ability is to record the inserted inline content
+ * @param insertInlineContent - what records the content inserted at the selection
+ * @param textAfter - the text the selection is followed by, in its block
+ * @returns an editor instance whose only abilities are to record the inserted inline content and to tell what the
+ *   selection is followed by
  */
-function instanceInsertingInto(insertInlineContent: () => void) {
-  return { editor: { insertInlineContent } } as unknown as EditorInstance;
+function instanceInsertingInto(
+  insertInlineContent: () => void,
+  textAfter = "",
+) {
+  return {
+    editor: {
+      insertInlineContent,
+      prosemirrorState: {
+        selection: {
+          $to: {
+            parent: {
+              textBetween: (from: number, to: number) =>
+                textAfter.slice(from, to),
+              content: { size: textAfter.length },
+            },
+            parentOffset: 0,
+          },
+        },
+      },
+    },
+  } as unknown as EditorInstance;
 }
 
 describe("toSuggestions", () => {
-  const renderer: MentionRenderer = { render: vi.fn(() => invocation) };
+  const factory: MentionFactory = { createMention: vi.fn(() => mention) };
   const instance = instanceInsertingInto(vi.fn());
 
   test("labels the item with the user name and its hint", () => {
-    const items = toSuggestions(instance, renderer, [user], "Users");
+    const items = toSuggestions(instance, factory, [user], "Users");
 
     expect(items[0].title).toBe("Administrator");
     expect(items[0].subtext).toBe("admin@example.com");
     expect(items[0].group).toBe("Users");
   });
 
-  test("hands the picked user to the mention renderer", () => {
-    toSuggestions(instance, renderer, [user], "Users")[0].onItemClick!();
+  test("hands the picked user to the mention factory", () => {
+    toSuggestions(instance, factory, [user], "Users")[0].onItemClick!();
 
-    expect(renderer.render).toHaveBeenCalledWith(user);
+    expect(factory.createMention).toHaveBeenCalledWith(user);
   });
 });
 
 describe("insertMention", () => {
-  const renderer: MentionRenderer = { render: () => invocation };
+  const factory: MentionFactory = { createMention: () => mention };
 
-  test("inserts the rendered macro call at the selection", () => {
+  test("inserts the mention built for the user, followed by a space", () => {
     const insertInlineContent = vi.fn();
 
-    insertMention(instanceInsertingInto(insertInlineContent), renderer, user);
+    insertMention(instanceInsertingInto(insertInlineContent), factory, user);
 
-    const [content] = insertInlineContent.mock.calls[0];
-    expect(content[0].type).toBe("xwikiInlineMacro");
-    expect(JSON.parse(content[0].props.call)).toEqual({
-      name: "mention",
-      parameters: { reference: "XWiki.Admin" },
+    expect(insertInlineContent).toHaveBeenCalledWith([mention, " "], {
+      updateSelection: true,
     });
   });
 
-  test("follows the macro call with a space, so that a lone mention stays inline", () => {
+  test("doesn't add a space when the selection is already followed by one", () => {
     const insertInlineContent = vi.fn();
 
-    insertMention(instanceInsertingInto(insertInlineContent), renderer, user);
+    insertMention(
+      instanceInsertingInto(insertInlineContent, " and you"),
+      factory,
+      user,
+    );
 
-    expect(insertInlineContent.mock.calls[1][0]).toBe(" ");
+    expect(insertInlineContent).toHaveBeenCalledWith([mention], {
+      updateSelection: true,
+    });
   });
 });

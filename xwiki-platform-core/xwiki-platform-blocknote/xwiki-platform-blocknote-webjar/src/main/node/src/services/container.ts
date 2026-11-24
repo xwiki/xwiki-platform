@@ -26,7 +26,7 @@ import { DefaultImageEditor } from "./image/DefaultImageEditor";
 import { DefaultImageMetadataHandler } from "./image/DefaultImageMetadataHandler";
 import { DefaultMacroEditor } from "./macros/DefaultMacroEditor";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
-import { DefaultMentionRenderer } from "./mentions/DefaultMentionRenderer";
+import { DefaultMentionFactory } from "./mentions/DefaultMentionFactory";
 import { DefaultUserSuggester } from "./mentions/DefaultUserSuggester";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultLogger } from "@xwiki/platform-api";
@@ -107,7 +107,7 @@ DefaultLinkMetadataHandler.bind(container);
 DefaultMacroWizard.bind(container);
 DefaultMacroEditor.bind(container);
 DefaultUserSuggester.bind(container);
-DefaultMentionRenderer.bind(container);
+DefaultMentionFactory.bind(container);
 
 MinimalApp.bind(container);
 

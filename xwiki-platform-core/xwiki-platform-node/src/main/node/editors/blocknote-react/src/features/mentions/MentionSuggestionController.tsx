@@ -23,10 +23,7 @@ import {
   toSuggestions,
 } from "./mentionMenu";
 import { EditorInstanceContext } from "../../contexts";
-import {
-  mentionRendererName,
-  userSuggesterName,
-} from "../../services/mentions";
+import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
 import { SuggestionMenuController } from "@blocknote/react";
 import {
   debounceAsync,
@@ -34,18 +31,18 @@ import {
 } from "@xwiki/platform-fn-utils";
 import { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import type { MentionRenderer, UserSuggester } from "../../services/mentions";
+import type { MentionFactory, UserSuggester } from "../../services/mentions";
 
 /**
  * Suggests the users to mention, as the user types after the mention trigger, and hands the picked one to the mention
- * renderer of the host application.
+ * factory of the host application.
  */
 export function MentionSuggestionController() {
   const instance = useContext(EditorInstanceContext)!;
   const userSuggester =
     instance.serviceContainer.get<UserSuggester>(userSuggesterName);
-  const mentionRenderer =
-    instance.serviceContainer.get<MentionRenderer>(mentionRendererName);
+  const mentionFactory =
+    instance.serviceContainer.get<MentionFactory>(mentionFactoryName);
 
   const { t } = useTranslation();
 
@@ -66,12 +63,12 @@ export function MentionSuggestionController() {
         }
         return toSuggestions(
           instance,
-          mentionRenderer,
+          mentionFactory,
           users,
           t("blocknote.mentionMenu.group"),
         );
       }),
-    [instance, userSuggester, mentionRenderer, t],
+    [instance, userSuggester, mentionFactory, t],
   );
 
   return (

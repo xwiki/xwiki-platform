@@ -20,14 +20,12 @@
 import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
-import {
-  mentionRendererName,
-  userSuggesterName,
-} from "../../services/mentions";
+import { createInlineMacro } from "../../misc/macroInvocation";
+import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
 import { useMemo, useState } from "react";
 import type { EditorType } from "../../blocknote";
 import type {
-  MentionRenderer,
+  MentionFactory,
   MentionableUser,
   UserSuggester,
 } from "../../services/mentions";
@@ -37,8 +35,8 @@ export type MentionSuggestionForTestProps = {
   users?: MentionableUser[];
   // When set, no user suggester is bound, as with a backend that can't look up users.
   noUserSuggester?: boolean;
-  // When set, no mention renderer is bound, as with a backend that has no way to represent a mention.
-  noMentionRenderer?: boolean;
+  // When set, no mention factory is bound, as with a backend that has no way to represent a mention.
+  noMentionFactory?: boolean;
   // When set, the syntax of the edited content can't save a mention.
   syntaxWithoutMentions?: boolean;
   // When set, looking the users up fails, as when the backend can't be reached.
@@ -46,9 +44,9 @@ export type MentionSuggestionForTestProps = {
 };
 
 /**
- * Renders the editor with a scripted user suggester feeding the mention menu and a scripted mention renderer standing
+ * Renders the editor with a scripted user suggester feeding the mention menu and a scripted mention factory standing
  * for the host application, and reports the content the editor holds, so that the tests can check what a picked
- * suggestion inserted. The renderer returns a call to a `mention` macro taking the mentioned reference: what an XWiki
+ * suggestion inserted. The factory builds a call to a `mention` macro taking the mentioned reference: what an XWiki
  * mention looks like is the integration's business, tested there.
  *
  * This is a dedicated story (rather than a `BlockNoteForTest` prop) because the services have to be built here, where
@@ -59,7 +57,7 @@ export const MentionSuggestionForTest: React.FC<
 > = ({
   users,
   noUserSuggester,
-  noMentionRenderer,
+  noMentionFactory,
   syntaxWithoutMentions,
   failingSuggestions,
 }) => {
@@ -83,14 +81,15 @@ export const MentionSuggestionForTest: React.FC<
         },
       });
     }
-    if (!noMentionRenderer) {
-      container.bind<MentionRenderer>(mentionRendererName).toConstantValue({
-        render: (user) => ({
-          kind: "inline",
-          id: "mention",
-          params: { reference: user.reference },
-          body: { type: "none" },
-        }),
+    if (!noMentionFactory) {
+      container.bind<MentionFactory>(mentionFactoryName).toConstantValue({
+        createMention: (user) =>
+          createInlineMacro({
+            kind: "inline",
+            id: "mention",
+            params: { reference: user.reference },
+            body: { type: "none" },
+          }),
       });
     }
     return container;

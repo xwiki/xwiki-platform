@@ -210,8 +210,8 @@
  *   Do take care that if the $actionUrl provided is empty,
  *   the $extraAttributes are going to be used for a `button` instead of an `anchor`
  *   and should have values fit to a `button`.
- * @param $alignDropdownRight (optional) whether to align the dropdown on the right of the menu even when the top menu
- *   entry has a link, e.g. when the menu is the last one displayed
+ * @param $alignDropdownRight (optional, since 19.0.0RC1) whether to align the dropdown on the right of the menu even
+ *   when the top menu entry has a link, e.g. when the menu is the last one displayed
  * @since 7.3M2
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute $alignDropdownRight)

@@ -488,7 +488,7 @@ public class DBTreeListClass extends DBListClass
                 } else {
                     select.append("idprop.value");
                     fromStatements.add("StringProperty as idprop");
-                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
+                    whereStatements.add("obj.id=idprop.id and idprop.name='" + idField + "'");
                 }
 
                 // Add the second column to the query.
@@ -502,7 +502,7 @@ public class DBTreeListClass extends DBListClass
                     } else {
                         select.append(", valueprop.value");
                         fromStatements.add("StringProperty as valueprop");
-                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
+                        whereStatements.add("obj.id=valueprop.id and valueprop.name='" + valueField + "'");
                     }
                 }
 
@@ -519,7 +519,7 @@ public class DBTreeListClass extends DBListClass
                     } else {
                         select.append(", parentprop.value");
                         fromStatements.add("StringProperty as parentprop");
-                        whereStatements.add("obj.id=parentprop.id.id and parentprop.id.name='" + parentField + "'");
+                        whereStatements.add("obj.id=parentprop.id and parentprop.name='" + parentField + "'");
                     }
                 }
                 // Let's create the complete query

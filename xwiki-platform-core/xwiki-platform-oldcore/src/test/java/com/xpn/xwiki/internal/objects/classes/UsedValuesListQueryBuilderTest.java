@@ -133,7 +133,7 @@ class UsedValuesListQueryBuilderTest
         verify(this.queryManager).createQuery("select prop.value as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, StringProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
-            + "prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "prop.id = obj.id and prop.name = :propertyName "
             + "group by prop.value "
             + "order by unfilterable0 desc", Query.HQL);
         verify(query).bindValue("className", "Blog.BlogPostClass");
@@ -157,7 +157,7 @@ class UsedValuesListQueryBuilderTest
         verify(this.queryManager).createQuery("select listItem as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, DBStringListProperty as prop join prop.list listItem "
             + "where obj.className = :className and obj.name <> :templateName and "
-            + "prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "prop.id = obj.id and prop.name = :propertyName "
             + "group by listItem "
             + "order by unfilterable0 desc", Query.HQL);
     }
@@ -175,7 +175,7 @@ class UsedValuesListQueryBuilderTest
         verify(this.queryManager).createQuery("select prop.textValue as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, StringListProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
-            + "prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "prop.id = obj.id and prop.name = :propertyName "
             + "group by prop.textValue "
             + "order by unfilterable0 desc", Query.HQL);
     }
@@ -196,12 +196,12 @@ class UsedValuesListQueryBuilderTest
             + "from BaseObject as obj, StringListProperty as prop "
                 + "where obj.className = :className "
                 + "  and obj.name <> :templateName "
-                + "  and prop.id.id = obj.id "
-                + "  and prop.id.name = :propertyName "
+                + "  and prop.id = obj.id "
+                + "  and prop.name = :propertyName "
                 + "  and not exists ("
                 + "    select 1 from StringListProperty as prop2 "
-                + "    where prop2.id.name = :propertyName "
-                + "      and prop2.id.id < prop.id.id "
+                + "    where prop2.name = :propertyName "
+                + "      and prop2.id < prop.id "
                 + "      and FUNCTION('DBMS_LOB.COMPARE', prop2.textValue, prop.textValue) = 0"
                 + "  ) "
                 + "order by obj.id", Query.HQL);
@@ -221,7 +221,7 @@ class UsedValuesListQueryBuilderTest
         verify(this.queryManager).createQuery("select prop.value as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, LargeStringProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
-            + "prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "prop.id = obj.id and prop.name = :propertyName "
             + "group by prop.value "
             + "order by unfilterable0 desc", Query.HQL);
         verify(query).bindValue("className", "Blog.BlogPostClass");
@@ -247,12 +247,12 @@ class UsedValuesListQueryBuilderTest
                 + "from BaseObject as obj, LargeStringProperty as prop "
                 + "where obj.className = :className "
                 + "  and obj.name <> :templateName "
-                + "  and prop.id.id = obj.id "
-                + "  and prop.id.name = :propertyName "
+                + "  and prop.id = obj.id "
+                + "  and prop.name = :propertyName "
                 + "  and not exists ("
                 + "    select 1 from LargeStringProperty as prop2 "
-                + "    where prop2.id.name = :propertyName "
-                + "      and prop2.id.id < prop.id.id "
+                + "    where prop2.name = :propertyName "
+                + "      and prop2.id < prop.id "
                 + "      and FUNCTION('DBMS_LOB.COMPARE', prop2.value, prop.value) = 0"
                 + "  ) "
                 + "order by obj.id", Query.HQL);

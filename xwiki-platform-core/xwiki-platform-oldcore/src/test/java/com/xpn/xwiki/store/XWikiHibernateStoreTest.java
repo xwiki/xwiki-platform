@@ -343,7 +343,7 @@ class XWikiHibernateStoreTest
         inOrder.verify(this.session).persist(lock);
 
         verify(query).setParameter("docId", 13L);
-        verify(this.session, never()).merge(any());
+        verify(this.session, never()).update(any());
         verify(this.hibernateStore).endTransaction(true);
     }
 
@@ -610,7 +610,7 @@ class XWikiHibernateStoreTest
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, never()).merge("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, never()).update("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again of the same document
 
@@ -620,7 +620,7 @@ class XWikiHibernateStoreTest
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, never()).merge("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, never()).update("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Indicate that the xobject was modified
 
@@ -629,14 +629,14 @@ class XWikiHibernateStoreTest
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session).merge("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).update("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again with no change
 
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session).merge("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session).update("com.xpn.xwiki.objects.BaseObject", object1);
 
         // Save again but with disabled tracking
 
@@ -645,6 +645,6 @@ class XWikiHibernateStoreTest
         this.store.saveXWikiDoc(document, this.xcontext, true);
 
         verify(this.session).persist("com.xpn.xwiki.objects.BaseObject", object1);
-        verify(this.session, times(2)).merge("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, times(2)).update("com.xpn.xwiki.objects.BaseObject", object1);
     }
 }

@@ -22,7 +22,9 @@ package com.xpn.xwiki.internal.store.hibernate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,44 +51,70 @@ class HibernateConnectionSettingTest
     }
 
     @Test
-    void getFollowsHibernatePrecedence()
+    void getValueFollowsHibernatePrecedence()
     {
         Map<String, Object> settings = new HashMap<>();
-        assertNull(HibernateConnectionSetting.URL.get(settings::get));
+        assertNull(HibernateConnectionSetting.URL.getValue(settings));
 
         settings.put("connection.url", "short");
-        assertEquals("short", HibernateConnectionSetting.URL.get(settings::get));
+        assertEquals("short", HibernateConnectionSetting.URL.getValue(settings));
 
         settings.put("javax.persistence.jdbc.url", "javax");
-        assertEquals("javax", HibernateConnectionSetting.URL.get(settings::get));
+        assertEquals("javax", HibernateConnectionSetting.URL.getValue(settings));
 
         settings.put("hibernate.connection.url", "hibernate");
-        assertEquals("hibernate", HibernateConnectionSetting.URL.get(settings::get));
+        assertEquals("hibernate", HibernateConnectionSetting.URL.getValue(settings));
 
         settings.put("jakarta.persistence.jdbc.url", "jakarta");
-        assertEquals("jakarta", HibernateConnectionSetting.URL.get(settings::get));
+        assertEquals("jakarta", HibernateConnectionSetting.URL.getValue(settings));
     }
 
     @Test
-    void getKeepsEmptyValue()
+    void getValueKeepsEmptyValue()
     {
         Map<String, Object> settings = Map.of("hibernate.connection.password", "");
 
-        assertEquals("", HibernateConnectionSetting.PASSWORD.get(settings::get));
+        assertEquals("", HibernateConnectionSetting.PASSWORD.getValue(settings));
     }
 
     @Test
-    void transformAllNames()
+    void getValueFromConfiguration()
+    {
+        Configuration configuration = new Configuration();
+        assertNull(HibernateConnectionSetting.DRIVER.getValue(configuration));
+
+        configuration.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver");
+        assertEquals("org.hsqldb.jdbcDriver", HibernateConnectionSetting.DRIVER.getValue(configuration));
+    }
+
+    @Test
+    void replaceValuesOfAllNames()
     {
         Map<String, Object> settings = new HashMap<>();
         settings.put("jakarta.persistence.jdbc.url", "jdbc:${dir}/jakarta");
         settings.put("hibernate.connection.url", "jdbc:${dir}/hibernate");
         settings.put("connection.url", "jdbc:/unchanged");
 
-        HibernateConnectionSetting.URL.transform(settings::get, settings::put,
+        Map<String, String> replaced = HibernateConnectionSetting.URL.replaceValues(settings,
             value -> value.contains("${dir}") ? value.replace("${dir}", "/data") : null);
 
+        assertEquals(List.of("jakarta.persistence.jdbc.url", "hibernate.connection.url"),
+            List.copyOf(replaced.keySet()));
+        assertEquals(Map.of("jakarta.persistence.jdbc.url", "jdbc:/data/jakarta", "hibernate.connection.url",
+            "jdbc:/data/hibernate"), replaced);
         assertEquals(Map.of("jakarta.persistence.jdbc.url", "jdbc:/data/jakarta", "hibernate.connection.url",
             "jdbc:/data/hibernate", "connection.url", "jdbc:/unchanged"), settings);
+    }
+
+    @Test
+    void replaceValuesInProperties()
+    {
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.connection.url", "jdbc:same");
+
+        assertEquals(Map.of(), HibernateConnectionSetting.URL.replaceValues(properties, value -> value));
+        assertEquals(Map.of("hibernate.connection.url", "jdbc:new"),
+            HibernateConnectionSetting.URL.replaceValues(properties, value -> "jdbc:new"));
+        assertEquals("jdbc:new", properties.getProperty("hibernate.connection.url"));
     }
 }

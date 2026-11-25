@@ -29,4 +29,11 @@
     </id>
     <property name="name" column="LE_NAME" length="255" />
   </class>
+  <!-- A dynamic map entity, only usable with its entity name -->
+  <class entity-name="LegacyMap" table="legacymap">
+    <id name="id" type="long" column="LM_ID" unsaved-value="undefined">
+      <generator class="assigned" />
+    </id>
+    <property name="name" type="string" column="LM_NAME" length="255" />
+  </class>
 </hibernate-mapping>

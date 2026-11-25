@@ -787,7 +787,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (queryTab.length > 0) {
             String sql =
                 "select distinct obj.number, obj.name from BaseObject as obj, StringProperty as prop , LargeStringProperty as lprop "
-                    + "where obj.className='XWiki.FeedEntryClass' and obj.id=prop.id.id and obj.id=lprop.id.id ";
+                    + "where obj.className='XWiki.FeedEntryClass' and obj.id=prop.id and obj.id=lprop.id ";
 
             StringBuilder sqlBuilder = new StringBuilder(sql);
             for (int i = 0; i < queryTab.length; i++) {

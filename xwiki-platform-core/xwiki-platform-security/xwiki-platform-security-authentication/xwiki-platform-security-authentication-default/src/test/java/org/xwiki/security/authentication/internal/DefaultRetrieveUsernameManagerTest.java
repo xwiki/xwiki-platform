@@ -57,7 +57,7 @@ import static org.mockito.Mockito.when;
 class DefaultRetrieveUsernameManagerTest
 {
     private static final String HQL_QUERY = ", BaseObject obj, StringProperty prop where obj.name = doc.fullName and "
-        + "obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' "
+        + "obj.className = 'XWiki.XWikiUsers' and prop.id = obj.id and prop.name = 'email' "
         + "and LOWER(prop.value) = :email";
 
     @InjectMockComponents

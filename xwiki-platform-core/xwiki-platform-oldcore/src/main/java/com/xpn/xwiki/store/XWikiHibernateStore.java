@@ -679,8 +679,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         doc.setNew(true);
                     }
 
-                    // Note: new documents are persisted rather than merged since merge() would first look for the
-                    // document in the database.
+                    // Note: existing documents (and their objects, properties and attachments) are updated with
+                    // update() rather than merge(), which would load a copy of the entity from the database before
+                    // copying the state of the passed instance into it: it would cost a select for each saved entity,
+                    // and several entities can't be loaded on their own (an attachment computes its identifier from
+                    // its document, which a copy loaded by Hibernate does not have).
                     if (doc.isNew()) {
                         if (doc.isContentDirty() || doc.isMetaDataDirty()) {
                             // Reset the creationDate to reflect the date of the first save, not the date of the object
@@ -689,7 +692,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
                         session.persist(doc);
                     } else {
-                        session.merge(doc);
+                        session.update(doc);
                     }
 
                     // Remove objects planned for removal
@@ -841,7 +844,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (space.isHidden()) {
             space.setHidden(false);
 
-            session.merge(space);
+            session.update(space);
 
             // Update parent
             if (space.getSpaceReference().getParent() instanceof SpaceReference parentReference) {
@@ -871,7 +874,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (calculateHiddenStatus(spaceReference, modifiedDocument, session)) {
             // Make the space hidden
             space.setHidden(true);
-            session.merge(space);
+            session.update(space);
 
             // Update space parent
             if (spaceReference.getParent() instanceof SpaceReference parentReference) {
@@ -1431,9 +1434,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 } else {
                     if (stats) {
-                        session.merge(object);
+                        session.update(object);
                     } else {
-                        session.merge("com.xpn.xwiki.objects.BaseObject", object);
+                        session.update("com.xpn.xwiki.objects.BaseObject", object);
                     }
                 }
                 BaseClass bclass = object.getXClass(context);
@@ -1448,7 +1451,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (query.uniqueResult() == null) {
                         session.persist(bclass.getName(), objmap);
                     } else {
-                        session.merge(bclass.getName(), objmap);
+                        session.update(bclass.getName(), objmap);
                     }
                 }
 
@@ -1874,7 +1877,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (oldClassType == null) {
                     session.persist(property);
                 } else if (oldClassType.equals(newClassType)) {
-                    session.merge(property);
+                    session.update(property);
                 } else {
                     // The property type has changed. We cannot simply update its value because the new value and the
                     // old
@@ -1999,7 +2002,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     attachment.updateContentArchive(context);
                 }
 
-                session.merge(attachment);
+                session.update(attachment);
 
                 // Save the attachment content if it's marked as "dirty" (out of sync with the database).
                 saveContent = attachment.isContentDirty();

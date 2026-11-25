@@ -30,9 +30,16 @@ import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.doc.rcs.XWikiPatch;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringListProperty;
@@ -41,6 +48,8 @@ import com.xpn.xwiki.objects.StringProperty;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Run the Hibernate operations used by the store on a real (in-memory HSQLDB) database with the XWiki mapping, to
@@ -124,23 +133,74 @@ class HibernateMappingOperationsTest
     }
 
     @Test
-    void mergeDetachedPropertyIdentifiedByItself()
+    void updateDetachedPropertyIdentifiedByItself()
     {
         write(session -> session.persist(newStringProperty(1, "prop", "value1")));
 
         // A new instance with the same identifier, like the store does when saving a modified document
-        write(session -> session.merge(newStringProperty(1, "prop", "value2")));
+        write(session -> session.update(newStringProperty(1, "prop", "value2")));
 
         assertEquals("value2", loadStringProperty(1, "prop").getValue());
     }
 
     @Test
-    void mergeNewProperty()
+    void persistNewProperty()
     {
-        write(session -> session.merge(newStringProperty(2, "prop", "value")));
+        write(session -> session.persist(newStringProperty(2, "prop", "value")));
 
         assertEquals("value", loadStringProperty(2, "prop").getValue());
         assertEquals(StringProperty.class.getName(), getStoredClassType(2));
+    }
+
+    @Test
+    void updateDetachedAttachment()
+    {
+        // The identifier of an attachment is computed from its document, which an instance created by Hibernate
+        // doesn't have
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getId()).thenReturn(42L);
+        when(document.getFullName()).thenReturn("Space.Page");
+
+        write(session -> session.persist(newAttachment(document, "version 1")));
+
+        // What the store does when saving an existing attachment
+        write(session -> session.update(newAttachment(document, "version 2")));
+
+        assertEquals(List.of("version 2"), read(session -> session
+            .createNativeQuery("select XWA_COMMENT from xwikiattachment where XWA_DOC_ID = 42", String.class)
+            .list()));
+    }
+
+    private static XWikiAttachment newAttachment(XWikiDocument document, String comment)
+    {
+        XWikiAttachment attachment = new XWikiAttachment(document, "file.txt");
+        attachment.setComment(comment);
+        attachment.setAuthor("XWiki.Alice");
+        attachment.setVersion("1.1");
+
+        return attachment;
+    }
+
+    @Test
+    void saveNewDocumentVersion()
+    {
+        // The information and the content of a version are two entities mapped on the same row
+        XWikiRCSNodeId id = new XWikiRCSNodeId(43L, new Version(1, 1));
+        XWikiRCSNodeInfo nodeInfo = new XWikiRCSNodeInfo(id);
+        nodeInfo.setDate(new Date());
+        nodeInfo.setAuthor("XWiki.Alice");
+        nodeInfo.setComment("comment");
+        XWikiRCSNodeContent nodeContent = new XWikiRCSNodeContent(id);
+        nodeContent.setPatch(new XWikiPatch("content", false));
+
+        // What the versioning store does when saving a new version
+        write(session -> {
+            session.saveOrUpdate(nodeInfo);
+            session.update(nodeContent);
+        });
+
+        assertEquals("XWiki.Alice", read(session -> session.find(XWikiRCSNodeInfo.class, id)).getAuthor());
+        assertEquals("content", read(session -> session.find(XWikiRCSNodeContent.class, id)).getPatch().getContent());
     }
 
     @Test

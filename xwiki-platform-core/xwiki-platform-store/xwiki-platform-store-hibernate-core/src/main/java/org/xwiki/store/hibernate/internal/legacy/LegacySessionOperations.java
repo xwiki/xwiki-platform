@@ -22,6 +22,8 @@ package org.xwiki.store.hibernate.internal.legacy;
 import java.io.Serializable;
 
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.Session;
 import org.hibernate.TransientObjectException;
@@ -31,7 +33,11 @@ import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.event.internal.EntityState;
 import org.hibernate.event.internal.OnUpdateVisitor;
+import org.hibernate.event.spi.DeleteContext;
 import org.hibernate.event.spi.EventSource;
+import org.hibernate.event.spi.RefreshContext;
+import org.hibernate.event.spi.RefreshEvent;
+import org.hibernate.event.spi.RefreshEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
@@ -125,6 +131,85 @@ public final class LegacySessionOperations
                     save(source, entityName, entity);
                     break;
             }
+        }
+    }
+
+    /**
+     * Hibernate 5 {@code load} with a lock mode or lock options failed when the entity did not exist, unlike
+     * {@code find} and {@code get}.
+     *
+     * @param <T> the type of the entity
+     * @param entity the loaded entity, or {@code null} if it does not exist
+     * @param entityName the name of the entity
+     * @param id the identifier of the entity
+     * @return the passed entity
+     * @throws ObjectNotFoundException when the entity does not exist
+     */
+    public static <T> T checkLoaded(T entity, String entityName, Object id)
+    {
+        if (entity == null) {
+            throw new ObjectNotFoundException(entityName, id);
+        }
+
+        return entity;
+    }
+
+    /**
+     * Remove a persistent instance.
+     *
+     * @param session the session
+     * @param entityName the entity name or {@code null} to deduce it from the instance (the name is required for
+     *            instances which are not of the mapped class, like dynamic map entities)
+     * @param object the instance to remove
+     */
+    public static void delete(Session session, String entityName, Object object)
+    {
+        if (entityName != null) {
+            session.unwrap(EventSource.class).delete(entityName, object, false, DeleteContext.create());
+        } else {
+            session.remove(object);
+        }
+    }
+
+    /**
+     * Re-read the state of an instance from the database.
+     *
+     * @param session the session
+     * @param entityName the entity name or {@code null} to deduce it from the instance
+     * @param object the instance to refresh
+     * @param lockOptions the lock options, or {@code null}
+     */
+    public static void refresh(Session session, String entityName, Object object, LockOptions lockOptions)
+    {
+        if (entityName == null) {
+            if (lockOptions != null) {
+                session.refresh(object, lockOptions);
+            } else {
+                session.refresh(object);
+            }
+        } else if (lockOptions == null) {
+            session.unwrap(EventSource.class).refresh(entityName, object, RefreshContext.create());
+        } else {
+            EventSource source = session.unwrap(EventSource.class);
+            source.getFactory().getEventListenerGroups().eventListenerGroup_REFRESH.fireEventOnEachListener(
+                new RefreshEvent(entityName, object, lockOptions, source), RefreshEventListener::onRefresh);
+        }
+    }
+
+    /**
+     * Obtain the specified lock level upon the given object.
+     *
+     * @param session the session
+     * @param entityName the entity name or {@code null} to deduce it from the instance
+     * @param object the instance to lock
+     * @param lockMode the lock level
+     */
+    public static void lock(Session session, String entityName, Object object, LockMode lockMode)
+    {
+        if (entityName != null) {
+            session.unwrap(EventSource.class).lock(entityName, object, new LockOptions(lockMode));
+        } else {
+            session.lock(object, lockMode);
         }
     }
 

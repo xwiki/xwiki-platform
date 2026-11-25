@@ -80,8 +80,8 @@ public class PagesForTagsResourceImpl extends XWikiResource implements PagesForT
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append(
             "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop ");
-        queryBuilder.append("where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id ");
-        queryBuilder.append("and prop.id.name='tags' and (");
+        queryBuilder.append("where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id ");
+        queryBuilder.append("and prop.name='tags' and (");
 
         for (int i = 0; i < tags.length; i++) {
             if (i > 0) {

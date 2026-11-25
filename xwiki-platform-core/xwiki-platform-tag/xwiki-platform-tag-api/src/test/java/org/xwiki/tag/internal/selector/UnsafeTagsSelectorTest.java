@@ -209,7 +209,7 @@ class UnsafeTagsSelectorTest
         verify(this.queryManager).createQuery("select item, count(*) "
             + "from XWikiDocument as doc, BaseObject as tagobject, DBStringListProperty as prop join prop.list item"
             + " where tagobject.name=doc.fullName and tagobject.className='XWiki.TagClass' and "
-            + "tagobject.id=prop.id.id and prop.id.name='tags' and doc.translation=0 group by item", Query.HQL);
+            + "tagobject.id=prop.id and prop.name='tags' and doc.translation=0 group by item", Query.HQL);
         verifyNoInteractions(this.stringDocumentReferenceResolver);
         verifyNoInteractions(this.contextualAuthorizationManager);
     }

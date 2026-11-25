@@ -117,7 +117,7 @@ public class UsersPingDataProvider extends AbstractPingDataProvider
         Query query = this.queryManager.createQuery("SELECT COUNT(DISTINCT doc.fullName) FROM Document doc, "
             + "doc.object(XWiki.XWikiUsers) AS obj WHERE doc.fullName NOT IN ("
             + "SELECT doc.fullName FROM XWikiDocument doc, BaseObject objLimit, IntegerProperty propActive "
-            + "WHERE objLimit.name = doc.fullName AND propActive.id.id = objLimit.id AND propActive.id.name = 'active' "
+            + "WHERE objLimit.name = doc.fullName AND propActive.id = objLimit.id AND propActive.name = 'active' "
             + "AND propActive.value = 0)", Query.XWQL).setWiki(wikiId);
         List<Long> results = query.execute();
         return results.get(0).longValue();

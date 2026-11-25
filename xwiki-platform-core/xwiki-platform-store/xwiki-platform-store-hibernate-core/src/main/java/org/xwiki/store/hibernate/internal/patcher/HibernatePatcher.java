@@ -73,6 +73,8 @@ public final class HibernatePatcher
 
     private static final String BINARY_ONLY_DESCRIPTOR = Type.getDescriptor(BinaryOnly.class);
 
+    private static final String PATCHED_DESCRIPTOR = Type.getDescriptor(Patched.class);
+
     private static final String CLASS_EXTENSION = ".class";
 
     private static final String META_INF = "META-INF/";
@@ -326,12 +328,7 @@ public final class HibernatePatcher
         if (classMixins != null) {
             bytes = merge(bytes, name, classMixins);
         }
-        ClassNode holder = this.binaryOnlyHolders.remove(name);
-        if (holder != null) {
-            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            holder.accept(writer);
-            write(holder.name + CLASS_EXTENSION, writer.toByteArray());
-        }
+        writeBinaryOnlyHolder(name);
 
         for (PackageBridge bridge : this.bridges) {
             if (bridge.accept(name)) {
@@ -340,6 +337,61 @@ public final class HibernatePatcher
         }
 
         write(name + CLASS_EXTENSION, bytes);
+    }
+
+    private void writeBinaryOnlyHolder(String name) throws IOException
+    {
+        ClassNode holder = this.binaryOnlyHolders.remove(name);
+        if (holder != null) {
+            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+            holder.accept(writer);
+            write(holder.name + CLASS_EXTENSION, writer.toByteArray());
+        }
+    }
+
+    /**
+     * Merge the mixins targeting classes of the classes directory (the Hibernate 5 types restored by this module),
+     * which are not part of the copied JARs.
+     */
+    private void patchLocalClasses() throws IOException
+    {
+        for (Map.Entry<String, List<ClassNode>> entry : this.mixins.entrySet()) {
+            String name = entry.getKey();
+            Path file = this.classes.resolve(name + CLASS_EXTENSION);
+            if (!this.patched.contains(name) && Files.isRegularFile(file)) {
+                byte[] bytes = Files.readAllBytes(file);
+                if (isPatched(bytes)) {
+                    // Already patched by a previous build (the class was not compiled again since)
+                    this.patched.add(name);
+                } else {
+                    write(name + CLASS_EXTENSION, markPatched(merge(bytes, name, entry.getValue())));
+                    writeBinaryOnlyHolder(name);
+                }
+            }
+        }
+    }
+
+    private static boolean isPatched(byte[] bytes)
+    {
+        ClassNode node = new ClassNode();
+        new ClassReader(bytes).accept(node, ClassReader.SKIP_CODE);
+
+        return getAnnotation(node.invisibleAnnotations, PATCHED_DESCRIPTOR) != null;
+    }
+
+    private static byte[] markPatched(byte[] bytes)
+    {
+        ClassNode node = new ClassNode();
+        new ClassReader(bytes).accept(node, 0);
+        if (node.invisibleAnnotations == null) {
+            node.invisibleAnnotations = new ArrayList<>();
+        }
+        node.invisibleAnnotations.add(new AnnotationNode(PATCHED_DESCRIPTOR));
+
+        ClassWriter writer = new ClassWriter(0);
+        node.accept(writer);
+
+        return writer.toByteArray();
     }
 
     private byte[] merge(byte[] bytes, String name, List<ClassNode> classMixins)
@@ -585,6 +637,8 @@ public final class HibernatePatcher
         for (Map.Entry<String, StringBuilder> entry : this.services.entrySet()) {
             write(SERVICES + entry.getKey(), entry.getValue().toString().getBytes(StandardCharsets.UTF_8));
         }
+
+        patchLocalClasses();
 
         Set<String> missing = new HashSet<>(this.mixins.keySet());
         missing.removeAll(this.patched);

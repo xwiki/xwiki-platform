@@ -247,8 +247,8 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
         try {
             String statement =
                 "select doc.fullName, prop.value from XWikiDocument doc, BaseObject obj, StringProperty prop where "
-                    + "obj.className=:sheetBindingClass and obj.name=doc.fullName and obj.id=prop.id.id and "
-                    + "prop.id.name=:sheetProperty order by doc.fullName";
+                    + "obj.className=:sheetBindingClass and obj.name=doc.fullName and obj.id=prop.id and "
+                    + "prop.name=:sheetProperty order by doc.fullName";
             this.sheetBindingsQuery = this.queryManager.createQuery(statement, Query.HQL);
             this.sheetBindingsQuery.bindValue("sheetBindingClass", getSheetBindingClass());
             this.sheetBindingsQuery.bindValue("sheetProperty", SHEET_PROPERTY);

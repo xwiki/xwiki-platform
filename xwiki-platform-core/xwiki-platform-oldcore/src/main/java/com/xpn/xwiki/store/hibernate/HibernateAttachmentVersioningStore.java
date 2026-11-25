@@ -91,7 +91,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
         throws XWikiException
     {
         executeWrite(context, session -> {
-            session.merge(archive);
+            session.saveOrUpdate(archive);
 
             return null;
         });

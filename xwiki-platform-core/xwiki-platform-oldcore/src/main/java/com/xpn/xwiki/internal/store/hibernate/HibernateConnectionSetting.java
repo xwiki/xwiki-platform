@@ -19,12 +19,13 @@
  */
 package com.xpn.xwiki.internal.store.hibernate;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
+import org.hibernate.boot.cfgxml.spi.LoadedConfig;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.JdbcSettings;
 
 /**
@@ -80,14 +81,20 @@ public enum HibernateConnectionSetting
     }
 
     /**
-     * @param getter the function returning the value associated with a setting name
+     * Returns the value of the setting, whichever of its names is used: for example the JDBC URL configured with
+     * {@code hibernate.connection.url} or {@code jakarta.persistence.jdbc.url}.
+     *
+     * @param settings the Hibernate settings (for example {@link Configuration#getProperties()},
+     *            {@link LoadedConfig#getConfigurationValues()}, the settings passed to a connection provider or
+     *            {@link System#getProperties()}); values which are not strings are converted with
+     *            {@link Object#toString()}
      * @return the value of the first name with a value, in the order of precedence used by Hibernate, or {@code null}
      *         if the setting is not set
      */
-    public String get(Function<String, ?> getter)
+    public String getValue(Map<?, ?> settings)
     {
         for (String name : this.names) {
-            Object value = getter.apply(name);
+            Object value = settings.get(name);
             if (value != null) {
                 return value.toString();
             }
@@ -97,23 +104,42 @@ public enum HibernateConnectionSetting
     }
 
     /**
-     * Transform the value of each name of the setting which is set.
+     * Returns the value of the setting in the passed configuration, whichever of its names is used.
      *
-     * @param getter the function returning the value associated with a setting name
-     * @param setter the function setting a new value for a setting name
-     * @param transformer the transformation to apply, returning {@code null} to keep the value unchanged
+     * @param configuration the Hibernate configuration
+     * @return the value of the first name with a value, in the order of precedence used by Hibernate, or {@code null}
+     *         if the setting is not set
      */
-    public void transform(Function<String, ?> getter, BiConsumer<String, String> setter,
-        UnaryOperator<String> transformer)
+    public String getValue(Configuration configuration)
     {
+        return getValue(configuration.getProperties());
+    }
+
+    /**
+     * Replaces the value of each name of the setting which is set (several names can be set at the same time, and the
+     * one Hibernate actually uses depends on its precedence rules, so all of them are updated).
+     *
+     * @param settings the Hibernate settings to modify (for example {@link Configuration#getProperties()} or
+     *            {@link LoadedConfig#getConfigurationValues()})
+     * @param resolver the function returning the new value for a current value (for example a JDBC URL with its
+     *            variables resolved), or {@code null} to keep it unchanged
+     * @return the names whose value was replaced, associated with their new value (empty when nothing changed), in
+     *         the order of precedence used by Hibernate
+     */
+    public Map<String, String> replaceValues(Map<? super String, Object> settings, UnaryOperator<String> resolver)
+    {
+        Map<String, String> replaced = new LinkedHashMap<>();
         for (String name : this.names) {
-            Object value = getter.apply(name);
+            Object value = settings.get(name);
             if (value != null) {
-                String newValue = transformer.apply(value.toString());
-                if (newValue != null && !Objects.equals(newValue, value)) {
-                    setter.accept(name, newValue);
+                String newValue = resolver.apply(value.toString());
+                if (newValue != null && !newValue.equals(value)) {
+                    settings.put(name, newValue);
+                    replaced.put(name, newValue);
                 }
             }
         }
+
+        return replaced;
     }
 }

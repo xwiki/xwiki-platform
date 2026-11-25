@@ -26,7 +26,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.query.Query;
 import org.hibernate.query.sqm.UnknownPathException;
+import org.hibernate.query.sqm.internal.SqmQueryImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,8 @@ import com.xpn.xwiki.objects.StringProperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -113,6 +117,7 @@ class LegacySessionImplementorTest
         assertFalse(LegacySessionImplementor.containsLegacyPropertyIdentifier("where prop.id = obj.id"));
         assertFalse(LegacySessionImplementor.containsLegacyPropertyIdentifier("where rcs.id.docId = :docId"));
         assertFalse(LegacySessionImplementor.containsLegacyPropertyIdentifier("where prop.id.identifier = 1"));
+        assertTrue(LegacySessionImplementor.containsLegacyPropertyIdentifier("where id.id = 1"));
     }
 
     @Test
@@ -172,5 +177,71 @@ class LegacySessionImplementorTest
         assertThrows(UnknownPathException.class, () -> read(session -> session
             .createQuery("select prop.value from StringProperty prop where prop.id.id = 1 and prop.unknown = 'prop'",
                 String.class)));
+    }
+
+    @Test
+    void legacyPropertyIdentifierDoesNotChangeStringLiterals()
+    {
+        String statement = "select prop.value from StringProperty prop"
+            + " where prop.id.id = 1 and prop.id.name = 'prop' and prop.value <> 'prop.id.name'";
+
+        assertEquals(List.of("value"), read(session -> session.createQuery(statement, String.class).list()));
+
+        assertEquals("Deprecated usage of the HQL paths [prop.id.id] and [prop.id.name] to the identifier of the"
+            + " object properties; use [prop.id] and [prop.name] instead. Query [" + statement
+            + "] has been converted to [select prop.value from StringProperty prop"
+            + " where prop.id = 1 and prop.name = 'prop' and prop.value <> 'prop.id.name']",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void legacyPropertyIdentifierWithFullEntityNameAndAs()
+    {
+        when(this.loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(false);
+
+        assertEquals(List.of("value"), read(session -> session.createQuery(
+            "select prop.value from com.xpn.xwiki.objects.StringProperty as prop where prop.id.id = 1", String.class)
+            .list()));
+    }
+
+    @Test
+    void legacyPropertyIdentifierWithoutAlias()
+    {
+        when(this.loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(false);
+
+        assertEquals(List.of("value"), read(session -> session
+            .createQuery("select value from StringProperty where id.id = 1 and id.name = 'prop'", String.class)
+            .list()));
+    }
+
+    @Test
+    void invalidPathOnOtherEntityIsNotConverted()
+    {
+        // obj.id is the identifier of the object, which has no name: converting obj.id.name to obj.name would select
+        // another field instead of failing
+        assertThrows(UnknownPathException.class, () -> read(session -> session.createQuery(
+            "select obj.name from BaseObject obj, StringProperty prop where prop.id = obj.id and obj.id.name = 'a'",
+            String.class)));
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void unwrapLegacyOrdinalParametersQuery()
+    {
+        when(this.loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(false);
+
+        read(session -> {
+            Query<String> query =
+                session.createQuery("select prop.value from StringProperty prop where prop.id = ?", String.class);
+
+            // The implementation class is not implemented by the proxy handling the legacy parameters
+            assertInstanceOf(SqmQueryImpl.class, query.unwrap(SqmQueryImpl.class));
+            // An interface of the query is still unwrapped to the proxy
+            assertSame(query, query.unwrap(Query.class));
+            // The positions keep being converted
+            assertEquals(List.of("value"), query.unwrap(Query.class).setParameter(0, 1L).list());
+
+            return null;
+        });
     }
 }

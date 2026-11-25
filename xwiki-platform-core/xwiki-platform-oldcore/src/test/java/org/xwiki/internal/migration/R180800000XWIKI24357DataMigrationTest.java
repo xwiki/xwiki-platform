@@ -124,7 +124,7 @@ class R180800000XWIKI24357DataMigrationTest
         when(countQuery.execute()).thenReturn(List.of(2L));
 
         Query batchQuery = mock(Query.class);
-        when(queryManager.createQuery("select id.id, id.name, value from PasswordProperty where length(value) > 0 "
+        when(queryManager.createQuery("select id, name, value from PasswordProperty where length(value) > 0 "
             + "order by id", Query.HQL)).thenReturn(batchQuery);
         when(batchQuery.setLimit(100)).thenReturn(batchQuery);
         when(batchQuery.setOffset(anyInt())).thenReturn(batchQuery);

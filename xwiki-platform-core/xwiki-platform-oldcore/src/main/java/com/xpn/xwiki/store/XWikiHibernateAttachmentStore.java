@@ -102,7 +102,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     AttachmentVersioningStore store = resolveAttachmentVersioningStore(attachment, context);
 
                     if (exist) {
-                        session.merge(content);
+                        session.update(content);
                     } else {
                         session.persist(content);
                     }

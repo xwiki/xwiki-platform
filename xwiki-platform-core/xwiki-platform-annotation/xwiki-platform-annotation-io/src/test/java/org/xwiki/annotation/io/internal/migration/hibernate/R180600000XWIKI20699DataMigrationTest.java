@@ -77,8 +77,8 @@ class R180600000XWIKI20699DataMigrationTest
     private static final String SELECT_QUERY = "SELECT distinct doc.fullName "
         + "FROM XWikiDocument doc, BaseObject as obj, StringProperty as prop "
         + "where doc.fullName = obj.name and obj.className = 'XWiki.XWikiComments' "
-        + "and obj.id = prop.id.id "
-        + "and prop.id.name = 'target' "
+        + "and obj.id = prop.id "
+        + "and prop.name = 'target' "
         + "and length(prop.value) > 0";
 
     @InjectMockComponents(role = HibernateDataMigration.class)

@@ -22,10 +22,10 @@ package org.xwiki.store.hibernate.internal.mixin;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import jakarta.persistence.TemporalType;
@@ -33,6 +33,7 @@ import jakarta.persistence.TemporalType;
 import org.hibernate.FlushMode;
 import org.hibernate.LockMode;
 import org.hibernate.query.Query;
+import org.hibernate.query.QueryParameter;
 import org.hibernate.query.SelectionQuery;
 import org.hibernate.type.Type;
 import org.xwiki.store.hibernate.internal.legacy.LegacyQueries;
@@ -61,6 +62,21 @@ public interface QueryMixin<R> extends Query<R>
     default Query<R> setParameter(String name, Object value, Type type)
     {
         LegacyQueries.setParameter(this, name, value, type);
+
+        return this;
+    }
+
+    /**
+     * @param parameter the parameter
+     * @param value the parameter value
+     * @param type the Hibernate type of the parameter
+     * @return this query
+     * @deprecated use {@link #setParameter(QueryParameter, Object, jakarta.persistence.metamodel.Type)} instead
+     */
+    @Deprecated
+    default Query<R> setParameter(QueryParameter parameter, Object value, Type type)
+    {
+        LegacyQueries.setParameter(this, parameter, value, type);
 
         return this;
     }
@@ -105,7 +121,7 @@ public interface QueryMixin<R> extends Query<R>
     @Deprecated
     default Query<R> setParameterList(String name, Object[] values, Type type)
     {
-        LegacyQueries.setParameterList(this, name, List.of(values), type);
+        LegacyQueries.setParameterList(this, name, Arrays.asList(values), type);
 
         return this;
     }

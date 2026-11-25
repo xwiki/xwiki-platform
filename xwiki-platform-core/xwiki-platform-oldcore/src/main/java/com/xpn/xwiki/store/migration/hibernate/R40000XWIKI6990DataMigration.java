@@ -226,9 +226,6 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         /** Name for the id column. */
         public static final String ID = "id";
 
-        /** Name for the subid column. */
-        public static final String IDID = "id.id";
-
         /** Name for the docid column. */
         public static final String DOCID = "docId";
 
@@ -836,7 +833,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
 
                     for (String propertyClass : classToProcess) {
-                        times[this.timer++] += executeIdUpdate(propertyClass, IDID);
+                        times[this.timer++] += executeIdUpdate(propertyClass, ID);
                     }
 
                     times[this.timer++] += executeIdUpdate(BaseObject.class, ID);

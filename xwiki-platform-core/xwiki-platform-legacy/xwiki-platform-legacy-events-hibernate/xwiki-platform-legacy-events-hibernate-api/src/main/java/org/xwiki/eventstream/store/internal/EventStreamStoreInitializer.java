@@ -74,8 +74,7 @@ public class EventStreamStoreInitializer implements EventListener
     {
         // This only adds the mappings to a queue. The mappings will be available after the session factory is created.
         // We need to use a different mapping for Oracle
-        String driverClass =
-            HibernateConnectionSetting.DRIVER.get(this.sessionFactory.getConfiguration()::getProperty);
+        String driverClass = HibernateConnectionSetting.DRIVER.getValue(this.sessionFactory.getConfiguration());
         if (StringUtils.containsIgnoreCase(driverClass, "oracle")) {
             addResource("eventstream.oracle.hbm.xml");
         } else {

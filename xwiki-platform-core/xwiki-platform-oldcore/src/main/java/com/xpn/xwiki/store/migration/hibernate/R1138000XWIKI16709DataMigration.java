@@ -146,7 +146,7 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         // i.e. those that does not have an email_checked property yet.
         Query<String> query = session.createQuery("select obj.name from BaseObject obj"
             + " where obj.className = 'XWiki.XWikiUsers'"
-            + " and obj.id not in (select prop.id.id from IntegerProperty prop where prop.id.name='email_checked')",
+            + " and obj.id not in (select prop.id from IntegerProperty prop where prop.name='email_checked')",
             String.class);
 
         return query.list();

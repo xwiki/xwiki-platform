@@ -124,27 +124,27 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
             Properties dbcpProperties = new Properties();
 
             // DriverClass & url
-            String jdbcDriverClass = HibernateConnectionSetting.DRIVER.get(props::get);
+            String jdbcDriverClass = HibernateConnectionSetting.DRIVER.getValue(props);
             // Some drivers register themselves automatically using the Service Loader mechanism and thus we don't need
             // to set the Hibernate "driverClassName" property.
             if (jdbcDriverClass != null) {
                 dbcpProperties.put("driverClassName", jdbcDriverClass);
             }
 
-            String jdbcUrl = HibernateConnectionSetting.URL.get(System::getProperty);
+            String jdbcUrl = HibernateConnectionSetting.URL.getValue(System.getProperties());
             if (jdbcUrl == null) {
-                jdbcUrl = HibernateConnectionSetting.URL.get(props::get);
+                jdbcUrl = HibernateConnectionSetting.URL.getValue(props);
             }
             dbcpProperties.put("url", jdbcUrl);
 
             // Username / password. Only put username and password if they're not null. This allows
             // external authentication support (OS authenticated). It'll thus work if the hibernate
             // config does not specify a username and/or password.
-            String username = HibernateConnectionSetting.USER.get(props::get);
+            String username = HibernateConnectionSetting.USER.getValue(props);
             if (username != null) {
                 dbcpProperties.put("username", username);
             }
-            String password = HibernateConnectionSetting.PASSWORD.get(props::get);
+            String password = HibernateConnectionSetting.PASSWORD.getValue(props);
             if (password != null) {
                 dbcpProperties.put("password", password);
             }

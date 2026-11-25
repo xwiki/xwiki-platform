@@ -111,7 +111,7 @@ public class TagNotificationFilter implements NotificationFilter
                     "SELECT DISTINCT doc.fullName FROM XWikiDocument doc, BaseObject obj, "
                             + "DBStringListProperty tags JOIN tags.list AS item "
                             + "WHERE obj.name = doc.fullName AND obj.className = 'XWiki.TagClass' "
-                            + "AND obj.id = tags.id.id AND tags.id.name = 'tags' AND lower(item) IN (:tagList)",
+                            + "AND obj.id = tags.id AND tags.name = 'tags' AND lower(item) IN (:tagList)",
                     Query.HQL);
             query.bindValue("tagList", enabledTags);
             query.setWiki(currentWiki);

@@ -19,11 +19,14 @@
  */
 package org.xwiki.store.hibernate.internal.mixin;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.hibernate.LockMode;
 import org.hibernate.query.NativeQuery;
+import org.hibernate.query.QueryParameter;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.type.Type;
 import org.xwiki.store.hibernate.internal.legacy.LegacyQueries;
 import org.xwiki.store.hibernate.internal.patcher.Mixin;
@@ -109,7 +112,7 @@ public interface NativeQueryMixin<T> extends NativeQuery<T>
     @Deprecated
     default NativeQuery<T> setParameterList(String name, Object[] values, Type type)
     {
-        LegacyQueries.setParameterList(this, name, List.of(values), type);
+        LegacyQueries.setParameterList(this, name, Arrays.asList(values), type);
 
         return this;
     }
@@ -123,5 +126,36 @@ public interface NativeQueryMixin<T> extends NativeQuery<T>
     default NativeQuery<T> setFlushMode(FlushMode flushMode)
     {
         return setHibernateFlushMode(flushMode);
+    }
+
+    /**
+     * @param parameter the parameter
+     * @param value the parameter value
+     * @param type the Hibernate type of the parameter
+     * @return this query
+     * @deprecated use {@link #setParameter(QueryParameter, Object, jakarta.persistence.metamodel.Type)} instead
+     */
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    default NativeQuery<T> setParameter(QueryParameter parameter, Object value, Type type)
+    {
+        LegacyQueries.setParameter(this, parameter, value, type);
+
+        return this;
+    }
+
+    /**
+     * @param alias the alias
+     * @param lockMode the lock mode
+     * @return this query
+     * @deprecated use {@link #setHibernateLockMode(LockMode)} instead
+     */
+    @Deprecated
+    default NativeQuery<T> setLockMode(String alias, LockMode lockMode)
+    {
+        // Call the method of SelectionQuery (a different method at the JVM level since its return type is different)
+        ((SelectionQuery<T>) this).setLockMode(alias, lockMode);
+
+        return this;
     }
 }

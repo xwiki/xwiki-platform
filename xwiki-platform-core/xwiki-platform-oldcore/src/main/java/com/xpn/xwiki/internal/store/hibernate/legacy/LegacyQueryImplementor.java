@@ -134,7 +134,13 @@ public final class LegacyQueryImplementor<R> implements InvocationHandler
             throw e.getCause();
         }
 
-        // Keep the fluent API going through the proxy
-        return result == this.delegate ? proxy : result;
+        // Keep the fluent API going through the proxy, except when the caller asks for an implementation class the
+        // proxy is not (unwrap)
+        if (result == this.delegate
+            && (!method.getName().equals("unwrap") || ((Class<?>) actualArgs[0]).isInstance(proxy))) {
+            return proxy;
+        }
+
+        return result;
     }
 }

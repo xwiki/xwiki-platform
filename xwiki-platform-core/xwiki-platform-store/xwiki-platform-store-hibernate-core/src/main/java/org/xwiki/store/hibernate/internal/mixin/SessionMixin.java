@@ -65,8 +65,12 @@ public interface SessionMixin extends Session
     }
 
     /**
+     * Make the passed detached instance persistent, without loading its current state from the database: the whole
+     * entity is written to the database at flush time.
+     *
      * @param object a detached instance containing updated state
-     * @deprecated use {@link #merge(Object)} instead
+     * @deprecated use {@link #merge(Object)} instead, which returns a managed copy of the passed instance and loads
+     *             the current state of the entity before updating it
      */
     @Deprecated
     default void update(Object object)
@@ -75,9 +79,13 @@ public interface SessionMixin extends Session
     }
 
     /**
+     * Make the passed detached instance persistent, without loading its current state from the database: the whole
+     * entity is written to the database at flush time.
+     *
      * @param entityName the entity name
      * @param object a detached instance containing updated state
-     * @deprecated use {@link #merge(String, Object)} instead
+     * @deprecated use {@link #merge(String, Object)} instead, which returns a managed copy of the passed instance and
+     *             loads the current state of the entity before updating it
      */
     @Deprecated
     default void update(String entityName, Object object)
@@ -124,7 +132,7 @@ public interface SessionMixin extends Session
     @Deprecated
     default void delete(String entityName, Object object)
     {
-        remove(object);
+        LegacySessionOperations.delete(this, entityName, object);
     }
 
     /**
@@ -230,7 +238,7 @@ public interface SessionMixin extends Session
     @Deprecated
     default <T> T load(Class<T> entityType, Serializable id, LockMode lockMode)
     {
-        return find(entityType, id, lockMode);
+        return LegacySessionOperations.checkLoaded(find(entityType, id, lockMode), entityType.getName(), id);
     }
 
     /**
@@ -244,7 +252,8 @@ public interface SessionMixin extends Session
     @Deprecated
     default <T> T load(Class<T> entityType, Serializable id, LockOptions lockOptions)
     {
-        return get(entityType, (Object) id, lockOptions);
+        return LegacySessionOperations.checkLoaded(get(entityType, (Object) id, lockOptions), entityType.getName(),
+            id);
     }
 
     /**
@@ -269,7 +278,7 @@ public interface SessionMixin extends Session
     @Deprecated
     default Object load(String entityName, Serializable id, LockMode lockMode)
     {
-        return find(entityName, id, lockMode);
+        return LegacySessionOperations.checkLoaded(find(entityName, id, lockMode), entityName, id);
     }
 
     /**
@@ -282,7 +291,7 @@ public interface SessionMixin extends Session
     @Deprecated
     default Object load(String entityName, Serializable id, LockOptions lockOptions)
     {
-        return get(entityName, (Object) id, lockOptions);
+        return LegacySessionOperations.checkLoaded(get(entityName, (Object) id, lockOptions), entityName, id);
     }
 
     /**
@@ -304,7 +313,7 @@ public interface SessionMixin extends Session
     @Deprecated
     default void refresh(String entityName, Object object)
     {
-        refresh(object);
+        LegacySessionOperations.refresh(this, entityName, object, null);
     }
 
     /**
@@ -327,7 +336,7 @@ public interface SessionMixin extends Session
     @Deprecated
     default void refresh(String entityName, Object object, LockOptions lockOptions)
     {
-        refresh(object, lockOptions);
+        LegacySessionOperations.refresh(this, entityName, object, lockOptions);
     }
 
     /**
@@ -339,7 +348,7 @@ public interface SessionMixin extends Session
     @Deprecated
     default void lock(String entityName, Object object, LockMode lockMode)
     {
-        lock(object, lockMode);
+        LegacySessionOperations.lock(this, entityName, object, lockMode);
     }
 
     /**

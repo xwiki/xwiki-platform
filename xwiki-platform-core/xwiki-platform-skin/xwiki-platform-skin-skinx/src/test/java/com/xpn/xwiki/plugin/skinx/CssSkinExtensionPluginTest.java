@@ -173,7 +173,7 @@ class CssSkinExtensionPluginTest
             CssSkinExtensionPlugin.class.getCanonicalName());
 
         String alwaysUsedExtensionsQuery = String.format(", BaseObject as obj, StringProperty as use "
-            + "where obj.className='%s' and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' "
+            + "where obj.className='%s' and obj.name=doc.fullName and use.id=obj.id and use.name='use' "
             + "and use.value='always'", CssSkinExtensionPlugin.SSX_CLASS_NAME);
         XWikiStoreInterface mockStore = this.mockitoOldcore.getMockStore();
 

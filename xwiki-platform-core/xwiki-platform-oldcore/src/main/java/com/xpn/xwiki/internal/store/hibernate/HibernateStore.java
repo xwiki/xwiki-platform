@@ -64,12 +64,14 @@ import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.MappingSettings;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.enhanced.LegacyNamingStrategy;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.KeyValue;
@@ -135,6 +137,15 @@ public class HibernateStore implements Disposable, Initializable
      * invisible, and the document cache then keeps that "does not exist" verdict with no expiry.
      */
     private static final String DEFAULT_ISOLATION = String.valueOf(Connection.TRANSACTION_READ_COMMITTED);
+
+    /**
+     * The strategy used to name the sequences of the {@code native} identifier generators when the Hibernate
+     * configuration doesn't set one. With the {@code legacy} strategy, all these generators share the
+     * {@code hibernate_sequence} sequence with an increment of 1, which is what existing databases contain. With the
+     * default {@code standard} strategy, each table would get its own {@code <table>_SEQ} sequence (incremented by
+     * 50), which would be created empty on an existing database and generate identifiers already in use.
+     */
+    private static final String DEFAULT_ID_NAMING_STRATEGY = LegacyNamingStrategy.STRATEGY_NAME;
 
     @Inject
     private Logger logger;
@@ -246,8 +257,9 @@ public class HibernateStore implements Disposable, Initializable
 
         // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
         this.configuration = new HibernateStoreConfiguration(this.configurationURL);
-        replaceVariables(this.configuration);
+        replaceVariables(this.configuration.getProperties());
         setDefaultIsolation(this.configuration);
+        setDefaultIdentifierNamingStrategy(this.configuration.getProperties());
     }
 
     private void disposeSessionFactory()
@@ -276,9 +288,11 @@ public class HibernateStore implements Disposable, Initializable
         ConfigLoader configLoader = new ConfigLoader(this.bootstrapServiceRegistry);
         LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
         // Resolve some variables
-        replaceVariables(baseConfiguration);
+        replaceVariables(baseConfiguration.getConfigurationValues());
         // Make sure a transaction isolation level is set, whatever the database defaults to
         setDefaultIsolation(baseConfiguration);
+        // Keep using the sequence that existing databases contain
+        setDefaultIdentifierNamingStrategy(baseConfiguration.getConfigurationValues());
 
         StandardServiceRegistryBuilder standardRegistryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
@@ -329,33 +343,15 @@ public class HibernateStore implements Disposable, Initializable
 
     /**
      * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
-     * from the XWiki configuration.
+     * now the only variables being replaced are {@link #PROPERTY_PERMANENTDIRECTORY}, replaced with the value coming
+     * from the XWiki configuration, and {@link #PROPERTY_TIMEZONE_VARIABLE}, in the JDBC URL.
      *
-     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
+     * @param settings the Hibernate settings to modify
      */
-    private void replaceVariables(Configuration hibernateConfiguration)
+    private void replaceVariables(Map<? super String, Object> settings)
     {
-        HibernateConnectionSetting.URL.transform(hibernateConfiguration::getProperty, (name, newURL) -> {
-            hibernateConfiguration.setProperty(name, newURL);
-            this.logger.debug("Resolved Hibernate property [{}] to [{}]", name, newURL);
-        }, this::resolveURL);
-    }
-
-    /**
-     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
-     * from the XWiki configuration.
-     *
-     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
-     */
-    private void replaceVariables(LoadedConfig hibernateConfiguration)
-    {
-        Map<String, Object> values = hibernateConfiguration.getConfigurationValues();
-        HibernateConnectionSetting.URL.transform(values::get, (name, newURL) -> {
-            values.put(name, newURL);
-            this.logger.debug("Resolved Hibernate property [{}] to [{}]", name, newURL);
-        }, this::resolveURL);
+        HibernateConnectionSetting.URL.replaceValues(settings, this::resolveURL)
+            .forEach((name, newURL) -> this.logger.debug("Resolved Hibernate property [{}] to [{}]", name, newURL));
     }
 
     /**
@@ -385,6 +381,20 @@ public class HibernateStore implements Disposable, Initializable
             values.put(org.hibernate.cfg.AvailableSettings.ISOLATION, DEFAULT_ISOLATION);
             this.logger.debug("No Hibernate transaction isolation level configured, defaulting to [{}]",
                 DEFAULT_ISOLATION);
+        }
+    }
+
+    /**
+     * Set the strategy used to name the sequences of the identifier generators to {@link #DEFAULT_ID_NAMING_STRATEGY}
+     * unless the configuration already contains one.
+     *
+     * @param settings the Hibernate settings to complete
+     */
+    private void setDefaultIdentifierNamingStrategy(Map<? super String, Object> settings)
+    {
+        Object strategy = settings.get(MappingSettings.ID_DB_STRUCTURE_NAMING_STRATEGY);
+        if (strategy == null || StringUtils.isBlank(strategy.toString())) {
+            settings.put(MappingSettings.ID_DB_STRUCTURE_NAMING_STRATEGY, DEFAULT_ID_NAMING_STRATEGY);
         }
     }
 
@@ -451,7 +461,7 @@ public class HibernateStore implements Disposable, Initializable
             } else {
                 // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
                 // driver
-                String connectionURL = HibernateConnectionSetting.URL.get(this.configuration::getProperty);
+                String connectionURL = HibernateConnectionSetting.URL.getValue(this.configuration);
                 this.databaseProductCache = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
             }
         }

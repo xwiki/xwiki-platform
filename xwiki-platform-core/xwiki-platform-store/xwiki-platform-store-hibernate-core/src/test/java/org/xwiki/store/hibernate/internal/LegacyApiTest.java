@@ -23,17 +23,23 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.FlushMode;
 import org.hibernate.LockMode;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.SQLQuery;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
@@ -43,6 +49,10 @@ import org.hibernate.mapping.Value;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.query.QueryProducer;
+import org.hibernate.type.BasicTypeReference;
+import org.hibernate.type.LongType;
+import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.type.StringType;
 import org.hibernate.type.Type;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -54,10 +64,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -313,6 +327,186 @@ class LegacyApiTest
             MethodHandle getIdentifier = LOOKUP.findVirtual(Session.class, "getIdentifier",
                 MethodType.methodType(Serializable.class, Object.class));
             assertEquals(1L, (Serializable) getIdentifier.invoke(session, (Object) entity));
+        }
+    }
+
+    @Test
+    void hibernate5TypeConstants() throws Throwable
+    {
+        inTransaction(session -> session.save(new LegacyEntity(1, "one")));
+
+        // Same field access as code compiled against Hibernate 5
+        Type stringType = (Type) LOOKUP.findStaticGetter(StandardBasicTypes.class, "STRING", StringType.class).invoke();
+        Type longType = (Type) LOOKUP.findStaticGetter(StandardBasicTypes.class, "LONG", LongType.class).invoke();
+        assertSame(StringType.INSTANCE, stringType);
+        // The Java compiler still sees the Hibernate 7 constants
+        assertInstanceOf(BasicTypeReference.class, StandardBasicTypes.STRING);
+
+        try (Session session = sessionFactory.openSession()) {
+            Query<String> query = session.createQuery(
+                "select name from " + LegacyEntity.class.getName() + " where name = :name", String.class);
+            assertEquals(List.of("one"), query.setParameter("name", "one", stringType).list());
+
+            NativeQuery<?> nativeQuery = session.createNativeQuery("select LE_ID as id from legacyentity");
+            nativeQuery.addScalar("id", longType);
+            assertEquals(List.of(1L), nativeQuery.list());
+        }
+    }
+
+    @Test
+    void setParameterListWithNullElement()
+    {
+        inTransaction(session -> session.save(new LegacyEntity(1, "one")));
+
+        try (Session session = sessionFactory.openSession()) {
+            Query<String> query = session.createQuery(
+                "select name from " + LegacyEntity.class.getName() + " where name in (:names)", String.class);
+            query.setParameterList("names", new Object[] { "one", null }, StringType.INSTANCE);
+
+            assertEquals(List.of("one"), query.list());
+        }
+    }
+
+    @Test
+    void hibernate5SQLQueryMethods() throws Throwable
+    {
+        inTransaction(session -> session.save(new LegacyEntity(1, "one")));
+
+        try (Session session = sessionFactory.openSession()) {
+            SQLQuery query = session.createSQLQuery("select LE_NAME from legacyentity where LE_ID = :id");
+
+            // Same call as code compiled against Hibernate 5 using a SQLQuery variable
+            MethodHandle setParameter = LOOKUP.findVirtual(SQLQuery.class, "setParameter",
+                MethodType.methodType(NativeQuery.class, String.class, Object.class));
+            MethodHandle setCacheable = LOOKUP.findVirtual(SQLQuery.class, "setCacheable",
+                MethodType.methodType(NativeQuery.class, boolean.class));
+            assertSame(query, setParameter.invoke(query, "id", (Object) 1L));
+            assertSame(query, setCacheable.invoke(query, false));
+
+            assertEquals(List.of("one"), query.list());
+        }
+    }
+
+    @Test
+    void hibernate5QueryMethods() throws Throwable
+    {
+        inTransaction(session -> {
+            session.save(new LegacyEntity(1, "one"));
+            session.save(new LegacyEntity(2, "two"));
+        });
+
+        try (Session session = sessionFactory.openSession()) {
+            org.hibernate.Query<String> query = session.createQuery(
+                "select name from " + LegacyEntity.class.getName() + " where id in (:ids) order by id", String.class);
+
+            assertSame(query, query.setHint("org.hibernate.readOnly", true));
+            assertSame(query, query.setParameterList("ids", List.of(1L, 2L)));
+            assertEquals(List.of("ids"), List.of(query.getNamedParameters()));
+            assertSame(query, query.setHibernateMaxResults(1));
+            assertEquals(1, query.getHibernateMaxResults());
+
+            Iterator<String> iterator = query.iterate();
+            assertEquals("one", iterator.next());
+            assertFalse(iterator.hasNext());
+
+            // javax.persistence based variant, only visible to code compiled against Hibernate 5
+            MethodHandle setFlushMode = LOOKUP.findVirtual(org.hibernate.Query.class, "setFlushMode",
+                MethodType.methodType(org.hibernate.Query.class, javax.persistence.FlushModeType.class));
+            assertSame(query, setFlushMode.invoke(query, javax.persistence.FlushModeType.COMMIT));
+            assertEquals(jakarta.persistence.FlushModeType.COMMIT, ((Query<String>) query).getFlushMode());
+        }
+    }
+
+    @Test
+    void hibernate5ScrollableResults() throws Throwable
+    {
+        inTransaction(session -> session.save(new LegacyEntity(1, "one")));
+
+        try (Session session = sessionFactory.openSession();
+            ScrollableResults<String> results =
+                session.createQuery("select name from " + LegacyEntity.class.getName(), String.class).scroll()) {
+            assertTrue(results.next());
+
+            // Hibernate 5 always returned the row as an array
+            MethodHandle get =
+                LOOKUP.findVirtual(ScrollableResults.class, "get", MethodType.methodType(Object[].class));
+            MethodHandle getString = LOOKUP.findVirtual(ScrollableResults.class, "getString",
+                MethodType.methodType(String.class, int.class));
+            assertArrayEquals(new Object[] { "one" }, (Object[]) get.invoke(results));
+            assertEquals("one", (String) getString.invoke(results, 0));
+        }
+    }
+
+    @Test
+    void hibernate5StatelessSession() throws Throwable
+    {
+        try (StatelessSession session = sessionFactory.openStatelessSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            MethodHandle insert = LOOKUP.findVirtual(StatelessSession.class, "insert",
+                MethodType.methodType(Serializable.class, Object.class));
+            MethodHandle get = LOOKUP.findVirtual(StatelessSession.class, "get",
+                MethodType.methodType(Object.class, Class.class, Serializable.class));
+            assertEquals(1L, (Serializable) insert.invoke(session, (Object) new LegacyEntity(1, "one")));
+            assertEquals("one", ((LegacyEntity) get.invoke(session, LegacyEntity.class, (Serializable) 1L)).getName());
+
+            transaction.commit();
+        }
+    }
+
+    @Test
+    void javaxTransactionSynchronization() throws Throwable
+    {
+        List<Integer> statuses = new ArrayList<>();
+        javax.transaction.Synchronization synchronization = new javax.transaction.Synchronization()
+        {
+            @Override
+            public void beforeCompletion()
+            {
+                statuses.add(-1);
+            }
+
+            @Override
+            public void afterCompletion(int status)
+            {
+                statuses.add(status);
+            }
+        };
+
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            MethodHandle registerSynchronization = LOOKUP.findVirtual(Transaction.class, "registerSynchronization",
+                MethodType.methodType(void.class, javax.transaction.Synchronization.class));
+            registerSynchronization.invoke(transaction, synchronization);
+            transaction.commit();
+        }
+
+        assertEquals(List.of(-1, jakarta.transaction.Status.STATUS_COMMITTED), statuses);
+    }
+
+    @Test
+    void loadWithLockModeOfMissingEntity()
+    {
+        try (Session session = sessionFactory.openSession()) {
+            assertThrows(ObjectNotFoundException.class,
+                () -> session.load(LegacyEntity.class, (Serializable) 42L, LockMode.READ));
+        }
+    }
+
+    @Test
+    void deleteDynamicMapEntity()
+    {
+        Map<String, Object> entity = new HashMap<>();
+        entity.put("id", 1L);
+        entity.put("name", "one");
+        inTransaction(session -> session.save("LegacyMap", entity));
+
+        // A map built by the caller, which can only be identified from the passed entity name
+        Map<String, Object> detached = new HashMap<>(entity);
+        inTransaction(session -> session.delete("LegacyMap", detached));
+
+        try (Session session = sessionFactory.openSession()) {
+            assertNull(session.find("LegacyMap", 1L));
         }
     }
 }

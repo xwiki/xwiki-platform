@@ -118,7 +118,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      * Query to retrieve all groups with a given member.
      */
     private static final String ALL_GROUPS_WITH_MEMBER_QUERY = ", BaseObject as obj, StringProperty as prop "
-        + "where doc.fullName=obj.name and obj.className=?1 and obj.id=prop.id.id "
+        + "where doc.fullName=obj.name and obj.className=?1 and obj.id=prop.id "
         + "and prop.name=?2 and prop.value like ?3";
 
     private static final String NAME = "groupservice";
@@ -482,7 +482,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                         fieldPrefix = "field" + fieldIndex;
                         from.append(", ").append(type).append(" as ").append(fieldPrefix);
 
-                        where.append(" and obj.id=").append(fieldPrefix).append(".id.id");
+                        where.append(" and obj.id=").append(fieldPrefix).append(".id");
                         parameterValues.add(fieldName);
                         where.append(" and ").append(fieldPrefix).append(".name=?")
                             .append(parameterValues.size());
@@ -501,8 +501,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     // filtering on the first name or the last name of the user.
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
                     from.append(", StringProperty firstName, StringProperty lastName");
-                    where.append("and obj.id = firstName.id.id and firstName.id.name = 'first_name' ")
-                        .append("and obj.id = lastName.id.id and lastName.id.name = 'last_name' ")
+                    where.append("and obj.id = firstName.id and firstName.name = 'first_name' ")
+                        .append("and obj.id = lastName.id and lastName.name = 'last_name' ")
                         .append(String.format("and (lower(doc.name) like ?%s or lower(firstName.value) like ?%s or "
                             + "lower(lastName.value) like ?%s)",
                             parameterValues.size(), parameterValues.size(), parameterValues.size()));
@@ -542,7 +542,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                         fieldPrefix = "field" + fieldIndex;
                         from.append(", ").append(type).append(" as ").append(fieldPrefix);
 
-                        where.append(" and obj.id=").append(fieldPrefix).append(".id.id");
+                        where.append(" and obj.id=").append(fieldPrefix).append(".id");
 
                         parameterValues.add(fieldName);
                         where.append(" and ").append(fieldPrefix).append(".name=?")
@@ -693,7 +693,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         // Add where clause. Select all group members.
         queryString.append(" WHERE obj.name = :groupdocname and obj.className = :groupclassname")
-            .append(" and obj.id = field.id.id and field.id.name = 'member'");
+            .append(" and obj.id = field.id and field.name = 'member'");
         parameterValues.put("groupdocname", groupFullName);
         parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);
 
@@ -703,8 +703,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             String matchedUsers = "select userDoc.fullName " + "from XWikiDocument userDoc, BaseObject as userObj,"
                 + " StringProperty as userFirstName, StringProperty as userLastName "
                 + "where userDoc.fullName = userObj.name and userObj.className = 'XWiki.XWikiUsers'"
-                + " and userObj.id = userFirstName.id.id and userFirstName.id.name = 'first_name'"
-                + " and userObj.id = userLastName.id.id and userLastName.id.name = 'last_name'"
+                + " and userObj.id = userFirstName.id and userFirstName.name = 'first_name'"
+                + " and userObj.id = userLastName.id and userLastName.name = 'last_name'"
                 + " and (lower(userDoc.name) like :matchfield or"
                 + " concat(concat(lower(userFirstName.value), ' '), lower(userLastName.value)) like :matchfield)";
             // Match groups from the same wiki.

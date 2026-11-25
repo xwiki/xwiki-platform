@@ -20,10 +20,16 @@
 package com.xpn.xwiki.internal.store.hibernate.legacy;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.ParameterLabelException;
@@ -34,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.logging.LoggerConfiguration;
 
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * Retro compatibility layer for features removed in Hibernate:
@@ -58,10 +65,29 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
 
     private static final Pattern LEGACY_MATCHER = Pattern.compile("\\?($|[^\\d])");
 
-    private static final Pattern LEGACY_PROPERTY_ID_MATCHER = Pattern.compile("\\b(\\w+)\\.id\\.(id|name)\\b");
+    private static final Pattern LEGACY_PROPERTY_ID_MATCHER = Pattern.compile("\\bid\\.(id|name)\\b");
+
+    /**
+     * A string literal or an identifier (possibly qualified), the only parts of a statement the conversion of the
+     * legacy property identifier paths needs to distinguish.
+     */
+    private static final Pattern TOKEN_MATCHER = Pattern.compile("'(?:[^']|'')*'|[\\w$]+(?:\\.[\\w$]+)*");
+
+    /**
+     * The keywords which can follow an entity name in a from clause, when the entity has no alias.
+     */
+    private static final String AS = "as";
+
+    private static final Set<String> NOT_ALIASES = Set.of(AS, "where", "join", "inner", "left", "right", "full",
+        "cross", "outer", "fetch", "order", "group", "having", "union", "intersect", "except", "on", "with", "set",
+        "limit", "offset");
 
     private static final Pattern LEGACY_PROPERTY_ID_ERROR =
         Pattern.compile("Could not interpret attribute '(id|name)' of basic-valued path '[^']*\\.id'");
+
+    private static final String ID = "id";
+
+    private static final String NAME = "name";
 
     private static final int CONVERSIONS_CACHE_SIZE = 1000;
 
@@ -137,9 +163,54 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
         return LEGACY_PROPERTY_ID_MATCHER.matcher(statement).find();
     }
 
+    /**
+     * Replace the legacy paths to the identifier of the properties ({@code prop.id.id} and {@code prop.id.name}, or
+     * {@code id.id} and {@code id.name} when the property entity has no alias) by the valid ones ({@code prop.id} and
+     * {@code prop.name}). Only the paths starting with an alias declared on a property entity are converted, and
+     * string literals are left untouched.
+     *
+     * @param queryString the statement to convert
+     * @return the converted statement, or {@code null} if it does not contain any legacy property identifier path
+     */
     private String replaceLegacyPropertyIdentifier(String queryString)
     {
-        String convertedQueryString = LEGACY_PROPERTY_ID_MATCHER.matcher(queryString).replaceAll("$1.$2");
+        Set<String> propertyEntityNames = getPropertyEntityNames();
+
+        // Find the aliases declared on property entities
+        Set<String> aliases = new HashSet<>();
+        boolean unaliasedProperty = false;
+        List<MatchResult> tokens = TOKEN_MATCHER.matcher(queryString).results().toList();
+        for (int i = 0; i < tokens.size(); ++i) {
+            if (propertyEntityNames.contains(tokens.get(i).group())) {
+                String alias = i + 1 < tokens.size() ? getAlias(tokens, i + 1) : null;
+                if (alias != null) {
+                    aliases.add(alias);
+                } else {
+                    unaliasedProperty = true;
+                }
+            }
+        }
+
+        // Convert the paths starting with one of these aliases
+        StringBuilder builder = new StringBuilder(queryString.length());
+        int index = 0;
+        boolean converted = false;
+        for (MatchResult token : tokens) {
+            String convertedToken = convertPropertyIdentifierPath(token.group(), aliases, unaliasedProperty);
+            if (convertedToken != null) {
+                builder.append(queryString, index, token.start());
+                builder.append(convertedToken);
+                index = token.end();
+                converted = true;
+            }
+        }
+
+        if (!converted) {
+            return null;
+        }
+
+        builder.append(queryString, index, queryString.length());
+        String convertedQueryString = builder.toString();
 
         if (this.loggerConfiguration.isDeprecatedLogEnabled()) {
             LOGGER.warn("Deprecated usage of the HQL paths [prop.id.id] and [prop.id.name] to the identifier of the"
@@ -148,6 +219,51 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
         }
 
         return convertedQueryString;
+    }
+
+    private static String getAlias(List<MatchResult> tokens, int index)
+    {
+        String alias = tokens.get(index).group();
+        if (AS.equalsIgnoreCase(alias) && index + 1 < tokens.size()) {
+            alias = tokens.get(index + 1).group();
+        }
+
+        // The token following the entity name is the alias only if it's an identifier, and not a keyword, which is
+        // only a good enough approximation since the tokens are not necessarily contiguous
+        return alias.startsWith("'") || alias.contains(".") || NOT_ALIASES.contains(alias.toLowerCase(Locale.ROOT))
+            ? null : alias;
+    }
+
+    private static String convertPropertyIdentifierPath(String token, Set<String> aliases, boolean unaliasedProperty)
+    {
+        String[] elements = StringUtils.split(token, '.');
+
+        if (elements.length == 3 && aliases.contains(elements[0]) && isLegacyPropertyIdentifierPath(elements, 1)) {
+            return elements[0] + '.' + elements[2];
+        } else if (elements.length == 2 && unaliasedProperty && isLegacyPropertyIdentifierPath(elements, 0)) {
+            return elements[1];
+        }
+
+        return null;
+    }
+
+    private static boolean isLegacyPropertyIdentifierPath(String[] elements, int index)
+    {
+        return ID.equals(elements[index]) && (ID.equals(elements[index + 1]) || NAME.equals(elements[index + 1]));
+    }
+
+    private Set<String> getPropertyEntityNames()
+    {
+        Set<String> names = new HashSet<>();
+        getFactory().getMappingMetamodel().forEachEntityDescriptor(entity -> {
+            if (BaseProperty.class.isAssignableFrom(entity.getMappedClass())) {
+                String entityName = entity.getEntityName();
+                names.add(entityName);
+                names.add(StringUtils.substringAfterLast(entityName, '.'));
+            }
+        });
+
+        return names;
     }
 
     private Conversion checkStatement(String statement)
@@ -190,14 +306,25 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
                 convertedStatement = replaceLegacyQueryParameters(convertedStatement);
                 ordinalParameters = true;
             } catch (UnknownPathException e) {
-                if (propertyIdentifier || !isLegacyPropertyIdentifierError(e)) {
+                if (propertyIdentifier) {
                     throw e;
                 }
 
-                convertedStatement = replaceLegacyPropertyIdentifier(convertedStatement);
+                convertedStatement = replaceLegacyPropertyIdentifier(convertedStatement, e);
                 propertyIdentifier = true;
             }
         }
+    }
+
+    private String replaceLegacyPropertyIdentifier(String statement, UnknownPathException e)
+    {
+        String convertedStatement =
+            isLegacyPropertyIdentifierError(e) ? replaceLegacyPropertyIdentifier(statement) : null;
+        if (convertedStatement == null) {
+            throw e;
+        }
+
+        return convertedStatement;
     }
 
     private static boolean isLegacyOrdinalParametersError(ParameterLabelException e)

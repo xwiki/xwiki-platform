@@ -21,10 +21,13 @@ package org.xwiki.store.hibernate.internal.legacy;
 
 import java.util.Collection;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.model.domain.BasicDomainType;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
+import org.hibernate.query.QueryParameter;
 import org.hibernate.type.Type;
+import org.hibernate.type.spi.TypeConfiguration;
 
 /**
  * Implementation of the Hibernate 5 query APIs which are restored in the patched Hibernate and accept Hibernate
@@ -40,10 +43,20 @@ public final class LegacyQueries
     }
 
     @SuppressWarnings("unchecked")
-    private static jakarta.persistence.metamodel.Type<Object> toJPAType(Type type)
+    private static jakarta.persistence.metamodel.Type<Object> toJPAType(Query<?> query, Type type)
     {
-        return type instanceof jakarta.persistence.metamodel.Type ? (jakarta.persistence.metamodel.Type<Object>) type
-            : null;
+        Type resolvedType = type;
+        if (type instanceof LegacyBasicType<?> legacyType) {
+            resolvedType = legacyType.resolve(getTypeConfiguration(query));
+        }
+
+        return resolvedType instanceof jakarta.persistence.metamodel.Type
+            ? (jakarta.persistence.metamodel.Type<Object>) resolvedType : null;
+    }
+
+    private static TypeConfiguration getTypeConfiguration(Query<?> query)
+    {
+        return query.getSession().getFactory().unwrap(SessionFactoryImplementor.class).getTypeConfiguration();
     }
 
     /**
@@ -54,11 +67,27 @@ public final class LegacyQueries
      */
     public static void setParameter(Query<?> query, String name, Object value, Type type)
     {
-        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(type);
+        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(query, type);
         if (jpaType != null) {
             query.setParameter(name, value, jpaType);
         } else {
             query.setParameter(name, value);
+        }
+    }
+
+    /**
+     * @param query the query
+     * @param parameter the parameter
+     * @param value the parameter value
+     * @param type the Hibernate type of the parameter
+     */
+    public static void setParameter(Query<?> query, QueryParameter<Object> parameter, Object value, Type type)
+    {
+        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(query, type);
+        if (jpaType != null) {
+            query.setParameter(parameter, value, jpaType);
+        } else {
+            query.setParameter(parameter, value);
         }
     }
 
@@ -70,7 +99,7 @@ public final class LegacyQueries
      */
     public static void setParameter(Query<?> query, int position, Object value, Type type)
     {
-        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(type);
+        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(query, type);
         if (jpaType != null) {
             query.setParameter(position, value, jpaType);
         } else {
@@ -87,11 +116,28 @@ public final class LegacyQueries
     @SuppressWarnings("unchecked")
     public static void setParameterList(Query<?> query, String name, Collection<?> values, Type type)
     {
-        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(type);
+        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(query, type);
         if (jpaType != null) {
             query.setParameterList(name, (Collection<Object>) values, jpaType);
         } else {
             query.setParameterList(name, values);
+        }
+    }
+
+    /**
+     * @param query the query
+     * @param position the parameter position
+     * @param values the parameter values
+     * @param type the Hibernate type of the values
+     */
+    @SuppressWarnings("unchecked")
+    public static void setParameterList(Query<?> query, int position, Collection<?> values, Type type)
+    {
+        jakarta.persistence.metamodel.Type<Object> jpaType = toJPAType(query, type);
+        if (jpaType != null) {
+            query.setParameterList(position, (Collection<Object>) values, jpaType);
+        } else {
+            query.setParameterList(position, values);
         }
     }
 
@@ -103,7 +149,9 @@ public final class LegacyQueries
     @SuppressWarnings("rawtypes")
     public static void addScalar(NativeQuery<?> query, String columnAlias, Type type)
     {
-        if (type instanceof BasicDomainType basicType) {
+        if (type instanceof LegacyBasicType<?> legacyType) {
+            query.addScalar(columnAlias, legacyType.getReference());
+        } else if (type instanceof BasicDomainType basicType) {
             query.addScalar(columnAlias, basicType);
         } else {
             query.addScalar(columnAlias);

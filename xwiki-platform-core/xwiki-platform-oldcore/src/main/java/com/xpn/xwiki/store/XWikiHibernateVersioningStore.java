@@ -185,12 +185,12 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             archivedoc.getDeletedNodeInfo().clear();
 
             for (XWikiRCSNodeInfo ni : archivedoc.getUpdatedNodeInfos()) {
-                session.merge(ni);
+                session.saveOrUpdate(ni);
             }
             archivedoc.getUpdatedNodeInfos().clear();
 
             for (XWikiRCSNodeContent nc : archivedoc.getUpdatedNodeContents()) {
-                session.merge(nc);
+                session.update(nc);
             }
             archivedoc.getUpdatedNodeContents().clear();
 

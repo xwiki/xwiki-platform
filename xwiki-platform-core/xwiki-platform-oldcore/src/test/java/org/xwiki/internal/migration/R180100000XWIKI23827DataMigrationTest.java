@@ -181,7 +181,7 @@ class R180100000XWIKI23827DataMigrationTest
 
         String objectIdsQuery = "select distinct obj.id "
             + "from BaseObject as obj, StringProperty as prop "
-            + "where obj.className = :className and prop.id.id = obj.id and prop.id.name in (:propNames) "
+            + "where obj.className = :className and prop.id = obj.id and prop.name in (:propNames) "
             + "order by obj.id";
         Query classObjectIdQuery = mock(Query.class);
         OngoingStubbing<Query> queryOngoingStubbing =
@@ -222,7 +222,7 @@ class R180100000XWIKI23827DataMigrationTest
         when(wiki.getHibernateStore()).thenReturn(hibernateStore);
 
         String selectProperties = "select prop from StringProperty as prop "
-            + "where prop.id.name in :propNames and prop.id.id in :objectIds";
+            + "where prop.name in :propNames and prop.id in :objectIds";
 
         // XWiki.XWikiUser: 108 objects with a single property
         // 2 loops, 1 for 100 objects, another one for 8 objects

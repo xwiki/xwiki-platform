@@ -68,8 +68,8 @@ public class ExhaustiveCheckTagsSelector extends AbstractTagsSelector
             + "from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop join prop.list item "
             + "where obj.name=doc.fullName "
             + "and obj.className='XWiki.TagClass' "
-            + "and obj.id=prop.id.id "
-            + "and prop.id.name='tags' "
+            + "and obj.id=prop.id "
+            + "and prop.name='tags' "
             + "order by item";
 
         try {
@@ -135,7 +135,7 @@ public class ExhaustiveCheckTagsSelector extends AbstractTagsSelector
             "select distinct doc.fullName as fullName, elements(prop.list) from XWikiDocument as doc, "
                 + "BaseObject as tagobject, DBStringListProperty as prop";
         String where = " where tagobject.name=doc.fullName and tagobject.className='XWiki.TagClass' and "
-            + "tagobject.id=prop.id.id and prop.id.name='tags' and doc.translation=0";
+            + "tagobject.id=prop.id and prop.name='tags' and doc.translation=0";
 
         // If at least one of the fragments is passed, the query should be matching XWiki documents
         if (!StringUtils.isBlank(fromHql) || !StringUtils.isBlank(whereHql)) {

@@ -20,6 +20,7 @@
 package org.xwiki.store.hibernate.internal.mixin;
 
 import org.hibernate.Transaction;
+import org.xwiki.store.hibernate.internal.legacy.JavaxSynchronization;
 import org.xwiki.store.hibernate.internal.patcher.BinaryOnly;
 import org.xwiki.store.hibernate.internal.patcher.Mixin;
 
@@ -42,5 +43,16 @@ public interface TransactionMixin extends Transaction
         Integer timeout = getTimeout();
 
         return timeout != null ? timeout : -1;
+    }
+
+    /**
+     * Hibernate 5 {@code registerSynchronization} took a {@code javax.transaction} synchronization.
+     *
+     * @param synchronization the synchronization callback to register
+     */
+    @BinaryOnly("registerSynchronization")
+    default void registerJavaxSynchronization(javax.transaction.Synchronization synchronization)
+    {
+        registerSynchronization(new JavaxSynchronization(synchronization));
     }
 }

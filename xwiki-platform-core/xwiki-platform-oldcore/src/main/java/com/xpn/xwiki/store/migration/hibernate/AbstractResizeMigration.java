@@ -42,6 +42,7 @@ import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Selectable;
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Value;
 import org.hibernate.query.NativeQuery;
@@ -216,8 +217,11 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 updateColumn(column, databaseMetaData, dynamicTables, rowFormats, builder, session);
             }
         } else if (value != null) {
-            for (Column column : value.getColumns()) {
-                updateColumn(column, databaseMetaData, dynamicTables, rowFormats, builder, session);
+            // Value#getColumns() fails when the value involves formulas
+            for (Selectable selectable : value.getSelectables()) {
+                if (selectable instanceof Column column) {
+                    updateColumn(column, databaseMetaData, dynamicTables, rowFormats, builder, session);
+                }
             }
         }
     }

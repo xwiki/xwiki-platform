@@ -46,7 +46,7 @@
 ## Hide inactive user profiles if requested.
 #if ($request.hideDisabledProfiles == 'true')
   #set ($extraFromClause = "$!extraFromClause, IntegerProperty as activeProperty")
-  #set ($isActive = "obj.id = activeProperty.id.id and activeProperty.id.name = 'active' and " +
+  #set ($isActive = "obj.id = activeProperty.id and activeProperty.name = 'active' and " +
     'activeProperty.value = 1')
   #set ($extraWhereClause = "$!extraWhereClause and $isActive")
 #end

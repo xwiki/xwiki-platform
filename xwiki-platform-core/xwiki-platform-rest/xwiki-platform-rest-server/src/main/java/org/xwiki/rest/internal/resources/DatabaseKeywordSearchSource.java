@@ -501,14 +501,14 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
                 f.format(addColumn);
                 f.format(" from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, "
                     + "LargeStringProperty as lsp where doc.space = :space and obj.name=doc.fullName "
-                    + "and sp.id.id = obj.id and lsp.id.id = obj.id "
+                    + "and sp.id = obj.id and lsp.id = obj.id "
                     + "and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             } else {
                 f.format("select distinct doc.fullName, doc.space, doc.name, obj.className, obj.number");
                 f.format(addColumn);
                 f.format(" from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, "
-                    + "LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id "
-                    + "and lsp.id.id = obj.id and (upper(sp.value) like :keywords "
+                    + "LargeStringProperty as lsp where obj.name=doc.fullName and sp.id = obj.id "
+                    + "and lsp.id = obj.id and (upper(sp.value) like :keywords "
                     + "or upper(lsp.value) like :keywords) ");
             }
 

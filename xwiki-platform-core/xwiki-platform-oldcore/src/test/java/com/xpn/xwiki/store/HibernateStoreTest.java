@@ -137,4 +137,12 @@ class HibernateStoreTest
 
         assertEquals("ASE_PAGE", this.store.getConfiguredColumnName(new Column("ase_page")));
     }
+
+    @Test
+    void initializeUsesTheLegacySequenceNamingStrategyByDefault()
+    {
+        // Existing databases contain a single hibernate_sequence sequence, incremented by 1
+        assertEquals("legacy",
+            this.store.getConfiguration().getProperty("hibernate.id.db_structure_naming_strategy"));
+    }
 }

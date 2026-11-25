@@ -22,9 +22,11 @@ package org.hibernate;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +35,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.persistence.TypedQuery;
 
 import org.hibernate.query.ParameterMetadata;
+import org.hibernate.query.QueryParameter;
 import org.hibernate.type.Type;
 import org.xwiki.store.hibernate.internal.legacy.LegacyQueries;
 
@@ -219,7 +222,7 @@ public interface Query<R> extends TypedQuery<R>
      */
     default Query<R> setParameterList(String name, Object[] values, Type type)
     {
-        LegacyQueries.setParameterList(hibernateQuery(), name, List.of(values), type);
+        LegacyQueries.setParameterList(hibernateQuery(), name, Arrays.asList(values), type);
 
         return this;
     }
@@ -406,6 +409,164 @@ public interface Query<R> extends TypedQuery<R>
         hibernateQuery().addQueryHint(hint);
 
         return this;
+    }
+
+    @Override
+    default Query<R> setHint(String hintName, Object value)
+    {
+        hibernateQuery().setHint(hintName, value);
+
+        return this;
+    }
+
+    /**
+     * @param <P> the type of the parameter
+     * @param parameter the parameter
+     * @param value the parameter value
+     * @return this query
+     */
+    default <P> Query<R> setParameter(QueryParameter<P> parameter, P value)
+    {
+        hibernateQuery().setParameter(parameter, value);
+
+        return this;
+    }
+
+    /**
+     * @param <P> the type of the parameter
+     * @param parameter the parameter
+     * @param value the parameter value
+     * @param type the Hibernate type of the parameter
+     * @return this query
+     */
+    @SuppressWarnings("unchecked")
+    default <P> Query<R> setParameter(QueryParameter<P> parameter, P value, Type type)
+    {
+        LegacyQueries.setParameter(hibernateQuery(), (QueryParameter<Object>) parameter, value, type);
+
+        return this;
+    }
+
+    /**
+     * @param <P> the type of the parameter
+     * @param parameter the parameter
+     * @param values the parameter values
+     * @return this query
+     */
+    default <P> Query<R> setParameterList(QueryParameter<P> parameter, Collection<? extends P> values)
+    {
+        hibernateQuery().setParameterList(parameter, values);
+
+        return this;
+    }
+
+    /**
+     * @param position the parameter position
+     * @param values the parameter values
+     * @return this query
+     */
+    @SuppressWarnings("rawtypes")
+    default Query<R> setParameterList(int position, Collection values)
+    {
+        hibernateQuery().setParameterList(position, values);
+
+        return this;
+    }
+
+    /**
+     * @param position the parameter position
+     * @param values the parameter values
+     * @param type the Hibernate type of the values
+     * @return this query
+     */
+    @SuppressWarnings("rawtypes")
+    default Query<R> setParameterList(int position, Collection values, Type type)
+    {
+        LegacyQueries.setParameterList(hibernateQuery(), position, values, type);
+
+        return this;
+    }
+
+    /**
+     * @param position the parameter position
+     * @param values the parameter values
+     * @return this query
+     */
+    default Query<R> setParameterList(int position, Object[] values)
+    {
+        hibernateQuery().setParameterList(position, values);
+
+        return this;
+    }
+
+    /**
+     * @param position the parameter position
+     * @param values the parameter values
+     * @param type the Hibernate type of the values
+     * @return this query
+     */
+    default Query<R> setParameterList(int position, Object[] values, Type type)
+    {
+        LegacyQueries.setParameterList(hibernateQuery(), position, values == null ? null : Arrays.asList(values),
+            type);
+
+        return this;
+    }
+
+    /**
+     * Unlike in Hibernate 5, the results are loaded at once (and not one by one from their identifiers).
+     *
+     * @return an iterator over the results
+     */
+    default Iterator<R> iterate()
+    {
+        return list().iterator();
+    }
+
+    /**
+     * @param firstResult the position of the first result to retrieve
+     * @return this query
+     */
+    default Query<R> setHibernateFirstResult(int firstResult)
+    {
+        return setFirstResult(Math.max(firstResult, 0));
+    }
+
+    /**
+     * @return the position of the first result to retrieve, or {@code null} if not set
+     */
+    default Integer getHibernateFirstResult()
+    {
+        int firstResult = getFirstResult();
+
+        return firstResult > 0 ? firstResult : null;
+    }
+
+    /**
+     * @param maxResults the maximum number of results to retrieve, a negative value meaning no limit
+     * @return this query
+     */
+    default Query<R> setHibernateMaxResults(int maxResults)
+    {
+        return setMaxResults(maxResults < 0 ? Integer.MAX_VALUE : maxResults);
+    }
+
+    /**
+     * @return the maximum number of results to retrieve, or {@code null} if there is no limit
+     */
+    default Integer getHibernateMaxResults()
+    {
+        int maxResults = getMaxResults();
+
+        return maxResults != Integer.MAX_VALUE ? maxResults : null;
+    }
+
+    /**
+     * @return the names of the named parameters of the query
+     */
+    default String[] getNamedParameters()
+    {
+        return hibernateQuery().getParameterMetadata().getNamedParameterNames().toArray(new String[0]);
     }
 
     /**

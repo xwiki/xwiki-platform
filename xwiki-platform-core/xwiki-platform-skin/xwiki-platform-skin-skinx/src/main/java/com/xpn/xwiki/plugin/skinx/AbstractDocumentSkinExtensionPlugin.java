@@ -213,7 +213,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             Set<DocumentReference> extensions = new HashSet<>();
             String query =
                 ", BaseObject as obj, StringProperty as use where obj.className='" + getExtensionClassName() + "'"
-                    + " and obj.name=doc.fullName and use.id.id=obj.id and use.id.name='use' and use.value='always'";
+                    + " and obj.name=doc.fullName and use.id=obj.id and use.name='use' and use.value='always'";
             try {
                 for (DocumentReference extension : context.getWiki().getStore()
                     .searchDocumentReferences(query, context)) {

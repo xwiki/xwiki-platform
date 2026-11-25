@@ -53,6 +53,40 @@ function readClientId(handlerDecoder: decoding.Decoder) {
 }
 
 /**
+ * The browser may keep the page in its back/forward cache (bfcache) instead of destroying it when the user navigates
+ * away. The page is then frozen with its WebSocket connection still open, so the server keeps the room, and its
+ * history, as long as the page stays in the cache: the next session for the same document (e.g. after the document was
+ * saved from another editor) would join this room instead of loading the saved document. So we disconnect when the page
+ * is stored in the cache. We reload the page when it is restored from the cache, instead of joining back, because the
+ * provider doesn't send to the server the changes it misses when (re)connecting.
+ *
+ * @param websocketProvider - the websocket provider to disconnect
+ */
+function leaveWhenStoredInBackForwardCache(
+  websocketProvider: WebsocketProvider,
+) {
+  const onPageHide = (event: PageTransitionEvent) => {
+    // When the page is not persisted it is destroyed, which closes the WebSocket connection.
+    if (event.persisted) {
+      websocketProvider.disconnect();
+    }
+  };
+  const onPageShow = (event: PageTransitionEvent) => {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  };
+  window.addEventListener("pagehide", onPageHide);
+  window.addEventListener("pageshow", onPageShow);
+  const destroy = websocketProvider.destroy.bind(websocketProvider);
+  websocketProvider.destroy = () => {
+    window.removeEventListener("pagehide", onPageHide);
+    window.removeEventListener("pageshow", onPageShow);
+    destroy();
+  };
+}
+
+/**
  * Initialize a websocket provider for a XWiki yjs endpoint.
  *
  * @param url - the url of the websocket endpoint
@@ -79,6 +113,7 @@ export function createXWikiWebSocketProvider(
       params: { room, locale },
     },
   );
+  leaveWhenStoredInBackForwardCache(websocketProvider);
 
   websocketProvider.messageHandlers[4] = (
     encoder,

@@ -966,7 +966,6 @@
         <artifactId>zookeeper-jute</artifactId>
         <version>${zookeeper.version}</version>
       </dependency>
-      <!-- ZooKeeper 3.10.0 depends on dnsjava 3.5.1, which is affected by CVE-2024-25638 -->
       <dependency>
         <groupId>dnsjava</groupId>
         <artifactId>dnsjava</artifactId>

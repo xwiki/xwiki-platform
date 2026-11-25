@@ -59,7 +59,9 @@ public class RealtimeWYSIWYGEditPage extends RealtimeEditPage
      *
      * @param leaveAction the action that makes the browser leave this edit page
      * @return the edit page, loaded again
-     * @since 19.0.0RC1
+     * @since 18.10.0
+     * @since 18.4.9
+     * @since 17.10.16
      */
     public RealtimeWYSIWYGEditPage leaveAndGoBack(Runnable leaveAction)
     {

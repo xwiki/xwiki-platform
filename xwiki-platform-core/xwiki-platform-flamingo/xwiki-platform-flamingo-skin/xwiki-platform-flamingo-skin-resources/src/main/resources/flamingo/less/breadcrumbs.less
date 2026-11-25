@@ -16,7 +16,8 @@
     vertical-align: top;
     /* Leave room for the taller targets inside the items, which hide their overflow. */
     padding-block: ~"var(--breadcrumb-target-overflow)";
-    margin-block: ~"calc(-1 * var(--breadcrumb-target-overflow))";
+    /* Half of that room goes over the breadcrumb padding, the other half makes the items taller than the text line. */
+    margin-block: ~"calc(-0.5 * var(--breadcrumb-target-overflow))";
 
     &.open {
       overflow: inherit;

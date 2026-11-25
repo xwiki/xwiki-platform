@@ -172,7 +172,6 @@ catalog:
   postcss: 8.5.32
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  prosemirror-state: 1.4.4
   publint: 0.3.25
   qunit: 3.0.0
   react: 19.3.1

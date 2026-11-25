@@ -228,9 +228,6 @@ catalogs:
     postcss-simple-vars:
       specifier: 7.0.1
       version: 7.0.1
-    prosemirror-state:
-      specifier: 1.4.4
-      version: 1.4.4
     publint:
       specifier: 0.3.25
       version: 0.3.25
@@ -4263,9 +4260,6 @@ importers:
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
-      prosemirror-state:
-        specifier: 'catalog:'
-        version: 1.4.4
       react:
         specifier: 'catalog:'
         version: 19.3.1

@@ -44,3 +44,11 @@
   max-height: 32px;
   max-width: 48px;
 }
+/* Give the version link the minimum target size without enlarging its text. */
+#_attachments .version > a {
+  display: inline-block;
+  min-width: var(--target-size-minimum);
+  min-height: var(--target-size-minimum);
+  line-height: var(--target-size-minimum);
+  text-align: center;
+}

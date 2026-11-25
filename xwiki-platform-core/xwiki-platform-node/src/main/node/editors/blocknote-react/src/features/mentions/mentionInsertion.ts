@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { TextSelection } from "prosemirror-state";
 import type { EditorType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
 import type { MentionFactory } from "../../services/mentions";
@@ -51,10 +52,16 @@ function insertMention(
   const mention = factory.createMention(user);
   // A mention is followed by a space, so that the user can keep typing after it. In XWiki syntax it is also what
   // keeps a mention alone in a paragraph from being saved as a block macro, a rendering macro never being inline-only.
-  const content = isFollowedByWhitespace(editor)
-    ? [mention]
-    : [mention, " " as const];
+  const spaceIsThere = isFollowedByWhitespace(editor);
+  const content = spaceIsThere ? [mention] : [mention, " " as const];
   editor.insertInlineContent(content, { updateSelection: true });
+  if (spaceIsThere) {
+    // The caret is left right after the mention, so step over the whitespace that stands for the inserted space.
+    // Typing would otherwise stick to the mention, on the wrong side of that whitespace.
+    editor.transact((tr) =>
+      tr.setSelection(TextSelection.create(tr.doc, tr.selection.to + 1)),
+    );
+  }
 }
 
 export { insertMention };

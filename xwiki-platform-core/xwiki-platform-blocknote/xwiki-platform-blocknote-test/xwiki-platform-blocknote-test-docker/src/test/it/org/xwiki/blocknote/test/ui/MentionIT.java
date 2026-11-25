@@ -158,6 +158,26 @@ class MentionIT extends AbstractBlockNoteIT
 
     @Test
     @Order(5)
+    void mentionBeforeAnExistingSpace(TestUtils setup, TestReference testReference)
+    {
+        BlockNoteInplaceEditPage page = editFreshPage(setup, testReference);
+        BlockNoteRichTextArea textArea = page.getContentEditor().getRichTextArea().click();
+        // Put the caret before a space the sentence already has, which is the case the mention doesn't add one in.
+        textArea.sendKeys(TEXT_BEFORE + " ");
+        textArea.sendKeys(Keys.ARROW_LEFT);
+        submitMention(page, openMentionMenu(textArea), GLOBAL_USER);
+
+        textArea.sendKeys(TEXT_AFTER);
+        page.save();
+
+        // The same content as keepTypingAfterMention(): the mention took the space that was already there instead of
+        // adding a second one, and it left the caret behind that space.
+        assertThat(page.editWiki().getContent(),
+            matchesPattern(TEXT_BEFORE + mentionPattern("XWiki\\.John", "XWiki-John") + " " + TEXT_AFTER));
+    }
+
+    @Test
+    @Order(6)
     void keepLoneMentionInline(TestUtils setup, TestReference testReference)
     {
         BlockNoteInplaceEditPage page = editFreshPage(setup, testReference);
@@ -176,7 +196,7 @@ class MentionIT extends AbstractBlockNoteIT
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void insertMentionFromSlashMenu(TestUtils setup, TestReference testReference)
     {
         BlockNoteInplaceEditPage page = editFreshPage(setup, testReference);
@@ -242,6 +262,14 @@ class MentionIT extends AbstractBlockNoteIT
         if (!textBefore.isEmpty()) {
             textArea.sendKeys(textBefore);
         }
+        return openMentionMenu(textArea);
+    }
+
+    /**
+     * Type the mention trigger followed by the query at the caret, and wait for the mention menu to open.
+     */
+    private SlashMenu openMentionMenu(BlockNoteRichTextArea textArea)
+    {
         // The trigger character has to be sent on its own. Typed together with the text before it, the browser
         // delivers the whole string as a single text input, which doesn't match the mention menu's trigger.
         textArea.sendKeys("@");

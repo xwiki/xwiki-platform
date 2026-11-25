@@ -34,6 +34,7 @@ import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
 import { BlockNoteEditor } from "@blocknote/core";
 import { userSuggesterProviderName } from "@xwiki/platform-user-suggest-api";
 import { Container } from "inversify";
+import { TextSelection } from "prosemirror-state";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 import type { InlineContentType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
@@ -201,14 +202,10 @@ describe("shouldOpenMentionMenu", () => {
 
 /**
  * @param insertInlineContent - what records the content inserted at the selection
- * @param textAfter - the text the selection is followed by, in its block
- * @returns an editor instance whose only abilities are to record the inserted inline content and to tell what the
- *   selection is followed by
+ * @returns an editor instance whose only abilities are to record the inserted inline content and to tell that the
+ *   selection is at the end of its block
  */
-function instanceInsertingInto(
-  insertInlineContent: () => void,
-  textAfter = "",
-) {
+function instanceInsertingInto(insertInlineContent: () => void) {
   return {
     editor: {
       insertInlineContent,
@@ -216,9 +213,8 @@ function instanceInsertingInto(
         selection: {
           $to: {
             parent: {
-              textBetween: (from: number, to: number) =>
-                textAfter.slice(from, to),
-              content: { size: textAfter.length },
+              textBetween: () => "",
+              content: { size: 0 },
             },
             parentOffset: 0,
           },
@@ -248,29 +244,53 @@ describe("toSuggestions", () => {
 });
 
 describe("insertMention", () => {
-  const factory: MentionFactory = { createMention: () => mention };
+  // Plain text rather than a macro call, which the schema of this editor doesn't hold: the feature inserts whatever
+  // the factory builds.
+  const textMention = {
+    type: "text",
+    text: "@Admin",
+    styles: {},
+  } as unknown as InlineContentType;
+  const factory: MentionFactory = { createMention: () => textMention };
+
+  /**
+   * The first character of the paragraph below, the document holding a block group and a block container around it.
+   */
+  const TEXT_START = 3;
+
+  /**
+   * @param caret - the document position the mention is inserted at
+   * @returns the text of the edited paragraph, and the text the caret is left after
+   */
+  function insertInto(caret: number) {
+    const textEditor = BlockNoteEditor.create({
+      schema: createBlockNoteSchema(),
+      initialContent: [{ type: "paragraph", content: "a b c" }],
+    }) as AnyEditor;
+    textEditor.transact((tr) =>
+      tr.setSelection(TextSelection.create(tr.doc, caret)),
+    );
+
+    insertMention({ editor: textEditor } as EditorInstance, factory, user);
+
+    const { doc, selection } = textEditor.prosemirrorState;
+    return {
+      text: doc.textContent,
+      beforeCaret: doc.textBetween(0, selection.to),
+    };
+  }
 
   test("inserts the mention built for the user, followed by a space", () => {
-    const insertInlineContent = vi.fn();
-
-    insertMention(instanceInsertingInto(insertInlineContent), factory, user);
-
-    expect(insertInlineContent).toHaveBeenCalledWith([mention, " "], {
-      updateSelection: true,
+    expect(insertInto(TEXT_START + 5)).toEqual({
+      text: "a b c@Admin ",
+      beforeCaret: "a b c@Admin ",
     });
   });
 
-  test("doesn't add a space when the selection is already followed by one", () => {
-    const insertInlineContent = vi.fn();
-
-    insertMention(
-      instanceInsertingInto(insertInlineContent, " and you"),
-      factory,
-      user,
-    );
-
-    expect(insertInlineContent).toHaveBeenCalledWith([mention], {
-      updateSelection: true,
+  test("leaves the caret after the space the mention is already followed by", () => {
+    expect(insertInto(TEXT_START + 1)).toEqual({
+      text: "a@Admin b c",
+      beforeCaret: "a@Admin ",
     });
   });
 });

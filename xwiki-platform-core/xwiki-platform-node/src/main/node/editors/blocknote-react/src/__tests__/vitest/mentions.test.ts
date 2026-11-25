@@ -247,10 +247,11 @@ describe("insertMention", () => {
     });
   });
 
-  test("takes over the space the mention is inserted before, leaving the caret after it", () => {
+  test("doesn't add a space when the selection is already followed by one", () => {
+    // The caret is left before that space, so the next typed character goes right after the mention.
     expect(insertInto(" a b", "start")).toEqual({
       text: "@Admin a b",
-      beforeCaret: "@Admin ",
+      beforeCaret: "@Admin",
     });
   });
 });

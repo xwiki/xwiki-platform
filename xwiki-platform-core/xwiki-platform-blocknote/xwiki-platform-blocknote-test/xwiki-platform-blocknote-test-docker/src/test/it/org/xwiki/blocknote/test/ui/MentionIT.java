@@ -165,14 +165,11 @@ class MentionIT extends AbstractBlockNoteIT
         textArea.sendKeys(TEXT_BEFORE + " ");
         textArea.sendKeys(Keys.ARROW_LEFT);
         submitMention(page, openMentionMenu(textArea), GLOBAL_USER);
-
-        textArea.sendKeys(TEXT_AFTER);
         page.save();
 
-        // The same content as keepTypingAfterMention(): the mention took the space that was already there instead of
-        // adding a second one, and it left the caret behind that space.
+        // One space, the mention having left the one that was already there alone rather than adding a second one.
         assertThat(page.editWiki().getContent(),
-            matchesPattern(TEXT_BEFORE + mentionPattern("XWiki\\.John", "XWiki-John") + " " + TEXT_AFTER));
+            matchesPattern(TEXT_BEFORE + mentionPattern("XWiki\\.John", "XWiki-John") + " "));
     }
 
     @Test

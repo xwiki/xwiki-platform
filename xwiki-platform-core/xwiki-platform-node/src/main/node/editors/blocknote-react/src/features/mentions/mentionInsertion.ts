@@ -22,19 +22,16 @@ import type { MentionFactory } from "../../services/mentionFactory";
 import type { SuggestedUser } from "@xwiki/platform-user-suggest-api";
 
 /**
- * Only a plain space, so that a mention inserted before a tab or a non-breaking space doesn't replace it with one.
- *
  * @param editor - the editor holding the selection the mention is inserted at
- * @returns whether the selection is already followed by a space
+ * @returns whether the selection is already followed by a whitespace, which a mention then doesn't have to add
  */
-function isFollowedBySpace(editor: EditorType): boolean {
+function isFollowedByWhitespace(editor: EditorType): boolean {
   const { $to } = editor.prosemirrorState.selection;
-  return (
-    $to.parent.textBetween(
-      $to.parentOffset,
-      Math.min($to.parentOffset + 1, $to.parent.content.size),
-    ) === " "
+  const following = $to.parent.textBetween(
+    $to.parentOffset,
+    Math.min($to.parentOffset + 1, $to.parent.content.size),
   );
+  return /\s/.test(following);
 }
 
 /**
@@ -52,18 +49,10 @@ function insertMention(
   const mention = factory.createMention(user);
   // A mention is followed by a space, so that the user can keep typing after it. In XWiki syntax it is also what
   // keeps a mention alone in a paragraph from being saved as a block macro, a rendering macro never being inline-only.
-  const spaceFollows = isFollowedBySpace(editor);
-  editor.transact((tr) => {
-    editor.insertInlineContent([mention, " " as const], {
-      updateSelection: true,
-    });
-    if (spaceFollows) {
-      // The mention brought its own space, so drop the one that was already there. Keeping ours is what leaves the
-      // caret behind the space: skipping it instead would leave it between the mention and that space, where the
-      // next typed character would stick to the mention.
-      tr.delete(tr.selection.to, tr.selection.to + 1);
-    }
-  });
+  const content = isFollowedByWhitespace(editor)
+    ? [mention]
+    : [mention, " " as const];
+  editor.insertInlineContent(content, { updateSelection: true });
 }
 
 export { insertMention };

@@ -95,7 +95,7 @@
     <dependency>
       <groupId>com.deque.html.axe-core</groupId>
       <artifactId>selenium</artifactId>
-      <version>4.11.1</version>
+      <version>4.14.1</version>
       <exclusions>
         <!-- Not used by axe-core's code. Selenium Manager (bundled with Selenium) resolves the browser drivers. -->
         <exclusion>

@@ -205,5 +205,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- The user scope of a wiki, which uorgsuggest.vm applies in its "auto" mode -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-script</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

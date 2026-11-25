@@ -87,4 +87,29 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
         getDriver().waitUntilPageIsReloaded();
         return new ViewPage();
     }
+
+    /**
+     * Leaves this edit page using the given action (e.g. by clicking on a link) and then comes back to it using the
+     * browser's Back button. The browser may restore the edit page from its back/forward cache, in which case the edit
+     * page reloads itself, because the editing session it was part of is not valid anymore.
+     *
+     * @param leaveAction the action that makes the browser leave this edit page
+     * @return the edit page, loaded again
+     * @since 18.10.0
+     * @since 18.4.9
+     * @since 17.10.16
+     */
+    public RealtimeWYSIWYGEditPage leaveAndGoBack(Runnable leaveAction)
+    {
+        // The marker is part of the page state that the back/forward cache keeps, so it's gone only once the edit page
+        // has really been loaded again.
+        getDriver().addPageNotYetReloadedMarker();
+        leaveAction.run();
+        getDriver().waitUntilPageIsReloaded();
+
+        getDriver().navigate().back();
+        getDriver().waitUntilPageIsReloaded();
+
+        return new RealtimeWYSIWYGEditPage();
+    }
 }

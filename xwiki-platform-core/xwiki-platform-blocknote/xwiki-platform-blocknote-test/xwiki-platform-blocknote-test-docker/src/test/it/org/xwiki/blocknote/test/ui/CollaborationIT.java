@@ -50,6 +50,7 @@ import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ForceEditLockModal;
 import org.xwiki.test.ui.po.editor.ForceEditLockPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -727,6 +728,20 @@ class CollaborationIT extends AbstractBlockNoteIT
         HistoryPane historyPane = inplaceEditablePage.openHistoryDocExtraPane().showMinorEdits();
         assertEquals(3, historyPane.getNumberOfVersions());
         assertEquals("Summarize changes", historyPane.getCurrentVersionComment());
+
+        // Edit in-place again, then switch to the wiki editor while editing. The browser may keep the page, with its
+        // in-place editor, in its back/forward cache, in which case the editor must leave the realtime editing
+        // session, otherwise the next editing session would join it instead of loading the saved content.
+        inplaceEditablePage = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        WikiEditPage wikiEditPage = inplaceEditablePage.editWiki();
+        wikiEditPage.setContent("one\n\ntwo\n\nfour");
+        wikiEditPage.clickSaveAndView();
+
+        inplaceEditablePage.editInplace();
+        textArea = inplaceEditablePage.getContentEditor().getRichTextArea();
+        textArea.waitUntilTextContains("four");
+        assertEquals("one\ntwo\nfour", textArea.getText());
+        assertEquals("one\ntwo\nfour", inplaceEditablePage.done().getContent());
     }
 
     @Test

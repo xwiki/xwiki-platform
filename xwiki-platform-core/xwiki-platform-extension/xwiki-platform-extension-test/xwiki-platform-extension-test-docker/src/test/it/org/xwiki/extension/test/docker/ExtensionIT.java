@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.extension.DefaultExtensionAuthor;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.DefaultExtensionIssueManagement;
@@ -116,6 +117,8 @@ class ExtensionIT
 
     private static final String RESET_USER_PASSWORD = "resetpassword";
 
+    private static final String PLUGIN_EXTENSION_ID = "pluginjarextension";
+
     private static RepositoryTestUtils repositoryTestUtils;
 
     private static org.xwiki.extension.test.junit5.ExtensionTestUtils extensionTestUtils;
@@ -144,6 +147,7 @@ class ExtensionIT
         extensionTestUtils.uninstall("alice-xar-extension");
         extensionTestUtils.uninstall("bob-xar-extension");
         extensionTestUtils.uninstall("scriptServiceJarExtension");
+        extensionTestUtils.uninstall(PLUGIN_EXTENSION_ID, Namespace.ROOT, false);
 
         setup.rest().deletePage("ExtensionTest", "Alice");
         assertFalse(setup.pageExists("ExtensionTest", "Alice"));
@@ -155,6 +159,7 @@ class ExtensionIT
         repositoryTestUtils.deleteExtension("alice-xar-extension");
         repositoryTestUtils.deleteExtension("bob-xar-extension");
         repositoryTestUtils.deleteExtension("scriptServiceJarExtension");
+        repositoryTestUtils.deleteExtension(PLUGIN_EXTENSION_ID);
         repositoryTestUtils.deleteExtension("XWiki Commons - Diff API");
         repositoryTestUtils.deleteExtension("XWiki Platform - Display API");
 
@@ -1185,6 +1190,31 @@ class ExtensionIT
 
         // Don't leave the rights of the ExtensionTest space behind for the other tests.
         setup.rest().deletePage("ExtensionTest", "WebPreferences");
+    }
+
+    /**
+     * Make sure that a plugin provided by an extension installed on the farm is available without being listed in
+     * xwiki.cfg, and that it's not available anymore once the extension is uninstalled.
+     */
+    @Test
+    @Order(17)
+    void testInstallPlugin(TestUtils setup, TestReference testReference) throws Exception
+    {
+        ViewPage viewPage = setup.createPage(testReference, "{{velocity}}"
+            + "#set ($plugin = $xwiki.getPlugin('testplugin'))"
+            + "#if ($plugin)$plugin.greet('world')#{else}No plugin#end"
+            + "{{/velocity}}");
+        assertEquals("No plugin", viewPage.getContent());
+
+        ExtensionId extensionId = new ExtensionId(PLUGIN_EXTENSION_ID, "1.0");
+        repositoryTestUtils.addExtension(repositoryTestUtils.getTestExtension(extensionId, "jar"));
+        extensionTestUtils.install(extensionId, Namespace.ROOT);
+
+        assertEquals("Hello world from the plugin!", setup.gotoPage(testReference).getContent());
+
+        extensionTestUtils.uninstall(PLUGIN_EXTENSION_ID, Namespace.ROOT, false);
+
+        assertEquals("No plugin", setup.gotoPage(testReference).getContent());
     }
 
     private void assertHistoryRecord(String expectedJobType, ExtensionId expectedExtensionId,

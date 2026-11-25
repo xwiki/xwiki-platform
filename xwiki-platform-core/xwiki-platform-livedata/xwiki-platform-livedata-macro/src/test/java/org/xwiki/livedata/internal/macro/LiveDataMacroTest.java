@@ -47,6 +47,7 @@ import org.xwiki.livedata.LiveDataSelectionConfiguration;
 import org.xwiki.livedata.internal.DefaultLiveDataConfigurationResolver;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
+import org.xwiki.livedata.internal.LiveDataSourceContentTrust;
 import org.xwiki.livedata.internal.StringLiveDataConfigurationResolver;
 import org.xwiki.livedata.macro.LiveDataMacroParameters;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -81,6 +82,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
 
@@ -124,6 +126,10 @@ class LiveDataMacroTest
 
     @MockComponent
     private IconManager iconManager;
+
+    @MockComponent
+    @Named("users")
+    private LiveDataSourceContentTrust usersContentTrust;
 
     @MockComponent
     private ContextualLocalizationManager contextualLocalizationManager;
@@ -291,11 +297,11 @@ class LiveDataMacroTest
     @Test
     void executeWithoutParams() throws Exception
     {
-
+        // Without source, there's nothing to confirm that the displayed content can be trusted.
         String expected =
             String.format("""
                     <div class="liveData loading" data-config="%s">\
-                    <script type='application/json' data-config-content-trusted="true"></script>\
+                    <script type='application/json' data-config-content-trusted="false"></script>\
                     </div>""",
                 escapeXML(json(this.liveDataConfiguration)));
 
@@ -307,6 +313,7 @@ class LiveDataMacroTest
     @Test
     void execute() throws Exception
     {
+        when(this.usersContentTrust.isContentTrusted(any())).thenReturn(true);
         this.liveDataConfiguration.setId("test");
         LiveDataQuery query = this.liveDataConfiguration.getQuery();
         query.setProperties(List.of("avatar", "firstName", "lastName", "position"));
@@ -351,6 +358,45 @@ class LiveDataMacroTest
         parameters.setShowPageSizeDropdown(true);
         parameters.setPageSizes("15, 25, 50");
         parameters.setDescription("A description");
+
+        List<Block> blocks = this.liveDataMacro.execute(parameters, null, this.macroTransformationContext);
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWithoutContentInRestrictedContext() throws Exception
+    {
+        when(this.usersContentTrust.isContentTrusted(any())).thenReturn(true);
+        when(this.transformationContext.isRestricted()).thenReturn(true);
+        this.liveDataConfiguration.getQuery().setSource(new LiveDataQuery.Source("users"));
+
+        String expected = String.format("""
+                <div class="liveData loading" data-config="%s">\
+                <script type='application/json' data-config-content-trusted="false"></script>\
+                </div>""",
+            escapeXML(json(this.liveDataConfiguration)));
+
+        LiveDataMacroParameters parameters = new LiveDataMacroParameters();
+        parameters.setSource("users");
+
+        List<Block> blocks = this.liveDataMacro.execute(parameters, null, this.macroTransformationContext);
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWithoutContentAndUntrustedSource() throws Exception
+    {
+        when(this.usersContentTrust.isContentTrusted(any())).thenReturn(false);
+        this.liveDataConfiguration.getQuery().setSource(new LiveDataQuery.Source("users"));
+
+        String expected = String.format("""
+                <div class="liveData loading" data-config="%s">\
+                <script type='application/json' data-config-content-trusted="false"></script>\
+                </div>""",
+            escapeXML(json(this.liveDataConfiguration)));
+
+        LiveDataMacroParameters parameters = new LiveDataMacroParameters();
+        parameters.setSource("users");
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, null, this.macroTransformationContext);
         assertBlocks(expected, blocks, this.rendererFactory);

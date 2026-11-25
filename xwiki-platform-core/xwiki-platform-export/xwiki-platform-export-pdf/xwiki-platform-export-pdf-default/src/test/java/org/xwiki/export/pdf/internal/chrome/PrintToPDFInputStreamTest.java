@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import org.jodconverter.core.util.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -83,9 +82,10 @@ class PrintToPDFInputStreamTest
         String streamHandle = "test";
         setUpStream(streamHandle, content, bufferSize, useBase64Encoding);
 
-        PrintToPDFInputStream inputStream =
-            new PrintToPDFInputStream(this.io, streamHandle, this.closeCallback, bufferSize);
-        assertEquals(content, IOUtils.toString(inputStream, StandardCharsets.UTF_8));
+        try (PrintToPDFInputStream inputStream =
+            new PrintToPDFInputStream(this.io, streamHandle, this.closeCallback, bufferSize)) {
+            assertEquals(content, new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
+        }
 
         verify(this.closeCallback).run();
     }

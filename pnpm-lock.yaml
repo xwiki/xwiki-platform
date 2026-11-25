@@ -442,6 +442,12 @@ importers:
       '@xwiki/platform-rendering-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/rendering/rendering-api
+      '@xwiki/platform-user-suggest-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/user-suggest/user-suggest-api
+      '@xwiki/platform-user-suggest-xwiki':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/user-suggest/user-suggest-xwiki
       '@xwiki/platform-xwiki-model-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api
@@ -3873,6 +3879,98 @@ importers:
         specifier: 'catalog:'
         version: 6.0.1(@typescript/typescript6@6.0.2)(vitest@5.1.0(@types/node@26.6.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.32))(yaml@2.9.0)))
 
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/user-suggest/user-suggest-api:
+    dependencies:
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../../api
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.60.1(@types/node@26.6.6)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
+      inversify:
+        specifier: 'catalog:'
+        version: 8.2.4(reflect-metadata@0.2.2)
+      reflect-metadata:
+        specifier: 'catalog:'
+        version: 0.2.2
+      typescript:
+        specifier: 'catalog:'
+        version: '@typescript/typescript6@6.0.2'
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.4(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.32))(yaml@2.9.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.0(@types/node@26.6.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.32))(yaml@2.9.0))
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/user-suggest/user-suggest-xwiki:
+    dependencies:
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/platform-authentication-api':
+        specifier: workspace:*
+        version: link:../../authentication/authentication-api
+      '@xwiki/platform-user-suggest-api':
+        specifier: workspace:*
+        version: link:../user-suggest-api
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.60.1(@types/node@26.6.6)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
+      inversify:
+        specifier: 'catalog:'
+        version: 8.2.4(reflect-metadata@0.2.2)
+      reflect-metadata:
+        specifier: 'catalog:'
+        version: 0.2.2
+      typescript:
+        specifier: 'catalog:'
+        version: '@typescript/typescript6@6.0.2'
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.4(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.32))(yaml@2.9.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.0(@types/node@26.6.6)(jsdom@30.1.3)(vite@8.3.4(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.32))(yaml@2.9.0))
+
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api:
     devDependencies:
       '@microsoft/api-extractor':
@@ -4153,6 +4251,9 @@ importers:
       '@xwiki/platform-uniast-react-jsx':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-react-jsx
+      '@xwiki/platform-user-suggest-api':
+        specifier: workspace:*
+        version: link:../../core/user-suggest/user-suggest-api
       i18next:
         specifier: 'catalog:'
         version: 27.1.3(@typescript/typescript6@6.0.2)
@@ -9665,7 +9766,7 @@ snapshots:
     dependencies:
       ajv: 8.20.0
       ajv-draft-04: 1.0.0(ajv@8.20.0)
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.20.0)
       fs-extra: 11.3.3
       import-lazy: 4.0.0
       jju: 1.4.0
@@ -10404,8 +10505,8 @@ snapshots:
     optionalDependencies:
       ajv: 8.20.0
 
-  ajv-formats@3.0.1:
-    dependencies:
+  ajv-formats@3.0.1(ajv@8.20.0):
+    optionalDependencies:
       ajv: 8.20.0
 
   ajv@6.15.0:

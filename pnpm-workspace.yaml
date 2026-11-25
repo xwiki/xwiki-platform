@@ -70,6 +70,8 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-react-jsx
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/user-suggest/user-suggest-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/user-suggest/user-suggest-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils
   - xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config

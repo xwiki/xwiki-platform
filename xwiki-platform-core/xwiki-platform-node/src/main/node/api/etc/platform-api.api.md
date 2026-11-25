@@ -445,6 +445,7 @@ export { Storage_2 as Storage }
 export interface WikiConfig {
     authenticationBaseURL?: string;
     authenticationManager?: string;
+    basePageURL?: string;
     // (undocumented)
     baseRestURL: string;
     // (undocumented)

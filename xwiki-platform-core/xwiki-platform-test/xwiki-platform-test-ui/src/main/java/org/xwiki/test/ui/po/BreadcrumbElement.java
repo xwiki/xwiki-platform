@@ -43,7 +43,7 @@ public class BreadcrumbElement extends BaseElement
 
     /**
      * @return the element that holds the breadcrumb items, e.g. to take a screenshot of the breadcrumb
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public WebElement getContainer()
     {

@@ -19,11 +19,18 @@
  */
 
 .breadcrumb {
+  /* How much the targets overflow the text line of the breadcrumb, above and below. */
+  --breadcrumb-target-overflow: max(0px, calc((var(--target-size-minimum) - 1lh) / 2));
+
   > li {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: top;
+    /* Leave room for the taller targets inside the items, which hide their overflow. */
+    padding-block: var(--breadcrumb-target-overflow);
+    /* Half of that room goes over the breadcrumb padding, the other half makes the items taller than the text line. */
+    margin-block: calc(-0.5 * var(--breadcrumb-target-overflow));
 
     &.open {
       overflow: inherit;
@@ -43,13 +50,10 @@
       > .dropdown-toggle {
         color: var(--breadcrumb-color);
         cursor: pointer;
-        /* Match the separator padding. */
-        margin: 2px 2px 2px 5px;
         /* Remove the default styles of buttons. */
         background: transparent;
         border-color: transparent;
         padding: 0;
-        line-height: .5rem;
 
         &:hover, &:focus {
           color: var(--breadcrumb-active-color);
@@ -68,6 +72,22 @@
         }
       }
     }
+  }
+
+  /* Give the icon-only targets the minimum target size, without making their icon bigger. The first item of a
+  hierarchy breadcrumb is the home icon link. */
+  > .wiki:first-child > a,
+  > li.dropdown > .dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--target-size-minimum);
+    min-height: var(--target-size-minimum);
+    /* Center the targets on the text line. Aligning on the baseline would raise image icons, whose baseline is their
+    bottom edge. */
+    vertical-align: top;
+    /* Keep the line height of the breadcrumb, the targets are taller than the text line. */
+    margin-block: calc(-1 * var(--breadcrumb-target-overflow));
   }
 
   > .active:last-of-type a {

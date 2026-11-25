@@ -151,7 +151,7 @@ public class TreeElement extends BaseElement
 
     /**
      * @return the element that represents the tree, e.g. to take a screenshot of the tree
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public WebElement getElement()
     {

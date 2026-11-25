@@ -573,7 +573,39 @@ define('xwiki-realtime-loader', [
         console.debug('We lost the connection to the editing session.');
       }
     });
+    leaveWhenStoredInBackForwardCache(network, () => {
+      expectedDisconnect = true;
+    });
     return network;
+  },
+
+  // When the user navigates away, the browser may keep the page in its back/forward cache (bfcache) instead of
+  // destroying it. The editors are then not destroyed, so they don't leave the realtime session, and the WebSocket
+  // connection stays open while the page is frozen: the other participants, and the next editing session of the same
+  // user, still see this page as a participant, and get its uncommitted changes (e.g. the changes discarded with
+  // Cancel). So we leave the realtime session explicitly when the page is stored in the bfcache, and we reload the
+  // page when it's restored from the bfcache, because its editing session is not valid anymore.
+  leaveWhenStoredInBackForwardCache = function(network, beforeDisconnect) {
+    const disconnect = () => {
+      beforeDisconnect();
+      network.disconnect();
+    };
+    window.addEventListener('pagehide', event => {
+      // When the page is not persisted it is destroyed, which closes the WebSocket connection.
+      if (event.persisted && document.visibilityState === 'hidden') {
+        disconnect();
+      } else if (event.persisted) {
+        // The page becomes hidden right after the pagehide event. Disconnect only afterwards, because the editors
+        // push their uncommitted changes to the other participants when the page becomes hidden (and they need the
+        // connection for this). Our listener is called last because it's registered last.
+        document.addEventListener('visibilitychange', disconnect, {once: true});
+      }
+    });
+    window.addEventListener('pageshow', event => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
   },
 
   onOpen = async channelInfo => {

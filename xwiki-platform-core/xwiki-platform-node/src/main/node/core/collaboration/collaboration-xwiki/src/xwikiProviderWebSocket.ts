@@ -312,20 +312,45 @@ function readClientId(handlerDecoder: decoding.Decoder) {
  * clock than any of these updates, and it's the last message we send on both channels, so it wins whatever order the
  * messages arrive in.
  *
+ * The browser may also keep the page in its back/forward cache (bfcache) instead of destroying it. The page is then
+ * frozen with its WebSocket connection still open, so the server keeps the room, and its history, as long as the page
+ * stays in the cache: the next session for the same document (e.g. after the document was saved from another editor)
+ * would join this room instead of loading the saved document. So we also disconnect in this case, and when the page is
+ * restored from the cache we join back, which synchronizes with the current state of the room (or detects that the
+ * room was replaced by a new session in the mean time).
+ *
  * @param websocketProvider - the websocket provider whose local awareness state is removed
  */
-function removeAwarenessOnPageHide(websocketProvider: WebsocketProvider) {
-  const onPageHide = () => {
+function leaveOnPageHide(websocketProvider: WebsocketProvider) {
+  let hiddenLocalState: Record<string, unknown> | null = null;
+  let disconnectedOnPageHide = false;
+  const onPageHide = (event: PageTransitionEvent) => {
+    hiddenLocalState = websocketProvider.awareness.getLocalState();
     removeAwarenessStates(
       websocketProvider.awareness,
       [websocketProvider.doc.clientID],
       "page hide",
     );
+    // Don't reconnect later if the synchronization was stopped on purpose (e.g. because the session was replaced).
+    disconnectedOnPageHide = event.persisted && websocketProvider.shouldConnect;
+    if (disconnectedOnPageHide) {
+      websocketProvider.disconnect();
+    }
+  };
+  const onPageShow = (event: PageTransitionEvent) => {
+    if (event.persisted && disconnectedOnPageHide) {
+      disconnectedOnPageHide = false;
+      // The awareness state is sent to the others once connected.
+      websocketProvider.awareness.setLocalState(hiddenLocalState);
+      websocketProvider.connect();
+    }
   };
   window.addEventListener("pagehide", onPageHide);
+  window.addEventListener("pageshow", onPageShow);
   const destroy = websocketProvider.destroy.bind(websocketProvider);
   websocketProvider.destroy = () => {
     window.removeEventListener("pagehide", onPageHide);
+    window.removeEventListener("pageshow", onPageShow);
     destroy();
   };
 }
@@ -364,7 +389,7 @@ export function createXWikiWebSocketProvider(
       disableBc: true,
     },
   );
-  removeAwarenessOnPageHide(websocketProvider);
+  leaveOnPageHide(websocketProvider);
   const syncGate = pushMissingUpdatesOnSync(websocketProvider);
 
   websocketProvider.messageHandlers[4] = (

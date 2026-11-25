@@ -42,7 +42,6 @@ import org.xwiki.wiki.user.UserScope;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Verify the user mentions of the BlockNote editor integration.
@@ -188,11 +187,18 @@ class MentionIT extends AbstractBlockNoteIT
         assertThat(page.editWiki().getContent(),
             matchesPattern(mentionPattern("XWiki\\.John", "XWiki-John") + " "));
 
-        // Load the saved content back. Without the space the call would be read as a block macro, which displays the
-        // mention on a line of its own instead of inside the paragraph.
-        BlockNoteRichTextArea textArea =
-            BlockNoteInplaceEditPage.gotoPage(testReference).editInplace().getContentEditor().getRichTextArea();
-        assertEquals("paragraph", textArea.getBlockType(0));
+        // Load the saved content back and keep typing at the end of the line the mention is on. Without the space the
+        // call would be read as a block macro, which puts the typed text in a paragraph of its own.
+        BlockNoteInplaceEditPage reloaded =
+            BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        BlockNoteRichTextArea textArea = reloaded.getContentEditor().getRichTextArea();
+        // The line holds the mention and the space that keeps it inline, so its end is two positions in.
+        textArea.click().moveCaretTo(2);
+        textArea.sendKeys(TEXT_AFTER);
+        reloaded.save();
+
+        assertThat(reloaded.editWiki().getContent(),
+            matchesPattern(mentionPattern("XWiki\\.John", "XWiki-John") + " " + TEXT_AFTER));
     }
 
     @Test

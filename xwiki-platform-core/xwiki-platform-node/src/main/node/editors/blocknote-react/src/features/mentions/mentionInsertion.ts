@@ -19,8 +19,7 @@
  */
 import { TextSelection } from "prosemirror-state";
 import type { EditorType } from "../../blocknote";
-import type { EditorInstance } from "../../editorInstance";
-import type { MentionFactory } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentionFactory";
 import type { SuggestedUser } from "@xwiki/platform-user-suggest-api";
 
 /**
@@ -39,16 +38,15 @@ function isFollowedByWhitespace(editor: EditorType): boolean {
 /**
  * Inserts a mention of the given user at the selection, as built by the given factory.
  *
- * @param instance - the editor instance to insert the mention into
+ * @param editor - the editor to insert the mention into, at its selection
  * @param factory - what builds the inline content standing for a mention of the user
  * @param user - the mentioned user
  */
 function insertMention(
-  instance: EditorInstance,
+  editor: EditorType,
   factory: MentionFactory,
   user: SuggestedUser,
 ): void {
-  const { editor } = instance;
   const mention = factory.createMention(user);
   // A mention is followed by a space, so that the user can keep typing after it. In XWiki syntax it is also what
   // keeps a mention alone in a paragraph from being saved as a block macro, a rendering macro never being inline-only.

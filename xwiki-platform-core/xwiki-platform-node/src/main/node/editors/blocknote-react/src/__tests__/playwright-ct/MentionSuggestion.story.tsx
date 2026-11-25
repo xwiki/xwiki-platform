@@ -21,11 +21,11 @@ import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { createInlineMacro } from "../../misc/macroInvocation";
-import { mentionFactoryName } from "../../services/mentions";
+import { mentionFactoryName } from "../../services/mentionFactory";
 import { userSuggesterProviderName } from "@xwiki/platform-user-suggest-api";
 import { useMemo, useState } from "react";
 import type { EditorType } from "../../blocknote";
-import type { MentionFactory } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentionFactory";
 import type {
   SuggestedUser,
   UserSuggesterProvider,

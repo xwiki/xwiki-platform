@@ -22,8 +22,7 @@ import { insertMention } from "./mentionInsertion";
 import { SuggestionMenu } from "@blocknote/core/extensions";
 import { createElement } from "react";
 import type { EditorType } from "../../blocknote";
-import type { EditorInstance } from "../../editorInstance";
-import type { MentionFactory } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentionFactory";
 import type { SuggestionMenuOptions } from "@blocknote/core/extensions";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type { SuggestedUser } from "@xwiki/platform-user-suggest-api";
@@ -63,14 +62,14 @@ const shouldOpenMentionMenu: NonNullable<
 };
 
 /**
- * @param instance - the editor instance where the mention is inserted
+ * @param editor - the editor where the mention is inserted
  * @param factory - what builds the inline content standing for a mention of the picked user
  * @param users - the suggested users
  * @param group - the label of the group of the suggestions, separating them from the other kinds of suggestions
  * @returns the menu items inserting a mention of the given users
  */
 function toSuggestions(
-  instance: EditorInstance,
+  editor: EditorType,
   factory: MentionFactory,
   users: SuggestedUser[],
   group: string,
@@ -86,7 +85,7 @@ function toSuggestions(
           className: "xwiki-mention-avatar",
         })
       : createElement("span", { className: user.icon?.cssClass }),
-    onItemClick: () => insertMention(instance, factory, user),
+    onItemClick: () => insertMention(editor, factory, user),
   }));
 }
 

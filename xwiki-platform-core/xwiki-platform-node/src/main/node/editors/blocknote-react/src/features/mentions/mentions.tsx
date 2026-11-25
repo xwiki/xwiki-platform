@@ -20,7 +20,7 @@
 import { MentionSuggestionController } from "./MentionSuggestionController";
 import { openMentionMenu } from "./mentionMenu";
 import { getUserSuggester } from "./userSuggester";
-import { mentionFactoryName } from "../../services/mentions";
+import { mentionFactoryName } from "../../services/mentionFactory";
 import { createElement } from "react";
 import { RiAtLine } from "react-icons/ri";
 import type { EditorType } from "../../blocknote";

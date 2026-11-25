@@ -24,7 +24,7 @@ import {
 } from "./mentionMenu";
 import { getUserSuggester } from "./userSuggester";
 import { EditorInstanceContext } from "../../contexts";
-import { mentionFactoryName } from "../../services/mentions";
+import { mentionFactoryName } from "../../services/mentionFactory";
 import { SuggestionMenuController } from "@blocknote/react";
 import {
   debounceAsync,
@@ -32,7 +32,7 @@ import {
 } from "@xwiki/platform-fn-utils";
 import { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import type { MentionFactory } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentionFactory";
 
 /**
  * Suggests the users to mention, as the user types after the mention trigger, and hands the picked one to the mention
@@ -40,37 +40,35 @@ import type { MentionFactory } from "../../services/mentions";
  */
 export function MentionSuggestionController() {
   const instance = useContext(EditorInstanceContext)!;
-  // Resolved by the mentions feature before it mounts this controller.
-  const userSuggester = getUserSuggester(instance.serviceContainer)!;
-  const mentionFactory =
-    instance.serviceContainer.get<MentionFactory>(mentionFactoryName);
-
   const { t } = useTranslation();
 
   // Memoized and debounced because the suggestion menu re-queries its items whenever this function changes, and
-  // looking the users up is a round-trip to the host application.
-  const suggestUsers = useMemo(
-    () =>
-      debounceAsync(async (query: string) => {
-        const users = await tryFalliblePromiseOrError(() =>
-          userSuggester.suggestUsers(query),
-        );
-        if (users instanceof Error) {
-          console.warn(
-            `Failed to get the user suggestions for [${query}].`,
-            users,
-          );
-          return [];
-        }
-        return toSuggestions(
-          instance,
-          mentionFactory,
+  // looking the users up is a round-trip to the host application. The services are resolved in here rather than on
+  // every render, which a container handing out a new instance each time would rebuild this function from.
+  const suggestUsers = useMemo(() => {
+    // Both are resolved by the mentions feature before it mounts this controller.
+    const userSuggester = getUserSuggester(instance.serviceContainer)!;
+    const mentionFactory =
+      instance.serviceContainer.get<MentionFactory>(mentionFactoryName);
+    return debounceAsync(async (query: string) => {
+      const users = await tryFalliblePromiseOrError(() =>
+        userSuggester.suggestUsers(query),
+      );
+      if (users instanceof Error) {
+        console.warn(
+          `Failed to get the user suggestions for [${query}].`,
           users,
-          t("blocknote.mentionMenu.group"),
         );
-      }),
-    [instance, userSuggester, mentionFactory, t],
-  );
+        return [];
+      }
+      return toSuggestions(
+        instance.editor,
+        mentionFactory,
+        users,
+        t("blocknote.mentionMenu.group"),
+      );
+    });
+  }, [instance, t]);
 
   return (
     <SuggestionMenuController

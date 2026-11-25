@@ -29,17 +29,17 @@ import {
   toSuggestions,
 } from "../../features/mentions/mentionMenu";
 import { mentionsFeature } from "../../features/mentions/mentions";
-import { mentionFactoryName } from "../../services/mentions";
+import { mentionFactoryName } from "../../services/mentionFactory";
 import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
 import { BlockNoteEditor } from "@blocknote/core";
 import { userSuggesterProviderName } from "@xwiki/platform-user-suggest-api";
 import { Container } from "inversify";
 import { TextSelection } from "prosemirror-state";
 import { beforeAll, describe, expect, test, vi } from "vitest";
-import type { InlineContentType } from "../../blocknote";
+import type { EditorType, InlineContentType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
 import type { FeatureContext } from "../../features/editorFeature";
-import type { MentionFactory } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentionFactory";
 import type {
   SuggestedUser,
   UserSuggester,
@@ -201,35 +201,32 @@ describe("shouldOpenMentionMenu", () => {
 });
 
 /**
- * @param insertInlineContent - what records the content inserted at the selection
- * @returns an editor instance whose only abilities are to record the inserted inline content and to tell that the
- *   selection is at the end of its block
+ * @returns an editor whose only abilities are to swallow the inserted inline content and to tell that the selection
+ *   is at the end of its block
  */
-function instanceInsertingInto(insertInlineContent: () => void) {
+function editorInsertingInto() {
   return {
-    editor: {
-      insertInlineContent,
-      prosemirrorState: {
-        selection: {
-          $to: {
-            parent: {
-              textBetween: () => "",
-              content: { size: 0 },
-            },
-            parentOffset: 0,
+    insertInlineContent: vi.fn(),
+    prosemirrorState: {
+      selection: {
+        $to: {
+          parent: {
+            textBetween: () => "",
+            content: { size: 0 },
           },
+          parentOffset: 0,
         },
       },
     },
-  } as unknown as EditorInstance;
+  } as unknown as EditorType;
 }
 
 describe("toSuggestions", () => {
   const factory: MentionFactory = { createMention: vi.fn(() => mention) };
-  const instance = instanceInsertingInto(vi.fn());
+  const stubEditor = editorInsertingInto();
 
   test("labels the item with the user name and its hint", () => {
-    const items = toSuggestions(instance, factory, [user], "Users");
+    const items = toSuggestions(stubEditor, factory, [user], "Users");
 
     expect(items[0].title).toBe("Administrator");
     expect(items[0].subtext).toBe("admin@example.com");
@@ -237,7 +234,7 @@ describe("toSuggestions", () => {
   });
 
   test("hands the picked user to the mention factory", () => {
-    toSuggestions(instance, factory, [user], "Users")[0].onItemClick!();
+    toSuggestions(stubEditor, factory, [user], "Users")[0].onItemClick!();
 
     expect(factory.createMention).toHaveBeenCalledWith(user);
   });
@@ -271,7 +268,7 @@ describe("insertMention", () => {
       tr.setSelection(TextSelection.create(tr.doc, caret)),
     );
 
-    insertMention({ editor: textEditor } as EditorInstance, factory, user);
+    insertMention(textEditor, factory, user);
 
     const { doc, selection } = textEditor.prosemirrorState;
     return {

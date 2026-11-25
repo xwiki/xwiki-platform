@@ -155,9 +155,9 @@ export {
   extractMacroRawContent,
 } from "./features/macros/utils";
 
-export { mentionFactoryName } from "./services/mentions";
+export { mentionFactoryName } from "./services/mentionFactory";
 
-export type { MentionFactory } from "./services/mentions";
+export type { MentionFactory } from "./services/mentionFactory";
 
 export { macroEditorName } from "./services/macroEditor";
 

@@ -25,8 +25,8 @@ import { injectable } from "inversify";
 import type {
   InlineContentType,
   MentionFactory,
-  MentionableUser,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { SuggestedUser } from "@xwiki/platform-user-suggest-api";
 import type { Container } from "inversify";
 
 /**
@@ -59,7 +59,7 @@ class DefaultMentionFactory implements MentionFactory {
       .inSingletonScope();
   }
 
-  public createMention(user: MentionableUser): InlineContentType {
+  public createMention(user: SuggestedUser): InlineContentType {
     return createInlineMacro({
       kind: "inline",
       id: "mention",

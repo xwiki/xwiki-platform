@@ -38,6 +38,8 @@
     "@xwiki/platform-model-remote-url-xwiki": "workspace:*",
     "@xwiki/platform-model-xwiki": "workspace:*",
     "@xwiki/platform-rendering-api": "workspace:*",
+    "@xwiki/platform-user-suggest-api": "workspace:*",
+    "@xwiki/platform-user-suggest-xwiki": "workspace:*",
     "@xwiki/platform-xwiki-model-api": "workspace:*",
     "@xwiki/platform-xwiki-syntax-config": "workspace:*",
     "@xwiki/platform-xwiki-utils": "workspace:*",

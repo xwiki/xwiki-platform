@@ -5,12 +5,6 @@
 #set ($config = {
   'collaborationURL': $services.websocket.url('yjs')
 })
-## Which users the mentions suggest. Left out when the wiki module isn't available, which leaves the mentions
-## suggesting the local users only.
-#set ($userScope = $services.wiki.user.userScope)
-#if ($userScope)
-  #set ($discard = $config.put('userScope', "$userScope"))
-#end
 <script id="blocknote-config" type="application/json">$jsontool.serialize($config).replace('<', '\u003C')</script>
 {{/html}}
 {{/velocity}}

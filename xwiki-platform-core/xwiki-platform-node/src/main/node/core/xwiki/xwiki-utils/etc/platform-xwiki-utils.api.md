@@ -70,6 +70,7 @@ export interface XWikiGlobal {
     // (undocumented)
     Document: new (reference: EntityReference) => LegacyXWikiDocument;
     editor?: string;
+    servletpath: string;
     widgets: {
         Notification: (new (text: string, type?: LegacyNotificationType) => LegacyNotification) & {
             show(text: string, type?: LegacyNotificationType): LegacyNotification;

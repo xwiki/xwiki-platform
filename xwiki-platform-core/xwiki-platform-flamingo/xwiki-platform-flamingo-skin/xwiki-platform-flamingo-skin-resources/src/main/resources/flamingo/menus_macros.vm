@@ -301,10 +301,8 @@
 #**
  * Display the entries of the edit menu dropdown, i.e. the editors the current user can use on the current document,
  * including the ones contributed to the {@code org.xwiki.plaftorm.editactions} UI extension point.
- *
- * @param $includeRights whether to include the entry used to edit the rights of the current document
  *#
-#macro (_displayEditMenuContent $includeRights)
+#macro (_displayEditMenuContent)
   #set ($staticExtensions = [])
   #if ($isAdvancedUser)
     ##
@@ -340,7 +338,7 @@
     ## administration is still combined with the space administration).
     ## TODO: create a proprer 'page administration' and stop adding a right editor in this menu
     #define ($rightsEditor)
-      #if ($includeRights && ($doc.documentReference.name != 'WebHome' || !$hasSpaceAdmin || !$isAdminAppInstalled))
+      #if ($doc.documentReference.name != 'WebHome' || !$hasSpaceAdmin || !$isAdminAppInstalled)
         #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock', $extraAttributes)
       #end
     #end

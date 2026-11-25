@@ -134,8 +134,7 @@
 #macro (_displayDocDoesNotExistCreateButton)
   #template('menus_macros.vm')
   #set ($extraAttributes = 'rel="nofollow"')
-  ## The rights of a missing page can't be edited without creating it.
-  #define ($menuContent)#_displayEditMenuContent(false)#end
+  #define ($menuContent)#_displayEditMenuContent()#end
   <ul id="contentmenu" class="pull-right actionmenu">
     #displayMenu('tmEdit', 'add', $menuContent, 'core.viewers.content.doesnotexist.create', true, $doc.getURL('create'),
       $extraAttributes, true)

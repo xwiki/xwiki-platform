@@ -125,8 +125,7 @@ class DocdoesnotexistPageTest extends PageTest
         Element createButton = result.selectFirst(CREATE_BUTTON);
         assertEquals("/xwiki/bin/create/Space/Page", createButton.attr("href"));
         assertEquals("core.viewers.content.doesnotexist.create", createButton.selectFirst(".btn-label").text());
-        // The rights of a missing page can't be edited without creating it.
-        assertEquals(List.of("tmEditWiki", "tmEditInline", "tmEditObject", "tmEditClass"),
+        assertEquals(List.of("tmEditWiki", "tmEditInline", "tmEditRights", "tmEditObject", "tmEditClass"),
             result.select("#tmEdit .dropdown-menu a").eachAttr("id"));
         assertNull(result.selectFirst(".recyclebin-list"));
     }

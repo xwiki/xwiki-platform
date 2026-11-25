@@ -66,6 +66,7 @@
     "@xwiki/platform-syntaxes-config": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
     "@xwiki/platform-uniast-react-jsx": "workspace:*",
+    "@xwiki/platform-user-suggest-api": "workspace:*",
     "i18next": "catalog:",
     "lodash-es": "catalog:",
     "react": "catalog:",

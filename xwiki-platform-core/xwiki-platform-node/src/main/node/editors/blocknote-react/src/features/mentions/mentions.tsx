@@ -19,7 +19,8 @@
  */
 import { MentionSuggestionController } from "./MentionSuggestionController";
 import { openMentionMenu } from "./mentionMenu";
-import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
+import { getUserSuggester } from "./userSuggester";
+import { mentionFactoryName } from "../../services/mentions";
 import { createElement } from "react";
 import { RiAtLine } from "react-icons/ri";
 import type { EditorType } from "../../blocknote";
@@ -52,10 +53,10 @@ function mentionSlashMenuItem(
 
 /**
  * Mentions a user in the edited content. The mention trigger and the "Mention" item of the slash menu open a menu
- * that suggests the users returned by the `UserSuggester` bound in the service container. Picking one hands it to the
- * `MentionFactory` bound there, and the inline content it returns is inserted at the selection. Looking a user up and
- * representing a mention are each backend specific, so this feature contributes nothing unless the host application
- * binds both services and the syntax of the edited content can save a mention.
+ * that suggests the users returned by the `UserSuggester` of the backend. Picking one hands it to the
+ * `MentionFactory` bound in the service container, and the inline content it returns is inserted at the selection.
+ * Looking a user up and representing a mention are each backend specific, so this feature contributes nothing unless
+ * the host application provides both and the syntax of the edited content can save a mention.
  *
  * @since 19.0.0RC1
  * @beta
@@ -70,7 +71,7 @@ const mentionsFeature: EditorFeature = {
   }: FeatureContext): FeatureContribution | undefined {
     if (
       !syntax.features.inlineContents.mentions ||
-      !serviceContainer.isBound(userSuggesterName) ||
+      !getUserSuggester(serviceContainer) ||
       !serviceContainer.isBound(mentionFactoryName)
     ) {
       return undefined;

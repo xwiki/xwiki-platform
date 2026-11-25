@@ -21,19 +21,20 @@ import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
 import { createInlineMacro } from "../../misc/macroInvocation";
-import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
+import { mentionFactoryName } from "../../services/mentions";
+import { userSuggesterProviderName } from "@xwiki/platform-user-suggest-api";
 import { useMemo, useState } from "react";
 import type { EditorType } from "../../blocknote";
+import type { MentionFactory } from "../../services/mentions";
 import type {
-  MentionFactory,
-  MentionableUser,
-  UserSuggester,
-} from "../../services/mentions";
+  SuggestedUser,
+  UserSuggesterProvider,
+} from "@xwiki/platform-user-suggest-api";
 
 export type MentionSuggestionForTestProps = {
   // The users the user suggester returns, whatever the query (none when not set).
-  users?: MentionableUser[];
-  // When set, no user suggester is bound, as with a backend that can't look up users.
+  users?: SuggestedUser[];
+  // When set, the backend has no user suggester, as with one that can't look up users.
   noUserSuggester?: boolean;
   // When set, no mention factory is bound, as with a backend that has no way to represent a mention.
   noMentionFactory?: boolean;
@@ -68,19 +69,24 @@ export const MentionSuggestionForTest: React.FC<
     const syntax = structuredClone(FULL_SYNTAX);
     syntax.features.inlineContents.mentions = !syntaxWithoutMentions;
     const container = serviceContainerMock([syntax]);
-    if (!noUserSuggester) {
-      container.bind<UserSuggester>(userSuggesterName).toConstantValue({
-        async suggestUsers(_instance, query) {
-          if (failingSuggestions) {
-            throw new Error("Failed to reach the backend");
-          }
-          // Matched on the user name, like the user suggestion template of XWiki does.
-          return (users ?? []).filter((user) =>
-            user.label.toLowerCase().includes(query.toLowerCase()),
-          );
-        },
+    container
+      .bind<UserSuggesterProvider>(userSuggesterProviderName)
+      .toConstantValue({
+        get: () =>
+          noUserSuggester
+            ? undefined
+            : {
+                async suggestUsers(query) {
+                  if (failingSuggestions) {
+                    throw new Error("Failed to reach the backend");
+                  }
+                  // Matched on the user name, like the user suggestion template of XWiki does.
+                  return (users ?? []).filter((user) =>
+                    user.label.toLowerCase().includes(query.toLowerCase()),
+                  );
+                },
+              },
       });
-    }
     if (!noMentionFactory) {
       container.bind<MentionFactory>(mentionFactoryName).toConstantValue({
         createMention: (user) =>

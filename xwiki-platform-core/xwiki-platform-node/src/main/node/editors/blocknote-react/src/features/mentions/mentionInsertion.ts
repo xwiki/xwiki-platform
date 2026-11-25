@@ -19,7 +19,8 @@
  */
 import type { EditorType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
-import type { MentionFactory, MentionableUser } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentions";
+import type { SuggestedUser } from "@xwiki/platform-user-suggest-api";
 
 /**
  * @param editor - the editor holding the selection the mention is inserted at
@@ -44,7 +45,7 @@ function isFollowedByWhitespace(editor: EditorType): boolean {
 function insertMention(
   instance: EditorInstance,
   factory: MentionFactory,
-  user: MentionableUser,
+  user: SuggestedUser,
 ): void {
   const { editor } = instance;
   const mention = factory.createMention(user);

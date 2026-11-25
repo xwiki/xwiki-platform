@@ -23,9 +23,10 @@ import { SuggestionMenu } from "@blocknote/core/extensions";
 import { createElement } from "react";
 import type { EditorType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
-import type { MentionFactory, MentionableUser } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentions";
 import type { SuggestionMenuOptions } from "@blocknote/core/extensions";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
+import type { SuggestedUser } from "@xwiki/platform-user-suggest-api";
 
 /**
  * The character that opens the mention menu when typed.
@@ -71,7 +72,7 @@ const shouldOpenMentionMenu: NonNullable<
 function toSuggestions(
   instance: EditorInstance,
   factory: MentionFactory,
-  users: MentionableUser[],
+  users: SuggestedUser[],
   group: string,
 ): DefaultReactSuggestionItem[] {
   return users.map((user) => ({

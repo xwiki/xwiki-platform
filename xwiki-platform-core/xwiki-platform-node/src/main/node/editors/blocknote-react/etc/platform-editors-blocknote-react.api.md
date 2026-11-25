@@ -40,6 +40,7 @@ import { StyleImplementation } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
 import { StyleSpecs } from '@blocknote/core';
+import { SuggestedUser } from '@xwiki/platform-user-suggest-api';
 import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 
 // @beta
@@ -360,19 +361,8 @@ export type MacroInsertionEditorPrefillData = {
 export const macrosFeature: EditorFeature;
 
 // @beta
-export type MentionableUser = {
-    reference: string;
-    label: string;
-    hint?: string;
-    icon?: {
-        url?: string;
-        cssClass?: string;
-    };
-};
-
-// @beta
 export interface MentionFactory {
-    createMention(user: MentionableUser): InlineContentType;
+    createMention(user: SuggestedUser): InlineContentType;
 }
 
 // @beta
@@ -416,14 +406,6 @@ export type UploadedFile = {
 
 // @beta
 export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
-
-// @beta
-export interface UserSuggester {
-    suggestUsers(instance: EditorInstance, query: string): Promise<MentionableUser[]>;
-}
-
-// @beta
-export const userSuggesterName = "UserSuggester";
 
 // @beta
 export const xwikiRenderingFeature: EditorFeature;

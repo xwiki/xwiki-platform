@@ -22,8 +22,9 @@ import {
   shouldOpenMentionMenu,
   toSuggestions,
 } from "./mentionMenu";
+import { getUserSuggester } from "./userSuggester";
 import { EditorInstanceContext } from "../../contexts";
-import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
+import { mentionFactoryName } from "../../services/mentions";
 import { SuggestionMenuController } from "@blocknote/react";
 import {
   debounceAsync,
@@ -31,7 +32,7 @@ import {
 } from "@xwiki/platform-fn-utils";
 import { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import type { MentionFactory, UserSuggester } from "../../services/mentions";
+import type { MentionFactory } from "../../services/mentions";
 
 /**
  * Suggests the users to mention, as the user types after the mention trigger, and hands the picked one to the mention
@@ -39,8 +40,8 @@ import type { MentionFactory, UserSuggester } from "../../services/mentions";
  */
 export function MentionSuggestionController() {
   const instance = useContext(EditorInstanceContext)!;
-  const userSuggester =
-    instance.serviceContainer.get<UserSuggester>(userSuggesterName);
+  // Resolved by the mentions feature before it mounts this controller.
+  const userSuggester = getUserSuggester(instance.serviceContainer)!;
   const mentionFactory =
     instance.serviceContainer.get<MentionFactory>(mentionFactoryName);
 
@@ -52,7 +53,7 @@ export function MentionSuggestionController() {
     () =>
       debounceAsync(async (query: string) => {
         const users = await tryFalliblePromiseOrError(() =>
-          userSuggester.suggestUsers(instance, query),
+          userSuggester.suggestUsers(query),
         );
         if (users instanceof Error) {
           console.warn(

@@ -18,15 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { InlineContentType } from "../blocknote";
-import type { EditorInstance } from "../editorInstance";
-
-/**
- * The name under which the {@link UserSuggester} is bound in the service container.
- *
- * @since 19.0.0RC1
- * @beta
- */
-const userSuggesterName = "UserSuggester";
+import type { SuggestedUser } from "@xwiki/platform-user-suggest-api";
 
 /**
  * The name under which the {@link MentionFactory} is bound in the service container.
@@ -35,55 +27,6 @@ const userSuggesterName = "UserSuggester";
  * @beta
  */
 const mentionFactoryName = "MentionFactory";
-
-/**
- * A user that can be mentioned in the edited content.
- *
- * @since 19.0.0RC1
- * @beta
- */
-type MentionableUser = {
-  /**
-   * The reference of the user, in the form a mention of them holds (e.g. "XWiki.Admin").
-   */
-  reference: string;
-
-  /**
-   * The user name to display.
-   */
-  label: string;
-
-  /**
-   * Additional information telling apart two users with the same name, e.g. an email address.
-   */
-  hint?: string;
-
-  /**
-   * The user avatar, or the icon standing for it when the user has no avatar.
-   */
-  icon?: { url?: string; cssClass?: string };
-};
-
-/**
- * Looks up the users that can be mentioned, which is backend specific. The mention menu is available only when it is
- * bound in the service container (see {@link userSuggesterName}).
- *
- * @since 19.0.0RC1
- * @beta
- */
-interface UserSuggester {
-  /**
-   * Looks up the users that can be mentioned and that match the given query.
-   *
-   * @param instance - the editor instance the mention is inserted in
-   * @param query - the text the suggested users have to match
-   * @returns the users matching the given query
-   */
-  suggestUsers(
-    instance: EditorInstance,
-    query: string,
-  ): Promise<MentionableUser[]>;
-}
 
 /**
  * Builds the inline content standing for a mention of a user, which the mentions feature then inserts into the edited
@@ -101,8 +44,8 @@ interface MentionFactory {
    * @param user - the mentioned user
    * @returns the inline content representing a mention of the given user
    */
-  createMention(user: MentionableUser): InlineContentType;
+  createMention(user: SuggestedUser): InlineContentType;
 }
 
-export { mentionFactoryName, userSuggesterName };
-export type { MentionFactory, MentionableUser, UserSuggester };
+export { mentionFactoryName };
+export type { MentionFactory };

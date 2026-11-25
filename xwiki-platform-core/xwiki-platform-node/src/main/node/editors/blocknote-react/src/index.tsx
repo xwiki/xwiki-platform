@@ -155,13 +155,9 @@ export {
   extractMacroRawContent,
 } from "./features/macros/utils";
 
-export { mentionFactoryName, userSuggesterName } from "./services/mentions";
+export { mentionFactoryName } from "./services/mentions";
 
-export type {
-  MentionFactory,
-  MentionableUser,
-  UserSuggester,
-} from "./services/mentions";
+export type { MentionFactory } from "./services/mentions";
 
 export { macroEditorName } from "./services/macroEditor";
 

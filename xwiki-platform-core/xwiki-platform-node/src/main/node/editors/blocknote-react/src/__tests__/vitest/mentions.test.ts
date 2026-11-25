@@ -29,21 +29,23 @@ import {
   toSuggestions,
 } from "../../features/mentions/mentionMenu";
 import { mentionsFeature } from "../../features/mentions/mentions";
-import { mentionFactoryName, userSuggesterName } from "../../services/mentions";
+import { mentionFactoryName } from "../../services/mentions";
 import { FULL_SYNTAX } from "../playwright-ct/syntax.mock";
 import { BlockNoteEditor } from "@blocknote/core";
+import { userSuggesterProviderName } from "@xwiki/platform-user-suggest-api";
 import { Container } from "inversify";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 import type { InlineContentType } from "../../blocknote";
 import type { EditorInstance } from "../../editorInstance";
 import type { FeatureContext } from "../../features/editorFeature";
+import type { MentionFactory } from "../../services/mentions";
 import type {
-  MentionFactory,
-  MentionableUser,
+  SuggestedUser,
   UserSuggester,
-} from "../../services/mentions";
+  UserSuggesterProvider,
+} from "@xwiki/platform-user-suggest-api";
 
-const user: MentionableUser = {
+const user: SuggestedUser = {
   reference: "XWiki.Admin",
   label: "Administrator",
   hint: "admin@example.com",
@@ -75,7 +77,7 @@ beforeAll(() => {
 });
 
 /**
- * @param suggester - whether a user suggester is bound, as a host application that can look users up does
+ * @param suggester - whether the backend can look users up
  * @param factory - whether a mention factory is bound, as a host application that can represent mentions does
  * @param mentions - whether the syntax of the edited content can save a mention
  * @returns the context the mentions feature contributes to
@@ -86,11 +88,9 @@ function context({
   mentions = true,
 }: { suggester?: boolean; factory?: boolean; mentions?: boolean } = {}) {
   const serviceContainer = new Container();
-  if (suggester) {
-    serviceContainer
-      .bind<UserSuggester>(userSuggesterName)
-      .toConstantValue(userSuggester);
-  }
+  serviceContainer
+    .bind<UserSuggesterProvider>(userSuggesterProviderName)
+    .toConstantValue({ get: () => (suggester ? userSuggester : undefined) });
   if (factory) {
     serviceContainer
       .bind<MentionFactory>(mentionFactoryName)

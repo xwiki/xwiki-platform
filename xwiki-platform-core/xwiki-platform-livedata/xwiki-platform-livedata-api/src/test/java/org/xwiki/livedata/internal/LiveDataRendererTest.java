@@ -27,9 +27,12 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -50,6 +53,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
+import static org.xwiki.security.authorization.Right.SCRIPT;
 
 /**
  * Test of {@link LiveDataRenderer}.
@@ -124,6 +128,47 @@ class LiveDataRendererTest
             )), block);
 
         verify(this.jsfx).use("uicomponents/widgets/liveData.js", Map.of("forceSkinAction", true));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        // restricted, author has script right, advanced parameters, source trust, expected trusted content
+        "false, true, '{}', none, true",
+        "true, true, '{}', none, false",
+        "false, false, '{}', trusted, false",
+        "false, false, '', trusted, true",
+        "false, false, '', untrusted, false",
+        "false, false, '', none, false",
+        "true, false, '', trusted, false"
+    })
+    void executeContentTrusted(boolean restricted, boolean scriptRight, String advancedParameters,
+        String sourceTrust, boolean expectedTrusted) throws Exception
+    {
+        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
+        LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
+        LiveDataQuery query = new LiveDataQuery();
+        query.setSource(new LiveDataQuery.Source("testSource"));
+        liveDataConfig.setQuery(query);
+        when(this.liveDataRendererConfiguration.getLiveDataConfiguration(advancedParameters, parameters))
+            .thenReturn(liveDataConfig);
+        when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
+        when(this.contextualAuthorizationManager.hasAccess(SCRIPT)).thenReturn(scriptRight);
+
+        ComponentManager componentManager = mock(ComponentManager.class);
+        when(this.componentManagerProvider.get()).thenReturn(componentManager);
+        if (!"none".equals(sourceTrust)) {
+            LiveDataSourceContentTrust contentTrust = mock(LiveDataSourceContentTrust.class);
+            when(contentTrust.isContentTrusted(query.getSource())).thenReturn("trusted".equals(sourceTrust));
+            when(componentManager.hasComponent(LiveDataSourceContentTrust.class, "testSource")).thenReturn(true);
+            when(componentManager.getInstance(LiveDataSourceContentTrust.class, "testSource"))
+                .thenReturn(contentTrust);
+        }
+
+        Block block = this.renderer.execute(parameters, advancedParameters, restricted);
+
+        assertEquals("""
+            <script type='application/json' data-config-content-trusted="%s"></script>""".formatted(expectedTrusted),
+            ((RawBlock) block.getChildren().get(0)).getRawContent());
     }
 
     @Test

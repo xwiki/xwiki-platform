@@ -170,6 +170,50 @@ class IconTemplateRendererManagerTest
     }
 
     @Test
+    void getRendererShouldHandleSeveralWebJarUrls() throws Exception
+    {
+        String template = "$services.webjars.url('org.webjars:font-awesome', 'css/all.min.css'),"
+            + "$services.webjars.url('org.webjars:font-awesome', 'css/v4-shims.min.css')";
+        when(this.webJarsUrlFactory.url("org.webjars:font-awesome", "css/all.min.css")).thenReturn("/all.min.css");
+        when(this.webJarsUrlFactory.url("org.webjars:font-awesome", "css/v4-shims.min.css"))
+            .thenReturn("/v4-shims.min.css");
+
+        IconTemplateRenderer renderer = this.iconTemplateRendererManager.getRenderer(template);
+
+        assertEquals("/all.min.css,/v4-shims.min.css", renderer.render(null, null));
+        verifyNoInteractions(this.velocityManager, this.velocityRenderer);
+    }
+
+    @Test
+    void getRendererShouldKeepTheSeparatorsBetweenWebJarUrls() throws Exception
+    {
+        String template = " $services.webjars.url('lib') ,\t$services.webjars.url('lib','ver'),"
+            + "$services.webjars.url('lib','ver','file.css') ";
+        when(this.webJarsUrlFactory.url("lib")).thenReturn("/lib");
+        when(this.webJarsUrlFactory.url("lib", "ver")).thenReturn("/lib/ver");
+        when(this.webJarsUrlFactory.url("lib", "ver", "file.css")).thenReturn("/lib/ver/file.css");
+
+        IconTemplateRenderer renderer = this.iconTemplateRendererManager.getRenderer(template);
+
+        assertEquals("/lib ,\t/lib/ver,/lib/ver/file.css", renderer.render(null, null));
+        verifyNoInteractions(this.velocityManager, this.velocityRenderer);
+    }
+
+    @Test
+    void getRendererShouldUseVelocityForWebJarUrlsMixedWithOtherCode() throws Exception
+    {
+        String template = "$services.webjars.url('lib'),$xwiki.getSkinFile('style.css')";
+        VelocityTemplate velocityTemplate = mock();
+        when(this.velocityManager.compile(eq(template), any())).thenReturn(velocityTemplate);
+        when(this.velocityRenderer.render(velocityTemplate, null, null)).thenReturn("/lib,/style.css");
+
+        IconTemplateRenderer renderer = this.iconTemplateRendererManager.getRenderer(template);
+
+        assertEquals("/lib,/style.css", renderer.render(null, null));
+        verifyNoInteractions(this.webJarsUrlFactory);
+    }
+
+    @Test
     void getRendererShouldHandleSkinFileTemplate() throws Exception
     {
         String template =

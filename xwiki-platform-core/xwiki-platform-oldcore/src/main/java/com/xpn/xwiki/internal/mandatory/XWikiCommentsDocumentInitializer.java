@@ -30,6 +30,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
+import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
 /**
  * Update XWiki.XWikiComments document with all required informations.
@@ -83,7 +85,10 @@ public class XWikiCommentsDocumentInitializer extends AbstractCommentsDocumentIn
     {
         super.createClass(xclass);
 
-        xclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
+        // The highlighted text is a passage quoted from the commented content, i.e., plain text: it must neither be
+        // rendered nor processed as wiki syntax (e.g., when updating links after a rename).
+        xclass.addTextAreaField("highlight", "Highlighted Text", 40, 2, EditorType.PURE_TEXT.toString(),
+            ContentType.PURE_TEXT.toString(), true);
         xclass.addNumberField("replyto", "Reply To", 5, "integer");
 
         String commentPropertyName = "comment";

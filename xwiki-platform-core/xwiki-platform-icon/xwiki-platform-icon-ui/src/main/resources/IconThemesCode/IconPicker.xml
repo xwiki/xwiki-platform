@@ -315,10 +315,15 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       for (var i = 0; i &lt; iconThemes.length; ++i) {
         icons[iconThemes[i]] = [];
       }
-      // The first icon theme is the current one (hack)
+      // Preselect the current icon theme. When the wiki has no icon theme set, fall back to the first available one.
       currentIconTheme = data.currentIconTheme;
+      if (!iconThemes.includes(currentIconTheme)) {
+        currentIconTheme = iconThemes[0];
+      }
       // Get the icons of the current icon theme
-      loadIconList(currentIconTheme);
+      if (currentIconTheme) {
+        loadIconList(currentIconTheme);
+      }
       // Fill the selector
       fillIconThemesSelector();
     });

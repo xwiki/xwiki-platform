@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
@@ -94,6 +95,35 @@ public class TemplateProviderInlinePage extends InlinePage
         this.iconInput.clear();
         this.iconInput.sendKeys(icon);
         this.iconInput.sendKeys(Keys.ESCAPE);
+    }
+
+    /**
+     * Select an icon using the icon picker: type its name to filter the picker list, then click the icon with that
+     * exact name. Waits for the picker to list the icon and to close once the icon is selected.
+     *
+     * @param icon the name of the icon to select
+     * @since 19.0.0RC1
+     */
+    public void selectIcon(String icon)
+    {
+        this.iconInput.clear();
+        this.iconInput.sendKeys(icon);
+        // The picker re-renders its list when the typed filter changes, so look for the icon again if it went stale.
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                for (WebElement iconButton : driver.findElements(By.className("xwikiIconPickerIcon"))) {
+                    if (icon.equals(iconButton.findElement(By.className("xwikiIconPickerIconName")).getText())) {
+                        iconButton.click();
+                        return true;
+                    }
+                }
+                return false;
+            } catch (StaleElementReferenceException e) {
+                return false;
+            }
+        });
+        getDriver().waitUntilCondition(
+            driver -> driver.findElements(By.className("xwikiIconPickerContainer")).isEmpty());
     }
 
     public void setDescription(String description)

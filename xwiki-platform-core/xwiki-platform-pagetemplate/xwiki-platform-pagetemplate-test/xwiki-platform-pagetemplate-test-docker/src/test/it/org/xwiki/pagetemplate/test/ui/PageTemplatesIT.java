@@ -599,15 +599,11 @@ class PageTemplatesIT
         String visibilitySpace = testSpace + ".VisibilitySpace";
         String creationSpace = testSpace + ".CreationSpace";
 
-        // Make sure there is an icon theme selected, otherwise we can't use the icon picker.
-        // See XWIKI-24557: The icon picker fails to load the icons if the wiki has no default icon theme selected
-        setup.setWikiPreference("iconTheme", "IconThemes.Silk");
-
         TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
         TemplateProviderInlinePage templateProviderInline =
             sectionPage.createTemplateProvider(templateProviderReference);
         templateProviderInline.setTemplateName("Restricted Template");
-        templateProviderInline.setIcon("page");
+        templateProviderInline.selectIcon("page");
         templateProviderInline.setDescription("A template with visibility restrictions");
         templateProviderInline.setTemplate(setup.serializeReference(templateReference));
 

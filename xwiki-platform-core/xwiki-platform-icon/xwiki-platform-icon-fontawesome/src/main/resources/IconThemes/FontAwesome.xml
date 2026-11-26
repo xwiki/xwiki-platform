@@ -411,6 +411,7 @@ zoom = search
 zoom_in = search-plus
 zoom_out = search-minus
 
+#@deprecatedstart
 ## Deprecated since 19.0.0RC1, these names don't follow the icon naming convention.
 arrow_in = window-minimize
 credit-card = credit-card
@@ -422,6 +423,7 @@ log-in=sign-in
 log-out=sign-out
 shopping-cart = shopping-cart
 table_sort = sort
+#@deprecatedend
 
 </content>
   <object>

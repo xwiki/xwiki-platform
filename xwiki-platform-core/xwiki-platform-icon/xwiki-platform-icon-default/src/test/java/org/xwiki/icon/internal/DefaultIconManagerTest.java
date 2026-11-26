@@ -184,6 +184,20 @@ class DefaultIconManagerTest
     }
 
     @Test
+    void getIconNamesWithoutDeprecated() throws Exception
+    {
+        IconSet iconSet = new IconSet("iconSet1");
+        iconSet.addIcon("icon1", new Icon("icon1 value"));
+        Icon deprecatedIcon = new Icon("icon1 value");
+        deprecatedIcon.setDeprecated(true);
+        iconSet.addIcon("icon_1", deprecatedIcon);
+        when(iconSetManager.getIconSet("iconSet1")).thenReturn(iconSet);
+
+        assertEquals(List.of("icon1"), iconManager.getIconNames("iconSet1", false));
+        assertEquals(2, iconManager.getIconNames("iconSet1", true).size());
+    }
+
+    @Test
     void getMetaData() throws Exception
     {
         IconSet iconSet = new IconSet("iconSet");

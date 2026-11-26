@@ -1212,6 +1212,7 @@ zoom = zoom
 zoom_in = zoom_in
 zoom_out = zoom_out
 
+#@deprecatedstart
 ## Deprecated since 19.0.0RC1, these names don't follow the icon naming convention.
 arrow_in = arrow_in
 credit-card = creditcards
@@ -1221,7 +1222,8 @@ floppy-disk = disk
 heart_empty = heart_empty
 log-in=user_go
 log-out=user_go
-shopping-cart = cart</content>
+shopping-cart = cart
+#@deprecatedend</content>
   <object>
     <name>IconThemes.Silk</name>
     <number>0</number>

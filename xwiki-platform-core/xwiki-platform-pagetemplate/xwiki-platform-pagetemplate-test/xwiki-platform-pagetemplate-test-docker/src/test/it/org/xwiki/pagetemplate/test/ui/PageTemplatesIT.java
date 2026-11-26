@@ -603,7 +603,7 @@ class PageTemplatesIT
         TemplateProviderInlinePage templateProviderInline =
             sectionPage.createTemplateProvider(templateProviderReference);
         templateProviderInline.setTemplateName("Restricted Template");
-        templateProviderInline.selectIcon("page");
+        templateProviderInline.setIcon("page");
         templateProviderInline.setDescription("A template with visibility restrictions");
         templateProviderInline.setTemplate(setup.serializeReference(templateReference));
 

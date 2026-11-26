@@ -65,6 +65,7 @@
       > .dropdown-menu {
         /* Leave more padding around the tree. */
         padding: 5px 10px 5px 0;
+        /* The smaller font size of the tree is set in type.css, with the other smaller texts. */
 
         a {
           /* Reset the link color inside the tree. */

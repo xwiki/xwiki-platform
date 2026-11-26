@@ -68,3 +68,5 @@ overrides:
   "lodash-es@4.17.21": 4.18.1
   # @xwiki/cristal-uniast-markdown 0.23.1 pins fast-xml-parser to an exact version, and no later Cristal release on this line pins a fixed one. Remove once Cristal is upgraded to a release that does.
   "@xwiki/cristal-uniast-markdown>fast-xml-parser": 5.12.1
+  # @xwiki/cristal-editors-blocknote-headless 0.23.1 pins vue-i18n to an exact version, and no later Cristal release on this line pins a fixed one. Remove once Cristal is upgraded to a release that does.
+  "@xwiki/cristal-editors-blocknote-headless>vue-i18n": 11.4.23

@@ -66,3 +66,5 @@ catalog:
 overrides:
   # @xwiki/cristal-editors-blocknote-headless and @xwiki/cristal-editors-blocknote-react 0.23.1 pin lodash-es to an exact version, and no later Cristal release on this line pins a fixed one. Remove once Cristal is upgraded to a release that does.
   "lodash-es@4.17.21": 4.18.1
+  # @xwiki/cristal-uniast-markdown 0.23.1 pins fast-xml-parser to an exact version, and no later Cristal release on this line pins a fixed one. Remove once Cristal is upgraded to a release that does.
+  "@xwiki/cristal-uniast-markdown>fast-xml-parser": 5.12.1

@@ -4120,7 +4120,6 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
-    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@unrs/resolver-binding-android-arm-eabi@1.11.1':
     resolution: {integrity: sha512-ppLRUgHVaGRWUx0R0Ut06Mjo9gBaBkg3v/8AxusGLhsIotbBLuRk51rAzqLC8gq6NyyAojEXglNjzf6R948DNw==}
@@ -5053,7 +5052,6 @@ packages:
   eslint@9.39.4:
     resolution: {integrity: sha512-XoMjdBOwe/esVgEvLmNsD3IRHkm7fbKIUGvrleloJXUZgDHig2IPWNniv+GwjyJXzuNqVjlr5+4yVUZjycJwfQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -6969,8 +6967,8 @@ packages:
       vite:
         optional: true
 
-  vite@6.4.1:
-    resolution: {integrity: sha512-+Oxm7q9hDoLMyJOYfUYBuHQo+dkAloi33apOPP56pzj+vsdJDzr+j1NISE5pyaAuKL4A3UD34qd0lx5+kfKp2g==}
+  vite@6.4.6:
+    resolution: {integrity: sha512-RtsraAwEG68idOA6iUOoIpOlcSKROnf815aIq9qHTSrDNpLoBrBa12suyfcEd8qn0xwOVQI1Yhm1GbmTjF600A==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -8109,7 +8107,7 @@ snapshots:
     dependencies:
       playwright: 1.58.2
       playwright-core: 1.58.2
-      vite: 6.4.1(@types/node@26.6.11)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)
+      vite: 6.4.6(@types/node@26.6.11)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -12180,12 +12178,12 @@ snapshots:
       - rollup
       - supports-color
 
-  vite@6.4.1(@types/node@26.6.11)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0):
+  vite@6.4.6(@types/node@26.6.11)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.7)
       picomatch: 4.0.7
-      postcss: 8.5.24
+      postcss: 8.5.33
       rollup: 4.68.8
       tinyglobby: 0.2.15
     optionalDependencies:

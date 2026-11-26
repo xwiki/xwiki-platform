@@ -20,6 +20,7 @@
 package org.xwiki.rendering.async.internal;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -451,10 +453,40 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             id.add(entry.getKey());
             // We don't really need actual value so let's play it safe regarding values not well supported by
             // application servers in URLs
-            id.add(encodeId(String.valueOf(entry.getValue())));
+            id.add(encodeId(toIdString(entry.getValue())));
         }
 
         return id;
+    }
+
+    /**
+     * Produce a string representation of a context value which only depends on its content, so that the same context
+     * always produces the same job identifier (and thus the same key for the cached result). {@link String#valueOf}
+     * is not enough because the string representation of an array is based on its identity, and arrays can be found
+     * in context values (e.g. the values of the request parameters).
+     */
+    private static String toIdString(Object value)
+    {
+        if (value != null && value.getClass().isArray()) {
+            int length = Array.getLength(value);
+            List<String> elements = new ArrayList<>(length);
+            for (int i = 0; i < length; ++i) {
+                elements.add(toIdString(Array.get(value, i)));
+            }
+
+            return elements.toString();
+        } else if (value instanceof Map<?, ?> map) {
+            // Same format as AbstractMap#toString()
+            return map.entrySet().stream()
+                .map(entry -> toIdString(entry.getKey()) + '=' + toIdString(entry.getValue()))
+                .collect(Collectors.joining(", ", "{", "}"));
+        } else if (value instanceof Collection<?> collection) {
+            // Same format as AbstractCollection#toString()
+            return collection.stream().map(DefaultAsyncRendererExecutor::toIdString)
+                .collect(Collectors.joining(", ", "[", "]"));
+        }
+
+        return String.valueOf(value);
     }
 
     private String encodeId(String value)

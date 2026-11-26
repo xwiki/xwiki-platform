@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static com.xpn.xwiki.internal.context.XWikiContextContextStore.PROP_DOCUMENT_REFERENCE;
+import static com.xpn.xwiki.internal.context.XWikiContextContextStore.PROP_REQUEST_PARAMETERS;
 import static com.xpn.xwiki.internal.context.XWikiContextContextStore.PROP_SECURE_AUTHOR;
 import static com.xpn.xwiki.internal.context.XWikiContextContextStore.PROP_SECURE_DOCUMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -215,6 +217,39 @@ class DefaultAsyncRendererExecutorTest
         assertEquals(ASYNC_JOB_HTTP_PATH, response.getJobIdHTTPPath());
         assertEquals("true true", response.getStatus().getResult().getResult());
         assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
+    }
+
+    @Test
+    void rendererAsyncCachedWithArraysInContext() throws Exception
+    {
+        // Enable async in the context
+        when(this.asyncContext.isEnabled()).thenReturn(true);
+
+        when(this.renderer.getId()).thenReturn(Arrays.asList("1", "2"));
+        when(this.renderer.isAsyncAllowed()).thenReturn(true);
+        when(this.renderer.isCacheAllowed()).thenReturn(true);
+
+        Set<String> entries = Set.of(PROP_REQUEST_PARAMETERS);
+        this.configuration.setContextEntries(entries);
+        // Two requests with the same parameters, whose values are stored in distinct arrays
+        when(this.context.save(entries)).thenReturn(requestParametersContext(), requestParametersContext());
+
+        List<String> firstId =
+            this.executor.render(this.renderer, this.configuration).getStatus().getRequest().getId();
+        List<String> secondId =
+            this.executor.render(this.renderer, this.configuration).getStatus().getRequest().getId();
+
+        // The same parameters must produce the same identifier, so that the cached result can be reused
+        assertEquals(firstId, secondId);
+        assertEquals("{foo=[bar, baz]}", firstId.get(firstId.indexOf(PROP_REQUEST_PARAMETERS) + 1));
+    }
+
+    private Map<String, Serializable> requestParametersContext()
+    {
+        LinkedHashMap<String, String[]> parameters = new LinkedHashMap<>();
+        parameters.put("foo", new String[] { "bar", "baz" });
+
+        return Map.of(PROP_REQUEST_PARAMETERS, parameters);
     }
 
     @Test

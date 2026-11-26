@@ -18,18 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import ICONS_SOURCE from "@webapp/resources/uicomponents/attachments/icons.js?raw";
 import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
-const ICONS_SOURCE = readFileSync(
-  resolve(
-    import.meta.dirname,
-    "../../../../../../main/webapp/resources/uicomponents/attachments/icons.js",
-  ),
-  "utf-8",
-);
 
 const IMAGE_ICON = { iconSetType: "FONT", cssClass: "fa fa-file-image-o" };
 const PDF_ICON = { iconSetType: "FONT", cssClass: "fa fa-file-pdf-o" };

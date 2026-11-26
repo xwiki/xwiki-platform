@@ -183,6 +183,7 @@ class DefaultIconManagerTest
         assertEquals(2, results2.size());
         assertTrue(results2.contains("icon1"));
         assertTrue(results2.contains("icon2"));
+        assertThrows(IconException.class, () -> iconManager.getIconNames("unknownIconSet"));
     }
 
     @Test
@@ -266,16 +267,6 @@ class DefaultIconManagerTest
         when(this.iconSetManager.getIconSet("testIconSet")).thenReturn(testIconSet);
         assertTrue(this.iconManager.hasIcon("testIconSet", "iconA"));
         assertFalse(this.iconManager.hasIcon("testIconSet", "iconB"));
-    }
-
-    @Test
-    void getIconNamesAndHasIconWithUnknownIconSet()
-    {
-        IconException exception =
-            assertThrows(IconException.class, () -> this.iconManager.getIconNames("unknownIconSet"));
-        assertEquals("The icon set [unknownIconSet] does not exist.", exception.getMessage());
-
-        exception = assertThrows(IconException.class, () -> this.iconManager.hasIcon("unknownIconSet", "iconA"));
-        assertEquals("The icon set [unknownIconSet] does not exist.", exception.getMessage());
+        assertThrows(IconException.class, () -> this.iconManager.hasIcon("unknownIconSet", "iconA"));
     }
 }

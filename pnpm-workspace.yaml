@@ -63,3 +63,6 @@ catalog:
   vue-tsc: 3.0.6
   vue3-touch-events: 5.0.13
   vuedraggable: 4.1.0
+overrides:
+  # @xwiki/cristal-editors-blocknote-headless and @xwiki/cristal-editors-blocknote-react 0.23.1 pin lodash-es to an exact version, and no later Cristal release on this line pins a fixed one. Remove once Cristal is upgraded to a release that does.
+  "lodash-es@4.17.21": 4.18.1

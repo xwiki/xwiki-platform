@@ -286,8 +286,8 @@ class MentionIT extends AbstractBlockNoteIT
      */
     private void submitMention(BlockNoteInplaceEditPage page, SlashMenu mentionMenu, String user)
     {
-        // Also makes the menu track the item that has to go away when the mention is inserted, which is how
-        // waitForItemSubmitted() below knows the suggestion was taken.
+        // Wait for the suggestions of the query to be loaded and the user to be selected, so that ENTER picks it. This
+        // also makes the menu remember the selected item, which waitForItemSubmitted() waits to disappear.
         mentionMenu.waitForItemSelected(user);
         page.getContentEditor().getRichTextArea().sendKeys(Keys.ENTER);
         mentionMenu.waitForItemSubmitted();

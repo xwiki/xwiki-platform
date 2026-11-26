@@ -61,7 +61,6 @@ class DefaultMentionFactory implements MentionFactory {
 
   public createMention(user: SuggestedUser): InlineContentType {
     return createInlineMacro({
-      kind: "inline",
       id: "mention",
       params: {
         reference: user.reference,

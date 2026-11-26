@@ -39,6 +39,7 @@ import { StyleImplementation } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
 import { StyleSpecs } from '@blocknote/core';
+import { SuggestedUser } from '@xwiki/platform-user-suggest-api';
 import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 
 // @beta
@@ -94,6 +95,9 @@ export class ComponentInit {
 export type ContributedBlockNoteOptions = Partial<Pick<BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>, "uploadFile">>;
 
 // @beta
+export function createInlineMacro(invocation: Omit<InlineMacroInvocation, "kind">): InlineContentType;
+
+// @beta
 export type EditorAppearance = {
     theme?: "light" | "dark";
     contentStyles?: "editor" | "host";
@@ -117,6 +121,7 @@ export interface EditorFeatures {
     images?: false;
     links?: object | false;
     macros?: MacroFeatureOptions | false;
+    mentions?: object | false;
     pasteFilter?: false;
     textStyles?: false;
     xwikiRendering?: false;
@@ -353,6 +358,17 @@ export type MacroInsertionEditorPrefillData = {
 
 // @beta
 export const macrosFeature: EditorFeature;
+
+// @beta
+export interface MentionFactory {
+    createMention(user: SuggestedUser): InlineContentType;
+}
+
+// @beta
+export const mentionFactoryName = "MentionFactory";
+
+// @beta
+export const mentionsFeature: EditorFeature;
 
 // @beta
 export const METADATA_PROP = "metadata";

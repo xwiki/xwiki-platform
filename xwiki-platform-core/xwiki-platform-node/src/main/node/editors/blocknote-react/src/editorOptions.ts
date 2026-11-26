@@ -124,8 +124,9 @@ interface EditorFeatures {
 
   /**
    * The user mentions are enabled when this is missing. `false` disables the mention menu, even when the services it
-   * needs are bound. The mentions already in the content are still displayed. The options of the mentions feature are
-   * those of the `MentionFactory`, declared by the integration binding it.
+   * needs are bound. The mentions already in the content are still displayed. The feature has no option of its own.
+   *
+   * @since 19.0.0RC1
    */
   mentions?: object | false;
 

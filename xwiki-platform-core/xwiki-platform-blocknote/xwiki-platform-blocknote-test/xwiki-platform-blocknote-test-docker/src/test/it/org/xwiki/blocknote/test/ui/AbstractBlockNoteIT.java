@@ -73,8 +73,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         // XAR that we don't install here.
         "org.xwiki.platform:xwiki-platform-wiki-creationjob",
 
-        // The base configuration of the editor reads the user scope of the wiki from $services.wiki.user, and a
-        // template is evaluated outside of any extension namespace, so that script service has to be core.
+        // uorgsuggest.vm reads the user scope of the suggesting wiki from $services.wiki.user, and a template is
+        // evaluated outside of any extension namespace, so that script service has to be core.
         "org.xwiki.platform:xwiki-platform-wiki-script",
         "org.xwiki.platform:xwiki-platform-wiki-user-default",
         "org.xwiki.platform:xwiki-platform-wiki-user-script"

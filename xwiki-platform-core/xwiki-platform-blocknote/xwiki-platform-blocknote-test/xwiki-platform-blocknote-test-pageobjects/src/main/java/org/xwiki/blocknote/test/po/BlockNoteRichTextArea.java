@@ -478,16 +478,6 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
-     * @param index the index of the block, starting from 0
-     * @return the type of the specified block, e.g. "paragraph" or "xwikiMacroBlock"
-     * @since 19.0.0RC1
-     */
-    public String getBlockType(int index)
-    {
-        return getBlock(index).getDomAttribute("data-content-type");
-    }
-
-    /**
      * Pastes several files at once into the rich text area, as one transfer, at the caret.
      *
      * @param filePaths the paths of the files to paste, relative to the test resources

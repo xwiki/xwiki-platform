@@ -42,9 +42,14 @@ type MacroCall = {
   content?: unknown;
 };
 
-/** Convert an editor macro invocation into the {@link MacroCall} stored in a macro block's `call` prop. */
+/**
+ * Convert an editor macro invocation into the {@link MacroCall} stored in a macro block's `call` prop. The block or
+ * inline distinction is carried by the content type rather than by the call, so the kind isn't needed here.
+ */
 function invocationToMacroCall(
-  invocation: MacroBlockInvocation | InlineMacroInvocation,
+  invocation:
+    | Omit<MacroBlockInvocation, "kind">
+    | Omit<InlineMacroInvocation, "kind">,
 ): MacroCall {
   const call: MacroCall = {
     name: invocation.id,
@@ -105,7 +110,7 @@ function macroCallToInvocation(
  * @beta
  */
 function createInlineMacro(
-  invocation: InlineMacroInvocation,
+  invocation: Omit<InlineMacroInvocation, "kind">,
 ): InlineContentType {
   const props = { call: JSON.stringify(invocationToMacroCall(invocation)) };
   // NOTE: the schema is dynamically typed with macros, so the types are incorrect here.

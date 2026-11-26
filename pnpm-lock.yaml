@@ -148,8 +148,8 @@ catalogs:
       specifier: 8.45.0
       version: 8.45.0
     u-node:
-      specifier: 0.0.2
-      version: 0.0.2
+      specifier: 0.0.8
+      version: 0.0.8
     vite:
       specifier: 7.3.7
       version: 7.3.7
@@ -322,7 +322,7 @@ importers:
         version: 6.3.7
       u-node:
         specifier: 'catalog:'
-        version: 0.0.2
+        version: 0.0.8
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.23(vue@3.5.45(typescript@5.9.3))
@@ -2364,9 +2364,6 @@ packages:
   lodash@4.18.1:
     resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
-  lodash@4.2.1:
-    resolution: {integrity: sha512-GZttIEgpAXIRPojhmAjK8qs5sDIYi7Usv7vp0l2O6ccLU9fxZB0TtvkemdjHyljjMFQt02w4lhKLyvB5YH2C7g==}
-
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
 
@@ -3127,8 +3124,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  u-node@0.0.2:
-    resolution: {integrity: sha512-MktcBCTkqnuu1ASws/vF9WePAcqV3ZPGVOlDsydVB0cxIOPxzJWYMHVFosu17KAVmTayVfpnj3oiwqrcmOQCjA==}
+  u-node@0.0.8:
+    resolution: {integrity: sha512-YIh8zu9dmBHj+H24XdRGUDDmzb0A1Faa6OS7OhIGk7iwtm1uI7QUZI+JnLB//WdY6W6hhinof00GM1V/GQcj5Q==}
+    engines: {node: '>=24'}
 
   uc.micro@2.1.0:
     resolution: {integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==}
@@ -5625,8 +5623,6 @@ snapshots:
 
   lodash@4.18.1: {}
 
-  lodash@4.2.1: {}
-
   longest-streak@3.1.0: {}
 
   lru-cache@10.4.3: {}
@@ -6565,9 +6561,7 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  u-node@0.0.2:
-    dependencies:
-      lodash: 4.2.1
+  u-node@0.0.8: {}
 
   uc.micro@2.1.0: {}
 

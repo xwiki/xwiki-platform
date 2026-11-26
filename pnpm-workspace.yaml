@@ -54,7 +54,7 @@ catalog:
   tippy.js: 6.3.7
   typescript: 5.9.3
   typescript-eslint: 8.45.0
-  u-node: 0.0.2
+  u-node: 0.0.8
   vite: 7.3.7
   vitest: 4.1.12
   vue: 3.5.45

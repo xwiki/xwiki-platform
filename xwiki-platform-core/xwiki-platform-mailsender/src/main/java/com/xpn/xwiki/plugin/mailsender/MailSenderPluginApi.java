@@ -53,6 +53,11 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderPluginApi.class);
 
     /**
+     * The key under which the error message is stored in the XWiki context.
+     */
+    private static final String ERROR_KEY = "error";
+
+    /**
      * API constructor.
      * 
      * @param plugin The wrapped plugin object.

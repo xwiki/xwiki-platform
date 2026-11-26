@@ -66,7 +66,7 @@ public class Icon
     }
 
     /**
-     * @return {@code true} if the icon name is deprecated in favor of another one, {@code false} otherwise
+     * {@return {@code true} if the icon name is deprecated in favor of another one, {@code false} otherwise}
      * @since 19.0.0RC1
      */
     public boolean isDeprecated()

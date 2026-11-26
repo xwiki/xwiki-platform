@@ -2980,10 +2980,6 @@ packages:
   sortablejs@1.14.0:
     resolution: {integrity: sha512-pBXvQCs5/33fdN1/39pPL0NZF20LeRbLQ5jtnheIPN9JQAaufGjKdWduZn4U7wCtVuzKhmRkI0DFYHYRbB2H1w==}
 
-  source-map-js@1.2.1:
-    resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
-    engines: {node: '>=0.10.0'}
-
   source-map-js@1.2.4:
     resolution: {integrity: sha512-J7ZjMvHd9O1fcT/5V09QWaaSl2BbWx3F6O08spde82Namf9UB0GxRVIPiNbVsdKkoizHiSpTodo3vp2bAy91MA==}
     engines: {node: '>=6.0.0'}
@@ -3946,12 +3942,12 @@ snapshots:
   '@intlify/message-compiler@11.1.12':
     dependencies:
       '@intlify/shared': 11.1.12
-      source-map-js: 1.2.1
+      source-map-js: 1.2.4
 
   '@intlify/message-compiler@11.4.23':
     dependencies:
       '@intlify/shared': 11.4.23
-      source-map-js: 1.2.1
+      source-map-js: 1.2.4
 
   '@intlify/shared@11.1.12': {}
 
@@ -4546,7 +4542,7 @@ snapshots:
       '@vue/shared': 3.5.38
       entities: 7.0.1
       estree-walker: 2.0.2
-      source-map-js: 1.2.1
+      source-map-js: 1.2.4
 
   '@vue/compiler-core@3.5.45':
     dependencies:
@@ -5039,7 +5035,7 @@ snapshots:
   css-tree@3.2.1:
     dependencies:
       mdn-data: 2.27.1
-      source-map-js: 1.2.1
+      source-map-js: 1.2.4
 
   cssesc@3.0.0: {}
 
@@ -6404,8 +6400,6 @@ snapshots:
       supports-color: 7.2.0
 
   sortablejs@1.14.0: {}
-
-  source-map-js@1.2.1: {}
 
   source-map-js@1.2.4: {}
 

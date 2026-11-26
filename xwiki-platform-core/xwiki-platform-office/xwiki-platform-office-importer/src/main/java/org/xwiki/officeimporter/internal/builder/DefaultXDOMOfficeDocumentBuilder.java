@@ -24,7 +24,6 @@ import java.io.StringReader;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.w3c.dom.Document;
@@ -67,12 +66,10 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
     private Parser xHtmlParser;
 
     /**
-     * Passed into XDOMOfficeDocument. The root component manager would not see the syntaxes that installed
-     * extensions provide.
+     * Component manager to be passed into XDOMOfficeDocument.
      */
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> contextComponentManagerProvider;
+    private ComponentManager componentManager;
 
     /**
      * Used to serialize the target document reference.
@@ -103,8 +100,7 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
         } catch (ParseException ex) {
             throw new OfficeImporterException("Error: Could not parse xhtml office content.", ex);
         }
-        return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifactsMap(),
-            this.contextComponentManagerProvider.get(),
+        return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifactsMap(), this.componentManager,
             xhtmlOfficeDocument.getConverterResult());
     }
 }

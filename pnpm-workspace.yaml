@@ -44,7 +44,7 @@ catalog:
   jiti: 2.6.0
   jquery: 3.7.1
   jsdom: 29.1.1
-  lodash: 4.17.21
+  lodash: 4.18.1
   lz-string: 1.5.0
   npm-run-all2: 8.0.4
   pinia: 3.0.2

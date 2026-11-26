@@ -197,21 +197,6 @@ public interface IconManager
     List<String> getIconNames(String iconSetName) throws IconException;
 
     /**
-     * Get the list of the names of the available icons in the specified icon set.
-     *
-     * @param iconSetName name of the icon set
-     * @param includeDeprecated {@code true} to include the names of the deprecated icons, {@code false} to leave them
-     *     out
-     * @return the icon names
-     * @throws IconException if problem occurs
-     * @since 19.0.0RC1
-     */
-    default List<String> getIconNames(String iconSetName, boolean includeDeprecated) throws IconException
-    {
-        return getIconNames(iconSetName);
-    }
-
-    /**
      * Checks if the provided icon name exists in the current icon set.
      *
      * @param iconName an icon name (for instance, {@code add})

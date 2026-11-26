@@ -29,8 +29,6 @@ public class Icon
 {
     private String value;
 
-    private boolean deprecated;
-
     /**
      * Default constructor.
      */
@@ -63,25 +61,5 @@ public class Icon
     public void setValue(String value)
     {
         this.value = value;
-    }
-
-    /**
-     * {@return {@code true} if the icon name is deprecated in favor of another one, {@code false} otherwise}
-     * @since 19.0.0RC1
-     */
-    public boolean isDeprecated()
-    {
-        return this.deprecated;
-    }
-
-    /**
-     * Set whether the icon name is deprecated in favor of another one.
-     *
-     * @param deprecated {@code true} if the icon name is deprecated
-     * @since 19.0.0RC1
-     */
-    public void setDeprecated(boolean deprecated)
-    {
-        this.deprecated = deprecated;
     }
 }

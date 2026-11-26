@@ -263,23 +263,6 @@ public class IconSet
     }
 
     /**
-     * {@return the list of names of the icons}
-     * @param includeDeprecated {@code true} to include the names of the deprecated icons, {@code false} to leave them
-     *     out
-     * @since 19.0.0RC1
-     */
-    public List<String> getIconNames(boolean includeDeprecated)
-    {
-        if (includeDeprecated) {
-            return getIconNames();
-        }
-        return this.iconMap.entrySet().stream()
-            .filter(entry -> !entry.getValue().isDeprecated())
-            .map(Map.Entry::getKey)
-            .toList();
-    }
-
-    /**
      * Checks if the provided icon name exists in the icon set.
      *
      * @param iconName an icon name (for instance, {@code add})

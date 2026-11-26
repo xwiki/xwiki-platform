@@ -69,6 +69,8 @@
     "@xwiki/platform-user-suggest-api": "workspace:*",
     "i18next": "catalog:",
     "lodash-es": "catalog:",
+    "prosemirror-model": "catalog:",
+    "prosemirror-state": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-i18next": "catalog:",

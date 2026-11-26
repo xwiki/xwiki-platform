@@ -24,6 +24,7 @@ import { imagesFeature } from "./features/images/images";
 import { linksFeature } from "./features/links/links";
 import { macrosFeature } from "./features/macros/macros";
 import { mentionsFeature } from "./features/mentions/mentions";
+import { pasteFilterFeature } from "./features/pasteFilter/pasteFilter";
 import { textStylesFeature } from "./features/textStyles/textStyles";
 import type { EditorFeature } from "./features/editorFeature";
 import type { Container } from "inversify";
@@ -42,6 +43,7 @@ export class ComponentInit {
   constructor(container: Container) {
     for (const feature of [
       fileTransferFeature,
+      pasteFilterFeature,
       codeBlocksFeature,
       textStylesFeature,
       imagesFeature,

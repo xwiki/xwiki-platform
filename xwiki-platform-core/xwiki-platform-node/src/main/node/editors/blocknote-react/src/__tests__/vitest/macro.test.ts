@@ -19,16 +19,12 @@
  */
 // @vitest-environment jsdom
 
-import { EditorInstanceContext } from "../../contexts";
-import { setMacroOutput } from "../../features/macros/macroMetadata";
 import { MacroOutput } from "../../features/macros/macroOutput";
-import { createBlockMetadataStore } from "../../misc/blockMetadata";
+import { MacroOutputCache } from "../../features/macros/macroOutputCache";
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { describe, expect, test } from "vitest";
-import type { EditorInstance } from "../../editorInstance";
-import type { BlockMetadataStore } from "../../misc/blockMetadata";
 import type { MacroCall } from "../../misc/macroInvocation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,19 +35,12 @@ function render(
   nodes: Nodes,
   call: MacroCall,
   inline = false,
-  metadata: BlockMetadataStore = createBlockMetadataStore(),
+  outputs = new MacroOutputCache(),
 ): HTMLElement {
   const container = document.createElement("div");
   const root = createRoot(container);
   flushSync(() => {
-    root.render(
-      createElement(
-        EditorInstanceContext.Provider,
-        // The macro output only needs the metadata of the editor instance.
-        { value: { metadata } as EditorInstance },
-        createElement(MacroOutput, { nodes, call, inline }),
-      ),
-    );
+    root.render(createElement(MacroOutput, { nodes, call, inline, outputs }));
   });
   return container;
 }
@@ -341,8 +330,9 @@ describe("MacroOutput (nested macro output lookup)", () => {
     },
   ];
   const editableOutput = [{ type: "xwikiEditable" }];
-  const metadata = createBlockMetadataStore();
-  setMacroOutput(metadata, "nested-1", JSON.stringify(errorCall), errorOutput);
+  const outputs = new MacroOutputCache({
+    "nested-1": { call: JSON.stringify(errorCall), output: errorOutput },
+  });
 
   /** @returns an info macro call whose content holds an error macro call, without its output */
   function infoCallWithNestedError(nestedCall: MacroCall): MacroCall {
@@ -358,12 +348,12 @@ describe("MacroOutput (nested macro output lookup)", () => {
     };
   }
 
-  test("retrieves the output of a macro nested in the macro content from the block metadata", () => {
+  test("retrieves the output of a macro nested in the macro content from the macro outputs", () => {
     const container = render(
       editableOutput,
       infoCallWithNestedError(errorCall),
       false,
-      metadata,
+      outputs,
     );
 
     const nested = container.querySelector<HTMLElement>(
@@ -373,7 +363,7 @@ describe("MacroOutput (nested macro output lookup)", () => {
     expect(nested!.textContent).toBe("test");
   });
 
-  test("displays a placeholder for a nested macro without output when its output is not in the block metadata", () => {
+  test("displays a placeholder for a nested macro without output when its output is not in the macro outputs", () => {
     const container = render(
       editableOutput,
       infoCallWithNestedError(errorCall),
@@ -389,7 +379,7 @@ describe("MacroOutput (nested macro output lookup)", () => {
       editableOutput,
       infoCallWithNestedError({ ...errorCall, content: "changed" }),
       false,
-      metadata,
+      outputs,
     );
 
     expect(

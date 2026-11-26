@@ -19,8 +19,6 @@
  */
 import { serviceContainerMock } from "./serviceContainer.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
-import { setMacroOutput } from "../../features/macros/macroMetadata";
-import { createBlockMetadataStore } from "../../misc/blockMetadata";
 import { macroEditorName } from "../../services/macroEditor";
 import { useMemo, useState } from "react";
 import type { BlockType } from "../../blocknote";
@@ -46,9 +44,6 @@ export type BlockNoteForTestProps = {
   // Binds the services that the test needs in the service container. Only for the stories wrapping this one, since a
   // function passed from the test runs outside of the browser.
   bind?: (container: Container) => void;
-  // The server-rendered output of the macro calls of the content, put in the metadata store of the editor instance
-  // (the store itself can't be passed from the test, since only serializable properties can).
-  macroOutputs?: { id: string; call: string; output: unknown[] }[];
   // Binds a macro editor returning the given macro call (or nothing, as when the user cancels). The calls it gets are
   // rendered, so that the tests can check them.
   macroEditor?: { result?: MacroBlockInvocation | InlineMacroInvocation };
@@ -58,7 +53,6 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
   content,
   options,
   bind,
-  macroOutputs,
   macroEditor,
 }) => {
   const [macroEditorCalls, setMacroEditorCalls] = useState<unknown[]>([]);
@@ -88,15 +82,6 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
     // The services are registered once, when the container is created.
   }, []);
 
-  const metadata = useMemo(() => {
-    const store = createBlockMetadataStore();
-    for (const { id, call, output } of macroOutputs ?? []) {
-      setMacroOutput(store, id, call, output);
-    }
-    return store;
-    // The macro outputs are put in the store once, when the editor is created.
-  }, []);
-
   return (
     <>
       <BlockNoteViewWrapper
@@ -104,7 +89,6 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
           lang: "en",
           label: "Some Label",
           serviceContainer,
-          metadata,
           ...options,
           syntax: options.syntax.id,
         }}

@@ -306,10 +306,6 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
     // Whether the user can attach files to the edited document (by pasting or dropping them, or with the upload
     // actions).
     upload: !uploadDisabled,
-    // The data that the BlockNote schema can't hold, extracted from the loaded content and put back on save, and the
-    // output of the macros, kept outside the edited content (which is shared with the other users when editing in
-    // realtime) because it was rendered for the current user.
-    metadata: blockNoteDocument!.metadata,
     features: {
       codeBlocks: {
         // Style the code blocks like the code macro output in view mode.
@@ -320,6 +316,11 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
         // links, to keep the link type selector short. Existing path and UNC path links are still edited with their
         // own link type.
         excludedTargetTypes: ["path", "unc"],
+      },
+      macros: {
+        // The output of the macro calls, extracted from the loaded content, kept outside the edited content (which is
+        // shared with the other users when editing in realtime) because it was rendered for the current user.
+        outputs: blockNoteDocument!.macroOutputs,
       },
     },
   };

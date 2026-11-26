@@ -893,4 +893,49 @@ class LinkIT extends AbstractBlockNoteIT
         page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
         page.getContentEditor().getRichTextArea().waitUntilLinkIsPresent("createLinkToCurrentPage");
     }
+
+    @Test
+    @Order(26)
+    void undoLinkEdit(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create the page currently linked to (the "old" target) and the page we're going to switch the link to (the
+        // "new" target), and wait for the new one to be indexed, since the page link suggestions are based on Solr
+        // indexation.
+        DocumentReference oldTargetPage =
+            new DocumentReference("UndoLinkOldTarget", testReference.getLastSpaceReference());
+        setup.deletePage(oldTargetPage);
+        setup.createPage(oldTargetPage, "", "Undo Link Old Target");
+        DocumentReference newTargetPage =
+            new DocumentReference("UndoLinkNewTarget", testReference.getLastSpaceReference());
+        setup.deletePage(newTargetPage);
+        setup.createPage(newTargetPage, "", "Undo Link New Target");
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[second>>doc:UndoLinkOldTarget]] third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Change the target page and the label of the link. The target is changed first, because the suggestions of the
+        // page reference (focused when the link modal opens) cover the link options until a page is selected.
+        textArea.click().moveCaretTo(8);
+        BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+        linkModal.setPageReference("Undo Link New Target", "Undo Link New Target");
+        linkModal.setDisplayText("2nd");
+        linkModal.submit();
+        textArea.waitUntilLinkIsPresent("2nd");
+
+        // Undo the link change. The undo shortcut is sent alone, so that the modifier key is released afterwards.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        textArea.waitUntilLinkIsPresent("second");
+
+        // Save and check the source: the link points to its initial target, whose reference (kept in the link metadata)
+        // was restored with the link.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>doc:UndoLinkOldTarget]] third", wikiEditor.getContent());
+    }
 }

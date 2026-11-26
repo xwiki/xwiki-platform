@@ -367,20 +367,27 @@ test("Macro blocks show their output from the metadata store", async ({
           children: [],
         } as unknown as BlockType,
       ]}
-      options={{ syntax: FULL_SYNTAX }}
-      macroOutputs={[
-        {
-          id: "with-output",
-          call,
-          output: [{ type: "paragraph", content: "Some information" }],
+      options={{
+        syntax: FULL_SYNTAX,
+        features: {
+          macros: {
+            outputs: {
+              "with-output": {
+                call,
+                output: [{ type: "paragraph", content: "Some information" }],
+              },
+              // The output of a macro call that was modified since it was rendered.
+              modified: {
+                call: JSON.stringify({
+                  name: "warning",
+                  parameters: { a: "b" },
+                }),
+                output: [{ type: "paragraph", content: "Some warning" }],
+              },
+            },
+          },
         },
-        // The output of a macro call that was modified since it was rendered.
-        {
-          id: "modified",
-          call: JSON.stringify({ name: "warning", parameters: { a: "b" } }),
-          output: [{ type: "paragraph", content: "Some warning" }],
-        },
-      ]}
+      }}
     />,
   );
 

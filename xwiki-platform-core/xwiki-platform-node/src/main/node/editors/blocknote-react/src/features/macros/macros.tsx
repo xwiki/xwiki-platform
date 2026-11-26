@@ -20,7 +20,8 @@
 import { CustomInsertMacroButton } from "./CustomInsertMacroButton";
 import { CustomMacroEditButton } from "./CustomMacroEditButton";
 import { getMacroEditing } from "./macroEditing";
-import { XWikiInlineMacro, XWikiMacroBlock } from "./macroSpec";
+import { MacroOutputCache } from "./macroOutputCache";
+import { createXWikiInlineMacro, createXWikiMacroBlock } from "./macroSpec";
 import { MACRO_NAME_PREFIX, adaptMacroForBlockNote } from "./utils";
 import { insertMacroInvocation } from "../../misc/macroInvocation";
 import { filterMap } from "@xwiki/platform-fn-utils";
@@ -65,13 +66,17 @@ function adaptMacros(
 
 /**
  * @param macros - the client-rendered macros
+ * @param outputs - the output of the server-rendered macro calls of the editor instance
  * @returns the block and inline content types of the macro calls: the server-rendered ones, and those of the
  *   client-rendered macros
  */
-function macroSchema(macros: BlockNoteConcreteMacro[]): SchemaContribution {
+function macroSchema(
+  macros: BlockNoteConcreteMacro[],
+  outputs: MacroOutputCache,
+): SchemaContribution {
   return {
     blockSpecs: {
-      xwikiMacroBlock: XWikiMacroBlock(),
+      xwikiMacroBlock: createXWikiMacroBlock(outputs)(),
       ...Object.fromEntries(
         filterMap(macros, ({ macro, bnRendering }) =>
           bnRendering.type === "block"
@@ -84,7 +89,7 @@ function macroSchema(macros: BlockNoteConcreteMacro[]): SchemaContribution {
       ),
     },
     inlineContentSpecs: {
-      xwikiInlineMacro: XWikiInlineMacro,
+      xwikiInlineMacro: createXWikiInlineMacro(outputs),
       ...Object.fromEntries(
         filterMap(macros, ({ macro, bnRendering }) =>
           bnRendering.type === "inline"
@@ -160,8 +165,8 @@ function macroSlashMenuItems(
 }
 
 /**
- * Displays, inserts and edits macro calls: the server-rendered macro calls and the client-rendered macros
- * (`features.macros.list`), added to the schema of the editor, the slash menu items and block type select items of the
+ * Displays, inserts and edits macro calls: the server-rendered macro calls, displayed with their output
+ * (`features.macros.outputs`), and the client-rendered macros (`features.macros.list`), added to the schema of the editor, the slash menu items and block type select items of the
  * client-rendered macros, and the actions to insert and edit macro calls with the `MacroEditor` bound in the service
  * container (the "Macro" slash menu item and the toolbar buttons), hidden without one. Nothing is contributed when the
  * syntax of the edited content doesn't support macros.
@@ -183,12 +188,12 @@ const macrosFeature: EditorFeature = {
       return undefined;
     }
     // Not called when the macros are disabled.
-    const macros = adaptMacros(
-      serviceContainer,
-      (options.features?.macros || undefined)?.list ?? [],
-    );
+    const macroOptions = options.features?.macros || undefined;
+    const macros = adaptMacros(serviceContainer, macroOptions?.list ?? []);
+    // The output of the server-rendered macro calls is kept with the macro calls rendering it.
+    const outputs = new MacroOutputCache(macroOptions?.outputs);
     return {
-      schema: macroSchema(macros),
+      schema: macroSchema(macros, outputs),
       slashMenuItems: () =>
         macroSlashMenuItems(getInstance(), macros, syntax, t),
       formattingToolbar: {

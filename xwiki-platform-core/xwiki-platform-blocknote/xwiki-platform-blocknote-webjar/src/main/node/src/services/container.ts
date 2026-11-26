@@ -39,6 +39,8 @@ import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platfor
 import { ComponentInit as DocumentXWikiComponentList } from "@xwiki/platform-document-xwiki";
 import {
   ComponentInit as BlockNoteReactComponentInit,
+  XWIKI_METADATA_KEYS,
+  blockMetadataKeyName,
   editorFeatureName,
   xwikiRenderingFeature,
 } from "@xwiki/platform-editors-blocknote-react";
@@ -58,7 +60,10 @@ import { ComponentInit as UserSuggestComponentList } from "@xwiki/platform-user-
 import { ComponentInit as UserSuggestXWikiComponentList } from "@xwiki/platform-user-suggest-xwiki";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
-import type { EditorFeature } from "@xwiki/platform-editors-blocknote-react";
+import type {
+  BlockMetadataKey,
+  EditorFeature,
+} from "@xwiki/platform-editors-blocknote-react";
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -94,11 +99,15 @@ new UserSuggestComponentList(container);
 new UserSuggestXWikiComponentList(container);
 
 // The generic editing features of the BlockNote editor, then the block types and text styles of the content converted
-// by the XWiki rendering.
+// by the XWiki rendering, with the keys of the metadata it keeps in the content (so that their pasted values are
+// filtered rather than dropped).
 new BlockNoteReactComponentInit(container);
 container
   .bind<EditorFeature>(editorFeatureName)
   .toConstantValue(xwikiRenderingFeature);
+XWIKI_METADATA_KEYS.forEach((key) =>
+  container.bind<BlockMetadataKey>(blockMetadataKeyName).toConstantValue(key),
+);
 
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);

@@ -25,14 +25,22 @@ import java.util.Map;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.plugin.PluginApi;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Plugin that brings powerful mailing capabilities. This is the wrapper accessible from in-document scripts.
+ * <p>
+ * Sending a mail requires the author of the calling script to have admin right on the current wiki. The rights of the
+ * current user are not checked, so that a script written by an admin (e.g. the Share Page feature) can send mails for
+ * any user.
  * 
  * @see MailSender
  * @version $Id$
@@ -118,6 +126,10 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
         String documentFullName, VelocityContext vcontext)
     {
+        if (!isAllowedToSend()) {
+            return -1;
+        }
+
         try {
             return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext,
                 this.context);
@@ -149,6 +161,10 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     public int sendMessageFromTemplate(String from, String to, String cc, String bcc, String language,
         String documentFullName, Map<String, Object> parameters)
     {
+        if (!isAllowedToSend()) {
+            return -1;
+        }
+
         try {
             return getProtectedPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, parameters,
                 this.context);
@@ -171,6 +187,10 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     @Override
     public int sendMail(Mail mail)
     {
+        if (!isAllowedToSend()) {
+            return -1;
+        }
+
         int result = 0;
         try {
             getProtectedPlugin().sendMail(mail, this.context);
@@ -198,6 +218,10 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
     @Override
     public int sendMail(Mail mail, MailConfiguration mailConfiguration)
     {
+        if (!isAllowedToSend()) {
+            return -1;
+        }
+
         int result = 0;
         try {
             getProtectedPlugin().sendMail(mail, mailConfiguration, this.context);
@@ -215,5 +239,23 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
         }
 
         return result;
+    }
+
+    /**
+     * Check if the author of the calling script is allowed to send mails, i.e. if it has admin right on the current
+     * wiki and the permissions have not been dropped. When it's not, the reason is stored in the XWiki context under
+     * the "error" key.
+     *
+     * @return {@code true} if mails can be sent, {@code false} otherwise
+     */
+    private boolean isAllowedToSend()
+    {
+        boolean allowed = !this.context.hasDroppedPermissions() && Utils.getComponent(AuthorizationManager.class)
+            .hasAccess(Right.ADMIN, this.context.getAuthorReference(), new WikiReference(this.context.getWikiId()));
+        if (!allowed) {
+            this.context.put(ERROR_KEY, "The author of the script needs admin right on the wiki to send mails. "
+                + "No mail has been sent.");
+        }
+        return allowed;
     }
 }

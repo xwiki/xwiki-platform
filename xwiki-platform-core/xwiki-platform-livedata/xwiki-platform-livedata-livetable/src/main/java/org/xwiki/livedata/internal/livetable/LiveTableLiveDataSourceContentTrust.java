@@ -21,8 +21,8 @@ package org.xwiki.livedata.internal.livetable;
 
 import java.util.Map;
 
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataQuery;

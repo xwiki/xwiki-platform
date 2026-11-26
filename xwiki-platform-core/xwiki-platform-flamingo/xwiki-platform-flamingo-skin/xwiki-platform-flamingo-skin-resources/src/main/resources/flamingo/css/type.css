@@ -8,7 +8,9 @@
 .xdocLastModification,
 #xdocFooter,
 #historyform td,
-#changes-info {
+#changes-info,
+/* The breadcrumb tree uses the smaller font size of the breadcrumb. */
+.breadcrumb > li.dropdown > .dropdown-menu {
   /* Rounded down to a whole pixel, to keep the size the text had with LESS. */
   font-size: round(down, calc(var(--font-size-base) * .95), 1px);
 }

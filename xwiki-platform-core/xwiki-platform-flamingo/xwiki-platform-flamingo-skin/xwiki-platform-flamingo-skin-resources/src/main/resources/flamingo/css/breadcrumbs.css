@@ -1,0 +1,105 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+.breadcrumb {
+  /* How much the targets overflow the text line of the breadcrumb, above and below. */
+  --breadcrumb-target-overflow: max(0px, calc((var(--target-size-minimum) - 1lh) / 2));
+
+  > li {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    /* Leave room for the taller targets inside the items, which hide their overflow. */
+    padding-block: var(--breadcrumb-target-overflow);
+    /* Half of that room goes over the breadcrumb padding, the other half makes the items taller than the text line. */
+    margin-block: calc(-0.5 * var(--breadcrumb-target-overflow));
+
+    &.open {
+      overflow: inherit;
+    }
+
+    /* Styles for the tree navigation. */
+    &.dropdown {
+      /* We make sure the links get their own specific color. */
+      > a {
+        color: var(--breadcrumb-link-color);
+
+        &:hover, &:focus {
+          color: var(--breadcrumb-active-color);
+        }
+      }
+
+      > .dropdown-toggle {
+        color: var(--breadcrumb-color);
+        cursor: pointer;
+        /* Remove the default styles of buttons. */
+        background: transparent;
+        border-color: transparent;
+        padding: 0;
+
+        &:hover, &:focus {
+          color: var(--breadcrumb-active-color);
+          /* We want to revert the default from Bootstrap where the outline is removed. */
+          outline: revert;
+        }
+      }
+
+      > .dropdown-menu {
+        /* Leave more padding around the tree. */
+        padding: 5px 10px 5px 0;
+        /* The smaller font size of the tree is set in type.css, with the other smaller texts. */
+
+        a {
+          /* Reset the link color inside the tree. */
+          color: var(--dropdown-link-color);
+        }
+      }
+    }
+  }
+
+  /* Give the icon-only targets the minimum target size, without making their icon bigger. The first item of a
+  hierarchy breadcrumb is the home icon link. */
+  > .wiki:first-child > a,
+  > li.dropdown > .dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--target-size-minimum);
+    min-height: var(--target-size-minimum);
+    /* Center the targets on the text line. Aligning on the baseline would raise image icons, whose baseline is their
+    bottom edge. */
+    vertical-align: top;
+    /* Keep the line height of the breadcrumb, the targets are taller than the text line. */
+    margin-block: calc(-1 * var(--breadcrumb-target-overflow));
+  }
+
+  > .active:last-of-type a {
+    color: var(--breadcrumb-active-color);
+  }
+}
+
+/* Display the separator without the non-breaking space that Bootstrap adds after it. The breadcrumbs are ordered
+  lists, so matching the list element makes this rule more specific than the Bootstrap one, which is loaded after this
+  file. */
+ol.breadcrumb > li + li::before {
+  /* The variable must hold a quoted CSS string, otherwise the separator is not displayed. */
+  content: var(--breadcrumb-separator);
+}

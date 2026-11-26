@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.xwiki.model.reference.DocumentReference;
 
@@ -277,7 +276,7 @@ public class IconSet
         return this.iconMap.entrySet().stream()
             .filter(entry -> !entry.getValue().isDeprecated())
             .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

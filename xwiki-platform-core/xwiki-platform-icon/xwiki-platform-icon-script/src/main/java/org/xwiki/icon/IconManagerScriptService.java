@@ -256,7 +256,7 @@ public class IconManagerScriptService implements ScriptService
             return iconManager.getIconNames(iconSetName, includeDeprecated);
         } catch (IconException e) {
             setLastError(e);
-            return null;
+            return List.of();
         }
     }
 

@@ -22,7 +22,6 @@ package org.xwiki.wysiwyg.macro;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Abstract representation of a node in {@link MacroDescriptorUI}.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.5.0
  */
-@Unstable
 public abstract class AbstractMacroUINode
 {
     private final MacroUINodeType type;
@@ -177,7 +175,6 @@ public abstract class AbstractMacroUINode
      * @return the identifier of the group the parameter belongs to or {@code null} if it doesn't belong to any group.
      * @since 17.9.0RC1
      */
-    @Unstable
     public String getParent()
     {
         return parent;
@@ -190,7 +187,6 @@ public abstract class AbstractMacroUINode
      * @return the current instance
      * @since 17.9.0RC1
      */
-    @Unstable
     public <T extends AbstractMacroUINode> T setParent(String parent)
     {
         this.parent = parent;

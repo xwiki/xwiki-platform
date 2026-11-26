@@ -74,6 +74,8 @@ class RecordsMacroRefactoringTest
 
     private static final SpaceReference MOVED_LOCATION = new SpaceReference("wiki", "Books", "Old");
 
+    private static final String NO_TEMPLATE_PROVIDER_VALUE = "XWiki.NoTemplateProvider";
+
     @InjectMockComponents
     private RecordsMacroRefactoring refactoring;
 
@@ -199,6 +201,24 @@ class RecordsMacroRefactoringTest
     }
 
     @Test
+    void replaceReferenceWhenTheTemplateProviderIsRenamed()
+    {
+        DocumentReference templateProvider = new DocumentReference("wiki", "Books", "BookTemplateProvider");
+        DocumentReference movedTemplateProvider = new DocumentReference("wiki", "Books", "NovelTemplateProvider");
+        MacroBlock macroBlock = macroBlock("templateProvider", "Books.BookTemplateProvider");
+        resolve(macroBlock, "Books.BookTemplateProvider", PAGE, templateProvider);
+        when(this.macroEntityReferenceResolver.resolve("Books.BookTemplateProvider", EntityType.DOCUMENT, macroBlock))
+            .thenReturn(templateProvider);
+        when(this.compactWikiEntityReferenceSerializer.serialize(movedTemplateProvider, PAGE.getWikiReference()))
+            .thenReturn("Books.NovelTemplateProvider");
+
+        Optional<MacroBlock> result =
+            this.refactoring.replaceReference(macroBlock, PAGE, templateProvider, movedTemplateProvider, false);
+
+        assertEquals("Books.NovelTemplateProvider", result.orElseThrow().getParameter("templateProvider"));
+    }
+
+    @Test
     void replaceReferenceKeepsThePartialObjectTypeAndLocationOfAPageMovedToAnotherWiki()
     {
         // A space value names every space, so only its wiki is completed from the page holding the macro.
@@ -220,6 +240,24 @@ class RecordsMacroRefactoringTest
 
         assertEquals("wiki:Books.BookClass", result.getParameter("class"));
         assertEquals("wiki:Archive", result.getParameter("newEntriesLocation"));
+    }
+
+    @Test
+    void replaceReferenceKeepsNoTemplateProviderOfAPageMovedToAnotherWiki()
+    {
+        MacroBlock macroBlock = macroBlock("templateProvider", NO_TEMPLATE_PROVIDER_VALUE);
+        DocumentReference otherWikiPage = new DocumentReference("other", "Shelf", "WebHome");
+        resolveNoTemplateProvider(macroBlock);
+        DocumentReference noTemplateProvider = new DocumentReference("wiki", "XWiki", "NoTemplateProvider");
+        // What a page moved to another wiki would get, were the value a page.
+        resolve(macroBlock, NO_TEMPLATE_PROVIDER_VALUE, PAGE, noTemplateProvider);
+        resolve(macroBlock, NO_TEMPLATE_PROVIDER_VALUE, otherWikiPage,
+            new DocumentReference("other", "XWiki", "NoTemplateProvider"));
+        when(this.compactWikiEntityReferenceSerializer.serialize(noTemplateProvider, otherWikiPage.getWikiReference()))
+            .thenReturn("wiki:XWiki.NoTemplateProvider");
+
+        assertEquals(Optional.empty(), this.refactoring.replaceReference(macroBlock, otherWikiPage, PAGE,
+            otherWikiPage, true, Map.of(PAGE, otherWikiPage)));
     }
 
     @Test
@@ -264,8 +302,23 @@ class RecordsMacroRefactoringTest
             this.refactoring.extractReferences(macroBlock("class", CLASS_VALUE)));
         assertEquals(Set.of(), this.refactoring.extractReferences(macroBlock("id", "books")));
         MacroBlock macroBlock = new MacroBlock(RecordsMacro.ID,
-            Map.of("class", CLASS_VALUE, "newEntriesLocation", LOCATION_VALUE), true);
-        assertEquals(Set.of(new DocumentResourceReference(CLASS_VALUE), new SpaceResourceReference(LOCATION_VALUE)),
+            Map.of("class", CLASS_VALUE, "newEntriesLocation", LOCATION_VALUE, "templateProvider",
+                "Books.BookTemplateProvider"), true);
+        when(this.macroEntityReferenceResolver.resolve("Books.BookTemplateProvider", EntityType.DOCUMENT, macroBlock))
+            .thenReturn(new DocumentReference("wiki", "Books", "BookTemplateProvider"));
+        assertEquals(Set.of(new DocumentResourceReference(CLASS_VALUE), new SpaceResourceReference(LOCATION_VALUE),
+            new DocumentResourceReference("Books.BookTemplateProvider")),
+            this.refactoring.extractReferences(macroBlock));
+    }
+
+    @Test
+    void extractReferencesSkipsNoTemplateProvider()
+    {
+        MacroBlock macroBlock = new MacroBlock(RecordsMacro.ID,
+            Map.of("class", CLASS_VALUE, "templateProvider", NO_TEMPLATE_PROVIDER_VALUE), true);
+        resolveNoTemplateProvider(macroBlock);
+
+        assertEquals(Set.of(new DocumentResourceReference(CLASS_VALUE)),
             this.refactoring.extractReferences(macroBlock));
     }
 
@@ -278,6 +331,12 @@ class RecordsMacroRefactoringTest
     {
         when(this.macroEntityReferenceResolver.resolve(eq(value), eq(EntityType.DOCUMENT), same(macroBlock),
             eq(base))).thenReturn(result);
+    }
+
+    private void resolveNoTemplateProvider(MacroBlock macroBlock)
+    {
+        when(this.macroEntityReferenceResolver.resolve(NO_TEMPLATE_PROVIDER_VALUE, EntityType.DOCUMENT, macroBlock))
+            .thenReturn(new DocumentReference("wiki", "XWiki", "NoTemplateProvider"));
     }
 
     private void resolveSpace(MacroBlock macroBlock, String value, DocumentReference base, SpaceReference result)

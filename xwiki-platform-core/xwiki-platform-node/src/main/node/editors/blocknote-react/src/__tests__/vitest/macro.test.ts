@@ -19,15 +19,13 @@
  */
 // @vitest-environment jsdom
 
-import { createBlockNoteSchema } from "../../blocknote";
-import { MacroOutput } from "../../blocknote/macroOutput";
-import { MacrosContext } from "../../contexts";
-import { BlockNoteEditor } from "@blocknote/core";
+import { MacroOutput } from "../../features/macros/macroOutput";
+import { MacroOutputCache } from "../../features/macros/macroOutputCache";
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { beforeAll, describe, expect, test } from "vitest";
-import type { ContextForMacros, MacroCall } from "../../blocknote/utils";
+import { describe, expect, test } from "vitest";
+import type { MacroCall } from "../../features/macros/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Nodes = any[];
@@ -37,18 +35,12 @@ function render(
   nodes: Nodes,
   call: MacroCall,
   inline = false,
-  macros: ContextForMacros | null = null,
+  outputs = new MacroOutputCache(),
 ): HTMLElement {
   const container = document.createElement("div");
   const root = createRoot(container);
   flushSync(() => {
-    root.render(
-      createElement(
-        MacrosContext.Provider,
-        { value: macros },
-        createElement(MacroOutput, { nodes, call, inline }),
-      ),
-    );
+    root.render(createElement(MacroOutput, { nodes, call, inline, outputs }));
   });
   return container;
 }
@@ -338,12 +330,9 @@ describe("MacroOutput (nested macro output lookup)", () => {
     },
   ];
   const editableOutput = [{ type: "xwikiEditable" }];
-  const outputLookup: ContextForMacros = {
-    getMacroOutput: (id, macroCall) =>
-      id === "nested-1" && macroCall === JSON.stringify(errorCall)
-        ? errorOutput
-        : undefined,
-  };
+  const outputs = new MacroOutputCache({
+    "nested-1": { call: JSON.stringify(errorCall), output: errorOutput },
+  });
 
   /** @returns an info macro call whose content holds an error macro call, without its output */
   function infoCallWithNestedError(nestedCall: MacroCall): MacroCall {
@@ -359,12 +348,12 @@ describe("MacroOutput (nested macro output lookup)", () => {
     };
   }
 
-  test("retrieves the output of a macro nested in the macro content through the macro context", () => {
+  test("retrieves the output of a macro nested in the macro content from the macro outputs", () => {
     const container = render(
       editableOutput,
       infoCallWithNestedError(errorCall),
       false,
-      outputLookup,
+      outputs,
     );
 
     const nested = container.querySelector<HTMLElement>(
@@ -374,7 +363,7 @@ describe("MacroOutput (nested macro output lookup)", () => {
     expect(nested!.textContent).toBe("test");
   });
 
-  test("displays a placeholder for a nested macro without output when there is no macro context", () => {
+  test("displays a placeholder for a nested macro without output when its output is not in the macro outputs", () => {
     const container = render(
       editableOutput,
       infoCallWithNestedError(errorCall),
@@ -390,46 +379,11 @@ describe("MacroOutput (nested macro output lookup)", () => {
       editableOutput,
       infoCallWithNestedError({ ...errorCall, content: "changed" }),
       false,
-      outputLookup,
+      outputs,
     );
 
     expect(
       container.querySelector('[data-macro-name="error"]')!.textContent,
     ).toBe("macro:error");
-  });
-});
-
-describe("XWikiParametersStyle", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let editor: BlockNoteEditor<any, any, any>;
-
-  beforeAll(() => {
-    editor = BlockNoteEditor.create({
-      schema: createBlockNoteSchema([]),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as BlockNoteEditor<any, any, any>;
-  });
-
-  test("applies xwikiParameters (JSON string form) as span attributes on export", () => {
-    const html = editor.blocksToHTMLLossy([
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "x",
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            styles: { xwikiParameters: '{"class":"foo"}' } as any,
-          },
-        ],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
-    ]);
-
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    const span = container.querySelector<HTMLElement>("span.foo");
-    expect(span).not.toBeNull();
-    expect(span!.textContent).toBe("x");
   });
 });

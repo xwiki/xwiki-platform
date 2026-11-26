@@ -67,7 +67,6 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -1179,7 +1178,6 @@ public class Document extends Api
      * @throws XWikiException if an error occurs while creating the XObject
      * @since 17.4.0RC1
      */
-    @Unstable
     public Object newObject(EntityReference classReference) throws XWikiException
     {
         int index = getDoc().createXObject(classReference, getXWikiContext());
@@ -1257,7 +1255,6 @@ public class Document extends Api
      * @return a list of xobjects corresponding to the given XClass or an empty list.
      * @since 17.4.0RC1
      */
-    @Unstable
     public List<Object> getObjects(EntityReference classReference)
     {
         List<BaseObject> objects = this.getDoc().getXObjects(classReference);
@@ -1432,7 +1429,6 @@ public class Document extends Api
      * @return the XWiki Object
      * @since 17.4.0RC1
      */
-    @Unstable
     public Object getObject(EntityReference classReference, int nb)
     {
         try {

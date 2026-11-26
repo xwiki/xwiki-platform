@@ -26,9 +26,10 @@ import { metadataLabels, translate } from "../common/translations";
  * The fields of the Records macro dialog that decide whether readers can create entries from the table.
  *
  * Creating entries needs the edit mode, so the creation strategy is disabled while the edit mode is not allowed, and
- * the location is disabled while there is no strategy. A strategy is also disabled when the table does not display
- * the columns it names the new pages after, with the reason in a warning below the dropdown. The macro editor does not
- * save a disabled field, so turning the edit mode off drops the strategy and the location.
+ * the location and the template are disabled while there is no strategy. A strategy is also disabled when the table
+ * does not display the columns it names the new pages after, with the reason in a warning below the dropdown. The
+ * macro editor does not save a disabled field, so turning the edit mode off drops the strategy, the location and the
+ * template.
  */
 
 const EDIT_MODE_PARAMETER = "allowEditMode";
@@ -36,6 +37,8 @@ const EDIT_MODE_PARAMETER = "allowEditMode";
 const STRATEGY_PARAMETER = "creationStrategy";
 
 const LOCATION_PARAMETER = "newEntriesLocation";
+
+const TEMPLATE_PROVIDER_PARAMETER = "templateProvider";
 
 const COLUMNS_PARAMETER = "properties";
 
@@ -113,34 +116,38 @@ function isDisplayedByDefault(column: string): boolean {
 }
 
 /**
- * Enables the location picker only when it is used.
+ * Enables the fields completing the creation strategy, the location and the template, only when they are used.
  *
  * @param scope - the dialog's form
- * @param enabled - whether the picker is enabled
+ * @param enabled - whether the fields are enabled
  */
-function setLocationEnabled(scope: ParentNode, enabled: boolean): void {
-  const fields = scope.querySelectorAll<HTMLSelectElement>(
-    `select[name="${LOCATION_PARAMETER}"]`,
-  );
-  fields.forEach((field) => {
-    // The suggest widget disables the select along with itself.
-    if (field.selectize) {
-      if (enabled) {
-        field.selectize.enable();
+function setStrategyDependentFieldsEnabled(
+  scope: ParentNode,
+  enabled: boolean,
+): void {
+  scope
+    .querySelectorAll<HTMLSelectElement>(
+      `select[name="${LOCATION_PARAMETER}"], select[name="${TEMPLATE_PROVIDER_PARAMETER}"]`,
+    )
+    .forEach((field) => {
+      // The suggest widget disables the select along with itself.
+      if (field.selectize) {
+        if (enabled) {
+          field.selectize.enable();
+        } else {
+          field.selectize.disable();
+        }
       } else {
-        field.selectize.disable();
+        field.disabled = !enabled;
       }
-    } else {
-      field.disabled = !enabled;
-    }
-    // The button opening the tree next to the picker.
-    field
-      .closest(".location-picker-compact")
-      ?.querySelectorAll("button")
-      .forEach((button) => {
-        button.disabled = !enabled;
-      });
-  });
+      // The button opening the tree next to the picker.
+      field
+        .closest(".location-picker-compact")
+        ?.querySelectorAll("button")
+        .forEach((button) => {
+          button.disabled = !enabled;
+        });
+    });
 }
 
 /**
@@ -187,7 +194,10 @@ function updateCreationFields(scope: ParentNode, reset: boolean): void {
   // The macro editor does not save a disabled option.
   strategy.selectedOptions[0]?.removeAttribute("disabled");
   strategy.disabled = findEditModeInput(scope)?.checked === false;
-  setLocationEnabled(scope, !strategy.disabled && strategy.value !== "");
+  setStrategyDependentFieldsEnabled(
+    scope,
+    !strategy.disabled && strategy.value !== "",
+  );
   showStrategyProblems(strategy, problems);
 }
 

@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -218,7 +216,6 @@ public class BaseObjects extends AbstractList<BaseObject>
      * @since 17.2.1
      * @since 17.3.0RC1
      */
-    @Unstable
     public void setDirty(boolean dirty, boolean deep)
     {
         if (deep) {

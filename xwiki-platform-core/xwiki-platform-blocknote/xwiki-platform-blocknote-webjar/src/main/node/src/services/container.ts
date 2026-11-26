@@ -17,12 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { XWikiFileUploader } from "./attachments/XWikiFileUploader";
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
+import { DefaultLinkMetadataHandler } from "./blocknote/DefaultLinkMetadataHandler";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
-import { DefaultImageWizard } from "./image/DefaultImageWizard";
+import { DefaultImageEditor } from "./image/DefaultImageEditor";
+import { DefaultImageMetadataHandler } from "./image/DefaultImageMetadataHandler";
+import { DefaultMacroEditor } from "./macros/DefaultMacroEditor";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
-import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
@@ -33,6 +36,13 @@ import { ComponentInit as BackendXWikiComponentList } from "@xwiki/platform-back
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as DocumentXWikiComponentList } from "@xwiki/platform-document-xwiki";
+import {
+  ComponentInit as BlockNoteReactComponentInit,
+  XWIKI_METADATA_KEYS,
+  blockMetadataKeyName,
+  editorFeatureName,
+  xwikiRenderingFeature,
+} from "@xwiki/platform-editors-blocknote-react";
 import { ComponentInit as LinkSuggestComponentList } from "@xwiki/platform-link-suggest-api";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as LinkTypeComponentInit } from "@xwiki/platform-link-type-api";
@@ -47,6 +57,10 @@ import { ComponentInit as ModelRemoteURLXWikiComponentList } from "@xwiki/platfo
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
+import type {
+  BlockMetadataKey,
+  EditorFeature,
+} from "@xwiki/platform-editors-blocknote-react";
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -79,12 +93,26 @@ new LinkTypeComponentInit(container);
 new LinkTypeDefaultComponentInit(container);
 new LinkTypeUIComponentInit(container);
 
+// The generic editing features of the BlockNote editor, then the block types and text styles of the content converted
+// by the XWiki rendering, with the keys of the metadata it keeps in the content (so that their pasted values are
+// filtered rather than dropped).
+new BlockNoteReactComponentInit(container);
+container
+  .bind<EditorFeature>(editorFeatureName)
+  .toConstantValue(xwikiRenderingFeature);
+XWIKI_METADATA_KEYS.forEach((key) =>
+  container.bind<BlockMetadataKey>(blockMetadataKeyName).toConstantValue(key),
+);
+
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);
 
-DefaultImageWizard.bind(container);
+XWikiFileUploader.bind(container);
+DefaultImageEditor.bind(container);
+DefaultImageMetadataHandler.bind(container);
+DefaultLinkMetadataHandler.bind(container);
 DefaultMacroWizard.bind(container);
-DefaultBlockNoteMacroWizard.bind(container);
+DefaultMacroEditor.bind(container);
 
 MinimalApp.bind(container);
 

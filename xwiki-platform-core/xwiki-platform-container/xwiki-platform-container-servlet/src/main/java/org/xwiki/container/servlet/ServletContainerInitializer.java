@@ -24,7 +24,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 
 @Role
 public interface ServletContainerInitializer
@@ -53,7 +52,6 @@ public interface ServletContainerInitializer
      * @param response the current response
      * @since 17.0.0RC1
      */
-    @Unstable
     default void initializeRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletContainerException
     {

@@ -26,10 +26,10 @@ import type { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrappe
 
 export const App: React.FC<BlockNoteViewWrapperProps> = (props) => {
   useEffect(() => {
-    if (props.lang !== i18n.language) {
-      i18n.changeLanguage(props.lang);
+    if (props.options.lang !== i18n.language) {
+      i18n.changeLanguage(props.options.lang);
     }
-  }, [props.lang]);
+  }, [props.options.lang]);
 
   return (
     <MantineProvider>

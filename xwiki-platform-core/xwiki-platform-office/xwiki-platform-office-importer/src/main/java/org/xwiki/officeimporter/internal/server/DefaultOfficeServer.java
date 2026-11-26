@@ -31,7 +31,7 @@ import org.jodconverter.core.document.JsonDocumentFormatRegistry;
 import org.jodconverter.core.office.OfficeManager;
 import org.jodconverter.local.LocalConverter;
 import org.jodconverter.local.filter.text.LinkedImagesEmbedderFilter;
-import org.jodconverter.local.office.ExternalOfficeManager;
+import org.jodconverter.local.office.AttachedOfficeManager;
 import org.jodconverter.local.office.LocalOfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -136,7 +136,7 @@ public class DefaultOfficeServer implements OfficeServer
                 throw new OfficeServerException("Failed to start Office server. Reason: " + e.getMessage(), e);
             }
         } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-            ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
+            AttachedOfficeManager.Builder externalProcessOfficeManager = AttachedOfficeManager.builder();
             externalProcessOfficeManager.portNumbers(this.config.getServerPorts());
             externalProcessOfficeManager.connectOnStart(true);
             this.jodManager = externalProcessOfficeManager.build();

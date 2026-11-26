@@ -21,15 +21,12 @@ package org.xwiki.observation.remote;
 
 import java.util.Collection;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * A channel used to communicate between several XWiki instances.
  * 
  * @version $Id$
  * @since 17.9.0RC1
  */
-@Unstable
 public interface NetworkChannel
 {
     /**

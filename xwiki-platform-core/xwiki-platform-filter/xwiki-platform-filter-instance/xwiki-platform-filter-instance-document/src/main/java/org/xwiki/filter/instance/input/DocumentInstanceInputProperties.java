@@ -292,7 +292,6 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     @PropertyName("Excluded property types")
     @PropertyDescription("The class property types (like \"Email\" or \"Password\") for whose values no "
         + "events shall be created when generating events for objects")
-    @Unstable
     public Set<String> getExcludedPropertyTypes()
     {
         return this.excludedPropertyTypes != null ? this.excludedPropertyTypes : Set.of();
@@ -305,7 +304,6 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
      * @since 16.10.5
      * @since 17.2.0RC1
      */
-    @Unstable
     public void setExcludedPropertyTypes(Set<String> excludedPropertyTypes)
     {
         this.excludedPropertyTypes = excludedPropertyTypes;

@@ -27,6 +27,7 @@ import jakarta.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
@@ -66,6 +67,9 @@ class TitleLiveTableNewRowNamingStrategyTest
 
     @InjectMockComponents
     private TitleLiveTableNewRowNamingStrategy strategy;
+
+    @MockComponent
+    private ContextualLocalizationManager l10n;
 
     @MockComponent
     @Named("current")
@@ -224,5 +228,14 @@ class TitleLiveTableNewRowNamingStrategyTest
         when(this.currentSpaceReferenceResolver.resolve(LOCATION)).thenReturn(this.space);
 
         assertEquals(Optional.of(this.space), this.strategy.getNewEntryLocation(PARAMETERS));
+    }
+
+    @Test
+    void getDescription()
+    {
+        when(this.l10n.getTranslationPlain("livedata.liveTable.newRowNamingStrategy.title.description"))
+            .thenReturn("Name from the title");
+
+        assertEquals("Name from the title", this.strategy.getDescription());
     }
 }

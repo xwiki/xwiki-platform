@@ -22,8 +22,6 @@ package org.xwiki.container;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a server response.
  * 
@@ -65,7 +63,6 @@ public interface Response
      * @throws IOException if an error happens
      * @since 17.0.0RC1
      */
-    @Unstable
     default void sendRedirect(String location) throws IOException
     {
         
@@ -81,7 +78,6 @@ public interface Response
      * @see #sendError
      * @since 17.0.0RC1
      */
-    @Unstable
     default void setStatus(int sc)
     {
         
@@ -99,7 +95,6 @@ public interface Response
      * @exception IllegalStateException If the response was committed
      * @since 17.0.0RC1
      */
-    @Unstable
     default void sendError(int sc, String msg) throws IOException
     {
         
@@ -116,7 +111,6 @@ public interface Response
      * @exception IllegalStateException If the response was committed before this method call
      * @since 17.0.0RC1
      */
-    @Unstable
     default void sendError(int sc) throws IOException
     {
         
@@ -129,7 +123,6 @@ public interface Response
      * @return <code>true</code> if the named response header has already been set; <code>false</code> otherwise
      * @since 17.0.0RC1
      */
-    @Unstable
     default boolean containsHeader(String name)
     {
         return false;
@@ -147,7 +140,6 @@ public interface Response
      * @see #addHeader
      * @since 17.0.0RC1
      */
-    @Unstable
     default void setHeader(String name, String value)
     {
         
@@ -163,7 +155,6 @@ public interface Response
      * @see #setHeader
      * @since 17.0.0RC1
      */
-    @Unstable
     default void addHeader(String name, String value)
     {
         

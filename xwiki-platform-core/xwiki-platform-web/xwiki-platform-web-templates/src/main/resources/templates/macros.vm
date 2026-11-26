@@ -2909,6 +2909,26 @@ $string##
 #end
 
 #**
+ * Outputs a link to the home page of the wiki targeted by a namespace (as used by extensions, jobs or logs), displaying
+ * the wiki pretty name (or its identifier when it has none). Only the wiki identifier is displayed when the wiki does
+ * not exist.
+ *
+ * @param $namespace the wiki namespace (e.g. {@code wiki:xwiki}); a wiki identifier is also accepted
+ * @since 18.10.0RC1
+ * @since 18.4.9
+ * @since 17.10.16
+ *#
+#macro (wikiNamespaceHomePageLink $namespace)
+#set ($wikiId = $stringtool.removeStart($namespace, 'wiki:'))
+#set ($wikiDescriptor = $services.wiki.getById($wikiId))
+#if ($wikiDescriptor)
+<a href="$escapetool.xml($xwiki.getURL($wikiDescriptor.mainPageReference))">$escapetool.xml($stringtool.defaultIfBlank($wikiDescriptor.prettyName, $wikiId))</a>##
+#else
+$escapetool.xml($wikiId)##
+#end
+#end
+
+#**
  * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the
  * current document (i.e. the document the sheet is applied to). If the condition is not specified then it checks if the
  * current document is a sheet by looking for an object of type 'XWiki.SheetDescriptorClass'. You can pass a translation

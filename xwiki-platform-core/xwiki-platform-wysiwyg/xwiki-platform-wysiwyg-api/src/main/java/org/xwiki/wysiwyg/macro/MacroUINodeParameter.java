@@ -22,7 +22,6 @@ package org.xwiki.wysiwyg.macro;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a single parameter of the macro descriptor.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.5.0
  */
-@Unstable
 public class MacroUINodeParameter extends AbstractMacroUINode
 {
     private boolean advanced;

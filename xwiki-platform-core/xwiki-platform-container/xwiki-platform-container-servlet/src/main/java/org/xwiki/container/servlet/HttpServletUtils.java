@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.internal.ForwardedHeader;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various helpers around the {@link HttpServletRequest} and {@link HttpServletResponse} API.
@@ -92,7 +91,6 @@ public final class HttpServletUtils
      * @throws MalformedURLException when an invalid URL was received
      * @since 17.0.0RC1
      */
-    @Unstable
     public static URL getSourceURL(HttpServletRequest servletRequest) throws MalformedURLException
     {
         URL baseURL = getSourceBaseURL(servletRequest);
@@ -121,7 +119,6 @@ public final class HttpServletUtils
      * @throws MalformedURLException when an invalid URL was received
      * @since 17.0.0RC1
      */
-    @Unstable
     public static URL getSourceBaseURL(HttpServletRequest servletRequest) throws MalformedURLException
     {
         StringBuilder builder = new StringBuilder();
@@ -247,7 +244,6 @@ public final class HttpServletUtils
      * @return true if the request explicitly disable getting resources from the cache
      * @since 17.0.0RC1
      */
-    @Unstable
     public static boolean isCacheReadAllowed(HttpServletRequest request)
     {
         String headerValue = request.getHeader(HEADER_CACHE_CONTROL);
@@ -269,7 +265,6 @@ public final class HttpServletUtils
      * @return the headers of the request
      * @since 17.0.0RC1
      */
-    @Unstable
     public static Map<String, List<String>> getHeaders(HttpServletRequest request)
     {
         Map<String, List<String>> map = new HashMap<>();
@@ -295,7 +290,6 @@ public final class HttpServletUtils
      * @return the IP of the actual client that made the request
      * @since 17.4.0RC1
      */
-    @Unstable
     public static String getClientIP(HttpServletRequest request)
     {
         // TODO: This HTTP header can have multiple values (each proxy is supposed to add a new value) and so the

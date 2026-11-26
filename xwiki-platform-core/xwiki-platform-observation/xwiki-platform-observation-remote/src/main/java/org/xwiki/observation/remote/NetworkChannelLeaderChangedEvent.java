@@ -20,7 +20,6 @@
 package org.xwiki.observation.remote;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * This event is triggered when the leader of a {@link NetworkChannel} changes (generally because the previous leader
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.9.0RC1
  */
-@Unstable
 public class NetworkChannelLeaderChangedEvent implements Event
 {
     private final String channel;

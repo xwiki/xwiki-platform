@@ -38,6 +38,7 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.records.macro.RecordsTemplateProvider;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -45,8 +46,9 @@ import org.xwiki.rendering.listener.reference.SpaceResourceReference;
 import org.xwiki.rendering.macro.MacroRefactoring;
 
 /**
- * Keeps the {@code class} and {@code newEntriesLocation} parameters of the Records macro pointing to their object type
- * and space when pages are moved or renamed, and declares them as references of the page holding the macro.
+ * Keeps the {@code class}, {@code newEntriesLocation} and {@code templateProvider} parameters of the Records macro
+ * pointing to their object type, space and template provider when pages are moved or renamed, and declares them as
+ * references of the page holding the macro.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -60,11 +62,14 @@ public class RecordsMacroRefactoring implements MacroRefactoring
 
     private static final String LOCATION_PARAMETER = "newEntriesLocation";
 
+    private static final String TEMPLATE_PROVIDER_PARAMETER = "templateProvider";
+
     /**
      * The parameters holding a reference, with the type of what they point to.
      */
     private static final Map<String, EntityType> REFERENCE_PARAMETERS =
-        Map.of(CLASS_PARAMETER, EntityType.DOCUMENT, LOCATION_PARAMETER, EntityType.SPACE);
+        Map.of(CLASS_PARAMETER, EntityType.DOCUMENT, LOCATION_PARAMETER, EntityType.SPACE, TEMPLATE_PROVIDER_PARAMETER,
+            EntityType.DOCUMENT);
 
     @Inject
     @Named("macro")
@@ -145,17 +150,30 @@ public class RecordsMacroRefactoring implements MacroRefactoring
     }
 
     /**
+     * @param value the value of the template provider parameter
+     * @param macroBlock the Records macro call
+     * @return whether the value means that the new entries start from no template, which names no page
+     */
+    private boolean isNoTemplateProvider(String value, MacroBlock macroBlock)
+    {
+        EntityReference reference = this.macroEntityReferenceResolver.resolve(value, EntityType.DOCUMENT, macroBlock);
+        return RecordsTemplateProvider.NONE.equals(new DocumentReference(reference).getLocalDocumentReference());
+    }
+
+    /**
      * @param macroBlock the Records macro call
      * @param parameterName the name of a parameter
      * @return the name the call gives to the parameter, which macro parameters accept in any case, if the call sets
-     *     it to a non blank value
+     *     it to a value naming a page, so neither blank nor {@link RecordsTemplateProvider#NONE}
      */
     private Optional<String> findParameter(MacroBlock macroBlock, String parameterName)
     {
         return macroBlock.getParameters().entrySet().stream()
             .filter(parameter -> parameterName.equalsIgnoreCase(parameter.getKey())
                 && StringUtils.isNotBlank(parameter.getValue()))
-            .map(Map.Entry::getKey).findFirst();
+            .map(Map.Entry::getKey).findFirst()
+            .filter(name -> !TEMPLATE_PROVIDER_PARAMETER.equals(parameterName)
+                || !isNoTemplateProvider(macroBlock.getParameter(name), macroBlock));
     }
 
     /**

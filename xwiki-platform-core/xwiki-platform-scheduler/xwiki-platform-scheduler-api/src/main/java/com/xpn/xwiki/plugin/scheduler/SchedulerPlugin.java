@@ -60,7 +60,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -170,7 +169,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      * @return true if the scheduler plugin is enabled on this instance
      * @since 17.5.0
      */
-    @Unstable
     public boolean isEnabled()
     {
         return this.enabled;

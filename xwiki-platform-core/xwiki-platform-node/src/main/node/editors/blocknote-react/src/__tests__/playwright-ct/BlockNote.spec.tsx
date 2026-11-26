@@ -26,7 +26,7 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 
 test("BlockNote shows with empty content", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
+    <BlockNoteForTest content={[]} options={{ syntax: FULL_SYNTAX }} />,
   );
 
   await expect(component).toBeVisible();
@@ -37,8 +37,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
   const component = await mount(
     <BlockNoteForTest
       content={buildParagraphs(["Hello,", "world!"])}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -48,7 +47,7 @@ test("BlockNote shows with initial content", async ({ mount }) => {
 
 test("BlockNote's content can be modified", async ({ mount }) => {
   const component = await mount(
-    <BlockNoteForTest content={[]} macros={false} syntax={FULL_SYNTAX} />,
+    <BlockNoteForTest content={[]} options={{ syntax: FULL_SYNTAX }} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -62,50 +61,9 @@ test("BlockNote's content can be modified", async ({ mount }) => {
   await expect(editorEl).toHaveText("Some basic content");
 });
 
-// eslint-disable-next-line max-statements
-test("Image insertion UI can be overridden", async ({ mount, page }) => {
-  let overrideFnCalledWithUrl: string | null = null;
-
-  const component = await mount(
-    <BlockNoteForTest
-      content={[buildImage(SMALL_IMG_DATA_URL)]}
-      macros={false}
-      overrides={{
-        // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
-        imageEdition: (block) => {
-          overrideFnCalledWithUrl = block.props.url;
-        },
-      }}
-      syntax={FULL_SYNTAX}
-    />,
-  );
-
-  const editorEl = component.locator(".bn-editor");
-
-  const imgEl = editorEl.locator("img.bn-visual-media");
-  await imgEl.waitFor({ state: "attached" });
-
-  // Trigger the toolbar by selecting the image.
-  await imgEl.click();
-
-  // The toolbar is rendered via FloatingPortal into document.body (outside the component root),
-  // so we must use page.locator instead of component.locator
-  const toolbarEl = page.locator(".bn-toolbar.bn-formatting-toolbar");
-  await toolbarEl.waitFor({ state: "attached" });
-
-  // Trigger the image edition UI
-  const imgEditBtnEl = page.locator(
-    'button[data-test="blocknote.imageToolbar.buttons.edit"]',
-  );
-  await imgEditBtnEl.waitFor({ state: "attached" });
-  await imgEditBtnEl.click();
-
-  expect(overrideFnCalledWithUrl).toBe(SMALL_IMG_DATA_URL);
-});
-
 test("Allowed syntax features should be available", async ({ mount, page }) => {
   const component = await mount(
-    <BlockNoteForTest macros={false} content={[]} syntax={FULL_SYNTAX} />,
+    <BlockNoteForTest content={[]} options={{ syntax: FULL_SYNTAX }} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -128,6 +86,10 @@ test("Allowed syntax features should be available", async ({ mount, page }) => {
 
   expect(menuItemsText).toContain("Table");
   expect(menuItemsText).toContain("Quote");
+  // The images feature replaces BlockNote's "Image" item, which keeps its place.
+  expect(menuItemsText.indexOf("Image")).toBeLessThan(
+    menuItemsText.indexOf("Video"),
+  );
 });
 
 test("Disallowed syntax features should be unavailable", async ({
@@ -138,9 +100,10 @@ test("Disallowed syntax features should be unavailable", async ({
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.blocks.tables.basicTables = false;
   syntax.features.blocks.quotes = false;
+  syntax.features.blocks.images.basicImages = false;
 
   const component = await mount(
-    <BlockNoteForTest macros={false} content={[]} syntax={syntax} />,
+    <BlockNoteForTest content={[]} options={{ syntax }} />,
   );
 
   const editorEl = component.locator(".bn-editor");
@@ -163,60 +126,277 @@ test("Disallowed syntax features should be unavailable", async ({
 
   expect(menuItemsText).not.toContain("Table");
   expect(menuItemsText).not.toContain("Quote");
+  expect(menuItemsText).not.toContain("Image");
 });
 
-// eslint-disable-next-line max-statements
-test("Macros can be inserted", async ({ mount, page }) => {
-  let macroInsertionModalTriggered = false;
+test("A disabled editor feature leaves BlockNote's default slash menu item", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[]}
+      options={{ syntax: FULL_SYNTAX, features: { images: false } }}
+    />,
+  );
 
+  await component.locator(".bn-editor").click();
+  await page.keyboard.type("/image");
+  await expect(
+    page.locator('.bn-suggestion-menu-item[aria-selected="true"]'),
+  ).toContainText("Image");
+  await page.keyboard.press("Enter");
+
+  // BlockNote's "Image" item inserts an empty image block, instead of opening the image suggestions.
+  await expect(
+    component.locator('.bn-block-content[data-content-type="image"]'),
+  ).toHaveCount(1);
+  await expect(page.locator(".bn-suggestion-menu")).toHaveCount(0);
+});
+
+test("The links feature can be disabled", async ({ mount, page }) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[]}
+      options={{ syntax: FULL_SYNTAX, features: { links: false } }}
+    />,
+  );
+
+  await component.locator(".bn-editor").press("/");
+
+  const slashMenuEl = page.locator(
+    "[data-floating-ui-portal] .bn-suggestion-menu",
+  );
+  await slashMenuEl.waitFor({ state: "attached" });
+  const menuItems = slashMenuEl.locator(
+    ".bn-suggestion-menu-item p:first-child",
+  );
+  await expect(menuItems.filter({ hasText: /^Table$/ })).toHaveCount(1);
+  await expect(menuItems.filter({ hasText: /^Link$/ })).toHaveCount(0);
+});
+
+test("The formatting toolbar offers only the text styles that the syntax supports", async ({
+  mount,
+  page,
+}) => {
+  const syntax = structuredClone(FULL_SYNTAX);
+  syntax.features.inlineContents.textStyles.superscript = false;
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["Yeah"])}
+      options={{ syntax }}
+    />,
+  );
+
+  // Trigger the formatting toolbar.
+  await component.locator("p.bn-inline-content").dblclick();
+  await page.locator('button[data-test="subscript"]').waitFor();
+  await expect(page.locator('button[data-test="superscript"]')).toHaveCount(0);
+});
+
+test("Macros can be inserted with the macro editor", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={buildParagraphs(["Yeah"])}
+      options={{ syntax: FULL_SYNTAX, features: { macros: { list: macros } } }}
+      macroEditor={{
+        result: {
+          kind: "block",
+          id: "info",
+          params: { title: "Note" },
+          body: { type: "none" },
+        },
+      }}
+    />,
+  );
+
+  // Trigger the formatting toolbar.
+  await component.locator("p.bn-inline-content").dblclick();
+  await page.locator('button[data-test="insertMacro"]').click();
+
+  // The macro editor gets the editor instance, and its prefill data.
+  const calls = JSON.parse(
+    await page.locator('output[data-test="macroEditorCalls"]').innerText(),
+  );
+  expect(calls).toEqual([
+    {
+      action: "insert",
+      syntax: FULL_SYNTAX.id,
+      prefill: {
+        kind: "block",
+        id: null,
+        params: null,
+        body: {
+          type: "inlineContents",
+          content: [{ type: "text", text: "Yeah", styles: {} }],
+        },
+      },
+    },
+  ]);
+  // The macro call returned by the macro editor replaces the selected block.
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="info"]'),
+  ).toHaveText("macro:info");
+});
+
+test("Macros are edited with the macro editor", async ({ mount, page }) => {
+  const call = { name: "info", parameters: { title: "Note" } };
   const component = await mount(
     <BlockNoteForTest
       content={[
         {
-          id: Math.random().toString(),
-          type: "paragraph",
+          id: "macro",
+          type: "xwikiMacroBlock",
+          props: { call: JSON.stringify(call) },
           children: [],
-          content: [{ type: "text", text: "Yeah", styles: {} }],
-          props: {
-            backgroundColor: "default",
-            textAlignment: "left",
-            textColor: "default",
-          },
-        },
+        } as unknown as BlockType,
       ]}
-      macros={{
-        ctx: {
-          openParamsEditor() {
-            throw new Error("Unreachable");
-          },
-
-          openInsertionEditor() {
-            macroInsertionModalTriggered = true;
-          },
+      options={{ syntax: FULL_SYNTAX }}
+      macroEditor={{
+        result: {
+          kind: "block",
+          id: "warning",
+          params: {},
+          body: { type: "none" },
         },
-        list: macros,
       }}
-      syntax={FULL_SYNTAX}
     />,
   );
 
-  const editorEl = component.locator(".bn-editor");
+  await component
+    .locator('.xwiki-macro-block[data-macro-name="info"]')
+    .dblclick();
 
-  const paragraph = editorEl.locator(
-    // 'div.bn-block-content[data-content-type="paragraph"]',
-    "p.bn-inline-content",
+  const calls = JSON.parse(
+    await page.locator('output[data-test="macroEditorCalls"]').innerText(),
+  );
+  expect(calls).toEqual([
+    {
+      action: "edit",
+      syntax: FULL_SYNTAX.id,
+      invocation: {
+        kind: "block",
+        id: "info",
+        params: { title: "Note" },
+        body: { type: "none" },
+      },
+    },
+  ]);
+  // The edited macro call is replaced by the one returned by the macro editor.
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="warning"]'),
+  ).toHaveText("macro:warning");
+});
+
+test("A canceled macro edition leaves the macro unchanged", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        {
+          id: "macro",
+          type: "xwikiMacroBlock",
+          props: { call: JSON.stringify({ name: "info", parameters: {} }) },
+          children: [],
+        } as unknown as BlockType,
+      ]}
+      options={{ syntax: FULL_SYNTAX }}
+      macroEditor={{}}
+    />,
   );
 
-  await paragraph.waitFor({ state: "attached" });
+  const macro = component.locator('.xwiki-macro-block[data-macro-name="info"]');
+  await macro.dblclick();
 
-  // Trigger the formatting toolbar
-  await paragraph.dblclick();
-  const macroInsertBtnEl = page.locator('button[data-test="insertMacro"]');
-  await macroInsertBtnEl.waitFor({ state: "attached" });
+  await page.locator('output[data-test="macroEditorCalls"]').waitFor();
+  await expect(macro).toHaveText("macro:info");
+});
 
-  expect(macroInsertionModalTriggered).toBe(false);
-  await macroInsertBtnEl.click();
-  expect(macroInsertionModalTriggered).toBe(true);
+test("Macros can't be inserted without a macro editor, when disabled, or when the syntax can't save them", async ({
+  mount,
+  page,
+}) => {
+  const syntaxWithoutMacros = structuredClone(FULL_SYNTAX);
+  syntaxWithoutMacros.features.blocks.macros = false;
+  syntaxWithoutMacros.features.inlineContents.macros = false;
+  for (const props of [
+    { options: { syntax: FULL_SYNTAX } },
+    {
+      options: { syntax: FULL_SYNTAX, features: { macros: false as const } },
+      macroEditor: {},
+    },
+    { options: { syntax: syntaxWithoutMacros }, macroEditor: {} },
+  ]) {
+    const component = await mount(
+      <BlockNoteForTest content={buildParagraphs(["Yeah"])} {...props} />,
+    );
+
+    await component.locator("p.bn-inline-content").dblclick();
+    // The formatting toolbar is shown, without the macro insertion action.
+    await page.locator('button[data-test="subscript"]').waitFor();
+    await expect(page.locator('button[data-test="insertMacro"]')).toHaveCount(
+      0,
+    );
+
+    await component.unmount();
+  }
+});
+
+test("Macro blocks show their output from the metadata store", async ({
+  mount,
+}) => {
+  const call = JSON.stringify({ name: "info", parameters: {} });
+  const component = await mount(
+    <BlockNoteForTest
+      content={[
+        {
+          id: "with-output",
+          type: "xwikiMacroBlock",
+          props: { call },
+          children: [],
+        } as unknown as BlockType,
+        {
+          id: "modified",
+          type: "xwikiMacroBlock",
+          props: { call: JSON.stringify({ name: "warning", parameters: {} }) },
+          children: [],
+        } as unknown as BlockType,
+      ]}
+      options={{
+        syntax: FULL_SYNTAX,
+        features: {
+          macros: {
+            outputs: {
+              "with-output": {
+                call,
+                output: [{ type: "paragraph", content: "Some information" }],
+              },
+              // The output of a macro call that was modified since it was rendered.
+              modified: {
+                call: JSON.stringify({
+                  name: "warning",
+                  parameters: { a: "b" },
+                }),
+                output: [{ type: "paragraph", content: "Some warning" }],
+              },
+            },
+          },
+        },
+      }}
+    />,
+  );
+
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="info"]'),
+  ).toHaveText("Some information");
+  await expect(
+    component.locator('.xwiki-macro-block[data-macro-name="warning"]'),
+  ).toHaveText("macro:warning");
 });
 
 test("Code blocks with supported and unsupported languages", async ({
@@ -241,8 +421,7 @@ test("Code blocks with supported and unsupported languages", async ({
       content={languages.map((language) =>
         buildCodeBlock(language, "if (true) { return 'foo'; }"),
       )}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -283,8 +462,7 @@ test("Code block languages use ids known by the code macro", async ({
         buildCodeBlock("md", "**foo**"),
         buildCodeBlock("text", "foo"),
       ]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -323,8 +501,7 @@ test("Code blocks created by typing ``` use the typed language or Plain Text", a
   const component = await mount(
     <BlockNoteForTest
       content={buildParagraphs(["", ""])}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -355,8 +532,7 @@ test("Ctrl+Alt+C turns the current block into a code block", async ({
   const component = await mount(
     <BlockNoteForTest
       content={buildParagraphs(["foo"])}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -372,6 +548,26 @@ test("Ctrl+Alt+C turns the current block into a code block", async ({
   await expect(component.locator("p.bn-inline-content")).toHaveCount(0);
 });
 
+test("The code blocks have the CSS classes set in the options of the code blocks feature", async ({
+  mount,
+}) => {
+  const component = await mount(
+    <BlockNoteForTest
+      content={[buildCodeBlock("java", "int count = 0;")]}
+      options={{
+        syntax: FULL_SYNTAX,
+        features: { codeBlocks: { className: "box code" } },
+      }}
+    />,
+  );
+
+  await expect(
+    component.locator(
+      '.bn-block-content[data-content-type="codeBlock"] pre.box.code',
+    ),
+  ).toHaveCount(1);
+});
+
 test("The language selector keeps the focus when changing the language", async ({
   mount,
   page,
@@ -379,8 +575,7 @@ test("The language selector keeps the focus when changing the language", async (
   const component = await mount(
     <BlockNoteForTest
       content={[buildCodeBlock("java", "int count = 0;")]}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      options={{ syntax: FULL_SYNTAX }}
     />,
   );
 
@@ -431,27 +626,6 @@ function buildCodeBlock(
     children: [],
   };
 }
-
-function buildImage(url: string): BlockOfType<"image"> {
-  return {
-    type: "image",
-    props: {
-      url,
-      backgroundColor: "default",
-      caption: "",
-      name: "",
-      previewWidth: 100,
-      showPreview: true,
-      textAlignment: "left",
-    },
-    children: [],
-    content: undefined,
-    id: Math.random().toString(),
-  };
-}
-
-const SMALL_IMG_DATA_URL =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 const FULL_SYNTAX: SyntaxConfig = {
   id: "default-syntax",

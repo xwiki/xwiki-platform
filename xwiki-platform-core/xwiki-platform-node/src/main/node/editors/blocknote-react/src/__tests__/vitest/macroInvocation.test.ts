@@ -21,12 +21,12 @@ import {
   insertMacroInvocation,
   invocationToMacroCall,
   macroCallToInvocation,
-} from "../../blocknote/utils";
+} from "../../features/macros/utils";
 import { describe, expect, test, vi } from "vitest";
 import type {
   InlineMacroInvocation,
   MacroBlockInvocation,
-} from "../../blocknote/utils";
+} from "../../services/macroEditor";
 
 describe("invocationToMacroCall / macroCallToInvocation", () => {
   test("a block invocation with a raw body round-trips through a MacroCall", () => {

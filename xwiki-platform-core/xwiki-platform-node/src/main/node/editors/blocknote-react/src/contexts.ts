@@ -18,20 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { createContext } from "react";
-import type { ContextForMacros } from "./blocknote/utils";
-import type { Container } from "inversify";
-
-const DepsContainerContext = createContext<Container | null>(null);
+import type { EditorInstance } from "./editorInstance";
 
 /**
- * The macro context (insert / edit callbacks) made available to the server-rendered macro specs so they can wire
- * in-content actions (e.g. double-click to edit). Null when macros are disabled or no callbacks are provided.
+ * The editor instance, which the components pass to the services they call.
  */
-const MacrosContext = createContext<ContextForMacros | null>(null);
+const EditorInstanceContext = createContext<EditorInstance | null>(null);
 
-/**
- * The serialized reference of the edited document, when specified. The current document is edited otherwise.
- */
-const EditedDocumentContext = createContext<string | undefined>(undefined);
-
-export { DepsContainerContext, EditedDocumentContext, MacrosContext };
+export { EditorInstanceContext };

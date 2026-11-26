@@ -24,7 +24,6 @@ import java.text.MessageFormat;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.stability.Unstable;
 
 public class XWikiException extends Exception
 {
@@ -279,7 +278,6 @@ public class XWikiException extends Exception
      * Error code for a template that enforces required rights and the user does not have them.
      * @since 17.10.2
      */
-    @Unstable
     public static final int ERROR_XWIKI_APP_TEMPLATE_REQUIRED_RIGHTS_MISSING = 11019;
 
     public static final int ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND = 12001;

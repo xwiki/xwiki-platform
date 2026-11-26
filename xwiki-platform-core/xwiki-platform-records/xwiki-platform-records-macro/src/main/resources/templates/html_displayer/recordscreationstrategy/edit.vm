@@ -36,12 +36,12 @@
 >
   <option value="">$escapetool.xml($services.localization.render("${translationPrefix}disabled"))</option>
   #foreach ($strategy in $strategies.entrySet())
-    ## A strategy installed without a label of ours is named by its hint.
-    #set ($label = $strategy.key)
-    #if ($services.localization.get("$translationPrefix$strategy.key"))
-      #set ($label = $services.localization.render("$translationPrefix$strategy.key"))
+    ## A strategy without a description is named by its hint.
+    #set ($label = $strategy.value.description)
+    #if ("$!label" == '')
+      #set ($label = $strategy.key)
     #end
-    <option value="$escapetool.xml($strategy.key)"
-      data-required-columns="$escapetool.xml($stringtool.join($strategy.value, ','))">$escapetool.xml($label)</option>
+    <option value="$escapetool.xml($strategy.key)" data-required-columns="$escapetool.xml(
+      $stringtool.join($strategy.value.mandatoryProperties, ','))">$escapetool.xml($label)</option>
   #end
 </select>

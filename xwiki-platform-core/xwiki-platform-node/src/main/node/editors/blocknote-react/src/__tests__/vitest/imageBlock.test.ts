@@ -19,7 +19,7 @@
  */
 // @vitest-environment jsdom
 
-import { getLabelFromURL } from "../../blocknote/imageBlock";
+import { getLabelFromURL } from "../../features/images/imageBlockSpec";
 import { describe, expect, test } from "vitest";
 
 describe("getLabelFromURL", () => {

@@ -59,15 +59,14 @@ function buildFormattedParagraph(
  */
 async function mountParagraph(
   mount: Parameters<typeof mountBlockNoteHeadless>[0],
-  editorContent: BlockType[],
+  content: BlockType[],
 ): Promise<{
   editorEl: ReturnType<Page["locator"]>;
   paragraph: ReturnType<Page["locator"]>;
 }> {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent,
-    editorProps: { syntax: FULL_SYNTAX },
-    macros: false,
+    content,
+    options: { syntax: FULL_SYNTAX },
   });
   const editorEl = component.locator(".bn-editor");
   const paragraph = editorEl.locator("p.bn-inline-content");
@@ -77,14 +76,13 @@ async function mountParagraph(
 
 /**
  * Selects, with the keyboard, the given number of characters starting at the given offset of the paragraph, then opens
- * the link modal from the formatting toolbar and sets the target to the given URL.
+ * the link modal from the formatting toolbar.
  */
-async function openLinkModalOnSelection(
+async function openLinkModalOnSelectedText(
   page: Page,
   paragraph: ReturnType<Page["locator"]>,
   offset: number,
   length: number,
-  url: string,
 ): Promise<void> {
   // Each key press is awaited until it is painted (see pressKeySettled) so that sending them in quick succession
   // doesn't outrun the editor's selection update. The paragraph is clicked at its start, where Home moves the caret:
@@ -101,6 +99,20 @@ async function openLinkModalOnSelection(
 
   // The formatting toolbar is rendered via FloatingPortal into document.body.
   await page.locator('button[data-test="createLink"]').click();
+}
+
+/**
+ * Selects, with the keyboard, the given number of characters starting at the given offset of the paragraph, then opens
+ * the link modal from the formatting toolbar and sets the target to the given URL.
+ */
+async function openLinkModalOnSelection(
+  page: Page,
+  paragraph: ReturnType<Page["locator"]>,
+  offset: number,
+  length: number,
+  url: string,
+): Promise<void> {
+  await openLinkModalOnSelectedText(page, paragraph, offset, length);
 
   // The link modal defaults to the "Page" target type, switch it to "URL".
   await page.locator('[data-test="linkTargetType"]').selectOption("URL");
@@ -112,11 +124,8 @@ test("Creating a link on a word in the middle of a line keeps the text intact", 
   page,
 }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: buildParagraphs(["First second third fourth"]),
-    editorProps: {
-      syntax: FULL_SYNTAX,
-    },
-    macros: false,
+    content: buildParagraphs(["First second third fourth"]),
+    options: { syntax: FULL_SYNTAX },
   });
 
   const editorEl = component.locator(".bn-editor");
@@ -210,4 +219,48 @@ test("Creating a link on a selection with an empty display text replaces the sel
   await expect(
     page.locator('[data-test="submittedLinkGeneratedTitle"]'),
   ).toHaveText("true");
+});
+
+test("Creating a link on a selection prefills the link target with the page named after the selected text", async ({
+  mount,
+  page,
+  // eslint-disable-next-line max-statements
+}) => {
+  const { editorEl, paragraph } = await mountParagraph(
+    mount,
+    buildParagraphs(["See some page reference first"]),
+  );
+
+  // Select "some page reference", which the mocked model reference parser resolves to a page.
+  await openLinkModalOnSelectedText(page, paragraph, 4, 19);
+
+  // The page search box is pre-filled with the selected text, and focused, so the matching pages are suggested right
+  // away.
+  await expect(
+    page.locator('[data-test="linkTargetType"] option:checked'),
+  ).toHaveText("Page");
+  const targetInputEl = page.locator('[data-test="linkPageReference"] input');
+  await expect(targetInputEl).toHaveValue("some page reference");
+  await expect(targetInputEl).toBeFocused();
+  await expect(
+    page.locator(".link-target li.suggestion", { hasText: "some page label" }),
+  ).toBeVisible();
+
+  // The link can be submitted as is, e.g. to link to a page that doesn't exist yet, named after the selected text.
+  await page.keyboard.press("Escape");
+  await page.locator('[data-test="linkSubmit"]').click();
+
+  await expect(
+    editorEl.locator('a[href="https://example.org/some/page"]'),
+  ).toHaveText("some page reference");
+  await expect(editorEl).toHaveText("See some page reference first");
+  // Saved like any page link created from the link modal.
+  await expect(page.locator('[data-test="submittedLinkReference"]')).toHaveText(
+    JSON.stringify({
+      type: "doc",
+      typed: true,
+      reference: "some page reference",
+      parameters: {},
+    }),
+  );
 });

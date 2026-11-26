@@ -22,8 +22,6 @@ package org.xwiki.container;
 import java.util.Collections;
 import java.util.Enumeration;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a session.
  * 
@@ -40,7 +38,6 @@ public interface Session
      * @exception IllegalStateException if this method is called on an invalidated session
      * @since 17.0.0RC1
      */
-    @Unstable
     default Object getAttribute(String name)
     {
         return null;
@@ -57,7 +54,6 @@ public interface Session
      * @exception IllegalStateException if this method is called on an invalidated session
      * @since 17.0.0RC1
      */
-    @Unstable
     default void setAttribute(String name, Object value)
     {
 
@@ -71,7 +67,6 @@ public interface Session
      * @exception IllegalStateException if this method is called on an invalidated session
      * @since 17.0.0RC1
      */
-    @Unstable
     default void removeAttribute(String name)
     {
 
@@ -86,7 +81,6 @@ public interface Session
      * @exception IllegalStateException if this method is called on an invalidated session
      * @since 17.0.0RC1
      */
-    @Unstable
     default Enumeration<String> getAttributeNames()
     {
         return Collections.emptyEnumeration();

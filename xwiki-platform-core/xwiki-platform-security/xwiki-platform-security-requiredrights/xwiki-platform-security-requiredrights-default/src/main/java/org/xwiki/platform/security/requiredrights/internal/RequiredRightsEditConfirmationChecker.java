@@ -50,7 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static com.xpn.xwiki.doc.XWikiDocument.CKEY_TDOC;
-import static javax.script.ScriptContext.GLOBAL_SCOPE;
+import static javax.script.ScriptContext.ENGINE_SCOPE;
 import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.NONE;
 import static org.xwiki.security.authorization.Right.EDIT;
 
@@ -113,14 +113,14 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
                         checkResult = Optional.empty();
                     } else {
                         this.scriptContextManager.getCurrentScriptContext()
-                            .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
+                            .setAttribute("analysisResults", analysisResults, ENGINE_SCOPE);
                         XDOM message = this.templateManager
                             .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");
                         checkResult = Optional.of(new EditConfirmationCheckerResult(message, false,
                             getRequiredRightsChangedSkipValue(analysisResults)));
                     }
                 } catch (RequiredRightsException e) {
-                    this.scriptContextManager.getCurrentScriptContext().setAttribute("exception", e, GLOBAL_SCOPE);
+                    this.scriptContextManager.getCurrentScriptContext().setAttribute("exception", e, ENGINE_SCOPE);
                     // Display an error message in case of exception.
                     XDOM message = this.templateManager
                         .executeNoException("security/requiredrights/requiredRightsEditConfirmationCheckerError.vm");

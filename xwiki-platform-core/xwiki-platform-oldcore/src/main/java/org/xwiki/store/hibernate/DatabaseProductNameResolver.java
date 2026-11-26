@@ -22,7 +22,6 @@ package org.xwiki.store.hibernate;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide a common identifier from the actual product name given by the database.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.1.0RC1
  */
-@Unstable
 @Role
 public interface DatabaseProductNameResolver
 {

@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Representation of a macro descriptor used for the configuration UI.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.5.0
  */
-@Unstable
 public class MacroDescriptorUI
 {
     private final String id;

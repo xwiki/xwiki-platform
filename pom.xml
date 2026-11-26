@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>18.10.0-SNAPSHOT</version>
+    <version>19.0.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.10.0-SNAPSHOT</version>
+  <version>19.0.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -79,7 +79,7 @@
     <solr.minimum.java.version>11</solr.minimum.java.version>
     <jersey.version>2.48</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.7</zookeeper.version>
+    <zookeeper.version>3.10.0</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>
     <calcite.version>1.42.0</calcite.version>
 
@@ -124,7 +124,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.14</pgsql.version>
+    <pgsql.version>42.7.15</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc17</oracle.artifactId>
     <oracle.version>23.26.4.0.0</oracle.version>
@@ -134,7 +134,7 @@
     <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
 
     <!-- Enable reproducible builds -->
-    <project.build.outputTimestamp>2026-10-14T08:07:04Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-11-18T16:46:04Z</project.build.outputTimestamp>
   </properties>
   <scm>
     <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
@@ -355,7 +355,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery</artifactId>
-        <version>4.0.0</version>
+        <version>4.1.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -669,7 +669,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.2.8</version>
+        <version>3.2.9</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -966,6 +966,11 @@
         <artifactId>zookeeper-jute</artifactId>
         <version>${zookeeper.version}</version>
       </dependency>
+      <dependency>
+        <groupId>dnsjava</groupId>
+        <artifactId>dnsjava</artifactId>
+        <version>3.7.1</version>
+      </dependency>
       <!-- Jersey -->
       <dependency>
         <groupId>org.glassfish.jersey.containers</groupId>
@@ -1197,7 +1202,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.4.20</version>
+        <version>11.4.23</version>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
@@ -1207,7 +1212,7 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-bom</artifactId>
-        <version>7.1.2</version>
+        <version>7.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

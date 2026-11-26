@@ -72,10 +72,11 @@ import org.xwiki.security.authorization.Right;
  * <p>
  * The one thing worth knowing about that translation is what it deliberately does <em>not</em> do. The renderer also
  * accepts an advanced configuration, which is the only way to reach the parts of a Live Data that are not macro
- * parameters. It is not used here, and cannot be while it stays the trust switch it is today: the renderer marks the
- * content trusted only when the advanced configuration is blank or the author holds script right, so passing one would
- * downgrade every table authored by someone without that right and get its HTML displayers sanitized. The mapping below
- * therefore sticks to what the parameters can express.
+ * parameters. It is not used here, and cannot be while it stays the trust switch it is today: for an author without
+ * script right, the renderer marks the content trusted only when the advanced configuration is blank and the source
+ * accepts its parameters, which the {@code liveTable} source does for the standard ones set here. Passing an advanced
+ * configuration would downgrade every table authored by someone without that right and get its HTML displayers
+ * sanitized. The mapping below therefore sticks to what the parameters can express.
  *
  * @version $Id$
  * @since 18.10.0RC1
@@ -128,6 +129,11 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * Source parameter naming the space new entries are created in.
      */
     static final String NEW_ROW_LOCATION_PARAMETER = "newRowLocation";
+
+    /**
+     * The source parameter naming the template provider new entries are created from.
+     */
+    static final String NEW_ROW_TEMPLATE_PROVIDER_PARAMETER = "newRowTemplateProvider";
 
     /**
      * The identifier prefix of the page metadata properties, which the default column list leaves out.
@@ -604,6 +610,10 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
                 sourceParameters.put(NAMING_STRATEGY_PARAMETER, strategy);
                 sourceParameters.put(NEW_ROW_LOCATION_PARAMETER,
                     this.entityReferenceSerializer.serialize(getNewEntriesLocation(parameters, context)));
+                if (parameters.getTemplateProvider() != null) {
+                    sourceParameters.put(NEW_ROW_TEMPLATE_PROVIDER_PARAMETER,
+                        this.entityReferenceSerializer.serialize(parameters.getTemplateProvider()));
+                }
             }
         }
 

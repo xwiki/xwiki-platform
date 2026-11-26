@@ -20,7 +20,6 @@
 package org.xwiki.observation.remote;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * This event is triggered when a new member joined a {@link NetworkChannel}.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 17.9.0RC1
  */
-@Unstable
 public class NetworkMemberJoinedEvent implements Event
 {
     private final String channel;

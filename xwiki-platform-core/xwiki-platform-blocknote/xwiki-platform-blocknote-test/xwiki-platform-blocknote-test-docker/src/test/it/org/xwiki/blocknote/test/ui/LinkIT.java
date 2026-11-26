@@ -195,9 +195,13 @@ class LinkIT extends AbstractBlockNoteIT
         // Select the word "second" using the keyboard.
         textArea.click().select(6, 6);
 
-        // Create a link targeting a page from the selection. Search by title since suggestions are matched (and
+        // Create a link targeting a page from the selection. The page search box is pre-filled with the selected text,
+        // so that the matching pages are suggested right away. Search by title since suggestions are matched (and
         // rendered) using the page title, not its reference.
-        editor.getToolBar().createLink().setPageTargetAndSubmit("Page Link Target", "Page Link Target");
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        assertEquals("Page", linkModal.getTargetType());
+        assertEquals("second", linkModal.getTarget());
+        linkModal.setPageTargetAndSubmit("Page Link Target", "Page Link Target");
 
         // Save and check the source: the link is inserted on the selected word, without touching the rest of the line.
         page.save();
@@ -697,8 +701,11 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the bold word using the keyboard, then create a link from the selection, changing its display text.
+        // The page search box, pre-filled with the selected text, is focused, which lists the matching pages: close
+        // these suggestions, which cover the link options.
         textArea.click().select(6, 6);
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
         linkModal.setDisplayText("2nd");
         linkModal.setTargetAndSubmit("https://xwiki.org");
 
@@ -770,9 +777,11 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard, then create a link from the selection, emptying its display
-        // text: the selection is replaced with the label generated from the link target.
+        // text: the selection is replaced with the label generated from the link target. Close first the suggestions
+        // of the page search box, pre-filled with the selected text, which cover the link options.
         textArea.click().select(6, 6);
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
         linkModal.setDisplayText("");
         linkModal.setTargetAndSubmit("https://xwiki.org");
         textArea.waitUntilTextIs("first https://xwiki.org third");
@@ -795,10 +804,12 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteEditor editor = page.getContentEditor();
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
-        // Select the word "second" using the keyboard, then create a link from the selection, leaving the page
-        // reference empty and setting only the anchor.
+        // Select the word "second" using the keyboard, then create a link from the selection, emptying the page
+        // reference (pre-filled with the selected text) and setting only the anchor.
         textArea.click().select(6, 6);
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
+        linkModal.setTarget("");
         linkModal.setAnchor("HSection");
         linkModal.submit();
 
@@ -863,9 +874,13 @@ class LinkIT extends AbstractBlockNoteIT
         textArea.waitUntilLinkIsPresent("createLinkToCurrentPage");
 
         // Select the word "second" of the first paragraph using the keyboard, then create another link to the current
-        // page from the selection, leaving the page reference, the query string and the anchor empty.
+        // page from the selection, emptying the page reference (pre-filled with the selected text) and leaving the query
+        // string and the anchor empty.
         textArea.clickBlock(0).select(6, 6);
-        editor.getToolBar().createLink().submit();
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.closeSuggestions();
+        linkModal.setTarget("");
+        linkModal.submit();
         textArea.waitUntilLinkIsPresent("second");
 
         // Save and check the source: both links have an empty reference, which designates the current page, and the
@@ -877,5 +892,50 @@ class LinkIT extends AbstractBlockNoteIT
         // The link is still there when editing the page again, with its generated label.
         page = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
         page.getContentEditor().getRichTextArea().waitUntilLinkIsPresent("createLinkToCurrentPage");
+    }
+
+    @Test
+    @Order(26)
+    void undoLinkEdit(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create the page currently linked to (the "old" target) and the page we're going to switch the link to (the
+        // "new" target), and wait for the new one to be indexed, since the page link suggestions are based on Solr
+        // indexation.
+        DocumentReference oldTargetPage =
+            new DocumentReference("UndoLinkOldTarget", testReference.getLastSpaceReference());
+        setup.deletePage(oldTargetPage);
+        setup.createPage(oldTargetPage, "", "Undo Link Old Target");
+        DocumentReference newTargetPage =
+            new DocumentReference("UndoLinkNewTarget", testReference.getLastSpaceReference());
+        setup.deletePage(newTargetPage);
+        setup.createPage(newTargetPage, "", "Undo Link New Target");
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[second>>doc:UndoLinkOldTarget]] third", "");
+
+        BlockNoteInplaceEditPage page = new BlockNoteInplaceEditPage().editInplace();
+        BlockNoteEditor editor = page.getContentEditor();
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Change the target page and the label of the link. The target is changed first, because the suggestions of the
+        // page reference (focused when the link modal opens) cover the link options until a page is selected.
+        textArea.click().moveCaretTo(8);
+        BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+        linkModal.setPageReference("Undo Link New Target", "Undo Link New Target");
+        linkModal.setDisplayText("2nd");
+        linkModal.submit();
+        textArea.waitUntilLinkIsPresent("2nd");
+
+        // Undo the link change. The undo shortcut is sent alone, so that the modifier key is released afterwards.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        textArea.waitUntilLinkIsPresent("second");
+
+        // Save and check the source: the link points to its initial target, whose reference (kept in the link metadata)
+        // was restored with the link.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>doc:UndoLinkOldTarget]] third", wikiEditor.getContent());
     }
 }

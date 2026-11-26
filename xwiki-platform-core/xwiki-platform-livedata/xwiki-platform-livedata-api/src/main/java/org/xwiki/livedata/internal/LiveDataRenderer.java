@@ -33,6 +33,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -141,12 +142,11 @@ public class LiveDataRenderer
             // Serialize as JSON.
             ObjectMapper objectMapper = new ObjectMapper();
             output.setParameter("data-config", objectMapper.writeValueAsString(liveDataConfig));
-            // The content is trusted if the author has script right, or if no advanced configuration is used (i.e.,
-            // no macro content), and we are running in a trusted context.
-
-            boolean trustedContent =
-                StringUtils.isBlank(advancedParameters) || (this.contextualAuthorizationManager.hasAccess(SCRIPT)
-                    && !restricted);
+            // The content is never trusted in a restricted context. Otherwise, it is trusted if the author has script
+            // right, or if no advanced configuration is used (that is, no macro content) and the source confirms that
+            // its parameters don't let the author choose where the displayed entries come from.
+            boolean trustedContent = !restricted && (this.contextualAuthorizationManager.hasAccess(SCRIPT)
+                || (StringUtils.isBlank(advancedParameters) && isSourceContentTrusted(liveDataConfig)));
             // A script element is used instead of an HTML attribute because the HTML sanitizer strips script elements
             // from untrusted markup, ensuring the contentTrusted property only originate from this macro, and cannot
             // be introduced through user-provided HTML content.
@@ -160,6 +160,21 @@ public class LiveDataRenderer
             throw new LiveDataException("Failed to generate live data configuration from macro parameters.", e);
         }
         return output;
+    }
+
+    private boolean isSourceContentTrusted(LiveDataConfiguration liveDataConfig) throws ComponentLookupException
+    {
+        LiveDataQuery query = liveDataConfig.getQuery();
+        LiveDataQuery.Source source = query != null ? query.getSource() : null;
+        String sourceId = source != null ? source.getId() : null;
+        if (sourceId == null) {
+            return false;
+        }
+        ComponentManager componentManager = this.componentManagerProvider.get();
+        // A source that doesn't declare which configurations it trusts is never trusted.
+        return componentManager.hasComponent(LiveDataSourceContentTrust.class, sourceId)
+            && componentManager.<LiveDataSourceContentTrust>getInstance(LiveDataSourceContentTrust.class, sourceId)
+                .isContentTrusted(source);
     }
 
     /**

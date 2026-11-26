@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-pagetemplate</artifactId>
-    <version>18.10.0-SNAPSHOT</version>
+    <version>19.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-pagetemplate-api</artifactId>
   <name>XWiki Platform - Page Templates - API</name>
   <packaging>jar</packaging>
   <description>API to read the page templates offered when creating pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

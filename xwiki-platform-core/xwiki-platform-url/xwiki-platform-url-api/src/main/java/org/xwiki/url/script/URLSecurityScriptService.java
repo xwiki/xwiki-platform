@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.FrontendURLCheckPolicy;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.url.URLSecurityManager;
@@ -85,7 +84,6 @@ public class URLSecurityScriptService implements ScriptService
      * @since 17.4.6
      * @since 16.10.13
      */
-    @Unstable
     public List<String> getTrustedDomains()
     {
         return this.urlConfiguration.getTrustedDomains();
@@ -99,7 +97,6 @@ public class URLSecurityScriptService implements ScriptService
      * @since 17.4.7
      * @since 16.10.14
      */
-    @Unstable
     public FrontendURLCheckPolicy getFrontendUrlCheckPolicy()
     {
         return this.urlConfiguration.getFrontendUrlCheckPolicy();
@@ -111,7 +108,6 @@ public class URLSecurityScriptService implements ScriptService
      * @since 17.4.6
      * @since 16.10.13
      */
-    @Unstable
     public List<String> getAllowedFrontendUrls()
     {
         return this.urlConfiguration.getAllowedFrontendUrls();

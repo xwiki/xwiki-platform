@@ -3,3 +3,4 @@ org.xwiki.records.internal.macro.RecordsLocationConverter
 org.xwiki.records.internal.macro.RecordsMacro
 org.xwiki.records.internal.macro.RecordsMacroRefactoring
 org.xwiki.records.internal.macro.RecordsMessages
+org.xwiki.records.internal.macro.RecordsTemplateProviderConverter

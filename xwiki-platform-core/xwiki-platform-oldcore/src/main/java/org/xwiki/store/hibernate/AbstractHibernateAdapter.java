@@ -37,7 +37,6 @@ import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
 import org.slf4j.Logger;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
@@ -49,7 +48,6 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
  * @version $Id$
  * @since 17.1.0RC1
  */
-@Unstable
 public abstract class AbstractHibernateAdapter implements HibernateAdapter
 {
     private static final String VIRTUAL_MODE_SCHEMA = "schema";

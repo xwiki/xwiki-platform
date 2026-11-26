@@ -47,7 +47,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.security.SecurityConfiguration;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -114,7 +113,6 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * @since 17.4.4
      * @since 16.10.11
      */
-    @Unstable
     protected int validateAndGetLimit(Integer limit)
     {
         int configuredLimit = this.securityConfiguration.getQueryItemsLimit();

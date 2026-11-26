@@ -16,3 +16,4 @@ org.xwiki.livedata.internal.livetable.ModelBridge
 org.xwiki.livedata.internal.livetable.TemplateProviderLiveTableNewRowNamingStrategy
 org.xwiki.livedata.internal.livetable.NewRowTemplateProviderResolver
 org.xwiki.livedata.internal.livetable.LiveTableNewEntryResolver
+org.xwiki.livedata.internal.livetable.LiveTableLiveDataSourceContentTrust

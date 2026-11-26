@@ -17,9 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { depsContainerMock } from "./depsContainer.mock";
+import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
+import {
+  linkEditorName,
+  linkMetadataHandlerName,
+} from "../../services/linkEditor";
 import {
   AttachmentReference,
   DocumentReference,
@@ -31,13 +35,18 @@ import { useMemo, useState } from "react";
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
 // the Vite pipeline used to bundle this story) can't parse.
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
-import type { LinkEditionData } from "../../components/links/linkEdition";
-import type { LinkEditionHooks } from "../../components/links/linkEditionHooks";
+import type {
+  LinkEditionData,
+  LinkEditor,
+  LinkMetadataHandler,
+} from "../../services/linkEditor";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/platform-model-reference-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { Container } from "inversify";
 
 const LINK_TYPE_PAGE = 0; // LinkType.PAGE
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
@@ -66,20 +75,63 @@ export type LinkSuggestionForTestProps = {
   uploadedFileName?: string;
   // The link data submitted by the scripted link editor (which is cancelled when not set).
   linkEditorSubmit?: LinkEditionData;
+  // When set, no link editor is bound.
+  noLinkEditor?: boolean;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
   // The syntax of the edited content (supporting everything when not set).
-  syntax?: BlockNoteViewWrapperProps["syntax"];
+  syntax?: SyntaxConfig;
+  // The upload option of the editor.
+  upload?: boolean;
 };
 
 /**
+ * Binds a link metadata handler reporting the inserted links (and rewriting their URL, like the XWiki integration does,
+ * to check that the rewritten URL is the one inserted), and a scripted link editor, when specified.
+ */
+function bindLinkServices(
+  container: Container,
+  {
+    onInsert,
+    linkEditor,
+  }: {
+    onInsert: (link: LinkEditionData) => void;
+    linkEditor?: {
+      onEdit: (input: unknown) => void;
+      submit?: LinkEditionData;
+    };
+  },
+): void {
+  container.bind<LinkMetadataHandler>(linkMetadataHandlerName).toConstantValue({
+    beforeEdit: (_instance, link) => link,
+    beforeUpdate: (_instance, link) => {
+      onInsert(link);
+      return { ...link, url: `${link.url}#inserted` };
+    },
+  });
+
+  if (linkEditor) {
+    container.bind<LinkEditor>(linkEditorName).toConstantValue({
+      async insert(_instance, prefill) {
+        linkEditor.onEdit({ action: "insert", prefill });
+        return linkEditor.submit;
+      },
+      async edit(_instance, link) {
+        linkEditor.onEdit({ action: "edit", link });
+        return linkEditor.submit;
+      },
+    });
+  }
+}
+
+/**
  * Renders the editor with a mocked LinkSuggestService feeding the link quick action's suggestions, a scripted link
- * editor and link edition hooks reporting the inserted links.
+ * editor and a link metadata handler reporting the inserted links.
  *
- * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own
- * `vitest-mock-extended` container: test-prop functions get proxied back to Node when called from the
- * mounted component, which strips any mock methods off objects passed through them, and breaks the synchronous
- * return value that the link edition hooks rely on. Building them here, where the code actually runs in the browser,
+ * This is a dedicated story (rather than a `BlockNoteForTest` prop) because it builds its own container of mocked
+ * services: test-prop functions get proxied back to Node when called from the mounted component, which strips any
+ * methods off objects passed through them, and breaks the synchronous return value that the link metadata handler
+ * relies on. Building them here, where the code actually runs in the browser,
  * keeps them intact.
  */
 export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
@@ -90,28 +142,27 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
   uploadedFileURL,
   uploadedFileName,
   linkEditorSubmit,
+  noLinkEditor,
   content,
   syntax,
+  upload,
 }) => {
-  // The links received by the link edition hooks before being inserted, and the link data the link editor was opened
-  // with, rendered so that the tests can assert on them.
+  // The links received by the link metadata handler before being inserted, and the link data the link editor was
+  // opened with, rendered so that the tests can assert on them.
   const [insertedLinks, setInsertedLinks] = useState<LinkEditionData[]>([]);
   const [linkEditorInput, setLinkEditorInput] = useState<string>();
 
-  // Stable, like the hooks of a real integration, so that the editor doesn't rebuild its menus on each insertion.
-  const linkEditionHooks = useMemo<LinkEditionHooks>(
-    () => ({
-      beforeUpdate: (linkData) => {
-        setInsertedLinks((links) => [...links, linkData]);
-        // Rewrite the URL, like the XWiki integration does, to check that the rewritten URL is the one inserted.
-        return { ...linkData, url: `${linkData.url}#inserted` };
-      },
-    }),
-    [],
-  );
-
-  const depsContainer = useMemo(() => {
-    const container = depsContainerMock();
+  const serviceContainer = useMemo(() => {
+    const container = serviceContainerMock([syntax ?? FULL_SYNTAX]);
+    bindLinkServices(container, {
+      onInsert: (link) => setInsertedLinks((links) => [...links, link]),
+      linkEditor: noLinkEditor
+        ? undefined
+        : {
+            onEdit: (input) => setLinkEditorInput(JSON.stringify(input)),
+            submit: linkEditorSubmit,
+          },
+    });
 
     const toLinks = (links: SuggestedLink[] | undefined, type: number) =>
       (links ?? []).map((link, index) => ({
@@ -127,7 +178,7 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
         url: link.url,
       }));
 
-    container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue(
+    container.rebind("LinkSuggestServiceProvider").toConstantValue(
       linkSuggestServiceUnavailable
         ? { get: () => undefined }
         : ({
@@ -146,10 +197,10 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
     );
 
     // A page reference that the model reference parser of the mocked container understands.
-    container.get.calledWith("DocumentService").mockReturnValue({
+    container.rebind("DocumentService").toConstantValue({
       getCurrentDocumentReferenceString: () => ({ value: "Some.Page" }),
     });
-    container.get.calledWith("AttachmentsService").mockReturnValue({
+    container.rebind("AttachmentsService").toConstantValue({
       async upload() {
         if (!uploadedFileURL) {
           throw new Error("Failed to upload the file");
@@ -182,24 +233,22 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
           )
         : new DocumentReference(reference, new SpaceReference());
     };
-    container.get.calledWith("ModelReferenceParserProvider").mockReturnValue({
+    container.rebind("ModelReferenceParserProvider").toConstantValue({
       get: () => ({ parse, parseAsync: async (...args) => parse(...args) }),
     } satisfies ModelReferenceParserProvider);
-    container.get
-      .calledWith("ModelReferenceSerializerProvider")
-      .mockReturnValue({
-        get: () => ({
-          serialize(reference, base) {
-            if (reference instanceof AttachmentReference) {
-              // The page is omitted when it's the base page.
-              return reference.document.name === base?.name
-                ? reference.name
-                : `${reference.document.name}@${reference.name}`;
-            }
-            return reference?.name;
-          },
-        }),
-      } satisfies ModelReferenceSerializerProvider);
+    container.rebind("ModelReferenceSerializerProvider").toConstantValue({
+      get: () => ({
+        serialize(reference, base) {
+          if (reference instanceof AttachmentReference) {
+            // The page is omitted when it's the base page.
+            return reference.document.name === base?.name
+              ? reference.name
+              : `${reference.document.name}@${reference.name}`;
+          }
+          return reference?.name;
+        },
+      }),
+    } satisfies ModelReferenceSerializerProvider);
 
     return container;
   }, []);
@@ -207,19 +256,14 @@ export const LinkSuggestionForTest: React.FC<LinkSuggestionForTestProps> = ({
   return (
     <>
       <BlockNoteViewWrapper
-        lang="en"
-        label="Some Label"
-        depsContainer={depsContainer}
-        macros={false}
-        content={content ?? []}
-        syntax={syntax ?? FULL_SYNTAX}
-        linkEditionHandler={({ mode, current, onSubmit }) => {
-          setLinkEditorInput(JSON.stringify({ mode, current }));
-          if (linkEditorSubmit) {
-            onSubmit(linkEditorSubmit);
-          }
+        options={{
+          lang: "en",
+          label: "Some Label",
+          serviceContainer,
+          syntax: (syntax ?? FULL_SYNTAX).id,
+          upload,
         }}
-        overrides={{ linkEdition: linkEditionHooks }}
+        content={content ?? []}
       />
       <output data-testid="insertedLinks">
         {JSON.stringify(insertedLinks)}

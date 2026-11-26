@@ -65,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -276,7 +277,7 @@ class ModelBridgeTest
         this.modelBridge.delete(documentReference);
 
         verify(this.authorization).checkAccess(Right.DELETE, documentReference);
-        verify(this.xwiki).deleteDocument(this.document, this.xcontext);
+        verify(this.xwiki).deleteDocument(this.document, true, true, this.xcontext);
     }
 
     @Test
@@ -289,7 +290,8 @@ class ModelBridgeTest
 
         this.modelBridge.delete(documentReference);
 
-        verify(this.xwiki, never()).deleteDocument(any(XWikiDocument.class), any(XWikiContext.class));
+        verify(this.xwiki, never()).deleteDocument(any(XWikiDocument.class), anyBoolean(), anyBoolean(),
+            any(XWikiContext.class));
     }
 
     @Test

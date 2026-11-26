@@ -29,7 +29,6 @@ import java.util.function.BooleanSupplier;
 import jakarta.servlet.http.Cookie;
 
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a web browser tab.
@@ -67,7 +66,6 @@ public interface BrowserTab extends AutoCloseable
      * @since 16.10.8
      * @since 17.4.0RC1
      */
-    @Unstable
     default boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout, BooleanSupplier isCanceled)
         throws IOException
     {
@@ -106,7 +104,6 @@ public interface BrowserTab extends AutoCloseable
      * @throws IOException if navigating to the specified web page fails
      * @since 17.0.0RC1
      */
-    @Unstable
     default boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout) throws IOException
     {
         return navigate(url, JakartaServletBridge.toJavax(cookies), wait, timeout);
@@ -137,7 +134,6 @@ public interface BrowserTab extends AutoCloseable
      * @throws IOException if navigating to the specified web page fails
      * @since 17.0.0RC1
      */
-    @Unstable
     default boolean navigate(URL url, Cookie[] cookies, boolean wait) throws IOException
     {
         return navigate(url, cookies, wait, 60);

@@ -26,7 +26,6 @@ import jakarta.servlet.http.HttpSession;
 import org.xwiki.container.Request;
 import org.xwiki.container.Session;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
-import org.xwiki.stability.Unstable;
 
 /**
  * This is the implementation of {@link Request} for {@link HttpSession}.
@@ -51,7 +50,6 @@ public class ServletSession implements Session
      * @param session the Servlet session
      * @since 17.0.0RC1
      */
-    @Unstable
     public ServletSession(HttpSession session)
     {
         this.httpSession = session;
@@ -71,7 +69,6 @@ public class ServletSession implements Session
      * @return the current Servlet session
      * @since 17.0.0RC1
      */
-    @Unstable
     public HttpSession getSession()
     {
         return this.httpSession;

@@ -62,6 +62,7 @@ public class RealtimeWYSIWYGEditPage extends RealtimeEditPage
      * @since 18.10.0
      * @since 18.4.9
      * @since 17.10.16
+     * @since 16.10.20
      */
     public RealtimeWYSIWYGEditPage leaveAndGoBack(Runnable leaveAction)
     {

@@ -19,9 +19,10 @@
  */
 
 /**
- * The data kept about a block (or a link, or a macro call) of the edited content, outside of the content itself: what
- * the BlockNote schema can't hold (e.g. the resource reference of an image), or what must not be shared with the other
- * users editing the same content in realtime (e.g. the output of a macro, rendered for the current user).
+ * The data kept about a block (or a link) of the edited content that the BlockNote schema can't hold (e.g. the resource
+ * reference of an image), as entries keyed by name. It is part of the edited content (see `getBlockMetadata` and
+ * `getLinkMetadata`), so it is shared with the other users editing the same content in realtime, and restored by undo /
+ * redo.
  *
  * @since 18.10.0RC1
  * @beta
@@ -29,68 +30,57 @@
 type BlockMetadata = Record<string, unknown>;
 
 /**
- * Holds the {@link BlockMetadata} of the edited content, by id: the block id for a block, the `id` property for an
- * inline macro, or an id of the integration's choosing otherwise (e.g. for a link). The metadata is changed only
- * through {@link BlockMetadataStore.set}, so that a store can tell what changed (e.g. to synchronize it).
+ * What is known about the content holding a pasted metadata entry, to decide whether the entry can be kept.
  *
- * @since 18.10.0RC1
+ * @since 18.10.0
  * @beta
  */
-interface BlockMetadataStore {
+type PastedMetadataContext = {
   /**
-   * Gets the metadata of a block.
-   *
-   * @param id - identifies the block (or the link, or the macro call)
-   * @returns the metadata of the specified block, or undefined if it has none; it must not be modified, use
-   *   {@link BlockMetadataStore.set} instead
+   * The URL displayed by the pasted node, when it has one: the URL of a link (without its metadata), or the source of
+   * an image.
    */
-  get(id: string): Readonly<BlockMetadata> | undefined;
-
-  /**
-   * Sets an entry of the metadata of a block.
-   *
-   * @param id - identifies the block (or the link, or the macro call)
-   * @param key - the name of the metadata entry
-   * @param value - the value of the metadata entry, or undefined to remove the entry (a block left without metadata
-   *   entries has no metadata)
-   */
-  set(id: string, key: string, value: unknown): void;
-}
-
-class DefaultBlockMetadataStore implements BlockMetadataStore {
-  private readonly metadata = new Map<string, BlockMetadata>();
-
-  public get(id: string): Readonly<BlockMetadata> | undefined {
-    return this.metadata.get(id);
-  }
-
-  public set(id: string, key: string, value: unknown): void {
-    const metadata = this.metadata.get(id);
-    if (value !== undefined) {
-      this.metadata.set(id, { ...metadata, [key]: value });
-    } else if (metadata && key in metadata) {
-      const rest = { ...metadata };
-      delete rest[key];
-      if (Object.keys(rest).length) {
-        this.metadata.set(id, rest);
-      } else {
-        this.metadata.delete(id);
-      }
-    }
-  }
-}
+  url?: string;
+};
 
 /**
- * Creates the metadata store used when the integration doesn't provide one.
+ * The name under which the {@link BlockMetadataKey}s are bound in the service container: the keys of the metadata
+ * entries that the editing features keep in the edited content (see `setBlockMetadata` and `setLinkMetadata`), so that
+ * the editor knows which pasted entries to keep (see {@link BlockMetadataKey.filterPasted}). They are bound either for
+ * all the editor instances, or in the service container of an editor instance, for that editor instance only. The
+ * pasted entries without a bound key are dropped.
  *
- * @returns an empty metadata store, kept in memory
+ * @since 18.10.0
+ * @beta
+ */
+const blockMetadataKeyName = "BlockMetadataKey";
+
+/**
+ * Identifies a metadata entry. It is defined by the editing feature that owns the entry, and used by all the code that
+ * reads or sets the entry.
  *
  * @since 18.10.0RC1
  * @beta
  */
-function createBlockMetadataStore(): BlockMetadataStore {
-  return new DefaultBlockMetadataStore();
-}
+type BlockMetadataKey = {
+  /**
+   * The name of the metadata entry.
+   */
+  name: string;
 
-export { createBlockMetadataStore };
-export type { BlockMetadata, BlockMetadataStore };
+  /**
+   * Decides what happens to a value of this entry found in pasted (or dropped) content. The pasted content can come
+   * from anywhere (another page, another application, a malicious web page), whatever its format, so its metadata
+   * can't be trusted: a value is kept only when it can't do anything that the user doesn't see. The entries are
+   * dropped from the pasted content when this is missing, as are the entries without a key bound in the service
+   * container (see {@link blockMetadataKeyName}).
+   *
+   * @param value - the pasted value
+   * @param context - what is known about the content holding the pasted value
+   * @returns the value to keep, or undefined to drop the entry
+   */
+  filterPasted?: (value: unknown, context: PastedMetadataContext) => unknown;
+};
+
+export { blockMetadataKeyName };
+export type { BlockMetadata, BlockMetadataKey, PastedMetadataContext };

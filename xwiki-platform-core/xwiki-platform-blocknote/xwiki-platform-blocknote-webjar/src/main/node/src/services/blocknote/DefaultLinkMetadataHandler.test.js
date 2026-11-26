@@ -18,8 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DefaultLinkMetadataHandler } from "./DefaultLinkMetadataHandler";
-import { extractLinkId, injectLinkId } from "./linkId";
-import { createBlockMetadataStore } from "@xwiki/platform-editors-blocknote-react";
+import {
+  getLinkMetadata,
+  setLinkMetadata,
+  stripLinkMetadata,
+} from "@xwiki/platform-editors-blocknote-react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 function pageReference(reference) {
@@ -31,20 +34,18 @@ describe("DefaultLinkMetadataHandler", () => {
   let instance;
 
   beforeEach(() => {
-    instance = { options: {}, metadata: createBlockMetadataStore() };
+    instance = { options: {} };
   });
 
   /**
    * @returns the URL of a link to Users.Alice whose label is generated, as loaded from the server
    */
-  function linkWithGeneratedLabel() {
-    instance.metadata.set(
-      "alice",
-      "xwikiReference",
-      pageReference("Users.Alice"),
-    );
-    instance.metadata.set("alice", "xwikiGeneratedLabel", "Alice");
-    return injectLinkId("/xwiki/bin/view/Users/Alice", "alice");
+  function linkWithGeneratedLabel(metadata = {}) {
+    return setLinkMetadata("/xwiki/bin/view/Users/Alice", {
+      xwikiReference: pageReference("Users.Alice"),
+      xwikiGeneratedLabel: "Alice",
+      ...metadata,
+    });
   }
 
   describe("beforeEdit", () => {
@@ -93,17 +94,45 @@ describe("DefaultLinkMetadataHandler", () => {
         previous,
       );
 
-      expect(extractLinkId(updated.url)).toBe("alice");
-      expect(instance.metadata.get("alice")).toEqual({
+      expect(stripLinkMetadata(updated.url)).toBe("/xwiki/bin/view/Users/Bob");
+      expect(getLinkMetadata(updated.url)).toEqual({
         xwikiReference: pageReference("Users.Bob"),
         xwikiGeneratedLabel: "Bob",
+      });
+    });
+
+    it("keeps the metadata that the link editor doesn't edit", () => {
+      const previous = {
+        title: "Alice",
+        url: linkWithGeneratedLabel({
+          xwikiParameters: { rel: "__blank" },
+        }),
+      };
+
+      const updated = handler.beforeUpdate(
+        instance,
+        {
+          title: "Bob",
+          url: "/xwiki/bin/view/Users/Bob",
+          reference: pageReference("Users.Bob"),
+        },
+        previous,
+      );
+
+      expect(getLinkMetadata(updated.url)).toEqual({
+        xwikiReference: pageReference("Users.Bob"),
+        xwikiParameters: { rel: "__blank" },
+      });
+      // The edited link is left untouched, so that undo restores it.
+      expect(getLinkMetadata(previous.url)).toMatchObject({
+        xwikiReference: pageReference("Users.Alice"),
       });
     });
 
     it("saves the label typed in the link editor, even when it's the same as the generated one", () => {
       const previous = { title: "Alice", url: linkWithGeneratedLabel() };
 
-      handler.beforeUpdate(
+      const updated = handler.beforeUpdate(
         instance,
         {
           title: "Alice",
@@ -114,7 +143,7 @@ describe("DefaultLinkMetadataHandler", () => {
         previous,
       );
 
-      expect(instance.metadata.get("alice")).toEqual({
+      expect(getLinkMetadata(updated.url)).toEqual({
         xwikiReference: pageReference("Users.Alice"),
       });
     });
@@ -127,20 +156,20 @@ describe("DefaultLinkMetadataHandler", () => {
         reference: pageReference("Users.Alice"),
       });
 
-      expect(instance.metadata.get(extractLinkId(updated.url))).toEqual({
+      expect(getLinkMetadata(updated.url)).toEqual({
         xwikiReference: pageReference("Users.Alice"),
         xwikiGeneratedLabel: "Alice",
       });
     });
 
-    it("marks the generated label of a link without reference, which then gets an id", () => {
+    it("marks the generated label of a link without reference", () => {
       const updated = handler.beforeUpdate(instance, {
         title: "https://xwiki.org/",
         generatedTitle: true,
         url: "https://xwiki.org/",
       });
 
-      expect(instance.metadata.get(extractLinkId(updated.url))).toEqual({
+      expect(getLinkMetadata(updated.url)).toEqual({
         xwikiGeneratedLabel: "https://xwiki.org/",
       });
     });
@@ -148,7 +177,7 @@ describe("DefaultLinkMetadataHandler", () => {
     it("leaves the url of a link without reference and with a label of its own untouched", () => {
       const linkData = { title: "XWiki", url: "https://xwiki.org" };
 
-      expect(handler.beforeUpdate(instance, linkData)).toBe(linkData);
+      expect(handler.beforeUpdate(instance, linkData)).toEqual(linkData);
     });
   });
 });

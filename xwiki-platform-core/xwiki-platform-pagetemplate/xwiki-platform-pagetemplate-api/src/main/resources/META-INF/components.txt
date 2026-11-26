@@ -2,3 +2,4 @@ org.xwiki.pagetemplate.internal.DefaultTemplateProviderManager
 org.xwiki.pagetemplate.internal.TemplateProviderClassDocumentInitializer
 org.xwiki.pagetemplate.internal.TemplateProviderRestrictionsRenameListener
 org.xwiki.pagetemplate.internal.TemplateProviderRestrictionsUpdater
+org.xwiki.pagetemplate.script.TemplateProviderScriptService

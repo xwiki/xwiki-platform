@@ -118,4 +118,10 @@ public class TemplateProviderLiveTableNewRowNamingStrategy extends TitleLiveTabl
         String defaultPageName = this.entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
         return new DocumentReference(defaultPageName, new SpaceReference(name, location));
     }
+
+    @Override
+    public String getDescription()
+    {
+        return getDescription(HINT);
+    }
 }

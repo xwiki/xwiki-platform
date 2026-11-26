@@ -102,13 +102,25 @@ public class HttpServletResponseStub implements HttpServletResponse
         return url;
     }
 
-    @Override
+    /**
+     * @param url the url to encode
+     * @return the passed url
+     * @deprecated this method was removed from the Servlet specification and is only kept for backward
+     *             compatibility, use {@link #encodeURL(String)} instead
+     */
+    @Deprecated(since = "19.0.0RC1")
     public String encodeUrl(String url)
     {
         return url;
     }
 
-    @Override
+    /**
+     * @param url the url to encode
+     * @return the passed url
+     * @deprecated this method was removed from the Servlet specification and is only kept for backward
+     *             compatibility, use {@link #encodeRedirectURL(String)} instead
+     */
+    @Deprecated(since = "19.0.0RC1")
     public String encodeRedirectUrl(String url)
     {
         return url;
@@ -174,7 +186,13 @@ public class HttpServletResponseStub implements HttpServletResponse
         // Nothing to do, this stub does not send any response.
     }
 
-    @Override
+    /**
+     * @param sc the status code
+     * @param sm the status message
+     * @deprecated this method was removed from the Servlet specification and is only kept for backward
+     *             compatibility, use {@link #setStatus(int)} or {@link #sendError(int, String)} instead
+     */
+    @Deprecated(since = "19.0.0RC1")
     public void setStatus(int sc, String sm)
     {
         // Nothing to do, this stub does not send any response.

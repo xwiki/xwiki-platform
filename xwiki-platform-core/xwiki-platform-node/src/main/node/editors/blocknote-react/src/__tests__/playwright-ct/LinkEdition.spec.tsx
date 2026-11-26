@@ -23,8 +23,8 @@ import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockType } from "../../blocknote";
 import type { Locator, Page } from "@playwright/test";
 
-// The url of the edited link carries a synthetic id, like the XWiki integration does to bind a link
-// to the metadata it can't store in the BlockNote schema.
+// The url of the edited link carries a query parameter, like the XWiki integration does to keep the
+// metadata of the link that the BlockNote schema can't hold.
 const LINK_URL = "https://xwiki.org/?id=42";
 
 test("beforeEdit transforms the link data used to pre-fill the link editor", async ({
@@ -73,7 +73,7 @@ test("beforeUpdate receives the submitted link data and the previous one, as sto
 
   // beforeUpdate gets the link data submitted by the link editor, together with the link data as it
   // is stored in the content: not the one transformed by beforeEdit, so that the integration can
-  // recover from it the metadata (e.g. a synthetic id) it hides from the link editor.
+  // recover from it the metadata it hides from the link editor.
   await expect(page.locator('[data-test="beforeUpdateInput"]')).toHaveText(
     JSON.stringify({
       linkData: submit,
@@ -124,7 +124,7 @@ test("A canceled link edition leaves the link unchanged", async ({
   ).not.toBeAttached();
 });
 
-test("The create link button opens the link editor prefilled with the selected text", async ({
+test("The create link button opens the link editor prefilled with the selected text, as label and target", async ({
   mount,
   page,
 }) => {
@@ -140,8 +140,17 @@ test("The create link button opens the link editor prefilled with the selected t
   await selectFirstWord(editorEl, page);
   await page.locator('button[data-test="createLink"]').click();
 
+  // The link target is the page named after the selected text, so that the link editor can suggest the matching pages.
   await expect(page.locator('[data-test="linkEditorInput"]')).toHaveText(
-    JSON.stringify({ title: "First" }),
+    JSON.stringify({
+      title: "First",
+      reference: {
+        type: "doc",
+        typed: false,
+        reference: "First",
+        parameters: {},
+      },
+    }),
   );
   // The selected text is replaced with the label of the inserted link.
   await expect(editorEl.locator('a[href="https://example.org/"]')).toHaveText(

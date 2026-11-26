@@ -28,7 +28,6 @@ import {
 import "@blocknote/core/fonts/inter.css";
 import { EditorInstanceContext } from "../contexts";
 import { contributeFeatures } from "../features/editorFeature";
-import { createBlockMetadataStore } from "../misc/blockMetadata";
 import { getSyntaxConfig } from "../misc/syntax";
 import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -126,12 +125,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     [options.serviceContainer],
   );
 
-  // The data about the edited content that isn't part of the content is kept by the integration, when it needs it.
-  const metadata = useMemo(
-    () => options.metadata ?? createBlockMetadataStore(),
-    [options.metadata],
-  );
-
   // The collaboration session holds the content of all the editor instances taking part in it, each instance editing
   // the content stored under its name, so an instance without a name can't take part.
   const collaboration = name ? requestedCollaboration : undefined;
@@ -221,23 +214,20 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       : editorOptions,
   );
 
-  // The editor instance, passed to the services acting on it. The options resolved for the editor instance (the
-  // service container and the metadata store) are exposed only by the editor instance itself.
+  // The editor instance, passed to the services acting on it. The service container resolved for the editor instance is
+  // exposed only by the editor instance itself.
   const instance: EditorInstance = useMemo(() => {
     const {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       serviceContainer: _serviceContainer,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      metadata: _metadata,
       ...instanceOptions
     } = options;
     return {
       editor,
       options: instanceOptions,
-      metadata,
       serviceContainer,
     };
-  }, [editor, options, metadata, serviceContainer]);
+  }, [editor, options, serviceContainer]);
 
   // Allow the editing features and the parent component to access the editor instance.
   useEffect(() => {
@@ -249,7 +239,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // of the participants will retrieve the editor content from the realtime server. We know who is the first user
   // joining the session by checking whether the name of the editor instance is in the map of the loaded contents
   // (shared across all session participants), because each editor instance taking part in the session has its own
-  // initial content.
+  // initial content. The metadata that must be shared is part of the content.
   if (collaboration) {
     const initialContentLoaded = collaboration.doc.getMap<boolean>(
       "initialContentLoaded",

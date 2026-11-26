@@ -45,10 +45,13 @@ import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 export type BlockMetadata = Record<string, unknown>;
 
 // @beta
-export interface BlockMetadataStore {
-    get(id: string): Readonly<BlockMetadata> | undefined;
-    set(id: string, key: string, value: unknown): void;
-}
+export type BlockMetadataKey = {
+    name: string;
+    filterPasted?: (value: unknown, context: PastedMetadataContext) => unknown;
+};
+
+// @beta
+export const blockMetadataKeyName = "BlockMetadataKey";
 
 // @beta
 export type BlockNoteViewWrapperProps = {
@@ -91,9 +94,6 @@ export class ComponentInit {
 export type ContributedBlockNoteOptions = Partial<Pick<BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>, "uploadFile">>;
 
 // @beta
-export function createBlockMetadataStore(): BlockMetadataStore;
-
-// @beta
 export type EditorAppearance = {
     theme?: "light" | "dark";
     contentStyles?: "editor" | "host";
@@ -117,6 +117,7 @@ export interface EditorFeatures {
     images?: false;
     links?: object | false;
     macros?: MacroFeatureOptions | false;
+    pasteFilter?: false;
     textStyles?: false;
     xwikiRendering?: false;
 }
@@ -127,8 +128,7 @@ export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<inf
 // @beta
 export type EditorInstance = {
     editor: EditorType;
-    options: Readonly<Omit<EditorOptions, "serviceContainer" | "metadata">>;
-    metadata: BlockMetadataStore;
+    options: Readonly<Omit<EditorOptions, "serviceContainer">>;
     serviceContainer: Container;
 };
 
@@ -152,7 +152,6 @@ export type EditorOptions = {
     appearance?: EditorAppearance;
     collaboration?: Collaboration;
     upload?: boolean;
-    metadata?: BlockMetadataStore;
     features?: EditorFeatures;
 };
 
@@ -221,7 +220,10 @@ export type FormattingToolbarContribution = {
 };
 
 // @beta
-export function getMacroOutput(metadata: BlockMetadataStore | undefined, id: string, call: string): unknown[] | undefined;
+export function getBlockMetadata(block: Pick<BlockType, "props">): BlockMetadata;
+
+// @beta
+export function getLinkMetadata(href: string): BlockMetadata;
 
 // @beta
 export type ImageEditionData = Partial<BlockOfType<"image">["props"]> & {
@@ -264,6 +266,9 @@ export type InlineMacroInvocation = Omit<InlineMacroInvocation_2, "body"> & {
         type: "none";
     };
 };
+
+// @beta
+export const LINK_METADATA_PARAM = "__xwikiMetadata";
 
 // @beta
 export type LinkEditionData = {
@@ -332,6 +337,10 @@ export const macroEditorName = "MacroEditor";
 // @beta
 export type MacroFeatureOptions = {
     list?: MacroWithUnknownParamsType[];
+    outputs?: Record<string, {
+        call: string;
+        output: unknown[];
+    }>;
 };
 
 // @beta
@@ -346,9 +355,23 @@ export type MacroInsertionEditorPrefillData = {
 export const macrosFeature: EditorFeature;
 
 // @beta
+export const METADATA_PROP = "metadata";
+
+// @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
 };
+
+// @beta
+export function parseMetadata(value: unknown): BlockMetadata;
+
+// @beta
+export type PastedMetadataContext = {
+    url?: string;
+};
+
+// @beta
+export const pasteFilterFeature: EditorFeature;
 
 // @beta
 export type SchemaContribution = {
@@ -358,12 +381,21 @@ export type SchemaContribution = {
 };
 
 // @beta
-export function setMacroOutput(metadata: BlockMetadataStore, id: string, call: string, output: unknown[]): void;
+export function setBlockMetadata(editor: EditorType, block: BlockType | string, key: BlockMetadataKey, value: unknown): void;
+
+// @beta
+export function setLinkMetadata(href: string, metadata: BlockMetadata): string;
 
 // @beta
 export type SlashMenuItem = DefaultReactSuggestionItem & {
     key?: string;
 };
+
+// @beta
+export function stringifyMetadata(metadata: BlockMetadata): string;
+
+// @beta
+export function stripLinkMetadata(href: string): string;
 
 // @beta
 export const textStylesFeature: EditorFeature;
@@ -377,6 +409,30 @@ export type UploadedFile = {
 
 // @beta
 export function uploadFile(instance: EditorInstance, file: File): Promise<UploadedFile>;
+
+// @beta
+export const XWIKI_FREESTANDING: BlockMetadataKey;
+
+// @beta
+export const XWIKI_GENERATED_LABEL: BlockMetadataKey;
+
+// @beta
+export const XWIKI_LEADING_NEW_LINE: BlockMetadataKey;
+
+// @beta
+export const XWIKI_METADATA_KEYS: readonly BlockMetadataKey[];
+
+// @beta
+export const XWIKI_PARAMETERS: BlockMetadataKey;
+
+// @beta
+export const XWIKI_REFERENCE: BlockMetadataKey;
+
+// @beta
+export const XWIKI_TRAILING_NEW_LINE: BlockMetadataKey;
+
+// @beta
+export const XWIKI_VERBATIM: BlockMetadataKey;
 
 // @beta
 export const xwikiRenderingFeature: EditorFeature;

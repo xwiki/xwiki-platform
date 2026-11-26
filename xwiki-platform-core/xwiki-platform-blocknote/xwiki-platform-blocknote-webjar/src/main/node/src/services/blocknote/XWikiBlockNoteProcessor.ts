@@ -18,13 +18,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { BlockNoteDocument } from "./BlockNoteProcessor";
-import { extractLinkId, injectLinkId, stripLinkId } from "./linkId";
-import { setMacroOutput } from "@xwiki/platform-editors-blocknote-react";
+import {
+  METADATA_PROP,
+  XWIKI_GENERATED_LABEL,
+  XWIKI_METADATA_KEYS,
+  getLinkMetadata,
+  parseMetadata,
+  setLinkMetadata,
+  stringifyMetadata,
+  stripLinkMetadata,
+} from "@xwiki/platform-editors-blocknote-react";
 import { Container, inject, injectable } from "inversify";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
 import type { BlockNoteProcessor } from "./BlockNoteProcessor";
-import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
+import type {
+  BlockMetadata,
+  BlockType,
+} from "@xwiki/platform-editors-blocknote-react";
 
 /**
  * XWik specific implementation of a BlockNoteProcessor.
@@ -55,20 +66,6 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     // Code block
     language: "text",
   };
-
-  // The block metadata that can't be stored in the BlockNote schema and is backed up (mapped to the block id) so that
-  // it survives the editing round-trip.
-  private static readonly KNOWN_METADATA: readonly string[] = [
-    "xwikiParameters",
-    "xwikiReference",
-    "xwikiFreestanding",
-    "xwikiGeneratedLabel",
-    // Whether the verbatim content of a code block starts or ends with a new line that is hidden in the code block.
-    "xwikiLeadingNewLine",
-    "xwikiTrailingNewLine",
-    // Whether a code block was produced from a verbatim block (otherwise it is saved as a code macro call).
-    "xwikiVerbatim",
-  ];
 
   public static bind(container: Container): void {
     container
@@ -101,13 +98,13 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
         return true;
       } else if (node.type === "link") {
         this.normalizeLinkContent(node);
-        this.backupLinkMetadata(node, blockNoteDocument);
+        this.loadLinkMetadata(node);
       } else if (
         "props" in node &&
         node.props !== null &&
         typeof node.props === "object"
       ) {
-        this.backupBlockMetadata(node, blockNoteDocument);
+        this.loadBlockMetadata(node);
       } else if (
         node.type === "text" &&
         "styles" in node &&
@@ -136,7 +133,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
    * <ul>
    * <li>By default, BlockNote supports only primitive values for block and inline content properties, so the macro call
    * object is converted into a string (JSON serialization).</li>
-   * <li>The macro output is moved to the document metadata. The macro output can contain information that only the
+   * <li>The macro output is moved to the output of the macro calls of the document. The macro output can contain information that only the
    * current user is allowed to view (macros are rendered server-side with the rights of the current user) so it must
    * not be part of the edited content, which is shared with the other users when editing in realtime. The same goes
    * for the output of the macros nested in the macro parameters or content (i.e. the parameters or the content that
@@ -160,16 +157,16 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     if (!nested) {
       props.call = call;
     }
+    // The macro calls don't have XWiki metadata.
+    delete props[METADATA_PROP];
 
     const output = props.output;
     delete props.output;
     if (Array.isArray(output) && output.length) {
-      setMacroOutput(
-        blockNoteDocument.metadata,
-        this.getMacroId(macroNode, nested),
+      blockNoteDocument.macroOutputs[this.getMacroId(macroNode, nested)] = {
         call,
         output,
-      );
+      };
     }
   }
 
@@ -230,65 +227,61 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
-   * Backup known block metada (like `xwikiParameters`) from a block's props so that it doesn't get lost during edit.
-   * The metadata is mapped to the block id, which is generated if missing (BlockNote preserves the generated id). The
-   * metadata is restored on save.
+   * Moves the XWiki metadata (e.g. the parameters, the resource reference) out of the given properties, which the
+   * BlockNote schema doesn't know about.
    *
-   * Modifying propSchema of standard BlockNote blocks to carry the metadata is not possible: the render and
-   * toExternalHTML closures inside each block's implementation capture the original propSchema at construction time,
-   * so they would receive the metadata in block.props but not find it in their captured propSchema, causing a
-   * TypeError in wrapInBlockStructure. The ID-injection side-channel avoids that entirely.
-   *
-   * @param block - the raw block node (mutable)
-   * @param blockNoteDocument - the BlockNote document where to backup the metadata
+   * @param props - the properties of a node of the loaded content (mutable)
+   * @returns the XWiki metadata found in the given properties
    */
-  private backupBlockMetadata(
-    block: Record<string, unknown>,
-    blockNoteDocument: BlockNoteDocument,
-  ): void {
-    const props = block.props as Record<string, unknown>;
-    XWikiBlockNoteProcessor.KNOWN_METADATA.filter(
-      (key) => key in props,
-    ).forEach((key) => {
-      block.id = block.id ?? uuidv4();
-      blockNoteDocument.metadata.set(block.id as string, key, props[key]);
-      delete props[key];
+  private extractMetadata(props: Record<string, unknown>): BlockMetadata {
+    const metadata: BlockMetadata = {};
+    XWIKI_METADATA_KEYS.filter((key) => key.name in props).forEach((key) => {
+      metadata[key.name] = props[key.name];
+      delete props[key.name];
     });
+    return metadata;
   }
 
   /**
-   * Backup the metadata of a link (resource reference, parameters, freestanding flag) so that it
-   * survives the editing round-trip. Unlike a block, a link is inline content and has no id that
-   * BlockNote preserves, so the metadata is mapped to a synthetic id that is stored in the link href
-   * (the only part of a link that BlockNote preserves verbatim). The BlockNote link schema has no
-   * props, so the props (holding the metadata) are removed after being backed up.
+   * Moves the XWiki metadata of a block (e.g. its parameters) into the metadata property of the block, where the editor
+   * keeps it, as part of the edited content (so that it is shared with the other users editing in realtime, and
+   * restored by undo / redo). The metadata is put back in the block properties on save. A metadata property found in
+   * the loaded block is replaced, because the metadata of the loaded content comes only from its XWiki properties.
+   *
+   * @param block - the raw block node (mutable)
+   */
+  private loadBlockMetadata(block: Record<string, unknown>): void {
+    const props = block.props as Record<string, unknown>;
+    const metadata = stringifyMetadata(this.extractMetadata(props));
+    // BlockNote drops the properties that the table cells don't have, the metadata property included, so the metadata
+    // of the table cells is currently lost.
+    if (metadata) {
+      props[METADATA_PROP] = metadata;
+    } else {
+      delete props[METADATA_PROP];
+    }
+  }
+
+  /**
+   * Moves the XWiki metadata of a link (e.g. its resource reference, its parameters) into its URL, where the editor
+   * keeps it (the links are inline content, which BlockNote doesn't let us extend with properties), as part of the
+   * edited content. The metadata is put back in the link properties on save. The metadata already held by the loaded
+   * link URL is dropped, because the metadata of the loaded content comes only from its XWiki properties.
    *
    * @param link - the raw link node (mutable)
-   * @param blockNoteDocument - the BlockNote document where to backup the metadata
    */
-  private backupLinkMetadata(
-    link: Record<string, unknown>,
-    blockNoteDocument: BlockNoteDocument,
-  ): void {
-    const props = (link.props ?? {}) as Record<string, unknown>;
-    const metadata: Record<string, unknown> = {};
-    XWikiBlockNoteProcessor.KNOWN_METADATA.filter(
-      (key) => key in props,
-    ).forEach((key) => {
-      metadata[key] = props[key];
-    });
-    if (Object.keys(metadata).length > 0) {
-      const id = uuidv4();
-      Object.entries(metadata).forEach(([key, value]) =>
-        blockNoteDocument.metadata.set(id, key, value),
-      );
-      link.href = injectLinkId(link.href as string, id);
-    }
-    // The BlockNote link schema doesn't support props so we drop them (the metadata they held is
-    // backed up above and restored on save).
+  private loadLinkMetadata(link: Record<string, unknown>): void {
+    const metadata = this.extractMetadata(
+      (link.props ?? {}) as Record<string, unknown>,
+    );
+    link.href = setLinkMetadata(
+      stripLinkMetadata(link.href as string),
+      metadata,
+    );
+    // The BlockNote link schema doesn't support properties.
     delete link.props;
 
-    this.showGeneratedLabel(link, metadata.xwikiGeneratedLabel);
+    this.showGeneratedLabel(link, metadata[XWIKI_GENERATED_LABEL.name]);
   }
 
   /**
@@ -313,7 +306,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   /**
    * A link without a label is rendered with an empty content and its generated label stored as metadata. Show the
    * generated label as the link content so that the link is visible and editable. If the user changes it, the label is
-   * no longer generated and the marker is dropped on save (see {@link restoreLinkMetadata}).
+   * no longer generated and the marker is dropped on save (see {@link saveLinkMetadata}).
    *
    * @param link - the raw link node (mutable)
    * @param generatedLabel - the generated label backed up from the link metadata, if any
@@ -373,28 +366,25 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   public save(blockNoteDocument: BlockNoteDocument): string {
     const blockNoteContentCopy = structuredClone(blockNoteDocument.content);
     this.iterator.iterate(blockNoteContentCopy, {
-      visit: (node) => this.saveNode(node, blockNoteDocument),
+      visit: (node) => this.saveNode(node),
     });
     return JSON.stringify(blockNoteContentCopy);
   }
 
-  private saveNode(
-    node: NodeType,
-    blockNoteDocument: BlockNoteDocument,
-  ): boolean {
+  private saveNode(node: NodeType): boolean {
     if (typeof node === "object") {
       if (this.isMacroNode(node)) {
         this.saveMacro(node as { props?: unknown });
         return true;
       } else if (node.type === "link") {
-        this.restoreLinkMetadata(node, blockNoteDocument);
+        this.saveLinkMetadata(node);
       } else if (
         "props" in node &&
         node.props !== null &&
         typeof node.props === "object"
       ) {
         this.removeDefaults(node.props);
-        this.restoreBlockMetadata(node, blockNoteDocument);
+        this.saveBlockMetadata(node.props);
       } else if (
         node.type === "text" &&
         "styles" in node &&
@@ -431,56 +421,42 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     }
     // The id used to look up the macro output.
     delete props.id;
+    // The macro calls don't have XWiki metadata.
+    delete props[METADATA_PROP];
     this.visitNestedMacros(props.call, (nestedMacro) =>
       this.saveMacro(nestedMacro),
     );
   }
 
   /**
-   * Re-injects the block metadata (like `xwikiParameters`) that was extracted during load and mapped to the block ID.
+   * Reverses {@link loadBlockMetadata}: moves the metadata kept in the metadata property of a block back to the block
+   * properties.
    *
-   * @param block - the raw block node
-   * @param blockNoteDocument - the BlockNote document to retrieve the metadata from
+   * @param props - the properties of the raw block node (mutable)
    */
-  private restoreBlockMetadata(
-    block: Record<string, unknown>,
-    blockNoteDocument: BlockNoteDocument,
-  ): void {
-    if (typeof block.id === "string") {
-      const metadata = blockNoteDocument.metadata.get(block.id);
-      const props = block.props as Record<string, unknown>;
-      Object.entries(metadata ?? {}).forEach(([key, value]) => {
-        props[key] = value;
-      });
-    }
+  private saveBlockMetadata(props: Record<string, unknown>): void {
+    Object.assign(props, parseMetadata(props[METADATA_PROP]));
+    delete props[METADATA_PROP];
   }
 
   /**
-   * Reverses {@link backupLinkMetadata}: reads the synthetic id from the link href, restores the
-   * backed up metadata into the link props (recreating them, since the BlockNote link schema has no
-   * props) and removes the synthetic id from the href.
+   * Reverses {@link loadLinkMetadata}: moves the metadata kept in the link URL back to the link properties.
    *
    * @param link - the raw link node (mutable)
-   * @param blockNoteDocument - the BlockNote document to retrieve the metadata from
    */
-  private restoreLinkMetadata(
-    link: Record<string, unknown>,
-    blockNoteDocument: BlockNoteDocument,
-  ): void {
-    const id =
-      typeof link.href === "string" ? extractLinkId(link.href) : undefined;
-    if (id) {
-      link.href = stripLinkId(link.href as string);
-      const metadata = blockNoteDocument.metadata.get(id);
-      if (metadata) {
-        const props = { ...metadata };
-        // Drop the generated label marker if the user changed the (originally generated) label, so that the modified
-        // label is preserved on save instead of being discarded as a generated label.
-        if (props.xwikiGeneratedLabel !== this.getLinkText(link)) {
-          delete props.xwikiGeneratedLabel;
-        }
-        link.props = props;
+  private saveLinkMetadata(link: Record<string, unknown>): void {
+    if (typeof link.href !== "string") {
+      return;
+    }
+    const metadata = getLinkMetadata(link.href);
+    if (Object.keys(metadata).length) {
+      link.href = stripLinkMetadata(link.href);
+      // Drop the generated label marker if the user changed the (originally generated) label, so that the modified
+      // label is preserved on save instead of being discarded as a generated label.
+      if (metadata[XWIKI_GENERATED_LABEL.name] !== this.getLinkText(link)) {
+        delete metadata[XWIKI_GENERATED_LABEL.name];
       }
+      link.props = metadata;
     }
   }
 

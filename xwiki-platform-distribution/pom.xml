@@ -321,8 +321,6 @@
                   <xwikiDbHbmMariaDBExtraMappings>${xwiki.db.mariadb.extraMappings}</xwikiDbHbmMariaDBExtraMappings>
                   <xwikiDbHbmPostgreSQLExtraMappings>${xwiki.db.pgsql.extraMappings}</xwikiDbHbmPostgreSQLExtraMappings>
                   <xwikiDbHbmOracleExtraMappings>${xwiki.db.oracle.extraMappings}</xwikiDbHbmOracleExtraMappings>
-                  <xwikiDbHbmDerbyExtraMappings>${xwiki.db.derby.extraMappings}</xwikiDbHbmDerbyExtraMappings>
-                  <xwikiDbHbmH2ExtraMappings>${xwiki.db.h2.extraMappings}</xwikiDbHbmH2ExtraMappings>
                   <xwikiDbVirtualMode>${xwiki.db.hbm.virtualMode}</xwikiDbVirtualMode>
                   <xwikiDbCompressionAllowed>${xwiki.db.hbm.compressionAllowed}</xwikiDbCompressionAllowed>
 

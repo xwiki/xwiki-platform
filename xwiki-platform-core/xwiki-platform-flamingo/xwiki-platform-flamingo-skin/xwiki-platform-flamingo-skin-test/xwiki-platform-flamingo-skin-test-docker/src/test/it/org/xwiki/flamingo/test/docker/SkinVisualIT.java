@@ -79,11 +79,24 @@ class SkinVisualIT
     }
 
     /**
+     * Verify the layout of the vertical menus, with their group headers and items, including the current item, the
+     * current group and a group with a single item. It runs before the tests that move the mouse pointer, so that no
+     * menu row is hovered.
+     */
+    @Test
+    @Order(2)
+    void verticalMenus(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "VerticalMenus"));
+        screenshots.assertMatches("verticalMenus", viewPage.getContentContainer());
+    }
+
+    /**
      * Verify the layout of the drawer menu: the brand with the current user, the category headers, the menu items and
      * the separators.
      */
     @Test
-    @Order(2)
+    @Order(3)
     void drawer(TestUtils setup, ScreenshotComparator screenshots) throws IOException
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Headings"));
@@ -98,7 +111,7 @@ class SkinVisualIT
      * table and in the advanced panels, are always displayed.
      */
     @Test
-    @Order(3)
+    @Order(4)
     void liveDataSmallScreen(TestUtils setup, ScreenshotComparator screenshots) throws IOException
     {
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "LiveData"));
@@ -117,5 +130,17 @@ class SkinVisualIT
         } finally {
             setup.maximizeBrowserWindow();
         }
+    }
+
+    /**
+     * Verify the layout of the figures: the space between the image and its caption, the style of the caption and the
+     * space below it, before the next figure and before the next paragraph.
+     */
+    @Test
+    @Order(4)
+    void figures(TestUtils setup, ScreenshotComparator screenshots) throws IOException
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(SPACE, "Figures"));
+        screenshots.assertMatches("figures", viewPage.getContentContainer());
     }
 }

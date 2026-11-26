@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { EditorLanguage } from "./blocknote";
-import type { BlockMetadataStore } from "./misc/blockMetadata";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
@@ -70,6 +69,18 @@ type MacroFeatureOptions = {
    * `MacroEditor` bound in the {@link EditorOptions.serviceContainer}, when there's one.
    */
   list?: MacroWithUnknownParamsType[];
+
+  /**
+   * The output of the server-rendered macro calls of the initial content, keyed by id: the block id for a block macro
+   * call, the `id` property for an inline macro call or for a macro call nested in the parameters or content of another
+   * macro call. Each output is associated with the macro call (JSON) it was rendered for, and is displayed only while
+   * the macro call is unchanged. The output of the macro calls is kept outside the edited content because it is
+   * rendered with the rights of the current user, so it must not be shared with the other users editing the same
+   * content in realtime.
+   *
+   * @since 18.10.0
+   */
+  outputs?: Record<string, { call: string; output: unknown[] }>;
 };
 
 /**
@@ -110,6 +121,16 @@ interface EditorFeatures {
    * bound.
    */
   macros?: MacroFeatureOptions | false;
+
+  /**
+   * The content pasted (or dropped) in the editor is filtered when this is missing: the metadata entries it holds are
+   * kept only when their key, bound in the service container, accepts them (see `BlockMetadataKey.filterPasted`).
+   * `false` keeps the pasted content as is, metadata included, which lets the pasted content set metadata that the user
+   * doesn't see (e.g. the target of a link): only for an integration that filters the pasted content itself.
+   *
+   * @since 18.10.0
+   */
+  pasteFilter?: false;
 
   /**
    * The subscript and superscript text styles are enabled when this is missing (and the syntax supports them). `false`
@@ -217,14 +238,6 @@ type EditorOptions = {
    * there's something to store the files with.
    */
   upload?: boolean;
-
-  /**
-   * Where to keep the data about the blocks of the edited content that isn't part of the content (e.g. the output of
-   * the macros, rendered for the current user). An integration specifies it when it fills it before the editor is
-   * created (e.g. with what it extracted while loading the content) or reads it after (e.g. to save the content). A
-   * store is created for the editor instance otherwise.
-   */
-  metadata?: BlockMetadataStore;
 
   /**
    * The options of each editor feature.

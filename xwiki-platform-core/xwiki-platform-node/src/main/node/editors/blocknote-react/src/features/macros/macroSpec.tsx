@@ -19,31 +19,28 @@
  */
 import "./macro.css";
 import { useMacroEditing } from "./macroEditing";
-import { getMacroOutput } from "./macroMetadata";
 import { MacroOutput } from "./macroOutput";
 import { invocationToMacroCall, macroCallToInvocation } from "./utils";
-import { EditorInstanceContext } from "../../contexts";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,
 } from "@blocknote/react";
-import { useContext } from "react";
-import type { BlockMetadataStore } from "../../misc/blockMetadata";
 import type { OutputNode } from "./macroOutput";
+import type { MacroOutputCache } from "./macroOutputCache";
 import type { MacroCall } from "./utils";
 
 /**
- * @param metadata - where the macro output is kept
+ * @param outputs - the output of the macro calls of the editor instance
  * @param id - identifies the macro call (the block id or the `id` property)
  * @param call - the current macro call (JSON)
  * @returns the server-rendered output of the specified macro call, or an empty array if not available
  */
 function getOutput(
-  metadata: BlockMetadataStore | undefined,
+  outputs: MacroOutputCache,
   id: string,
   call: string,
 ): OutputNode[] {
-  return (getMacroOutput(metadata, id, call) ?? []) as OutputNode[];
+  return (outputs.get(id, call) ?? []) as OutputNode[];
 }
 
 /**
@@ -51,141 +48,151 @@ function getOutput(
  * `props.call` holds the macro call as a JSON string, serialized/deserialized
  * by `XWikiBlockNoteProcessor` on load/save. Not exposed in the slash menu.
  *
- * The server-rendered macro output is not stored in the block: it is retrieved by block id from the metadata of the
- * editor instance, where the integration puts it (see `setMacroOutput`). The output is rendered for the current user
- * (it can contain information that only the current user is allowed to view) so it must not be part of the edited
- * content, which is shared with the other users when editing in realtime.
+ * The server-rendered macro output is not stored in the block: it is retrieved by block id from the given output of the
+ * macro calls of the editor instance, initialized by the integration (see `MacroFeatureOptions.outputs`). The output
+ * is rendered for the current user (it can contain information that only the current user is allowed to view) so it
+ * must not be part of the edited content, which is shared with the other users when editing in realtime.
  *
  * The output is rendered as React components by {@link MacroOutput}, so a macro whose parameter/content is used
  * verbatim (an `xwikiEditable` marker) and contains nested macro calls resolves through plain React composition, to
  * any depth. The double-click-to-edit handler lives only on this outermost wrapper; a double-click inside a nested
  * macro bubbles up to it, so the whole macro island is edited as one call.
  *
- * @since 18.6.0RC1
- * @beta
+ * @param outputs - the output of the macro calls of the editor instance
+ * @returns the factory of the block spec
  */
-const XWikiMacroBlock = createReactBlockSpec(
-  {
-    type: "xwikiMacroBlock",
-    propSchema: {
-      call: { default: "{}" },
+const createXWikiMacroBlock = (outputs: MacroOutputCache) =>
+  createReactBlockSpec(
+    {
+      type: "xwikiMacroBlock",
+      propSchema: {
+        call: { default: "{}" },
+      },
+      content: "none",
     },
-    content: "none",
-  },
-  {
-    render: ({ block, editor }) => {
-      const call = JSON.parse(block.props.call) as MacroCall;
-      const macroEditing = useMacroEditing();
-      const output = getOutput(
-        useContext(EditorInstanceContext)?.metadata,
-        block.id,
-        block.props.call,
-      );
-      // Double-click opens the macro editor (when available), editing the call in place.
-      const onDoubleClick = macroEditing
-        ? () =>
-            macroEditing.edit(macroCallToInvocation(call, "block"), (updated) =>
-              editor.updateBlock(block.id, {
-                props: {
-                  call: JSON.stringify(invocationToMacroCall(updated)),
-                },
-              }),
-            )
-        : undefined;
-      if (output.length) {
+    {
+      render: ({ block, editor }) => {
+        const call = JSON.parse(block.props.call) as MacroCall;
+        const macroEditing = useMacroEditing();
+        const output = getOutput(outputs, block.id, block.props.call);
+        // Double-click opens the macro editor (when available), editing the call in place.
+        const onDoubleClick = macroEditing
+          ? () =>
+              macroEditing.edit(
+                macroCallToInvocation(call, "block"),
+                (updated) =>
+                  editor.updateBlock(block.id, {
+                    props: {
+                      call: JSON.stringify(invocationToMacroCall(updated)),
+                    },
+                  }),
+              )
+          : undefined;
+        if (output.length) {
+          return (
+            <div
+              className="xwiki-macro-block"
+              data-macro-name={call.name}
+              title={"macro:" + call.name}
+              onDoubleClick={onDoubleClick}
+            >
+              <MacroOutput
+                nodes={output}
+                call={call}
+                inline={false}
+                outputs={outputs}
+              />
+            </div>
+          );
+        }
         return (
           <div
-            className="xwiki-macro-block"
+            className="xwiki-macro-block xwiki-macro-placeholder"
             data-macro-name={call.name}
             title={"macro:" + call.name}
             onDoubleClick={onDoubleClick}
           >
-            <MacroOutput nodes={output} call={call} inline={false} />
+            macro:{call.name}
           </div>
         );
-      }
-      return (
-        <div
-          className="xwiki-macro-block xwiki-macro-placeholder"
-          data-macro-name={call.name}
-          title={"macro:" + call.name}
-          onDoubleClick={onDoubleClick}
-        >
-          macro:{call.name}
-        </div>
-      );
+      },
     },
-  },
-);
+  );
 
 /**
  * BlockNote inline content spec for an XWiki macro call (inline macro).
- * Mirrors {@link XWikiMacroBlock} but for inline content: `props.call` holds the
+ * Mirrors {@link createXWikiMacroBlock} but for inline content: `props.call` holds the
  * macro call as a JSON string, serialized/deserialized by `XWikiBlockNoteProcessor`
  * on load/save. Not exposed in the slash menu. Inline content has no id that BlockNote
  * preserves so `props.id` is used to retrieve the server-rendered macro output.
  *
- * @since 18.6.0RC1
- * @beta
+ * @param outputs - the output of the macro calls of the editor instance
+ * @returns the inline content spec
  */
-const XWikiInlineMacro = createReactInlineContentSpec(
-  {
-    type: "xwikiInlineMacro",
-    propSchema: {
-      call: { default: "{}" },
-      id: { default: "" },
+const createXWikiInlineMacro = (outputs: MacroOutputCache) =>
+  createReactInlineContentSpec(
+    {
+      type: "xwikiInlineMacro",
+      propSchema: {
+        call: { default: "{}" },
+        id: { default: "" },
+      },
+      content: "none",
     },
-    content: "none",
-  },
-  {
-    render: ({ inlineContent, updateInlineContent }) => {
-      const call = JSON.parse(inlineContent.props.call) as MacroCall;
-      const macroEditing = useMacroEditing();
-      const output = getOutput(
-        useContext(EditorInstanceContext)?.metadata,
-        inlineContent.props.id,
-        inlineContent.props.call,
-      );
-      // Double-click opens the macro editor (when available), editing the call in place.
-      const onDoubleClick = macroEditing
-        ? () =>
-            macroEditing.edit(
-              macroCallToInvocation(call, "inline"),
-              (updated) =>
-                updateInlineContent({
-                  type: "xwikiInlineMacro",
-                  props: {
-                    call: JSON.stringify(invocationToMacroCall(updated)),
-                    id: inlineContent.props.id,
-                  },
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                } as any),
-            )
-        : undefined;
-      if (output.length) {
+    {
+      render: ({ inlineContent, updateInlineContent }) => {
+        const call = JSON.parse(inlineContent.props.call) as MacroCall;
+        const macroEditing = useMacroEditing();
+        const output = getOutput(
+          outputs,
+          inlineContent.props.id,
+          inlineContent.props.call,
+        );
+        // Double-click opens the macro editor (when available), editing the call in place.
+        const onDoubleClick = macroEditing
+          ? () =>
+              macroEditing.edit(
+                macroCallToInvocation(call, "inline"),
+                (updated) =>
+                  updateInlineContent({
+                    type: "xwikiInlineMacro",
+                    props: {
+                      call: JSON.stringify(invocationToMacroCall(updated)),
+                      id: inlineContent.props.id,
+                    },
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  } as any),
+              )
+          : undefined;
+        if (output.length) {
+          return (
+            <span
+              className="xwiki-macro-inline"
+              data-macro-name={call.name}
+              title={"macro:" + call.name}
+              onDoubleClick={onDoubleClick}
+            >
+              <MacroOutput
+                nodes={output}
+                call={call}
+                inline={true}
+                outputs={outputs}
+              />
+            </span>
+          );
+        }
         return (
           <span
-            className="xwiki-macro-inline"
+            className="xwiki-macro-inline xwiki-macro-placeholder"
             data-macro-name={call.name}
             title={"macro:" + call.name}
             onDoubleClick={onDoubleClick}
           >
-            <MacroOutput nodes={output} call={call} inline={true} />
+            macro:{call.name}
           </span>
         );
-      }
-      return (
-        <span
-          className="xwiki-macro-inline xwiki-macro-placeholder"
-          data-macro-name={call.name}
-          title={"macro:" + call.name}
-          onDoubleClick={onDoubleClick}
-        >
-          macro:{call.name}
-        </span>
-      );
+      },
     },
-  },
-);
+  );
 
-export { XWikiInlineMacro, XWikiMacroBlock };
+export { createXWikiInlineMacro, createXWikiMacroBlock };

@@ -20,7 +20,12 @@
 import { serviceContainerMock } from "./serviceContainer.mock";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { BlockNoteViewWrapper } from "../../components/BlockNoteViewWrapper";
-import { createBlockMetadataStore } from "../../misc/blockMetadata";
+import {
+  METADATA_PROP,
+  getBlockMetadata,
+  setBlockMetadata,
+  stringifyMetadata,
+} from "../../misc/contentMetadata";
 import {
   imageEditorName,
   imageMetadataHandlerName,
@@ -31,6 +36,7 @@ import { useMemo, useState } from "react";
 // transitively exports classes using decorators, which the Playwright Node-side transform (unlike
 // the Vite pipeline used to bundle this story) can't parse.
 import type { BlockNoteViewWrapperProps } from "../../components/BlockNoteViewWrapper";
+import type { BlockMetadataKey } from "../../misc/blockMetadata";
 import type {
   ImageEditionData,
   ImageEditor,
@@ -39,6 +45,9 @@ import type {
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+
+// The image metadata entry holding the image reference.
+const REFERENCE: BlockMetadataKey = { name: "reference" };
 
 const LINK_TYPE_ATTACHMENT = 1; // LinkType.ATTACHMENT
 
@@ -64,7 +73,8 @@ export type ImageSuggestionForTestProps = {
   // When set, an image editor is bound, returning the given result right away (undefined when the user cancels). The
   // image selector of the editor is used otherwise.
   imageEditor?: { result?: ImageEditionData };
-  // The resource references of the images of the initial content, by block id, as kept by the image metadata handler.
+  // The resource references of the images of the initial content, by block id, kept by the image metadata handler in
+  // the metadata of the image blocks.
   imageReferences?: Record<string, ResourceReference>;
   // The editor's initial content (an empty paragraph when not set).
   content?: BlockNoteViewWrapperProps["content"];
@@ -100,14 +110,24 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
   // The calls to the image editor.
   const [imageEditorCalls, setImageEditorCalls] = useState<unknown[]>([]);
 
-  // Holds the references of the images, like the store of a real integration.
-  const metadata = useMemo(() => {
-    const store = createBlockMetadataStore();
-    Object.entries(imageReferences ?? {}).forEach(([id, reference]) =>
-      store.set(id, "reference", reference),
-    );
-    return store;
-  }, []);
+  // The images of the initial content hold their reference in their metadata, as loaded by a real integration.
+  const initialContent = useMemo(
+    () =>
+      (content ?? []).map((block) =>
+        imageReferences?.[block.id]
+          ? {
+              ...block,
+              props: {
+                ...block.props,
+                [METADATA_PROP]: stringifyMetadata({
+                  [REFERENCE.name]: imageReferences[block.id],
+                }),
+              },
+            }
+          : block,
+      ) as BlockNoteViewWrapperProps["content"],
+    [],
+  );
 
   const serviceContainer = useMemo(() => {
     const container = serviceContainerMock([syntax ?? FULL_SYNTAX]);
@@ -117,12 +137,12 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
       .toConstantValue({
         beforeEdit: (instance, block) => ({
           ...block.props,
-          reference: instance.metadata.get(block.id)?.reference as
+          reference: getBlockMetadata(block)[REFERENCE.name] as
             | ResourceReference
             | undefined,
         }),
         afterUpdate: (instance, block, reference) => {
-          instance.metadata.set(block.id, "reference", reference);
+          setBlockMetadata(instance.editor, block, REFERENCE, reference);
           setSelectedImages((images) => [
             ...images,
             { blockId: block.id, url: block.props.url, reference },
@@ -224,10 +244,9 @@ export const ImageSuggestionForTest: React.FC<ImageSuggestionForTestProps> = ({
               : // The mocked model reference serializer serializes a page reference as its name.
                 new DocumentReference(documentReference, new SpaceReference()),
           syntax: (syntax ?? FULL_SYNTAX).id,
-          metadata,
           upload,
         }}
-        content={content ?? []}
+        content={initialContent}
       />
       <output data-testid="selectedImages">
         {JSON.stringify(selectedImages)}

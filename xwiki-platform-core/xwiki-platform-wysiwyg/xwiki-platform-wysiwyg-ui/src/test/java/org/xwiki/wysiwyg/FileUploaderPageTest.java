@@ -22,7 +22,6 @@ package org.xwiki.wysiwyg;
 import java.util.Date;
 import java.util.List;
 
-import javax.script.ScriptContext;
 import javax.servlet.http.Part;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,6 @@ import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentException;
@@ -49,15 +47,14 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
-import com.xpn.xwiki.render.ScriptXWikiServletRequest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -77,8 +74,6 @@ import static org.mockito.Mockito.when;
 })
 class FileUploaderPageTest extends PageTest
 {
-    private ScriptContext scriptContext;
-
     @Mock
     private CSRFTokenScriptService csrfScriptService;
 
@@ -94,8 +89,6 @@ class FileUploaderPageTest extends PageTest
     @BeforeEach
     void setUp() throws Exception
     {
-        ScriptContextManager scriptContextManager = this.oldcore.getMocker().getInstance(ScriptContextManager.class);
-        this.scriptContext = scriptContextManager.getScriptContext();
         this.componentManager.registerComponent(ScriptService.class, "csrf", this.csrfScriptService);
         this.componentManager.registerComponent(ScriptService.class, "temporaryAttachments",
             this.temporaryAttachmentsScriptService);
@@ -260,9 +253,12 @@ class FileUploaderPageTest extends PageTest
 
     private void setAttachmentSupportStatus(boolean status)
     {
-        ScriptXWikiServletRequest requestSpy =
-            spy((ScriptXWikiServletRequest) this.scriptContext.getAttribute("request"));
-        this.scriptContext.setAttribute("request", requestSpy, GLOBAL_SCOPE);
-        when(requestSpy.getHeader("X-XWiki-Temporary-Attachment-Support")).thenReturn(Boolean.toString(status));
+        // The script context initializers wrap the context request again on each script execution, so the header has
+        // to be set on the context request rather than on the request script binding.
+        if (!mockingDetails(this.request).isSpy()) {
+            this.request = spy(this.request);
+            this.context.setRequest(this.request);
+        }
+        when(this.request.getHeader("X-XWiki-Temporary-Attachment-Support")).thenReturn(Boolean.toString(status));
     }
 }

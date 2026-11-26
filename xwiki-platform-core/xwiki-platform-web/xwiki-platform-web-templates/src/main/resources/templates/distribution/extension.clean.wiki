@@ -6,21 +6,7 @@
 ## Globals
 #set ($currentNamespace = "wiki:${services.wiki.currentWikiId}")
 
-#set($orphanedExtensions = [])
-#foreach ($installedExtension in $services.extension.installed.getInstalledExtensions($currentNamespace))
-  #if ($installedExtension.isDependency($currentNamespace))
-    #if ($installedExtension.isInstalled($NULL))
-      #if ($xcontext.isMainWiki())
-        #set($orphanedExtension = $services.extension.installed.repository.getBackwardDependencies($installedExtension.id, true).isEmpty())
-      #end
-    #else
-      #set($orphanedExtension = $services.extension.installed.repository.getBackwardDependencies($installedExtension.id.id, $currentNamespace, true).isEmpty())
-    #end
-    #if ($orphanedExtension)
-      #set ($void = $orphanedExtensions.add($installedExtension))
-    #end
-  #end
-#end
+#set ($orphanedExtensions = $services.distribution.getOrphanedExtensions())
 
 #set($requestUninstalled = $request.getParameterValues('uninstalled_extensions'))
 

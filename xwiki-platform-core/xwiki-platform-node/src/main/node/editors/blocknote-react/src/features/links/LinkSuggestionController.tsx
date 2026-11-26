@@ -22,6 +22,7 @@ import { LINK_SUGGESTION_TRIGGER } from "./linkSuggestionMenu";
 import { EditorInstanceContext } from "../../contexts";
 import { canUploadFiles } from "../../files/fileUploader";
 import { pickAndUploadFile, uploadedFileLink } from "../../files/uploadedFile";
+import { linkTargetPrefill } from "../../misc/linkTargetPrefill";
 import { suggestedLinkData } from "../../misc/suggestedLink";
 import { insertLink } from "../../services/linkEditor";
 import { SuggestionMenuController } from "@blocknote/react";
@@ -102,7 +103,7 @@ export function LinkSuggestionController({
                 {
                   title: t("blocknote.linkSuggestion.linkTo"),
                   icon: <RiLink size={18} />,
-                  onItemClick: openLinkEditor,
+                  onItemClick: () => openLinkEditor(query),
                 },
               ]
             : []),
@@ -170,11 +171,14 @@ function useLinkInsertion() {
     [instance],
   );
 
+  // The link target is pre-filled from the text typed in the link suggestion menu (see linkTargetPrefill), e.g. to link
+  // to a page that none of the suggestions match, named after that text. The display text is left empty, so that the
+  // link label is generated from its target.
   const openLinkEditor = useMemo(
     () =>
       linkEditing &&
-      (async () => {
-        await linkEditing.insert({}, insert);
+      (async (query: string) => {
+        await linkEditing.insert(linkTargetPrefill(query), insert);
         instance.editor.focus();
       }),
     [instance, linkEditing, insert],

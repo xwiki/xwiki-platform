@@ -88,7 +88,7 @@
     <!-- Needed in order to be able to mock the room manager, whose API uses the WebSocket session. -->
     <dependency>
       <groupId>jakarta.websocket</groupId>
-      <artifactId>jakarta.websocket-api</artifactId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

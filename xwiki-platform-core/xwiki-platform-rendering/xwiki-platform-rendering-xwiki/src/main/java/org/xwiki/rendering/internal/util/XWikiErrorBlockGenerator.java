@@ -113,7 +113,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
         ScriptContext scriptContext = this.scriptContextManagerProvider.get().getCurrentScriptContext();
 
         // Remember the current value in the context
-        Object currentRenderingerror = scriptContext.getAttribute(CONTEXT_ATTRIBUTE, ScriptContext.GLOBAL_SCOPE);
+        Object currentRenderingerror = scriptContext.getAttribute(CONTEXT_ATTRIBUTE, ScriptContext.ENGINE_SCOPE);
 
         boolean renderingContextPushed = false;
         try {
@@ -131,7 +131,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
                 renderingerror.put("rootCause", rootCause != null ? rootCause : message.getThrowable());
                 renderingerror.put("stackTrace", ExceptionUtils.getStackTrace(message.getThrowable()));
             }
-            scriptContext.setAttribute(CONTEXT_ATTRIBUTE, renderingerror, ScriptContext.GLOBAL_SCOPE);
+            scriptContext.setAttribute(CONTEXT_ATTRIBUTE, renderingerror, ScriptContext.ENGINE_SCOPE);
 
             // Disable restricted context if set as the error generator template generally needs scripting
             if (this.renderingContext.isRestricted()
@@ -158,7 +158,7 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
             }
 
             // Restore the previous context value
-            scriptContext.setAttribute(CONTEXT_ATTRIBUTE, currentRenderingerror, ScriptContext.GLOBAL_SCOPE);
+            scriptContext.setAttribute(CONTEXT_ATTRIBUTE, currentRenderingerror, ScriptContext.ENGINE_SCOPE);
 
             // We don't execute a renderingerror template anymore
             econtext.removeProperty(ECONTEXT_MARKER);

@@ -19,8 +19,20 @@
  */
 
 import { defineConfig } from "vitest/config";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  resolve: {
+    // Let the tests import the legacy JavaScript files they cover (with the ?raw suffix) without counting directories.
+    // Vite resolves relative aliases from the importing file, so the paths must be absolute.
+    alias: {
+      "@webapp": fileURLToPath(new URL("../../main/webapp", import.meta.url)),
+      // Filled by the unpack-prototype-for-javascript-tests execution in the pom.xml of this module.
+      "@test-webjars": fileURLToPath(
+        new URL("../../../target/test-webjars", import.meta.url),
+      ),
+    },
+  },
   test: {
     environment: "jsdom",
   },

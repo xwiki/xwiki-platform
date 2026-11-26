@@ -20,6 +20,7 @@
 import "./macro.css";
 import { useMacroEditing } from "./macroEditing";
 import { MacroOutput } from "./macroOutput";
+import { useMacroOutput } from "./macroOutputCache";
 import { invocationToMacroCall, macroCallToInvocation } from "./utils";
 import {
   createReactBlockSpec,
@@ -33,14 +34,15 @@ import type { MacroCall } from "./utils";
  * @param outputs - the output of the macro calls of the editor instance
  * @param id - identifies the macro call (the block id or the `id` property)
  * @param call - the current macro call (JSON)
- * @returns the server-rendered output of the specified macro call, or an empty array if not available
+ * @returns the server-rendered output of the specified macro call, or an empty array if not available; the calling
+ *   component is rendered again when a new output is cached for the macro call
  */
-function getOutput(
+function useOutput(
   outputs: MacroOutputCache,
   id: string,
   call: string,
 ): OutputNode[] {
-  return (outputs.get(id, call) ?? []) as OutputNode[];
+  return (useMacroOutput(outputs, id, call) ?? []) as OutputNode[];
 }
 
 /**
@@ -74,7 +76,7 @@ const createXWikiMacroBlock = (outputs: MacroOutputCache) =>
       render: ({ block, editor }) => {
         const call = JSON.parse(block.props.call) as MacroCall;
         const macroEditing = useMacroEditing();
-        const output = getOutput(outputs, block.id, block.props.call);
+        const output = useOutput(outputs, block.id, block.props.call);
         // Double-click opens the macro editor (when available), editing the call in place.
         const onDoubleClick = macroEditing
           ? () =>
@@ -143,7 +145,7 @@ const createXWikiInlineMacro = (outputs: MacroOutputCache) =>
       render: ({ inlineContent, updateInlineContent }) => {
         const call = JSON.parse(inlineContent.props.call) as MacroCall;
         const macroEditing = useMacroEditing();
-        const output = getOutput(
+        const output = useOutput(
           outputs,
           inlineContent.props.id,
           inlineContent.props.call,

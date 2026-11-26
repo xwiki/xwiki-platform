@@ -54,6 +54,31 @@ export type BlockMetadataKey = {
 export const blockMetadataKeyName = "BlockMetadataKey";
 
 // @beta
+export class BlockNoteDocument {
+    constructor(content: BlockType[]);
+    // (undocumented)
+    content: BlockType[];
+    readonly macroOutputs: NonNullable<MacroFeatureOptions["outputs"]>;
+}
+
+// @beta
+export interface BlockNoteIterator {
+    iterate(blockNoteContent: BlockType[], visitor: BlockNoteVisitor): void;
+}
+
+// @beta
+export const blockNoteIteratorName = "BlockNoteIterator";
+
+// @beta
+export interface BlockNoteProcessor {
+    load(blockNoteJSON: string): BlockNoteDocument;
+    save(blockNoteDocument: BlockNoteDocument, options?: SaveOptions): string;
+}
+
+// @beta
+export const blockNoteProcessorName = "BlockNoteProcessor";
+
+// @beta
 export type BlockNoteViewWrapperProps = {
     options: EditorOptions;
     content: BlockType[];
@@ -62,6 +87,11 @@ export type BlockNoteViewWrapperProps = {
         setInstance?: (instance: EditorInstance) => void;
     };
 };
+
+// @beta
+export interface BlockNoteVisitor {
+    visit(node: NodeType, macro?: object): boolean;
+}
 
 // @beta
 export type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, {
@@ -92,6 +122,14 @@ export class ComponentInit {
 
 // @beta
 export type ContributedBlockNoteOptions = Partial<Pick<BlockNoteEditorOptions<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>, "uploadFile">>;
+
+// @beta
+export class DefaultBlockNoteIterator implements BlockNoteIterator {
+    // (undocumented)
+    static bind(container: Container): void;
+    // (undocumented)
+    iterate(blocks: BlockType[], visitor: BlockNoteVisitor): void;
+}
 
 // @beta
 export type EditorAppearance = {
@@ -146,6 +184,7 @@ export type EditorOptions = {
     name?: string;
     sourceDocumentReference?: DocumentReference;
     syntax: string;
+    restricted?: boolean;
     lang: EditorLanguage;
     label: string;
     autofocus?: boolean;
@@ -224,6 +263,9 @@ export function getBlockMetadata(block: Pick<BlockType, "props">): BlockMetadata
 
 // @beta
 export function getLinkMetadata(href: string): BlockMetadata;
+
+// @beta
+export function getMacroCalls(content: BlockType[], iterator: BlockNoteIterator): MacroCallEntry[];
 
 // @beta
 export type ImageEditionData = Partial<BlockOfType<"image">["props"]> & {
@@ -323,6 +365,12 @@ export type MacroCall = {
 };
 
 // @beta
+export type MacroCallEntry = {
+    id: string;
+    call: string;
+};
+
+// @beta
 export type MacroCallParams = Record<string, boolean | number | string>;
 
 // @beta
@@ -352,6 +400,14 @@ export type MacroInsertionEditorPrefillData = {
 };
 
 // @beta
+export interface MacroRenderer {
+    render(instance: EditorInstance): Promise<NonNullable<MacroFeatureOptions["outputs"]>>;
+}
+
+// @beta
+export const macroRendererName = "MacroRenderer";
+
+// @beta
 export const macrosFeature: EditorFeature;
 
 // @beta
@@ -363,6 +419,12 @@ export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWra
 };
 
 // @beta
+export type NodeType = BlockType | {
+    type: "tableCell";
+    content: InlineContentType[];
+} | InlineContentType | string;
+
+// @beta
 export function parseMetadata(value: unknown): BlockMetadata;
 
 // @beta
@@ -372,6 +434,11 @@ export type PastedMetadataContext = {
 
 // @beta
 export const pasteFilterFeature: EditorFeature;
+
+// @beta
+export type SaveOptions = {
+    macroIds?: boolean;
+};
 
 // @beta
 export type SchemaContribution = {

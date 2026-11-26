@@ -26,6 +26,7 @@ import {
   createReactInlineContentSpec,
 } from "@blocknote/react";
 import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
+import { uuidv4 } from "lib0/random";
 import { RiFileList3Fill } from "react-icons/ri";
 import type { InlineContentType } from "../../blocknote";
 import type {
@@ -635,8 +636,13 @@ function insertMacroInvocation(
       insertOrUpdateBlockForSlashMenu(editor, block);
     }
   } else {
+    // Inline content has no id that BlockNote preserves, so the id used to keep the macro output is a property.
+    const inlineMacro = {
+      type: "xwikiInlineMacro",
+      props: { ...props, id: uuidv4() },
+    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    editor.insertInlineContent([{ type: "xwikiInlineMacro", props } as any], {
+    editor.insertInlineContent([inlineMacro as any], {
       updateSelection: true,
     });
   }

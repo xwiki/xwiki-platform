@@ -96,7 +96,11 @@ export class XWikiCollaborationManager extends AbstractCollaborationManager {
     collaborator: Collaborator,
   ): Promise<Collaboration> {
     collaborator.id = `${provider.doc.clientID}`;
+    const { room, locale } = provider.params;
     const collaboration: Collaboration = {
+      // The collaboration room, as expected by the "collaboration" request parameter: the server uses it to find the
+      // participant of the session whose rights apply to the edited content it receives.
+      id: `${encodeURIComponent(room)}/${encodeURIComponent(locale)}`,
       connectionStatus: ref(ConnectionStatus.Connecting),
       collaborators: ref([]),
       warnings: ref([]),

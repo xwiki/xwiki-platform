@@ -18,14 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { XWikiFileUploader } from "./attachments/XWikiFileUploader";
-import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
 import { DefaultLinkMetadataHandler } from "./blocknote/DefaultLinkMetadataHandler";
+import { XWikiBlockNoteIterator } from "./blocknote/XWikiBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultImageEditor } from "./image/DefaultImageEditor";
 import { DefaultImageMetadataHandler } from "./image/DefaultImageMetadataHandler";
 import { DefaultMacroEditor } from "./macros/DefaultMacroEditor";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
+import { XWikiMacroRenderer } from "./macros/XWikiMacroRenderer";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
@@ -104,7 +105,8 @@ XWIKI_METADATA_KEYS.forEach((key) =>
   container.bind<BlockMetadataKey>(blockMetadataKeyName).toConstantValue(key),
 );
 
-DefaultBlockNoteIterator.bind(container);
+// The XWiki rendering produces macro calls whose parameters and content can hold other macro calls.
+XWikiBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);
 
 XWikiFileUploader.bind(container);
@@ -113,6 +115,7 @@ DefaultImageMetadataHandler.bind(container);
 DefaultLinkMetadataHandler.bind(container);
 DefaultMacroWizard.bind(container);
 DefaultMacroEditor.bind(container);
+XWikiMacroRenderer.bind(container);
 
 MinimalApp.bind(container);
 

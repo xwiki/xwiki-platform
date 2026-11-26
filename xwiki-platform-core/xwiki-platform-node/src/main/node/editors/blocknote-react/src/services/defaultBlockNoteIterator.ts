@@ -17,26 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, injectable } from "inversify";
+import { blockNoteIteratorName } from "./blockNoteIterator";
+import { injectable } from "inversify";
+import type { BlockType } from "../blocknote";
 import type {
   BlockNoteIterator,
   BlockNoteVisitor,
   NodeType,
-} from "./BlockNoteIterator";
-import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
+} from "./blockNoteIterator";
+import type { Container } from "inversify";
 
 type Table = Extract<BlockType, { type: "table" }>;
 
 /**
- * Default implementation of a BlockNoteIterator.
+ * Default implementation of a BlockNoteIterator: it visits the blocks, the table cells and the inline content, but
+ * doesn't enter the macro calls.
  *
+ * @since 18.10.0
  * @beta
  */
 @injectable("Singleton")
 export class DefaultBlockNoteIterator implements BlockNoteIterator {
   public static bind(container: Container): void {
     container
-      .bind("BlockNoteIterator")
+      .bind<BlockNoteIterator>(blockNoteIteratorName)
       .to(DefaultBlockNoteIterator)
       .inSingletonScope();
   }

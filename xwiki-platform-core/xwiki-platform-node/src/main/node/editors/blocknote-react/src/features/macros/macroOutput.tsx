@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { useMacroOutput } from "./macroOutputCache";
 import { applyXWikiParameters } from "../../blocknote/parameters";
 import { Fragment, createContext, createElement, useContext } from "react";
 import type { MacroOutputCache } from "./macroOutputCache";
@@ -379,7 +380,7 @@ function NestedMacro({
 }): ReactNode {
   const call = (node.props?.call ?? {}) as MacroCall;
   const outputs = useContext(MacroOutputCacheContext);
-  const output = getNestedMacroOutput(node, call, outputs);
+  const output = useNestedMacroOutput(node, call, outputs);
   const tag = inline ? "span" : "div";
   if (!output.length) {
     return createElement(
@@ -406,28 +407,27 @@ function NestedMacro({
  * @param call - the nested macro call
  * @param outputs - the output of the macro calls of the editor instance, where the output of a macro nested in the
  *   parameters or content of another macro call is kept
- * @returns the output of the given nested macro, or an empty array if not available
+ * @returns the output of the given nested macro, or an empty array if not available; the calling component is
+ *   rendered again when a new output is cached for the nested macro
  */
-function getNestedMacroOutput(
+function useNestedMacroOutput(
   node: RawNode,
   call: MacroCall,
   outputs: MacroOutputCache | undefined,
 ): OutputNode[] {
-  // A macro nested in the output of another macro carries its own output, because the whole output of the top-level
-  // macro was rendered for the current user and is kept outside the edited content.
-  const output = node.props?.output;
-  if (output) {
-    return output as OutputNode[];
-  }
   // A macro nested in the parameters or content of another macro call (i.e. in an xwikiEditable value) is part of the
   // edited content, which is shared with the other users when editing in realtime, so it doesn't carry its output
   // (rendered for the current user). Its output, if available, is kept with the output of the macro calls of the
   // editor instance, under the macro id.
   const id = node.props?.id;
-  if (typeof id === "string" && id) {
-    return (outputs?.get(id, JSON.stringify(call)) ?? []) as OutputNode[];
-  }
-  return [];
+  const keptOutput = useMacroOutput(
+    outputs,
+    typeof id === "string" ? id : "",
+    JSON.stringify(call),
+  );
+  // A macro nested in the output of another macro carries its own output, because the whole output of the top-level
+  // macro was rendered for the current user and is kept outside the edited content.
+  return (node.props?.output ?? keptOutput ?? []) as OutputNode[];
 }
 
 /**

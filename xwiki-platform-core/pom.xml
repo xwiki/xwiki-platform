@@ -155,6 +155,37 @@
             -->
             <revapi.differences>
               <justification>
+                These differences are inherited from jakarta.servlet.ServletRequest, which changed in Servlet 6.0, and
+                the upgrade to Jakarta EE 10 is worth this breakage. An implementation of MutableJakartaServletRequest
+                that does not extend a Servlet API request wrapper has to implement the new methods, and code calling
+                getRealPath on it has to use ServletContext#getRealPath instead.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.lang.String jakarta.servlet.ServletRequest::getProtocolRequestId() @ org.xwiki.wysiwyg.filter.MutableJakartaServletRequest</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.lang.String jakarta.servlet.ServletRequest::getRequestId() @ org.xwiki.wysiwyg.filter.MutableJakartaServletRequest</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method jakarta.servlet.ServletConnection jakarta.servlet.ServletRequest::getServletConnection() @ org.xwiki.wysiwyg.filter.MutableJakartaServletRequest</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String jakarta.servlet.ServletRequest::getRealPath(java.lang.String) @ org.xwiki.wysiwyg.filter.MutableJakartaServletRequest</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
                 The live table new row naming strategies now receive the values the entry is created with, so that a
                 strategy can name the entry after one of them. This API is still @Unstable.
               </justification>

@@ -2130,6 +2130,15 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("one");
         assertEquals(SaveStatus.UNSAVED, firstEditPage.getToolbar().getSaveStatus());
 
+        // Leave the page again, same way, but come back using the browser's Back button. The browser may restore the
+        // edit page from its back/forward cache, in which case the edit page must have left the editing session when
+        // hidden, and must reload itself when restored.
+        firstEditPage = firstEditPage.leaveAndGoBack(() -> new ViewPage().getBreadcrumb()
+            .clickPathElement(testReference.getLastSpaceReference().getName()));
+
+        // Verify that the edit page we left is not a participant of the editing session anymore.
+        assertTrue(firstEditPage.getToolbar().waitUntilConnected().isEditingAlone());
+
         // Cancel the unsaved changes.
         setup.leaveEditMode();
 
@@ -2651,6 +2660,23 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(firstEditor.getToolBar().canUndo());
         assertTrue(firstEditor.getToolBar().isRedoDisabled());
         assertEquals("142", firstTextArea.getText());
+
+        // Leave the realtime session. The default undo / redo should be restored, keeping the history of the changes
+        // made in the realtime session.
+        firstEditPage.getToolbar().leaveCollaboration();
+        assertTrue(firstEditor.getToolBar().canUndo());
+
+        firstTextArea.sendKeys("5");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("142");
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("1452");
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
     }
 
     @Test

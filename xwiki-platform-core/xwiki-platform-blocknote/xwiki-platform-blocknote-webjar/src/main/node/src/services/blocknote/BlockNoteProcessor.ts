@@ -17,21 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { createBlockMetadataStore } from "@xwiki/platform-editors-blocknote-react";
 import type {
-  BlockMetadataStore,
   BlockType,
+  MacroFeatureOptions,
 } from "@xwiki/platform-editors-blocknote-react";
 
 /**
- * Encapsulates the BlockNote content and the metadata that couldn't be stored in the BlockNote schema.
+ * Encapsulates the BlockNote content and the output of its macro calls (which must not be part of the content).
  */
 class BlockNoteDocument {
   /**
-   * The metadata associated to the BlockNote content, by block ID (or by the ID injected in a link, or by macro ID).
-   * It is passed to the editor, which reads from it the output of the macros.
+   * The output of the macro calls of the BlockNote content (rendered for the current user), by block id or by macro id,
+   * with the macro call it was rendered for. It is passed to the editor, which displays it (see
+   * `MacroFeatureOptions.outputs`).
    */
-  public readonly metadata: BlockMetadataStore = createBlockMetadataStore();
+  public readonly macroOutputs: NonNullable<MacroFeatureOptions["outputs"]> =
+    {};
 
   constructor(public content: BlockType[]) {}
 }

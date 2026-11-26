@@ -599,6 +599,18 @@ define('xwiki-ckeditor-realtime-adapter', [
         destroy: () => {
           commandListener.removeListener();
           this._ckeditor.undoManager.onChange = originalOnChange;
+          // Re-enable the default undo / redo behavior. CKEditor's undo plugin computes this flag only when the editor
+          // mode or read-only state changes, which doesn't happen when the custom history handler is removed. The
+          // snapshots recorded while the custom history handler was active are kept (CKEditor records them even when
+          // the undo manager is disabled), so the user can still undo the changes made before leaving the realtime
+          // session, including the remote ones.
+          this._ckeditor.undoManager.enabled = !this._ckeditor.readOnly && this._ckeditor.mode === 'wysiwyg';
+          // CKEditor records the text typed by the user as a single undo step until a non-typing action takes place.
+          // Save a snapshot so that the text typed before and after the custom history handler is removed are
+          // separate undo steps.
+          this._ckeditor.fire('saveSnapshot');
+          // Update the state of the undo / redo commands.
+          this._ckeditor.undoManager.refreshState();
         },
 
         updateState: () => this._ckeditor.undoManager.onChange()

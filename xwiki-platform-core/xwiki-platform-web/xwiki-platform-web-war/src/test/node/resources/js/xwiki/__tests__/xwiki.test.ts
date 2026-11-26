@@ -20,27 +20,12 @@
 
 // Publish the entity reference API on the global XWiki object, as the corresponding bundle does on every page.
 import "xwiki-platform-web-webjar";
+import PROTOTYPE_SOURCE from "@test-webjars/prototype.js?raw";
+import XWIKI_SOURCE from "@webapp/resources/js/xwiki/xwiki.js?raw";
 import { JSDOM } from "jsdom";
 import { beforeEach, describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
 // xwiki.js uses Prototype.js, which isn't published on npm, so the Maven build extracts it from its WebJar. See the
 // unpack-prototype-for-javascript-tests execution in the pom.xml of this module.
-const PROTOTYPE_SOURCE = readFileSync(
-  resolve(
-    import.meta.dirname,
-    "../../../../../../../target/test-webjars/prototype.js",
-  ),
-  "utf-8",
-);
-const XWIKI_SOURCE = readFileSync(
-  resolve(
-    import.meta.dirname,
-    "../../../../../../main/webapp/resources/js/xwiki/xwiki.js",
-  ),
-  "utf-8",
-);
 
 // The tabs at the bottom of a page in view mode, as docextra.vm renders them.
 const DOC_EXTRA_HTML = `

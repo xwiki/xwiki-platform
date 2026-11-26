@@ -19,6 +19,7 @@
  */
 import { useLinkEditing } from "./linkEditing";
 import { EditorInstanceContext } from "../../contexts";
+import { stripLinkMetadata } from "../../misc/contentMetadata";
 import { getEditedLink, updateLink } from "../../services/linkEditor";
 import { LinkToolbarExtension } from "@blocknote/core/extensions";
 import { useComponentsContext, useExtension } from "@blocknote/react";
@@ -57,8 +58,8 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
           icon={<RiPencilLine />}
           onClick={async () => {
             // The link data exactly as stored in the content. The link metadata handler may transform what the link
-            // editor is pre-filled with (e.g. hide the synthetic id carried by the URL), but it needs the
-            // untransformed data before the update to be able to recover that id, so keep it aside.
+            // editor is pre-filled with (e.g. hide the metadata carried by the URL), but it needs the untransformed
+            // data before the update to be able to recover what the link editor doesn't edit, so keep it aside.
             const previous: LinkEditionData = {
               url: linkToolbarProps.url,
               title: linkToolbarProps.text,
@@ -76,7 +77,8 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
         data-test="openLink"
         label={t("blocknote.linkToolbar.buttons.open")}
         icon={<RiExternalLinkLine />}
-        onClick={() => window.open(linkToolbarProps.url)}
+        // The metadata carried by the URL isn't for the link target.
+        onClick={() => window.open(stripLinkMetadata(linkToolbarProps.url))}
       />
 
       <Components.FormattingToolbar.Button

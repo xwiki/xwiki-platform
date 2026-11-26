@@ -89,8 +89,7 @@ public class WCAGContext
             entry("blink", true),
             entry("button-name", true),
             entry("bypass", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("color-contrast", false),
+            entry("color-contrast", true),
             entry("definition-list", true),
             entry("dlitem", true),
             entry("document-title", true),
@@ -124,8 +123,7 @@ public class WCAGContext
             entry("no-autoplay-audio", true),
             entry("object-alt", true),
             entry("role-img-alt", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("scrollable-region-focusable", false),
+            entry("scrollable-region-focusable", true),
             entry("select-name", true),
             entry("server-side-image-map", true),
             entry("svg-img-alt", true),

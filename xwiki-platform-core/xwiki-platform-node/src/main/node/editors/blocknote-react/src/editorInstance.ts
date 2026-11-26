@@ -19,7 +19,6 @@
  */
 import type { EditorType } from "./blocknote";
 import type { EditorOptions } from "./editorOptions";
-import type { BlockMetadataStore } from "./misc/blockMetadata";
 import type { Container } from "inversify";
 
 /**
@@ -41,13 +40,7 @@ type EditorInstance = {
    * {@link EditorOptions.sourceDocumentReference}. It doesn't hold the options that are resolved for the editor
    * instance, which are exposed by the editor instance itself, so that there's only one place to read them from.
    */
-  options: Readonly<Omit<EditorOptions, "serviceContainer" | "metadata">>;
-
-  /**
-   * The data kept about the blocks of the edited content, outside of the content itself: the
-   * {@link EditorOptions.metadata} store when specified, and a store created for the editor instance otherwise.
-   */
-  metadata: BlockMetadataStore;
+  options: Readonly<Omit<EditorOptions, "serviceContainer">>;
 
   /**
    * The service container of the editor instance: a child of {@link EditorOptions.serviceContainer} created for the

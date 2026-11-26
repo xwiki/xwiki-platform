@@ -18,8 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { toRelativeAttachmentResourceReference } from "../blocknote/attachmentResourceReference";
-import { XWIKI_REFERENCE } from "../blocknote/metadataKeys";
-import { imageMetadataHandlerName } from "@xwiki/platform-editors-blocknote-react";
+import {
+  METADATA_PROP,
+  XWIKI_REFERENCE,
+  getBlockMetadata,
+  imageMetadataHandlerName,
+  setBlockMetadata,
+} from "@xwiki/platform-editors-blocknote-react";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
 import { Container, injectable } from "inversify";
 import type {
@@ -31,9 +36,10 @@ import type {
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
- * Default ImageMetadataHandler implementation: the XWiki resource reference of an image is kept as block metadata
- * (outside the BlockNote schema), so that the image is saved with the reference provided by the server rather than with
- * its URL, relative to the source document of the edited content.
+ * Default ImageMetadataHandler implementation: the XWiki resource reference of an image is kept in the metadata of the
+ * image block (see `setBlockMetadata`), so that the image is saved with the reference provided by the server rather
+ * than with its URL, relative to the source document of the edited content. Being part of the edited content, it is
+ * shared with the other users editing in realtime, and it is restored by undo / redo along with the image.
  *
  * @since 18.10.0RC1
  */
@@ -50,10 +56,13 @@ export class DefaultImageMetadataHandler implements ImageMetadataHandler {
     instance: EditorInstance,
     block: BlockOfType<"image">,
   ): ImageEditionData {
-    // The image editor gets the reference of the image, because the user may select a different image.
+    // The image editor gets the image properties without the metadata, which it doesn't edit, and the reference of the
+    // image, because the user may select a different image.
+    const props: ImageEditionData = { ...block.props };
+    delete (props as Record<string, unknown>)[METADATA_PROP];
     return {
-      ...block.props,
-      reference: instance.metadata.get(block.id)?.[XWIKI_REFERENCE.name] as
+      ...props,
+      reference: getBlockMetadata(block)[XWIKI_REFERENCE.name] as
         | ResourceReference
         | undefined,
     };
@@ -65,8 +74,9 @@ export class DefaultImageMetadataHandler implements ImageMetadataHandler {
     reference?: ResourceReference,
   ): void {
     // An image known only by its URL is saved with that URL, so we drop the reference of the previous image source.
-    instance.metadata.set(
-      block.id,
+    setBlockMetadata(
+      instance.editor,
+      block,
       XWIKI_REFERENCE,
       reference?.type === "attach"
         ? this.toImageAttachmentReference(instance, reference)

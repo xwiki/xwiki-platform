@@ -13,7 +13,7 @@ it, and the existing ones are checked against it.
   by other features (file upload).
 - **Service**: an implementation bound in the Inversify service container, which a feature calls (`LinkEditor`,
   `FileUploader`, `MacroEditor`).
-- **Editor instance**: `EditorInstance`, i.e. `{ editor, options, metadata, serviceContainer }`, one per mounted
+- **Editor instance**: `EditorInstance`, i.e. `{ editor, options, serviceContainer }`, one per mounted
   editor.
 
 ## Principles
@@ -26,7 +26,7 @@ it, and the existing ones are checked against it.
    doesn't gets an editor without them, silently). The generic features are also exported, so that an integration can
    bind only some of them, in another order, or replace one of them with its own. The features that only some
    integrations need are exported without being bound (e.g. `xwikiRenderingFeature`, for the content converted by the
-   XWiki rendering, bound by the WebJar). The editor collects what the features contribute and applies it; it doesn't
+   XWiki rendering, bound by the WebJar with the keys of its metadata, `XWIKI_METADATA_KEYS`). The editor collects what the features contribute and applies it; it doesn't
    name or special-case any feature.
    `features.<id>: false` disables a feature, and a feature contributes nothing when the syntax of the edited content
    can't save what it adds.
@@ -48,11 +48,16 @@ it, and the existing ones are checked against it.
    UI).
 5. **A feature's code lives in its own folder.** `src/features/<id>/` holds what only that feature uses (its BlockNote
    extensions, components, menu items) and exports the feature. What several features use (e.g. the `FileUploader`,
-   the metadata store, the editor services in `src/services/`) lives outside `src/features/`. A feature folder never
+   the content metadata helpers, the editor services in `src/services/`) lives outside `src/features/`. A feature folder never
    imports from another feature folder.
-6. **The data that the BlockNote schema can't hold** (e.g. resource references, generated link labels, macro output)
-   goes through the metadata store of the editor instance and the `*MetadataHandler` services (`beforeEdit`,
-   `beforeUpdate`, `afterUpdate`). Features don't write integration-specific metadata themselves.
+6. **The data that the BlockNote schema can't hold** (e.g. resource references, generated link labels) is kept in the
+   content, as block metadata (`getBlockMetadata`, `setBlockMetadata`) or link metadata (`getLinkMetadata`,
+   `setLinkMetadata`), so that undo / redo, realtime collaboration and copy / paste handle it like the rest of the
+   content, and goes through the `*MetadataHandler` services (`beforeEdit`, `beforeUpdate`, `afterUpdate`). Its keys
+   are bound in the service container (`blockMetadataKeyName`), with the filter applied to their pasted values. Features
+   don't write integration-specific metadata themselves. What must not be shared with the other users (e.g. the macro
+   output, rendered for the current user) stays out of the content, in the feature using it (e.g.
+   `features.macros.outputs`).
 
 ### Configuration
 
@@ -65,8 +70,8 @@ it, and the existing ones are checked against it.
 
 9. **Services are stateless singletons** bound in the shared service container. Each call takes the editor instance
    as first argument. The bindings specific to an editor instance go in the child container of that instance.
-10. **The state of an editor instance lives with the instance** (its metadata store, the store of a BlockNote extension,
-    its child container), never in a service, in a closure captured when the editor is created, or in a module global.
+10. **The state of an editor instance lives with the instance** (the store of a BlockNote extension, the state a
+    feature creates when contributing to it, its child container), never in a service or in a module global.
 11. **Several editors on the same page don't interfere.** DOM listeners are scoped to the editor (best done through a
     BlockNote extension), state is kept per instance, and realtime content is identified by the editor `name`.
 
@@ -94,4 +99,3 @@ it, and the existing ones are checked against it.
 | BlockNote's default blocks and text styles | kept in the static schema (the typed API derives from it) when no feature replaces them, so BlockNote's own code block, with its Ctrl+Alt+C shortcut, is there even when the syntax can't save code blocks | 1 |
 | Content with an unsupported type | BlockNote throws while the editor is created and no integration catches it: the editor isn't displayed and the user isn't told why | 2 |
 | `lang` option | changes a module-global translation instance | 10, 11 |
-| Realtime metadata | references and generated labels are only in the metadata store of the inserting client | 6, 11 |

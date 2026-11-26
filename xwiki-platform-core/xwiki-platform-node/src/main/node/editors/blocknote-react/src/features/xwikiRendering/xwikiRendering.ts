@@ -28,7 +28,8 @@ import type { EditorFeature, FeatureContribution } from "../editorFeature";
  * (definition list items, groups, raw content, verbatim text and the XWiki parameters kept on the text), so that the
  * editor can load such content. None of them can be inserted from the editor UI. The syntax configuration has no
  * capability for them, so the feature always contributes them; the integrations whose content comes from the XWiki
- * rendering bind it (it isn't bound by the `ComponentInit` of this package).
+ * rendering bind it (it isn't bound by the `ComponentInit` of this package), along with the keys of the metadata entries
+ * that the XWiki rendering keeps in the content (see `XWIKI_METADATA_KEYS`).
  *
  * @since 18.10.0RC1
  * @beta

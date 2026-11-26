@@ -17,47 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  getMacroOutput,
-  setMacroOutput,
-} from "../../features/macros/macroMetadata";
-import { createBlockMetadataStore } from "../../misc/blockMetadata";
+import { MacroOutputCache } from "../../features/macros/macroOutputCache";
 import { describe, expect, test } from "vitest";
 
-describe("getMacroOutput", () => {
+describe("MacroOutputCache", () => {
   const call = JSON.stringify({ name: "info", parameters: {} });
   const output = [{ type: "paragraph", content: "Information" }];
 
   test("returns the output of an unchanged macro call", () => {
-    const metadata = createBlockMetadataStore();
-    setMacroOutput(metadata, "m1", call, output);
+    const outputs = new MacroOutputCache({ m1: { call, output } });
 
-    expect(getMacroOutput(metadata, "m1", call)).toBe(output);
+    expect(outputs.get("m1", call)).toBe(output);
   });
 
   test("returns nothing once the macro call is modified, or for an unknown macro call", () => {
-    const metadata = createBlockMetadataStore();
-    setMacroOutput(metadata, "m1", call, output);
+    const outputs = new MacroOutputCache({ m1: { call, output } });
 
-    expect(getMacroOutput(metadata, "m1", "{}")).toBeUndefined();
-    expect(getMacroOutput(metadata, "m2", call)).toBeUndefined();
-    expect(getMacroOutput(metadata, "", call)).toBeUndefined();
-    expect(getMacroOutput(undefined, "m1", call)).toBeUndefined();
+    expect(outputs.get("m1", "{}")).toBeUndefined();
+    expect(outputs.get("m2", call)).toBeUndefined();
+    expect(outputs.get("", call)).toBeUndefined();
+    expect(new MacroOutputCache().get("m1", call)).toBeUndefined();
   });
 
-  test("keeps the other metadata of the macro block", () => {
-    const metadata = createBlockMetadataStore();
-    metadata.set(
-      "m1",
-      { name: "xwikiParameters", shared: true },
-      { class: "box" },
-    );
-    setMacroOutput(metadata, "m1", call, output);
+  test("isn't affected by the changes of the initial outputs", () => {
+    const initial = { m1: { call, output } };
+    const outputs = new MacroOutputCache(initial);
+    delete (initial as Record<string, unknown>).m1;
 
-    expect(metadata.get("m1")).toEqual({
-      xwikiParameters: { class: "box" },
-      macroCall: call,
-      macroOutput: output,
-    });
+    expect(outputs.get("m1", call)).toBe(output);
   });
 });

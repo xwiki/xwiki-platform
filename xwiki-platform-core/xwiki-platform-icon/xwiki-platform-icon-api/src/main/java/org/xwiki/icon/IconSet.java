@@ -267,7 +267,7 @@ public class IconSet
      * @param includeDeprecated {@code true} to include the names of the deprecated icons, {@code false} to leave them
      *     out
      * @return the list of names of the icons
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     public List<String> getIconNames(boolean includeDeprecated)
     {

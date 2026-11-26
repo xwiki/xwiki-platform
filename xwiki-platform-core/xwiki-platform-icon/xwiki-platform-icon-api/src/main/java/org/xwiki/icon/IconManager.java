@@ -204,7 +204,7 @@ public interface IconManager
      *     out
      * @return the icon names
      * @throws IconException if problem occurs
-     * @since 18.10.0RC1
+     * @since 19.0.0RC1
      */
     default List<String> getIconNames(String iconSetName, boolean includeDeprecated) throws IconException
     {

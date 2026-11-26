@@ -1212,7 +1212,7 @@ zoom_in = zoom_in
 zoom_out = zoom_out
 
 #@deprecatedstart
-## Deprecated since 18.10.0RC1, these names don't follow the icon naming convention.
+## Deprecated since 19.0.0RC1, these names don't follow the icon naming convention.
 arrow_in = arrow_in
 bullet_black = bullet_black
 credit-card = creditcards

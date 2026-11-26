@@ -17,6 +17,7 @@
     "jsdom": "catalog:",
     "tom-select": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:",
     "xwiki-platform-web-webjar": "workspace:*"
   }

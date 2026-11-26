@@ -20,20 +20,11 @@
 
 // Publish the entity reference API on the global XWiki object, as the corresponding bundle does on every page.
 import "xwiki-platform-web-webjar";
+import LOCATION_PICKER_SOURCE from "@webapp/resources/uicomponents/widgets/locationPicker.js?raw";
 import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import jquery from "jquery";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import type { RequireJSMock } from "@xwiki/platform-test-requirejs";
-
-const LOCATION_PICKER_SOURCE = readFileSync(
-  resolve(
-    import.meta.dirname,
-    "../../../../../../main/webapp/resources/uicomponents/widgets/locationPicker.js",
-  ),
-  "utf-8",
-);
 
 // The parent field is not empty, in order to avoid the location preview update performed on initialization.
 const LOCATION_PICKER_HTML = `

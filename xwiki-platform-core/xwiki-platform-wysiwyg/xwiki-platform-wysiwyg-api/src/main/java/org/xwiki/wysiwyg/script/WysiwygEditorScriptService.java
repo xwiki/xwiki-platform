@@ -46,6 +46,7 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -57,6 +58,7 @@ import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
+import org.xwiki.wysiwyg.internal.converter.EditedContentRefresher;
 import org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactory;
 import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
 
@@ -151,6 +153,9 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
+    @Inject
+    private EditedContentRefresher editedContentRefresher;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -387,6 +392,64 @@ public class WysiwygEditorScriptService implements ScriptService
             }
 
             setSecurityDocument(originalSecurityDocument);
+        }
+    }
+
+    /**
+     * Executes the macro calls of the content edited with a WYSIWYG editor whose content syntax is not HTML (for
+     * example BlockNote), so that the editor can show the output of the macro calls that were inserted or modified
+     * since the content was loaded. All the macro calls are executed, not only those that were modified, because the
+     * output of a macro call can depend on the rest of the content (for example the table of contents, or the
+     * variables set by a script macro and used by another).
+     * <p>
+     * The edited content is not the stored content, so it is executed with the rights of the request effective author
+     * (see {@code XWikiRequest#getEffectiveAuthor()}), which is the current user, unless the content is edited in a
+     * realtime collaboration session indicated by the request: then it's the session participant with the least script
+     * rights among those that changed the content, so that the current user doesn't execute, with their own rights,
+     * the scripts inserted by the other participants.
+     *
+     * @param content the edited content, in the syntax of the editor (for example the BlockNote JSON)
+     * @param editorSyntax the syntax of the editor (for example {@code blocknote/1.0}), used to parse the given content
+     *            and to render the result
+     * @param sourceSyntax the syntax used to save the edited content (for example {@code xwiki/2.1}): the content and
+     *            the parameters of the macro calls that are edited in-place are converted to this syntax before the
+     *            macros are executed, like when the content is saved
+     * @param sourceReference the document where the edited content is saved, which is the context of the macro calls
+     *            (for example to resolve the relative references)
+     * @param restricted {@code true} to execute the macros in a restricted context (for example when editing a
+     *            comment), where the macros that are not safe (for example the script macros) are not executed
+     * @return the content with the output of its macro calls, in the syntax of the editor
+     * @throws AccessDeniedException if the author of the calling script doesn't have programming right, because the
+     *             macros are executed with the rights of the request effective author (for example the user viewing
+     *             the page that holds the calling script)
+     * @throws Exception if the syntax of the editor is not supported (missing parser or renderer), or if the content
+     *             can't be parsed or its macros can't be executed
+     * @since 18.10.0
+     */
+    @Unstable
+    public String refresh(String content, Syntax editorSyntax, Syntax sourceSyntax, DocumentReference sourceReference,
+        boolean restricted) throws Exception
+    {
+        this.authorization.checkAccess(Right.PROGRAM);
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        // Save the value of the "is in rendering engine" context property.
+        Object isInRenderingEngine = xcontext.get(IS_IN_RENDERING_ENGINE);
+        try {
+            // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
+            // syntax and not HTML syntax.
+            xcontext.put(IS_IN_RENDERING_ENGINE, true);
+            DocumentReference author = xcontext.getRequest().getEffectiveAuthor()
+                .map(this.userDocumentReferenceSerializer::serialize).orElseGet(xcontext::getUserReference);
+            // The author executor sets the security document itself, with the given author as content author.
+            return this.authorExecutor.call(() -> this.editedContentRefresher.refresh(content, editorSyntax,
+                sourceSyntax, sourceReference, restricted), author, sourceReference);
+        } finally {
+            if (isInRenderingEngine != null) {
+                xcontext.put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+            } else {
+                xcontext.remove(IS_IN_RENDERING_ENGINE);
+            }
         }
     }
 

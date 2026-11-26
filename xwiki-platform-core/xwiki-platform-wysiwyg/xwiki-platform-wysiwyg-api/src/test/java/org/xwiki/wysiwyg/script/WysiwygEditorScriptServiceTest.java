@@ -39,7 +39,9 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -49,6 +51,7 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
+import org.xwiki.wysiwyg.internal.converter.EditedContentRefresher;
 import org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactory;
 import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
 
@@ -65,6 +68,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -121,6 +125,9 @@ class WysiwygEditorScriptServiceTest
 
     @MockComponent
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
+    @MockComponent
+    private EditedContentRefresher editedContentRefresher;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -421,5 +428,56 @@ class WysiwygEditorScriptServiceTest
         object.setLargeStringValue(LONG_TEXT_PROPERTY, propertyValue);
         sourceDocument.getAuthors().setEffectiveMetadataAuthor(metadataAuthor);
         this.oldcore.getSpyXWiki().saveDocument(sourceDocument, context);
+    }
+
+    @Test
+    void refreshWithTheRightsOfTheRequestEffectiveAuthor() throws Exception
+    {
+        // The effective author of a request that holds content edited in realtime is the session participant with the
+        // least script rights.
+        UserReference effectiveAuthor = mock();
+        DocumentReference effectiveAuthorReference = new DocumentReference("xwiki", "XWiki", "EffectiveAuthor");
+        when(this.userDocumentReferenceSerializer.serialize(effectiveAuthor)).thenReturn(effectiveAuthorReference);
+        XWikiContext context = this.oldcore.getXWikiContext();
+        XWikiRequest request = mock();
+        when(request.getEffectiveAuthor()).thenReturn(Optional.of(effectiveAuthor));
+        context.setRequest(request);
+        context.setUserReference(new DocumentReference("xwiki", "XWiki", "CurrentUser"));
+
+        Syntax editorSyntax = Syntax.HTML_5_0;
+        when(this.editedContentRefresher.refresh("edited", editorSyntax, SYNTAX, DOCUMENT_REFERENCE, true))
+            .thenReturn("refreshed");
+
+        assertEquals("refreshed",
+            this.editorScriptService.refresh("edited", editorSyntax, SYNTAX, DOCUMENT_REFERENCE, true));
+        verify(this.authorExecutor).call(any(), eq(effectiveAuthorReference), eq(DOCUMENT_REFERENCE));
+    }
+
+    @Test
+    void refreshWithTheRightsOfTheCurrentUser() throws Exception
+    {
+        DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "CurrentUser");
+        this.oldcore.getXWikiContext().setUserReference(currentUser);
+
+        Syntax editorSyntax = Syntax.HTML_5_0;
+        when(this.editedContentRefresher.refresh("edited", editorSyntax, SYNTAX, DOCUMENT_REFERENCE, false))
+            .thenReturn("refreshed");
+
+        assertEquals("refreshed",
+            this.editorScriptService.refresh("edited", editorSyntax, SYNTAX, DOCUMENT_REFERENCE, false));
+        verify(this.authorExecutor).call(any(), eq(currentUser), eq(DOCUMENT_REFERENCE));
+    }
+
+    @Test
+    void refreshWithoutProgrammingRight() throws Exception
+    {
+        // The macros are executed with the rights of the user viewing the page that holds the calling script.
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockContextualAuthorizationManager())
+            .checkAccess(Right.PROGRAM);
+
+        Syntax editorSyntax = Syntax.HTML_5_0;
+        assertThrows(AccessDeniedException.class,
+            () -> this.editorScriptService.refresh("edited", editorSyntax, SYNTAX, DOCUMENT_REFERENCE, false));
+        verifyNoInteractions(this.editedContentRefresher);
     }
 }

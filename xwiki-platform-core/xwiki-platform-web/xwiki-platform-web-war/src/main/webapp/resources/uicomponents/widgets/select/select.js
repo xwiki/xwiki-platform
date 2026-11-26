@@ -352,8 +352,7 @@ require(['jquery'], function($) {
     //--------------------
     if (!action || action == 'init') {
       // Handle each object separately
-      for (let i = 0; i < this.length; ++i) {
-        var domElement = this[i];
+      for (const domElement of this) {
         // This widget might have already been created
         if ($(domElement).data('xwikiSelectWidget')) {
           continue;
@@ -364,8 +363,8 @@ require(['jquery'], function($) {
       }
     } else if (action == 'clearSelection') {
       // Handle each object separately
-      for (let i = 0; i < this.length; ++i) {
-        $(this[i]).data('xwikiSelectWidget').clearSelection();
+      for (const selectElement of this) {
+        $(selectElement).data('xwikiSelectWidget').clearSelection();
       }
     } else if (action == 'getValue') {
       // In such a case, there is no possible chaining

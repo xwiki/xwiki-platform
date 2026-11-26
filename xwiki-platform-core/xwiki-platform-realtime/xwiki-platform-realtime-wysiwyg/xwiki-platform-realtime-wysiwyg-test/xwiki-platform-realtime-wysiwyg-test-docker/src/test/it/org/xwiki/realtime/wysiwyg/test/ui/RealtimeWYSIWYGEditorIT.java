@@ -2660,6 +2660,23 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(firstEditor.getToolBar().canUndo());
         assertTrue(firstEditor.getToolBar().isRedoDisabled());
         assertEquals("142", firstTextArea.getText());
+
+        // Leave the realtime session. The default undo / redo should be restored, keeping the history of the changes
+        // made in the realtime session.
+        firstEditPage.getToolbar().leaveCollaboration();
+        assertTrue(firstEditor.getToolBar().canUndo());
+
+        firstTextArea.sendKeys("5");
+        assertTrue(firstEditor.getToolBar().canUndo());
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
+
+        firstEditor.getToolBar().undo();
+        firstTextArea.waitUntilTextIs("142");
+        assertTrue(firstEditor.getToolBar().canRedo());
+
+        firstEditor.getToolBar().redo();
+        firstTextArea.waitUntilTextIs("1452");
+        assertTrue(firstEditor.getToolBar().isRedoDisabled());
     }
 
     @Test

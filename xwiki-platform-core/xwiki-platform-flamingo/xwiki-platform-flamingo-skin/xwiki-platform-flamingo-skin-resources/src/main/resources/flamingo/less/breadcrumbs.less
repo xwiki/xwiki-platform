@@ -18,7 +18,8 @@
     padding-block: ~"var(--breadcrumb-target-overflow)";
     /* Half of that room goes over the breadcrumb padding, the other half makes the items taller than the text line.
     The margins are rounded to whole pixels so that the content below the breadcrumb doesn't land on a fraction of a
-    pixel. */
+    pixel. They are rounded in opposite directions so that, with the 13px font of the breadcrumb, their sum is -3px for
+    -2.72px and the breadcrumb is 37px high. Rounding both the same way gives -2px or -4px, so 1px more or less. */
     margin-block-start: ~"round(down, calc(-0.5 * var(--breadcrumb-target-overflow)), 1px)";
     margin-block-end: ~"round(up, calc(-0.5 * var(--breadcrumb-target-overflow)), 1px)";
 

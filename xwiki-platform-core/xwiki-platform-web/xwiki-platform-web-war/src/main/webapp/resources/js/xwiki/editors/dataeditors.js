@@ -17,12 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
-#[[*/
-// Start JavaScript-only code.
-
-(function(icons) {
+(function() {
   "use strict";
   define('dataeditors-translations', {
     prefix: 'core.editors.',
@@ -48,7 +43,11 @@
       'class.switchClass.confirm'
     ]
   });
-  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-events-bridge','jquery-ui'], function ($, xm, l10n) {
+  define('dataeditors-icons', {
+    icons: ['reposition']
+  });
+  require(['jquery', 'xwiki-meta', 'xwiki-l10n!dataeditors-translations', 'xwiki-icon!dataeditors-icons',
+      'xwiki-events-bridge', 'jquery-ui'], function ($, xm, l10n, icons) {
     class XDataEditors {
       constructor() {
         let self = this;
@@ -740,7 +739,7 @@
             let movebutton = $('<span>', {
               'class': 'tool move',
               title: l10n['class.moveProperty.handle.label']
-            }).html(icons['reposition']);
+            }).append(icons.reposition.render());
             item.css('position', 'relative');
             item.append(movebutton);
             movebutton.on('click', function (event) {
@@ -825,6 +824,4 @@
     }
     $(init);
   });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons]));
+})();

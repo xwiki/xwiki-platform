@@ -357,7 +357,7 @@
 #else
   ## Actual Object editor
   $xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
-  $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
+  $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js')##
   ## Insert JS and CSS needed for the fullscreen edit feature
   $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})##
   $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##

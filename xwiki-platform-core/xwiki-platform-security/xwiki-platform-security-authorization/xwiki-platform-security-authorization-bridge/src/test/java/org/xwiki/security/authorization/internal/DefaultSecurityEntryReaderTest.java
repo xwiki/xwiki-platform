@@ -19,16 +19,23 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.DefaultSecurityReferenceFactory;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightSet;
+import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.internal.DefaultXWikiBridge;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -43,6 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -61,6 +69,8 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 class DefaultSecurityEntryReaderTest
 {
+    private static final WikiReference SUB_WIKI = new WikiReference("sub");
+
     @InjectMockComponents
     private DefaultSecurityEntryReader defaultSecurityEntryReader;
 
@@ -98,5 +108,36 @@ class DefaultSecurityEntryReaderTest
 
         assertTrue(ruleEntry.getRules().isEmpty());
         verify(this.wiki).getWikiOwner("foo", this.context);
+    }
+
+    @Test
+    void ownerRuleOnlyOnWiki() throws Exception
+    {
+        when(this.context.getWikiReference()).thenReturn(new WikiReference("xwiki"));
+        when(this.context.getMainXWiki()).thenReturn("xwiki");
+        when(this.context.isMainWiki("xwiki")).thenReturn(true);
+        when(this.wiki.getWikiOwner("sub", this.context)).thenReturn("XWiki.SubOwner");
+        when(this.wiki.getWikiOwner("xwiki", this.context)).thenReturn("XWiki.MainOwner");
+
+        SecurityRuleEntry subWikiEntry =
+            this.defaultSecurityEntryReader.read(this.securityReferenceFactory.newEntityReference(SUB_WIKI));
+        assertEquals(List.of(new XWikiSecurityRule(new RightSet(Right.ADMIN), RuleState.ALLOW,
+            List.of(new DocumentReference("sub", "XWiki", "SubOwner")), null)),
+            List.copyOf(subWikiEntry.getRules()));
+
+        SecurityRuleEntry mainWikiEntry = this.defaultSecurityEntryReader
+            .read(this.securityReferenceFactory.newEntityReference(new WikiReference("xwiki")));
+        assertEquals(List.of(new XWikiSecurityRule(new RightSet(Right.PROGRAM), RuleState.ALLOW,
+            List.of(new DocumentReference("xwiki", "XWiki", "MainOwner")), null)),
+            List.copyOf(mainWikiEntry.getRules()));
+
+        // The rules of the wiki already allow the owner to administrate every space.
+        for (SpaceReference space : List.of(new SpaceReference("Space", SUB_WIKI),
+            new SpaceReference("XWiki", SUB_WIKI))) {
+            assertEquals(List.of(), List.copyOf(
+                this.defaultSecurityEntryReader.read(this.securityReferenceFactory.newEntityReference(space))
+                    .getRules()));
+        }
+        verify(this.wiki).getWikiOwner("sub", this.context);
     }
 }

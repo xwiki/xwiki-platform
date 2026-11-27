@@ -339,7 +339,13 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
 
         if (isGlobalRightsReference) {
             if (isGlobalRightRequested) {
-                addImpliedGlobalRule(documentReference, rules);
+                // The wiki owner rule belongs to the wiki only: an admin or programming right allowed on the wiki
+                // can't be denied on a lower level, so repeating the rule in the global rights of each space
+                // (WebPreferences) wouldn't change any access, but would make the rules of every space depend on the
+                // wiki descriptor.
+                if (XWikiConstants.WIKI_DOC.equals(documentReference.getName())) {
+                    addImpliedGlobalRule(documentReference, rules);
+                }
             } else {
                 // Deny local edit right on documents hosting global rights for anyone but admins.
                 rules.add(DENY_EDIT);

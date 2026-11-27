@@ -29,6 +29,7 @@
 <template>
   <!-- Pagination -->
   <nav
+    v-if="showPagination"
     class="livedata-pagination"
     :aria-label="
       this.data.id
@@ -222,6 +223,12 @@ export default {
 
   props: ["side"],
 
+  data() {
+    return {
+      paginationNeeded: false,
+    };
+  },
+
   computed: {
     data() {
       return this.logic.data;
@@ -330,6 +337,30 @@ export default {
     },
     showEntryRange() {
       return this.data.meta.pagination.showEntryRange;
+    },
+    pageCount() {
+      return this.logic.getPageCount();
+    },
+    showPagination() {
+      return (
+        this.data.meta.pagination.showPaginationOnSinglePage ||
+        this.paginationNeeded
+      );
+    },
+  },
+
+  watch: {
+    // The pagination becomes needed as soon as the entries span more than one page, or the user is not on the first
+    // page. Once needed it stays displayed for the rest of the session: deciding again on every update would make the
+    // controls appear and disappear while the user works with the live data, and the page size selector, which lives
+    // inside the pagination, would be able to remove itself by making the entries fit a single page.
+    pageCount: {
+      handler(pageCount) {
+        if (pageCount > 1 || this.logic.getPageIndex() > 0) {
+          this.paginationNeeded = true;
+        }
+      },
+      immediate: true,
     },
   },
 

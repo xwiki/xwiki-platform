@@ -56,6 +56,8 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return the list of recent statistics action stored.
      */
+    // The statistics rows are built by the store and their type varies, so there is no element type to name.
+    @SuppressWarnings("java:S1452")
     Collection<?> getRecentActions(String action, int size, XWikiContext context);
 
     /**
@@ -108,6 +110,8 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return a list of DocumentStats objects.
      */
+    // The statistics rows are built by the store and their type varies, so there is no element type to name.
+    @SuppressWarnings("java:S1452")
     List<?> getBackLinkStatistics(String domain, Scope scope, Period period, Range range, XWikiContext context);
 
     /**
@@ -120,6 +124,8 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return a map of (date, actionCount) pairs.
      */
+    // The statistics rows are built by the store and their type varies, so there is no element type to name.
+    @SuppressWarnings("java:S1452")
     Map<?, ?> getActionStatistics(String action, Scope scope, Period period, Duration step, XWikiContext context);
 
     // ////////////////////////////////////////////////////////////////////////////////////////

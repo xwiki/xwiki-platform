@@ -327,6 +327,8 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
+    // The element type depends on the withdetails parameter (String or XWikiDocument), as the Javadoc states.
+    @SuppressWarnings("java:S1452")
     public List<?> getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
@@ -384,6 +386,8 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
+    // The element type depends on the withdetails parameter (String or XWikiDocument), as the Javadoc states.
+    @SuppressWarnings("java:S1452")
     public List<?> getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
@@ -419,6 +423,8 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
+    // The element type depends on the withdetails parameter (String or XWikiDocument), as the Javadoc states.
+    @SuppressWarnings("java:S1452")
     public List<?> getAllMatchedWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
@@ -472,6 +478,8 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
+    // The element type depends on the withdetails parameter (String or XWikiDocument), as the Javadoc states.
+    @SuppressWarnings("java:S1452")
     public List<?> getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {

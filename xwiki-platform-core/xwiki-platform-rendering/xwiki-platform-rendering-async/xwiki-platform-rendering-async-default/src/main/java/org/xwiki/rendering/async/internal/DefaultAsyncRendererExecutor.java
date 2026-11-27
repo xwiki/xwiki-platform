@@ -179,26 +179,10 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         List<String> jobId = getJobId(renderer, context);
 
         if (cacheAllowed) {
-            this.cache.getLock().readLock().lock();
+            AsyncRendererExecutorResponse cachedResponse = getCachedResponse(jobId, asyncAllowed, configuration);
 
-            try {
-                AsyncRendererJobStatus status = getCurrent(jobId);
-
-                if (status != null
-                    && (status.getEndDate() == null || this.cacheControl.isCacheReadAllowed(status.getEndDate()))) {
-                    if (status.getResult() != null && !configuration.isPlaceHolderForced()) {
-                        // Available cached result, return it
-
-                        injectUses(status);
-
-                        return new AsyncRendererExecutorResponse(status);
-                    } else if (asyncAllowed) {
-                        // Already running job, associate it with another client
-                        return new AsyncRendererExecutorResponse(status, newClientId());
-                    }
-                }
-            } finally {
-                this.cache.getLock().readLock().unlock();
+            if (cachedResponse != null) {
+                return cachedResponse;
             }
         }
 
@@ -211,30 +195,27 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         request.setJobGroupPath(renderer.getJobGroupPath());
 
         if (asyncAllowed) {
-            this.cache.getLock().writeLock().lock();
-
-            try {
-                if (context != null) {
-                    request.setContext(context);
-                }
-
-                String asyncClientId = newClientId();
-
-                // If cache is disabled make sure the id is unique
-                if (!renderer.isCacheAllowed()) {
-                    jobId.add(asyncClientId);
-                }
-
-                request.setId(jobId);
-
-                Job job = this.executor.execute(AsyncRendererJobStatus.JOBTYPE, request);
-
-                AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
-
-                response = new AsyncRendererExecutorResponse(status, asyncClientId);
-            } finally {
-                this.cache.getLock().writeLock().unlock();
+            if (context != null) {
+                request.setContext(context);
             }
+
+            String asyncClientId = newClientId();
+
+            // If cache is disabled make sure the id is unique
+            if (!renderer.isCacheAllowed()) {
+                jobId.add(asyncClientId);
+            }
+
+            request.setId(jobId);
+
+            Job job = this.executor.execute(AsyncRendererJobStatus.JOBTYPE, request);
+
+            AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
+
+            // The job might already be finished and its status stored in the cache, which is handled by #addClient.
+            this.cache.addClient(status, asyncClientId);
+
+            response = new AsyncRendererExecutorResponse(status, asyncClientId);
         } else {
             AsyncRendererJobStatus status;
 
@@ -301,6 +282,37 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         }
 
         return response;
+    }
+
+    /**
+     * Look for a running job or a cached result. This is executed without lock as it's executed for every cached
+     * element of every page: the caches and the job executor are thread-safe, the result of a status is set last and
+     * the registration of a new client is safe even when the job finishes concurrently (see
+     * {@link AsyncRendererCache#addClient(AsyncRendererJobStatus, String)}).
+     */
+    private AsyncRendererExecutorResponse getCachedResponse(List<String> jobId, boolean asyncAllowed,
+        AsyncRendererConfiguration configuration)
+    {
+        AsyncRendererJobStatus status = getCurrent(jobId);
+
+        if (status != null
+            && (status.getEndDate() == null || this.cacheControl.isCacheReadAllowed(status.getEndDate()))) {
+            if (status.getResult() != null && !configuration.isPlaceHolderForced()) {
+                // Available cached result, return it
+                injectUses(status);
+
+                return new AsyncRendererExecutorResponse(status);
+            } else if (asyncAllowed) {
+                // Already running job (or finished one when the placeholder is forced), associate it with another
+                // client
+                String clientId = newClientId();
+                this.cache.addClient(status, clientId);
+
+                return new AsyncRendererExecutorResponse(status, clientId);
+            }
+        }
+
+        return null;
     }
 
     private AsyncRendererResult syncRender(AsyncRenderer renderer, boolean cached,

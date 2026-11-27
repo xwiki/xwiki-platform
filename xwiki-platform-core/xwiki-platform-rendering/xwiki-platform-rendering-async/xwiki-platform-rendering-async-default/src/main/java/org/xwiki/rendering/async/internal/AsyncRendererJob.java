@@ -100,8 +100,6 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
 
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
-        getStatus().setResult(result);
-
         if (this.asyncContext instanceof DefaultAsyncContext defaultAsyncContext) {
             // Remember various elements used during the execution (to invalidate the cache or restore them when needed)
             ContextUse contextUse = defaultAsyncContext.popContextUse();
@@ -110,6 +108,10 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
             getStatus().setRoleTypes(contextUse.getRoleTypes());
             getStatus().setUses(contextUse.getUses());
         }
+
+        // Set the result last: other threads read the status of the running job without lock and use the result as
+        // the indication that the execution is complete, including the uses to inject.
+        getStatus().setResult(result);
     }
 
     @Override

@@ -50,7 +50,11 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
      */
     public static final String JOBTYPE = "asyncrenderer";
 
-    private AsyncRendererResult result;
+    /**
+     * Volatile as the status of a running job is read without lock by other threads: the result is set last so that
+     * a thread seeing the result also sees the other elements of the execution (e.g., the uses to inject).
+     */
+    private volatile AsyncRendererResult result;
 
     private Set<EntityReference> references;
 
@@ -64,7 +68,12 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
     private boolean async;
 
-    private Set<String> clients = ConcurrentHashMap.newKeySet();
+    private final Set<String> clients = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Indicate if the clients have been published to the cache. Guarded by {@link #clients}.
+     */
+    private boolean clientsPublished;
 
     /**
      * @param request the request provided when started the job
@@ -114,12 +123,12 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
         this.async = false;
 
-        setResult(result);
         setReferences(references);
         setRoleTypes(roleTypes);
         setRoles(roles);
         setRights(rights);
         setUses(uses);
+        setResult(result);
 
         setState(State.FINISHED);
         setEndDate(new Date());
@@ -257,6 +266,41 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     public Set<String> getClients()
     {
         return this.clients;
+    }
+
+    /**
+     * Associate a client with this status and indicate if the clients have already been published with
+     * {@link #publishClients()}, in which case the caller is responsible for making the status available to the new
+     * client.
+     *
+     * @param client the identifier of the client to associate with this status
+     * @return {@code true} if the clients have already been published, {@code false} if the client is part of the
+     *     clients that will be returned by {@link #publishClients()}
+     * @since 19.0.0RC1
+     */
+    public boolean addClientAndCheckPublished(String client)
+    {
+        synchronized (this.clients) {
+            this.clients.add(client);
+
+            return this.clientsPublished;
+        }
+    }
+
+    /**
+     * Mark the clients as published and return them. Clients added later with
+     * {@link #addClientAndCheckPublished(String)} are reported as added after the publication.
+     *
+     * @return the clients associated with this status at the time of the publication
+     * @since 19.0.0RC1
+     */
+    public Set<String> publishClients()
+    {
+        synchronized (this.clients) {
+            this.clientsPublished = true;
+
+            return Set.copyOf(this.clients);
+        }
     }
 
     /**

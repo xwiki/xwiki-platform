@@ -35,7 +35,7 @@
     <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.46</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.47</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
@@ -145,8 +145,13 @@
 
     <!-- Storage -->
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-hibernate-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
     </dependency>
     <!-- Hibernate 5 seems to require (but don't declare) javax validation-->
     <dependency>
@@ -485,6 +490,17 @@
       <artifactId>jetty-io</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Used to wrap Hibernate queries, which can't be represented by a java.lang.reflect.Proxy -->
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+    </dependency>
+    <!-- Needed to test the Hibernate operations used by the store on a real database -->
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Used in to prioritize MandatoryDocumentInitializers -->
     <dependency>
@@ -766,7 +782,6 @@
                 **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
                 **/internal/script/DebugScriptService.java,
                 **/internal/store/hibernate/HibernateStore.java,
-                **/internal/store/hibernate/QueryImplementorDelegate.java,
                 **/internal/skin/*.java,
                 **/internal/template/InternalTemplateManager.java,
                 **/internal/template/TemplateEnvironmentResource.java,

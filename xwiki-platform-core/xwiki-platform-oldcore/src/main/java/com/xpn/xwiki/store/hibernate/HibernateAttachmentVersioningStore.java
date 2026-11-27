@@ -67,7 +67,9 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
             archive.setAttachment(attachment);
             executeRead(context, session -> {
                 try {
-                    session.load(archive, archive.getId());
+                    // Object typed identifier to call Session#load(Object, Object)
+                    Object id = archive.getId();
+                    session.load(archive, id);
                 } catch (ObjectNotFoundException e) {
                     // if none found then return empty created archive
                 }
@@ -103,7 +105,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
             executeWrite(context, session -> {
                 XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
                 archive.setAttachment(attachment);
-                session.delete(archive);
+                session.remove(archive);
 
                 return null;
             });

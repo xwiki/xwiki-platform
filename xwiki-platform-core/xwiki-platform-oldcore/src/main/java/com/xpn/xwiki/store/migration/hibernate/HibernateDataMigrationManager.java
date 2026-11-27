@@ -27,9 +27,9 @@ import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -176,8 +176,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
         try {
             getBaseStore().executeWrite(context, session -> {
-                session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
-                session.save(version);
+                session.createMutationQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
+                session.persist(version);
 
                 return null;
             });

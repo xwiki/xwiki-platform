@@ -116,6 +116,19 @@ class HibernateStoreTest
     }
 
     @Test
+    void getDatabaseProductNameWhenNoSessionFactoryAndStandardSetting() throws Exception
+    {
+        Field field = ReflectionUtils.getField(this.store.getClass(), "configuration");
+        field.setAccessible(true);
+        Configuration storeConfiguration = (Configuration) field.get(this.store);
+        Properties properties = new Properties();
+        properties.setProperty("jakarta.persistence.jdbc.url", "jdbc:postgresql://localhost/xwiki");
+        storeConfiguration.addProperties(properties);
+
+        assertEquals(DatabaseProduct.POSTGRESQL, this.store.getDatabaseProductName());
+    }
+
+    @Test
     void getConfiguredColumnNameUsesTheCaseOfTheDatabase()
     {
         HibernateAdapter adapter = mock(HibernateAdapter.class);
@@ -123,5 +136,21 @@ class HibernateStoreTest
         ReflectionUtils.setFieldValue(this.store, "adapter", adapter);
 
         assertEquals("ASE_PAGE", this.store.getConfiguredColumnName(new Column("ase_page")));
+    }
+
+    @Test
+    void initializeUsesTheLegacySequenceNamingStrategyByDefault()
+    {
+        // Existing databases contain a single hibernate_sequence sequence, incremented by 1
+        assertEquals("legacy",
+            this.store.getConfiguration().getProperty("hibernate.id.db_structure_naming_strategy"));
+    }
+
+    @Test
+    void initializeUsesTheLegacyWrapperArrayHandlingByDefault()
+    {
+        // Byte[] and Character[] properties (wrapper-binary and wrapper-characters types) are stored like byte[] and
+        // char[]
+        assertEquals("LEGACY", this.store.getConfiguration().getProperty("hibernate.type.wrapper_array_handling"));
     }
 }

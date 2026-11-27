@@ -166,7 +166,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         Map<String, String> rowFormats, StringBuilder builder, Session session)
         throws SQLException, HibernateStoreException
     {
-        int expectedLenght = column.getLength();
+        int expectedLenght = HibernateStore.getLength(column);
 
         if (expectedLenght >= MAXSIZE_MIN && expectedLenght <= MAXSIZE_MAX) {
             Integer databaseSize = getDatabaseSize(column, databaseMetaData);

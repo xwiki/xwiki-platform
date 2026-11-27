@@ -36,7 +36,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.RootClass;
 import org.hibernate.query.spi.NativeQueryImplementor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -107,7 +107,7 @@ class R140300001XWIKI19571DataMigrationTest
     private HibernateAdapter adapter;
 
     @Mock
-    private PersistentClass persistentClass;
+    private RootClass persistentClass;
 
     @Mock
     private DatabaseMetaData databaseMetaData;

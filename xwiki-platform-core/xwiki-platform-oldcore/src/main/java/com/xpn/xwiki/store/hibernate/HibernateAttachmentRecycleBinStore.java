@@ -27,10 +27,10 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -105,7 +105,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                         createDeletedAttachment(attachment, deleter, date, contentStore);
 
                     // Hibernate store.
-                    long index = ((Number) session.save(trashAttachment)).longValue();
+                    session.persist(trashAttachment);
+                    long index = trashAttachment.getId();
 
                     // External store
                     if (contentStore != null) {
@@ -151,7 +152,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         throws XWikiException
     {
         return executeRead(context, session -> {
-            DeletedAttachment deletedAttachment = session.get(DeletedAttachment.class, Long.valueOf(index));
+            DeletedAttachment deletedAttachment = session.find(DeletedAttachment.class, index);
 
             if (deletedAttachment != null && resolve) {
                 deletedAttachment = resolveDeletedAttachmentContent(deletedAttachment, false, false);
@@ -243,7 +244,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                     DeletedAttachment deletedDocument = loadDeletedAttachment(index, context, false);
 
                     try {
-                        session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=:id")
+                        session
+                            .createMutationQuery("delete from " + DeletedAttachment.class.getName() + " where id=:id")
                             .setParameter("id", index).executeUpdate();
                     } catch (Exception ex) {
                         // Invalid ID?

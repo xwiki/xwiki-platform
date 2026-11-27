@@ -22,15 +22,20 @@
 
 <!DOCTYPE hibernate-mapping PUBLIC
   "-//Hibernate/Hibernate Mapping DTD//EN"
-  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" [
+  <!-- The length of the "text" properties, which gives the large character type of the database ("longtext" on MySQL,
+       "text" on PostgreSQL, "clob" on Oracle, etc.): org.hibernate.Length.LONG32. A smaller length could give a
+       "varchar", limiting the size of the values and counting in the maximum size of a MySQL row. -->
+  <!ENTITY largeTextLength "2147483647">
+]>
 <hibernate-mapping>
     <class entity-name="XWiki.AggregatorURLClass" table="feeds_aggregatorurl">
         <id name="id" type="long" unsaved-value="any">
             <column name="agg_id" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="name" type="text" column="agg_name" length="2000" />
-        <property name="url" type="text" column="agg_url" length="2000" />
+        <property name="name" type="text" column="agg_name" length="&largeTextLength;" />
+        <property name="url" type="text" column="agg_url" length="&largeTextLength;" />
         <list name="group" table="feeds_aggregatorurlgroups" lazy="false">
             <key><column name="agl_id" /></key>
             <index column="agl_number" />
@@ -62,15 +67,15 @@
             <column name="fee_id" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="title" type="text" column="fee_title" length="2000" />
-        <property name="author" type="text" column="fee_author" length="2000" />
-        <property name="feedurl" type="text" column="fee_feedurl" length="2000" />
-        <property name="feedname" type="text" column="fee_feedname" length="2000" />
-        <property name="url" type="text" column="fee_url" length="2000" />
-        <property name="category" type="text" column="fee_category" length="2000" />
-        <property name="content" type="text" column="fee_content" length="30000" />
-        <property name="fullContent" type="text" column="fee_fullcontent" length="30000" />
-        <property name="xml" type="text" column="fee_xml" length="30000" />
+        <property name="title" type="text" column="fee_title" length="&largeTextLength;" />
+        <property name="author" type="text" column="fee_author" length="&largeTextLength;" />
+        <property name="feedurl" type="text" column="fee_feedurl" length="&largeTextLength;" />
+        <property name="feedname" type="text" column="fee_feedname" length="&largeTextLength;" />
+        <property name="url" type="text" column="fee_url" length="&largeTextLength;" />
+        <property name="category" type="text" column="fee_category" length="&largeTextLength;" />
+        <property name="content" type="text" column="fee_content" length="&largeTextLength;" />
+        <property name="fullContent" type="text" column="fee_fullcontent" length="&largeTextLength;" />
+        <property name="xml" type="text" column="fee_xml" length="&largeTextLength;" />
         <property name="date" type="timestamp" column="fee_date" />
         <property name="flag" type="integer">
             <column name="fee_flag" default="0" />

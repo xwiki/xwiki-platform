@@ -41,6 +41,8 @@ import org.hibernate.service.spi.Stoppable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xpn.xwiki.internal.store.hibernate.HibernateConnectionSetting;
+
 /**
  * <p>
  * A connection provider that uses an Apache commons DBCP connection pool.
@@ -52,10 +54,10 @@ import org.slf4j.LoggerFactory;
  *
  * <pre>
  * Supported Hibernate properties:
- *   hibernate.connection.driver_class
- *   hibernate.connection.url
- *   hibernate.connection.username
- *   hibernate.connection.password
+ *   jakarta.persistence.jdbc.driver (or hibernate.connection.driver_class)
+ *   jakarta.persistence.jdbc.url (or hibernate.connection.url)
+ *   jakarta.persistence.jdbc.user (or hibernate.connection.username)
+ *   jakarta.persistence.jdbc.password (or hibernate.connection.password)
  *   hibernate.connection.isolation
  *   hibernate.connection.autocommit
  *   hibernate.connection.pool_size
@@ -122,27 +124,27 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
             Properties dbcpProperties = new Properties();
 
             // DriverClass & url
-            String jdbcDriverClass = (String) props.get(AvailableSettings.DRIVER);
+            String jdbcDriverClass = HibernateConnectionSetting.DRIVER.getValue(props);
             // Some drivers register themselves automatically using the Service Loader mechanism and thus we don't need
             // to set the Hibernate "driverClassName" property.
             if (jdbcDriverClass != null) {
                 dbcpProperties.put("driverClassName", jdbcDriverClass);
             }
 
-            String jdbcUrl = System.getProperty(AvailableSettings.URL);
+            String jdbcUrl = HibernateConnectionSetting.URL.getValue(System.getProperties());
             if (jdbcUrl == null) {
-                jdbcUrl = (String) props.get(AvailableSettings.URL);
+                jdbcUrl = HibernateConnectionSetting.URL.getValue(props);
             }
             dbcpProperties.put("url", jdbcUrl);
 
             // Username / password. Only put username and password if they're not null. This allows
             // external authentication support (OS authenticated). It'll thus work if the hibernate
             // config does not specify a username and/or password.
-            String username = (String) props.get(AvailableSettings.USER);
+            String username = HibernateConnectionSetting.USER.getValue(props);
             if (username != null) {
                 dbcpProperties.put("username", username);
             }
-            String password = (String) props.get(AvailableSettings.PASS);
+            String password = HibernateConnectionSetting.PASSWORD.getValue(props);
             if (password != null) {
                 dbcpProperties.put("password", password);
             }
@@ -293,7 +295,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
      * Does this connection provider support aggressive release of JDBC connections and re-acquistion of those
      * connections (if need be) later?
      * <p>
-     * This is used in conjunction with {@link org.hibernate.cfg.Environment#RELEASE_CONNECTIONS} to aggressively
+     * This is used in conjunction with {@link org.hibernate.cfg.JdbcSettings#CONNECTION_HANDLING} to aggressively
      * release JDBC connections. However, the configured ConnectionProvider must support re-acquisition of the same
      * underlying connection for that semantic to work.
      * <p>

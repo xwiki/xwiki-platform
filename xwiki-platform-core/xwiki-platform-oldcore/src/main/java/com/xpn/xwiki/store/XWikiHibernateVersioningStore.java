@@ -180,7 +180,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     {
         executeWrite(context, session -> {
             for (XWikiRCSNodeInfo ni : archivedoc.getDeletedNodeInfo()) {
-                session.delete(ni);
+                session.remove(ni);
             }
             archivedoc.getDeletedNodeInfo().clear();
 
@@ -367,7 +367,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
             return executeRead(context, session -> {
                 XWikiRCSNodeContent content = new XWikiRCSNodeContent(id);
-                session.load(content, content.getId());
+                // Object typed identifier to call Session#load(Object, Object)
+                Object contentId = content.getId();
+                session.load(content, contentId);
 
                 return content;
             });
@@ -380,7 +382,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException
     {
         executeWrite(context, session -> {
-            VersioningStoreQueryFactory.getDeleteArchiveQuery(session, doc.getId()).executeUpdate();
+            VersioningStoreQueryFactory.createDeleteArchiveQuery(session, doc.getId()).executeUpdate();
             return null;
         });
     }

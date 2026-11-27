@@ -27,6 +27,8 @@ import java.net.URL;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.MappingException;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.jaxb.hbm.spi.JaxbHbmHibernateMapping;
+import org.hibernate.boot.jaxb.mapping.spi.JaxbEntityMappingsImpl;
 import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.cfg.Configuration;
 
@@ -50,6 +52,28 @@ public class HibernateStoreConfiguration extends Configuration
         if (url != null) {
             configure(url);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A connection setting which can be configured with several names (for example
+     * {@code hibernate.connection.driver_class} or {@code jakarta.persistence.jdbc.driver}) is returned whichever of
+     * its names is used in the configuration.
+     */
+    @Override
+    public String getProperty(String propertyName)
+    {
+        String value = super.getProperty(propertyName);
+
+        if (value == null) {
+            HibernateConnectionSetting setting = HibernateConnectionSetting.fromName(propertyName);
+            if (setting != null) {
+                value = setting.getValue(this);
+            }
+        }
+
+        return value;
     }
 
     @Override
@@ -99,8 +123,11 @@ public class HibernateStoreConfiguration extends Configuration
      */
     public void copy(MetadataSources metadataSource)
     {
-        for (Binding<?> binding : this.metadataSources.getXmlBindings()) {
-            metadataSource.addXmlBinding(binding);
+        for (Binding<JaxbHbmHibernateMapping> binding : this.metadataSources.getHbmXmlBindings()) {
+            metadataSource.addHbmXmlBinding(binding);
+        }
+        for (Binding<JaxbEntityMappingsImpl> binding : this.metadataSources.getMappingXmlBindings()) {
+            metadataSource.addMappingXmlBinding(binding);
         }
     }
 }

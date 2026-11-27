@@ -64,7 +64,9 @@ class OldCoreHelperTest
         WeakReference<XWiki> xwiki = createAndCloseOldCoreHelper();
 
         // The embedded Solr implementation isn't in the test classpath, so the components requiring it fail to load.
-        this.logCapture.ignoreAllMessages(List.of(OldCoreHelperTest::isCausedByMissingSolr));
+        // Hibernate warns about each mapping still using the hbm.xml format.
+        this.logCapture.ignoreAllMessages(
+            List.of(OldCoreHelperTest::isCausedByMissingSolr, OldCoreHelperTest::isDeprecatedHibernateMapping));
 
         // The packager runs inside the Maven JVM: anything still referencing the XWiki instance once the packager is
         // done (e.g., a thread started by XWiki and never stopped) keeps it in memory until the end of the build.
@@ -89,6 +91,11 @@ class OldCoreHelperTest
         }
 
         return false;
+    }
+
+    private static boolean isDeprecatedHibernateMapping(ILoggingEvent event)
+    {
+        return StringUtils.startsWith(event.getFormattedMessage(), "HHH90000028:");
     }
 
     /**

@@ -77,6 +77,14 @@ class MySQLHibernateAdapterTest
     }
 
     @Test
+    void getRowFormatsWhenNoCurrentWiki()
+    {
+        when(this.wikis.getCurrentWikiId()).thenReturn(null);
+
+        assertEquals(Map.of(), this.adapter.getRowFormats(null));
+    }
+
+    @Test
     void getAlterRowFormatStringWhenNoCurrentWiki() throws Exception
     {
         when(this.wikis.getCurrentWikiId()).thenReturn(null);

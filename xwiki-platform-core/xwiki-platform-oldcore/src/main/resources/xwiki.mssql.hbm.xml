@@ -22,7 +22,12 @@
 
 <!DOCTYPE hibernate-mapping PUBLIC
   "-//Hibernate/Hibernate Mapping DTD//EN"
-  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" [
+  <!-- The length of the "text" properties, which gives the large character type of the database ("longtext" on MySQL,
+       "text" on PostgreSQL, "clob" on Oracle, etc.): org.hibernate.Length.LONG32. A smaller length could give a
+       "varchar", limiting the size of the values and counting in the maximum size of a MySQL row. -->
+  <!ENTITY largeTextLength "2147483647">
+]>
 <hibernate-mapping auto-import="true">
 
     <!-- This file is a copy of xwiki.hbm.xml with the following modification:
@@ -220,6 +225,12 @@
                 <column name="XWP_NAME" index="PROP_NAME" />
             </key-property>
         </composite-id>
+        <!-- The class name stored in XWP_CLASSTYPE identifies the type of the property, which is needed since
+             LargeStringProperty and StringListProperty share the same table. The column is written through the
+             classType property. -->
+        <discriminator type="string" insert="false">
+            <column name="XWP_CLASSTYPE" length="255" not-null="false" />
+        </discriminator>
         <property name="classType" type="string" column="XWP_CLASSTYPE" length="255" />
 
         <joined-subclass name="com.xpn.xwiki.objects.IntegerProperty" table="xwikiintegers">
@@ -275,7 +286,7 @@
                 <column name="XWL_ID" />
                 <column name="XWL_NAME" index="XWLS_NAME" />
             </key>
-            <property name="value" type="text" column="XWL_VALUE" length="60000" />
+            <property name="value" type="text" column="XWL_VALUE" length="&largeTextLength;" />
         </joined-subclass>
 
         <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikilargestrings">
@@ -283,7 +294,7 @@
                 <column name="XWL_ID" />
                 <column name="XWL_NAME" />
             </key>
-            <property name="textValue" type="text" column="XWL_VALUE" length="60000" />
+            <property name="textValue" type="text" column="XWL_VALUE" length="&largeTextLength;" />
         </joined-subclass>
 
         <joined-subclass name="com.xpn.xwiki.objects.DBStringListProperty" table="xwikilists">
@@ -309,7 +320,7 @@
                 <column name="XWP_NAME" index="XWPASSWORD_NAME" />
             </key>
             <!-- Using a text size to ensure large tokens can be stored. -->
-            <property name="value" type="text" column="XWP_VALUE" length="60000" />
+            <property name="value" type="text" column="XWP_VALUE" length="&largeTextLength;" />
         </joined-subclass>
     </class>
 
@@ -355,7 +366,7 @@
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
         <property name="className" type="string" column="XWR_CLASSNAME" length="255" />
-        <property name="referer" type="text" column="XWR_REFERER" not-null="true" length="8192" />
+        <property name="referer" type="text" column="XWR_REFERER" not-null="true" length="&largeTextLength;" />
         <property name="pageViews" type="integer" column="XWR_PAGE_VIEWS" index="XWRS_PAGE_VIEWS" not-null="false" />
         <property name="period" type="integer" column="XWR_PERIOD" index="XWRS_PERIOD" not-null="false" />
     </class>
@@ -373,8 +384,8 @@
              (new stats) -->
         <property name="className" type="string" column="XWV_CLASSNAME" length="255" />
         <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
-        <property name="userAgent" type="text" column="XWV_USER_AGENT" not-null="true" length="8192" />
-        <property name="cookie" type="text" column="XWV_COOKIE" not-null="true" length="8192" />
+        <property name="userAgent" type="text" column="XWV_USER_AGENT" not-null="true" length="&largeTextLength;" />
+        <property name="cookie" type="text" column="XWV_COOKIE" not-null="true" length="&largeTextLength;" />
         <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="255" />
         <property name="pageViews" type="integer" column="XWV_PAGE_VIEWS" index="XWVS_PAGE_VIEWS" not-null="false" />
         <property name="pageSaves" type="integer" column="XWV_PAGE_SAVES" index="XWVS_PAGE_SAVES" not-null="false" />
@@ -403,15 +414,15 @@
         <property name="webcopyright" type="string" column="XWP_WEBCOPYRIGHT" length="255" />
         <property name="title" type="string" column="XWP_TITLE" length="255" />
         <property name="version" type="string" column="XWP_VERSION" length="255" />
-        <property name="meta" type="text" column="XWP_META" length="30000" />
+        <property name="meta" type="text" column="XWP_META" length="&largeTextLength;" />
         <property name="use_email_verification" type="integer" column="XWP_USE_EMAIL_VERIFICATION" />
         <property name="smtp_server" type="string" column="XWP_SMTP_SERVER" length="255" />
         <property name="admin_email" type="string" column="XWP_ADMIN_EMAIL" length="255" />
-        <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
-        <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
-        <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
-        <property name="leftPanels" type="text" column="XWP_LEFT_PANELS" length="2000" />
-        <property name="rightPanels" type="text" column="XWP_RIGHT_PANELS" length="2000" />
+        <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="&largeTextLength;" />
+        <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="&largeTextLength;" />
+        <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="&largeTextLength;" />
+        <property name="leftPanels" type="text" column="XWP_LEFT_PANELS" length="&largeTextLength;" />
+        <property name="rightPanels" type="text" column="XWP_RIGHT_PANELS" length="&largeTextLength;" />
         <property name="showLeftPanels" type="integer" column="XWP_SHOW_LEFT_PANELS" />
         <property name="showRightPanels" type="integer" column="XWP_SHOW_RIGHT_PANELS" />
         <property name="languages" type="string" column="XWP_LANGUAGES" length="255" />
@@ -421,7 +432,7 @@
         <property name="edit_registered" type="string" column="XWP_EDIT_REGISTERED" length="255" />
         <property name="comment_anonymous" type="string" column="XWP_COMMENT_ANONYMOUS" length="255" />
         <property name="comment_registered" type="string" column="XWP_COMMENT_REGISTERED" length="255" />
-        <property name="documentBundles" type="text" column="XWP_DOCUMENT_BUNDLES" length="2000" />
+        <property name="documentBundles" type="text" column="XWP_DOCUMENT_BUNDLES" length="&largeTextLength;" />
     </class>
 
     <!-- XWikiComments custom mapping -->
@@ -431,8 +442,8 @@
             <generator class="assigned" />
         </id>
         <property name="author" type="string" column="XWC_AUTHOR" length="255" index="COMMENT_AUTHOR" />
-        <property name="highlight" type="text" column="XWC_HIGHLIGHT" length="60000" />
-        <property name="comment" type="text" column="XWC_COMMENT" length="60000" />
+        <property name="highlight" type="text" column="XWC_HIGHLIGHT" length="&largeTextLength;" />
+        <property name="comment" type="text" column="XWC_COMMENT" length="&largeTextLength;" />
         <property name="replyto" type="integer" column="XWP_REPLYTO" index="COMMENT_REPLYTO" />
         <property name="date" type="timestamp" column="XWP_DATE" index="COMMENT_DATE" />
     </class>

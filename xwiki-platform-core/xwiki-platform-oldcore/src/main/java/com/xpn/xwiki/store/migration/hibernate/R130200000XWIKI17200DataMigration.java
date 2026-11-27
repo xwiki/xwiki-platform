@@ -221,7 +221,7 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
                     this.hibernateStore.getDialect().getTypeName(column.getSqlTypeCode(configurationMetadata));
 
                 if (!currentColumnType.equalsIgnoreCase(expectedColumnType)) {
-                    int expectedLenght = column.getLength();
+                    int expectedLenght = HibernateStore.getLength(column);
 
                     int currentColumnSize = resultSet.getInt("COLUMN_SIZE");
 

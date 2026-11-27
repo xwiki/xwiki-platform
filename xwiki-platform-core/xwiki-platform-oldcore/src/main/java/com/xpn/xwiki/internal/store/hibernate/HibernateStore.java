@@ -30,7 +30,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +42,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import jakarta.persistence.GenerationType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -63,11 +64,14 @@ import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.MappingSettings;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.enhanced.LegacyNamingStrategy;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.KeyValue;
@@ -76,6 +80,7 @@ import org.hibernate.mapping.Property;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.tool.schema.extract.spi.ExtractionContext;
 import org.hibernate.tool.schema.extract.spi.SequenceInformation;
+import org.hibernate.type.WrapperArrayHandling;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
@@ -133,6 +138,23 @@ public class HibernateStore implements Disposable, Initializable
      * invisible, and the document cache then keeps that "does not exist" verdict with no expiry.
      */
     private static final String DEFAULT_ISOLATION = String.valueOf(Connection.TRANSACTION_READ_COMMITTED);
+
+    /**
+     * The strategy used to name the sequences of the {@code native} identifier generators when the Hibernate
+     * configuration doesn't set one. With the {@code legacy} strategy, all these generators share the
+     * {@code hibernate_sequence} sequence with an increment of 1, which is what existing databases contain. With the
+     * default {@code standard} strategy, each table would get its own {@code <table>_SEQ} sequence (incremented by
+     * 50), which would be created empty on an existing database and generate identifiers already in use.
+     */
+    private static final String DEFAULT_ID_NAMING_STRATEGY = LegacyNamingStrategy.STRATEGY_NAME;
+
+    /**
+     * The handling of the {@code Byte[]} and {@code Character[]} properties when the Hibernate configuration doesn't
+     * set one. With the {@code legacy} handling, they are stored like {@code byte[]} and {@code char[]} (and mappings
+     * can keep using the {@code wrapper-binary} and {@code wrapper-characters} types), while by default Hibernate
+     * rejects these mappings.
+     */
+    private static final String DEFAULT_WRAPPER_ARRAY_HANDLING = WrapperArrayHandling.LEGACY.name();
 
     @Inject
     private Logger logger;
@@ -244,8 +266,9 @@ public class HibernateStore implements Disposable, Initializable
 
         // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
         this.configuration = new HibernateStoreConfiguration(this.configurationURL);
-        replaceVariables(this.configuration);
+        replaceVariables(this.configuration.getProperties());
         setDefaultIsolation(this.configuration);
+        setDefaultSettings(this.configuration.getProperties());
     }
 
     private void disposeSessionFactory()
@@ -274,9 +297,11 @@ public class HibernateStore implements Disposable, Initializable
         ConfigLoader configLoader = new ConfigLoader(this.bootstrapServiceRegistry);
         LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
         // Resolve some variables
-        replaceVariables(baseConfiguration);
+        replaceVariables(baseConfiguration.getConfigurationValues());
         // Make sure a transaction isolation level is set, whatever the database defaults to
         setDefaultIsolation(baseConfiguration);
+        // Keep the behaviors that existing databases and mappings rely on
+        setDefaultSettings(baseConfiguration.getConfigurationValues());
 
         StandardServiceRegistryBuilder standardRegistryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
@@ -327,37 +352,15 @@ public class HibernateStore implements Disposable, Initializable
 
     /**
      * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
-     * from the XWiki configuration.
+     * now the only variables being replaced are {@link #PROPERTY_PERMANENTDIRECTORY}, replaced with the value coming
+     * from the XWiki configuration, and {@link #PROPERTY_TIMEZONE_VARIABLE}, in the JDBC URL.
      *
-     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
+     * @param settings the Hibernate settings to modify
      */
-    private void replaceVariables(Configuration hibernateConfiguration)
+    private void replaceVariables(Map<? super String, Object> settings)
     {
-        String newURL = resolveURL(hibernateConfiguration.getProperty(org.hibernate.cfg.AvailableSettings.URL));
-        if (newURL != null) {
-            // Set the new URL
-            hibernateConfiguration.setProperty(org.hibernate.cfg.AvailableSettings.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
-        }
-    }
-
-    /**
-     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
-     * from the XWiki configuration.
-     *
-     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
-     */
-    private void replaceVariables(LoadedConfig hibernateConfiguration)
-    {
-        Map values = hibernateConfiguration.getConfigurationValues();
-        String newURL = resolveURL((String) values.get(org.hibernate.cfg.AvailableSettings.URL));
-        if (newURL != null) {
-            // Set the new URL
-            values.put(org.hibernate.cfg.AvailableSettings.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
-        }
+        HibernateConnectionSetting.URL.replaceValues(settings, this::resolveURL)
+            .forEach((name, newURL) -> this.logger.debug("Resolved Hibernate property [{}] to [{}]", name, newURL));
     }
 
     /**
@@ -387,6 +390,27 @@ public class HibernateStore implements Disposable, Initializable
             values.put(org.hibernate.cfg.AvailableSettings.ISOLATION, DEFAULT_ISOLATION);
             this.logger.debug("No Hibernate transaction isolation level configured, defaulting to [{}]",
                 DEFAULT_ISOLATION);
+        }
+    }
+
+    /**
+     * Set the strategy used to name the sequences of the identifier generators to {@link #DEFAULT_ID_NAMING_STRATEGY}
+     * and the handling of the wrapper arrays to {@link #DEFAULT_WRAPPER_ARRAY_HANDLING}, unless the configuration
+     * already sets them.
+     *
+     * @param settings the Hibernate settings to complete
+     */
+    private void setDefaultSettings(Map<? super String, Object> settings)
+    {
+        setDefaultSetting(settings, MappingSettings.ID_DB_STRUCTURE_NAMING_STRATEGY, DEFAULT_ID_NAMING_STRATEGY);
+        setDefaultSetting(settings, MappingSettings.WRAPPER_ARRAY_HANDLING, DEFAULT_WRAPPER_ARRAY_HANDLING);
+    }
+
+    private void setDefaultSetting(Map<? super String, Object> settings, String name, String defaultValue)
+    {
+        Object value = settings.get(name);
+        if (value == null || StringUtils.isBlank(value.toString())) {
+            settings.put(name, defaultValue);
         }
     }
 
@@ -453,10 +477,7 @@ public class HibernateStore implements Disposable, Initializable
             } else {
                 // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
                 // driver
-                String connectionURL = this.configuration.getProperty("hibernate.connection.url");
-                if (connectionURL == null) {
-                    connectionURL = this.configuration.getProperty("connection.url");
-                }
+                String connectionURL = HibernateConnectionSetting.URL.getValue(this.configuration);
                 this.databaseProductCache = DatabaseProduct.toProduct(extractJDBCConnectionURLScheme(connectionURL));
             }
         }
@@ -986,10 +1007,10 @@ public class HibernateStore implements Disposable, Initializable
         createSequenceIfMissing(wikiId);
     }
 
-    private <T, E> T executeNative(String sqlString, Function<NativeQuery<E>, T> function)
+    private <T, E> T executeNative(String sqlString, Class<E> resultClass, Function<NativeQuery<E>, T> function)
     {
         try (Session session = getSessionFactory().openSession()) {
-            NativeQuery<E> query = session.createNativeQuery(sqlString);
+            NativeQuery<E> query = session.createNativeQuery(sqlString, resultClass);
 
             return function.apply(query);
         }
@@ -1031,9 +1052,10 @@ public class HibernateStore implements Disposable, Initializable
 
     private List<String> getOracleSequences(String schemaName)
     {
-        return this.<List<String>, String>executeNative(String
-            .format("select SEQUENCE_NAME from all_sequences where SEQUENCE_OWNER = '%s'", schemaName.toUpperCase()),
-            NativeQuery::getResultList);
+        return executeNative(
+            String.format("select SEQUENCE_NAME from all_sequences where SEQUENCE_OWNER = '%s'",
+                schemaName.toUpperCase()),
+            String.class, NativeQuery::getResultList);
     }
 
     /**
@@ -1050,7 +1072,8 @@ public class HibernateStore implements Disposable, Initializable
     private void createSequenceIfMissing(String wikiId)
     {
         // There's no issue with catalog based databases, only with schemas.
-        if (!getAdapter().isCatalog() && "sequence".equals(getDialect().getNativeIdentifierGeneratorStrategy())) {
+        if (!getAdapter().isCatalog()
+            && getDialect().getNativeValueGenerationStrategy() == GenerationType.SEQUENCE) {
             String schemaName = getAdapter().getDatabaseFromWikiName(wikiId);
 
             boolean ignoreError = false;
@@ -1093,7 +1116,7 @@ public class HibernateStore implements Disposable, Initializable
             // Try to create the Hibernate sequence
             try (Session session = getSessionFactory().openSession()) {
                 Transaction transaction = session.beginTransaction();
-                session.createNativeQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
+                session.createNativeMutationQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
                     .executeUpdate();
                 transaction.commit();
             } catch (Exception e) {
@@ -1141,11 +1164,7 @@ public class HibernateStore implements Disposable, Initializable
             // (org.hibernate.mapping.PersistentClass#getProperty does not support composite ids) is fixed
             KeyValue identifier = persistentClass.getIdentifier();
             if (identifier instanceof org.hibernate.mapping.Component component) {
-                Iterator<Property> it = component.getPropertyIterator();
-
-                while (it.hasNext()) {
-                    Property property = it.next();
-
+                for (Property property : component.getProperties()) {
                     if (property.getName().equals(propertyName)) {
                         return getConfiguredColumnName(property);
                     }
@@ -1164,7 +1183,7 @@ public class HibernateStore implements Disposable, Initializable
      */
     public String getConfiguredColumnName(Property property)
     {
-        Column column = (Column) property.getColumnIterator().next();
+        Column column = property.getColumns().get(0);
 
         return getConfiguredColumnName(column);
     }
@@ -1261,14 +1280,26 @@ public class HibernateStore implements Disposable, Initializable
         return result;
     }
 
+    /**
+     * @param column the column
+     * @return the length of the column, or the Hibernate default length if none is explicitly set
+     * @since 19.0.0RC1
+     */
+    public static int getLength(Column column)
+    {
+        Long length = column.getLength();
+
+        return length != null ? length.intValue() : (int) Size.DEFAULT_LENGTH;
+    }
+
     public int getLimitSize(Class<?> entityType, String propertyName)
     {
         int result = metadataTableOrColumn(entityType, propertyName, -1, resultSet -> resultSet.getInt("COLUMN_SIZE"));
 
         if (result == -1) {
             PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
-            Column column2 = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            result = column2.getLength();
+            Column column2 = persistentClass.getProperty(propertyName).getColumns().get(0);
+            result = getLength(column2);
             this.logger.warn(
                 "Error while getting the size limit for entity [{}] and propertyName [{}]. "
                     + "The length value set by hibernate [{}] will be used.",

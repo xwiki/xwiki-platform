@@ -33,6 +33,7 @@
   margin-right: .5em;
   min-width: 3em;
   text-align: right;
+  border-right: 1px solid #eee;
 }
 
 .revision .version, .revision .line-number {
@@ -42,10 +43,6 @@
 .revision .author, .revision .version, 
 .revision .line-number {
   background-color: #fafbfc;
-}
-
-.revision .line-number {
-  border-right: 1px solid #eee;
 }
 
 .revision .line-number a {

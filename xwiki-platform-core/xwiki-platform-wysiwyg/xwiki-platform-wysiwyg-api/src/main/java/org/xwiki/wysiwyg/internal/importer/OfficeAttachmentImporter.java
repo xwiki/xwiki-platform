@@ -114,13 +114,27 @@ public class OfficeAttachmentImporter implements AttachmentImporter
         throws Exception
     {
         boolean filterStyles = Boolean.parseBoolean(String.valueOf(parameters.get("filterStyles")));
-        Syntax outputSyntax = AttachmentImporter.getOutputSyntax(parameters);
+        Syntax outputSyntax = getOutputSyntax(parameters);
         if (Boolean.parseBoolean(String.valueOf(parameters.get("useOfficeViewer")))) {
             return this.officeMacroImporter
                 .render(this.officeMacroImporter.buildXDOM(attachmentReference, filterStyles), outputSyntax);
         } else {
             return maybeConvertAttachmentContent(attachmentReference, filterStyles, outputSyntax);
         }
+    }
+
+    private static Syntax getOutputSyntax(Map<String, Object> parameters)
+    {
+        Object outputSyntax = parameters.get(OUTPUT_SYNTAX);
+        if (outputSyntax == null) {
+            return Syntax.ANNOTATED_XHTML_1_0;
+        } else if (outputSyntax instanceof Syntax syntax) {
+            return syntax;
+        }
+        // Script callers build the map by hand, so an unusable value names the parameter instead of reaching the
+        // cast as a ClassCastException.
+        throw new IllegalArgumentException(String.format("The [%s] import parameter must be a [%s] but was [%s].",
+            OUTPUT_SYNTAX, Syntax.class.getName(), outputSyntax.getClass().getName()));
     }
 
     private String maybeConvertAttachmentContent(AttachmentReference attachmentReference, boolean filterStyles,

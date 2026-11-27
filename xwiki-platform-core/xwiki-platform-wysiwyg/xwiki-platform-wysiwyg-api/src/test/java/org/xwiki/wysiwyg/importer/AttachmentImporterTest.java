@@ -76,10 +76,11 @@ class AttachmentImporterTest
     @Test
     void importAttachmentWithNonSyntaxOutputSyntaxFails()
     {
+        // The default never casts the value, so it refuses it as an unsupported syntax rather than inspecting its
+        // type. What matters is that it doesn't fall back to HTML.
         Map<String, Object> parameters = Map.of(AttachmentImporter.OUTPUT_SYNTAX, "blocknote/1.0");
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
             () -> this.htmlOnlyImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
-        assertEquals("The [outputSyntax] import parameter must be a [org.xwiki.rendering.syntax.Syntax] but was "
-            + "[java.lang.String].", exception.getMessage());
+        assertEquals("This importer doesn't support the [blocknote/1.0] output syntax.", exception.getMessage());
     }
 }

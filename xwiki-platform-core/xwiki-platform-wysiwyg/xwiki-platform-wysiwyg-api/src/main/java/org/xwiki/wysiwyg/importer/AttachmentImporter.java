@@ -64,7 +64,6 @@ public interface AttachmentImporter
      *     content to, {@link Syntax#ANNOTATED_XHTML_1_0} by default
      * @return the content to insert into the content of the WYSIWYG editor
      * @throws Exception if importing the specified attachment fails
-     * @throws IllegalArgumentException if the {@link #OUTPUT_SYNTAX} parameter is not a {@link Syntax}
      * @throws UnsupportedOperationException if this importer cannot produce the requested syntax
      * @since 19.0.0RC1
      */
@@ -72,34 +71,14 @@ public interface AttachmentImporter
     default String importAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
         throws Exception
     {
-        Syntax outputSyntax = getOutputSyntax(parameters);
-        if (Syntax.ANNOTATED_XHTML_1_0.equals(outputSyntax)) {
+        Object outputSyntax = parameters.get(OUTPUT_SYNTAX);
+        if (outputSyntax == null || Syntax.ANNOTATED_XHTML_1_0.equals(outputSyntax)) {
             return toHTML(attachmentReference, parameters);
         }
         // The id, not Syntax#toString, which gives the display name rather than what a caller passes.
+        String outputSyntaxId =
+            outputSyntax instanceof Syntax syntax ? syntax.toIdString() : String.valueOf(outputSyntax);
         throw new UnsupportedOperationException(
-            String.format("This importer doesn't support the [%s] output syntax.", outputSyntax.toIdString()));
-    }
-
-    /**
-     * Reads the {@link #OUTPUT_SYNTAX} import parameter. Script callers can put anything in the parameters map, so an
-     * unusable value has to fail with a message that names the parameter rather than a {@link ClassCastException}.
-     *
-     * @param parameters the import parameters
-     * @return the syntax to convert the attachment content to, {@link Syntax#ANNOTATED_XHTML_1_0} when unset
-     * @throws IllegalArgumentException if the parameter is set to something that is not a {@link Syntax}
-     * @since 19.0.0RC1
-     */
-    @Unstable
-    static Syntax getOutputSyntax(Map<String, Object> parameters)
-    {
-        Object outputSyntax = parameters.get(OUTPUT_SYNTAX);
-        if (outputSyntax == null) {
-            return Syntax.ANNOTATED_XHTML_1_0;
-        } else if (outputSyntax instanceof Syntax syntax) {
-            return syntax;
-        }
-        throw new IllegalArgumentException(String.format("The [%s] import parameter must be a [%s] but was [%s].",
-            OUTPUT_SYNTAX, Syntax.class.getName(), outputSyntax.getClass().getName()));
+            String.format("This importer doesn't support the [%s] output syntax.", outputSyntaxId));
     }
 }

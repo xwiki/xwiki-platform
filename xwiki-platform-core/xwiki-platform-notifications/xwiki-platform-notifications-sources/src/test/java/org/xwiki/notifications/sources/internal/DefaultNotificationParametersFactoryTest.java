@@ -63,6 +63,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
@@ -401,6 +402,56 @@ class DefaultNotificationParametersFactoryTest
             ParametersKey.USE_USER_PREFERENCES, "false",
             ParametersKey.SPACES, "s1"
         )));
+    }
+
+    @Test
+    void createNotificationParametersWithQuotedValues() throws Exception
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
+        NotificationParameters expectedNotificationParameters = new NotificationParameters();
+        expectedNotificationParameters.format = NotificationFormat.ALERT;
+        expectedNotificationParameters.preferences = List.of(
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(1))
+        );
+        expectedNotificationParameters.filters = Set.of(
+            this.ownEventFilter,
+            this.minorEventFilter,
+            this.systemEventFilter,
+            this.readEventFilter,
+            this.scopeFilter
+        );
+
+        DefaultNotificationFilterPreference filterPreference0 = getFilterPreference("SPACE", 0);
+        filterPreference0.setPage("mywiki@@My, Space");
+        DefaultNotificationFilterPreference filterPreference1 = getFilterPreference("SPACE", 1);
+        filterPreference1.setPage("mywiki@@Your, Space");
+        DefaultNotificationFilterPreference filterPreference2 = getFilterPreference("SPACE", 2);
+        filterPreference2.setPage("mywiki@@Other Space");
+        expectedNotificationParameters.filterPreferences = List.of(
+            new ScopeNotificationFilterPreference(filterPreference0, this.entityReferenceResolver),
+            new ScopeNotificationFilterPreference(filterPreference1, this.entityReferenceResolver),
+            new ScopeNotificationFilterPreference(filterPreference2, this.entityReferenceResolver),
+            new TagNotificationFilterPreference("my tag", "mywiki"),
+            new TagNotificationFilterPreference("say \"hi\"", "mywiki")
+        );
+
+        // The values are quoted the way the macro editor writes them, except for the spaces, written by hand inside
+        // braces, one of them in single quotes and the last one without quotes since it holds no comma.
+        assertEquals(expectedNotificationParameters, this.parametersFactory.createNotificationParameters(Map.of(
+            ParametersKey.USE_USER_PREFERENCES, "false",
+            ParametersKey.SPACES, "{\"My, Space\", 'Your, Space', Other Space}",
+            ParametersKey.TAGS, "\"my tag\",\"say \\\"hi\\\"\""
+        )));
+    }
+
+    @Test
+    void splitListParameterWithLongQuotedValue()
+    {
+        String value = "a\\\"".repeat(500000);
+
+        assertArrayEquals(new String[] { value.replace("\\", "") },
+            DefaultNotificationParametersFactory.splitListParameter('"' + value + '"'));
     }
 
     private DefaultNotificationFilterPreference getFilterPreference(String property, int number)

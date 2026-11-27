@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -34,6 +36,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.CaseUtils;
@@ -79,6 +82,42 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 public class DefaultNotificationParametersFactory
 {
     private static final String FIELD_SEPARATOR = ",";
+
+    /**
+     * Matches one value of a parameter holding a list. The whitespaces before the value are matched first by
+     * {@code \s*+}, then the value is matched by one of three alternatives, tried in this order:
+     * <ul>
+     * <li>{@code "((?:\\.|[^"\\])*+)"} matches a value put in double quotes. Its content is captured by the first group:
+     * any number of either a backslash followed by any character, which is an escaped character, or a character that is
+     * neither a double quote nor a backslash.</li>
+     * <li>{@code '((?:\\.|[^'\\])*+)'} does the same for a value put in single quotes, captured by the second
+     * group.</li>
+     * <li>{@code ([^,]+)} matches a value without quotes, captured by the third group: everything up to the next comma.
+     * Whitespaces and quotes inside it are kept, so that a value typed by hand like {@code My Space} or
+     * {@code O'Brien} stays whole. A value starting with a quote that is never closed, like {@code '90s}, is matched
+     * here too, so that it is also kept whole.</li>
+     * </ul>
+     * The commas separating the values are matched by none of the alternatives, so they are skipped between two
+     * matches. A quoted value ends at its closing quote, so a text following it before the next comma, like the
+     * {@code b} of {@code "a"b}, is matched as another value without quotes, as the macro does. The whitespaces between
+     * a closing quote and the next comma are matched by {@code \s*+} alone, which isn't a value.
+     * <p>
+     * The quantifiers are possessive, with a {@code +} after them, so that the regular expression engine doesn't keep
+     * the positions it would need to backtrack, which would overflow the stack for a long quoted value. The
+     * alternatives can't match the same characters, so backtracking wouldn't find another match anyway.
+     * <p>
+     * The macro editor reads the values of the collection parameters with the same pattern, {@code
+     * collectionValuePattern} in the {@code macro/macroEditor.js} file of the WYSIWYG webjar, so that the values it
+     * writes and reads are read the same way here. Keep the two patterns in sync.
+     */
+    private static final Pattern LIST_VALUE_PATTERN =
+        Pattern.compile("\\s*+(?:\"((?:\\\\.|[^\"\\\\])*+)\"|'((?:\\\\.|[^'\\\\])*+)'|([^,]+))");
+
+    /**
+     * Matches a backslash followed by the character it escapes, captured by the first group, to remove the backslash
+     * from a value put in quotes.
+     */
+    private static final Pattern ESCAPED_CHARACTER_PATTERN = Pattern.compile("\\\\(.)");
 
     @Inject
     private DocumentReferenceResolver<String> stringDocumentReferenceResolver;
@@ -482,13 +521,48 @@ public class DefaultNotificationParametersFactory
         handleTagsParameter(notificationParameters, parameters.get(ParametersKey.TAGS), currentWiki);
     }
 
+    /**
+     * Splits the value of a parameter holding a list the way the macro editor reads it: the braces wrapping the whole
+     * value are removed, then the value is split on the commas that are not inside double or single quotes, a
+     * backslash escaping the next character inside quotes. See {@link #LIST_VALUE_PATTERN}.
+     * <p>
+     * The standard {@code AbstractCollectionConverter} used for the macro parameters isn't used here because it also
+     * splits the values on whitespaces and cuts a value at any quote. These parameters are also given unquoted, by
+     * notifications macro calls saved in existing pages, by the RSS feed URLs readers are subscribed to and by the
+     * clients of the REST API, so a value like {@code My Space} would become the two values {@code My} and
+     * {@code Space}, and a name like {@code O'Brien} would be cut at its apostrophe. The notifications filtered on
+     * these values would no longer be displayed. The converter component is shared by all the macros, so it can't be
+     * configured differently for these parameters.
+     *
+     * @param value the value of the parameter
+     * @return the values it holds, trimmed, empty values excluded
+     */
+    static String[] splitListParameter(String value)
+    {
+        if (StringUtils.isBlank(value)) {
+            return new String[0];
+        }
+        String text = value.trim();
+        if (text.startsWith("{") && text.endsWith("}")) {
+            text = text.substring(1, text.length() - 1);
+        }
+        return LIST_VALUE_PATTERN.matcher(text).results()
+            .map(DefaultNotificationParametersFactory::getListValue)
+            .map(String::trim)
+            .filter(StringUtils::isNotEmpty)
+            .toArray(String[]::new);
+    }
+
+    private static String getListValue(MatchResult match)
+    {
+        String quotedValue = ObjectUtils.firstNonNull(match.group(1), match.group(2));
+        return quotedValue != null ? ESCAPED_CHARACTER_PATTERN.matcher(quotedValue).replaceAll("$1") : match.group(3);
+    }
+
     private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
     {
-        if (StringUtils.isNotBlank(tags)) {
-            String[] tagArray = tags.split(",");
-            for (int i = 0; i < tagArray.length; ++i) {
-                parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
-            }
+        for (String tag : splitListParameter(tags)) {
+            parameters.filterPreferences.add(new TagNotificationFilterPreference(tag, currentWiki));
         }
     }
 
@@ -538,7 +612,7 @@ public class DefaultNotificationParametersFactory
             Set<NotificationFormat> formats = new HashSet<>();
             formats.add(parameters.format);
 
-            String[] locationArray = locations.split(FIELD_SEPARATOR);
+            String[] locationArray = splitListParameter(locations);
             for (int i = 0; i < locationArray.length; ++i) {
                 DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
                 pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));

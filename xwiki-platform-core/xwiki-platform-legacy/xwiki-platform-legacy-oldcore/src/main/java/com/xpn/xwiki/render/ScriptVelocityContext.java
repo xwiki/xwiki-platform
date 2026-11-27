@@ -31,6 +31,9 @@ import org.apache.velocity.VelocityContext;
  * @deprecated use {@link org.xwiki.velocity.ScriptVelocityContext} instead
  */
 @Deprecated(since = "15.9RC1")
+// The shadowing is deliberate: this deprecated class exists only to keep the old name compiling against the
+// class that replaced it, so renaming it would defeat its only purpose.
+@SuppressWarnings("java:S2176")
 public class ScriptVelocityContext extends org.xwiki.velocity.ScriptVelocityContext
 {
     /**

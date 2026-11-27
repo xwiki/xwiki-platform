@@ -36,6 +36,9 @@ import org.xwiki.security.authorization.cache.SecurityShadowEntry;
  * @version $Id$
  * @since 4.0M2 
  */
+// The shadowing is deliberate: this is the same role seen from inside the module, adding the operations that
+// are not meant to be public, so it deliberately carries the name of the public interface it extends.
+@SuppressWarnings("java:S2176")
 public interface SecurityCache extends org.xwiki.security.authorization.cache.SecurityCache
 {
     /**

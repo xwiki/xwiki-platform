@@ -55,6 +55,9 @@ import org.dom4j.io.OutputFormat;
  * @version $Id$
  * @since 3.0M2
  */
+// The shadowing is deliberate: this is a drop-in extension of the DOM4J writer (see the class Javadoc), so
+// keeping its name means that moving to it is an import change and nothing else.
+@SuppressWarnings("java:S2176")
 public class XMLWriter extends org.dom4j.io.XMLWriter
 {
     /**

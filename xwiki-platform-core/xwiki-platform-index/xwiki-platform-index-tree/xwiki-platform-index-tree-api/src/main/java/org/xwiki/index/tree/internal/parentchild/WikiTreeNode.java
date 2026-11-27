@@ -38,6 +38,9 @@ import org.xwiki.tree.TreeNode;
 @Component
 @Named("wiki/parentChild")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+// The shadowing is deliberate: the tree node implementations of the various hierarchies are named after the
+// node they represent and told apart by their package and their component hint, not by their class name.
+@SuppressWarnings("java:S2176")
 public class WikiTreeNode extends org.xwiki.index.tree.internal.nestedpages.WikiTreeNode
 {
     @Inject

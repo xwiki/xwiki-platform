@@ -48,7 +48,7 @@
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
     <!-- TODO: remove once a version of this module has been released -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
 
     <!-- The classes embedded in the JAR -->
     <hibernate.patch.classes>${project.build.outputDirectory}</hibernate.patch.classes>

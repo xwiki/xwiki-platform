@@ -56,6 +56,18 @@ public class SafeNetworkMember implements NetworkMember
         return this.wrapped.getId();
     }
 
+    @Override
+    public boolean isLocal()
+    {
+        return this.wrapped.isLocal();
+    }
+
+    @Override
+    public int getSingletonPriority()
+    {
+        return this.wrapped.getSingletonPriority();
+    }
+
     // Object
 
     @Override

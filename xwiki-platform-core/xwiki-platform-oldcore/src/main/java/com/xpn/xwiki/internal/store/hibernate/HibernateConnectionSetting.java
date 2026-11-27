@@ -73,6 +73,23 @@ public enum HibernateConnectionSetting
     }
 
     /**
+     * @param name a name of a setting, for example {@code hibernate.connection.driver_class}
+     * @return the setting having this name, or {@code null} if the name is not one of the names of a connection
+     *         setting
+     * @since 19.0.0RC1
+     */
+    public static HibernateConnectionSetting fromName(String name)
+    {
+        for (HibernateConnectionSetting setting : values()) {
+            if (setting.names.contains(name)) {
+                return setting;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return the names of the setting, in the order of precedence used by Hibernate
      */
     public List<String> getNames()

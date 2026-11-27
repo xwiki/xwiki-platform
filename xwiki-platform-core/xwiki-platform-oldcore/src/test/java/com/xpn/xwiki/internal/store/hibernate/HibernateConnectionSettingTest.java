@@ -117,4 +117,14 @@ class HibernateConnectionSettingTest
             HibernateConnectionSetting.URL.replaceValues(properties, value -> "jdbc:new"));
         assertEquals("jdbc:new", properties.getProperty("hibernate.connection.url"));
     }
+
+    @Test
+    void fromName()
+    {
+        assertEquals(HibernateConnectionSetting.DRIVER,
+            HibernateConnectionSetting.fromName("hibernate.connection.driver_class"));
+        assertEquals(HibernateConnectionSetting.DRIVER, HibernateConnectionSetting.fromName("connection.driver_class"));
+        assertEquals(HibernateConnectionSetting.URL, HibernateConnectionSetting.fromName("jakarta.persistence.jdbc.url"));
+        assertNull(HibernateConnectionSetting.fromName("hibernate.dialect"));
+    }
 }

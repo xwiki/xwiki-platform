@@ -54,6 +54,28 @@ public class HibernateStoreConfiguration extends Configuration
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A connection setting which can be configured with several names (for example
+     * {@code hibernate.connection.driver_class} or {@code jakarta.persistence.jdbc.driver}) is returned whichever of
+     * its names is used in the configuration.
+     */
+    @Override
+    public String getProperty(String propertyName)
+    {
+        String value = super.getProperty(propertyName);
+
+        if (value == null) {
+            HibernateConnectionSetting setting = HibernateConnectionSetting.fromName(propertyName);
+            if (setting != null) {
+                value = setting.getValue(this);
+            }
+        }
+
+        return value;
+    }
+
     @Override
     public Configuration addURL(URL url) throws MappingException
     {

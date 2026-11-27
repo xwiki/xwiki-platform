@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,7 +36,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
-import com.xpn.xwiki.internal.store.hibernate.HibernateConnectionSetting;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
 
@@ -74,7 +74,9 @@ public class EventStreamStoreInitializer implements EventListener
     {
         // This only adds the mappings to a queue. The mappings will be available after the session factory is created.
         // We need to use a different mapping for Oracle
-        String driverClass = HibernateConnectionSetting.DRIVER.getValue(this.sessionFactory.getConfiguration());
+        String driverClass =
+            Objects.toString(this.sessionFactory.getConfiguration().getProperty("hibernate.connection.driver_class"),
+                this.sessionFactory.getConfiguration().getProperty("connection.driver_class"));
         if (StringUtils.containsIgnoreCase(driverClass, "oracle")) {
             addResource("eventstream.oracle.hbm.xml");
         } else {

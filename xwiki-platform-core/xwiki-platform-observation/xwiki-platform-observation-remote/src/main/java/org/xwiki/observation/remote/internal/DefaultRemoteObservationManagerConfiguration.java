@@ -90,6 +90,12 @@ public class DefaultRemoteObservationManagerConfiguration
     }
 
     @Override
+    public String getClusterName()
+    {
+        return this.configurationSource.getProperty("observation.remote.clusterName", "event");
+    }
+
+    @Override
     public void initialize() throws InitializationException
     {
         this.id = this.configurationSource.getProperty("observation.remote.id");

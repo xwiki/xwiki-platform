@@ -54,6 +54,9 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
      * Volatile as the status of a running job is read without lock by other threads: the result is set last so that
      * a thread seeing the result also sees the other elements of the execution (e.g., the uses to inject).
      */
+    // Volatile is enough: the reference is only ever replaced as a whole and the result itself isn't modified after
+    // being set, the volatile write/read is only needed to publish it and what was set before it.
+    @SuppressWarnings("java:S3077")
     private volatile AsyncRendererResult result;
 
     private Set<EntityReference> references;

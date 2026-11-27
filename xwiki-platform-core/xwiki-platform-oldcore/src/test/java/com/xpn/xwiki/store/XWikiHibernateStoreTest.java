@@ -393,6 +393,27 @@ class XWikiHibernateStoreTest
     @Test
     void saveObjectWithPropertyTypeChange() throws Exception
     {
+        StringProperty oldProperty = new StringProperty();
+        BaseProperty property = saveObjectWithPropertyTypeChange(oldProperty);
+
+        // Delete the old property value and then save the new one.
+        verify(session).remove(oldProperty);
+        verify(session).persist(property);
+    }
+
+    @Test
+    void saveObjectWithPropertyTypeChangeWhenOldPropertyIsAlreadyRemoved() throws Exception
+    {
+        // The old property is not found when it was already removed from the session (as a field to remove of the
+        // object), while the type stored in the database is still the old one
+        BaseProperty property = saveObjectWithPropertyTypeChange(null);
+
+        verify(session, never()).remove(any());
+        verify(session).persist(property);
+    }
+
+    private BaseProperty saveObjectWithPropertyTypeChange(StringProperty oldProperty) throws Exception
+    {
         // The class must be local.
         DocumentReference classReference = new DocumentReference("myWiki", "mySpace", "myClass");
         when(xcontext.getWikiId()).thenReturn(classReference.getWikiReference().getName());
@@ -430,7 +451,6 @@ class XWikiHibernateStoreTest
         EntityType entityType = mock(EntityType.class);
         when(metamodel.entity(StringProperty.class.getName())).thenReturn(entityType);
         when(entityType.getJavaType()).thenReturn(StringProperty.class);
-        StringProperty oldProperty = new StringProperty();
         // A property is its own identifier
         when(session.find(eq(StringProperty.class), argThat((StringProperty identifier) ->
             identifier.getId() == propertyId && propertyName.equals(identifier.getName())))).thenReturn(oldProperty);
@@ -440,9 +460,7 @@ class XWikiHibernateStoreTest
         verify(oldClassTypeQuery).setParameter("id", propertyId);
         verify(oldClassTypeQuery).setParameter("name", propertyName);
 
-        // Delete the old property value and then save the new one.
-        verify(session).remove(oldProperty);
-        verify(session).persist(property);
+        return property;
     }
 
     @Test

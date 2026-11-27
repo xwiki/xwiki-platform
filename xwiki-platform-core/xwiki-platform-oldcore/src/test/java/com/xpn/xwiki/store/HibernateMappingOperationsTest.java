@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -35,6 +36,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.rcs.XWikiPatch;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
@@ -336,5 +338,70 @@ class HibernateMappingOperationsTest
         });
 
         assertEquals("found", property.getValue());
+    }
+
+    @Test
+    void persistAnotherTypeAfterRemovingTheOldPropertyInTheSameSession()
+    {
+        write(session -> session.persist(newStringProperty(20, "prop", "old")));
+
+        // What the store does when the type of a property changed: the old property is first removed as a field to
+        // remove of the object, and the type stored in the database is still the old one since XWiki sessions are
+        // only flushed at commit time
+        write(session -> {
+            session.setHibernateFlushMode(FlushMode.COMMIT);
+
+            session.remove(newStringProperty(20, "prop", "old"));
+
+            assertEquals(StringProperty.class.getName(), session
+                .createQuery("select prop.classType from BaseProperty as prop where prop.id = :id and prop.name= :name",
+                    String.class)
+                .setParameter("id", 20L).setParameter("name", "prop").uniqueResult());
+            // The old property can't be found anymore since it's already removed
+            assertNull(session.find(StringProperty.class, newStringProperty(20, "prop", "")));
+
+            LargeStringProperty newProperty = new LargeStringProperty();
+            newProperty.setId(20);
+            newProperty.setName("prop");
+            newProperty.setValue("large");
+            session.persist(newProperty);
+        });
+
+        assertEquals(LargeStringProperty.class.getName(), getStoredClassType(20));
+    }
+
+    @Test
+    void queryLinks()
+    {
+        XWikiLink attachmentLink = new XWikiLink(30, "Space.Target", "Space.Source", "attachment");
+        attachmentLink.setAttachmentName("file.txt");
+        write(session -> {
+            session.persist(new XWikiLink(30, "Space.Target", "Space.Source"));
+            session.persist(attachmentLink);
+        });
+
+        // The queries of the store on the links (XWikiLink has a simple identifier, its properties are not part of it)
+        assertEquals(2, read(session -> session
+            .createQuery(" from XWikiLink as link where link.docId = :docId", XWikiLink.class)
+            .setParameter("docId", 30L).list()).size());
+        assertEquals(Long.valueOf(2), read(session -> session
+            .createQuery("select count(*) from XWikiLink as link where link.docId = :docId", Long.class)
+            .setParameter("docId", 30L).getSingleResult()));
+        assertEquals(List.of("Space.Source"), read(session -> session
+            .createQuery("select distinct backlink.fullName from XWikiLink as backlink where backlink.link = :backlink",
+                String.class)
+            .setParameter("backlink", "Space.Target").list()));
+        assertEquals(List.of("Space.Source"), read(session -> session
+            .createQuery("select distinct backlink.fullName from XWikiLink as backlink where backlink.link = :backlink"
+                + " and backlink.type = :type and backlink.attachmentName = :attachmentName", String.class)
+            .setParameter("backlink", "Space.Target").setParameter("type", "attachment")
+            .setParameter("attachmentName", "file.txt").list()));
+
+        write(session -> session.createMutationQuery("delete from XWikiLink as link where link.docId = :docId")
+            .setParameter("docId", 30L).executeUpdate());
+
+        assertEquals(Long.valueOf(0), read(session -> session
+            .createQuery("select count(*) from XWikiLink as link where link.docId = :docId", Long.class)
+            .setParameter("docId", 30L).getSingleResult()));
     }
 }

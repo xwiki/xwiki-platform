@@ -1889,7 +1889,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     // property or delete a clone of the new property; loading the old property from the BaseProperty
                     // table
                     // doesn't work either).
-                    session.remove(findProperty(session, oldClassType, property.getId(), property.getName()));
+                    // The old property is not found when it was already removed from the session (as a field to
+                    // remove of the object): the type stored in the database is still the old one since the session
+                    // is only flushed at commit time. Persisting the new property then flushes that removal first.
+                    BaseProperty oldProperty =
+                        findProperty(session, oldClassType, property.getId(), property.getName());
+                    if (oldProperty != null) {
+                        session.remove(oldProperty);
+                    }
                     session.persist(property);
                 }
 
@@ -2202,7 +2209,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return executeRead(inputxcontext, session -> {
             try {
                 Query<XWikiLink> query =
-                    session.createQuery(" from XWikiLink as link where link.id.docId = :docId", XWikiLink.class);
+                    session.createQuery(" from XWikiLink as link where link.docId = :docId", XWikiLink.class);
                 query.setParameter(DOC_ID, docId);
 
                 return query.list();
@@ -2221,7 +2228,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return innerLoadBacklinks(inputxcontext, (Session session) -> {
             // the select clause is compulsory to reach the fullName i.e. the page pointed
             Query<String> query = session.createQuery(
-                "select distinct backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink",
+                "select distinct backlink.fullName from XWikiLink as backlink where backlink.link = :backlink",
                 String.class);
 
             // if we are in the same wiki context, we should only get the local reference
@@ -2242,8 +2249,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return innerLoadBacklinks(inputxcontext, (Session session) -> {
             // the select clause is compulsory to reach the fullName i.e. the page pointed
             Query<String> query = session.createQuery(
-                "select distinct backlink.fullName from XWikiLink as backlink " + "where backlink.id.link = :backlink "
-                    + "and backlink.id.type = :type " + "and backlink.attachmentName = :attachmentName",
+                "select distinct backlink.fullName from XWikiLink as backlink " + "where backlink.link = :backlink "
+                    + "and backlink.type = :type " + "and backlink.attachmentName = :attachmentName",
                 String.class);
 
             // if we are in the same wiki context, we should only get the local reference
@@ -2423,7 +2430,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         executeWrite(inputxcontext, session -> {
             try {
-                Query<?> query = session.createQuery("delete from XWikiLink as link where link.id.docId = :docId");
+                Query<?> query = session.createQuery("delete from XWikiLink as link where link.docId = :docId");
                 query.setParameter(DOC_ID, docId);
                 query.executeUpdate();
             } catch (Exception e) {
@@ -3360,7 +3367,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return executeRead(inputxcontext, session -> {
             try {
                 Query<Long> query = session
-                    .createQuery("select count(*) from XWikiLink as link where link.id.docId = :docId", Long.class)
+                    .createQuery("select count(*) from XWikiLink as link where link.docId = :docId", Long.class)
                     .setParameter(DOC_ID, docId);
                 return query.getSingleResult();
             } catch (Exception e) {

@@ -29,6 +29,30 @@
     </id>
     <property name="name" column="LE_NAME" length="255" />
   </class>
+  <!-- Enums mapped with the Hibernate 5 enum type -->
+  <class name="org.xwiki.store.hibernate.internal.LegacyEnumEntity" table="legacyenumentity">
+    <id name="id" column="LEE_ID" unsaved-value="undefined">
+      <generator class="assigned" />
+    </id>
+    <property name="ordinalUnit" column="LEE_ORDINAL">
+      <type name="org.hibernate.type.EnumType">
+        <param name="enumClass">java.util.concurrent.TimeUnit</param>
+      </type>
+    </property>
+    <property name="namedUnit" column="LEE_NAMED">
+      <type name="org.hibernate.type.EnumType">
+        <param name="enumClass">java.util.concurrent.TimeUnit</param>
+        <param name="useNamed">true</param>
+      </type>
+    </property>
+    <!-- 12 is java.sql.Types.VARCHAR -->
+    <property name="typedUnit" column="LEE_TYPED">
+      <type name="org.hibernate.type.EnumType">
+        <param name="enumClass">java.util.concurrent.TimeUnit</param>
+        <param name="type">12</param>
+      </type>
+    </property>
+  </class>
   <!-- A dynamic map entity, only usable with its entity name -->
   <class entity-name="LegacyMap" table="legacymap">
     <id name="id" type="long" column="LM_ID" unsaved-value="undefined">

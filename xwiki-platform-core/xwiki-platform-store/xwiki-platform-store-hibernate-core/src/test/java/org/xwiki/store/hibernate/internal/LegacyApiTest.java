@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.hibernate.FlushMode;
@@ -507,6 +508,46 @@ class LegacyApiTest
 
         try (Session session = sessionFactory.openSession()) {
             assertNull(session.find("LegacyMap", 1L));
+        }
+    }
+
+    @Test
+    void enumType()
+    {
+        LegacyEnumEntity entity = new LegacyEnumEntity();
+        entity.setId(1);
+        entity.setOrdinalUnit(TimeUnit.MINUTES);
+        entity.setNamedUnit(TimeUnit.HOURS);
+        entity.setTypedUnit(TimeUnit.DAYS);
+        LegacyEnumEntity nullEntity = new LegacyEnumEntity();
+        nullEntity.setId(2);
+        inTransaction(session -> {
+            session.persist(entity);
+            session.persist(nullEntity);
+        });
+
+        try (Session session = sessionFactory.openSession()) {
+            // Stored the same way as Hibernate 5 did
+            Object[] row = session.createNativeQuery(
+                "select LEE_ORDINAL, LEE_NAMED, LEE_TYPED from legacyenumentity where LEE_ID = 1", Object[].class)
+                .getSingleResult();
+            assertEquals(TimeUnit.MINUTES.ordinal(), ((Number) row[0]).intValue());
+            assertEquals("HOURS", row[1]);
+            assertEquals("DAYS", row[2]);
+
+            LegacyEnumEntity loaded = session.find(LegacyEnumEntity.class, 1L);
+            assertEquals(TimeUnit.MINUTES, loaded.getOrdinalUnit());
+            assertEquals(TimeUnit.HOURS, loaded.getNamedUnit());
+            assertEquals(TimeUnit.DAYS, loaded.getTypedUnit());
+
+            LegacyEnumEntity loadedNull = session.find(LegacyEnumEntity.class, 2L);
+            assertNull(loadedNull.getOrdinalUnit());
+            assertNull(loadedNull.getNamedUnit());
+            assertNull(loadedNull.getTypedUnit());
+
+            assertEquals(List.of(1L), session
+                .createQuery("select e.id from LegacyEnumEntity e where e.namedUnit = :unit", Long.class)
+                .setParameter("unit", TimeUnit.HOURS).list());
         }
     }
 }

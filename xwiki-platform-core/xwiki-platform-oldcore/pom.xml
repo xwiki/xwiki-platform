@@ -149,6 +149,10 @@
       <artifactId>xwiki-platform-store-hibernate-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+    </dependency>
     <!-- Hibernate 5 seems to require (but don't declare) javax validation-->
     <dependency>
       <groupId>javax.validation</groupId>

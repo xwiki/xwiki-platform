@@ -36,7 +36,6 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.rcs.XWikiPatch;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
@@ -370,38 +369,4 @@ class HibernateMappingOperationsTest
         assertEquals(LargeStringProperty.class.getName(), getStoredClassType(20));
     }
 
-    @Test
-    void queryLinks()
-    {
-        XWikiLink attachmentLink = new XWikiLink(30, "Space.Target", "Space.Source", "attachment");
-        attachmentLink.setAttachmentName("file.txt");
-        write(session -> {
-            session.persist(new XWikiLink(30, "Space.Target", "Space.Source"));
-            session.persist(attachmentLink);
-        });
-
-        // The queries of the store on the links (XWikiLink has a simple identifier, its properties are not part of it)
-        assertEquals(2, read(session -> session
-            .createQuery(" from XWikiLink as link where link.docId = :docId", XWikiLink.class)
-            .setParameter("docId", 30L).list()).size());
-        assertEquals(Long.valueOf(2), read(session -> session
-            .createQuery("select count(*) from XWikiLink as link where link.docId = :docId", Long.class)
-            .setParameter("docId", 30L).getSingleResult()));
-        assertEquals(List.of("Space.Source"), read(session -> session
-            .createQuery("select distinct backlink.fullName from XWikiLink as backlink where backlink.link = :backlink",
-                String.class)
-            .setParameter("backlink", "Space.Target").list()));
-        assertEquals(List.of("Space.Source"), read(session -> session
-            .createQuery("select distinct backlink.fullName from XWikiLink as backlink where backlink.link = :backlink"
-                + " and backlink.type = :type and backlink.attachmentName = :attachmentName", String.class)
-            .setParameter("backlink", "Space.Target").setParameter("type", "attachment")
-            .setParameter("attachmentName", "file.txt").list()));
-
-        write(session -> session.createMutationQuery("delete from XWikiLink as link where link.docId = :docId")
-            .setParameter("docId", 30L).executeUpdate());
-
-        assertEquals(Long.valueOf(0), read(session -> session
-            .createQuery("select count(*) from XWikiLink as link where link.docId = :docId", Long.class)
-            .setParameter("docId", 30L).getSingleResult()));
-    }
 }

@@ -155,11 +155,6 @@
       <artifactId>jaxb2-fluent-api</artifactId>
       <version>3.0</version>
     </dependency>
-    <!-- The JAXB implementation used to marshal and unmarshal the REST resources -->
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-icon-api</artifactId>

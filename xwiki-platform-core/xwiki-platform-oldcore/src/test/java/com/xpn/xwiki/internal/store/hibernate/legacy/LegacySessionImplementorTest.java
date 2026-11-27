@@ -38,6 +38,7 @@ import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 
+import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.objects.StringProperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -86,6 +87,9 @@ class LegacySessionImplementorTest
             property.setName("prop");
             property.setValue("value");
             session.persist(property);
+            XWikiLink link = new XWikiLink(1, "Space.Target", "Space.Source", "attachment");
+            link.setAttachmentName("file.txt");
+            session.persist(link);
         });
     }
 
@@ -110,14 +114,16 @@ class LegacySessionImplementorTest
     }
 
     @Test
-    void containsLegacyPropertyIdentifier()
+    void containsLegacyIdentifierPath()
     {
-        assertTrue(LegacySessionImplementor.containsLegacyPropertyIdentifier("where prop.id.id = obj.id"));
-        assertTrue(LegacySessionImplementor.containsLegacyPropertyIdentifier("where prop.id.name = 'name'"));
-        assertFalse(LegacySessionImplementor.containsLegacyPropertyIdentifier("where prop.id = obj.id"));
-        assertFalse(LegacySessionImplementor.containsLegacyPropertyIdentifier("where rcs.id.docId = :docId"));
-        assertFalse(LegacySessionImplementor.containsLegacyPropertyIdentifier("where prop.id.identifier = 1"));
-        assertTrue(LegacySessionImplementor.containsLegacyPropertyIdentifier("where id.id = 1"));
+        assertTrue(LegacySessionImplementor.containsLegacyIdentifierPath("where prop.id.id = obj.id"));
+        assertTrue(LegacySessionImplementor.containsLegacyIdentifierPath("where prop.id.name = 'name'"));
+        assertTrue(LegacySessionImplementor.containsLegacyIdentifierPath("where link.id.docId = :docId"));
+        assertTrue(LegacySessionImplementor.containsLegacyIdentifierPath("where id.id = 1"));
+        // Might be valid (when the identifier is an embeddable), which is only known when parsing the statement
+        assertTrue(LegacySessionImplementor.containsLegacyIdentifierPath("where rcs.id.docId = :docId"));
+        assertFalse(LegacySessionImplementor.containsLegacyIdentifierPath("where prop.id = obj.id"));
+        assertFalse(LegacySessionImplementor.containsLegacyIdentifierPath("where prop.docid.name = 1"));
     }
 
     @Test
@@ -128,8 +134,8 @@ class LegacySessionImplementorTest
 
         assertEquals(List.of("Space.Page"), read(session -> session.createQuery(statement, String.class).list()));
 
-        assertEquals("Deprecated usage of the HQL paths [prop.id.id] and [prop.id.name] to the identifier of the"
-            + " object properties; use [prop.id] and [prop.name] instead. Query [" + statement
+        assertEquals("Deprecated usage of the HQL paths [alias.id.property] to the attributes of the entity"
+            + " [com.xpn.xwiki.objects.StringProperty]; use [alias.property] instead. Query [" + statement
             + "] has been converted to [select obj.name from BaseObject obj, StringProperty prop"
             + " where prop.id = obj.id and prop.name = 'prop' and prop.value = 'value']", this.logCapture.getMessage(0));
 
@@ -187,8 +193,8 @@ class LegacySessionImplementorTest
 
         assertEquals(List.of("value"), read(session -> session.createQuery(statement, String.class).list()));
 
-        assertEquals("Deprecated usage of the HQL paths [prop.id.id] and [prop.id.name] to the identifier of the"
-            + " object properties; use [prop.id] and [prop.name] instead. Query [" + statement
+        assertEquals("Deprecated usage of the HQL paths [alias.id.property] to the attributes of the entity"
+            + " [com.xpn.xwiki.objects.StringProperty]; use [alias.property] instead. Query [" + statement
             + "] has been converted to [select prop.value from StringProperty prop"
             + " where prop.id = 1 and prop.name = 'prop' and prop.value <> 'prop.id.name']",
             this.logCapture.getMessage(0));
@@ -215,13 +221,67 @@ class LegacySessionImplementorTest
     }
 
     @Test
-    void invalidPathOnOtherEntityIsNotConverted()
+    void legacyIdentifierPathOnSeveralEntities()
     {
-        // obj.id is the identifier of the object, which has no name: converting obj.id.name to obj.name would select
-        // another field instead of failing
-        assertThrows(UnknownPathException.class, () -> read(session -> session.createQuery(
-            "select obj.name from BaseObject obj, StringProperty prop where prop.id = obj.id and obj.id.name = 'a'",
-            String.class)));
+        when(this.loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(false);
+
+        // Hibernate 5 resolved alias.id.property as alias.property for any attribute of any entity
+        assertEquals(List.of("Space.Page"), read(session -> session.createQuery(
+            "select obj.id.name from BaseObject obj, StringProperty prop where prop.id.id = obj.id.id"
+                + " and obj.id.className = 'Space.Class' and prop.id.name = 'prop'",
+            String.class).list()));
+    }
+
+    @Test
+    void legacyIdentifierPathOnEntityWithSimpleIdentifier()
+    {
+        String statement = "select count(*) from XWikiLink as link where link.id.docId = :docId";
+
+        assertEquals(List.of(1L), read(session -> session.createQuery(statement, Long.class).setParameter("docId", 1L)
+            .list()));
+
+        assertEquals("Deprecated usage of the HQL paths [alias.id.property] to the attributes of the entity"
+            + " [com.xpn.xwiki.doc.XWikiLink]; use [alias.property] instead. Query [" + statement
+            + "] has been converted to [select count(*) from XWikiLink as link where link.docId = :docId]",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void legacyIdentifierPathOnEntityWithSimpleIdentifierWithoutAlias()
+    {
+        when(this.loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(false);
+
+        assertEquals(List.of("Space.Source"), read(session -> session.createQuery(
+            "select distinct fullName from XWikiLink where id.link = :backlink and id.type = 'attachment'"
+                + " and id.attachmentName = 'file.txt'",
+            String.class).setParameter("backlink", "Space.Target").list()));
+    }
+
+    @Test
+    void legacyIdentifierPathInJoin()
+    {
+        when(this.loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(false);
+
+        assertEquals(List.of("Space.Target"), read(session -> session.createQuery(
+            "select link.link from BaseObject obj join XWikiLink link on link.id.docId = obj.id", String.class)
+            .list()));
+    }
+
+    @Test
+    void unknownAttributeIsNotConverted()
+    {
+        assertThrows(UnknownPathException.class, () -> read(session -> session
+            .createQuery("select obj.name from BaseObject obj where obj.id.unknown = 'a'", String.class)));
+        assertEquals(0, this.logCapture.size());
+    }
+
+    @Test
+    void validIdentifierPathIsNotConverted()
+    {
+        // The identifier of a document version is an embeddable
+        assertEquals(List.of(), read(session -> session
+            .createQuery("select rcs.id.version1 from XWikiRCSNodeInfo rcs where rcs.id.docId = 1", Integer.class)
+            .list()));
         assertEquals(0, this.logCapture.size());
     }
 

@@ -2209,7 +2209,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return executeRead(inputxcontext, session -> {
             try {
                 Query<XWikiLink> query =
-                    session.createQuery(" from XWikiLink as link where link.docId = :docId", XWikiLink.class);
+                    session.createQuery(" from XWikiLink as link where link.id.docId = :docId", XWikiLink.class);
                 query.setParameter(DOC_ID, docId);
 
                 return query.list();
@@ -2228,7 +2228,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return innerLoadBacklinks(inputxcontext, (Session session) -> {
             // the select clause is compulsory to reach the fullName i.e. the page pointed
             Query<String> query = session.createQuery(
-                "select distinct backlink.fullName from XWikiLink as backlink where backlink.link = :backlink",
+                "select distinct backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink",
                 String.class);
 
             // if we are in the same wiki context, we should only get the local reference
@@ -2249,8 +2249,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return innerLoadBacklinks(inputxcontext, (Session session) -> {
             // the select clause is compulsory to reach the fullName i.e. the page pointed
             Query<String> query = session.createQuery(
-                "select distinct backlink.fullName from XWikiLink as backlink " + "where backlink.link = :backlink "
-                    + "and backlink.type = :type " + "and backlink.attachmentName = :attachmentName",
+                "select distinct backlink.fullName from XWikiLink as backlink " + "where backlink.id.link = :backlink "
+                    + "and backlink.id.type = :type " + "and backlink.attachmentName = :attachmentName",
                 String.class);
 
             // if we are in the same wiki context, we should only get the local reference
@@ -2430,7 +2430,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         executeWrite(inputxcontext, session -> {
             try {
-                Query<?> query = session.createQuery("delete from XWikiLink as link where link.docId = :docId");
+                Query<?> query = session.createQuery("delete from XWikiLink as link where link.id.docId = :docId");
                 query.setParameter(DOC_ID, docId);
                 query.executeUpdate();
             } catch (Exception e) {
@@ -3367,7 +3367,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return executeRead(inputxcontext, session -> {
             try {
                 Query<Long> query = session
-                    .createQuery("select count(*) from XWikiLink as link where link.docId = :docId", Long.class)
+                    .createQuery("select count(*) from XWikiLink as link where link.id.docId = :docId", Long.class)
                     .setParameter(DOC_ID, docId);
                 return query.getSingleResult();
             } catch (Exception e) {

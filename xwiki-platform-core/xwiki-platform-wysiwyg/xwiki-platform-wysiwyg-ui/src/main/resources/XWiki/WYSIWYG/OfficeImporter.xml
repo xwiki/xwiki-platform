@@ -43,20 +43,35 @@
     'filterStyles': $request.filterStyles,
     'useOfficeViewer': $request.useOfficeViewer
   })
-  #template('display_macros.vm')
-  #initRequiredSkinExtensions()
-  ## This is not named outputSyntax because that request parameter already selects the syntax this page is
-  ## rendered in, and callers pass plain. An unset value falls back to annotated XHTML, which HTML editors expect.
-  #set ($output = $services.wysiwyg.importOfficeAttachment($attachmentReference, $parameters,
-    "$!request.targetSyntax"))
-  #if ($output != '' &amp;&amp; "$!output" == '')
-    ## Null output means an error has occurred.
-    $response.sendError(500)
+  ## The output is written directly to the response below, so outputSyntax selects the syntax the office content is
+  ## converted to rather than the one this page is rendered in. Unset means annotated XHTML, what HTML editors expect.
+  #set ($outputSyntaxId = "$!request.outputSyntax")
+  #if ($outputSyntaxId != '' &amp;&amp; "$!request.outputSyntaxVersion" != '')
+    #set ($outputSyntaxId = "${outputSyntaxId}/${request.outputSyntaxVersion}")
+  #end
+  #set ($outputSyntax = $NULL)
+  #if ($outputSyntaxId != '')
+    #set ($outputSyntax = $services.rendering.resolveSyntax($outputSyntaxId))
+  #end
+  #if ($outputSyntaxId != '' &amp;&amp; !$outputSyntax)
+    $response.sendError(400, "Unknown output syntax [$escapetool.xml($outputSyntaxId)].")
   #else
-    ## When importing presentations using the Office Viewer macro the slides are displayed using the gallery widget for
-    ## which we need to load the required CSS and JavaScript resources.
-    #sendRequiredSkinExtensions()
-    $output
+    #if ($outputSyntax)
+      #set ($discard = $parameters.put('outputSyntax', $outputSyntax))
+    #end
+    #template('display_macros.vm')
+    #initRequiredSkinExtensions()
+    #set ($output = $services.wysiwyg.importOfficeAttachment($attachmentReference, $parameters))
+    #if ($output != '' &amp;&amp; "$!output" == '')
+      ## Null output means an error has occurred.
+      $response.sendError(500)
+    #else
+      ## When importing presentations using the Office Viewer macro the slides are displayed using the gallery widget
+      ## for which we need to load the required CSS and JavaScript resources. This sets a response header, so it has to
+      ## run before #rawResponse commits the response.
+      #sendRequiredSkinExtensions()
+      #rawResponse($output)
+    #end
   #end
 #end
 {{/velocity}}

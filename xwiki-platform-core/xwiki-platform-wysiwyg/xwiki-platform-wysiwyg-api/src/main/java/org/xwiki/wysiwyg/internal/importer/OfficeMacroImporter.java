@@ -147,6 +147,8 @@ public class OfficeMacroImporter
     {
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
+        // The macros run before the renderer sees them, so they have to know which syntax their output ends up in.
+        txContext.setTargetSyntax(outputSyntax);
         ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
 
         BlockRenderer renderer =

@@ -25,6 +25,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
@@ -119,12 +120,14 @@ class OfficeMacroImporterTest
         }).when(blockNoteRenderer).render(any(XDOM.class), any(WikiPrinter.class));
 
         XDOM xdom = new XDOM(List.of());
+        Syntax blockNote = new Syntax(new SyntaxType("blocknote", "BlockNote"), "1.0");
 
-        assertEquals("[]", this.officeMacroImporter.render(xdom,
-            new Syntax(new SyntaxType("blocknote", "BlockNote"), "1.0")));
+        assertEquals("[]", this.officeMacroImporter.render(xdom, blockNote));
 
-        // The office macro must run before the renderer sees the XDOM, otherwise its output is missing.
-        verify(this.renderingContext).transformInContext(eq(this.macroTransformation),
-            any(TransformationContext.class), eq(xdom));
+        // The office macro must run before the renderer sees the XDOM, otherwise its output is missing. It also has to
+        // know the syntax its output ends up in, because a macro can render differently per target syntax.
+        ArgumentCaptor<TransformationContext> txContext = ArgumentCaptor.captor();
+        verify(this.renderingContext).transformInContext(eq(this.macroTransformation), txContext.capture(), eq(xdom));
+        assertEquals(blockNote, txContext.getValue().getTargetSyntax());
     }
 }

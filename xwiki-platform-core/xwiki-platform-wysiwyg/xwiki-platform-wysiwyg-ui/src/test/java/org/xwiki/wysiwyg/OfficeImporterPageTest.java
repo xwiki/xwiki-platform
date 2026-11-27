@@ -29,6 +29,7 @@ import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.script.service.ScriptService;
@@ -51,6 +52,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Page test for {@code XWiki.WYSIWYG.OfficeImporter}.
@@ -70,22 +72,6 @@ class OfficeImporterPageTest extends PageTest
 
     private static final Syntax BLOCKNOTE = new Syntax(new SyntaxType("blocknote", "BlockNote"), "1.0");
 
-    /**
-     * Stands in for the rendering script service. The page needs one method from it, and declaring that method here
-     * keeps this module's tests off the rendering implementation.
-     */
-    public static class RenderingScriptServiceStub implements ScriptService
-    {
-        /**
-         * @param syntaxId the syntax identifier to resolve
-         * @return the matching syntax, or {@code null} when no syntax matches
-         */
-        public Syntax resolveSyntax(String syntaxId)
-        {
-            return BLOCKNOTE.toIdString().equals(syntaxId) ? BLOCKNOTE : null;
-        }
-    }
-
     private WysiwygEditorScriptService wysiwygEditorScriptService;
 
     @BeforeEach
@@ -93,7 +79,12 @@ class OfficeImporterPageTest extends PageTest
     {
         this.wysiwygEditorScriptService = mock(WysiwygEditorScriptService.class);
         this.componentManager.registerComponent(ScriptService.class, "wysiwyg", this.wysiwygEditorScriptService);
-        this.componentManager.registerComponent(ScriptService.class, "rendering", new RenderingScriptServiceStub());
+
+        // The page resolves the requested syntax the way core does, by looking for a renderer that produces it.
+        PrintRendererFactory blockNoteRendererFactory = mock(PrintRendererFactory.class);
+        when(blockNoteRendererFactory.getSyntax()).thenReturn(BLOCKNOTE);
+        this.componentManager.registerComponent(PrintRendererFactory.class, BLOCKNOTE.toIdString(),
+            blockNoteRendererFactory);
     }
 
     @Test
@@ -134,6 +125,21 @@ class OfficeImporterPageTest extends PageTest
         ArgumentCaptor<Map<String, Object>> parameters = ArgumentCaptor.captor();
         verify(this.wysiwygEditorScriptService)
             .importOfficeAttachment(eq(new AttachmentReference("my.doc", OFFICE_IMPORTER)), parameters.capture());
+        assertEquals(BLOCKNOTE, parameters.getValue().get("outputSyntax"));
+    }
+
+    @Test
+    void importWithOutputSyntaxWithoutVersion() throws Exception
+    {
+        this.request.put("fileName", "my.doc");
+        this.request.put("outputSyntax", "blocknote");
+
+        renderPage(OFFICE_IMPORTER);
+
+        // Core accepts the syntax type on its own and takes the newest version of it, so this page does too.
+        ArgumentCaptor<Map<String, Object>> parameters = ArgumentCaptor.captor();
+        verify(this.wysiwygEditorScriptService)
+            .importOfficeAttachment(any(AttachmentReference.class), parameters.capture());
         assertEquals(BLOCKNOTE, parameters.getValue().get("outputSyntax"));
     }
 

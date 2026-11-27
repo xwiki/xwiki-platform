@@ -61,6 +61,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.PageObjectReference;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -784,6 +786,27 @@ class XWikiDocumentMockitoTest
             this.document.getXObject(new ObjectReference(
                 this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference()),
                 this.document.getDocumentReference())));
+    }
+
+    @Test
+    void getXObjectWithPageReferences() throws XWikiException
+    {
+        // A page reference always targets a nested document.
+        BaseObject nestedObject = this.document.newXObject(
+            new DocumentReference(DOCWIKI, List.of(DOCSPACE, "Class"), "WebHome"), this.oldcore.getXWikiContext());
+        PageReference nestedClassReference = new PageReference(DOCWIKI, DOCSPACE, "Class");
+
+        assertSame(nestedObject, this.document.getXObject(nestedClassReference));
+        assertEquals(List.of(nestedObject), this.document.getXObjects(nestedClassReference));
+
+        // The page part of a page object reference is ignored, only the object name (class and number) matters.
+        PageReference pageReference = new PageReference(DOCWIKI, DOCSPACE, DOCNAME);
+        String className = this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference());
+
+        assertSame(this.baseObject, this.document.getXObject(new PageObjectReference(className, pageReference)));
+        assertSame(this.baseObject2, this.document.getXObject(
+            new PageObjectReference(className + "[" + this.baseObject2.getNumber() + "]", pageReference)));
+        assertNull(this.document.getXObject(new PageObjectReference(className + "[42]", pageReference)));
     }
 
     @Test

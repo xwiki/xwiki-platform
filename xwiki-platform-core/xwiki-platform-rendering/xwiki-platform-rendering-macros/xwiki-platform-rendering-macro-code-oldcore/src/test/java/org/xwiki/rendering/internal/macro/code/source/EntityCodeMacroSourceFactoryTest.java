@@ -235,6 +235,8 @@ class EntityCodeMacroSourceFactoryTest
     {
         assertFailCodeMacroSource(this.documentObjectPropertyFactory,
             new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class.property"));
+        assertFailCodeMacroSource(this.pageObjectPropertyFactory,
+            new MacroContentSourceReference("page_object_property", "wiki:Space/Document/Space.Class/property"));
 
         LocalDocumentReference classLocalReference = new LocalDocumentReference("Space", "Class");
         DocumentReference classDocumentReference =
@@ -284,6 +286,25 @@ class EntityCodeMacroSourceFactoryTest
         assertCodeMacroSource(this.documentObjectPropertyFactory,
             new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class.other"),
             "other content", null);
+        // page reference
+        assertCodeMacroSource(this.pageObjectPropertyFactory,
+            new MacroContentSourceReference("page_object_property", "wiki:Space/Document/Space.Class/text"),
+            "text content", null);
+        assertCodeMacroSource(this.pageObjectPropertyFactory,
+            new MacroContentSourceReference("page_object_property", "wiki:Space/Document/Space.Class[0]/text"),
+            "text content", null);
+        assertCodeMacroSource(this.pageObjectPropertyFactory, new MacroContentSourceReference("page_object_property",
+            "wiki:Space/Document/Space.Class[0]/textareavelocitycode"), "velocity code content", "velocity");
+        // unknown object
+        assertFailCodeMacroSource(this.documentObjectPropertyFactory,
+            new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class[1].text"));
+        assertFailCodeMacroSource(this.pageObjectPropertyFactory,
+            new MacroContentSourceReference("page_object_property", "wiki:Space/Document/Space.Class[1]/text"));
+        assertFailCodeMacroSource(this.documentObjectPropertyFactory,
+            new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.OtherClass.text"));
+        // unknown property
+        assertFailCodeMacroSource(this.pageObjectPropertyFactory,
+            new MacroContentSourceReference("page_object_property", "wiki:Space/Document/Space.Class/unknown"));
         // email
         assertCodeMacroSource(this.documentObjectPropertyFactory,
             new MacroContentSourceReference("object_property", "wiki:Space.Document^Space.Class.email"),

@@ -3048,7 +3048,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public List<BaseObject> getXObjects(EntityReference reference)
     {
-        if (reference.getType() == EntityType.DOCUMENT) {
+        if (reference.getType() == EntityType.DOCUMENT || reference.getType() == EntityType.PAGE) {
             // class reference
             return getXObjects(resolveClassReference(reference));
         }
@@ -3089,18 +3089,28 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
+     * Get the object matching the passed reference, which can be either:
+     * <ul>
+     * <li>a class reference ({@link EntityType#DOCUMENT} or {@link EntityType#PAGE}), in which case the first object
+     * of that class is returned</li>
+     * <li>an object reference ({@link EntityType#OBJECT} or {@link EntityType#PAGE_OBJECT})</li>
+     * </ul>
+     * The document part of an object reference is ignored: the object is always searched in this document.
+     *
+     * @param reference the reference of the object or of its class
+     * @return the object, or {@code null} if it can't be found or the type of the reference is not supported
      * @since 3.3M1
      */
     public BaseObject getXObject(EntityReference reference)
     {
         if (reference instanceof DocumentReference docReference) {
             return getXObject(docReference);
-        } else if (reference.getType() == EntityType.DOCUMENT) {
+        } else if (reference.getType() == EntityType.DOCUMENT || reference.getType() == EntityType.PAGE) {
             // class reference
             return getXObject(
                 getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()));
-        } else if (reference.getType() == EntityType.OBJECT) {
-            // object reference
+        } else if (reference.getType() == EntityType.OBJECT || reference.getType() == EntityType.PAGE_OBJECT) {
+            // object reference (the resolver converts page object references)
             return getXObject(getCurrentReferenceObjectReferenceResolver().resolve(reference, getDocumentReference()));
         }
 

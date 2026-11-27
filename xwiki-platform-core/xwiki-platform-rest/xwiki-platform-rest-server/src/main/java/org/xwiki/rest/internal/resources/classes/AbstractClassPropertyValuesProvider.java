@@ -84,7 +84,7 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         }
 
         try {
-            if (filter.isEmpty() || limit <= 0) {
+            if (limit <= 0) {
                 return getAllowedValues(propertyDefinition, limit, filter);
             } else {
                 return getMixedValues(propertyDefinition, limit, filter);

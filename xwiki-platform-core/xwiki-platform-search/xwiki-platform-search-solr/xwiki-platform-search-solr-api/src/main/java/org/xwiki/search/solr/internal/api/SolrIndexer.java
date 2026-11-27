@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.api;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
@@ -55,6 +56,19 @@ public interface SolrIndexer
      * @param recurse indicate if children entities should be removed too
      */
     void delete(EntityReference reference, boolean recurse);
+
+    /**
+     * Add to the queue the indexing of the documents containing links whose target depends on the existence of the
+     * passed document, because it was just created or deleted.
+     * <p>
+     * For example the untyped link {@code [[Space.Page]]} targets the terminal document {@code Space.Page} when it
+     * exists and {@code Space.Page.WebHome} otherwise: the documents containing it are indexed again when
+     * {@code Space.Page} is created, so that its backlinks are right.
+     *
+     * @param documentReference the reference of the document which was created or deleted
+     * @since 18.10.0RC1
+     */
+    void indexExistenceDependents(DocumentReference documentReference);
 
     /**
      * @return the number of element in the index/delete queue

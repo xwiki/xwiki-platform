@@ -37,6 +37,13 @@ public enum IndexOperation
      */
     DELETE,
 
+    /**
+     * Index the entries containing links whose target depends on the existence of the entry.
+     *
+     * @since 18.10.0RC1
+     */
+    INDEX_EXISTENCE_DEPENDENTS,
+
     // General operations
 
     /**

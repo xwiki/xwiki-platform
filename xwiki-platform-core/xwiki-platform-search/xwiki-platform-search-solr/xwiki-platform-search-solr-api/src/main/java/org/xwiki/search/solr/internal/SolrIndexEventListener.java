@@ -129,10 +129,14 @@ public class SolrIndexEventListener implements EventListener
                 // to be re-indexed as indexing operations before that failed due to the missing default translation.
                 // This second case can happen during extension installations.
                 indexTranslations(document, (XWikiContext) data);
+
+                indexExistenceDependents(document);
             } else if (event instanceof DocumentDeletedEvent) {
                 XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
 
                 this.solrIndexer.get().delete(document.getDocumentReferenceWithLocale(), false);
+
+                indexExistenceDependents(document);
             } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();
@@ -180,6 +184,14 @@ public class SolrIndexEventListener implements EventListener
             // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and the source is
             // an arbitrary object whose graph would be written out and read back as null if it cannot be resolved.
             this.logger.error("Failed to handle event [{}] with source [{}]", event, String.valueOf(source), e);
+        }
+    }
+
+    private void indexExistenceDependents(XWikiDocument document)
+    {
+        // Only the creation or deletion of the default translation changes the existence of the document.
+        if (Locale.ROOT.equals(document.getLocale())) {
+            this.solrIndexer.get().indexExistenceDependents(document.getDocumentReference());
         }
     }
 

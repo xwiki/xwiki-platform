@@ -1661,6 +1661,7 @@ public class XWiki implements EventListener
         if (!plugins.isEmpty()) {
             getPluginManager().addPlugins(StringUtils.split(plugins, " ,"), context);
         }
+        getPluginManager().addComponentPlugins(Utils.getRootComponentManager(), context);
     }
 
     /**

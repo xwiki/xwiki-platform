@@ -1,9 +1,8 @@
 {{groovy}}
-import java.util.Arrays;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import org.xwiki.extension.ExtensionManager;
+import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.logging.LogLevel;
@@ -31,8 +30,8 @@ if (request.action == 'is_installed') {
 
   def job = null;
   if (request.action == 'uninstall') {
-    if (services.extension.installed.getInstalledExtension(request.extensionId, 'wiki:xwiki') != null) {
-      def uninstallRequest = services.extension.createUninstallRequest(request.extensionId, 'wiki:xwiki')
+    if (services.extension.installed.getInstalledExtension(request.extensionId, extensionNamespace) != null) {
+      def uninstallRequest = services.extension.createUninstallRequest(request.extensionId, extensionNamespace)
       uninstallRequest.setInteractive(false)
       job = services.extension.uninstall(uninstallRequest)
       job.join()
@@ -45,8 +44,8 @@ if (request.action == 'is_installed') {
       }
       // Remove the extension job logs.
       def jobStatusStore = services.component.getInstance(JobStatusStore.class)
-      jobStatusStore.remove(Arrays.asList('extension', 'action', request.extensionId, 'wiki:xwiki'))
-      jobStatusStore.remove(Arrays.asList('extension', 'plan', request.extensionId, 'wiki:xwiki'))
+      jobStatusStore.remove(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, request.extensionId, extensionNamespace))
+      jobStatusStore.remove(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, request.extensionId, extensionNamespace))
     }
 
   } else if (request.action == 'install') {

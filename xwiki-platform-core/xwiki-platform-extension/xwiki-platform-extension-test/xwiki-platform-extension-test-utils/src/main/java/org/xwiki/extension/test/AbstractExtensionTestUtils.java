@@ -129,9 +129,27 @@ public abstract class AbstractExtensionTestUtils
      */
     public void uninstall(String extensionId, boolean keepLocalCache) throws Exception
     {
+        uninstall(extensionId, null, keepLocalCache);
+    }
+
+    /**
+     * Uninstalls the specified extension from the passed namespace, optionally removing it from the local cache.
+     *
+     * @param extensionId the id of the extension to uninstall
+     * @param namespace the namespace from which to uninstall the extension, {@code null} to uninstall it from the
+     *     main wiki and {@link Namespace#ROOT} to uninstall it from the root namespace
+     * @param keepLocalCache whether to keep the local cached extension or not
+     * @since 18.10.0
+     */
+    public void uninstall(String extensionId, Namespace namespace, boolean keepLocalCache) throws Exception
+    {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXTENSION_ID, extensionId);
         parameters.put("keepLocalCache", String.valueOf(keepLocalCache));
+        if (namespace != null) {
+            String namespaceString = namespace.serialize();
+            parameters.put(EXTENSION_NAMESPACE, namespaceString != null ? namespaceString : "");
+        }
 
         doAction("uninstall", parameters);
     }

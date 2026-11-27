@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.plugin;
 
+import org.xwiki.component.annotation.Role;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -41,7 +43,12 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * {@link org.xwiki.bridge.event.WikiEvent wiki events}</li>
  * </ul>
  * <p>
- * In order for a plugin to be active, it must be registered in {@code xwiki.cfg}.
+ * In order for a plugin to be active, it must either be listed in the {@code xwiki.plugins} property of
+ * {@code xwiki.cfg}, or be registered as a {@link XWikiPluginInterface} component in the root component manager (for
+ * example by an extension installed on the farm), in which case it's loaded and unloaded along with the component.
+ * Plugins registered as components are instantiated by the component manager, so they need a public constructor
+ * without parameters, and their component hint must be their name: extending {@link AbstractXWikiPlugin} takes care
+ * of that.
  * </p>
  * <p>
  * Public scriptable APIs are implemented in a custom {@link PluginApi} wrapper, which is instantiated by calling the
@@ -57,6 +64,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
+@Role
 @Deprecated
 public interface XWikiPluginInterface
 {

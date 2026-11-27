@@ -312,6 +312,24 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                No retro compatibility impact: XWikiPluginInterface becomes a component role so that a plugin can be
+                registered as a component (XWIKI-25777), plugins listed in xwiki.cfg are still created by the plugin
+                manager. Only a component implementing XWikiPluginInterface without declaring its roles would also be
+                registered as a plugin, and there is no such component.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>interface com.xpn.xwiki.plugin.XWikiPluginInterface</old>
+                  <new>interface com.xpn.xwiki.plugin.XWikiPluginInterface</new>
+                  <annotation>@org.xwiki.component.annotation.Role</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

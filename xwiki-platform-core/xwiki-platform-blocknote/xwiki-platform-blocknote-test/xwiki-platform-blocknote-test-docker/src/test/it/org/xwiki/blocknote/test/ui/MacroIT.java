@@ -321,6 +321,19 @@ class MacroIT extends AbstractBlockNoteIT
         // show the macro placeholder.
         assertEquals("macro:success", textArea.getText());
 
+        // Undo the macro call update, without changing the selection: the toolbar edits the restored macro call. The
+        // undo shortcut is sent alone, so that the modifier key is released afterwards.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        macroEditModal = editor.getToolBar().editMacro();
+        assertEquals("bar", macroEditModal.getMacroParameter("title"));
+        macroEditModal.clickCancel();
+
+        // Redo the macro call update: the toolbar edits the updated macro call again.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, "y"));
+        macroEditModal = editor.getToolBar().editMacro();
+        assertEquals("baz", macroEditModal.getMacroParameter("title"));
+        macroEditModal.clickCancel();
+
         page.save();
         wikiEditor = page.editWiki();
         assertEquals("""

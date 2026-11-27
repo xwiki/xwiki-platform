@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -103,6 +105,8 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     private static final String PREPARE_QUEUE_CAPACITY_PROPERTY = "prepareQueueCapacity";
     private static final String SEND_QUEUE_CAPACITY_PROPERTY = "sendQueueCapacity";
+
+    private static final String SUPPORTED_IMAGE_MEDIA_TYPES_PROPERTY = "supportedImageMediaTypes";
 
     /**
      * The default size of the prepare queue.
@@ -347,6 +351,17 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     {
         return this.xwikiPropertiesSource.getProperty(PREFIX + SEND_QUEUE_CAPACITY_PROPERTY,
             SEND_QUEUE_CAPACITY_DEFAULT);
+    }
+
+    @Override
+    public List<String> getSupportedImageMediaTypes()
+    {
+        List<?> mediaTypes = this.xwikiPropertiesSource.getProperty(PREFIX + SUPPORTED_IMAGE_MEDIA_TYPES_PROPERTY,
+            List.class, MailSenderConfiguration.super.getSupportedImageMediaTypes());
+
+        return mediaTypes.stream().filter(Objects::nonNull)
+            .map(mediaType -> mediaType.toString().trim().toLowerCase(Locale.ROOT))
+            .filter(mediaType -> !mediaType.isEmpty()).distinct().toList();
     }
 
     private boolean isMainWiki()

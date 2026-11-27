@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents all XWiki configuration options for the Mail Sending feature.
@@ -120,5 +121,19 @@ public interface MailSenderConfiguration
     default int getSendQueueCapacity()
     {
         return 1000;
+    }
+
+    /**
+     * @return the media types (in lower case) of the images that can be embedded in emails, i.e. the image formats
+     *         that are well supported by mail clients. Code embedding an image in an email (e.g. the wiki logo in the
+     *         notification emails) should use another image (or no image at all) when its media type is not in this
+     *         list. An empty list means that no image format is supported.
+     * @since 19.0.0RC1
+     */
+    @Unstable
+    default List<String> getSupportedImageMediaTypes()
+    {
+        return List.of("image/png", "image/jpeg", "image/gif", "image/bmp", "image/x-icon", "image/vnd.microsoft.icon",
+            "image/webp");
     }
 }

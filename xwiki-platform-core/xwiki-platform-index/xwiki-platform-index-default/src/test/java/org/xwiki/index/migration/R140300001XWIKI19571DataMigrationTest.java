@@ -37,7 +37,7 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.RootClass;
-import org.hibernate.query.NativeQuery;
+import org.hibernate.query.spi.NativeQueryImplementor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -113,7 +113,7 @@ class R140300001XWIKI19571DataMigrationTest
     private DatabaseMetaData databaseMetaData;
 
     @Mock
-    private NativeQuery nativeQueryImplementor;
+    private NativeQueryImplementor nativeQueryImplementor;
 
     @Mock
     private ExecutionContext context;

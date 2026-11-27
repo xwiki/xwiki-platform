@@ -83,10 +83,10 @@ public class R4340XWIKI883DataMigration extends AbstractHibernateDataMigration
                         lst2.add(lsp);
                     }
                     for (StringProperty property : lst) {
-                        session.remove(property);
+                        session.delete(property);
                     }
                     for (LargeStringProperty property : lst2) {
-                        session.persist(property);
+                        session.save(property);
                     }
                 }
                 return null;

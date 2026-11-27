@@ -97,7 +97,7 @@ public class R73000XWIKI12277DataMigration extends AbstractHibernateDataMigratio
         query.append("FROM BaseObject templateProviderObj, StringProperty typeProp ");
         query.append("WHERE templateProviderObj.className='XWiki.TemplateProviderClass'");
         query.append(" AND templateProviderObj.name<>'XWiki.TemplateProviderTemplate'");
-        query.append(" AND typeProp.id=templateProviderObj.id");
+        query.append(" AND typeProp.id.id=templateProviderObj.id");
         query.append(" AND typeProp.name='type'");
 
         return query.toString();
@@ -119,6 +119,6 @@ public class R73000XWIKI12277DataMigration extends AbstractHibernateDataMigratio
         // Save the new property.
         session.saveOrUpdate(terminalProperty);
         // Delete the old property.
-        session.remove(typeProperty);
+        session.delete(typeProperty);
     }
 }

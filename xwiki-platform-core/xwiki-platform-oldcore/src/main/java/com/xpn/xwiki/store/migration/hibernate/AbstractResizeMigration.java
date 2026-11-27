@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +37,7 @@ import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Column;
@@ -213,12 +214,12 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         if (value instanceof Collection collection) {
             Table collectionTable = collection.getCollectionTable();
 
-            for (Column column : collectionTable.getColumns()) {
-                updateColumn(column, databaseMetaData, dynamicTables, rowFormats, builder, session);
+            for (Iterator<Column> it = collectionTable.getColumnIterator(); it.hasNext();) {
+                updateColumn(it.next(), databaseMetaData, dynamicTables, rowFormats, builder, session);
             }
         } else if (value != null) {
-            // Value#getColumns() fails when the value involves formulas
-            for (Selectable selectable : value.getSelectables()) {
+            for (Iterator<Selectable> it = value.getColumnIterator(); it.hasNext();) {
+                Selectable selectable = it.next();
                 if (selectable instanceof Column column) {
                     updateColumn(column, databaseMetaData, dynamicTables, rowFormats, builder, session);
                 }
@@ -320,7 +321,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     {
         NativeQuery<String> query =
             session.createNativeQuery("SELECT DISTINCT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS "
-                + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table AND CONSTRAINT_TYPE = 'UNIQUE'", String.class);
+                + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table AND CONSTRAINT_TYPE = 'UNIQUE'");
         query.setParameter("schema", databaseName);
         query.setParameter("table", tableName);
 
@@ -333,8 +334,8 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     {
         for (PersistentClass entity : existingTables) {
             // Find properties to update
-            for (Property property : entity.getProperties()) {
-                updateProperty(property, databaseMetaData, dynamicTables, rowFormats, builder, session);
+            for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
+                updateProperty(it.next(), databaseMetaData, dynamicTables, rowFormats, builder, session);
             }
 
             // Check the key
@@ -397,9 +398,10 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         MySQLHibernateAdapter mysqlAdapater = getMySQLAdapter();
 
         if (mysqlAdapater != null) {
-            String tableName =
-                this.hibernateStore.getSessionFactory().unwrap(SessionFactoryImplementor.class)
-                    .getSqlStringGenerationContext().format(column.getValue().getTable().getQualifiedTableName());
+            JdbcEnvironment jdbcEnvironment =
+                this.hibernateStore.getConfigurationMetadata().getDatabase().getJdbcEnvironment();
+            String tableName = jdbcEnvironment.getQualifiedObjectNameFormatter()
+                .format(column.getValue().getTable().getQualifiedTableName(), this.hibernateStore.getDialect());
 
             String quotedColumn = column.getQuotedName(this.hibernateStore.getDialect());
 
@@ -424,7 +426,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 builder);
             appendXmlAttribute("columnName", this.hibernateStore.getConfiguredColumnName(column), builder);
             appendXmlAttribute("newDataType",
-                column.getSqlType(this.hibernateStore.getConfigurationMetadata()),
+                column.getSqlType(this.hibernateStore.getDialect(), this.hibernateStore.getConfigurationMetadata()),
                 builder);
             builder.append("/>");
         }
@@ -434,7 +436,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     {
         Dialect dialect = this.hibernateStore.getDialect();
 
-        StringBuilder builder = new StringBuilder(column.getSqlType(configurationMetadata));
+        StringBuilder builder = new StringBuilder(column.getSqlType(dialect, configurationMetadata));
 
         if (column.isNullable()) {
             builder.append(dialect.getNullColumnString());

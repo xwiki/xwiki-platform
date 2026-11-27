@@ -119,7 +119,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         // Get all the objects that have less properties than what their class declares (the expected property count).
         // Note that we count only the expected properties (those declared by the class).
         Query<Long> query = session.createQuery("select obj.id from BaseObject as obj, BaseProperty as prop "
-            + "where obj.id = prop.id and obj.className = :className and prop.name in :expectedProperties "
+            + "where obj.id = prop.id.id and obj.className = :className and prop.id.name in :expectedProperties "
             + "group by obj.id having count(prop) < :expectedPropertyCount", Long.class);
         query.setParameter("className", className);
         query.setParameterList("expectedProperties", expectedProperties);
@@ -136,7 +136,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
                 // The property has a composite id made of the object id and the property name.
                 // We don't set the property name because newProperty() does it.
                 property.setId(objectId);
-                session.persist(property);
+                session.save(property);
             }
         }
     }
@@ -153,8 +153,8 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
     private List<String> getCurrentProperties(Long objectId, Session session)
     {
         // The object was loaded from the database without its properties so we need to make a second query to get them.
-        Query<String> query = session.createQuery("select prop.name from BaseObject as obj, BaseProperty as prop "
-            + "where obj.id = prop.id and obj.id = :objectId", String.class);
+        Query<String> query = session.createQuery("select prop.id.name from BaseObject as obj, BaseProperty as prop "
+            + "where obj.id = prop.id.id and obj.id = :objectId", String.class);
         query.setParameter("objectId", objectId);
         return query.list();
     }

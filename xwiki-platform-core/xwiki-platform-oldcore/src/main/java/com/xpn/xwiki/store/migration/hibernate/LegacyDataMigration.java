@@ -77,36 +77,37 @@ public class LegacyDataMigration extends AbstractHibernateDataMigration
                 String docClass = XWikiDocument.class.getName();
                 try {
                     session
-                        .createMutationQuery(
+                        .createQuery(
                             UPDATE + docClass + " doc set doc.translation = 0 where doc.translation is null")
                         .executeUpdate();
 
-                    session.createMutationQuery(
-                        UPDATE + docClass + " doc set doc.language = '' where doc.language is null").executeUpdate();
+                    session
+                        .createQuery(UPDATE + docClass + " doc set doc.language = '' where doc.language is null")
+                        .executeUpdate();
 
                     session
-                        .createMutationQuery(UPDATE + docClass
+                        .createQuery(UPDATE + docClass
                             + " doc set doc.defaultLanguage = '' where doc.defaultLanguage is null")
                         .executeUpdate();
 
                     session
-                        .createMutationQuery(UPDATE + docClass
+                        .createQuery(UPDATE + docClass
                             + " doc set doc.fullName = concat(doc.space,'.',doc.name) where doc.fullName is null")
                         .executeUpdate();
 
                     session
-                        .createMutationQuery(UPDATE + docClass + " doc set doc.elements = 3 where doc.elements is null")
+                        .createQuery(UPDATE + docClass + " doc set doc.elements = 3 where doc.elements is null")
                         .executeUpdate();
 
                     try {
                         session
-                            .createMutationQuery(DELETE_FROM + BaseProperty.class.getName() + " prop"
+                            .createQuery(DELETE_FROM + BaseProperty.class.getName() + " prop"
                                 + " where prop.name like 'editbox_%'"
                                 + " and prop.classType = 'com.xpn.xwiki.objects.LongProperty'")
                             .executeUpdate();
 
                         session
-                            .createMutationQuery(
+                            .createQuery(
                                 DELETE_FROM + LongProperty.class.getName() + " prop where prop.name like 'editbox_%'")
                             .executeUpdate();
                     } catch (Exception ignored) {

@@ -216,12 +216,11 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
             if (resultSet.next()) {
                 String currentColumnType = resultSet.getString("TYPE_NAME");
 
-                Column column = property.getColumns().get(0);
-                String[] expectedColumnTypes =
-                    configurationMetadata.getDatabase().getTypeConfiguration().getDdlTypeRegistry()
-                        .getDescriptor(column.getSqlTypeCode(configurationMetadata)).getRawTypeNames();
+                Column column = (Column) property.getColumnIterator().next();
+                String expectedColumnType =
+                    this.hibernateStore.getDialect().getTypeName(column.getSqlTypeCode(configurationMetadata));
 
-                if (Arrays.stream(expectedColumnTypes).noneMatch(currentColumnType::equalsIgnoreCase)) {
+                if (!currentColumnType.equalsIgnoreCase(expectedColumnType)) {
                     int expectedLenght = HibernateStore.getLength(column);
 
                     int currentColumnSize = resultSet.getInt("COLUMN_SIZE");
@@ -251,7 +250,7 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
     {
         Dialect dialect = this.hibernateStore.getDialect();
 
-        StringBuilder builder = new StringBuilder(column.getSqlType(configurationMetadata));
+        StringBuilder builder = new StringBuilder(column.getSqlType(dialect, configurationMetadata));
 
         if (column.isNullable()) {
             builder.append(dialect.getNullColumnString());

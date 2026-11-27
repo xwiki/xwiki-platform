@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.SQLQuery;
@@ -42,10 +43,16 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.HSQLDialect;
+import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -191,7 +198,19 @@ class LegacyApiTest
             {Value.class, "getColumnIterator", MethodType.methodType(Iterator.class)},
             {Table.class, "getColumnIterator", MethodType.methodType(Iterator.class)},
             {Table.class, "getIndexIterator", MethodType.methodType(Iterator.class)},
-            {Column.class, "getLength", MethodType.methodType(int.class)}};
+            {Column.class, "getLength", MethodType.methodType(int.class)},
+            {Column.class, "getPrecision", MethodType.methodType(int.class)},
+            {Column.class, "getScale", MethodType.methodType(int.class)},
+            {Column.class, "setLength", MethodType.methodType(void.class, int.class)},
+            {Column.class, "setPrecision", MethodType.methodType(void.class, int.class)},
+            {Column.class, "setScale", MethodType.methodType(void.class, int.class)},
+            {Column.class, "getSqlTypeCode", MethodType.methodType(int.class, Mapping.class)},
+            {Column.class, "getSqlType", MethodType.methodType(String.class, Dialect.class, Mapping.class)},
+            {Dialect.class, "getTypeName", MethodType.methodType(String.class, int.class)},
+            {Dialect.class, "getTypeName",
+                MethodType.methodType(String.class, int.class, long.class, int.class, int.class)},
+            {SessionImplementor.class, "createSQLQuery",
+                MethodType.methodType(org.hibernate.query.spi.NativeQueryImplementor.class, String.class)}};
     }
 
     @ParameterizedTest
@@ -207,6 +226,9 @@ class LegacyApiTest
     {
         assertTrue(org.hibernate.Query.class.isAssignableFrom(Query.class));
         assertTrue(SQLQuery.class.isAssignableFrom(NativeQuery.class));
+        assertTrue(org.hibernate.query.spi.NativeQueryImplementor.class
+            .isAssignableFrom(org.hibernate.query.sql.spi.NativeQueryImplementor.class));
+        assertTrue(Mapping.class.isAssignableFrom(Metadata.class));
     }
 
     @Test
@@ -600,5 +622,66 @@ class LegacyApiTest
             java.sql.Connection connection = (java.sql.Connection) sessionConnection.invoke(session);
             assertEquals(1, connection.createStatement().executeUpdate("insert into legacyentity (LE_ID) values (99)"));
         }
+    }
+
+    @Test
+    void hibernate5SessionImplementorCreateSQLQuery() throws Throwable
+    {
+        inTransaction(session -> session.save(new LegacyEntity(1, "one")));
+
+        MethodHandle createSQLQuery = LOOKUP.findVirtual(SessionImplementor.class, "createSQLQuery",
+            MethodType.methodType(org.hibernate.query.spi.NativeQueryImplementor.class, String.class));
+        try (Session session = sessionFactory.openSession()) {
+            org.hibernate.query.spi.NativeQueryImplementor<?> query =
+                (org.hibernate.query.spi.NativeQueryImplementor<?>) createSQLQuery.invoke(session,
+                    "select LE_NAME from legacyentity");
+
+            assertEquals(List.of("one"), query.getResultList());
+        }
+    }
+
+    @Test
+    void hibernate5ColumnMethods() throws Throwable
+    {
+        MethodHandle getSqlType = LOOKUP.findVirtual(Column.class, "getSqlType",
+            MethodType.methodType(String.class, Dialect.class, Mapping.class));
+        MethodHandle getSqlTypeCode =
+            LOOKUP.findVirtual(Column.class, "getSqlTypeCode", MethodType.methodType(int.class, Mapping.class));
+        MethodHandle setLength =
+            LOOKUP.findVirtual(Column.class, "setLength", MethodType.methodType(void.class, int.class));
+        MethodHandle getLength = LOOKUP.findVirtual(Column.class, "getLength", MethodType.methodType(int.class));
+
+        try (StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+            .applySetting("jakarta.persistence.database-product-name", "HSQL Database Engine")
+            .applySetting("hibernate.boot.allow_jdbc_metadata_access", "false").build()) {
+            Metadata metadata = new MetadataSources(registry).addResource("legacy.hbm.xml").buildMetadata();
+            Column column = metadata.getEntityBinding(LegacyEntity.class.getName()).getProperty("name").getColumns()
+                .get(0);
+
+            assertEquals(java.sql.Types.VARCHAR, (int) getSqlTypeCode.invoke(column, (Mapping) metadata));
+
+            // Like with Hibernate 5, the length has to be set before the SQL type is computed (and cached)
+            setLength.invoke(column, 42);
+            assertEquals(42, (int) getLength.invoke(column));
+            assertEquals("varchar(42)", getSqlType.invoke(column, new HSQLDialect(), (Mapping) metadata));
+        }
+
+        assertTrue(logCapture.getMessage(logCapture.size() - 1)
+            .startsWith("HHH90000028: Support for `<hibernate-mappings/>` is deprecated"));
+    }
+
+    @Test
+    void hibernate5DialectTypeName() throws Throwable
+    {
+        MethodHandle getTypeName =
+            LOOKUP.findVirtual(Dialect.class, "getTypeName", MethodType.methodType(String.class, int.class));
+        MethodHandle getSizedTypeName = LOOKUP.findVirtual(Dialect.class, "getTypeName",
+            MethodType.methodType(String.class, int.class, long.class, int.class, int.class));
+
+        Dialect dialect = new MySQLDialect();
+        assertEquals("longtext", getTypeName.invoke(dialect, java.sql.Types.LONGVARCHAR));
+        assertEquals("bigint", getTypeName.invoke(dialect, java.sql.Types.BIGINT));
+        assertEquals("varchar(42)", getSizedTypeName.invoke(dialect, java.sql.Types.VARCHAR, 42L, 0, 0));
+        assertThrows(HibernateException.class, () -> getTypeName.invoke(dialect, Integer.MIN_VALUE));
     }
 }

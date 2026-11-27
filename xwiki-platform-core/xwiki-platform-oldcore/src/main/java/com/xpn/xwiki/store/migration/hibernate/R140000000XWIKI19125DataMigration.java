@@ -24,7 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.Session;
-import org.hibernate.query.MutationQuery;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
@@ -67,8 +67,8 @@ public class R140000000XWIKI19125DataMigration extends AbstractHibernateDataMigr
 
     private int updateDocuments(Session session)
     {
-        MutationQuery query = session
-            .createMutationQuery("update XWikiDocument doc set doc.originalMetadataAuthorReference = doc.author");
+        Query query =
+            session.createQuery("update XWikiDocument doc set doc.originalMetadataAuthorReference = doc.author");
         return query.executeUpdate();
     }
 }

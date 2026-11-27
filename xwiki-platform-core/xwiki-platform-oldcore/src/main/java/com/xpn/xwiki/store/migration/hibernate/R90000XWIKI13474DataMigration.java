@@ -63,7 +63,7 @@ public class R90000XWIKI13474DataMigration extends AbstractHibernateDataMigratio
             @Override
             public Void doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.createMutationQuery("UPDATE XWikiAttachment SET longSize = filesize").executeUpdate();
+                session.createQuery("UPDATE XWikiAttachment SET longSize = filesize").executeUpdate();
 
                 return null;
             }

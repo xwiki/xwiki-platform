@@ -752,7 +752,8 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'info',
-              content: editor.localization.get('xwiki-slash.action.info.defaultContent'),
+              // A block macro gets an empty content with a placeholder, an inline one can't be edited in place.
+              contentIfInline: editor.localization.get('xwiki-slash.action.info.defaultContent'),
               // We know this macro can be called inline.
               inline: true
             }
@@ -767,7 +768,8 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'success',
-              content: editor.localization.get('xwiki-slash.action.success.defaultContent'),
+              // A block macro gets an empty content with a placeholder, an inline one can't be edited in place.
+              contentIfInline: editor.localization.get('xwiki-slash.action.success.defaultContent'),
               // We know this macro can be called inline.
               inline: true
             }
@@ -782,7 +784,8 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'warning',
-              content: editor.localization.get('xwiki-slash.action.warning.defaultContent'),
+              // A block macro gets an empty content with a placeholder, an inline one can't be edited in place.
+              contentIfInline: editor.localization.get('xwiki-slash.action.warning.defaultContent'),
               // We know this macro can be called inline.
               inline: true
             }
@@ -797,7 +800,8 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'error',
-              content: editor.localization.get('xwiki-slash.action.error.defaultContent'),
+              // A block macro gets an empty content with a placeholder, an inline one can't be edited in place.
+              contentIfInline: editor.localization.get('xwiki-slash.action.error.defaultContent'),
               // We know this macro can be called inline.
               inline: true
             }

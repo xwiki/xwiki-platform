@@ -124,29 +124,25 @@
       'infoBox': {
         'command': 'xwiki-macro-insert',
         'data': {
-          'name': 'info',
-          'content': $services.localization.render('ckeditor.plugin.slash.action.info.defaultContent')
+          'name': 'info'
         }
       },
       'successBox': {
         'command': 'xwiki-macro-insert',
         'data': {
-          'name': 'success',
-          'content': $services.localization.render('ckeditor.plugin.slash.action.success.defaultContent')
+          'name': 'success'
         }
       },
       'warningBox': {
         'command': 'xwiki-macro-insert',
         'data': {
-          'name': 'warning',
-          'content': $services.localization.render('ckeditor.plugin.slash.action.warning.defaultContent')
+          'name': 'warning'
         }
       },
       'errorBox': {
         'command': 'xwiki-macro-insert',
         'data': {
-          'name': 'error',
-          'content': $services.localization.render('ckeditor.plugin.slash.action.error.defaultContent')
+          'name': 'error'
         }
       },
       'toc': {

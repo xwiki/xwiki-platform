@@ -74,6 +74,11 @@ ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
 ckeditor.plugin.macro.installPending=Installing {0} {1}...
 ckeditor.plugin.macro.installSuccessful=Successfully installed {0} {1}.
 ckeditor.plugin.macro.installFailed=Failed to install {0} {1}.
+ckeditor.plugin.macro.nestedEditablePlaceholder.$content=Type the content here.
+ckeditor.plugin.macro.nestedEditablePlaceholder.info.$content=Type your information message here.
+ckeditor.plugin.macro.nestedEditablePlaceholder.success.$content=Type your success message here.
+ckeditor.plugin.macro.nestedEditablePlaceholder.warning.$content=Type your warning message here.
+ckeditor.plugin.macro.nestedEditablePlaceholder.error.$content=Type your error message here.
 
 ckeditor.plugin.office.importer.title=Import Office File
 ckeditor.plugin.office.importer.filePath=File Path

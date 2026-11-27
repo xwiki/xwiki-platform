@@ -283,9 +283,10 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         textArea.insertMacro("/inf", "Info Box");
 
-        // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        // The message is empty, with a placeholder, and the caret is in it.
+        textArea.waitForNestedEditablePlaceholders("Type your information message here.");
         textArea.sendKeys("my info message");
+        textArea.waitForNestedEditablePlaceholders();
 
         assertSourceEquals("{{info}}\nmy info message\n{{/info}}");
     }
@@ -296,9 +297,10 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         textArea.insertMacro("/suc", "Success Box");
 
-        // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        // The message is empty, with a placeholder, and the caret is in it.
+        textArea.waitForNestedEditablePlaceholders("Type your success message here.");
         textArea.sendKeys("my success message");
+        textArea.waitForNestedEditablePlaceholders();
 
         assertSourceEquals("{{success}}\nmy success message\n{{/success}}");
     }
@@ -309,9 +311,10 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         textArea.insertMacro("/war", "Warning Box");
 
-        // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        // The message is empty, with a placeholder, and the caret is in it.
+        textArea.waitForNestedEditablePlaceholders("Type your warning message here.");
         textArea.sendKeys("my warning message");
+        textArea.waitForNestedEditablePlaceholders();
 
         assertSourceEquals("{{warning}}\nmy warning message\n{{/warning}}");
     }
@@ -322,9 +325,10 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         textArea.insertMacro("/err", "Error Box");
 
-        // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        // The message is empty, with a placeholder, and the caret is in it.
+        textArea.waitForNestedEditablePlaceholders("Type your error message here.");
         textArea.sendKeys("my error message");
+        textArea.waitForNestedEditablePlaceholders();
 
         assertSourceEquals("{{error}}\nmy error message\n{{/error}}");
     }

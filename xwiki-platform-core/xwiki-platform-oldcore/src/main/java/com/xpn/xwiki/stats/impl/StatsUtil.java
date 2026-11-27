@@ -90,6 +90,8 @@ public final class StatsUtil
 
     /**
      * See {@link #CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS_REQUEST}.
+     *
+     * @deprecated use {@link #CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS_REQUEST} instead
      */
     @Deprecated
     private static final String DEPRECATED_CFGPROP_STATS_EXCLUDEDUSERSANDGROUPS = "xwiki.stats.excludedUsersAndGroups";
@@ -130,6 +132,8 @@ public final class StatsUtil
 
     /**
      * See {@link #PREFPROP_EXCLUDEDUSERSANDGROUPS_REQUEST}.
+     *
+     * @deprecated use {@link #PREFPROP_EXCLUDEDUSERSANDGROUPS_REQUEST} instead
      */
     @Deprecated
     private static final String DEPRECATED_PREFPROP_EXCLUDEDUSERSANDGROUPS = "statistics_excludedUsersAndGroups";

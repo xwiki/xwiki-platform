@@ -54,6 +54,7 @@ public interface ObjectReferenceResolver<T>
     /**
      * @param objectReferenceRepresentation the representation of an object reference (e.g. as a String)
      * @return the valid resolved object reference as an object
+     * @deprecated use {@link #resolve(Object, Object...)} instead
      */
     @Deprecated
     ObjectReference resolve(T objectReferenceRepresentation);

@@ -30,7 +30,7 @@
   <name>XWiki Platform - Security - Required Rights - Default</name>
   <description>Default implementation of the Required Rights API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.82</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Required Rights Application</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
@@ -76,6 +76,19 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Provides the macros used by the templates of this module. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-templates</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

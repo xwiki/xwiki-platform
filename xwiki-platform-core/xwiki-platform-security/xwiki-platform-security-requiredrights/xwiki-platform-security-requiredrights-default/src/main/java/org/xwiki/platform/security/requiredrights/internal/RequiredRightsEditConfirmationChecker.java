@@ -28,6 +28,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
@@ -90,6 +92,9 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
     @Named("html/5.0")
     private BlockRenderer htmlBlockRender;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Optional<EditConfirmationCheckerResult> check()
     {
@@ -120,7 +125,11 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
                             getRequiredRightsChangedSkipValue(analysisResults)));
                     }
                 } catch (RequiredRightsException e) {
-                    this.scriptContextManager.getCurrentScriptContext().setAttribute("exception", e, ENGINE_SCOPE);
+                    this.logger.warn("Failed to analyze the required rights of [{}]. Root cause is [{}].",
+                        tdoc.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
+                    // Not named "exception", which is a reserved Velocity binding that never reaches the template.
+                    this.scriptContextManager.getCurrentScriptContext()
+                        .setAttribute("requiredRightsException", e, ENGINE_SCOPE);
                     // Display an error message in case of exception.
                     XDOM message = this.templateManager
                         .executeNoException("security/requiredrights/requiredRightsEditConfirmationCheckerError.vm");

@@ -154,11 +154,11 @@ XWiki.UserWikiTab = Class.create({
       }.bind(this),
 
       onSuccess : function(response) {
-        $('wikiActivityColumn').innerHTML = response.responseText;
-        require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMacro) {
-          var macro = new XWikiNotificationsMacro($('#wikiActivityColumn .notifications-macro'));
-          macro.load(0);
-        });
+        const activityColumn = $('wikiActivityColumn');
+        activityColumn.innerHTML = response.responseText;
+        // The response holds the rendered notifications: let the notifications macro initialize them like the ones
+        // present on page load (expand / collapse the grouped events) instead of loading the events a second time.
+        document.fire('xwiki:dom:updated', {elements: [activityColumn]});
       }.bind(this),
 
       onFailure: function(response) {

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -48,8 +49,6 @@ public class LiveDataElement extends BaseElement
      * {@link TableLayoutElement#waitUntilReady()}.
      */
     private static final int READY_TIMEOUT_SECONDS = 20;
-
-    // TODO: add the operations to switch between the layouts.
 
     private final String id;
 
@@ -268,6 +267,47 @@ public class LiveDataElement extends BaseElement
         WebElement element = getRootElement().findElement(By.cssSelector(".pagination-page-size select"));
         new Select(element).selectByValue(Integer.toString(paginationNumber));
         return this;
+    }
+
+    /**
+     * Go to a page of entries, the way clicking its number in the pagination does, and wait for its entries to be
+     * fetched.
+     *
+     * @param pageNumber the number of the page, starting at 1, among the page numbers the pagination offers
+     * @return the current page object
+     * @since 18.10.0RC1
+     */
+    public LiveDataElement goToPage(int pageNumber)
+    {
+        By pageButton = By.xpath(String.format("(.//nav[contains(@class, 'livedata-pagination')])[1]"
+            + "//button[contains(@class, 'page-nav')][normalize-space(text()[last()]) = '%d']", pageNumber));
+        getRootElement().findElement(pageButton).click();
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                WebElement root = getRootElement();
+                return "page".equals(root.findElement(pageButton).getAttribute("aria-current"))
+                    && !StringUtils.defaultString(
+                        root.findElement(By.className("layout-loader")).getAttribute("class")).contains("waiting");
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
+                // The pagination is being updated.
+                return false;
+            }
+        }, READY_TIMEOUT_SECONDS);
+        return this;
+    }
+
+    /**
+     * Display the entries as cards, the way picking the cards layout in the drop down menu does.
+     *
+     * @return the card layout, once its cards are displayed
+     * @since 18.10.0RC1
+     */
+    public CardLayoutElement switchToCardLayout()
+    {
+        openDropDownMenu().findElement(By.partialLinkText("Cards")).click();
+        CardLayoutElement cardLayout = getCardLayout();
+        cardLayout.waitUntilReady();
+        return cardLayout;
     }
 
     /**

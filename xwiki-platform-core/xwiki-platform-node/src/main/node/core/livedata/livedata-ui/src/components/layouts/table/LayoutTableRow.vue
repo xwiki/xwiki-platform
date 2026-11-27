@@ -94,11 +94,20 @@ export default {
       type: Number,
       required: true,
     },
+    /**
+     * The descriptors of the displayed properties, computed once by the layout for all its entries. When missing,
+     * they are computed from the logic.
+     * @since 18.10.0RC1
+     */
+    propertyDescriptors: {
+      type: Array,
+      default: undefined,
+    },
   },
 
   computed: {
     properties() {
-      return this.logic.getPropertyDescriptors();
+      return this.propertyDescriptors ?? this.logic.getPropertyDescriptors();
     },
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();

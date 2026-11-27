@@ -1237,6 +1237,32 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Waits until a column is displayed or hidden, for instance after toggling it in the properties panel. A column
+     * is displayed when its header is displayed and when all its cells, if there are any, are displayed. It is hidden
+     * when its header is gone or not displayed and when none of its cells is displayed, so that a hidden column can
+     * be told apart from a table without rows.
+     *
+     * @param columnLabel the label of a column, for instance {@code "Title"}
+     * @param displayed {@code true} to wait for the column to be displayed, {@code false} to wait for it to be hidden
+     * @since 18.10.0RC1
+     */
+    public void waitUntilColumnDisplayed(String columnLabel, boolean displayed)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            boolean headerDisplayed = getDriver().findElementsWithoutWaiting(getRoot(),
+                By.cssSelector("thead tr th .property-name")).stream()
+                .anyMatch(header -> columnLabel.equals(header.getText()) && header.isDisplayed());
+            List<WebElement> cells = getDriver().findElementsWithoutWaiting(getRoot(),
+                By.cssSelector(String.format("tbody tr td.cell[data-title='%s']", columnLabel)));
+            if (displayed) {
+                return headerDisplayed && cells.stream().allMatch(WebElement::isDisplayed);
+            } else {
+                return !headerDisplayed && cells.stream().noneMatch(WebElement::isDisplayed);
+            }
+        });
+    }
+
+    /**
      * Return the {@link WebElement} of the dropdown button.
      *
      * @return the {@link WebElement} of the dropdown button

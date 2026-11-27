@@ -241,6 +241,8 @@ define('xwiki-requiredrights-dialog', [
                 event.preventDefault();
                 this.save();
             });
+
+            this.#setupResponsiveLayoutInitialization();
         }
 
         toggleAdvanced()
@@ -443,6 +445,128 @@ define('xwiki-requiredrights-dialog', [
             });
 
             this.analysisResultsContainer.appendChild(panelGroup);
+        }
+
+        /**
+         * @returns {number} the minimum width of the rights list in horizontal layout
+         */
+        #computeMinWidth()
+        {
+            // Temporarily set width to min-content to get the scrollWidth
+            const prevWidth = this.rightsList.style.width;
+            this.rightsList.style.width = 'min-content';
+            // Force reflow
+            this.rightsList.offsetWidth;
+            const minWidth = this.rightsList.scrollWidth;
+            this.rightsList.style.width = prevWidth;
+            return minWidth;
+        }
+
+        /**
+         * Update the class of the rights list to 'vertical' if the available width is less than the minimum width.
+         *
+         * @param minWidth the minimum width of the rights list in horizontal layout
+         */
+        #updateVerticalClass(minWidth)
+        {
+            const availableWidth = this.rightsList.clientWidth;
+
+            // Only update the class if the available width is not zero, i.e., the element is visible.
+            if (availableWidth === 0) {
+                return;
+            }
+
+            if (minWidth > availableWidth) {
+                this.rightsList.classList.add('vertical');
+            } else if (minWidth < availableWidth - 1) {
+                // Add some tolerance to avoid flickering.
+                this.rightsList.classList.remove('vertical');
+            }
+        }
+
+        /**
+         * Debounce a function to limit how often it can be called.
+         *
+         * @param fn the function to debounce
+         * @param delay the delay in milliseconds
+         * @returns {(function(...[*]): void)|*} a debounced version of the function
+         */
+        #debounce(fn, delay)
+        {
+            let timeoutId;
+            return function (...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        /**
+         * Set up the responsive layout for the rights list. Must be called after the dialog is shown.
+         *
+         * We use JavaScript to manage the responsive layout as we don't know in advance the width of the rights
+         * list in horizontal layout, and thus we can't define a breakpoint in CSS using a media/container query.
+         * This could be reconsidered when CSS environment variables become available which should greatly simplify
+         * this code.
+         */
+        #setupResponsiveLayout()
+        {
+            // Compute the minimum width once, after DOM is ready and content is rendered
+            let minimumWidth = this.#computeMinWidth();
+            // Initial update
+            this.#updateVerticalClass(minimumWidth);
+
+            // Debounced resize handler
+            const onResize = this.#debounce(() => {
+                this.#updateVerticalClass(minimumWidth);
+            }, 100);
+            window.addEventListener('resize', onResize);
+
+            // When the radio button changes, the rights list might become visible. In this case, we need to update
+            // the layout.
+            const enforceRadios = this.dialogElement.querySelectorAll('input[name="enforceRequiredRights"]');
+            enforceRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    // Use setTimeout to run after the CSS display has been updated
+                    setTimeout(() => {
+                        if (minimumWidth === 0) {
+                            // Recompute the minimum width if it was zero, which is the case when the rights list
+                            // wasn't visible before.
+                            minimumWidth = this.#computeMinWidth();
+                        }
+                        this.#updateVerticalClass(minimumWidth);
+                    }, 0);
+                });
+            });
+
+            // Clean up on dialog close as the dialog is destroyed when it is closed.
+            $(this.dialogElement).on('hidden.bs.modal', () => {
+                window.removeEventListener('resize', onResize);
+            });
+        }
+
+        /**
+         * Set up the responsive layout initialization. This method needs to be called after the HTML structure has
+         * been created but before the dialog is shown.
+         */
+        #setupResponsiveLayoutInitialization()
+        {
+            // Wait for the "in" class to be added to the dialog element to setup the responsive layout as early as
+            // possible, before the animation ends.
+            const classObserver = new MutationObserver(mutationList => {
+                mutationList.forEach((mutation) => {
+                    if (mutation.target.classList.contains('in')) {
+                        this.#setupResponsiveLayout();
+                        // Unregister the observer after the first mutation to avoid multiple calls.
+                        // The setup of the responsive layout only needs to be called once for the dialog.
+                        classObserver.disconnect();
+                    }
+                });
+            });
+
+            classObserver.observe(this.dialogElement, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
         }
     }
 

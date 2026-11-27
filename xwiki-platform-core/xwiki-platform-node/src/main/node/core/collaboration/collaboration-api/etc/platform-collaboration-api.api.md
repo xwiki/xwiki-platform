@@ -44,6 +44,7 @@ export abstract class AbstractCollaborationManager implements CollaborationManag
 
 // @beta
 export type Collaboration = {
+    id?: string;
     connectionStatus: Ref<ConnectionStatus>;
     collaborators: Ref<Collaborator[]>;
     warnings?: Ref<CollaborationWarning[]>;

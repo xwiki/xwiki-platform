@@ -204,6 +204,15 @@ type EditorOptions = {
   syntax: string;
 
   /**
+   * Whether the edited content is executed in a restricted context when it's viewed (e.g. a comment), where some macros
+   * (e.g. the script macros) are not executed. The macro calls are then rendered the same way while editing. Not
+   * restricted by default.
+   *
+   * @since 18.10.0
+   */
+  restricted?: boolean;
+
+  /**
    * The language of the editor UI (menus, toolbars, placeholders), usually the language of the page hosting the
    * editor.
    */

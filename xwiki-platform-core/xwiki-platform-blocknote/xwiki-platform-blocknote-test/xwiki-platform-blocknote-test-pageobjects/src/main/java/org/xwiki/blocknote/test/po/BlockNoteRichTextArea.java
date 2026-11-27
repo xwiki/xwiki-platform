@@ -293,6 +293,25 @@ public class BlockNoteRichTextArea extends BaseElement
         return this;
     }
 
+    /**
+     * Waits until the output of all the macro calls is displayed. The macro calls that are inserted or modified, by
+     * the current user or by the other users editing the same content in realtime, are rendered asynchronously,
+     * server-side, and their placeholder is displayed meanwhile.
+     *
+     * @return this rich text area instance
+     * @since 18.10.0
+     */
+    public BlockNoteRichTextArea waitUntilMacrosAreRendered()
+    {
+        // The placeholder is displayed only for the macro calls that are not rendered yet. This has to change once the
+        // placeholder is displayed also for the rendered macro calls that don't have a visible output (XWIKI-24062:
+        // Macros without (visible) output are not visible in the BlockNote editor): the macro calls that are not
+        // rendered yet must then be told apart by something else.
+        getDriver().waitUntilCondition(
+            driver -> this.container.findElements(By.className("xwiki-macro-placeholder")).isEmpty());
+        return this;
+    }
+
     private WebElement getMacro(int index)
     {
         // The double click event listener is registered on the macro output wrapper which is the first child of the

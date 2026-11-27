@@ -86,13 +86,15 @@
 
 <script setup lang="ts">
 import { temporaryUploadsName } from "../services/attachments/temporaryUploads";
-import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { BLOCKNOTE_SYNTAX } from "../services/blocknote/syntax";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { joinFormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import { XWikiDocument } from "@xwiki/platform-document-xwiki";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { fileUploadListenerName } from "@xwiki/platform-editors-blocknote-react";
+import {
+  blockNoteProcessorName,
+  fileUploadListenerName,
+} from "@xwiki/platform-editors-blocknote-react";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { EntityType, Model } from "@xwiki/platform-xwiki-model-api";
 import { Container } from "inversify";
@@ -107,7 +109,6 @@ import {
 } from "vue";
 import type { Logic } from "../services/Logic";
 import type { TemporaryUploads } from "../services/attachments/temporaryUploads";
-import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -116,6 +117,8 @@ import type {
 import type { FormCollaboration } from "@xwiki/platform-collaboration-xwiki";
 import type { HeadlessEditorOptions } from "@xwiki/platform-editors-blocknote-headless";
 import type {
+  BlockNoteDocument,
+  BlockNoteProcessor,
   BlockType,
   EditorLanguage,
   FileUploadListener,
@@ -130,7 +133,7 @@ import type { Ref } from "vue";
 const container = inject<Container>("container")!;
 const logic = inject<Logic>("logic")!;
 const blockNoteProcessor: BlockNoteProcessor = container.get(
-  "BlockNoteProcessor",
+  blockNoteProcessorName,
   {
     name: "XWiki",
   },
@@ -151,6 +154,7 @@ const {
   documentReference = Model.serialize(XWiki.currentDocument.documentReference),
   locale,
   startupFocus = undefined,
+  restricted = false,
 } = defineProps<{
   // The key used to submit the edited content.
   name?: string;
@@ -187,6 +191,10 @@ const {
 
   // Whether to focus the editor when it's created. It's a string when it comes from an HTML attribute.
   startupFocus?: boolean | string;
+
+  // Whether the edited content is executed in a restricted context (e.g. a comment), where some macros are not
+  // executed. It's a string when it comes from an HTML attribute.
+  restricted?: boolean | string;
 }>();
 
 const actualLocale = locale || xwikiMeta.locale;
@@ -281,13 +289,14 @@ function createEditorOptions(label: string): HeadlessEditorOptions {
     // they edit within the realtime collaboration session.
     name,
     // The images and the links are saved relative to the edited document, so that they keep working when the edited
-    // document is renamed or copied. The pasted and dropped files are attached to it.
-    sourceDocumentReference: toCristalEntityReference(
-      sourceDocumentReference,
-    ) as DocumentReference | undefined,
+    // document is renamed or copied. The pasted and dropped files are attached to it. The macro calls are rendered for
+    // the edited document translation.
+    sourceDocumentReference: getEditorSourceDocumentReference(),
     // The syntax of the edited content, which is normally the syntax of the source document. The editor offers only
     // what this syntax supports, so that the edited content can be saved without losing anything.
     syntax: outputSyntax,
+    // The macro calls are rendered like when the edited content is viewed.
+    restricted: restricted === true || restricted === "true",
     // Translate the editor UI (menus, toolbars, placeholders) in the same language as the rest of the page.
     lang: (actualLocale || "en") as EditorLanguage,
     // The accessible name of the editing area, announced by the screen readers to tell which field is being edited.
@@ -346,7 +355,20 @@ async function joinCollaborationSession(): Promise<void> {
   });
   joinedCollaboration = await formCollaboration;
   collaboration.value = joinedCollaboration.collaboration;
-  collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
+  collaborationKey.value = joinedCollaboration.collaboration.id;
+}
+
+/**
+ * @returns the reference of the edited document translation, as expected by the BlockNote editor
+ */
+function getEditorSourceDocumentReference(): DocumentReference | undefined {
+  const reference = toCristalEntityReference(sourceDocumentReference) as
+    | DocumentReference
+    | undefined;
+  if (reference) {
+    reference.locale = actualLocale;
+  }
+  return reference;
 }
 
 onUnmounted(async () => {

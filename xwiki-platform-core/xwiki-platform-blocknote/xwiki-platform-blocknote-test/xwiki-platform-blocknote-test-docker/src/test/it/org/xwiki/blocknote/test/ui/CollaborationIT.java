@@ -34,6 +34,7 @@ import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.blocknote.test.po.BlockNoteStandaloneEditPage;
+import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.test.po.CoeditorElement;
@@ -51,6 +52,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ForceEditLockModal;
 import org.xwiki.test.ui.po.editor.ForceEditLockPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -68,6 +70,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class CollaborationIT extends AbstractBlockNoteIT
 {
+    private static final String VELOCITY_NOT_ALLOWED = "Failed to execute the [velocity] macro";
+
     @Test
     @Order(1)
     void editDifferentParagraphs(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
@@ -1126,8 +1130,9 @@ class CollaborationIT extends AbstractBlockNoteIT
         BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
         joinSessionConfirmingRequiredRightsWarning(secondEditPage);
         BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
-        // John gets the macro calls but not their output (which was rendered for superadmin).
-        secondTextArea.waitUntilTextContains("Hello macro:velocity!");
+        // John gets the macro calls but not their output (which was rendered for superadmin). The macro calls are
+        // rendered for John, with his rights, which don't allow him to execute the velocity macro.
+        secondTextArea.waitUntilTextContains(VELOCITY_NOT_ALLOWED);
         String secondText = secondTextArea.getText();
         assertMacroOutputNotShared(secondText);
 
@@ -1274,11 +1279,98 @@ class CollaborationIT extends AbstractBlockNoteIT
             five""", setup.rest().<Page>get(testReference).getContent());
     }
 
+    @Test
+    @Order(16)
+    void renderMacroModifiedByAnotherUser(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup) throws Exception
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+        setup.createPage(testReference, """
+            {{info}}one{{/info}}
+
+            end""", "");
+
+        BlockNoteInplaceEditPage firstEditPage = BlockNoteInplaceEditPage.gotoPage(testReference).editInplace();
+        BlockNoteRichTextArea firstTextArea = firstEditPage.getContentEditor().getRichTextArea();
+        firstTextArea.waitUntilTextContains("one");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsAlice(setup);
+        BlockNoteInplaceEditPage secondEditPage = BlockNoteInplaceEditPage.gotoPage(testReference);
+        joinSession(secondEditPage, setup);
+        BlockNoteRichTextArea secondTextArea = secondEditPage.getContentEditor().getRichTextArea();
+        // The macro call is rendered for Alice, since the macro output is not shared.
+        secondTextArea.waitUntilTextContains("one");
+
+        // Alice modifies the macro call.
+        secondTextArea.doubleClickMacro(0).setMacroContent("two").clickSubmit();
+        secondTextArea.waitUntilTextContains("two");
+
+        //
+        // First Tab
+        //
+
+        // The macro call modified by Alice is rendered again for John.
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("two");
+        assertThat(firstTextArea.getText(), not(containsString("one")));
+
+        // John inserts a macro call, which is rendered for both users.
+        firstTextArea.clickBlock(1).sendKeys(Keys.END, Keys.ENTER, "/");
+        SlashMenu slashMenu = new SlashMenu();
+        firstTextArea.sendKeys("macro");
+        slashMenu.waitForItemSelected("Macro");
+        firstTextArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+        MacroDialogSelectModal macroSelectModal = new MacroDialogSelectModal();
+        macroSelectModal.filterByText("success", 1).getFirstMacro().orElseThrow().click();
+        macroSelectModal.clickSelect().setMacroContent("three").clickSubmit();
+        firstTextArea.waitUntilTextContains("three");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilTextContains("three");
+        secondEditPage.cancel();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstEditPage.getToolbar().waitUntilEditingAlone();
+        firstEditPage.done();
+        // The macro output is not saved, only the macro calls. BlockNote adds an empty paragraph after the block
+        // inserted at the end of the content.
+        assertEquals("""
+            {{info}}
+            two
+            {{/info}}
+
+            end
+
+            {{success}}
+            three
+            {{/success}}""", setup.rest().<Page>get(testReference).getContent().strip());
+    }
+
     private void assertMacroOutputNotShared(String text)
     {
         // We can't simply check that the text doesn't contain "superadmin" because the text includes the labels of the
         // coeditor carets.
-        assertEquals(2, StringUtils.countMatches(text, "macro:velocity"), "Unexpected content: " + text);
+        assertEquals(2, StringUtils.countMatches(text, VELOCITY_NOT_ALLOWED), "Unexpected content: " + text);
         assertThat(text, not(containsString("Hello superadmin")));
         assertThat(text, not(containsString("Welcome superadmin")));
     }

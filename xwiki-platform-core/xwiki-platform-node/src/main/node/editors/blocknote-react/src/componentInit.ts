@@ -25,6 +25,7 @@ import { linksFeature } from "./features/links/links";
 import { macrosFeature } from "./features/macros/macros";
 import { pasteFilterFeature } from "./features/pasteFilter/pasteFilter";
 import { textStylesFeature } from "./features/textStyles/textStyles";
+import { DefaultBlockNoteIterator } from "./services/defaultBlockNoteIterator";
 import type { EditorFeature } from "./features/editorFeature";
 import type { Container } from "inversify";
 
@@ -51,5 +52,8 @@ export class ComponentInit {
     ]) {
       container.bind<EditorFeature>(editorFeatureName).toConstantValue(feature);
     }
+    // Iterates the edited content, without entering the macro calls (an implementation that knows the structure of the
+    // macro calls can replace it).
+    DefaultBlockNoteIterator.bind(container);
   }
 }

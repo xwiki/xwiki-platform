@@ -161,6 +161,10 @@ describe("insertMacroInvocation", () => {
         type: "xwikiInlineMacro",
         props: {
           call: JSON.stringify(invocationToMacroCall(invocation)),
+          // Inline content has no id that BlockNote preserves, so the id used to keep the macro output is a property.
+          id: expect.stringMatching(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+          ),
         },
       },
     ]);

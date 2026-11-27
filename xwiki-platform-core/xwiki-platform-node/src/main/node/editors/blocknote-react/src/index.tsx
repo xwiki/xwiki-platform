@@ -183,6 +183,34 @@ export type {
 
 export type { MacroCall } from "./features/macros/utils";
 
+export { getMacroCalls } from "./features/macros/macroOutputUpdate";
+
+export type { MacroCallEntry } from "./features/macros/macroOutputUpdate";
+
+export { blockNoteIteratorName } from "./services/blockNoteIterator";
+
+export type {
+  BlockNoteIterator,
+  BlockNoteVisitor,
+  NodeType,
+} from "./services/blockNoteIterator";
+
+export { DefaultBlockNoteIterator } from "./services/defaultBlockNoteIterator";
+
+export {
+  BlockNoteDocument,
+  blockNoteProcessorName,
+} from "./services/blockNoteProcessor";
+
+export type {
+  BlockNoteProcessor,
+  SaveOptions,
+} from "./services/blockNoteProcessor";
+
+export { macroRendererName } from "./services/macroRenderer";
+
+export type { MacroRenderer } from "./services/macroRenderer";
+
 export { linkEditorName, linkMetadataHandlerName } from "./services/linkEditor";
 
 export type {

@@ -17,11 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type {
-  BlockType,
-  InlineContentType,
-} from "@xwiki/platform-editors-blocknote-react";
+import type { BlockType, InlineContentType } from "../blocknote";
 
+/**
+ * A node of the BlockNote content: a block, a table cell, some inline content or a text.
+ *
+ * @since 18.10.0
+ * @beta
+ */
 type NodeType =
   | BlockType
   | { type: "tableCell"; content: InlineContentType[] }
@@ -31,6 +34,7 @@ type NodeType =
 /**
  * Used to visit BlockNote nodes (blocks and inline content).
  *
+ * @since 18.10.0
  * @beta
  */
 interface BlockNoteVisitor {
@@ -38,14 +42,27 @@ interface BlockNoteVisitor {
    * Visit a BlockNote node (block or inline content).
    *
    * @param node - the node to visit
-   * @returns true if the iterator should not visit the children of this node, false otherwise
+   * @param macro - the macro node that holds the visited node in the parameters or the content of its call, if any (the
+   *   parameters and the content of a macro call that are editable in-place are BlockNote fragments, which only some
+   *   iterators enter); undefined when the visited node is part of the iterated content
+   * @returns true if the iterator should not visit the children of this node (nor the nested macro calls, for a macro
+   *   node), false otherwise
    */
-  visit(node: NodeType): boolean;
+  visit(node: NodeType, macro?: object): boolean;
 }
+
+/**
+ * The name under which the {@link BlockNoteIterator} is bound in the service container.
+ *
+ * @since 18.10.0
+ * @beta
+ */
+const blockNoteIteratorName = "BlockNoteIterator";
 
 /**
  * Used to iterate BlockNote nodes (blocks and inline content).
  *
+ * @since 18.10.0
  * @beta
  */
 interface BlockNoteIterator {
@@ -58,4 +75,5 @@ interface BlockNoteIterator {
   iterate(blockNoteContent: BlockType[], visitor: BlockNoteVisitor): void;
 }
 
+export { blockNoteIteratorName };
 export type { BlockNoteIterator, BlockNoteVisitor, NodeType };

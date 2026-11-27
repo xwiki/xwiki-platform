@@ -386,4 +386,24 @@ describe("MacroOutput (nested macro output lookup)", () => {
       container.querySelector('[data-macro-name="error"]')!.textContent,
     ).toBe("macro:error");
   });
+
+  test("displays the output of a nested macro once it is rendered", () => {
+    const freshOutputs = new MacroOutputCache();
+    const container = render(
+      editableOutput,
+      infoCallWithNestedError(errorCall),
+      false,
+      freshOutputs,
+    );
+    const nested = () =>
+      container.querySelector<HTMLElement>('[data-macro-name="error"]')!;
+    expect(nested().textContent).toBe("macro:error");
+
+    flushSync(() =>
+      freshOutputs.set("nested-1", JSON.stringify(errorCall), errorOutput),
+    );
+
+    expect(nested().querySelector("div.box.errormessage")).not.toBeNull();
+    expect(nested().textContent).toBe("test");
+  });
 });

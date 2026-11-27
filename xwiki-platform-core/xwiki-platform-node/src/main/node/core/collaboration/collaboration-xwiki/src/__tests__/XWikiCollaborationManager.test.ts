@@ -36,6 +36,8 @@ import type { WebsocketProvider } from "y-websocket";
 class FakeProvider {
   public readonly doc = { clientID: 42 };
 
+  public readonly params = { room: "xwiki:Space.Page/Child", locale: "fr" };
+
   public readonly awareness = {
     on: vi.fn(),
     getStates: () => new Map(),
@@ -138,6 +140,8 @@ describe("XWikiCollaborationManager", () => {
     const collaboration = await joined;
     expect(collaboration.provider).toBe(provider);
     expect(collaboration.collaborator.id).toBe("42");
+    // The room, as the server expects it in the "collaboration" request parameter.
+    expect(collaboration.id).toBe("xwiki%3ASpace.Page%2FChild/fr");
     expect(collaboration.connectionStatus.value).toBe(
       ConnectionStatus.Connected,
     );

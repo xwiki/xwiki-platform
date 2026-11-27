@@ -35,6 +35,7 @@ import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -76,9 +77,9 @@ class MacroIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Verify the macro output is rendered.
-        String text = textArea.getText();
-        assertThat(text, containsString("green"));
-        assertThat(text, containsString("and a warning."));
+        String initialText = textArea.getText();
+        assertThat(initialText, containsString("green"));
+        assertThat(initialText, containsString("and a warning."));
 
         // Edit the inline macro.
         MacroDialogEditModal macroEditModal = textArea.doubleClickMacro(0);
@@ -90,9 +91,8 @@ class MacroIT extends AbstractBlockNoteIT
         macroEditModal.setMacroParameter("title", "Inline title").setMacroParameter("cssClass", "two")
             .setMacroContent("Red {{error}}Green{{/error}} Blue").clickSubmit();
 
-        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
-        // show the macro placeholder.
-        assertThat(textArea.getText(), containsString("macro:success"));
+        // The edited content is rendered again, to show the output of the updated macro call.
+        textArea.waitUntilTextContains("Green");
 
         // Edit the block macro.
         macroEditModal = textArea.doubleClickMacro(1);
@@ -112,12 +112,8 @@ class MacroIT extends AbstractBlockNoteIT
         macroEditModal.setMacroParameter("title", "New title").setMacroParameter("cssClass", "test")
             .setMacroContent("New content.").clickSubmit();
 
-        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
-        // show the macro placeholder.
-        assertEquals("""
-            first macro:success line
-            macro:info
-            end""", textArea.getText());
+        textArea.waitUntilTextContains("New content.");
+        assertThat(textArea.getText(), not(containsString("My content.")));
 
         // Edit again the inline macro.
         macroEditModal = textArea.doubleClickMacro(0);
@@ -128,6 +124,8 @@ class MacroIT extends AbstractBlockNoteIT
 
         macroEditModal.setMacroParameter("title", "My Inline Title").setMacroParameter("cssClass", "three")
             .clickSubmit();
+        // Wait for the updated macro call to be rendered before editing another macro call.
+        textArea.waitUntilMacrosAreRendered();
 
         // Edit again the block macro.
         macroEditModal = textArea.doubleClickMacro(1);
@@ -174,6 +172,8 @@ class MacroIT extends AbstractBlockNoteIT
         assertEquals("", macroEditModal.getMacroParameter("cssClass"));
         assertEquals("Red {{error}}Green{{/error}} Blue", macroEditModal.getMacroContent());
         macroEditModal.setMacroParameter("cssClass", "four").setMacroContent("**Failed**!").clickSubmit();
+        // Wait for the updated macro call to be rendered before editing another macro call.
+        textArea.waitUntilMacrosAreRendered();
 
         // Change the block macro from info to warning.
         macroEditModal = textArea.doubleClickMacro(1);
@@ -195,6 +195,8 @@ class MacroIT extends AbstractBlockNoteIT
             //Some//
 
             {{box}}warning{{/box}}!""").clickSubmit();
+        // Wait for the updated macro call to be rendered before editing another macro call.
+        textArea.waitUntilMacrosAreRendered();
 
         // Edit again the inline macro.
         macroEditModal = textArea.doubleClickMacro(0);
@@ -256,9 +258,8 @@ class MacroIT extends AbstractBlockNoteIT
         MacroDialogEditModal macroEditModal = macroSelectModal.clickSelect();
         macroEditModal.setMacroContent("foo").setMacroParameter("title", "bar").clickSubmit();
 
-        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
-        // show the macro placeholder.
-        assertEquals("macro:info", textArea.getText());
+        // The edited content is rendered again, to show the output of the inserted macro call.
+        textArea.waitUntilTextContains("foo");
 
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
@@ -288,9 +289,8 @@ class MacroIT extends AbstractBlockNoteIT
         MacroDialogEditModal macroEditModal = macroSelectModal.clickSelect();
         macroEditModal.setMacroContent("foo").setMacroParameter("title", "bar").clickSubmit();
 
-        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
-        // show the macro placeholder.
-        assertEquals("macro:success", textArea.getText());
+        // The edited content is rendered again, to show the output of the inserted macro call.
+        textArea.waitUntilTextContains("foo");
 
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
@@ -317,19 +317,23 @@ class MacroIT extends AbstractBlockNoteIT
 
         macroEditModal.setMacroParameter("title", "baz").clickSubmit();
 
-        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
-        // show the macro placeholder.
-        assertEquals("macro:success", textArea.getText());
+        // The edited content is rendered again, to show the output of the updated macro call.
+        textArea.waitUntilTextContains("baz");
 
-        // Undo the macro call update, without changing the selection: the toolbar edits the restored macro call. The
-        // undo shortcut is sent alone, so that the modifier key is released afterwards.
+        // Undo the macro call update, without changing the selection: the previous macro call is restored, rendered
+        // again, and edited by the toolbar. The undo shortcut is sent alone, so that the modifier key is released
+        // afterwards.
         textArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        textArea.waitUntilTextContains("bar");
+        assertThat(textArea.getText(), not(containsString("baz")));
         macroEditModal = editor.getToolBar().editMacro();
         assertEquals("bar", macroEditModal.getMacroParameter("title"));
         macroEditModal.clickCancel();
 
-        // Redo the macro call update: the toolbar edits the updated macro call again.
+        // Redo the macro call update: the updated macro call is restored, rendered again, and edited by the toolbar.
         textArea.sendKeys(Keys.chord(Keys.CONTROL, "y"));
+        textArea.waitUntilTextContains("baz");
+        assertThat(textArea.getText(), not(containsString("bar")));
         macroEditModal = editor.getToolBar().editMacro();
         assertEquals("baz", macroEditModal.getMacroParameter("title"));
         macroEditModal.clickCancel();

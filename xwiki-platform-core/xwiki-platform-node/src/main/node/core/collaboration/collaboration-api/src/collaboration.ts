@@ -44,6 +44,15 @@ type CollaborationWarning = "sessionReplaced";
  */
 type Collaboration = {
   /**
+   * Identifies the collaboration session for the server where the content is saved, e.g. to tell it, along with the
+   * content edited in this session, which session the content comes from. Undefined when the collaboration provider
+   * doesn't identify its sessions.
+   *
+   * @since 18.10.0
+   */
+  id?: string;
+
+  /**
    * Specifies whether the current user is connected, connecting or disconnected from this collaboration. The connection
    * status is reactive and will be updated when the connection status changes. Note that the collaboration provider
    * will automatically try to reconnect when the connection is lost.

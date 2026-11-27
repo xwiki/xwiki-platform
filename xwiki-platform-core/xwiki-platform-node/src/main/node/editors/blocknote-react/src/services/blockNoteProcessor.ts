@@ -17,13 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type {
-  BlockType,
-  MacroFeatureOptions,
-} from "@xwiki/platform-editors-blocknote-react";
+import type { BlockType } from "../blocknote";
+import type { MacroFeatureOptions } from "../editorOptions";
 
 /**
  * Encapsulates the BlockNote content and the output of its macro calls (which must not be part of the content).
+ *
+ * @since 18.10.0
+ * @beta
  */
 class BlockNoteDocument {
   /**
@@ -38,11 +39,20 @@ class BlockNoteDocument {
 }
 
 /**
+ * The name under which the {@link BlockNoteProcessor} is bound in the service container (the implementations are told
+ * apart by their binding name, e.g. "XWiki").
+ *
+ * @since 18.10.0
+ * @beta
+ */
+const blockNoteProcessorName = "BlockNoteProcessor";
+
+/**
  * Processes the BlockNote content before it is loaded in the editor and before it is submitted to be saved server-side.
  * In other words, it acts as a pre-processor and post-processor for the BlockNote content.
  *
+ * @since 18.10.0
  * @beta
- * @since 18.6.0RC1
  */
 interface BlockNoteProcessor {
   /**
@@ -57,9 +67,26 @@ interface BlockNoteProcessor {
    * Serializes the given BlockNote document in the BlockNote JSON format that can be saved server-side.
    *
    * @param blockNoteDocument - the BlockNote document to be serialized to JSON
+   * @param options - how to serialize the given BlockNote document
    * @returns the JSON serialization of the given BlockNote document
    */
-  save(blockNoteDocument: BlockNoteDocument): string;
+  save(blockNoteDocument: BlockNoteDocument, options?: SaveOptions): string;
 }
 
-export { BlockNoteDocument, type BlockNoteProcessor };
+/**
+ * How to serialize a BlockNote document.
+ *
+ * @since 18.10.0
+ * @beta
+ */
+type SaveOptions = {
+  /**
+   * Whether to keep the id of each macro call (used to look up its output), as a macro parameter, so that the output of
+   * the macro calls rendered server-side can be associated with them. The content serialized this way is meant to be
+   * rendered, not saved.
+   */
+  macroIds?: boolean;
+};
+
+export { BlockNoteDocument, blockNoteProcessorName };
+export type { BlockNoteProcessor, SaveOptions };

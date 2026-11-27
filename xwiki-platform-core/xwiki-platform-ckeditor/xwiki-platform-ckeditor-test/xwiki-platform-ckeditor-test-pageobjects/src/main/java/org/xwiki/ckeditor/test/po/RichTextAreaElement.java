@@ -870,6 +870,81 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
+     * @return the vertical scroll position of the edited content, in pixels; this is the scroll position of the
+     *         rich text area itself when it is implemented using an iframe, or the scroll position of its closest
+     *         scrollable ancestor (usually the page) otherwise
+     * @since 17.10.16
+     * @since 18.4.9
+     * @since 18.10.0RC1
+     */
+    public int getScrollTop()
+    {
+        return ((Number) executeOnScrollContainer("return scrollContainer.scrollTop;")).intValue();
+    }
+
+    /**
+     * Scrolls the edited content vertically, like the user would do using the mouse wheel or the scroll bar, i.e.
+     * without moving the caret or changing the focus.
+     *
+     * @param scrollTop the new vertical scroll position of the edited content, in pixels
+     * @see #getScrollTop()
+     * @since 17.10.16
+     * @since 18.4.9
+     * @since 18.10.0RC1
+     */
+    public void scrollTo(int scrollTop)
+    {
+        executeOnScrollContainer("scrollContainer.scrollTop = arguments[1];", scrollTop);
+    }
+
+    /**
+     * @return {@code true} if the caret (or the start of the selection) is inside the visible area of the edited
+     *         content, {@code false} otherwise (including when the rich text area has no selection)
+     * @since 17.10.16
+     * @since 18.4.9
+     * @since 18.10.0RC1
+     */
+    public boolean isCaretVisible()
+    {
+        return (Boolean) executeOnScrollContainer("""
+            const selection = arguments[0].ownerDocument.getSelection();
+            if (!selection.rangeCount || !arguments[0].contains(selection.getRangeAt(0).startContainer)) {
+              return false;
+            }
+            const range = selection.getRangeAt(0).cloneRange();
+            range.collapse(true);
+            // A collapsed range has no client rectangle when it's not inside a text node.
+            let rect = range.getClientRects()[0];
+            if (!rect) {
+              const node = range.startContainer;
+              rect = (node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement).getBoundingClientRect();
+            }
+            const viewport = scrollContainer === scrollContainer.ownerDocument.scrollingElement
+              ? {top: 0, bottom: scrollContainer.ownerDocument.defaultView.innerHeight}
+              : scrollContainer.getBoundingClientRect();
+            return rect.top >= viewport.top && rect.bottom <= viewport.bottom;
+            """);
+    }
+
+    private Object executeOnScrollContainer(String script, Object... arguments)
+    {
+        return getFromEditedContent(() -> {
+            Object[] allArguments = new Object[arguments.length + 1];
+            allArguments[0] = getRootEditableElement(false);
+            System.arraycopy(arguments, 0, allArguments, 1, arguments.length);
+            return getDriver().executeScript("""
+                const isScrollable = element => element.scrollHeight > element.clientHeight
+                  && ['auto', 'scroll'].includes(getComputedStyle(element).overflowY);
+                let scrollContainer = arguments[0];
+                while (scrollContainer && !isScrollable(scrollContainer)) {
+                  scrollContainer = scrollContainer.parentElement;
+                }
+                scrollContainer = scrollContainer || arguments[0].ownerDocument.scrollingElement;
+                """ + script, allArguments);
+        });
+    }
+
+    /**
      * Drag the specified image relative to its current position.
      * 
      * @param imageIndex the index of the image to be dragged (0-based)

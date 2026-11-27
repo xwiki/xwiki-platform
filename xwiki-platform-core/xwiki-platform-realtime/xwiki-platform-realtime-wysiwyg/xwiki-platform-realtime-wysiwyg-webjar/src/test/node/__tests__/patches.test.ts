@@ -315,5 +315,17 @@ describe("Patches", () => {
         expect(getRestoredCaret()).toBeNull();
       });
     });
+
+    it("doesn't scroll the restored selection into view", async () => {
+      // The local user didn't make the remote change and may be reading a different part of the content.
+      setContent("<p>one</p>");
+      placeCaret(findText("one"), 1);
+
+      await applyRemoteContent("<p>one</p><p>two</p>");
+
+      expect(restoreSelection.mock.calls[0][1]).toEqual({
+        preventScroll: true,
+      });
+    });
   });
 });

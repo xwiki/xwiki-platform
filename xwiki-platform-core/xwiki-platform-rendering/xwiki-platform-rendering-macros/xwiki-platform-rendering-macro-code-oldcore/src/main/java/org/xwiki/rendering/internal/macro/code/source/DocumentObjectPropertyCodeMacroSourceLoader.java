@@ -52,6 +52,10 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
         MacroContentSourceReference reference, XWikiContext xcontext) throws MacroExecutionException
     {
         BaseObject xobject = document.getXObject(entityReference.getParent());
+        if (xobject == null) {
+            throw new MacroExecutionException("Unknown object [" + entityReference.getParent() + "]");
+        }
+
         BaseProperty xobjectProperty;
         try {
             xobjectProperty = (BaseProperty) xobject.get(entityReference.getName());

@@ -602,18 +602,21 @@ public class WysiwygEditorScriptService implements ScriptService
     }
 
     /**
-     * Builds the annotated XHTML needed to import the specified office attachment in the WYSIWYG editor.
+     * Builds the content needed to import the specified office attachment in the WYSIWYG editor.
      *
      * @param attachmentReference the office attachment to import
      * @param parameters the import parameters; {@code filterStyles} controls whether styles are filtered when
      *     importing office text documents; {@code useOfficeViewer} controls whether the office viewer macro is used
-     *     instead of converting the content of the office file to wiki syntax
-     * @return the annotated XHTML needed to import the specified attachment into the content of the WYSIWYG editor
+     *     instead of converting the content of the office file to wiki syntax;
+     *     {@link AttachmentImporter#OUTPUT_SYNTAX} (since 19.0.0RC1) holds the {@link Syntax} the office content is
+     *     converted to, annotated XHTML by default
+     * @return the content needed to import the specified attachment into the content of the WYSIWYG editor, in the
+     *     requested output syntax
      */
     public String importOfficeAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
     {
         try {
-            return this.officeAttachmentImporter.toHTML(attachmentReference, parameters);
+            return this.officeAttachmentImporter.importAttachment(attachmentReference, parameters);
         } catch (Exception e) {
             this.logger.warn("Failed to import office attachment [{}]. Root cause is [{}]",
                 this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));

@@ -36,12 +36,15 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -62,6 +65,12 @@ class OfficeAttachmentImporterTest
 {
     private static final AttachmentReference ATTACHMENT_REFERENCE =
         new AttachmentReference("my.doc", new DocumentReference("wiki", "Some", "Page"));
+
+    private static final Syntax BLOCKNOTE = new Syntax(new SyntaxType("blocknote", "BlockNote"), "1.0");
+
+    private static final String ANNOTATED_XHTML_ID = Syntax.ANNOTATED_XHTML_1_0.toIdString();
+
+    private static final String BLOCKNOTE_ID = BLOCKNOTE.toIdString();
 
     @InjectMockComponents
     private OfficeAttachmentImporter officeAttachmentImporter;
@@ -101,69 +110,102 @@ class OfficeAttachmentImporterTest
     }
 
     @Test
-    void toHTMLWithOfficeViewer() throws Exception
+    void importAttachmentWithOfficeViewer() throws Exception
     {
         XDOM xdom = mock(XDOM.class);
         when(officeMacroImporter.buildXDOM(ATTACHMENT_REFERENCE, false)).thenReturn(xdom);
-        when(officeMacroImporter.render(xdom)).thenReturn("foo");
+        when(officeMacroImporter.render(xdom, Syntax.ANNOTATED_XHTML_1_0)).thenReturn("foo");
 
         Map<String, Object> parameters = Map.of("useOfficeViewer", "true");
-        assertEquals("foo", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
+        assertEquals("foo", officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
     }
 
     @Test
-    void toHTMLRequiresEditRight()
+    void importAttachmentWithOfficeViewerAndOutputSyntax() throws Exception
+    {
+        XDOM xdom = mock(XDOM.class);
+        when(officeMacroImporter.buildXDOM(ATTACHMENT_REFERENCE, false)).thenReturn(xdom);
+        when(officeMacroImporter.render(xdom, BLOCKNOTE)).thenReturn("[]");
+
+        Map<String, Object> parameters = Map.of("useOfficeViewer", "true", AttachmentImporter.OUTPUT_SYNTAX, BLOCKNOTE);
+        assertEquals("[]", officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    @Test
+    void importAttachmentRequiresEditRight()
     {
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Map.of());
+            officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, Map.of());
         });
         assertEquals("Edit right is required in order to import [Some.Page@my.doc].", runtimeException.getMessage());
     }
 
     @Test
-    void toHTMLAttachmentNotFound()
+    void importAttachmentNotFound()
     {
         when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Map.of());
+            officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, Map.of());
         });
         assertEquals("Attachment not found: [Some.Page@my.doc].", runtimeException.getMessage());
     }
 
     @Test
-    void toHTMLOfficeServerNotConnected() throws Exception
+    void importAttachmentOfficeServerNotConnected() throws Exception
     {
         when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
         when(this.documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn("1.3");
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Map.of());
+            officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, Map.of());
         });
         assertEquals("The office server is not connected.", runtimeException.getMessage());
     }
 
     @Test
-    void toHTML() throws Exception
+    void importAttachment() throws Exception
     {
-        when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
-        when(this.documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn("1.3");
-        when(this.officeServer.getState()).thenReturn(ServerState.CONNECTED);
-
-        InputStream attachmentContent = mock(InputStream.class);
-        when(this.documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
-
-        XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
-        when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
-            .thenReturn(xdomOfficeDocument);
-        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
-        when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
+        XDOMOfficeDocument xdomOfficeDocument = mockConvertibleAttachment();
+        when(xdomOfficeDocument.getContentAsString(ANNOTATED_XHTML_ID)).thenReturn("test");
 
         Map<String, Object> parameters = Map.of("filterStyles", "true");
+        assertEquals("test", officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    @Test
+    void importAttachmentWithOutputSyntax() throws Exception
+    {
+        XDOMOfficeDocument xdomOfficeDocument = mockConvertibleAttachment();
+        when(xdomOfficeDocument.getContentAsString(BLOCKNOTE_ID)).thenReturn("[]");
+
+        Map<String, Object> parameters = Map.of("filterStyles", "true", AttachmentImporter.OUTPUT_SYNTAX, BLOCKNOTE);
+        assertEquals("[]", officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    @Test
+    void importAttachmentWithNonSyntaxOutputSyntax()
+    {
+        // Script callers build the parameters map by hand, so the value can be anything.
+        Map<String, Object> parameters = Map.of("filterStyles", "true", AttachmentImporter.OUTPUT_SYNTAX, "[]");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
+        assertEquals("The [outputSyntax] import parameter must be a [org.xwiki.rendering.syntax.Syntax] but was "
+            + "[java.lang.String].", exception.getMessage());
+    }
+
+    @Test
+    void toHTMLIgnoresTheOutputSyntaxParameter() throws Exception
+    {
+        XDOMOfficeDocument xdomOfficeDocument = mockConvertibleAttachment();
+        when(xdomOfficeDocument.getContentAsString(ANNOTATED_XHTML_ID)).thenReturn("test");
+
+        // Callers of the deprecated method get HTML whatever the map asks for.
+        Map<String, Object> parameters = Map.of("filterStyles", "true", AttachmentImporter.OUTPUT_SYNTAX, BLOCKNOTE);
         assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
     }
 
     @Test
-    void toHTMLTemporaryUploadedAttachment() throws Exception
+    void importAttachmentTemporaryUploadedAttachment() throws Exception
     {
         when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
         when(this.documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(null);
@@ -180,9 +222,25 @@ class OfficeAttachmentImporterTest
         when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
             .thenReturn(xdomOfficeDocument);
         when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
-        when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
+        when(xdomOfficeDocument.getContentAsString(ANNOTATED_XHTML_ID)).thenReturn("test");
 
         Map<String, Object> parameters = Map.of("filterStyles", "true");
-        assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
+        assertEquals("test", officeAttachmentImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
+    }
+
+    private XDOMOfficeDocument mockConvertibleAttachment() throws Exception
+    {
+        when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
+        when(this.documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn("1.3");
+        when(this.officeServer.getState()).thenReturn(ServerState.CONNECTED);
+
+        InputStream attachmentContent = mock(InputStream.class);
+        when(this.documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
+
+        XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
+        when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
+            .thenReturn(xdomOfficeDocument);
+        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
+        return xdomOfficeDocument;
     }
 }

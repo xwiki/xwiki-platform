@@ -76,13 +76,6 @@ ckeditor.plugin.macro.installSuccessful=Successfully installed {0} {1}.
 ckeditor.plugin.macro.installFailed=Failed to install {0} {1}.
 
 ckeditor.plugin.office.importer.title=Import Office File
-ckeditor.plugin.office.importer.filePath=File Path
-ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
-ckeditor.plugin.office.importer.filterStyles=Filter Styles
-ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
-ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
-ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
-ckeditor.plugin.office.importer.required=Required
 ckeditor.plugin.office.importer.import=Import
 ckeditor.plugin.office.importer.inProgress=Importing office file...
 ckeditor.plugin.office.importer.done=Office file successfully imported.
@@ -295,6 +288,22 @@ ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to disp
 ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 ckeditor.upload.error.csrf=The CSRF token is missing.
 ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
+
+## Deprecated since 19.0.0RC1
+#@deprecated wysiwyg.officeImporter.filePath.label
+ckeditor.plugin.office.importer.filePath=File Path
+#@deprecated wysiwyg.officeImporter.filePath.hint
+ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+#@deprecated wysiwyg.officeImporter.filterStyles.label
+ckeditor.plugin.office.importer.filterStyles=Filter Styles
+#@deprecated wysiwyg.officeImporter.filterStyles.hint
+ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+#@deprecated wysiwyg.officeImporter.useOfficeViewer.label
+ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+#@deprecated wysiwyg.officeImporter.useOfficeViewer.hint
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+#@deprecated wysiwyg.officeImporter.required
+ckeditor.plugin.office.importer.required=Required
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

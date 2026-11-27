@@ -25,11 +25,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
@@ -40,6 +42,7 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -76,11 +79,11 @@ public class OfficeMacroImporter
     private Transformation macroTransformation;
 
     /**
-     * The component used to render a XDOM to XHTML.
+     * Used to look up the renderer matching the requested output syntax.
      */
     @Inject
-    @Named("annotatedxhtml/1.0")
-    private BlockRenderer xhtmlRenderer;
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
 
     /**
      * Used to serialize the reference of the document that has the office file attachment.
@@ -132,20 +135,26 @@ public class OfficeMacroImporter
     }
 
     /**
-     * Renders the given XDOM to the annotated XHTML syntax.
+     * Renders the given XDOM to the specified syntax.
      * 
      * @param xdom the XDOM to be rendered
-     * @return the result of rendering the given XDOM to annotated XHTML syntax
-     * @throws Exception if the rendering process fails
+     * @param outputSyntax the syntax to render the given XDOM to
+     * @return the result of rendering the given XDOM to the specified syntax
+     * @throws Exception if rendering fails, in particular if no renderer exists for the specified syntax
+     * @since 19.0.0RC1
      */
-    public String render(XDOM xdom) throws Exception
+    public String render(XDOM xdom, Syntax outputSyntax) throws Exception
     {
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
+        // A macro can render differently per target syntax, so the transformation needs the syntax too.
+        txContext.setTargetSyntax(outputSyntax);
         ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
 
+        BlockRenderer renderer =
+            this.contextComponentManagerProvider.get().getInstance(BlockRenderer.class, outputSyntax.toIdString());
         WikiPrinter printer = new DefaultWikiPrinter();
-        xhtmlRenderer.render(xdom, printer);
+        renderer.render(xdom, printer);
 
         return printer.toString();
     }

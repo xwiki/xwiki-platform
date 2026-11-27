@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.internal.importer;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,6 +41,7 @@ import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
@@ -101,23 +103,47 @@ public class OfficeAttachmentImporter implements AttachmentImporter
     @Override
     public String toHTML(AttachmentReference attachmentReference, Map<String, Object> parameters) throws Exception
     {
+        // Callers of the deprecated method expect HTML whatever the parameters map says.
+        Map<String, Object> htmlParameters = new HashMap<>(parameters);
+        htmlParameters.put(OUTPUT_SYNTAX, Syntax.ANNOTATED_XHTML_1_0);
+        return importAttachment(attachmentReference, htmlParameters);
+    }
+
+    @Override
+    public String importAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
+        throws Exception
+    {
         boolean filterStyles = Boolean.parseBoolean(String.valueOf(parameters.get("filterStyles")));
+        Syntax outputSyntax = getOutputSyntax(parameters);
         if (Boolean.parseBoolean(String.valueOf(parameters.get("useOfficeViewer")))) {
             return this.officeMacroImporter
-                .render(this.officeMacroImporter.buildXDOM(attachmentReference, filterStyles));
+                .render(this.officeMacroImporter.buildXDOM(attachmentReference, filterStyles), outputSyntax);
         } else {
-            return maybeConvertAttachmentContent(attachmentReference, filterStyles);
+            return maybeConvertAttachmentContent(attachmentReference, filterStyles, outputSyntax);
         }
     }
 
-    private String maybeConvertAttachmentContent(AttachmentReference attachmentReference, boolean filterStyles)
-        throws Exception
+    private static Syntax getOutputSyntax(Map<String, Object> parameters)
+    {
+        Object outputSyntax = parameters.get(OUTPUT_SYNTAX);
+        if (outputSyntax == null) {
+            return Syntax.ANNOTATED_XHTML_1_0;
+        } else if (outputSyntax instanceof Syntax syntax) {
+            return syntax;
+        }
+        // Script callers build the map by hand, so name the parameter rather than let the cast fail.
+        throw new IllegalArgumentException(String.format("The [%s] import parameter must be a [%s] but was [%s].",
+            OUTPUT_SYNTAX, Syntax.class.getName(), outputSyntax.getClass().getName()));
+    }
+
+    private String maybeConvertAttachmentContent(AttachmentReference attachmentReference, boolean filterStyles,
+        Syntax outputSyntax) throws Exception
     {
         if (this.authorization.hasAccess(Right.EDIT, attachmentReference)) {
             if (this.documentAccessBridge.getAttachmentVersion(attachmentReference) != null
                 || this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachmentReference).isPresent()) {
                 if (this.officeServer.getState() == ServerState.CONNECTED) {
-                    return convertAttachmentContent(attachmentReference, filterStyles);
+                    return convertAttachmentContent(attachmentReference, filterStyles, outputSyntax);
                 } else {
                     throw new RuntimeException("The office server is not connected.");
                 }
@@ -137,11 +163,12 @@ public class OfficeAttachmentImporter implements AttachmentImporter
      * @param attachmentReference specifies the office file whose content should be converted
      * @param filterStyles controls whether styles are filtered when converting the HTML produced by the office server
      *            to wiki syntax
-     * @return the annotated XHTML text obtained from the specified office document
+     * @param outputSyntax the syntax to convert the office document to
+     * @return the text obtained from the specified office document, in the specified syntax
      * @throws Exception if converting the content of the specified attachment fails
      */
-    private String convertAttachmentContent(AttachmentReference attachmentReference, boolean filterStyles)
-        throws Exception
+    private String convertAttachmentContent(AttachmentReference attachmentReference, boolean filterStyles,
+        Syntax outputSyntax) throws Exception
     {
         DocumentReference targetDocRef = attachmentReference.getDocumentReference();
 
@@ -156,7 +183,7 @@ public class OfficeAttachmentImporter implements AttachmentImporter
                 }
             }
 
-            return xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");
+            return xdomOfficeDocument.getContentAsString(outputSyntax.toIdString());
         }
     }
 

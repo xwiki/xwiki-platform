@@ -77,7 +77,7 @@
       editor.config['xwiki-office'] = $.extend({
         enabled: false,
         importer: editor.config.sourceDocument.getURL('get', $.param({
-          sheet: 'CKEditor.OfficeImporter',
+          sheet: 'XWiki.WYSIWYG.OfficeImporter',
           language: editor.getContentLocale()
         }))
       }, editor.config['xwiki-office']);
@@ -172,11 +172,12 @@
           var notification = editor.showNotification(editor.localization.get('xwiki-office.importer.inProgress'),
             'progress');
           var widget = this;
+          // The importer page writes the response itself, so outputSyntax now selects the syntax the office content
+          // is converted to. Unset means annotated XHTML, which is what CKEditor edits.
           $.get(officeConfig.importer, {
             fileName: upload.fileName,
             filterStyles: upload.file.filterStyles,
-            useOfficeViewer: upload.file.useOfficeViewer,
-            outputSyntax: 'plain'
+            useOfficeViewer: upload.file.useOfficeViewer
           }).done(function(html) {
             widget.replaceWith(html);
             notification.update({

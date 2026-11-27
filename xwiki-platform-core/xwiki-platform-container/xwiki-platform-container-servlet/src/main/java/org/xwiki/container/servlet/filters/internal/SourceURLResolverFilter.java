@@ -152,7 +152,18 @@ public class SourceURLResolverFilter implements Filter
         {
             checkBaseURL();
 
-            return this.baseURL != null ? this.baseURL.getPort() : super.getServerPort();
+            if (this.baseURL != null) {
+                int port = this.baseURL.getPort();
+                if (port != -1) {
+                    return port;
+                }
+                int defaultPort = this.baseURL.getDefaultPort();
+                if (defaultPort != -1) {
+                    return defaultPort;
+                }
+            }
+
+            return super.getServerPort();
         }
 
         @Override

@@ -23,12 +23,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -36,6 +39,7 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.job.JobException;
@@ -118,6 +122,9 @@ class DefaultAsyncRendererExecutorTest
     @MockComponent
     private AuthorExecutor authorExecutor;
 
+    @MockComponent
+    private CacheControl cacheControl;
+
     private XWikiContext xcontext;
 
     private XWikiDocument secureDocument;
@@ -133,8 +140,6 @@ class DefaultAsyncRendererExecutorTest
 
     private AsyncRendererJob job;
 
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
     private JobGroupPath jobGroupPath;
 
     @BeforeEach
@@ -148,8 +153,6 @@ class DefaultAsyncRendererExecutorTest
         when(this.renderer.render(false, true)).thenReturn(new AsyncRendererResult("false true"));
         this.jobGroupPath = new JobGroupPath(Arrays.asList("Something", "Foo", "Bar"));
         when(this.renderer.getJobGroupPath()).thenReturn(this.jobGroupPath);
-
-        when(this.cache.getLock()).thenReturn(this.lock);
 
         this.xcontext = mock();
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
@@ -215,6 +218,8 @@ class DefaultAsyncRendererExecutorTest
         assertEquals(ASYNC_JOB_HTTP_PATH, response.getJobIdHTTPPath());
         assertEquals("true true", response.getStatus().getResult().getResult());
         assertEquals(this.jobGroupPath, response.getStatus().getRequest().getJobGroupPath());
+        // The job might already be finished, so the client must be registered through the cache.
+        verify(this.cache).addClient(response.getStatus(), response.getAsyncClientId());
     }
 
     @Test
@@ -325,6 +330,88 @@ class DefaultAsyncRendererExecutorTest
 
         assertNotNull(response.getAsyncClientId());
         assertSame(status, response.getStatus());
+        verify(this.cache).addClient(status, response.getAsyncClientId());
+    }
+
+    @Test
+    void renderForcedPlaceHolderWithCachedResult() throws Exception
+    {
+        AsyncRendererJobStatus status = new AsyncRendererJobStatus(new AsyncRendererJobRequest(),
+            new AsyncRendererResult("cached"));
+        when(this.cache.getSync(ASYNC_JOB_ID)).thenReturn(status);
+        when(this.cacheControl.isCacheReadAllowed(any(Date.class))).thenReturn(true);
+        when(this.renderer.isCacheAllowed()).thenReturn(true);
+        this.configuration.setPlaceHolderForced(true);
+
+        AsyncRendererExecutorResponse response = renderAsync();
+
+        // The status is already finished and stored, so the new client must be registered through the cache to be
+        // able to resolve the placeholder.
+        assertSame(status, response.getStatus());
+        assertNotNull(response.getAsyncClientId());
+        verify(this.cache).addClient(status, response.getAsyncClientId());
+        verify(this.jobs, never()).execute(any(), any());
+    }
+
+    @Test
+    void renderCachedResultWhileStartingAnotherJob() throws Exception
+    {
+        when(this.asyncContext.isEnabled()).thenReturn(true);
+        when(this.cacheControl.isCacheReadAllowed(any(Date.class))).thenReturn(true);
+
+        // A first element which is not cached yet: its job start is blocked.
+        when(this.renderer.getId()).thenReturn(List.of("1", "2"));
+        when(this.renderer.isAsyncAllowed()).thenReturn(true);
+        when(this.renderer.isCacheAllowed()).thenReturn(true);
+        CountDownLatch jobStarting = new CountDownLatch(1);
+        CountDownLatch releaseJobStart = new CountDownLatch(1);
+        when(this.jobs.execute(same(AsyncRendererJobStatus.JOBTYPE), any(AsyncRendererJobRequest.class)))
+            .thenAnswer(invocation -> {
+                jobStarting.countDown();
+                releaseJobStart.await();
+
+                AsyncRendererJobStatus status = new AsyncRendererJobStatus(invocation.getArgument(1), null, null);
+                when(this.job.getStatus()).thenReturn(status);
+
+                return this.job;
+            });
+
+        // A second element with a cached result.
+        AsyncRenderer cachedRenderer = mock();
+        when(cachedRenderer.getId()).thenReturn(List.of("cached"));
+        when(cachedRenderer.isAsyncAllowed()).thenReturn(true);
+        when(cachedRenderer.isCacheAllowed()).thenReturn(true);
+        AsyncRendererJobStatus cachedStatus =
+            new AsyncRendererJobStatus(new AsyncRendererJobRequest(), new AsyncRendererResult("cached"));
+        when(this.cache.getSync(any())).thenAnswer(
+            invocation -> "cached".equals(invocation.<List<String>>getArgument(0).get(0)) ? cachedStatus : null);
+
+        CompletableFuture<AsyncRendererExecutorResponse> startingRender = CompletableFuture.supplyAsync(() -> {
+            try {
+                return this.executor.render(this.renderer, this.configuration);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        });
+
+        try {
+            assertTrue(jobStarting.await(10, TimeUnit.SECONDS));
+
+            CompletableFuture<AsyncRendererExecutorResponse> cachedRender = CompletableFuture.supplyAsync(() -> {
+                try {
+                    return this.executor.render(cachedRenderer, this.configuration);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+
+            // Getting a cached result must not wait for the start of the other job.
+            assertSame(cachedStatus, cachedRender.get(10, TimeUnit.SECONDS).getStatus());
+        } finally {
+            releaseJobStart.countDown();
+        }
+
+        assertNotNull(startingRender.get(10, TimeUnit.SECONDS).getAsyncClientId());
     }
 
     @Test

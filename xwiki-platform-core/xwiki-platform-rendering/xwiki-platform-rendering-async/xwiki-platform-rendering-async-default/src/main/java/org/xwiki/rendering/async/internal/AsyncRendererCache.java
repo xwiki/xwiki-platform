@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -72,18 +71,6 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     private final Map<ComponentRole<?>, Set<String>> roleMapping = new ConcurrentHashMap<>();
 
     private final Map<RightEntry, Set<String>> rightMapping = new ConcurrentHashMap<>();
-
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-    /**
-     * @return the lock the lock
-     * @since 10.11.5
-     * @since 11.3RC1
-     */
-    public ReentrantReadWriteLock getLock()
-    {
-        return this.lock;
-    }
 
     /**
      * @param jobId the job identifier
@@ -154,30 +141,42 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public void put(AsyncRendererJobStatus status)
     {
-        this.lock.writeLock().lock();
+        boolean longCacheAllowed =
+            status.getRequest().getRenderer() != null && status.getRequest().getRenderer().isCacheAllowed();
 
-        try {
-            boolean longCacheAllowed =
-                status.getRequest().getRenderer() != null && status.getRequest().getRenderer().isCacheAllowed();
+        // Avoid storing useless stuff in the RAM
+        status.dispose();
 
-            // Avoid storing useless stuff in the RAM
-            status.dispose();
+        String cacheKey = toCacheKey(status.getRequest().getId());
 
-            String cacheKey = toCacheKey(status.getRequest().getId());
+        // If cache is enabled, store the status in the long cache
+        if (longCacheAllowed) {
+            this.longCache.set(cacheKey, status);
+        }
 
-            // If cache is enabled, store the status in the long cache
-            if (longCacheAllowed) {
-                this.longCache.set(cacheKey, status);
-            }
+        // Asynchronous statuses are stored in a short lived cache to avoid race condition (result invalidated before
+        // it get a chance of being received for the first time). Clients registered after this point are stored by
+        // #addClient.
+        for (String clientId : status.publishClients()) {
+            this.asyncCache.set(clientId, status);
+        }
+    }
 
-            // Asynchronous statuses are stored in a short lived cache to avoid race condition (result invalidated
-            // before it
-            // get a chance of being received for the first time)
-            for (String clientId : status.getClients()) {
-                this.asyncCache.set(clientId, status);
-            }
-        } finally {
-            this.lock.writeLock().unlock();
+    /**
+     * Associate a new client with the status and make sure that this client can get the status through
+     * {@link #getAsync(String)} once the execution is finished, even when the status has already been stored in the
+     * cache by {@link #put(AsyncRendererJobStatus)}.
+     *
+     * @param status the status to associate the client with
+     * @param clientId the identifier of the client
+     * @since 19.0.0RC1
+     */
+    public void addClient(AsyncRendererJobStatus status, String clientId)
+    {
+        if (status.addClientAndCheckPublished(clientId)) {
+            // The clients of the status have already been stored in the async cache, so this client has to be added
+            // here.
+            this.asyncCache.set(clientId, status);
         }
     }
 
@@ -198,19 +197,19 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         String key = entry.getKey();
 
         for (EntityReference reference : status.getReferences()) {
-            this.referenceMapping.computeIfAbsent(reference, k -> ConcurrentHashMap.newKeySet()).add(key);
+            add(key, reference, this.referenceMapping);
         }
 
         for (Type role : status.getRoleTypes()) {
-            this.roleTypeMapping.computeIfAbsent(role, k -> ConcurrentHashMap.newKeySet()).add(key);
+            add(key, role, this.roleTypeMapping);
         }
 
         for (ComponentRole<?> role : status.getRoles()) {
-            this.roleMapping.computeIfAbsent(role, k -> ConcurrentHashMap.newKeySet()).add(key);
+            add(key, role, this.roleMapping);
         }
 
         for (RightEntry right : status.getRights()) {
-            this.rightMapping.computeIfAbsent(right, k -> ConcurrentHashMap.newKeySet()).add(key);
+            add(key, right, this.rightMapping);
         }
     }
 
@@ -227,18 +226,26 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         remove(key, status.getRights(), this.rightMapping);
     }
 
+    private <T> void add(String key, T value, Map<T, Set<String>> mapping)
+    {
+        // Add the key inside the atomic compute operation so that a concurrent #remove cannot drop the set the key is
+        // added to (the cache entry would then never be invalidated).
+        mapping.compute(value, (k, keys) -> {
+            Set<String> result = keys != null ? keys : ConcurrentHashMap.newKeySet();
+            result.add(key);
+            return result;
+        });
+    }
+
     private <T> void remove(String key, Set<T> values, Map<T, Set<String>> mapping)
     {
         for (T value : values) {
-            Set<String> keys = mapping.get(value);
-
-            if (keys != null) {
+            // Remove the key and the empty set atomically so that a key concurrently added by #add is never lost.
+            mapping.computeIfPresent(value, (k, keys) -> {
                 keys.remove(key);
 
-                if (keys.isEmpty()) {
-                    mapping.remove(value);
-                }
-            }
+                return keys.isEmpty() ? null : keys;
+            });
         }
     }
 

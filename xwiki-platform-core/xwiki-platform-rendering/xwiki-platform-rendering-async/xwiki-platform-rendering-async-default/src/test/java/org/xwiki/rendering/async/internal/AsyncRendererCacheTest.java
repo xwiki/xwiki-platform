@@ -271,4 +271,55 @@ class AsyncRendererCacheTest
 
         assertNull(this.asyncCache.getAsync("2"));
     }
+
+    @Test
+    void addClientBeforePut()
+    {
+        this.asyncCache.addClient(this.status, "1");
+
+        assertNull(this.asyncCache.getAsync("1"));
+
+        this.asyncCache.put(this.status);
+
+        assertSame(this.status, this.asyncCache.getAsync("1"));
+    }
+
+    @Test
+    void addClientAfterPut()
+    {
+        this.asyncCache.put(this.status);
+
+        // The status was already stored for its clients, a client registered later still has to be able to get it.
+        this.asyncCache.addClient(this.status, "1");
+
+        assertSame(this.status, this.asyncCache.getAsync("1"));
+        assertNull(this.asyncCache.getAsync("1"));
+    }
+
+    @Test
+    void invalidateSyncAfterRemovingOtherEntryWithSameReference()
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "document");
+        DocumentReference otherReference = new DocumentReference("wiki", "space", "other");
+        setReferences(reference);
+        this.asyncCache.put(this.status);
+
+        AsyncRendererJobRequest otherRequest = new AsyncRendererJobRequest();
+        otherRequest.setId(List.of("other", "id"));
+        otherRequest.setRenderer(this.renderer);
+        AsyncRendererJobStatus otherStatus =
+            new AsyncRendererJobStatus(otherRequest, new AsyncRendererResult("other result"));
+        otherStatus.setReferences(Set.of(reference, otherReference));
+        this.asyncCache.put(otherStatus);
+
+        // Removing the other entry must keep the mapping of the first entry.
+        this.asyncCache.cleanCache(otherReference);
+
+        assertNull(this.asyncCache.getSync(otherRequest.getId()));
+        assertSame(this.status, this.asyncCache.getSync(getId()));
+
+        this.asyncCache.cleanCache(reference);
+
+        assertNull(this.asyncCache.getSync(getId()));
+    }
 }

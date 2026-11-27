@@ -19,7 +19,10 @@
  */
 package org.xwiki.rendering.async.internal;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,12 +31,18 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.internal.DefaultAsyncContext.ContextUse;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static com.xpn.xwiki.internal.context.XWikiContextContextStore.PROP_DOCUMENT_REFERENCE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,8 +58,7 @@ class AsyncRendererJobTest
     @InjectMockComponents
     private AsyncRendererJob job;
 
-    @MockComponent
-    private AsyncContext asyncContext;
+    private DefaultAsyncContext asyncContext;
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
@@ -60,10 +68,20 @@ class AsyncRendererJobTest
 
     private AsyncRendererJobRequest request = new AsyncRendererJobRequest();
 
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        // Register the default implementation type as the job only collects the uses with it.
+        this.asyncContext = mock();
+        componentManager.registerComponent(AsyncContext.class, this.asyncContext);
+    }
+
     @BeforeEach
     void beforeEach()
     {
         this.request.setRenderer(this.renderer);
+
+        when(this.asyncContext.popContextUse()).thenReturn(new ContextUse());
     }
 
     @Test
@@ -100,5 +118,30 @@ class AsyncRendererJobTest
         this.job.run();
 
         verify(this.asyncContext, never()).useEntity(any());
+    }
+
+    @Test
+    void runSetsResultAfterUses() throws RenderingException
+    {
+        AsyncRendererResult result = new AsyncRendererResult("result");
+        when(this.renderer.render(true, false)).thenReturn(result);
+
+        ContextUse contextUse = new ContextUse();
+        contextUse.getUses().put("type", List.of("value"));
+        AtomicReference<AsyncRendererResult> resultWhenCollectingUses = new AtomicReference<>();
+        when(this.asyncContext.popContextUse()).thenAnswer(invocation -> {
+            resultWhenCollectingUses.set(this.job.getStatus().getResult());
+
+            return contextUse;
+        });
+
+        this.job.initialize(this.request);
+        this.job.run();
+
+        // The status of the running job is read without lock by other threads: the result must be published last.
+        assertNull(resultWhenCollectingUses.get());
+        Map<String, Collection<Object>> uses = this.job.getStatus().getUses();
+        assertEquals(List.of("value"), uses.get("type"));
+        assertEquals(result, this.job.getStatus().getResult());
     }
 }

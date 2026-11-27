@@ -216,7 +216,9 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
             }
         }
 
-        @SuppressWarnings("checkstyle:NoFinalizer")
+        // The finalizer is a deliberate last-resort safety net releasing the temporary file backing this input
+        // source when a caller forgot to close it; super.finalize() is called for the same reason.
+        @SuppressWarnings({ "checkstyle:NoFinalizer", "java:S1113", "java:S5738" })
         @Override
         protected void finalize() throws Throwable
         {

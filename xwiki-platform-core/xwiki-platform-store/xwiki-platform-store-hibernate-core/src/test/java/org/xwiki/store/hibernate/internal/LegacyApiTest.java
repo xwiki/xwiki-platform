@@ -135,6 +135,9 @@ class LegacyApiTest
     static Object[][] hibernate5Methods()
     {
         return new Object[][] {
+            {StatelessSession.class, "connection", MethodType.methodType(java.sql.Connection.class)},
+            {org.hibernate.engine.spi.SharedSessionContractImplementor.class, "connection",
+                MethodType.methodType(java.sql.Connection.class)},
             {Session.class, "save", MethodType.methodType(Serializable.class, Object.class)},
             {Session.class, "save", MethodType.methodType(Serializable.class, String.class, Object.class)},
             {Session.class, "update", MethodType.methodType(void.class, Object.class)},
@@ -578,5 +581,24 @@ class LegacyApiTest
 
         assertTrue(logCapture.getMessage(logCapture.size() - 1)
             .startsWith("HHH90000028: Support for `<hibernate-mappings/>` is deprecated"));
+    }
+
+    @Test
+    void connection() throws Throwable
+    {
+        MethodHandle statelessConnection = LOOKUP.findVirtual(StatelessSession.class, "connection",
+            MethodType.methodType(java.sql.Connection.class));
+        try (StatelessSession session = sessionFactory.openStatelessSession()) {
+            java.sql.Connection connection = (java.sql.Connection) statelessConnection.invoke(session);
+            assertFalse(connection.isClosed());
+        }
+
+        MethodHandle sessionConnection = LOOKUP.findVirtual(
+            org.hibernate.engine.spi.SharedSessionContractImplementor.class, "connection",
+            MethodType.methodType(java.sql.Connection.class));
+        try (Session session = sessionFactory.openSession()) {
+            java.sql.Connection connection = (java.sql.Connection) sessionConnection.invoke(session);
+            assertEquals(1, connection.createStatement().executeUpdate("insert into legacyentity (LE_ID) values (99)"));
+        }
     }
 }

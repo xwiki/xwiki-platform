@@ -137,7 +137,8 @@ class LegacySessionImplementorTest
         assertEquals("Deprecated usage of the HQL paths [alias.id.property] to the attributes of the entity"
             + " [com.xpn.xwiki.objects.StringProperty]; use [alias.property] instead. Query [" + statement
             + "] has been converted to [select obj.name from BaseObject obj, StringProperty prop"
-            + " where prop.id = obj.id and prop.name = 'prop' and prop.value = 'value']", this.logCapture.getMessage(0));
+            + " where prop.id = obj.id and prop.name = 'prop' and prop.value = 'value']",
+            this.logCapture.getMessage(0));
 
         // The conversion is remembered
         assertEquals(List.of("Space.Page"), read(session -> session.createQuery(statement, String.class).list()));
@@ -303,5 +304,21 @@ class LegacySessionImplementorTest
 
             return null;
         });
+    }
+
+    @Test
+    void legacySyntaxCombinedWithCollectionAndStringFunctions()
+    {
+        when(this.loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(false);
+
+        // The kind of statements found in extensions (for example the tags and the livetable results)
+        assertEquals(List.of(), read(session -> session.createQuery("select doc.fullName from XWikiDocument doc,"
+            + " BaseObject obj, DBStringListProperty tagprop where obj.name = doc.fullName and obj.id = tagprop.id.id"
+            + " and tagprop.id.name = 'tags' and ? in elements(tagprop.list)", String.class).setParameter(0, "tag")
+            .list()));
+        assertEquals(List.of("Space.Page"), read(session -> session.createQuery("select obj.name from BaseObject obj,"
+            + " StringProperty prop where obj.id = prop.id.id and prop.id.name = ?"
+            + " and upper(str(prop.value)) like upper(?)",
+            String.class).setParameter(0, "prop").setParameter(1, "VAL%").list()));
     }
 }

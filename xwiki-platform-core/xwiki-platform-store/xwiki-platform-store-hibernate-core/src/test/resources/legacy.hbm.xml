@@ -60,4 +60,5 @@
     </id>
     <property name="name" type="string" column="LM_NAME" length="255" />
   </class>
+  <query name="legacyEntityNames">select entity.name from org.xwiki.store.hibernate.internal.LegacyEntity entity</query>
 </hibernate-mapping>

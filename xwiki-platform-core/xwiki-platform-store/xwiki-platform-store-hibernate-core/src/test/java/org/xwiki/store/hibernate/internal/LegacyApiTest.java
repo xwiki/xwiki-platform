@@ -42,6 +42,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -549,5 +553,30 @@ class LegacyApiTest
                 .createQuery("select e.id from LegacyEnumEntity e where e.namedUnit = :unit", Long.class)
                 .setParameter("unit", TimeUnit.HOURS).list());
         }
+    }
+
+    @Test
+    void namedQueryDefinition()
+    {
+        Configuration configuration = new Configuration();
+        configuration.addResource("legacy.hbm.xml");
+
+        // Like Hibernate 5, the configuration doesn't expose the named queries of the mappings
+        assertTrue(configuration.getNamedQueries().isEmpty());
+
+        // The named query definitions found in the metadata are also Hibernate 5 definitions
+        try (StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+            .applySetting("jakarta.persistence.database-product-name", "HSQL Database Engine")
+            .applySetting("hibernate.boot.allow_jdbc_metadata_access", "false").build()) {
+            org.hibernate.engine.spi.NamedQueryDefinition definition =
+                (org.hibernate.engine.spi.NamedQueryDefinition) new MetadataSources(registry)
+                    .addResource("legacy.hbm.xml").buildMetadata().getNamedHqlQueryMapping("legacyEntityNames");
+
+            assertEquals("select entity.name from org.xwiki.store.hibernate.internal.LegacyEntity entity",
+                definition.getQuery());
+        }
+
+        assertTrue(logCapture.getMessage(logCapture.size() - 1)
+            .startsWith("HHH90000028: Support for `<hibernate-mappings/>` is deprecated"));
     }
 }

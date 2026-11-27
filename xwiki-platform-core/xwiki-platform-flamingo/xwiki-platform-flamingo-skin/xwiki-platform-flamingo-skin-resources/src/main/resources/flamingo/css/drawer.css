@@ -37,7 +37,9 @@
   height: 100vh;
   height: 100dvh;
   margin-right: calc(-1 * var(--xwiki-drawer-width));
-  transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+  /* Keep the drawer displayed in the top layer while it slides out. */
+  transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), display .6s, overlay .6s;
+  transition-behavior: allow-discrete;
   padding: 0;
   border: 0;
   overflow-y: auto;
@@ -50,14 +52,24 @@
     opacity: 0;
     /* The backdrop uses the inverse of the page background color. */
     background-color: rgb(from var(--xwiki-drawer-bg) calc(255 - r) calc(255 - g) calc(255 - b));
-    transition: opacity .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+    transition: opacity .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), display .6s, overlay .6s;
+    transition-behavior: allow-discrete;
   }
 
-  &[open]:not(.drawer-transitioning) {
+  &[open] {
     margin-right: 0;
 
     &::backdrop {
       opacity: 0.2;
+    }
+  }
+
+  /* Slide the drawer out before closing it, in the browsers that can't keep it in the top layer while it closes. */
+  &[open].drawer-closing {
+    margin-right: calc(-1 * var(--xwiki-drawer-width));
+
+    &::backdrop {
+      opacity: 0;
     }
   }
 
@@ -159,6 +171,17 @@
     color: hsl(from var(--xwiki-drawer-menu-item-color) h s calc(l - -10));
     padding: var(--xwiki-drawer-menu-item-padding);
     font-size: larger;
+  }
+}
+
+/* Make the drawer slide in when it opens. */
+@starting-style {
+  #tmDrawer.drawer-nav[open] {
+    margin-right: calc(-1 * var(--xwiki-drawer-width));
+  }
+
+  #tmDrawer.drawer-nav[open]::backdrop {
+    opacity: 0;
   }
 }
 

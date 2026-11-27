@@ -75,7 +75,7 @@ public class DrawerMenu extends BaseElement
         if (isVisible()) {
             // Close the drawer by clicking outside.
             // We don't perform directly a click since it could lead to a
-            // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay above it.
+            // org.openqa.selenium.ElementClickInterceptedException because of the drawer backdrop above it.
             // The click through action is performed with a move and click, which is what we really want.
             getDriver().createActions().click(this.mainContainerDiv).perform();
             waitForDrawer(false);
@@ -121,19 +121,13 @@ public class DrawerMenu extends BaseElement
 
     private void waitForDrawer(boolean visible)
     {
-        // We always want the transition to be ended in the wait condition.
-        ExpectedCondition<Boolean> transitionEnded = ExpectedConditions.not(
-            ExpectedConditions.attributeContains(this.drawerContainer, "class", "drawer-transitioning")
-        );
+        // We always want the drawer to be done sliding in or out.
+        ExpectedCondition<Boolean> transitionEnded = driver -> Boolean.TRUE.equals(getDriver().executeScript(
+            "return arguments[0].getAnimations().length === 0;", this.drawerContainer));
         if (visible) {
-            // The drawer-transitioning class is removed as soon as the drawer is shown, while the drawer keeps sliding
-            // in, so we also wait for the slide in animation to end.
-            ExpectedCondition<Boolean> slideInEnded = driver -> Boolean.TRUE.equals(getDriver().executeScript(
-                "return arguments[0].getAnimations().length === 0;", this.drawerContainer));
             getDriver().waitUntilCondition(ExpectedConditions.and(
                 ExpectedConditions.visibilityOf(this.drawerContainer),
-                transitionEnded,
-                slideInEnded
+                transitionEnded
             ));
         } else {
             getDriver().waitUntilCondition(ExpectedConditions.and(

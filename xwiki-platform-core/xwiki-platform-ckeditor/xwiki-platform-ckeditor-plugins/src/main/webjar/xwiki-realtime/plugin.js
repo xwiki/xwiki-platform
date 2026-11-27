@@ -145,7 +145,8 @@
         // When using the iframed editor, switching to source destroys the iframe, preventing the realtime framework
         // from applying new patches. We need to leave the realtime session when switching to source mode in order to
         // avoid unexpected behaviour.
-        if (editor._realtime.rejoin) {
+        // The editor isn't created if we never joined (e.g. when the in-line editor switches to its startup mode).
+        if (editor._realtime.rejoin && editor._realtime.editor) {
           // Notify the user that we're leaving the realtime collaboration.
           editor.showNotification(editor.localization.get('xwiki-realtime.leavingCollaboration'));
 
@@ -267,8 +268,10 @@
             await editor._realtime.editor?._onAbort();
             onAfterLeaveCollaboration(editor);
           };
-          // We can't join the realtime session before knowing the editing mode (we join only in WYSIWYG mode).
-          return whenEditingModeIsSet(editor).then(() => editor._realtime.connect());
+          // We can't join the realtime session before knowing the editing mode (we join only in WYSIWYG mode). The
+          // in-line editor starts in WYSIWYG mode even when it's about to switch to its Source startup mode.
+          return whenEditingModeIsSet(editor).then(() => editor.config.startupMode === 'source' ||
+            editor._realtime.connect());
         }, resolve, reject), reject);
       });
     }

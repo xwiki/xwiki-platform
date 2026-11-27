@@ -89,7 +89,8 @@ CKEDITOR.editorConfig = function(config) {
     disableNativeSpellChecker: false,
     // This is used in XWiki.WYSIWYG.FileUploader so we must keep them in sync.
     fileTools_defaultFileName: '__fileCreatedFromDataURI__', // jshint ignore:line
-    // The editor input is a full HTML page because we need to include the XWiki skin (in order to achieve WYSIWYG).
+    // The input of the classic (iframe-based) editor is a full HTML page because we need to include the XWiki skin (in
+    // order to achieve WYSIWYG).
     fullPage: true,
     // The maximum image width is limited from the skin to 100% of the available page width (responsive images).
     // Prefilling the image dimensions leads to a stretched image (horizontally) because the browser uses the prefilled

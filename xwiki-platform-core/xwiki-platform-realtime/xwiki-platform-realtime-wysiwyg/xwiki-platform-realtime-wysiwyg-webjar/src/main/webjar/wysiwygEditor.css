@@ -11,23 +11,33 @@
   top: 15px;
 }
 
-/* The rich text area of the standalone WYSIWYG editor needs a larger padding in order for the user caret indicators to
-  fit on the left side. */
-#body[role="textbox"],
-/* When the in-place editor is maximized it behaves very similar to the standalone editor. */
-[data-maximized="true"] #xwikicontent {
+/* When maximized, the edited content takes the full width so it needs a larger padding in order for the user caret
+  indicators to fit on the left side. .cke_textarea_inline is the edited content of the standalone editor. */
+[data-maximized="true"] #xwikicontent,
+[data-maximized="true"] .cke_textarea_inline {
   padding-right: 24px;
   padding-left: 24px;
 }
-#body[role="textbox"] ~ .realtime-user-position,
-[data-maximized="true"] #xwikicontent ~ .realtime-user-position {
+[data-maximized="true"] #xwikicontent ~ .realtime-user-position,
+[data-maximized="true"] .cke_textarea_inline ~ .realtime-user-position {
   left: 4px; /* (richTextAreaLeftPadding:24 - avatarWidth:16) / 2 */
 }
 
 /* This is for the in-place editor. */
 .xcontent.form > .document-header ~ .row {
   position: relative;
-}  
+}
 #xwikicontent ~ .realtime-user-position {
   left: -6px;
+}
+
+/* This is for the standalone editor. Position the user caret indicators relative to the element containing the edited
+  content, on its left. */
+#xwikieditcontent:has(.cke_textarea_inline) {
+  position: relative;
+}
+.cke_textarea_inline ~ .realtime-user-position {
+  /* The edited content has no top padding. */
+  top: 0;
+  left: -22px;
 }

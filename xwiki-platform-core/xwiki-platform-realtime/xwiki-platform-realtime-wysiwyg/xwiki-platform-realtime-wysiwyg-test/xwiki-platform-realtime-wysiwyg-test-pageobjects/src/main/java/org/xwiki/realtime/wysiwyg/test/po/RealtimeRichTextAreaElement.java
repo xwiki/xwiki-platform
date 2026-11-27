@@ -97,24 +97,24 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         }
 
         /**
-         * @return the location of the coeditor position, relative to the edited content
+         * @return the location of the coeditor position, relative to the root editable element
          */
         public Point getLocation()
         {
-            return getFromEditedContent(() -> getContainer().getLocation());
+            return getFromEditedContent(this::getRelativeLocation);
         }
 
         /**
          * Waits for the coeditor position to be at the given location.
          *
-         * @param point the expected location, relative to the edited content
+         * @param point the expected location, relative to the root editable element
          * @return this coeditor position
          */
         public CoeditorPosition waitForLocation(Point point)
         {
             getDriver().waitUntilCondition(driver -> getFromEditedContent(() -> {
                 try {
-                    return getContainer().getLocation().equals(point);
+                    return getRelativeLocation().equals(point);
                 } catch (StaleElementReferenceException e) {
                     // The coeditor position (caret indicator) can be updated while we're waiting for it.
                     return false;
@@ -133,13 +133,24 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
                 WebElement root = getDriver().findElementWithoutWaitingWithoutScrolling(By.tagName("html"));
                 int viewportHeight = Integer.parseInt(root.getDomProperty("clientHeight"));
                 int viewportWidth = Integer.parseInt(root.getDomProperty("clientWidth"));
-                Map<String, Long> position = (Map<String, Long>) getDriver()
+                // The values are fractional when the rich text area is not in an iframe.
+                Map<String, Number> position = (Map<String, Number>) getDriver()
                     .executeScript("return arguments[0].getBoundingClientRect()", getContainer());
-                long y = position.get("y");
-                long x = position.get("x");
-                return y >= 0 && x >= 0 && (y + position.get("height")) <= viewportHeight
-                    && (x + position.get("width")) <= viewportWidth;
+                double y = position.get("y").doubleValue();
+                double x = position.get("x").doubleValue();
+                return y >= 0 && x >= 0 && (y + position.get("height").doubleValue()) <= viewportHeight
+                    && (x + position.get("width").doubleValue()) <= viewportWidth;
             });
+        }
+
+        private Point getRelativeLocation()
+        {
+            WebElement container = getContainer();
+            // The coeditor position is displayed after the root editable element.
+            WebElement rootEditable = (WebElement) getDriver().executeScript(
+                "return arguments[0].parentElement.querySelector(':scope > [contenteditable]');", container);
+            Point rootLocation = rootEditable.getLocation();
+            return container.getLocation().moveBy(-rootLocation.getX(), -rootLocation.getY());
         }
 
         private WebElement getContainer()

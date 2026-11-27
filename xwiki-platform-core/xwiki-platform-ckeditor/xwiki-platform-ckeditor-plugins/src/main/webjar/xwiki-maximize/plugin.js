@@ -56,7 +56,8 @@
   });
 
   var onBeforeToggleMaximize = function(editor, state) {
-    var bottom = editor.ui.space('bottom');
+    // Only the classic editor shows the form action buttons in its bottom bar.
+    var bottom = editor.elementMode === CKEDITOR.ELEMENT_MODE_REPLACE && editor.ui.space('bottom');
     bottom = $(bottom && bottom.$);
     var form = $(editor.element.$).closest('form');
     var bottomButtons = form.find('.bottombuttons');

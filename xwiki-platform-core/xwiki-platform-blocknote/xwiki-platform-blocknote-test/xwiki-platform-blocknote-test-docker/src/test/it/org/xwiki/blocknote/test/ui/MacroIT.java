@@ -25,10 +25,12 @@ import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteInplaceEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.BlockNoteStandaloneEditPage;
 import org.xwiki.blocknote.test.po.BlockNoteToolBar;
 import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
@@ -366,5 +368,25 @@ class MacroIT extends AbstractBlockNoteIT
             {{code language="java" layout="linenumbers"}}
             final int count = 0;
             {{/code}}""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(5)
+    void saveWithFormFieldInMacroOutput(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        // The macro output is in the edited content, which is inside the edit form. Its form field has the same name as
+        // the version summary field, which comes after it in the form.
+        setup.createPage(testReference,
+            "before\n\n{{html}}<input type=\"hidden\" name=\"comment\" value=\"From macro\"/>{{/html}}", "");
+
+        BlockNoteStandaloneEditPage editPage = BlockNoteStandaloneEditPage.gotoPage(testReference);
+        editPage.getContentEditor().getRichTextArea().appendParagraph("after").waitUntilTextContains("after");
+
+        HistoryPane historyPane = editPage.clickDone().openHistoryDocExtraPane().showMinorEdits();
+        // The editor saved a new version on top of the one the page was created with.
+        assertEquals(2, historyPane.getNumberOfVersions());
+        assertEquals("", historyPane.getCurrentVersionComment());
     }
 }

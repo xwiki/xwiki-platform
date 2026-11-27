@@ -56,13 +56,39 @@ function getButton(name: string): HTMLInputElement {
 }
 
 /**
- * Stand in for actionButtons.js, which fires "xwiki:actions:save" on the button that was clicked, but only once the
- * form validates. When it does not, no such event is fired at all, which is how the saver detects that the save was
- * prevented.
+ * @returns the version summary field of the edit form
+ */
+function getVersionSummaryField(): HTMLInputElement {
+  return document.querySelector<HTMLInputElement>(
+    '#edit > input[name="comment"]',
+  )!;
+}
+
+/**
+ * Add a form field with the same name as the version summary field to the edited content, which comes first in the
+ * form, like the form fields that macros output, and disable it when the save starts, like the editors do.
+ *
+ * @returns the added form field
+ */
+function addVersionSummaryFieldToContent(): HTMLInputElement {
+  const fieldSet = document.createElement("fieldset");
+  fieldSet.innerHTML = '<input name="comment" value="from macro" />';
+  document.getElementById("edit")!.prepend(fieldSet);
+  jquery(document).one("xwiki:actions:beforeSave", () => {
+    fieldSet.disabled = true;
+  });
+  return fieldSet.querySelector("input")!;
+}
+
+/**
+ * Stand in for actionButtons.js, which fires "xwiki:actions:beforeSave" and then "xwiki:actions:save" on the button
+ * that was clicked, but the latter only once the form validates. When it does not, no such event is fired at all,
+ * which is how the saver detects that the save was prevented.
  */
 function fakeActionButtons(): void {
   for (const name of ["action_save", "action_saveandcontinue"]) {
     getButton(name).addEventListener("click", () => {
+      jquery(getButton(name)).trigger("xwiki:actions:beforeSave");
       if (formIsValid) {
         jquery(getButton(name)).trigger("xwiki:actions:save");
       }
@@ -306,41 +332,6 @@ describe("XWikiFormSaveTarget", () => {
   });
 
   describe("submit", () => {
-    it("records the auto-save version summary and restores the one the user typed", async () => {
-      target = await createTarget();
-      const comment = document.querySelector<HTMLInputElement>(
-        'input[name="comment"]',
-      )!;
-      let summaryWhileSaving: string | undefined;
-      $("#edit").on("xwiki:actions:save", () => {
-        summaryWhileSaving = comment.value;
-      });
-
-      const submitting = target.submit({ action: "autoSave" });
-      $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
-      await submitting;
-
-      expect(summaryWhileSaving).toBe("Auto-saved");
-      expect(comment.value).toBe("user summary");
-    });
-
-    it("keeps the version summary of a manual save", async () => {
-      target = await createTarget();
-      const comment = document.querySelector<HTMLInputElement>(
-        'input[name="comment"]',
-      )!;
-      let summaryWhileSaving: string | undefined;
-      $("#edit").on("xwiki:actions:save", () => {
-        summaryWhileSaving = comment.value;
-      });
-
-      const submitting = target.submit({ action: "saveAndView" });
-      $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
-      await submitting;
-
-      expect(summaryWhileSaving).toBe("user summary");
-    });
-
     it("clicks the save button matching a manual save", async () => {
       target = await createTarget();
       const comment = document.querySelector<HTMLInputElement>(
@@ -440,6 +431,63 @@ describe("XWikiFormSaveTarget", () => {
       } finally {
         vi.useRealTimers();
       }
+    });
+  });
+
+  describe("version summary", () => {
+    it("records the auto-save version summary and restores the one the user typed", async () => {
+      target = await createTarget();
+      // The saver submits while it's saving.
+      vi.mocked(saver.isSaving).mockReturnValue(true);
+      const comment = document.querySelector<HTMLInputElement>(
+        'input[name="comment"]',
+      )!;
+      let summaryWhileSaving: string | undefined;
+      $("#edit").on("xwiki:actions:save", () => {
+        summaryWhileSaving = comment.value;
+      });
+
+      const submitting = target.submit({ action: "autoSave" });
+      $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
+      await submitting;
+
+      expect(summaryWhileSaving).toBe("Auto-saved");
+      expect(comment.value).toBe("user summary");
+    });
+
+    it("records the auto-save version summary in the version summary field that is not disabled", async () => {
+      target = await createTarget();
+      // The saver submits while it's saving.
+      vi.mocked(saver.isSaving).mockReturnValue(true);
+      const macroComment = addVersionSummaryFieldToContent();
+      const comment = getVersionSummaryField();
+      let summariesWhileSaving: string[] = [];
+      $("#edit").on("xwiki:actions:save", () => {
+        summariesWhileSaving = [macroComment.value, comment.value];
+      });
+
+      const submitting = target.submit({ action: "autoSave" });
+      $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
+      await submitting;
+
+      expect(summariesWhileSaving).toEqual(["from macro", "Auto-saved"]);
+    });
+
+    it("keeps the version summary of a manual save", async () => {
+      target = await createTarget();
+      const comment = document.querySelector<HTMLInputElement>(
+        'input[name="comment"]',
+      )!;
+      let summaryWhileSaving: string | undefined;
+      $("#edit").on("xwiki:actions:save", () => {
+        summaryWhileSaving = comment.value;
+      });
+
+      const submitting = target.submit({ action: "saveAndView" });
+      $("#edit").trigger("xwiki:document:saved", [{ newVersion: "1.2" }]);
+      await submitting;
+
+      expect(summaryWhileSaving).toBe("user summary");
     });
   });
 

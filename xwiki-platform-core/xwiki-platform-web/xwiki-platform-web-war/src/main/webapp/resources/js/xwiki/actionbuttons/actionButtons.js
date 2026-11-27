@@ -122,7 +122,10 @@ var XWiki = (function(XWiki) {
         return false;
       }
 
-      var commentField = form?.comment || $('commentinput');
+      // The edited content can have form fields with the same name or id (e.g. output by macros), which are disabled
+      // before the form is validated, so that they are not submitted.
+      var commentField = [...(form?.elements || [])]
+        .find(field => field.name === 'comment' && !field.matches(':disabled')) || $('commentinput');
       const commentIsSuggested = commentField?.getAttribute('data-xwiki-edit-comment-suggested') === 'true';
       const commentIsMandatory = commentField?.getAttribute('data-xwiki-edit-comment-mandatory') === 'true';
       if (commentIsSuggested || commentIsMandatory) {
@@ -585,6 +588,9 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
 
       var jsonAnswer = response.responseJSON;
+      // The changes are previewed, so the form fields are prepared as for a preview (e.g. the editors keep the form
+      // fields of the edited content out of the form data).
+      state.saveButton.fire('xwiki:actions:beforePreview', {form: this.form});
       var formData = this.getFormData('preview');
 
       var displayModal;

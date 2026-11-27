@@ -43,6 +43,8 @@
 #set ($fromHTML = $request.fromHTML == 'true')
 #if (($toHTML || $fromHTML) &amp;&amp; $services.csrf.isTokenValid($request.formToken))
   #set ($text = "$!request.text")
+  ## Without this parameter the response is a full HTML page, which only the classic editor needs. Not passing it is
+  ## deprecated since 18.10.0RC1, like the classic editor.
   #set ($stripHTMLEnvelope = $request.stripHTMLEnvelope == 'true')
   #set ($output = "#ckeditor_convert($text $toHTML $fromHTML $stripHTMLEnvelope)")
   #rawResponse($output)

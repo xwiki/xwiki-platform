@@ -105,6 +105,7 @@ var CKBUILDER_CONFIG = {
     resize: 1,
     save: 1,
     selectall: 0,
+    sharedspace: 1,
     showblocks: 0,
     showborders: 1,
     smiley: 0,

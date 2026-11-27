@@ -23,6 +23,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -30,6 +31,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
@@ -122,5 +124,37 @@ class SaveIT extends AbstractCKEditorIT
 
         assertEquals("test [[label>>||anchor=\"target\"]]", editPage.clickSaveAndView().editWiki().getContent());
         assertEquals("xwiki/2.1", new DocumentInformationPanel().getSyntaxPicker().getSelectedSyntax());
+    }
+
+    @Test
+    @Order(3)
+    void saveWithFormFieldInMacroOutput(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The user is asked for a version summary when saving.
+        setup.loginAsSuperAdmin();
+        setup.setWikiPreference("editcomment_mandatory", "1");
+        try {
+            setup.login("alice", "pa$$word");
+
+            // The macro output is in the edited content, which is inside the edit form. Its form field has the same
+            // name as the version summary field, which comes after it in the form.
+            setup.createPage(testReference,
+                "before\n\n{{html}}<input type=\"hidden\" name=\"comment\" value=\"From macro\"/>{{/html}}");
+            WYSIWYGEditPage editPage = edit(setup, testReference, false);
+            this.textArea.sendKeys("x");
+
+            editPage.clickSaveAndContinue(false);
+            Alert alert = editPage.waitForVersionSummaryAlert();
+            alert.sendKeys("Typed summary");
+            alert.accept();
+            editPage.waitForNotificationSuccessMessage("Saved");
+
+            HistoryPane historyPane = editPage.clickCancel().openHistoryDocExtraPane();
+            assertEquals("Typed summary", historyPane.getCurrentVersionComment());
+        } finally {
+            // The other tests save without being asked for a version summary.
+            setup.loginAsSuperAdmin();
+            setup.setWikiPreference("editcomment_mandatory", "0");
+        }
     }
 }

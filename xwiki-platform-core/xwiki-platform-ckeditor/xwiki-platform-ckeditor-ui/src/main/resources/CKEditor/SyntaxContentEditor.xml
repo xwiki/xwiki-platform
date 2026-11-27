@@ -50,6 +50,10 @@
     ## render the content with the rights of the document author. It's removed from the attributes by #ckeditor so that
     ## it's not output as an HTML attribute.
     #set ($discard = $textArea.attributes.put('data-sourcePropertyReference', $edit.parameters.sourcePropertyReference))
+    ## The main field of the form (e.g. the page content) has a floating tool bar and takes all the available height.
+    #if ("$!edit.parameters.full" == 'true')
+      #set ($discard = $textArea.attributes.put('class', "$!textArea.attributes.get('class') ckeditor-main-field"))
+    #end
     #ckeditor($textArea)
   #else
     ## Fall back on a plain text area.

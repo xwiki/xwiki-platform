@@ -70,6 +70,36 @@
       return fullData;
     },
 
+    /**
+     * Switches the editor to the given mode, using the given content as is in that mode, without converting the content
+     * of the current mode (e.g. from HTML to wiki syntax).
+     *
+     * @param {CKEDITOR.editor} editor the editor whose mode to set
+     * @param {string} mode the mode to set, e.g. 'wysiwyg' or 'source'
+     * @param {string} content the content to edit in the given mode, e.g. wiki syntax in 'source' mode; ignored if the
+     *   editor is already in the given mode
+     * @return {Promise} a promise that resolves with the editor when the mode is set
+     * @since 18.10.0RC1
+     */
+    setModeWithoutConversion: function(editor, mode, content) {
+      return new Promise(resolve => {
+        // We need this check because CKEditor doesn't call the callback if the given mode is already set.
+        if (mode === editor.mode) {
+          resolve(editor);
+        } else {
+          // Avoid any conversion when switching modes.
+          const previousMode = editor._.modes[editor.mode];
+          previousMode.data = CKEDITOR.plugins.xwikiSource.getFullData(editor);
+          editor._.modes[mode].data = content;
+          editor.setMode(mode, () => {
+            // Force a conversion on the next mode switch.
+            delete previousMode.data;
+            resolve(editor);
+          });
+        }
+      });
+    },
+
     addModeChangeHandler: function(editor, handler, priority = 0) {
       editor._.modeChangeHandlers = editor._.modeChangeHandlers || [];
       editor._.modeChangeHandlers.push({handler, priority});

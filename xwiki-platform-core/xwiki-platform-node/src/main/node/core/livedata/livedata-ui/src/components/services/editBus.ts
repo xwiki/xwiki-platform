@@ -23,6 +23,13 @@ import { reactive } from "vue";
 import type { Logic, Values } from "@xwiki/platform-livedata-api";
 import type { Reactive } from "vue";
 
+// The events notified to the callbacks registered with onAnyEvent.
+const EDIT_EVENTS = [
+  "save-editing-entry",
+  "start-editing-entry",
+  "cancel-editing-entry",
+];
+
 /**
  * Centralizes the edition event listeners and maintain a centralized state of the edition states
  * and results for the live data. This is useful to know when to save the table, and to know
@@ -104,12 +111,22 @@ export class EditBusService {
   }
 
   onAnyEvent(callback: () => unknown) {
-    for (const event of [
-      "save-editing-entry",
-      "start-editing-entry",
-      "cancel-editing-entry",
-    ]) {
+    for (const event of EDIT_EVENTS) {
       this.eventEmitter.on(event, callback);
+    }
+  }
+
+  /**
+   * Unregisters a callback registered with {@link onAnyEvent}. A component registering a callback must unregister it
+   * when it is unmounted, otherwise the edit bus keeps the component alive and keeps calling the callback.
+   * @param callback - the callback passed to {@link onAnyEvent}
+   * @since 17.10.15
+   * @since 18.4.9
+   * @since 18.10.0RC1
+   */
+  offAnyEvent(callback: () => unknown) {
+    for (const event of EDIT_EVENTS) {
+      this.eventEmitter.off(event, callback);
     }
   }
 

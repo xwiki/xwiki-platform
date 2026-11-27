@@ -289,13 +289,20 @@ ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 ckeditor.upload.error.csrf=The CSRF token is missing.
 ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
 
-## Deprecated since 19.0.0RC1, moved to XWiki.WYSIWYG.Translations as wysiwyg.office.importer.*
+## Deprecated since 19.0.0RC1
+#@deprecated wysiwyg.officeImporter.filePath.label
 ckeditor.plugin.office.importer.filePath=File Path
+#@deprecated wysiwyg.officeImporter.filePath.hint
 ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+#@deprecated wysiwyg.officeImporter.filterStyles.label
 ckeditor.plugin.office.importer.filterStyles=Filter Styles
+#@deprecated wysiwyg.officeImporter.filterStyles.hint
 ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+#@deprecated wysiwyg.officeImporter.useOfficeViewer.label
 ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+#@deprecated wysiwyg.officeImporter.useOfficeViewer.hint
 ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+#@deprecated wysiwyg.officeImporter.required
 ckeditor.plugin.office.importer.required=Required
 
 ## Used to indicate where deprecated keys end

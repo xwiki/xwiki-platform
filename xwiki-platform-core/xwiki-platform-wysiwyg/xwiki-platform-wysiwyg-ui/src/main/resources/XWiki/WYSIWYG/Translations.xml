@@ -152,16 +152,16 @@ wysiwyg.imageSelector.urlTab.url.title=Url
 wysiwyg.imageSelector.urlTab.url.hint=The url of the image to display.
 wysiwyg.imageSelector.urlTab.url.placeholder=https://...
 
+wysiwyg.officeImporter.filePath.label=File Path
+wysiwyg.officeImporter.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+wysiwyg.officeImporter.filterStyles.label=Filter Styles
+wysiwyg.officeImporter.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+wysiwyg.officeImporter.useOfficeViewer.label=Use the Office Viewer
+wysiwyg.officeImporter.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+wysiwyg.officeImporter.required=Required
+
 wysiwyg.upload.error.csrf=The CSRF token is missing.
 wysiwyg.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
-
-wysiwyg.office.importer.filePath=File Path
-wysiwyg.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
-wysiwyg.office.importer.filterStyles=Filter Styles
-wysiwyg.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
-wysiwyg.office.importer.useOfficeViewer=Use the Office Viewer
-wysiwyg.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
-wysiwyg.office.importer.required=Required
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

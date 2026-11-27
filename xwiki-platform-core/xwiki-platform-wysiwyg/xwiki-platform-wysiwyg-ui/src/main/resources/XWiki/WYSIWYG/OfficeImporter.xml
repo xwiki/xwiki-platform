@@ -83,13 +83,13 @@
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;label&gt;
-          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filePath'))
+          $escapetool.xml($services.localization.render('wysiwyg.officeImporter.filePath.label'))
           &lt;span class="xRequired"&gt;
-            ($escapetool.xml($services.localization.render('wysiwyg.office.importer.required')))
+            ($escapetool.xml($services.localization.render('wysiwyg.officeImporter.required')))
           &lt;/span&gt;
         &lt;/label&gt;
         &lt;span class="xHint"&gt;
-          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filePath.hint'))
+          $escapetool.xml($services.localization.render('wysiwyg.officeImporter.filePath.hint'))
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
@@ -98,20 +98,20 @@
       &lt;dt&gt;
         &lt;label&gt;
           &lt;input type="checkbox" name="filterStyles" value="true" checked="checked" /&gt;
-          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filterStyles'))
+          $escapetool.xml($services.localization.render('wysiwyg.officeImporter.filterStyles.label'))
         &lt;/label&gt;
         &lt;span class="xHint"&gt;
-          $escapetool.xml($services.localization.render('wysiwyg.office.importer.filterStyles.hint'))
+          $escapetool.xml($services.localization.render('wysiwyg.officeImporter.filterStyles.hint'))
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;&lt;/dd&gt;
       &lt;dt&gt;
         &lt;label&gt;
           &lt;input type="checkbox" name="useOfficeViewer" value="true" /&gt;
-          $escapetool.xml($services.localization.render('wysiwyg.office.importer.useOfficeViewer'))
+          $escapetool.xml($services.localization.render('wysiwyg.officeImporter.useOfficeViewer.label'))
         &lt;/label&gt;
         &lt;span class="xHint"&gt;
-          $escapetool.xml($services.localization.render('wysiwyg.office.importer.useOfficeViewer.hint'))
+          $escapetool.xml($services.localization.render('wysiwyg.officeImporter.useOfficeViewer.hint'))
         &lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;&lt;/dd&gt;

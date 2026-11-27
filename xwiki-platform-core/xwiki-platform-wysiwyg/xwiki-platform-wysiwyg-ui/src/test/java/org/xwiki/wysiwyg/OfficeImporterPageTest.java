@@ -106,9 +106,9 @@ class OfficeImporterPageTest extends PageTest
 
         // The page test framework mocks the localization service, so a key renders as itself. These assertions
         // check that the form uses the keys that moved to XWiki.WYSIWYG.Translations rather than the CKEditor ones.
-        assertTrue(result.contains("wysiwyg.office.importer.filePath"), result);
-        assertTrue(result.contains("wysiwyg.office.importer.filterStyles"), result);
-        assertTrue(result.contains("wysiwyg.office.importer.useOfficeViewer"), result);
+        assertTrue(result.contains("wysiwyg.officeImporter.filePath.label"), result);
+        assertTrue(result.contains("wysiwyg.officeImporter.filterStyles.label"), result);
+        assertTrue(result.contains("wysiwyg.officeImporter.useOfficeViewer.label"), result);
         assertTrue(result.contains("name=\"filePath\""), result);
     }
 

@@ -142,6 +142,14 @@ class UserProfileIT
 
     private static final String GROUP_COLUMN = "Group";
 
+    private static final String PROFILE_GROUP = "Profile";
+
+    private static final String SETTINGS_GROUP = "Settings";
+
+    private static final String PROFILE_CATEGORY = "Profile";
+
+    private static final String PREFERENCES_CATEGORY = "Preferences";
+
     /**
      * The Page Index, the User Index and the Application Index, which are listed in the drawer, with their titles.
      */
@@ -235,13 +243,34 @@ class UserProfileIT
         assertEquals(OTHER_IMAGE_NAME, ProfileUserProfilePage.gotoPage(this.userName).getAvatarImageName());
     }
 
-    /** Functionality check: changing the user type. */
+    /**
+     * Functionality check: navigating the grouped categories of the user profile menu and changing the user type.
+     */
     @Test
     @Order(3)
     void changeUserProfile()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        // The categories are grouped, and only the group of the displayed category is expanded.
+        List<String> groups = userProfilePage.getMenuGroups();
+        assertEquals(PROFILE_GROUP, groups.get(0));
+        assertTrue(groups.contains(SETTINGS_GROUP), groups::toString);
+        assertEquals(List.of(PROFILE_CATEGORY, "Groups"),
+            userProfilePage.getCategoriesInGroup(PROFILE_GROUP).subList(0, 2));
+        assertTrue(userProfilePage.getCategoriesInGroup(SETTINGS_GROUP).contains(PREFERENCES_CATEGORY));
+        assertEquals(List.of(PROFILE_GROUP), userProfilePage.getExpandedMenuGroups());
+
+        // Opening a category of a collapsed group expands it and collapses the other groups.
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
+        assertEquals(List.of(SETTINGS_GROUP), preferencesPage.getExpandedMenuGroups());
+        assertEquals(PREFERENCES_CATEGORY, preferencesPage.getCurrentCategory());
+
+        // Going back in the history expands again the group of the previous category.
+        preferencesPage.goBackToPreviousCategory();
+        assertEquals(PROFILE_CATEGORY, preferencesPage.getCurrentCategory());
+        assertEquals(List.of(PROFILE_GROUP), preferencesPage.getExpandedMenuGroups());
+
+        preferencesPage = userProfilePage.switchToPreferences();
         assertEquals("", preferencesPage.getTimezone());
 
         // Setting to Simple user and setting the timezone to Europe/Paris

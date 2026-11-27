@@ -221,6 +221,7 @@
       <parameters>icon=heart
 name=$services.localization.render('like.userprofile.menu')
 isActive=#if($services.like.isEnabled() &amp;&amp; $services.like.isAuthorized($services.wiki.currentWikiReference))true#{else}false#end
+group=activity
 priority=1000</parameters>
     </property>
     <property>

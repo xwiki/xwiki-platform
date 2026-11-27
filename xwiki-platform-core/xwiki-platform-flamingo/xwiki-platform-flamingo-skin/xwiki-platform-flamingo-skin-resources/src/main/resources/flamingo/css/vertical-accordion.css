@@ -1,0 +1,60 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/* Vertical menu displayed as an accordion, see #verticalNavigationAccordion. */
+
+.vertical-accordion-menu a.panel-heading {
+  display: flex;
+  align-items: center;
+}
+
+.vertical-accordion-menu a.panel-heading.collapsed {
+  border-bottom-left-radius: var(--border-radius-base);
+  border-bottom-right-radius: var(--border-radius-base);
+}
+
+.vertical-accordion-menu a.panel-heading:not(.collapsed) {
+  background-color: var(--navbar-default-bg);
+  color: var(--navbar-default-link-color);
+}
+
+.vertical-accordion-menu a.panel-heading:active,
+.vertical-accordion-menu a.panel-heading:focus,
+.vertical-accordion-menu a.panel-heading:hover {
+  text-decoration: none;
+}
+
+.vertical-accordion-menu a.panel-heading > span:first-child {
+  flex-grow: 1;
+}
+
+/* Rotate the caret when the group is collapsed. */
+.vertical-accordion-menu a.panel-heading > span:last-child {
+  transition: transform 200ms ease-in-out;
+}
+
+.vertical-accordion-menu a.panel-heading.collapsed > span:last-child {
+  transform: rotate(90deg);
+}
+
+.vertical-accordion-menu .panel-collapse > .list-group:last-child > .list-group-item:last-child {
+  border-bottom-left-radius: var(--border-radius-base);
+  border-bottom-right-radius: var(--border-radius-base);
+}

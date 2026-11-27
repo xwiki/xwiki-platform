@@ -2569,6 +2569,89 @@ $displayName##
 #end
 
 #**
+ * Generates the HTML of a vertical menu displayed as an accordion: each top level item is a group that can be expanded
+ * or collapsed, and only one group is expanded at a time. The group that holds the current item is expanded initially.
+ * The output is HTML so the caller has to wrap it in an HTML macro when it's used from wiki content.
+ *
+ * Expected format of the menu:
+ * menu = list of groups
+ * group = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the group; optional, defaults to
+ *                     $services.localization.render("$!{translationPrefix}${group.id}")
+ *        'icon'     : the name of an icon from the current icon theme, displayed before the name; optional
+ *        'children' : list of items displayed in the group, in the given order
+ * item = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the item; optional, defaults to
+ *                     $services.localization.render("$!{translationPrefix}${item.id}")
+ *        'icon'     : the name of an icon from the current icon theme, displayed before the name; optional
+ *        'url'      : the target of the item link; optional, the link has no target when the URL is not safe
+ *        'cssClass' : a specific css class for the item, for custom styling; optional
+ *
+ * @param $menu the menu object, in the format described above
+ * @param $options a map of options, where the following entries are used:
+ *        'id'       : the identifier of the menu, used to build the identifiers of the groups; mandatory
+ *        'label'    : the accessible name of the menu; optional
+ *        'cssClass' : a specific css class for the menu; optional
+ *        'translationPrefix' : the translation prefix added to the id of each group and item without name
+ *        'crtItemId': the identifier of the current item
+ * @since 19.0.0RC1
+ *#
+#macro(verticalNavigationAccordion $menu $options)
+  #set ($escapedMenuId = $escapetool.xml($options.id))
+  <nav id="$escapedMenuId" class="panel-group vertical-accordion-menu $!escapetool.xml($options.cssClass)"##
+    #if ("$!options.label" != '') aria-label="$escapetool.xml($options.label)"#end>
+    #foreach ($group in $menu)
+      #set ($groupId = "${options.id}-group-${group.id}")
+      #set ($escapedGroupId = $escapetool.xml($groupId))
+      #set ($isActiveGroup = false)
+      #foreach ($item in $group.children)
+        #if ("$!options.crtItemId" != '' && $item.id == $options.crtItemId)
+          #set ($isActiveGroup = true)
+        #end
+      #end
+      <div class="panel panel-default">
+        <a class="panel-heading#if (!$isActiveGroup) collapsed#end" id="${escapedGroupId}-heading" role="button"
+          href="#${escapedGroupId}" data-toggle="collapse" data-parent="#$escapedMenuId"
+          aria-expanded="$isActiveGroup" aria-controls="$escapedGroupId">
+          <span>#_verticalNavigationAccordionLabel($group $options)</span>
+          <span>$services.icon.renderHTML('caret-down')</span>
+        </a>
+        <section class="panel-collapse collapse#if ($isActiveGroup) in#end" id="$escapedGroupId"
+          aria-labelledby="${escapedGroupId}-heading">
+          <div class="list-group">
+            #foreach ($item in $group.children)
+              #set ($isActiveItem = false)
+              #if ("$!options.crtItemId" != '' && $item.id == $options.crtItemId)
+                #set ($isActiveItem = true)
+              #end
+              #set ($escapedItemUrl = '')
+              #if ("$!item.url" != '')
+                #getSanitizedURLAttributeValue('a' 'href' $item.url '' $escapedItemUrl)
+              #end
+              <a class="list-group-item#if ($isActiveItem) active#end $!escapetool.xml($item.cssClass)" ##
+                id="vertical-menu-$escapetool.xml($item.id)" data-id="$escapetool.xml($item.id)" ##
+                #if ("$!escapedItemUrl" != '')href="$escapedItemUrl" #end##
+                #if ($isActiveItem)aria-current="page"#end>##
+                #_verticalNavigationAccordionLabel($item $options)</a>
+            #end
+          </div>
+        </section>
+      </div>
+    #end
+  </nav>
+#end
+
+#macro(_verticalNavigationAccordionLabel $entry $options)
+  #set ($label = "$!entry.name")
+  #if ($label == '')
+    #set ($label = $services.localization.render("$!{options.translationPrefix}${entry.id}"))
+  #end
+  #if ("$!entry.icon" != '')$services.icon.renderHTML($entry.icon) #end$escapetool.xml($label)##
+#end
+
+#**
  * Sort a collection containing maps by a field.
  *
  *

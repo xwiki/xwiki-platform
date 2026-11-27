@@ -61,6 +61,11 @@ user.profile.network.error=Error saving the notification setting
 user.profile.status.done=Done
 user.profile.status.saving=Saving...
 user.profile.status.error=Error saving the user status
+platform.core.profile.menu.label=User profile
+platform.core.profile.menu.group.profile=Profile
+platform.core.profile.menu.group.activity=Activity
+platform.core.profile.menu.group.settings=Settings
+platform.core.profile.menu.group.other=Other
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

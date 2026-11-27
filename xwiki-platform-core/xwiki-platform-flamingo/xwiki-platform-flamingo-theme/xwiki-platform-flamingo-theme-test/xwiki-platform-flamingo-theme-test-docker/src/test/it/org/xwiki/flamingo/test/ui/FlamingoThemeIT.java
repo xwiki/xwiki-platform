@@ -22,6 +22,7 @@ package org.xwiki.flamingo.test.ui;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +50,7 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -223,6 +225,46 @@ class FlamingoThemeIT
             // Restore the color theme that was in use so that this test doesn't affect the other tests.
             setup.setWikiPreference(COLOR_THEME_PREFERENCE, Objects.toString(previousColorTheme, ""));
         }
+    }
+
+    @Test
+    @Order(4)
+    void compileSeveralLESSSkinExtensionsWithTheSameColorTheme(TestUtils setup, TestInfo info) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        // A color theme with all its variables left empty, so that the skin defaults apply.
+        String testMethodName = info.getTestMethod().get().getName();
+        DocumentReference themeReference = new DocumentReference("xwiki", THEMES_SPACE, testMethodName);
+        setup.rest().delete(themeReference);
+        setup.rest().addObject(themeReference, "FlamingoThemesCode.ThemeClass");
+
+        // Two LESS skin extensions on the same page, using the same color theme variables. They are compiled one
+        // after the other in the same request, and they must get the same values.
+        DocumentReference extensionReference =
+            new DocumentReference("xwiki", info.getTestClass().get().getSimpleName(), testMethodName);
+        setup.rest().delete(extensionReference);
+        for (int i = 0; i < 2; i++) {
+            setup.rest().addObject(extensionReference, "XWiki.StyleSheetExtension", "contentType", "LESS", "use",
+                "onDemand", "parse", "0", "code", String.format(".object%d{color:@dropdown-link-hover-bg;"
+                    + "background-color:@dropdown-link-color;border-color:@headings-color}", i));
+        }
+
+        String css = setup.getString(String.format("%sssx/%s/%s", setup.getBaseBinPath(null),
+            extensionReference.getLastSpaceReference().getName(), extensionReference.getName()),
+            Map.of(COLOR_THEME_PREFERENCE, THEMES_SPACE + '.' + testMethodName));
+
+        String firstObjectStyle = getRuleDeclarations(css, ".object0");
+        assertFalse(firstObjectStyle.contains(":;"),
+            String.format("The first skin extension has an empty value: [%s]", firstObjectStyle));
+        assertEquals(firstObjectStyle, getRuleDeclarations(css, ".object1"));
+    }
+
+    private String getRuleDeclarations(String css, String selector)
+    {
+        String declarations = StringUtils.substringBetween(css, selector + '{', "}");
+        assertNotNull(declarations, String.format("No [%s] rule found in [%s]", selector, css));
+        return declarations;
     }
 
     private void validateThemeCreation(ThemeApplicationWebHomePage themeApplicationWebHomePage, String testMethodName)

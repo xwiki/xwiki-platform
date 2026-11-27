@@ -51,7 +51,7 @@
 #elseif ($request.action == 'data_icons')
   #set ($icons = [])
   #set ($iconTheme = $request.iconTheme)
-  #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
+  #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme, false)))
   #set ($iconNamePrefix = $request.query.toLowerCase())
   #foreach ($xwikiIcon in $xwikiIcons)
     #if ("$!iconNamePrefix" == '' || $xwikiIcon.startsWith($iconNamePrefix))

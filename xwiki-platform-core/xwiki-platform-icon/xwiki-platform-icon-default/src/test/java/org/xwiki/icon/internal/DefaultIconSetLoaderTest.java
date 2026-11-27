@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -49,8 +50,10 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -99,7 +102,19 @@ class DefaultIconSetLoaderTest
         assertEquals("fa fa-$icon", result.getIconCssClass());
         assertEquals("anchor", result.getIcon("transmit").getValue());
         assertEquals("globe", result.getIcon("earth").getValue());
+        assertEquals("signal", result.getIcon("satellite").getValue());
         assertEquals(IconType.FONT, result.getType());
+
+        // The icons declared between the deprecation markers are still loaded, but flagged as deprecated.
+        assertEquals("globe", result.getIcon("old_earth").getValue());
+        assertEquals("anchor", result.getIcon("old_transmit").getValue());
+        assertTrue(result.getIcon("old_earth").isDeprecated());
+        assertTrue(result.getIcon("old_transmit").isDeprecated());
+        assertFalse(result.getIcon("earth").isDeprecated());
+        assertFalse(result.getIcon("satellite").isDeprecated());
+        assertEquals(Set.of("transmit", "earth", "satellite"), Set.copyOf(result.getIconNames(false)));
+        assertEquals(Set.of("transmit", "earth", "satellite", "old_earth", "old_transmit"),
+            Set.copyOf(result.getIconNames()));
     }
 
     @Test

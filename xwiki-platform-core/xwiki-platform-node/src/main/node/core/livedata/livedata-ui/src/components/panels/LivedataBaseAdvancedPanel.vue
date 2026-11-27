@@ -57,7 +57,7 @@
         >
           <XWikiIcon
             v-if="!collapsed"
-            :icon-descriptor="{ name: 'arrow_in' }"
+            :icon-descriptor="{ name: 'arrow-in' }"
           />
           <XWikiIcon v-else :icon-descriptor="{ name: 'arrow_out' }" />
           <span class="sr-only">{{

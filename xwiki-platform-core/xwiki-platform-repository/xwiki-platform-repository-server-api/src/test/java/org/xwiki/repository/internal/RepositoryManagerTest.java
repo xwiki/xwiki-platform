@@ -25,6 +25,9 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.extension.DefaultExtensionSupportPlans;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -49,6 +52,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -81,6 +85,9 @@ class RepositoryManagerTest
 
     @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
+    private RepositoryConfiguration configuration;
 
     @Test
     void importExtensionChecksEditRightBeforeAnySideEffect() throws Exception
@@ -186,5 +193,47 @@ class RepositoryManagerTest
         verify(xwiki).saveDocument(versionDocumentClone, "Migrate the extension version", xcontext);
         verify(blankVersionObject, never()).clone();
         verify(whitespaceVersionObject, never()).clone();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void validateExtensionMarksDeprecatedExtensionAsNotInstallable(boolean deprecated) throws Exception
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        XWiki xwiki = mock(XWiki.class);
+        when(this.xcontextProvider.get()).thenReturn(xcontext);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+
+        // An extension which is installable with Extension Manager, apart from its deprecated status
+        XWikiDocument extensionDocument = mock(XWikiDocument.class);
+        BaseObject extensionObject = mock(BaseObject.class);
+        when(extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE)).thenReturn(extensionObject);
+        when(this.extensionStore.resolveExtensionSupportPlans(any()))
+            .thenReturn(new DefaultExtensionSupportPlans(List.of()));
+        when(this.extensionStore.getExtensionId(extensionDocument)).thenReturn("my-ext");
+        when(this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID))
+            .thenReturn("my-ext");
+        when(this.extensionStore.isVersionPageEnabled(extensionDocument)).thenReturn(true);
+        when(this.extensionStore.isVersionPageEnabled(extensionObject)).thenReturn(true);
+        when(this.extensionStore.getExtensionLastVersion("my-ext")).thenReturn("1.0");
+        when(extensionDocument.getStringValue(XWikiRepositoryModel.PROP_LASTVERSION)).thenReturn("1.0");
+        when(this.configuration.isValidType(any())).thenReturn(true);
+
+        // The extension used to be installable
+        when(this.extensionStore.getBooleanValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION,
+            false)).thenReturn(true);
+        when(this.extensionStore.getBooleanValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DEPRECATED,
+            false)).thenReturn(deprecated);
+
+        this.repositoryManager.validateExtension(extensionDocument, true);
+
+        if (deprecated) {
+            verify(extensionObject).set(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, "0", xcontext);
+            verify(xwiki).saveDocument(extensionDocument, "Validated extension", true, xcontext);
+        } else {
+            verify(extensionObject, never()).set(eq(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION), any(),
+                any());
+            verify(xwiki, never()).saveDocument(any(), anyString(), anyBoolean(), any());
+        }
     }
 }

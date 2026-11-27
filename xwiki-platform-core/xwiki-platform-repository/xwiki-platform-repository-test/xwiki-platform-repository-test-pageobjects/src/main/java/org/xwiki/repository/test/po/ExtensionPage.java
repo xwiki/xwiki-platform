@@ -56,6 +56,15 @@ public class ExtensionPage extends ViewPage
     }
 
     /**
+     * @return {@code true} if the page warns that the extension is deprecated
+     * @since 18.10.0
+     */
+    public boolean isDeprecated()
+    {
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector(".extensionDeprecated")).isEmpty();
+    }
+
+    /**
      * @return the dependencies listed in the "Dependencies" section, each as its id followed by its version
      *     constraint, or an empty list when the section is not displayed
      * @since 18.10.0RC1

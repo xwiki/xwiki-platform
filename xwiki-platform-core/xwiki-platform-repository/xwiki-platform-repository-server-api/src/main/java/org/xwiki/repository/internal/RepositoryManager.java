@@ -249,6 +249,11 @@ public class RepositoryManager
         boolean valid;
         if (StringUtils.isEmpty(lastVersion)) {
             valid = false;
+        } else if (this.extensionStore.getBooleanValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DEPRECATED,
+            false)) {
+            // A deprecated extension is not recommended for new installations, so it's not exposed to the Extension
+            // Manager
+            valid = false;
         } else {
             valid = isValid(document, extensionObject, xcontext);
         }

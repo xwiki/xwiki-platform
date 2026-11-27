@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.icon.Icon;
+import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconManager;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
@@ -36,6 +37,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -181,6 +183,7 @@ class DefaultIconManagerTest
         assertEquals(2, results2.size());
         assertTrue(results2.contains("icon1"));
         assertTrue(results2.contains("icon2"));
+        assertThrows(IconException.class, () -> iconManager.getIconNames("unknownIconSet"));
     }
 
     @Test
@@ -264,5 +267,6 @@ class DefaultIconManagerTest
         when(this.iconSetManager.getIconSet("testIconSet")).thenReturn(testIconSet);
         assertTrue(this.iconManager.hasIcon("testIconSet", "iconA"));
         assertFalse(this.iconManager.hasIcon("testIconSet", "iconB"));
+        assertThrows(IconException.class, () -> this.iconManager.hasIcon("unknownIconSet", "iconA"));
     }
 }

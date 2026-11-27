@@ -133,7 +133,7 @@ public class DefaultIconManager implements IconManager
     @Override
     public List<String> getIconNames(String iconSetName) throws IconException
     {
-        return iconSetManager.getIconSet(iconSetName).getIconNames();
+        return getExistingIconSet(iconSetName).getIconNames();
     }
 
     @Override
@@ -145,7 +145,21 @@ public class DefaultIconManager implements IconManager
     @Override
     public boolean hasIcon(String iconSetName, String iconName) throws IconException
     {
-        return this.iconSetManager.getIconSet(iconSetName).hasIcon(iconName);
+        return getExistingIconSet(iconSetName).hasIcon(iconName);
+    }
+
+    /**
+     * @param iconSetName name of the icon set
+     * @return the specified icon set
+     * @throws IconException if the icon set cannot be loaded or does not exist
+     */
+    private IconSet getExistingIconSet(String iconSetName) throws IconException
+    {
+        IconSet iconSet = this.iconSetManager.getIconSet(iconSetName);
+        if (iconSet == null) {
+            throw new IconException(String.format("The icon set [%s] does not exist.", iconSetName));
+        }
+        return iconSet;
     }
 
     /**

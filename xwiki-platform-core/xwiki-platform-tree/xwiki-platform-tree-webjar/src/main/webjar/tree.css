@@ -1,0 +1,1362 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/**
+ * Styles of the jstree default theme, renamed to xwiki and adapted to XWiki. They come from the LESS sources of the
+ * jstree 3.3.16 default theme: base.less, main.less, mixins.less and responsive.less, under src/themes in the jstree
+ * repository. The changes made for XWiki are marked with "XWiki customization" comments, so that they can be kept
+ * when upgrading jstree.
+ */
+
+/* Local variables of the xwiki theme. */
+.jstree-xwiki {
+  --jstree-hovered-bg-color: var(--nav-link-hover-bg);
+  --jstree-hovered-shadow-color: #cccccc;
+  --jstree-disabled-color: #666666;
+  --jstree-disabled-bg-color: #efefef;
+  --jstree-disabled-opacity: .5;
+  --jstree-clicked-bg-color: #beebff;
+  --jstree-clicked-shadow-color: #999999;
+  --jstree-clicked-gradient-color-1: #beebff;
+  --jstree-clicked-gradient-color-2: #a8e4ff;
+  --jstree-search-result-color: #8b0000;
+  --jstree-mobile-wholerow-bg-color: #ebebeb;
+  --jstree-mobile-wholerow-shadow: #666666;
+  --jstree-mobile-wholerow-bordert: rgba(255, 255, 255, 0.7);
+  --jstree-mobile-wholerow-borderb: rgba(64, 64, 64, 0.2);
+  --jstree-border-radius-small: 3px;
+  --jstree-narrow-icon-width: 12px;
+}
+
+/**
+ * jstree base styles
+ */
+.jstree-node,
+.jstree-children,
+.jstree-container-ul {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  list-style-image: none;
+}
+.jstree-node {
+  white-space: nowrap;
+}
+/* XWiki customization: the upstream "color: black" is removed so that the node labels use the link color of the
+  skin. */
+.jstree-anchor {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0 4px 0 1px;
+  margin: 0;
+  vertical-align: top;
+  &:focus {
+    outline: 0;
+  }
+}
+/* XWiki customization: the upstream "color: inherit" is moved to the .jstree-no-links and .jstree-no-link rules
+  below. */
+.jstree-anchor,
+.jstree-anchor:link,
+.jstree-anchor:visited,
+.jstree-anchor:hover,
+.jstree-anchor:active {
+  text-decoration: none;
+}
+/* XWiki customization: the icons use the text color of the skin. */
+.jstree-icon {
+  color: var(--text-color);
+  display: inline-block;
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+  text-align: center;
+  &:empty {
+    display: inline-block;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    text-align: center;
+  }
+}
+.jstree-ocl {
+  cursor: pointer;
+}
+.jstree-leaf > .jstree-ocl {
+  cursor: default;
+}
+.jstree {
+  .jstree-open > .jstree-children {
+    display: block;
+  }
+  .jstree-closed > .jstree-children,
+  .jstree-leaf > .jstree-children {
+    display: none;
+  }
+}
+.jstree-anchor > .jstree-themeicon {
+  margin-right: 2px;
+}
+.jstree-no-icons .jstree-themeicon,
+.jstree-anchor > .jstree-themeicon-hidden {
+  display: none;
+}
+.jstree-hidden,
+.jstree-node.jstree-hidden {
+  display: none;
+}
+/* XWiki customization: a tree without links, or a node without a link, keeps the text color and has no underline. */
+.jstree-no-links {
+  .jstree-anchor:focus {
+    outline: 0;
+  }
+  .jstree-anchor,
+  .jstree-anchor:link,
+  .jstree-anchor:visited,
+  .jstree-anchor:hover,
+  .jstree-anchor:active {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+.jstree-no-link {
+  &.jstree-anchor:focus {
+    outline: 0;
+  }
+  &.jstree-anchor,
+  &.jstree-anchor:link,
+  &.jstree-anchor:visited,
+  &.jstree-anchor:hover,
+  &.jstree-anchor:active {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+.jstree-rtl {
+  .jstree-anchor {
+    padding: 0 1px 0 4px;
+  }
+  .jstree-anchor > .jstree-themeicon {
+    margin-left: 2px;
+    margin-right: 0;
+  }
+  .jstree-node {
+    margin-left: 0;
+  }
+  .jstree-container-ul > .jstree-node {
+    margin-right: 0;
+  }
+}
+.jstree-wholerow-ul {
+  position: relative;
+  display: inline-block;
+  min-width: 100%;
+  .jstree-leaf > .jstree-ocl {
+    cursor: pointer;
+  }
+  .jstree-anchor,
+  .jstree-icon {
+    position: relative;
+  }
+  .jstree-wholerow {
+    width: 100%;
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+.jstree-contextmenu .jstree-anchor {
+  -webkit-user-select: none; /* disable selection/Copy of UIWebView */
+  -webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
+  user-select: none;
+}
+.vakata-context {
+  display: none;
+  &,
+  ul {
+    margin: 0;
+    padding: 2px;
+    position: absolute;
+    background: #f5f5f5;
+    border: 1px solid #979797;
+    box-shadow: 2px 2px 2px #999999;
+  }
+  ul {
+    list-style: none;
+    left: 100%;
+    margin-top: -2.7em;
+    margin-left: -4px;
+  }
+  .vakata-context-right ul {
+    left: auto;
+    right: 100%;
+    margin-left: auto;
+    margin-right: -4px;
+  }
+  li {
+    list-style: none;
+    > a {
+      display: block;
+      padding: 0 2em 0 2em;
+      text-decoration: none;
+      width: auto;
+      color: black;
+      white-space: nowrap;
+      line-height: 2.4em;
+      text-shadow: 1px 1px 0 white;
+      border-radius: 1px;
+      &:hover {
+        position: relative;
+        background-color: #e8eff7;
+        box-shadow: 0 0 2px #0a6aa1;
+      }
+      &.vakata-context-parent {
+        background-image: url("data:image/gif;base64,R0lGODlhCwAHAIAAACgoKP///yH5BAEAAAEALAAAAAALAAcAAAIORI4JlrqN1oMSnmmZDQUAOw==");
+        background-position: right center;
+        background-repeat: no-repeat;
+      }
+    }
+    > a:focus {
+      outline: 0;
+    }
+  }
+  .vakata-context-no-icons {
+    margin-left: 0;
+  }
+  .vakata-context-hover > a {
+    position: relative;
+    background-color: #e8eff7;
+    box-shadow: 0 0 2px #0a6aa1;
+  }
+  .vakata-context-separator {
+    > a,
+    > a:hover {
+      background: white;
+      border: 0;
+      border-top: 1px solid #e2e3e3;
+      height: 1px;
+      min-height: 1px;
+      max-height: 1px;
+      padding: 0;
+      margin: 0 0 0 2.4em;
+      border-left: 1px solid #e0e0e0;
+      text-shadow: 0 0 0 transparent;
+      box-shadow: 0 0 0 transparent;
+      border-radius: 0;
+    }
+  }
+  .vakata-contextmenu-disabled {
+    a,
+    a:hover {
+      color: silver;
+      background-color: transparent;
+      border: 0;
+      box-shadow: 0 0 0;
+    }
+    > a > i {
+      filter: grayscale(100%);
+    }
+  }
+  li > a {
+    > i {
+      text-decoration: none;
+      display: inline-block;
+      width: 2.4em;
+      height: 2.4em;
+      background: transparent;
+      margin: 0 0 0 -2em;
+      vertical-align: top;
+      text-align: center;
+      line-height: 2.4em;
+    }
+    > i:empty {
+      width: 2.4em;
+      line-height: 2.4em;
+    }
+    .vakata-contextmenu-sep {
+      display: inline-block;
+      width: 1px;
+      height: 2.4em;
+      background: white;
+      margin: 0 0.5em 0 0;
+      border-left: 1px solid #e2e3e3;
+    }
+  }
+  .vakata-contextmenu-shortcut {
+    font-size: 0.8em;
+    color: silver;
+    opacity: 0.5;
+    display: none;
+  }
+}
+.vakata-context-rtl {
+  ul {
+    left: auto;
+    right: 100%;
+    margin-left: auto;
+    margin-right: -4px;
+  }
+  li > a.vakata-context-parent {
+    background-image: url("data:image/gif;base64,R0lGODlhCwAHAIAAACgoKP///yH5BAEAAAEALAAAAAALAAcAAAINjI+AC7rWHIsPtmoxLAA7");
+    background-position: left center;
+    background-repeat: no-repeat;
+  }
+  .vakata-context-separator > a {
+    margin: 0 2.4em 0 0;
+    border-left: 0;
+    border-right: 1px solid #e2e3e3;
+  }
+  .vakata-context-left ul {
+    right: auto;
+    left: 100%;
+    margin-left: -4px;
+    margin-right: auto;
+  }
+  li > a {
+    > i {
+      margin: 0 -2em 0 0;
+    }
+    .vakata-contextmenu-sep {
+      margin: 0 0 0 0.5em;
+      border-left-color: white;
+      background: #e2e3e3;
+    }
+  }
+}
+#jstree-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: -5px 0 0 0;
+  padding: 0;
+  border-right: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid;
+  width: 0;
+  height: 0;
+  font-size: 0;
+  line-height: 0;
+}
+#jstree-dnd {
+  line-height: 16px;
+  margin: 0;
+  padding: 4px;
+  .jstree-icon,
+  .jstree-copy {
+    display: inline-block;
+    text-decoration: none;
+    margin: 0 2px 0 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+  }
+  .jstree-ok {
+    background: green;
+  }
+  .jstree-er {
+    background: red;
+  }
+  .jstree-copy {
+    margin: 0 2px 0 2px;
+  }
+}
+
+/**
+ * xwiki theme
+ */
+.jstree-xwiki {
+  .jstree-node,
+  .jstree-icon {
+    background-repeat: no-repeat;
+    background-color: transparent;
+  }
+  .jstree-anchor,
+  .jstree-animated,
+  .jstree-wholerow {
+    transition: background-color 0.15s, box-shadow 0.15s;
+    /* XWiki customization: one border radius for every node state, instead of the upstream 2px radius on the hovered,
+      context and clicked nodes. */
+    border-radius: var(--jstree-border-radius-small);
+  }
+  /* XWiki customization: the hover style applies only under the mouse, while the node hovered with the keyboard gets
+    a focus ring that looks like the :focus-visible style. Two outline declarations are needed for cross-browser
+    compatibility. */
+  .jstree-hovered:hover {
+    background: var(--jstree-hovered-bg-color);
+    box-shadow: inset 0 0 1px var(--jstree-hovered-shadow-color);
+    outline: revert;
+  }
+  .jstree-hovered {
+    outline: 5px auto Highlight;
+    outline: 5px auto -webkit-focus-ring-color;
+  }
+  .jstree-context {
+    background: var(--jstree-hovered-bg-color);
+    box-shadow: inset 0 0 1px var(--jstree-hovered-shadow-color);
+  }
+  .jstree-clicked {
+    background: var(--jstree-clicked-bg-color);
+    box-shadow: inset 0 0 1px var(--jstree-clicked-shadow-color);
+  }
+  .jstree-no-icons .jstree-anchor > .jstree-themeicon {
+    display: none;
+  }
+  /* XWiki customization: disabled nodes are also faded out. */
+  .jstree-disabled {
+    background: transparent;
+    color: var(--jstree-disabled-color);
+    opacity: var(--jstree-disabled-opacity);
+    &.jstree-hovered {
+      background: transparent;
+      box-shadow: none;
+    }
+    &.jstree-clicked {
+      background: var(--jstree-disabled-bg-color);
+    }
+    /* XWiki customization: the upstream "opacity: 0.8" is removed since the whole disabled node is already faded
+      out. */
+    > .jstree-icon {
+      filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale"); /* Firefox 10+ */
+      filter: gray; /* IE6-9 */
+      -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */
+    }
+  }
+  .jstree-search {
+    font-style: italic;
+    color: var(--jstree-search-result-color);
+    font-weight: bold;
+  }
+  .jstree-no-checkboxes .jstree-checkbox {
+    display: none !important;
+  }
+  &.jstree-checkbox-no-clicked {
+    .jstree-clicked {
+      background: transparent;
+      box-shadow: none;
+      &.jstree-hovered {
+        background: var(--jstree-hovered-bg-color);
+      }
+    }
+    > .jstree-wholerow-ul .jstree-wholerow-clicked {
+      background: transparent;
+      &.jstree-wholerow-hovered {
+        background: var(--jstree-hovered-bg-color);
+      }
+    }
+  }
+  > .jstree-striped {
+    min-width: 100%;
+    display: inline-block;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAkCAMAAAB/qqA+AAAABlBMVEUAAAAAAAClZ7nPAAAAAnRSTlMNAMM9s3UAAAAXSURBVHjajcEBAQAAAIKg/H/aCQZ70AUBjAATb6YPDgAAAABJRU5ErkJggg==") left top repeat;
+  }
+  > .jstree-wholerow-ul .jstree-hovered,
+  > .jstree-wholerow-ul .jstree-clicked {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  .jstree-wholerow {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .jstree-wholerow-hovered {
+    background: var(--jstree-hovered-bg-color);
+  }
+  .jstree-wholerow-clicked {
+    background: var(--jstree-clicked-gradient-color-1);
+    background: linear-gradient(to bottom, var(--jstree-clicked-gradient-color-1) 0%,
+      var(--jstree-clicked-gradient-color-2) 100%);
+  }
+}
+
+/* Default size */
+.jstree-xwiki {
+  .jstree-node {
+    min-height: 24px;
+    line-height: 24px;
+    margin-left: 24px;
+    min-width: 24px;
+  }
+  .jstree-anchor {
+    line-height: 24px;
+    height: 24px;
+  }
+  .jstree-icon {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+  }
+  .jstree-icon:empty {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+  }
+  &.jstree-rtl .jstree-node {
+    margin-right: 24px;
+  }
+  .jstree-wholerow {
+    height: 24px;
+  }
+  .jstree-node,
+  .jstree-icon {
+    background-image: url("32px.png");
+  }
+  .jstree-node {
+    background-position: -292px -4px;
+    background-repeat: repeat-y;
+  }
+  .jstree-last {
+    background-image: none;
+  }
+  .jstree-open > .jstree-ocl {
+    background-position: -132px -4px;
+  }
+  .jstree-closed > .jstree-ocl {
+    background-position: -100px -4px;
+  }
+  .jstree-leaf > .jstree-ocl {
+    background-position: -68px -4px;
+  }
+  .jstree-themeicon {
+    background-position: -260px -4px;
+  }
+  > .jstree-no-dots {
+    .jstree-node,
+    .jstree-leaf > .jstree-ocl {
+      background: transparent;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: -36px -4px;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: -4px -4px;
+    }
+  }
+  .jstree-disabled {
+    background: transparent;
+    &.jstree-hovered {
+      background: transparent;
+    }
+    &.jstree-clicked {
+      background: #efefef;
+    }
+  }
+  .jstree-checkbox {
+    background-position: -164px -4px;
+    &:hover {
+      background-position: -164px -36px;
+    }
+  }
+  &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox,
+  .jstree-checked > .jstree-checkbox {
+    background-position: -228px -4px;
+  }
+  &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox:hover,
+  .jstree-checked > .jstree-checkbox:hover {
+    background-position: -228px -36px;
+  }
+  .jstree-anchor > .jstree-undetermined {
+    background-position: -196px -4px;
+    &:hover {
+      background-position: -196px -36px;
+    }
+  }
+  .jstree-checkbox-disabled {
+    opacity: 0.8;
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale"); /* Firefox 10+ */
+    filter: gray; /* IE6-9 */
+    -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */
+  }
+  > .jstree-striped {
+    background-size: auto 48px;
+  }
+  &.jstree-rtl {
+    .jstree-node {
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAACAQMAAAB49I5GAAAABlBMVEUAAAAdHRvEkCwcAAAAAXRSTlMAQObYZgAAAAxJREFUCNdjAAMOBgAAGAAJMwQHdQAAAABJRU5ErkJggg==");
+      background-position: 100% 1px;
+      background-repeat: repeat-y;
+    }
+    .jstree-last {
+      background-image: none;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: -132px -36px;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: -100px -36px;
+    }
+    .jstree-leaf > .jstree-ocl {
+      background-position: -68px -36px;
+    }
+    > .jstree-no-dots {
+      .jstree-node,
+      .jstree-leaf > .jstree-ocl {
+        background: transparent;
+      }
+      .jstree-open > .jstree-ocl {
+        background-position: -36px -36px;
+      }
+      .jstree-closed > .jstree-ocl {
+        background-position: -4px -36px;
+      }
+    }
+  }
+  .jstree-themeicon-custom {
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 0;
+  }
+  .jstree-file {
+    background: url("32px.png") -100px -68px no-repeat;
+  }
+  .jstree-folder {
+    background: url("32px.png") -260px -4px no-repeat;
+  }
+  > .jstree-container-ul > .jstree-node {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  #jstree-dnd& {
+    line-height: 24px;
+    padding: 0 4px;
+    .jstree-ok,
+    .jstree-er {
+      background-image: url("32px.png");
+      background-repeat: no-repeat;
+      background-color: transparent;
+    }
+    i {
+      background: transparent;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+    }
+    .jstree-ok {
+      background-position: -4px -68px;
+    }
+    .jstree-er {
+      background-position: -36px -68px;
+    }
+  }
+  .jstree-ellipsis {
+    overflow: hidden;
+    .jstree-anchor {
+      width: calc(100% - 29px);
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+  &.jstree-rtl .jstree-node {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAACAQMAAAB49I5GAAAABlBMVEUAAAAdHRvEkCwcAAAAAXRSTlMAQObYZgAAAAxJREFUCNdjAAMOBgAAGAAJMwQHdQAAAABJRU5ErkJggg==");
+  }
+  &.jstree-rtl .jstree-last {
+    background-image: none;
+  }
+}
+
+/* Small size */
+.jstree-xwiki-small {
+  .jstree-node {
+    min-height: 18px;
+    line-height: 18px;
+    margin-left: 18px;
+    min-width: 18px;
+  }
+  .jstree-anchor {
+    line-height: 18px;
+    height: 18px;
+  }
+  .jstree-icon {
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+  }
+  .jstree-icon:empty {
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+  }
+  &.jstree-rtl .jstree-node {
+    margin-right: 18px;
+  }
+  .jstree-wholerow {
+    height: 18px;
+  }
+  .jstree-node,
+  .jstree-icon {
+    background-image: url("32px.png");
+  }
+  .jstree-node {
+    background-position: -295px -7px;
+    background-repeat: repeat-y;
+  }
+  .jstree-last {
+    background-image: none;
+  }
+  .jstree-open > .jstree-ocl {
+    background-position: -135px -7px;
+  }
+  .jstree-closed > .jstree-ocl {
+    background-position: -103px -7px;
+  }
+  .jstree-leaf > .jstree-ocl {
+    background-position: -71px -7px;
+  }
+  .jstree-themeicon {
+    background-position: -263px -7px;
+  }
+  > .jstree-no-dots {
+    .jstree-node,
+    .jstree-leaf > .jstree-ocl {
+      background: transparent;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: -39px -7px;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: -7px -7px;
+    }
+  }
+  .jstree-disabled {
+    background: transparent;
+    &.jstree-hovered {
+      background: transparent;
+    }
+    &.jstree-clicked {
+      background: #efefef;
+    }
+  }
+  .jstree-checkbox {
+    background-position: -167px -7px;
+    &:hover {
+      background-position: -167px -39px;
+    }
+  }
+  &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox,
+  .jstree-checked > .jstree-checkbox {
+    background-position: -231px -7px;
+  }
+  &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox:hover,
+  .jstree-checked > .jstree-checkbox:hover {
+    background-position: -231px -39px;
+  }
+  .jstree-anchor > .jstree-undetermined {
+    background-position: -199px -7px;
+    &:hover {
+      background-position: -199px -39px;
+    }
+  }
+  .jstree-checkbox-disabled {
+    opacity: 0.8;
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale"); /* Firefox 10+ */
+    filter: gray; /* IE6-9 */
+    -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */
+  }
+  > .jstree-striped {
+    background-size: auto 36px;
+  }
+  &.jstree-rtl {
+    .jstree-node {
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAACAQMAAAB49I5GAAAABlBMVEUAAAAdHRvEkCwcAAAAAXRSTlMAQObYZgAAAAxJREFUCNdjAAMOBgAAGAAJMwQHdQAAAABJRU5ErkJggg==");
+      background-position: 100% 1px;
+      background-repeat: repeat-y;
+    }
+    .jstree-last {
+      background-image: none;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: -135px -39px;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: -103px -39px;
+    }
+    .jstree-leaf > .jstree-ocl {
+      background-position: -71px -39px;
+    }
+    > .jstree-no-dots {
+      .jstree-node,
+      .jstree-leaf > .jstree-ocl {
+        background: transparent;
+      }
+      .jstree-open > .jstree-ocl {
+        background-position: -39px -39px;
+      }
+      .jstree-closed > .jstree-ocl {
+        background-position: -7px -39px;
+      }
+    }
+  }
+  .jstree-themeicon-custom {
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 0;
+  }
+  .jstree-file {
+    background: url("32px.png") -103px -71px no-repeat;
+  }
+  .jstree-folder {
+    background: url("32px.png") -263px -7px no-repeat;
+  }
+  > .jstree-container-ul > .jstree-node {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  #jstree-dnd& {
+    line-height: 18px;
+    padding: 0 4px;
+    .jstree-ok,
+    .jstree-er {
+      background-image: url("32px.png");
+      background-repeat: no-repeat;
+      background-color: transparent;
+    }
+    i {
+      background: transparent;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+    }
+    .jstree-ok {
+      background-position: -7px -71px;
+    }
+    .jstree-er {
+      background-position: -39px -71px;
+    }
+  }
+  .jstree-ellipsis {
+    overflow: hidden;
+    .jstree-anchor {
+      width: calc(100% - 23px);
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+  &.jstree-rtl .jstree-node {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAACAQMAAABv1h6PAAAABlBMVEUAAAAdHRvEkCwcAAAAAXRSTlMAQObYZgAAAAxJREFUCNdjAAMHBgAAiABBI4gz9AAAAABJRU5ErkJggg==");
+  }
+  &.jstree-rtl .jstree-last {
+    background-image: none;
+  }
+}
+
+/* Large size */
+.jstree-xwiki-large {
+  .jstree-node {
+    min-height: 32px;
+    line-height: 32px;
+    margin-left: 32px;
+    min-width: 32px;
+  }
+  .jstree-anchor {
+    line-height: 32px;
+    height: 32px;
+  }
+  .jstree-icon {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+  }
+  .jstree-icon:empty {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+  }
+  &.jstree-rtl .jstree-node {
+    margin-right: 32px;
+  }
+  .jstree-wholerow {
+    height: 32px;
+  }
+  .jstree-node,
+  .jstree-icon {
+    background-image: url("32px.png");
+  }
+  .jstree-node {
+    background-position: -288px 0;
+    background-repeat: repeat-y;
+  }
+  .jstree-last {
+    background-image: none;
+  }
+  .jstree-open > .jstree-ocl {
+    background-position: -128px 0;
+  }
+  .jstree-closed > .jstree-ocl {
+    background-position: -96px 0;
+  }
+  .jstree-leaf > .jstree-ocl {
+    background-position: -64px 0;
+  }
+  .jstree-themeicon {
+    background-position: -256px 0;
+  }
+  > .jstree-no-dots {
+    .jstree-node,
+    .jstree-leaf > .jstree-ocl {
+      background: transparent;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: -32px 0;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: 0 0;
+    }
+  }
+  .jstree-disabled {
+    background: transparent;
+    &.jstree-hovered {
+      background: transparent;
+    }
+    &.jstree-clicked {
+      background: #efefef;
+    }
+  }
+  .jstree-checkbox {
+    background-position: -160px 0;
+    &:hover {
+      background-position: -160px -32px;
+    }
+  }
+  &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox,
+  .jstree-checked > .jstree-checkbox {
+    background-position: -224px 0;
+  }
+  &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox:hover,
+  .jstree-checked > .jstree-checkbox:hover {
+    background-position: -224px -32px;
+  }
+  .jstree-anchor > .jstree-undetermined {
+    background-position: -192px 0;
+    &:hover {
+      background-position: -192px -32px;
+    }
+  }
+  .jstree-checkbox-disabled {
+    opacity: 0.8;
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale"); /* Firefox 10+ */
+    filter: gray; /* IE6-9 */
+    -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */
+  }
+  > .jstree-striped {
+    background-size: auto 64px;
+  }
+  &.jstree-rtl {
+    .jstree-node {
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAACAQMAAAB49I5GAAAABlBMVEUAAAAdHRvEkCwcAAAAAXRSTlMAQObYZgAAAAxJREFUCNdjAAMOBgAAGAAJMwQHdQAAAABJRU5ErkJggg==");
+      background-position: 100% 1px;
+      background-repeat: repeat-y;
+    }
+    .jstree-last {
+      background-image: none;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: -128px -32px;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: -96px -32px;
+    }
+    .jstree-leaf > .jstree-ocl {
+      background-position: -64px -32px;
+    }
+    > .jstree-no-dots {
+      .jstree-node,
+      .jstree-leaf > .jstree-ocl {
+        background: transparent;
+      }
+      .jstree-open > .jstree-ocl {
+        background-position: -32px -32px;
+      }
+      .jstree-closed > .jstree-ocl {
+        background-position: 0 -32px;
+      }
+    }
+  }
+  .jstree-themeicon-custom {
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 0;
+  }
+  .jstree-file {
+    background: url("32px.png") -96px -64px no-repeat;
+  }
+  .jstree-folder {
+    background: url("32px.png") -256px 0 no-repeat;
+  }
+  > .jstree-container-ul > .jstree-node {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  #jstree-dnd& {
+    line-height: 32px;
+    padding: 0 4px;
+    .jstree-ok,
+    .jstree-er {
+      background-image: url("32px.png");
+      background-repeat: no-repeat;
+      background-color: transparent;
+    }
+    i {
+      background: transparent;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+    }
+    .jstree-ok {
+      background-position: 0 -64px;
+    }
+    .jstree-er {
+      background-position: -32px -64px;
+    }
+  }
+  .jstree-ellipsis {
+    overflow: hidden;
+    .jstree-anchor {
+      width: calc(100% - 37px);
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+  &.jstree-rtl .jstree-node {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAACAQMAAAAD0EyKAAAABlBMVEUAAAAdHRvEkCwcAAAAAXRSTlMAQObYZgAAAAxJREFUCNdjgIIGBgABCgCBvVLXcAAAAABJRU5ErkJggg==");
+  }
+  &.jstree-rtl .jstree-last {
+    background-image: none;
+  }
+}
+
+/* Responsive drag and drop */
+@media (max-width: 768px) {
+  #jstree-dnd.jstree-dnd-responsive {
+    line-height: 40px;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-shadow: 1px 1px white;
+    > i {
+      background: transparent;
+      width: 40px;
+      height: 40px;
+    }
+    > .jstree-ok {
+      background-image: url("40px.png");
+      background-position: 0 -200px;
+      background-size: 120px 240px;
+    }
+    > .jstree-er {
+      background-image: url("40px.png");
+      background-position: -40px -200px;
+      background-size: 120px 240px;
+    }
+  }
+  #jstree-marker.jstree-dnd-responsive {
+    border-left-width: 10px;
+    border-top-width: 10px;
+    border-bottom-width: 10px;
+    margin-top: -10px;
+  }
+}
+
+/* Responsive theme */
+.jstree-xwiki-responsive {
+  @media (max-width: 768px) {
+    .jstree-icon {
+      background-image: url("40px.png");
+    }
+    .jstree-node,
+    .jstree-leaf > .jstree-ocl {
+      background: transparent;
+    }
+    .jstree-node {
+      min-height: 40px;
+      line-height: 40px;
+      margin-left: 40px;
+      min-width: 40px;
+      white-space: nowrap;
+    }
+    .jstree-anchor {
+      line-height: 40px;
+      height: 40px;
+    }
+    .jstree-icon,
+    .jstree-icon:empty {
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+    }
+    > .jstree-container-ul > .jstree-node {
+      margin-left: 0;
+    }
+    &.jstree-rtl .jstree-node {
+      margin-left: 0;
+      margin-right: 40px;
+      background: transparent;
+    }
+    &.jstree-rtl .jstree-container-ul > .jstree-node {
+      margin-right: 0;
+    }
+    .jstree-ocl,
+    .jstree-themeicon,
+    .jstree-checkbox {
+      background-size: 120px 240px;
+    }
+    .jstree-leaf > .jstree-ocl,
+    &.jstree-rtl .jstree-leaf > .jstree-ocl {
+      background: transparent;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: 0 0 !important;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: 0 -40px !important;
+    }
+    &.jstree-rtl .jstree-closed > .jstree-ocl {
+      background-position: -40px 0 !important;
+    }
+    .jstree-themeicon {
+      background-position: -40px -40px;
+    }
+    .jstree-checkbox,
+    .jstree-checkbox:hover {
+      background-position: -40px -80px;
+    }
+    &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox,
+    &.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox:hover,
+    .jstree-checked > .jstree-checkbox,
+    .jstree-checked > .jstree-checkbox:hover {
+      background-position: 0 -80px;
+    }
+    .jstree-anchor > .jstree-undetermined,
+    .jstree-anchor > .jstree-undetermined:hover {
+      background-position: 0 -120px;
+    }
+    /* XWiki customization: the upstream "text-shadow: 1px 1px white" is removed. */
+    .jstree-anchor {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    > .jstree-striped {
+      background: transparent;
+    }
+    .jstree-wholerow {
+      border-top: 1px solid var(--jstree-mobile-wholerow-bordert);
+      border-bottom: 1px solid var(--jstree-mobile-wholerow-borderb);
+      background: var(--jstree-mobile-wholerow-bg-color);
+      height: 40px;
+    }
+    .jstree-wholerow-hovered {
+      background: var(--jstree-hovered-bg-color);
+    }
+    .jstree-wholerow-clicked {
+      background: var(--jstree-clicked-bg-color);
+    }
+    .jstree-children .jstree-last > .jstree-wholerow {
+      box-shadow: inset 0 -6px 3px -5px var(--jstree-mobile-wholerow-shadow);
+    }
+    .jstree-children .jstree-open > .jstree-wholerow {
+      box-shadow: inset 0 6px 3px -5px var(--jstree-mobile-wholerow-shadow);
+      border-top: 0;
+    }
+    .jstree-children .jstree-open + .jstree-open {
+      box-shadow: none;
+    }
+    .jstree-node,
+    .jstree-icon,
+    .jstree-node > .jstree-ocl,
+    .jstree-themeicon,
+    .jstree-checkbox {
+      background-image: url("40px.png");
+      background-size: 120px 240px;
+    }
+    .jstree-node {
+      background-position: -80px 0;
+      background-repeat: repeat-y;
+    }
+    .jstree-last {
+      background-image: none;
+    }
+    .jstree-leaf > .jstree-ocl {
+      background-position: -40px -120px;
+    }
+    .jstree-last > .jstree-ocl {
+      background-position: -40px -160px;
+    }
+    .jstree-themeicon-custom {
+      background-color: transparent;
+      background-image: none;
+      background-position: 0 0;
+    }
+    .jstree-file {
+      background: url("40px.png") 0 -160px no-repeat;
+      background-size: 120px 240px;
+    }
+    .jstree-folder {
+      background: url("40px.png") -40px -40px no-repeat;
+      background-size: 120px 240px;
+    }
+    > .jstree-container-ul > .jstree-node {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+}
+
+/**
+ * Narrow Tree
+ */
+/* Any container that is too narrow to display long labels on a single line, such as a dashboard gadget or a panel, can
+  mark itself with this class in order for the trees it holds to wrap their node labels: the node labels are split on
+  multiple lines instead of being cut, so that the full label remains readable. */
+.xwiki-narrow-container .jstree-xwiki {
+  .jstree-node,
+  .jstree-anchor {
+    /* Allow the label to be split on multiple lines. */
+    white-space: normal;
+  }
+  .jstree-anchor {
+    /* The node label can be split on multiple lines. */
+    height: auto;
+    /* A page name is often a single unbroken word, which offers no place to wrap. Break inside it when it would
+      otherwise be wider than the container. */
+    overflow-wrap: break-word;
+  }
+}
+
+/**
+ * Narrow Tree (no icons and no edges)
+ */
+.jstree-xwiki > .jstree-no-dots.jstree-no-icons {
+  /* Reduce a bit the font size. */
+  font-size: 95%;
+  .jstree-node {
+    /* Leave some space for the open/close icon. */
+    margin-left: 0;
+    padding-left: var(--jstree-narrow-icon-width);
+  }
+  .jstree-node,
+  .jstree-anchor {
+    /* Allow the label to be split on multiple lines. */
+    white-space: normal;
+  }
+  .jstree-anchor {
+    /* The node label can be split on multiple lines. */
+    height: auto;
+    /* A page name is often a single unbroken word, which offers no place to wrap. Break inside it when it would
+      otherwise be wider than the container. */
+    overflow-wrap: break-word;
+  }
+  .jstree-ocl {
+    /* Use FontAwesome for the open/close/leaf icons. */
+    color: var(--text-muted);
+    display: inline-block;
+    font-family: "FontAwesome";
+    font-size: inherit;
+    font-size-adjust: none;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    text-rendering: auto;
+    -moz-font-feature-settings: normal;
+    -moz-font-language-override: normal;
+    background-image: none;
+    /* Position the open/close icon in the parent left padding in order for the node label to be properly aligned when
+      split on multiple lines. */
+    margin-left: calc(-1 * var(--jstree-narrow-icon-width));
+    width: var(--jstree-narrow-icon-width);
+  }
+  .jstree-closed > .jstree-ocl:before {
+    /* fa-angle-right */
+    content: '\f105';
+  }
+  .jstree-open > .jstree-ocl:before {
+    /* fa-angle-down */
+    content: '\f107';
+  }
+  .jstree-leaf > .jstree-ocl {
+    font-size: calc(var(--jstree-narrow-icon-width) / 2);
+    &:before {
+      /* fa-circle */
+      content: '\f111';
+    }
+  }
+  .jstree-closed.jstree-loading > .jstree-ocl:before,
+  .jstree-open.jstree-loading > .jstree-ocl:before,
+  .jstree-leaf.jstree-loading > .jstree-ocl:before {
+    /* Hide the open/close/leaf icon while the node is in loading state. */
+    content: normal;
+  }
+}
+@media (max-width: 768px) {
+  .jstree-xwiki-responsive > .jstree-no-dots.jstree-no-icons {
+    .jstree-node {
+      /* The icons are bigger on small screens. */
+      padding-left: calc(2 * var(--jstree-narrow-icon-width));
+    }
+    .jstree-ocl {
+      font-size: calc(2 * var(--jstree-narrow-icon-width));
+      margin-left: calc(-2 * var(--jstree-narrow-icon-width));
+      width: calc(2 * var(--jstree-narrow-icon-width));
+    }
+    .jstree-closed > .jstree-ocl:before {
+      /* fa-chevron-right */
+      content: '\f054';
+    }
+    .jstree-open > .jstree-ocl:before {
+      /* fa-chevron-down */
+      content: '\f078';
+    }
+  }
+}
+
+/**
+ * Custom styles for XWiki
+ */
+.jstree-xwiki > .jstree-container-ul .jstree-loading > .jstree-ocl {
+  background-image: url("data:image/gif;base64,R0lGODlhEAAQAPMPAObs8pSvyTNmmXmau8rX5EJxoK/D116GrvL1+KG4z2qPtE97p7zM3YakwjZomv///yH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgAPACwAAAAAEAAQAAAEcfDJh2gbdeoHFkCCAFCbBAgL4ojIqAFjIiQrnEmIMoPOMHymDEDnILhwQByCcTjiNAmFz1CiIK5RhYJaul6thMAtqEEkCgpnyzgJLAzmBAzAoLA5I8CBwDAA5E8TCAMBDwZUAHAlAAEjhxIEYyUEBFURACH5BAUKAA8ALAAAAAAPABAAAARd8Mn5QpOITiWXBAWjSQeyOMAiEKNkLIUhcNMQI8VhCUKWSQPBATAhEFu01oPRCARYyodh0GhAox/D6DdhKAZbwC+hYCAMDID6KNY0AATzVRPQxiVzjCFzfxyVaiMRACH5BAUKAA8ALAAAAAAQAA8AAARa8Mn5TKJYNqkWQkcmOQPSIYOIVALTMRNASMHBgEqSHAKQCD1NIRUzAAWzCaGxUgouEoLOAMh8royAVsR9wLqURqLZNQQICAL6qpIkAHAEgIwxzOAPOfeLz1MiACH5BAUKAA8ALAAAAAAQABAAAARd8MkpDb0yIDTUHgT2HFqHNBgyFURHCCgCSEkDIEpgGIqAGIKC6hEg3SaEhYh4AcBuCIKBwRA1CgUHaGeYXRqC8IESagLOQ0DCskR2Zd7lMLoZtgmzTVvi1e8nfhcRACH5BAUKAAgALAAAAAAQAA4AAARGEMmJQqBYDikEz9zWIQUoBQLRGUJJDQWBCIflVaMmbFgnGBge5jABGI6ggy9muWQKvpsEgFERMcCqj4rgmnwZL4UgnJomEQAh+QQFCgAOACwAAAAAEAAQAAAEbNDJ6Qih2CGGUApdAGRIwCWJt4wZ0AAoUCQYwQCeYQUHQiwKiS9BQEwQgIHgwJIAGBiEwtDpAK5GjGEwUCSu2IxhsSg0KNkJ4GCIXilPgSAoxFU7BUFSUEhnGAIDElBRFAsCFyQYAAJtGY9+EQAh+QQFCgAPACwAAAAAEAAQAAAEX/DJ+QCgWBKEjOFGJhkAwnyGIkqJSSoMZnEMYRmNpOQSYGeNwgCDuGAaDI6SI2I0GoOWsqk4HAKrySCJyGoEgkZXFGgsBIiG4LAqCBICrE+EcBuNdIfA4oitEAMHYxQRACH5BAUKAA4ALAEAAQAPAA8AAARa0EmAECGVyS1Jx0TDcSABNJ6DqBvgAkyAAENSzesYHMGYc4nUaEgIGDXDTWhQS0oQqOEM8AQsBL2RQJBIKBaIhEABxC4WBu4QsAUUCohDkiHAvGcLYWszSEYAACH5BAUKAA8ALAAAAAAQABAAAARg8Mn5EKJYWgSAJVfmcR5ghBhHIgmQbTDBSImRpUZj35jh8hhAYgicAALImYSwIGBaFIBCINhNFIWExiE4AAQLA6OhQBgWDYnBSTscGFXJj7JAuBEDB8/hWRwkCjwhSDcRACH5BAUKAA4ALAAAAQAQAA8AAARc0MnpkEWAamkl2dr1bcB1AZljjODEJASipRTrNEXegExPHIKgAmQwwDAAQ4EmMbQcsQmicXBKFoIGYqHoJQYIwiAgYdAMAwWhwKiADog0InAAERYSxfDG3CQSIBEAIfkEBQoADwAsAAABABAADwAABF3wyUkfqngiUAHHwEUJQoKcqIQQH0EK3wSwVSAwnSgtfPYQQMDAUSgEMkDGB8FQYHCVASkmSTSgj4MggFAMgIaGJGCQECSGW6ABOPgeBQVijTA4QffG4HR8PwxlGBEAIfkEBQoADwAsAAABAA8ADwAABF7wSVKAvPgSsbKXg8B8UvcAguAByLmkxnghLGY4RIbsSHIoioSHBgAEFkihrsjaEQae3CwgKHgYCcIulEA0AkWGgRY7TQqEBLhhebQkiEOjF0Aw6p6GRL0zkCQMMhgRADs=");
+  background-position: center center !important;
+  background-size: 16px;
+}
+.jstree ul.jstree-children {
+  /* Overwrite the margin and padding from the XWiki skin. */
+  margin: 0;
+  padding: 0;
+}
+.jstree-contextmenu {
+  z-index: 100;
+  a * {
+    /* Overwrite the line height from the XWiki skin. */
+    line-height: inherit;
+  }
+}
+body.modal-open > .jstree-xwiki-contextmenu {
+  /* Bootstrap modals have z-index 1050 by default but the WYSIWYG editor has increased that to 10050 in order to be able
+    to show the Bootstrap modals on top of standard CKEditor dialogs (e.g. the standard CKEditor link dialog has been
+    customized to show a page picker that opens a Bootstrap modal with the XWiki page tree). When the tree is displayed
+    in a modal we want the context menu to be displayed on top of the modal. */
+  z-index: 10051;
+}

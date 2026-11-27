@@ -27,6 +27,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
  * @version $Id$
  * @since 2.0M4
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("java:S1214")
 public interface WikiMacroConstants
 {
     /**

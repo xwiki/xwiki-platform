@@ -45,6 +45,11 @@
       <artifactId>xwiki-platform-sheet-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test dependencies. -->
     <dependency>

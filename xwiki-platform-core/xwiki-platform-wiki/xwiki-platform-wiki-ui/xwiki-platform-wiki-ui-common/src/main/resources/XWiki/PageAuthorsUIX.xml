@@ -152,7 +152,7 @@
       </scope>
     </class>
     <property>
-      <async_cached>1</async_cached>
+      <async_cached>0</async_cached>
     </property>
     <property>
       <async_context>
@@ -163,7 +163,7 @@
       </async_context>
     </property>
     <property>
-      <async_enabled>1</async_enabled>
+      <async_enabled>0</async_enabled>
     </property>
     <property>
       <content>{{velocity}}

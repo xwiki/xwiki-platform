@@ -104,10 +104,10 @@ catalog:
   "@eslint/js": 10.0.1
   "@floating-ui/react": 0.27.20
   "@jridgewell/remapping": 2.3.5
-  "@mantine/core": 9.6.3
-  "@mantine/hooks": 9.6.3
+  "@mantine/core": 9.8.2
+  "@mantine/hooks": 9.8.2
   "@microsoft/api-extractor": 7.60.1
-  "@oxc-project/runtime": 0.158.0
+  "@oxc-project/runtime": 0.160.0
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
   "@playwright/test": 1.65.1
@@ -137,7 +137,7 @@ catalog:
   chainpad: 5.3.2
   cross-env: 10.1.0
   diff-dom: 5.2.1
-  dompurify: 3.4.18
+  dompurify: 3.5.0
   esbuild: 0.28.2
   eslint: 10.12.0
   eslint-import-resolver-typescript: 4.4.5
@@ -150,7 +150,7 @@ catalog:
   eventemitter3: 5.0.4
   flush-promises: 1.0.2
   globals: 17.14.0
-  i18next: 27.1.3
+  i18next: 27.2.9
   inversify: 8.2.4
   jiti: 2.7.0
   jquery: 4.1.0
@@ -166,13 +166,13 @@ catalog:
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-package-json-lint: 11.0.1
   npm-run-all: 4.1.5
-  npm-run-all2: 9.0.4
+  npm-run-all2: 9.1.0
   nx: 24.0.6
   pinia: 4.1.0
   postcss: 8.5.33
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  prosemirror-model: 1.25.12
+  prosemirror-model: 1.25.13
   prosemirror-state: 1.4.4
   publint: 0.3.25
   qunit: 3.0.0
@@ -192,7 +192,7 @@ catalog:
   u-node: 0.0.8
   unified: 11.0.5
   utility-types: 3.11.0
-  vite: 8.3.4
+  vite: 8.3.5
   vite-plugin-css-injected-by-js: 5.0.3
   vite-plugin-dts: 4.5.4
   vitest: 5.1.0

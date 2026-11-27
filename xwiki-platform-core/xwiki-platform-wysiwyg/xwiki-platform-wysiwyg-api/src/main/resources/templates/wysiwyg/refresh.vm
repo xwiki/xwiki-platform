@@ -1,0 +1,67 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Executes the macro calls of the content edited with a WYSIWYG editor whose content syntax is not HTML (e.g.
+## BlockNote), so that the editor can show the output of the macro calls that were inserted or modified, by the current
+## user or by the other users editing the same content in realtime. All the macro calls are executed because the output
+## of a macro call can depend on the rest of the content.
+##
+## The request has to be sent to the document where the edited content is saved, which is the context of the macro
+## calls, and it takes the following parameters:
+## * content: the edited content, in the syntax of the editor
+## * editorSyntax: the syntax of the editor (e.g. blocknote/1.0), used to parse the edited content and to render the
+##   result, which is sent back as plain text
+## * sourceSyntax: the syntax used to save the edited content (e.g. xwiki/2.1); defaults to the syntax of the document
+## * restricted: "true" to execute the macros in a restricted context (e.g. when editing a comment)
+## * form_token: the CSRF token
+## * collaboration: the realtime collaboration session where the content is edited, if any; the content is then
+##   executed with the rights of the session participant with the least script rights among those that changed the
+##   content, instead of the rights of the current user
+## ---------------------------------------------------------------------------
+#if ($request.method != 'POST' || !$services.csrf.isTokenValid($request.form_token))
+  #set ($discard = $response.sendError(403, 'A valid form token is required.'))
+#else
+  #set ($editorSyntax = $NULL)
+  #if ("$!request.editorSyntax" != '')
+    #set ($editorSyntax = $services.rendering.resolveSyntax($request.editorSyntax))
+  #end
+  #set ($sourceSyntax = $NULL)
+  #if ("$!request.sourceSyntax" != '')
+    #set ($sourceSyntax = $services.rendering.resolveSyntax($request.sourceSyntax))
+  #end
+  #if (!$sourceSyntax)
+    #set ($sourceSyntax = $tdoc.syntax)
+  #end
+  #if (!$editorSyntax)
+    #set ($discard = $response.sendError(400, 'The editor syntax is missing or not valid.'))
+  #else
+    ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
+    #set ($discard = $xcontext.setDisplayMode('view'))
+    #set ($restricted = $request.restricted == 'true')
+    #try('refreshException')
+      #set ($output = $services.wysiwyg.refresh("$!request.content", $editorSyntax, $sourceSyntax,
+        $doc.documentReference, $restricted))
+    #end
+    #if ($refreshException)
+      #set ($discard = $response.sendError(500, 'Failed to execute the macro calls of the edited content.'))
+    #else
+      #rawResponse($output 'text/plain')
+    #end
+  #end
+#end

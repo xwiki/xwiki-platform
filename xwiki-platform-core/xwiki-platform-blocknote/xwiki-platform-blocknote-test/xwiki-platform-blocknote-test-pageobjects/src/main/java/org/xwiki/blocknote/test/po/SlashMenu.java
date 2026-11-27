@@ -42,6 +42,8 @@ public class SlashMenu extends BaseElement
 
     private static final By ITEM_TITLE = By.cssSelector(".bn-suggestion-menu-item .bn-mt-suggestion-menu-item-title");
 
+    private static final By LOADER = By.className("bn-suggestion-menu-loader");
+
     /**
      * We keep a reference to the previously selected item in order to detect when the items are updated.
      */
@@ -126,10 +128,20 @@ public class SlashMenu extends BaseElement
      */
     public void clickItem(String title, String subtitleFragment)
     {
+        // The items are reloaded as the query is typed, and BlockNote identifies them by their title. An updated list
+        // can thus reuse the element of an item for another one with the same title, e.g. an image with the same name
+        // attached to another page. Look up the item once the items of the current query are displayed, so that the
+        // element found still holds that item when it is clicked.
+        waitForItemsLoaded();
         getDriver().findElement(By.xpath("//div[contains(@class, 'bn-suggestion-menu-item') and "
             + ".//p[contains(@class, 'bn-mt-suggestion-menu-item-title') and text()='" + title + "'] and "
             + ".//p[contains(@class, 'bn-mt-suggestion-menu-item-subtitle') and contains(., '" + subtitleFragment
             + "')]]")).click();
+    }
+
+    private void waitForItemsLoaded()
+    {
+        getDriver().waitUntilCondition(driver -> getDriver().findElementsWithoutWaiting(LOADER).isEmpty());
     }
 
     /**

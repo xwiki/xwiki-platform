@@ -108,6 +108,7 @@ class MinimalSyntaxConfig implements SyntaxConfig {
         language: false,
       },
       macros: false,
+      mentions: false,
       rawHtml: false,
       textStyles: {
         bold: false,

@@ -25,7 +25,7 @@ import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { describe, expect, test } from "vitest";
-import type { MacroCall } from "../../features/macros/utils";
+import type { MacroCall } from "../../misc/macroInvocation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Nodes = any[];

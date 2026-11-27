@@ -98,6 +98,7 @@ export class MarkdownSyntaxConfig implements SyntaxConfig {
         language: false,
       },
       macros: true,
+      mentions: true,
       rawHtml: true,
       textStyles: {
         bold: true,

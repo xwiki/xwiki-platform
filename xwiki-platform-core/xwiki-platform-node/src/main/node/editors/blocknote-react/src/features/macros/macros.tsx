@@ -22,11 +22,8 @@ import { CustomMacroEditButton } from "./CustomMacroEditButton";
 import { getMacroEditing } from "./macroEditing";
 import { MacroOutputCache } from "./macroOutputCache";
 import { createXWikiInlineMacro, createXWikiMacroBlock } from "./macroSpec";
-import {
-  MACRO_NAME_PREFIX,
-  adaptMacroForBlockNote,
-  insertMacroInvocation,
-} from "./utils";
+import { MACRO_NAME_PREFIX, adaptMacroForBlockNote } from "./utils";
+import { insertMacroInvocation } from "../../misc/macroInvocation";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import { createElement } from "react";

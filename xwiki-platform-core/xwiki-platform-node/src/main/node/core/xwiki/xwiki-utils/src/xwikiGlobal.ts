@@ -197,6 +197,14 @@ interface XWikiGlobal {
   contextPath: string;
 
   /**
+   * The path the current wiki serves its pages from, relative to the context path and ending with a separator, e.g.
+   * `bin/` or `wiki/<subwiki>/` for a subwiki reached through a path.
+   *
+   * @since 19.0.0RC1
+   */
+  servletpath: string;
+
+  /**
    * The syntax identifier of the current document, e.g. `xwiki/2.1`.
    */
   docsyntax: string;

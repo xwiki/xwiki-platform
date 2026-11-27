@@ -127,6 +127,8 @@ export { linksFeature } from "./features/links/links";
 
 export { macrosFeature } from "./features/macros/macros";
 
+export { mentionsFeature } from "./features/mentions/mentions";
+
 export { pasteFilterFeature } from "./features/pasteFilter/pasteFilter";
 
 export { textStylesFeature } from "./features/textStyles/textStyles";
@@ -171,6 +173,10 @@ export {
   extractMacroRawContent,
 } from "./features/macros/utils";
 
+export { mentionFactoryName } from "./services/mentionFactory";
+
+export type { MentionFactory } from "./services/mentionFactory";
+
 export { macroEditorName } from "./services/macroEditor";
 
 export type {
@@ -181,7 +187,9 @@ export type {
   MacroInsertionEditorPrefillData,
 } from "./services/macroEditor";
 
-export type { MacroCall } from "./features/macros/utils";
+export { createInlineMacro } from "./misc/macroInvocation";
+
+export type { MacroCall } from "./misc/macroInvocation";
 
 export { linkEditorName, linkMetadataHandlerName } from "./services/linkEditor";
 

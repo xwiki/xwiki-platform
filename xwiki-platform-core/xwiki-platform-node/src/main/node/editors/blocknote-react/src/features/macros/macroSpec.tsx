@@ -20,14 +20,17 @@
 import "./macro.css";
 import { useMacroEditing } from "./macroEditing";
 import { MacroOutput } from "./macroOutput";
-import { invocationToMacroCall, macroCallToInvocation } from "./utils";
+import {
+  invocationToMacroCall,
+  macroCallToInvocation,
+} from "../../misc/macroInvocation";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,
 } from "@blocknote/react";
+import type { MacroCall } from "../../misc/macroInvocation";
 import type { OutputNode } from "./macroOutput";
 import type { MacroOutputCache } from "./macroOutputCache";
-import type { MacroCall } from "./utils";
 
 /**
  * @param outputs - the output of the macro calls of the editor instance

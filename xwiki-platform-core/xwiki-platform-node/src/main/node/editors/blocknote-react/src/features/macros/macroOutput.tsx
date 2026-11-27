@@ -19,8 +19,8 @@
  */
 import { applyXWikiParameters } from "../../blocknote/parameters";
 import { Fragment, createContext, createElement, useContext } from "react";
+import type { MacroCall } from "../../misc/macroInvocation";
 import type { MacroOutputCache } from "./macroOutputCache";
-import type { MacroCall } from "./utils";
 import type { CSSProperties, ReactNode } from "react";
 
 /**

@@ -326,6 +326,11 @@ type SyntaxAllowedFeatures = {
     macros: boolean;
 
     /**
+     * Support for mentioning a user, however the syntax represents one (e.g. XWiki writes a macro call)
+     */
+    mentions: boolean;
+
+    /**
      * Support for raw HTML
      */
     rawHtml: boolean;

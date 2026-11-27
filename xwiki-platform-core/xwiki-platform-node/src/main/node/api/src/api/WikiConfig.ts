@@ -31,6 +31,15 @@ interface WikiConfig {
   // The rest base url of the backend endpoint
   baseRestURL: string;
   /**
+   * The base url the backend serves its pages from, ending with a separator, e.g. `/xwiki/bin/` for XWiki. Defaults
+   * to the `bin` folder of the base url when undefined. A backend that serves a wiki from its own url, as XWiki does
+   * for a subwiki reached through a path, states the url of the wiki the application talks to.
+   *
+   * @since 19.0.0RC1
+   * @beta
+   */
+  basePageURL?: string;
+  /**
    * Realtime endpoint URL.
    * Defaults to http://localhost:15681/collaboration when undefined.
    * @since 18.0.0RC1

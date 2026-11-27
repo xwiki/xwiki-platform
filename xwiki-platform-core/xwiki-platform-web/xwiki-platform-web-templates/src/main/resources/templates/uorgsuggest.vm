@@ -40,34 +40,91 @@
       'where lower(doc.name) like :input and doc.fullName <> ''XWiki.XWikiGroupTemplate'' ' +
       'order by lower(doc.name), doc.name')
   #end
-  #if ($request.wiki == 'global')
-    #set ($wikiReference = $services.model.createWikiReference($xcontext.mainWikiName))
-  #else
-    #set ($wikiReference = $doc.documentReference.wikiReference)
-  #end
-  #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter('unique'))
-  #set ($query = $query.bindValue('input').anyChars().literal($input).anyChars().query())
-  #set ($rawResults = $query.execute())
-  #set ($results = [])
+  #set ($wikiReferences = [])
+  #resolveSuggestedWikis($wikiReferences)
   #getAndValidateQueryLimitFromRequest('limit', 10, $limit)
-  ## Iterate over the results and select the first N results (based on the limit request parameter) that are accessible
-  ## to the current user.
-  #foreach ($rawResult in $rawResults)
+  #set ($results = [])
+  #set ($wikisWithResults = 0)
+  #foreach ($wikiReference in $wikiReferences)
     #if ($results.size() >= $limit)
       #break
     #end
-    #if ($services.security.authorization.hasAccess('view', $services.model.resolveDocument($rawResult, $wikiReference)))
-      #set ($discard = $results.add($rawResult))
+    #set ($resultCountBefore = $results.size())
+    #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter('unique'))
+    #set ($query = $query.bindValue('input').anyChars().literal($input).anyChars().query())
+    ## Iterate over the results and select the first N results (based on the limit request parameter) that are
+    ## accessible to the current user. The limit is shared by the queried wikis, the first one filling it first.
+    #foreach ($rawResult in $query.execute())
+      #if ($results.size() >= $limit)
+        #break
+      #end
+      #if ($services.security.authorization.hasAccess('view', $services.model.resolveDocument($rawResult, $wikiReference)))
+        #addResultData($rawResult $results $wikiReference)
+      #end
+    #end
+    #if ($results.size() > $resultCountBefore)
+      #set ($wikisWithResults = $wikisWithResults + 1)
     #end
   #end
-  #displayResults($results $wikiReference)
+  #if ($wikisWithResults > 1)
+    ## Sort only when a second wiki added users, so that a single wiki keeps the order of its query.
+    #set ($sortedResults = [])
+    #sortResultsByLabel($results $sortedResults)
+    #set ($results = $sortedResults)
+  #end
+  #displayResultsData($results)
 #end
 ##
-#macro (displayResults $rawResults $wikiReference)
-  #set ($results = [])
-  #foreach ($result in $rawResults)
-    #addResultData($result $results $wikiReference)
+#**
+ * Resolve the wikis to suggest the users or groups of, from the "wiki" request parameter: "global" for the main wiki,
+ * "auto" for the wikis the user scope of the current wiki allows, and the current wiki otherwise.
+ *
+ * @param $wikiReferences - List - the references of the wikis to query are added to this list, in the order in which
+ *                          they fill the suggestions
+ *#
+#macro (resolveSuggestedWikis $wikiReferences)
+  #set ($mainWikiReference = $services.model.createWikiReference($xcontext.mainWikiName))
+  #set ($currentWikiReference = $doc.documentReference.wikiReference)
+  #if ($request.wiki == 'global')
+    #set ($discard = $wikiReferences.add($mainWikiReference))
+  #elseif ($request.wiki == 'auto')
+    ## The user scope tells which users the queried wiki can use. It is empty when the wiki module isn't installed,
+    ## and then the wiki has only its own users.
+    #set ($userScope = "$!services.wiki.user.getUserScope($currentWikiReference.name)")
+    #if ($userScope == 'GLOBAL_ONLY')
+      #set ($discard = $wikiReferences.add($mainWikiReference))
+    #else
+      #set ($discard = $wikiReferences.add($currentWikiReference))
+      ## On the main wiki both queries would return the same users, so only a subwiki completes its own users with
+      ## the global ones.
+      #if ($userScope == 'LOCAL_AND_GLOBAL' && $currentWikiReference.name != $mainWikiReference.name)
+        #set ($discard = $wikiReferences.add($mainWikiReference))
+      #end
+    #end
+  #else
+    #set ($discard = $wikiReferences.add($currentWikiReference))
   #end
+#end
+##
+#**
+ * Sort the given results by the name they display, ignoring its case because the default sort puts every lower case
+ * name after "Z".
+ *
+ * @param $results - List - the results to sort
+ * @param $sortedResults - List - the sorted results are added to this list
+ *#
+#macro (sortResultsByLabel $results $sortedResults)
+  #foreach ($result in $results)
+    #set ($sortKey = "$!result.label")
+    #set ($discard = $result.put('sortKey', $sortKey.toLowerCase()))
+  #end
+  #sortCollectionOfMapsByField($results 'sortKey' '' 'asc' $sortedResults)
+  #foreach ($result in $sortedResults)
+    #set ($discard = $result.remove('sortKey'))
+  #end
+#end
+##
+#macro (displayResultsData $results)
   #if ($request.media == 'json')
     #displayResultsJSON($results)
   #else
@@ -135,8 +192,9 @@
 ##
 #if ($request.exactMatch == 'true' && "$!request.input" != '')
   ## This is normally used for loading the initial selection.
-  #set ($rawResults = [$request.input])
-  #displayResults($rawResults)
+  #set ($results = [])
+  #addResultData($request.input $results $doc.documentReference.wikiReference)
+  #displayResultsData($results)
 #else
   #suggestUsersOrGroups()
 #end

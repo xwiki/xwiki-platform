@@ -31,6 +31,7 @@ export class MinimalApp {
     getType: () => string;
     realtimeHint: string;
     baseURL: string;
+    basePageURL: string;
     readonly storage: Storage;
   };
 
@@ -39,6 +40,9 @@ export class MinimalApp {
       getType: () => "XWiki",
       realtimeHint: "xwiki",
       baseURL: XWiki.contextPath,
+      // A subwiki reached through a path serves its pages from its own URL, so the servlet path of the wiki the
+      // services talk to is the one the server put in the page, not the "bin" of the default configuration.
+      basePageURL: `${XWiki.contextPath}/${XWiki.servletpath}`,
       // Resolved on access because the storage is registered after this configuration is built.
       get storage(): Storage {
         return container.get("Storage", { name: "XWiki" });

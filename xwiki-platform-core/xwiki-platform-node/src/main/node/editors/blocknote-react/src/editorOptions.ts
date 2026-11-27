@@ -123,6 +123,14 @@ interface EditorFeatures {
   macros?: MacroFeatureOptions | false;
 
   /**
+   * The user mentions are enabled when this is missing. `false` disables the mention menu, even when the services it
+   * needs are bound. The mentions already in the content are still displayed. The feature has no option of its own.
+   *
+   * @since 19.0.0RC1
+   */
+  mentions?: object | false;
+
+  /**
    * The content pasted (or dropped) in the editor is filtered when this is missing: the metadata entries it holds are
    * kept only when their key, bound in the service container, accepts them (see `BlockMetadataKey.filterPasted`).
    * `false` keeps the pasted content as is, metadata included, which lets the pasted content set metadata that the user

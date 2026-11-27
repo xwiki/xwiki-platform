@@ -21,8 +21,11 @@ package org.xwiki.web;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -43,6 +46,11 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.user.UserConfiguration;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.script.UserScriptService;
+import org.xwiki.wiki.script.WikiManagerScriptService;
+import org.xwiki.wiki.user.UserScope;
+import org.xwiki.wiki.user.script.WikiUserManagerScriptService;
+
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +60,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xmlunit.builder.Input.fromStream;
@@ -81,6 +90,10 @@ class UorgsuggestPageTest extends PageTest
     private static final String USERS_ORDER_BY =
         "order by lower(user.first_name), user.first_name, lower(user.last_name), user.last_name";
 
+    private static final String MAIN_WIKI = "xwiki";
+
+    private static final String SUBWIKI = "subwiki";
+
     private TemplateManager templateManager;
 
     @Mock
@@ -94,6 +107,12 @@ class UorgsuggestPageTest extends PageTest
 
     @Mock
     private UserConfiguration userConfiguration;
+
+    @Mock
+    private WikiManagerScriptService wikiManagerScriptService;
+
+    @Mock
+    private WikiUserManagerScriptService wikiUserManagerScriptService;
 
     @BeforeEach
     void setUp() throws Exception
@@ -217,5 +236,137 @@ class UorgsuggestPageTest extends PageTest
 
         InputStream inputStream = getClass().getResourceAsStream("/uorgsuggest/groups.json");
         JSONAssert.assertEquals(IOUtils.toString(inputStream, StandardCharsets.UTF_8), render, true);
+    }
+
+    @Test
+    void autoSuggestsTheLocalUsersOfAWikiThatHasItsOwn() throws Exception
+    {
+        setUserScope(SUBWIKI, UserScope.LOCAL_ONLY);
+        when(this.query.execute()).thenReturn(asList("XWiki.Alice"));
+
+        suggestUsersOf(SUBWIKI);
+
+        verify(this.query).setWiki(SUBWIKI);
+        verify(this.query, never()).setWiki(MAIN_WIKI);
+    }
+
+    @Test
+    void autoSuggestsTheGlobalUsersOfAWikiWithoutUsersOfItsOwn() throws Exception
+    {
+        setUserScope(SUBWIKI, UserScope.GLOBAL_ONLY);
+        when(this.query.execute()).thenReturn(asList("XWiki.Alice"));
+
+        suggestUsersOf(SUBWIKI);
+
+        verify(this.query).setWiki(MAIN_WIKI);
+        verify(this.query, never()).setWiki(SUBWIKI);
+    }
+
+    @Test
+    void autoCompletesTheLocalUsersWithTheGlobalOnes() throws Exception
+    {
+        setUserScope(SUBWIKI, UserScope.LOCAL_AND_GLOBAL);
+        userName(SUBWIKI, "alice");
+        userName(SUBWIKI, "Carol");
+        userName(MAIN_WIKI, "Bob");
+        when(this.query.execute()).thenReturn(asList("XWiki.Carol", "XWiki.alice"), asList("XWiki.Bob"));
+
+        // Sorted by name, ignoring its case, so that the two wikis don't look like two separate lists.
+        assertEquals(List.of("alice", "Bob", "Carol"), labels(suggestUsersOf(SUBWIKI)));
+
+        verify(this.query).setWiki(SUBWIKI);
+        verify(this.query).setWiki(MAIN_WIKI);
+    }
+
+    @Test
+    void autoQueriesTheMainWikiOnceWhenItsUsersAreLocalAndGlobal() throws Exception
+    {
+        setUserScope(MAIN_WIKI, UserScope.LOCAL_AND_GLOBAL);
+        userName(MAIN_WIKI, "Alice");
+        when(this.query.execute()).thenReturn(asList("XWiki.Alice"));
+
+        // The local and the global users are the same on the main wiki, so they are suggested once.
+        assertEquals(List.of("Alice"), labels(suggestUsersOf(MAIN_WIKI)));
+
+        verify(this.query).setWiki(MAIN_WIKI);
+    }
+
+    @Test
+    void autoStopsQueryingWhenTheLocalUsersFillTheLimit() throws Exception
+    {
+        setUserScope(SUBWIKI, UserScope.LOCAL_AND_GLOBAL);
+        when(this.query.execute()).thenReturn(asList("XWiki.Alice", "XWiki.Bob"));
+        this.request.put("limit", "2");
+
+        suggestUsersOf(SUBWIKI);
+
+        verify(this.query, never()).setWiki(MAIN_WIKI);
+    }
+
+    @Test
+    void autoSuggestsTheLocalUsersWithoutTheWikiModule() throws Exception
+    {
+        // The wiki script service isn't registered, as when the wiki module isn't installed.
+        when(this.query.execute()).thenReturn(asList("XWiki.Alice"));
+
+        suggestUsersOf(SUBWIKI);
+
+        verify(this.query).setWiki(SUBWIKI);
+        verify(this.query, never()).setWiki(MAIN_WIKI);
+    }
+
+    /**
+     * Configure the user scope of a wiki, which also registers the script service holding it.
+     *
+     * @param wikiId the identifier of the wiki
+     * @param userScope the user scope of that wiki
+     */
+    private void setUserScope(String wikiId, UserScope userScope) throws Exception
+    {
+        this.componentManager.registerComponent(ScriptService.class, "wiki", this.wikiManagerScriptService);
+        when(this.wikiManagerScriptService.get("user")).thenReturn(this.wikiUserManagerScriptService);
+        when(this.wikiUserManagerScriptService.getUserScope(wikiId)).thenReturn(userScope);
+    }
+
+    /**
+     * Give a user the name the suggestions display, instead of the name of its page.
+     *
+     * @param wikiId the identifier of the wiki holding the user
+     * @param name the name of the user, also the name of its page
+     */
+    private void userName(String wikiId, String name)
+    {
+        when(this.xwiki.getPlainUserName(new DocumentReference(wikiId, "XWiki", name), this.context))
+            .thenReturn(name);
+    }
+
+    /**
+     * Suggest the users of a wiki, letting that wiki apply its own user scope.
+     *
+     * @param wikiId the identifier of the wiki the request is sent to
+     * @return the suggestions, as JSON
+     */
+    private String suggestUsersOf(String wikiId) throws Exception
+    {
+        // The suggestions come from the wiki of the page the template renders against.
+        this.context.setDoc(new XWikiDocument(new DocumentReference(wikiId, "Main", "WebHome")));
+        this.request.put("uorg", "user");
+        this.request.put("media", "json");
+        this.request.put("wiki", "auto");
+
+        return this.templateManager.render(UORGSUGGEST).trim();
+    }
+
+    /**
+     * @param suggestions the suggestions, as JSON
+     * @return the names the given suggestions display, in the order in which they are suggested
+     */
+    private List<String> labels(String suggestions)
+    {
+        JSONArray results = new JSONArray(suggestions);
+
+        return IntStream.range(0, results.length())
+            .mapToObj(index -> results.getJSONObject(index).getString("label"))
+            .toList();
     }
 }

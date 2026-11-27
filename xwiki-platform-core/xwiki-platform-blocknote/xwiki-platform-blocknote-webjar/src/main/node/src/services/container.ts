@@ -26,6 +26,7 @@ import { DefaultImageEditor } from "./image/DefaultImageEditor";
 import { DefaultImageMetadataHandler } from "./image/DefaultImageMetadataHandler";
 import { DefaultMacroEditor } from "./macros/DefaultMacroEditor";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
+import { DefaultMentionFactory } from "./mentions/DefaultMentionFactory";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
@@ -55,6 +56,8 @@ import { ComponentInit as ModelReferenceXWikiComponentList } from "@xwiki/platfo
 import { ComponentInit as ModelRemoteURLComponentList } from "@xwiki/platform-model-remote-url-api";
 import { ComponentInit as ModelRemoteURLXWikiComponentList } from "@xwiki/platform-model-remote-url-xwiki";
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
+import { ComponentInit as UserSuggestComponentList } from "@xwiki/platform-user-suggest-api";
+import { ComponentInit as UserSuggestXWikiComponentList } from "@xwiki/platform-user-suggest-xwiki";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
 import type {
@@ -92,6 +95,8 @@ new LinkSuggestXWikiComponentList(container);
 new LinkTypeComponentInit(container);
 new LinkTypeDefaultComponentInit(container);
 new LinkTypeUIComponentInit(container);
+new UserSuggestComponentList(container);
+new UserSuggestXWikiComponentList(container);
 
 // The generic editing features of the BlockNote editor, then the block types and text styles of the content converted
 // by the XWiki rendering, with the keys of the metadata it keeps in the content (so that their pasted values are
@@ -113,6 +118,7 @@ DefaultImageMetadataHandler.bind(container);
 DefaultLinkMetadataHandler.bind(container);
 DefaultMacroWizard.bind(container);
 DefaultMacroEditor.bind(container);
+DefaultMentionFactory.bind(container);
 
 MinimalApp.bind(container);
 

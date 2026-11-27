@@ -25,7 +25,6 @@ import {
 } from "./utils";
 import { useEditor } from "../../hooks";
 import { useComponentsContext } from "@blocknote/react";
-import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiPencilFill } from "react-icons/ri";
 import type {
@@ -94,24 +93,22 @@ export const CustomMacroEditButton: React.FC = () => {
   // A block macro is edited when it is node-selected (clicked) or the text cursor is inside it.
   // getSelection() returns undefined for a node selection, so resolve the block from the text cursor
   // position instead — the same approach the image toolbar uses to detect a selected image block.
-  const block = editor.getTextCursorPosition().block;
+  const getMacroEdit = () =>
+    resolveMacroEdit(editor, editor.getTextCursorPosition().block);
 
-  const openMacroEditor = useMemo(() => {
-    // Hide the edit action when no macro editor is available.
-    if (!macroEditing) {
-      return null;
+  // The toolbar isn't rendered again when the selected block is modified without changing the selection (e.g. on
+  // undo), so the macro call to edit is read when the button is clicked, not when the button is rendered.
+  const openMacroEditor = () => {
+    const edit = getMacroEdit();
+    if (edit) {
+      macroEditing?.edit(edit.invocation, edit.writeBack);
     }
-
-    const edit = resolveMacroEdit(editor, block);
-    if (!edit) {
-      return null;
-    }
-
-    return () => macroEditing.edit(edit.invocation, edit.writeBack);
-  }, [block, macroEditing, editor]);
+  };
 
   return (
-    openMacroEditor && (
+    // Hide the edit action when no macro editor is available.
+    macroEditing &&
+    getMacroEdit() && (
       <Components.FormattingToolbar.Button
         className={"bn-button"}
         data-test="editMacro"

@@ -30,22 +30,12 @@
   #template("hierarchy.vm")
   ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
-  #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
-  #template('contentheader.vm')
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    #set ($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
+    #template('contentheader.vm')
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
   #else
-    #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thispagedoesnotexist'))
-    ## Create link
-    #if($hasEdit)
-      #set($url = $doc.getURL("create", $editparams))
-      $services.localization.render('core.viewers.content.doesnotexists.edittocreate', [$url])
-    #end
-    ## UI Extensions, if any.
-    #showExtensions()
-    ## Recycle bin
-    #template("recyclebinlist.vm")
-    #xwikimessageboxend()
+    #_displayDocDoesNotExist()
   #end
   <div class="clearfloats"></div>
   </main>## mainContentArea
@@ -57,4 +47,96 @@
 ##
 #macro (showExtensions)
   $services.uix.renderExtensions('org.xwiki.platform.docdoesnotexist', 'html/5.0', {'sortByParameter': 'order'})
+#end
+##
+## Display the "Page not found" or the "Page moved to recycle bin" message, depending on the recycle bin content.
+##
+#macro (_displayDocDoesNotExist)
+  #_getDeletedDocuments($_deletedDocuments $_deletedTerminalDocuments)
+  ## Look at the most recent entry of each list: the summary describes the most recent deletion, and the recycle bin
+  ## tables are useful only to the users who can view, restore or delete their entries, which each table checks on its
+  ## first entry.
+  #set ($latestDeletedDocument = $NULL)
+  #set ($canRestore = false)
+  #set ($displayRecycleBin = false)
+  #foreach ($_deletedList in [$_deletedDocuments, $_deletedTerminalDocuments])
+    #if (!$_deletedList.isEmpty())
+      #set ($_deletedEntry = $_deletedList[0])
+      #if (!$latestDeletedDocument || $_deletedEntry.date.after($latestDeletedDocument.date))
+        #set ($latestDeletedDocument = $_deletedEntry)
+      #end
+      #if ($_deletedEntry.canUndelete())
+        #set ($canRestore = true)
+        #set ($displayRecycleBin = true)
+      #elseif ($_deletedEntry.canDelete() || $_deletedEntry.canView())
+        #set ($displayRecycleBin = true)
+      #end
+    #end
+  #end
+  #set ($canCreate = $hasEdit && !$isReadOnly)
+  ## The layout can hide the content menu, and the Create button replaces the edit menu.
+  #set ($displayCreateButton = $canCreate && $displayContentMenu && $displayEditMenu)
+  #if ($latestDeletedDocument)
+    #set ($titleKey = 'core.viewers.content.deleted.title')
+  #else
+    #set ($titleKey = 'core.viewers.content.doesnotexist.title')
+  #end
+  <div class="row document-header">
+    <section class="document-info col-xs-12 #if ($displayCreateButton)col-md-7#end"
+      aria-label="$escapetool.xml($services.localization.render('core.document.header.info.label'))">
+      <div id="document-title"><h1>$escapetool.xml($services.localization.render($titleKey))</h1></div>
+    </section>
+    #if ($displayCreateButton)
+      <nav class="document-menu col-xs-12 col-md-5"
+        aria-label="$escapetool.xml($services.localization.render('core.document.header.menu.nav.label'))">
+        #_displayDocDoesNotExistCreateButton()
+      </nav>
+    #end
+  </div>
+  <div class="docdoesnotexist">
+    #set ($pageTitle = $doc.plainTitle)
+    #if (!$latestDeletedDocument)
+      <p class="docdoesnotexist-hint">#if ($canCreate)
+        $escapetool.xml($services.localization.render('core.viewers.content.doesnotexist.hint'))
+      #else
+        $escapetool.xml($services.localization.render('core.viewers.content.doesnotexist.hintNoCreate'))
+      #end</p>
+    #elseif ($displayRecycleBin && $canRestore)
+      <p class="docdoesnotexist-hint">#if ($canCreate)
+        $escapetool.xml($services.localization.render('core.viewers.content.deleted.hint', [$pageTitle]))
+      #else
+        $escapetool.xml($services.localization.render('core.viewers.content.deleted.hintNoCreate', [$pageTitle]))
+      #end</p>
+    #else
+      ## The deleter is displayed as a link, so it's inserted only once the rest of the message is escaped.
+      #set ($deleterPlaceholder = '__docdoesnotexist_deleter__')
+      #set ($deletedInfo = $services.localization.render('core.viewers.content.deleted.info',
+        [$pageTitle, $deleterPlaceholder, $xwiki.formatDate($latestDeletedDocument.date)]))
+      <p class="docdoesnotexist-hint">
+        $escapetool.xml($deletedInfo).replace($deleterPlaceholder, $xwiki.getUserName($latestDeletedDocument.deleter))
+        #if ($canCreate)
+          $escapetool.xml($services.localization.render('core.viewers.content.deleted.infoCreate'))
+        #end
+      </p>
+    #end
+    #if ($displayRecycleBin)
+      #displayDeletedDocuments($_deletedDocuments, 'docs', '')
+      #displayDeletedDocuments($_deletedTerminalDocuments, 'terminal-docs', 'core.recyclebin.showListTerminalPagesMsg')
+    #end
+    ## UI Extensions, if any.
+    #showExtensions()
+  </div>
+#end
+##
+## Display the split button used to create the missing page. Its dropdown lets advanced users pick the editor.
+## The ids are those of the regular edit menu so that the edit entries can be found at the same place.
+##
+#macro (_displayDocDoesNotExistCreateButton)
+  #template('menus_macros.vm')
+  #set ($extraAttributes = 'rel="nofollow"')
+  #define ($menuContent)#_displayEditMenuContent()#end
+  <ul id="contentmenu" class="pull-right actionmenu">
+    #displayMenu('tmEdit', 'add', $menuContent, 'core.viewers.content.doesnotexist.create', true, $doc.getURL('create'),
+      $extraAttributes, true)
+  </ul>
 #end

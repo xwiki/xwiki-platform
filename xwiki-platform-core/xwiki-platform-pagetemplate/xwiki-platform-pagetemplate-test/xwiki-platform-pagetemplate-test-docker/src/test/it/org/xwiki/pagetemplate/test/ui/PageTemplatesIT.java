@@ -163,7 +163,7 @@ class PageTemplatesIT
         vp = new ViewPage();
         assertFalse(vp.exists());
         DocumentDoesNotExistPage unexistingPage = new DocumentDoesNotExistPage();
-        unexistingPage.clickEditThisPageToCreate();
+        unexistingPage.clickCreate();
         CreatePagePage createUnexistingPage = new CreatePagePage();
         // Make sure we're in create mode.
         assertTrue(setup.isInCreateMode());

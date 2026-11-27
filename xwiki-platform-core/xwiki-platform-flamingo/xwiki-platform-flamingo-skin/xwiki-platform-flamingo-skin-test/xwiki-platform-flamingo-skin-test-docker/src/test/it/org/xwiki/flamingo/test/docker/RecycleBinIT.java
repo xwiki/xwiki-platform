@@ -211,36 +211,20 @@ class RecycleBinIT
         testUtils.login(user2, user2);
         testUtils.gotoPage(page1);
 
+        // User2 can neither view, restore nor delete the deleted versions, so they get a summary instead of the table.
         DeletePageOutcomePage recycleBinPage1 = new DeletePageOutcomePage();
-        List<DeletedPageEntry> deletedPagesEntries = recycleBinPage1.getDeletedPagesEntries();
-        List<DeletedPageEntry> deletedTerminalPagesEntries = recycleBinPage1.getDeletedTerminalPagesEntries();
-
-        // Check that both Page1 and Page1 terminal are shown
-        assertEquals(1, deletedPagesEntries.size());
-        assertEquals(1, deletedTerminalPagesEntries.size());
-
-        assertEquals(user1, deletedPagesEntries.get(0).getDeleter());
-        assertEquals(user1, deletedTerminalPagesEntries.get(0).getDeleter());
-
-        // Check that the user cannot view the page as it's not the deleter
-        assertFalse(deletedPagesEntries.get(0).canBeViewed());
-        assertFalse(deletedTerminalPagesEntries.get(0).canBeViewed());
-
-        // Check that however other actions are not possible
-        assertFalse(deletedPagesEntries.get(0).canBeDeleted());
-        assertFalse(deletedTerminalPagesEntries.get(0).canBeDeleted());
-
-        // Check that however other actions are not possible
-        assertFalse(deletedPagesEntries.get(0).canBeRestored());
-        assertFalse(deletedTerminalPagesEntries.get(0).canBeRestored());
+        assertTrue(recycleBinPage1.getDeletedPagesEntries().isEmpty());
+        assertTrue(recycleBinPage1.getDeletedTerminalPagesEntries().isEmpty());
+        assertThat(recycleBinPage1.getMessage(),
+            startsWith(String.format("The page \"Page1\" was moved to the recycle bin by %s on ", user1)));
 
         // Check view deleted page with User1
         testUtils.login(user1, user1);
         testUtils.gotoPage(page1);
 
         recycleBinPage1 = new DeletePageOutcomePage();
-        deletedPagesEntries = recycleBinPage1.getDeletedPagesEntries();
-        deletedTerminalPagesEntries = recycleBinPage1.getDeletedTerminalPagesEntries();
+        List<DeletedPageEntry> deletedPagesEntries = recycleBinPage1.getDeletedPagesEntries();
+        List<DeletedPageEntry> deletedTerminalPagesEntries = recycleBinPage1.getDeletedTerminalPagesEntries();
 
         // Check that both Page1 and Page1 terminal are shown
         assertEquals(1, deletedPagesEntries.size());
@@ -315,7 +299,7 @@ class RecycleBinIT
         testUtils.login(user1, user1);
         testUtils.gotoPage(page1);
         recycleBinPage1 = new DeletePageOutcomePage();
-        assertEquals("The requested page could not be found.", recycleBinPage1.getMessage());
+        assertEquals("Page moved to recycle bin", recycleBinPage1.getDocumentTitle());
         DeletedPageEntry deletedPageEntry = recycleBinPage1.getDeletedPagesEntries().get(0);
         assertEquals(user1, deletedPageEntry.getDeleter());
         assertThat(deletedPageEntry.getDeletionDate(), matchesPattern(DATE_PATTERN));

@@ -70,8 +70,10 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public RealtimeEditToolbar waitUntilConnected()
     {
-        getDriver().waitUntilCondition(
-            ExpectedConditions.attributeToBe(By.cssSelector(CONNECTION_STATUS_SELECTOR), STATUS_ATTRIBUTE, CONNECTED));
+        // The toolbar is replaced when the editor joins a new realtime session (e.g. after reconnecting while editing
+        // alone), so the status element can become stale between its lookup and the read of its status.
+        getDriver().waitUntilElementHasAttributeValue(By.cssSelector(CONNECTION_STATUS_SELECTOR), STATUS_ATTRIBUTE,
+            CONNECTED);
         return this;
     }
 

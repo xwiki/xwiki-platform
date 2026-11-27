@@ -1,0 +1,150 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/* Panels */
+
+.panel {
+  color: var(--panel-default-text);
+}
+
+/* The Bootstrap .panel rule adds a shadow and is compiled after this file, so the element type is needed to win. */
+div.panel {
+  box-shadow: none;
+}
+
+h1.xwikipaneltitle, h2.xwikipaneltitle {
+  /* Panels headings are the same size as the content's h5 headings. */
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  margin: 5px 16px var(--padding-large-vertical);
+  padding: 0 0 var(--padding-large-vertical);
+  color: var(--panel-header-text);
+  border-bottom: var(--border-width) solid var(--xwiki-page-content-bg);
+  box-shadow: 0 var(--border-width) 0 var(--xwiki-border-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* Kept from the Bootstrap panel-title mixin, the rest of it is overridden by the rules above. */
+  > a,
+  > small,
+  > .small,
+  > small > a,
+  > .small > a {
+    color: inherit;
+  }
+}
+
+.xwikipanelcontents {
+  padding: 0 16px 6px;
+  overflow: hidden;
+}
+
+/* Lists inside panels */
+
+.panel {
+  ul {
+    list-style-type: none;
+    padding: 0;
+
+    ul {
+      padding: 0 1em;
+    }
+  }
+
+  dl {
+    margin-bottom: 0;
+  }
+}
+
+/* Panels inside the page */
+
+.main .panel-body {
+  background-color: var(--xwiki-page-content-bg);
+  /* Without this radius, the panel background can be displayed over the parent border, when the parent has a rounded
+     corner. */
+  border-radius: inherit;
+}
+
+/* Panels with a collapse body, for example on the delete page */
+
+a.panel-collapse-carret {
+  padding: 10px 15px;
+}
+
+/* The Bootstrap link hover and focus colors are compiled after this file, so they need to be overridden explicitly. */
+a.panel-collapse-carret,
+a.panel-collapse-carret:is(:hover, :focus) {
+  color: var(--text-color);
+}
+
+/* Radio buttons displayed for a panel */
+
+.panel-radio {
+  float: left;
+  padding: 15px;
+}
+
+/* Navigation panel rules */
+
+/* The .panels and .PanelsNavigation parents isolate the rules. */
+.panels .PanelsNavigation .jstree {
+  ul.jstree-children {
+    width: 100%;
+  }
+
+  &.jstree-xwiki .jstree-node {
+    display: flex;
+    gap: 4px;
+    /* Allows sub-lists to drop down to the next line. */
+    flex-flow: row wrap;
+    align-items: flex-start;
+
+    .jstree-ocl {
+      padding: 2px;
+      /* Prevents the expand/collapse button from shrinking. */
+      flex-shrink: 0;
+    }
+
+    a {
+      /* Makes the link flex to align the inner icon and text. */
+      display: flex;
+      /* Aligns the file icon with the first line of text. */
+      align-items: flex-start;
+      /* Takes up all the remaining space on the line. */
+      flex: 1;
+      width: 100%;
+      /* Allows the link to grow vertically if the text wraps. */
+      height: auto;
+      min-height: 24px;
+      padding: 2px 4px;
+      /* Prevents long words from overflowing the layout. */
+      word-break: break-word;
+
+      &.jstree-clicked {
+        text-shadow: 0 0 0.5px currentColor, 0 0 0.5px currentColor;
+      }
+    }
+
+    /* Ensures sub-lists occupy a full line below the parent node. */
+    > ul.jstree-children {
+      flex: 0 0 100%;
+    }
+  }
+}

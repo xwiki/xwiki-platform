@@ -31,6 +31,9 @@ import org.xwiki.observation.event.AbstractCancelableEvent;
  * </ul>
  *
  * This event is cancellable: canceling it means the data won't be deleted.
+ * <p>
+ * When clustering is enabled, the event is only notified on the cluster member performing the cleanup: it is not
+ * sent to the other members, which are informed of the deletion of the filter preferences once it is done.
  *
  * @version $Id$
  * @since 15.10.2

@@ -62,6 +62,9 @@ public class DefaultSolr implements Solr, Initializable
         }
     }
 
+    /**
+     * @deprecated use {@link #getCore(String)} instead
+     */
     @Override
     @Deprecated
     public SolrClient getClient(String name) throws SolrException

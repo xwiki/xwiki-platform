@@ -156,7 +156,7 @@ var XWiki = (function(XWiki) {
       var parts = location.split('#', 2);
       var fragmentId = (parts.length == 2) ? parts[1] : '';
       location = parts[0];
-      if (location.indexOf('?') == -1) {
+      if (!location.includes('?')) {
         location += '?';
       }
 
@@ -174,7 +174,7 @@ var XWiki = (function(XWiki) {
 
       // Optimisation: Prevent a redundant request to remove the edit lock when the page unload event is triggered. Both
       // the cancel action and the page unload event would unlock the document, so no point in doing both.
-      XWiki.EditLock && XWiki.EditLock.setLocked(false);
+      XWiki.EditLock?.setLocked(false);
 
       // Call the cancel URL directly instead of submitting the form. (optimisation)
       window.location = location + cancelActionParameter + xredirectParameter + languageParameter + fragmentId;
@@ -279,7 +279,7 @@ var XWiki = (function(XWiki) {
       this.form = $(event.memo.form);
 
       // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-      let isCustomForm = this.form.action.indexOf("/preview/") === -1 && this.form.action.indexOf("/save/") === -1;
+      let isCustomForm = !this.form.action.includes("/preview/") && !this.form.action.includes("/save/");
       const customFormAttribute = this.form.dataset.customForm;
       if (customFormAttribute !== undefined) {
         isCustomForm = customFormAttribute !== 'false';
@@ -360,7 +360,7 @@ var XWiki = (function(XWiki) {
     },
     onSuccess : function(state, response) {
       // If there was a 'template' field in the form, disable it to avoid 'This document already exists' errors.
-      if (this.form && this.form.template) {
+      if (this.form?.template) {
         this.form.template.disabled = true;
         this.form.template.value = "";
       }
@@ -499,7 +499,7 @@ var XWiki = (function(XWiki) {
     },
     // 403 happens in case of CSRF issue
     on403 : function (state, response) {
-      if (!response.responseJSON || response.responseJSON.errorType !== "CSRF") {
+      if (response.responseJSON?.errorType !== "CSRF") {
         return this.on401(state, response);
       }
 
@@ -803,7 +803,7 @@ var XWiki = (function(XWiki) {
         // Redirect to view mode or to whatever URL was requested.
         url = XWiki.currentDocument.getURL();
         var xredirectElement = this.form.select('input[name="xredirect"]')[0];
-        if (xredirectElement && xredirectElement.value) {
+        if (xredirectElement?.value) {
           url = xredirectElement.value;
         }
       } else if ($('body').hasClassName('previewbody')) {
@@ -811,7 +811,7 @@ var XWiki = (function(XWiki) {
 
         // Redirect to edit mode or to the previous edit mode, if not overridden.
         url = XWiki.currentDocument.getURL('edit');
-        if (this.form.xcontinue && this.form.xcontinue.value) {
+        if (this.form.xcontinue?.value) {
           url = this.form.xcontinue.value;
         }
       } else {

@@ -216,7 +216,7 @@ XWiki.ExtensionBehaviour = Class.create({
         response.request.options.defaultValues.onComplete(response);
         // Remove the loading marker if it's still there (i.e. fetching failed).
         var loadingMarker = this.container.down('.extension-body.loading');
-        loadingMarker && loadingMarker.remove();
+        loadingMarker?.remove();
       }.bind(this)
     });
   },
@@ -519,7 +519,7 @@ XWiki.ExtensionBehaviour = Class.create({
    */
   _enhanceDescriptionBehaviour : function() {
     var extensionVersionsLink = this.container.down('.extension-versions-link');
-    extensionVersionsLink && extensionVersionsLink.observe('click', function(event) {
+    extensionVersionsLink?.observe('click', function(event) {
       event.stop();
       // Hide the link and show the loading annimation.
       event.element().hide().up().addClassName('loading').setStyle({'height': '16px', 'width': '16px'});
@@ -645,7 +645,7 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
 });
 
 var toQueryParams = function(url) {
-  return url.indexOf('?') < 0 ? {} : url.toQueryParams();
+  return url.includes('?') ? url.toQueryParams() : {};
 };
 
 /**
@@ -675,7 +675,7 @@ var fixExtensionLinks = function(container) {
 };
 
 var enhanceExtensions = function(event) {
-  ((event && event.memo.elements) || [$('body')]).each(function(element) {
+  (event?.memo.elements || [$('body')]).each(function(element) {
     element.select('.extension-item').each(function(extension) {
       !extension._extensionBehaviour && new XWiki.ExtensionBehaviour(extension);
     });

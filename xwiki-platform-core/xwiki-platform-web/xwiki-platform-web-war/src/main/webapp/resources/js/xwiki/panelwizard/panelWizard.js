@@ -31,7 +31,7 @@ function debugwrite(sometext) {
 }
 
 function isPanel(node) {
-  return node && node.nodeType === 1 && node.classList.contains('panel') &&
+  return node?.nodeType === 1 && node.classList.contains('panel') &&
     $(node).up('#leftPanels, #rightPanels, #allviewpanels');
 }
 
@@ -562,10 +562,10 @@ function setPanelWidth() {
   }
   let leftPanelsWidth = 'Medium';
   let rightPanelsWidth = 'Medium';
-  if (availableClasses.indexOf(leftPanelsWidthInput.value) >= 0) {
+  if (availableClasses.includes(leftPanelsWidthInput.value)) {
       leftPanelsWidth = leftPanelsWidthInput.value;
   }
-  if (availableClasses.indexOf(rightPanelsWidthInput.value) >= 0) {
+  if (availableClasses.includes(rightPanelsWidthInput.value)) {
       rightPanelsWidth = rightPanelsWidthInput.value;
   }
   mainContainer.addClassName('panel-left-width-'+leftPanelsWidth);

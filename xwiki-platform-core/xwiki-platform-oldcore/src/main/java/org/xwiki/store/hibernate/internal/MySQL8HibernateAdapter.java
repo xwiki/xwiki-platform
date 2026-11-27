@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.store.hibernate.HibernateAdapter;
 
 /**
- * The {@link HibernateAdapter} for MariaDB.
+ * The {@link HibernateAdapter} for MySQL 8.0 and more recent versions.
  * 
  * @version $Id$
  * @since 17.1.0RC1
@@ -40,11 +40,4 @@ public class MySQL8HibernateAdapter extends MySQLHibernateAdapter
      * The role hint of the component.
      */
     public static final String HINT = "mysql/8";
-
-    @Override
-    public String getInformationShemaInnoDBTables()
-    {
-        // "INNODB_SYS_TABLES" was renamed to "INNODB_TABLES" in MySQL 8.0
-        return "information_schema.INNODB_TABLES";
-    }
 }

@@ -42,8 +42,9 @@ public class MariaDBHibernateAdapter extends MySQLHibernateAdapter
     public static final String HINT = "mariadb";
 
     @Override
-    public String getInformationShemaInnoDBTables()
+    protected boolean isLongUniqueIndexSupported()
     {
-        return "information_schema.INNODB_SYS_TABLES";
+        // MariaDB transparently switches a too long unique index to a hash based one
+        return true;
     }
 }

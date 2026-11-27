@@ -124,8 +124,7 @@ class OfficeMacroImporterTest
 
         assertEquals("[]", this.officeMacroImporter.render(xdom, blockNote));
 
-        // The office macro must run before the renderer sees the XDOM, otherwise its output is missing. It also has to
-        // know the syntax its output ends up in, because a macro can render differently per target syntax.
+        // A macro runs before the renderer and can render differently per target syntax, so it needs both.
         ArgumentCaptor<TransformationContext> txContext = ArgumentCaptor.captor();
         verify(this.renderingContext).transformInContext(eq(this.macroTransformation), txContext.capture(), eq(xdom));
         assertEquals(blockNote, txContext.getValue().getTargetSyntax());

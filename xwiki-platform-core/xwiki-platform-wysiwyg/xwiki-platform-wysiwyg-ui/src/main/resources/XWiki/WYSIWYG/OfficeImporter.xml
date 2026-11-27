@@ -43,10 +43,10 @@
     'filterStyles': $request.filterStyles,
     'useOfficeViewer': $request.useOfficeViewer
   })
-  ## The output is written directly to the response below, so outputSyntax selects the syntax the office content is
-  ## converted to rather than the one this page is rendered in. Unset means annotated XHTML, what HTML editors expect.
-  ## Core reads these two parameters with #getAvailableRendererSyntax, so we read them the same way: the version is
-  ## optional and the newest one wins, and a syntax nothing can render to is rejected here instead of failing later.
+  ## The page writes the output directly to the response below, so outputSyntax selects the syntax the office
+  ## content is converted to, not the one this page is rendered in. Unset means annotated XHTML.
+  ## Core reads these two parameters with $xwiki.getAvailableRendererSyntax, so we read them the same way. The
+  ## version is optional and the newest one wins, and a syntax with no renderer fails here instead of later.
   #set ($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
   #if ("$!request.outputSyntax" != '' &amp;&amp; !$outputSyntax)
     #set ($outputSyntaxId = "$request.outputSyntax")

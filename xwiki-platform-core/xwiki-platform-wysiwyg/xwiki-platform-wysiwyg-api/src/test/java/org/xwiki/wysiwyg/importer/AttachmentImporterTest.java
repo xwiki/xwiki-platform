@@ -44,7 +44,7 @@ class AttachmentImporterTest
     private static final Syntax BLOCKNOTE = new Syntax(new SyntaxType("blocknote", "BlockNote"), "1.0");
 
     /**
-     * An importer written against the 9.8 interface: it implements {@code toHTML} and nothing else.
+     * An importer written against the 9.8 interface, which implements only {@code toHTML}.
      */
     private final AttachmentImporter htmlOnlyImporter =
         (attachmentReference, parameters) -> "<p>" + attachmentReference.getName() + "</p>";
@@ -66,7 +66,7 @@ class AttachmentImporterTest
     @Test
     void importAttachmentWithAnotherSyntaxFails()
     {
-        // Returning HTML here would hand BlockNote annotated XHTML to parse as JSON, failing much later.
+        // Returning HTML would give BlockNote annotated XHTML to parse as JSON, which fails much later.
         Map<String, Object> parameters = Map.of(AttachmentImporter.OUTPUT_SYNTAX, BLOCKNOTE);
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
             () -> this.htmlOnlyImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));
@@ -76,8 +76,7 @@ class AttachmentImporterTest
     @Test
     void importAttachmentWithNonSyntaxOutputSyntaxFails()
     {
-        // The default never casts the value, so it refuses it as an unsupported syntax rather than inspecting its
-        // type. What matters is that it doesn't fall back to HTML.
+        // The default never casts the value, so it refuses an unsupported syntax instead of checking the type.
         Map<String, Object> parameters = Map.of(AttachmentImporter.OUTPUT_SYNTAX, "blocknote/1.0");
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
             () -> this.htmlOnlyImporter.importAttachment(ATTACHMENT_REFERENCE, parameters));

@@ -131,8 +131,7 @@ public class OfficeAttachmentImporter implements AttachmentImporter
         } else if (outputSyntax instanceof Syntax syntax) {
             return syntax;
         }
-        // Script callers build the map by hand, so an unusable value names the parameter instead of reaching the
-        // cast as a ClassCastException.
+        // Script callers build the map by hand, so name the parameter rather than let the cast fail.
         throw new IllegalArgumentException(String.format("The [%s] import parameter must be a [%s] but was [%s].",
             OUTPUT_SYNTAX, Syntax.class.getName(), outputSyntax.getClass().getName()));
     }

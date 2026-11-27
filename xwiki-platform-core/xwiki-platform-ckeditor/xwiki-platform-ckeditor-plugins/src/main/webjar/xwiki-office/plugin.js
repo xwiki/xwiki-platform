@@ -172,8 +172,8 @@
           var notification = editor.showNotification(editor.localization.get('xwiki-office.importer.inProgress'),
             'progress');
           var widget = this;
-          // No outputSyntax: the importer page writes the response itself, and the parameter now selects the syntax
-          // the office content is converted to. Unset means annotated XHTML, which is what CKEditor edits.
+          // The importer page writes the response itself, so outputSyntax now selects the syntax the office content
+          // is converted to. Unset means annotated XHTML, which is what CKEditor edits.
           $.get(officeConfig.importer, {
             fileName: upload.fileName,
             filterStyles: upload.file.filterStyles,

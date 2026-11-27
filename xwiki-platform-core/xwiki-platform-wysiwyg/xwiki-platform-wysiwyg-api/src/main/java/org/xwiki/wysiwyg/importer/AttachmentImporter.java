@@ -75,7 +75,7 @@ public interface AttachmentImporter
         if (outputSyntax == null || Syntax.ANNOTATED_XHTML_1_0.equals(outputSyntax)) {
             return toHTML(attachmentReference, parameters);
         }
-        // The id, not Syntax#toString, which gives the display name rather than what a caller passes.
+        // Syntax#toString gives the display name rather than the identifier a caller passes.
         String outputSyntaxId =
             outputSyntax instanceof Syntax syntax ? syntax.toIdString() : String.valueOf(outputSyntax);
         throw new UnsupportedOperationException(

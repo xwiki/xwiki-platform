@@ -199,7 +199,7 @@ class OfficeAttachmentImporterTest
         XDOMOfficeDocument xdomOfficeDocument = mockConvertibleAttachment();
         when(xdomOfficeDocument.getContentAsString(ANNOTATED_XHTML_ID)).thenReturn("test");
 
-        // The deprecated method promises HTML, so a caller that still uses it gets HTML whatever the map asks for.
+        // Callers of the deprecated method get HTML whatever the map asks for.
         Map<String, Object> parameters = Map.of("filterStyles", "true", AttachmentImporter.OUTPUT_SYNTAX, BLOCKNOTE);
         assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
     }

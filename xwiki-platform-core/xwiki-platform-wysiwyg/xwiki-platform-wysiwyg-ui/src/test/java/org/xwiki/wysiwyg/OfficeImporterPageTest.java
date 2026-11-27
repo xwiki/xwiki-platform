@@ -95,8 +95,7 @@ class OfficeImporterPageTest extends PageTest
 
         String result = renderPage(OFFICE_IMPORTER);
 
-        // The page test framework mocks the localization service, so a key renders as itself. These assertions
-        // check that the form uses the keys that moved to XWiki.WYSIWYG.Translations rather than the CKEditor ones.
+        // The page test framework mocks the localization service, so a key renders as itself.
         assertTrue(result.contains("wysiwyg.officeImporter.filePath.label"), result);
         assertTrue(result.contains("wysiwyg.officeImporter.filterStyles.label"), result);
         assertTrue(result.contains("wysiwyg.officeImporter.useOfficeViewer.label"), result);
@@ -113,15 +112,12 @@ class OfficeImporterPageTest extends PageTest
 
         String result = renderPage(OFFICE_IMPORTER);
 
-        // The skin extension macros come from display_macros.vm, which the page loads itself, rather than from the
-        // CKEditor macros it no longer includes. Velocity renders an unresolved macro as literal text, so a macro
-        // name in the output means its definition is missing.
+        // Velocity renders an unresolved macro as literal text, so a macro name in the output means it is missing.
         assertFalse(result.contains("#initRequiredSkinExtensions"), result);
         assertFalse(result.contains("#sendRequiredSkinExtensions"), result);
         assertFalse(result.contains("#rawResponse"), result);
 
-        // The page resolves the syntax itself and hands the service a Syntax, not the identifier it was given. It
-        // looks the office file up on the document the sheet is applied to, which is the edited document.
+        // The page looks the office file up on the document the sheet applies to, which is the edited document.
         ArgumentCaptor<Map<String, Object>> parameters = ArgumentCaptor.captor();
         verify(this.wysiwygEditorScriptService)
             .importOfficeAttachment(eq(new AttachmentReference("my.doc", OFFICE_IMPORTER)), parameters.capture());
@@ -168,10 +164,9 @@ class OfficeImporterPageTest extends PageTest
 
         renderPage(OFFICE_IMPORTER);
 
-        // A syntax identifier that resolves to nothing is the caller's mistake, so it gets a 400 naming the value
-        // rather than the blank 500 that a failed import returns.
+        // An unknown syntax is the caller's mistake, so it gets a 400 instead of the blank 500 a failure returns.
         verify(response).sendError(eq(400), startsWith("Unknown output syntax [no-such-syntax/1.0]"));
-        // The import must not run at all: converting an office file is expensive and the result is unusable.
+        // Converting an office file is expensive and the result would be unusable, so the import must not run.
         verify(this.wysiwygEditorScriptService, never())
             .importOfficeAttachment(any(AttachmentReference.class), any(Map.class));
     }

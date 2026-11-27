@@ -41,7 +41,7 @@
       org.hibernate:hibernate-core/${hibernate.version},
       jakarta.persistence:jakarta.persistence-api/${jakarta.persistence.version}
     </xwiki.extension.features>
-    <xwiki.extension.name>Hibernate ORM Core</xwiki.extension.name>
+    <xwiki.extension.name>Hibernate ORM Core with Hibernate 5 compatibility</xwiki.extension.name>
     <!-- The restored APIs follow the Hibernate naming and API (and cannot follow the XWiki ones) -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <!-- Spoon resolves the tests against the original Hibernate JAR instead of the patched classes -->

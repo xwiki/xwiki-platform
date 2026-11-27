@@ -110,7 +110,7 @@ public class EditorWikiComponentBuilder implements WikiComponentBuilder
             Query query =
                 this.queryManager.createQuery(", BaseObject as editorObject, StringProperty as roleHint "
                     + "where doc.fullName = editorObject.name and editorObject.className = 'XWiki.EditorClass' and "
-                    + "editorObject.id = roleHint.id and roleHint.name='roleHint' and "
+                    + "editorObject.id = roleHint.id.id and roleHint.id.name='roleHint' and "
                     + "(roleHint.value <> '' or (roleHint.value is not null and '' is null))", Query.HQL);
             for (Object result : query.execute()) {
                 editorReferences.add(this.currentDocumentReferenceResolver.resolve(result.toString()));

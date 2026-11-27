@@ -132,7 +132,7 @@ public final class RightsManager
      */
     private static final String ALL_RIGHTS_QUERY = ", BaseObject as obj, %s as prop "
         + "where doc.fullName=obj.name and (obj.className=?1 or obj.className=?2) "
-        + "and obj.id=prop.id and prop.name=?3 and prop.value like ?4";
+        + "and obj.id=prop.id.id and prop.name=?3 and prop.value like ?4";
 
     // ////////////////////////////////////////////////////////////////////////////
 

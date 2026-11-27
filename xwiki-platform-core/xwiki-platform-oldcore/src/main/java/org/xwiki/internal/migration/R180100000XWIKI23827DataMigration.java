@@ -77,13 +77,13 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigration
 {
     // We limit to 100 as each occurrence in the batch adds a where statement such as:
-    // (prop.id = :objectId_0 and prop.name = :property_0)
+    // (prop.id.id = :objectId_0 and prop.id.name = :property_0)
     private static final int BATCH_SIZE = 100;
 
     private static final String PROPERTY_NAMES_PARAMETER = "propNames";
 
     private static final String SELECT_PROPERTIES_STATEMENT = "select prop from StringProperty as prop "
-        + "where prop.name in :propNames and prop.id in :objectIds";
+        + "where prop.id.name in :propNames and prop.id.id in :objectIds";
 
     @Inject
     @Named("current")
@@ -231,7 +231,7 @@ public class R180100000XWIKI23827DataMigration extends AbstractHibernateDataMigr
         // others (e.g. already migrated, since the migration can be executed again) can be skipped.
         String objectIdsQuery = "select distinct obj.id "
             + "from BaseObject as obj, StringProperty as prop "
-            + "where obj.className = :className and prop.id = obj.id and prop.name in (:propNames) "
+            + "where obj.className = :className and prop.id.id = obj.id and prop.id.name in (:propNames) "
             + "order by obj.id";
         List<Long> results;
         try {

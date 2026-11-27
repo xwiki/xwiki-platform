@@ -83,7 +83,7 @@ public class TagsResourceImpl extends XWikiResource implements TagsResource
         String query =
                 "select distinct elements(prop.list) from BaseObject as obj, "
                         + "DBStringListProperty as prop where obj.className='XWiki.TagClass' "
-                        + "and obj.id=prop.id and prop.name='tags'";
+                        + "and obj.id=prop.id.id and prop.id.name='tags'";
 
         List<String> tags = queryManager.createQuery(query, Query.HQL).execute();
         Collections.sort(tags, String.CASE_INSENSITIVE_ORDER);

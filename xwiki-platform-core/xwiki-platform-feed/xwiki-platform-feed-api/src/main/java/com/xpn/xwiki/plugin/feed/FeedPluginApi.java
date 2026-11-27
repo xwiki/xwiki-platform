@@ -797,7 +797,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
                 query =
                     ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='"
                         + BLOG_POST_CLASS_NAME + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME
-                        + "' and obj.id=prop.id and prop.name='category' and list = '" + category
+                        + "' and obj.id=prop.id.id and prop.id.name='category' and list = '" + category
                         + "' order by doc.creationDate desc";
             }
         }

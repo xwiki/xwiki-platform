@@ -202,7 +202,7 @@ class LiveTableResultsTest extends PageTest
             ", BaseObject as obj , StringProperty prop_where  "
                 + "where obj.name=doc.fullName and obj.className = :className and "
                 + "doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                + "and obj.id=prop_where.id and prop_where.name = :prop_where_name   "
+                + "and obj.id=prop_where.id.id and prop_where.name = :prop_where_name   "
                 + "order by lower(prop_where.value) asc, prop_where.value asc");
     }
 
@@ -292,10 +292,10 @@ class LiveTableResultsTest extends PageTest
             .hql(", BaseObject as obj , StringProperty as prop_category, StringProperty prop_name  "
                 + "where obj.name=doc.fullName and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                + "and obj.id = prop_category.id and prop_category.name = :prop_category_id_name "
+                + "and obj.id = prop_category.id.id and prop_category.id.name = :prop_category_id_name "
                 + "and ((prop_category.value like :prop_category_value_1 or prop_category.value is null) "
                 + "OR prop_category.value = :prop_category_value_2) "
-                + "and obj.id=prop_name.id and prop_name.name = :prop_name_name   "
+                + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
                 + "order by lower(prop_name.value) asc, prop_name.value asc");
         Map<String, Object> values = new HashMap<>();
         values.put("className", "Panels.PanelClass");
@@ -343,13 +343,13 @@ class LiveTableResultsTest extends PageTest
                 + "where obj.name=doc.fullName "
                 + "and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                + "and obj.id = prop_category.id "
-                + "and prop_category.name = :prop_category_id_name "
+                + "and obj.id = prop_category.id.id "
+                + "and prop_category.id.name = :prop_category_id_name "
                 + "and ("
                 + "upper(concat('|', concat(prop_category.textValue, '|'))) like upper(:prop_category_textValue_1) "
                 + "OR upper(concat('|', concat(prop_category.textValue, '|'))) like upper(:prop_category_textValue_2)"
                 + ") "
-                + "and obj.id=prop_name.id and prop_name.name = :prop_name_name   "
+                + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
                 + "order by lower(prop_name.value) asc, prop_name.value asc");
         Map<String, Object> values = new HashMap<>();
         values.put("className", "Panels.PanelClass");
@@ -398,11 +398,11 @@ class LiveTableResultsTest extends PageTest
             .hql(", BaseObject as obj , StringProperty as prop_category, StringProperty prop_name  "
                 + "where obj.name=doc.fullName and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                + "and obj.id = prop_category.id and prop_category.name = :prop_category_id_name "
+                + "and obj.id = prop_category.id.id and prop_category.id.name = :prop_category_id_name "
                 + "and (upper(prop_category.value) like upper(:prop_category_value_1) OR"
                 + " upper(prop_category.value) like upper(:prop_category_value_2) OR"
                 + " prop_category.value in (:prop_category_value_3, :prop_category_value_4)) "
-                + "and obj.id=prop_name.id and prop_name.name = :prop_name_name   "
+                + "and obj.id=prop_name.id.id and prop_name.name = :prop_name_name   "
                 + "order by lower(prop_name.value) asc, prop_name.value asc");
         Map<String, Object> values = new HashMap<>();
         values.put("className", "Panels.PanelClass");
@@ -443,8 +443,8 @@ class LiveTableResultsTest extends PageTest
             + "where obj.name=doc.fullName "
             + "and obj.className = :className "
             + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-            + "and obj.id = prop_shortText.id "
-            + "and prop_shortText.name = :prop_shortText_id_name "
+            + "and obj.id = prop_shortText.id.id "
+            + "and prop_shortText.id.name = :prop_shortText_id_name "
             + "and (upper(prop_shortText.value) like upper(:prop_shortText_value_1)) ");
 
         Map<String, Object> values = new HashMap<>();
@@ -615,8 +615,8 @@ class LiveTableResultsTest extends PageTest
                     + "where obj.name=doc.fullName "
                     + "and obj.className = :className "
                     + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                    + "and obj.id = prop_name.id "
-                    + "and prop_name.name = :prop_name_id_name "
+                    + "and obj.id = prop_name.id.id "
+                    + "and prop_name.id.name = :prop_name_id_name "
                     + "and (upper(prop_name.value) like upper(:prop_name_value_1)) ",
                 Map.of(
                     "className", "Space.MyClass",
@@ -634,11 +634,11 @@ class LiveTableResultsTest extends PageTest
                     + "where obj.name=doc.fullName "
                     + "and obj.className = :className "
                     + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                    + "and obj.id = prop_mail.id "
-                    + "and prop_mail.name = :prop_mail_id_name "
+                    + "and obj.id = prop_mail.id.id "
+                    + "and prop_mail.id.name = :prop_mail_id_name "
                     + "and (upper(prop_mail.value) like upper(:prop_mail_value_1)) "
-                    + "and obj.id = prop_name.id "
-                    + "and prop_name.name = :prop_name_id_name "
+                    + "and obj.id = prop_name.id.id "
+                    + "and prop_name.id.name = :prop_name_id_name "
                     + "and (upper(prop_name.value) like upper(:prop_name_value_1)) ",
                 Map.of(
                     "className", "Space.MyClass",
@@ -722,7 +722,7 @@ class LiveTableResultsTest extends PageTest
                     + "where obj.name=doc.fullName "
                     + "and obj.className = :className "
                     + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                    + "and obj.id=prop_email.id "
+                    + "and obj.id=prop_email.id.id "
                     + "and prop_email.name = :prop_email_name   "
                     + "order by lower(prop_email.value) asc, prop_email.value asc",
                 Map.of(
@@ -852,8 +852,8 @@ class LiveTableResultsTest extends PageTest
                 + "where obj.name=doc.fullName "
                 + "and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                + "and obj.id = prop_dbList.id "
-                + "and prop_dbList.name = :prop_dbList_id_name "
+                + "and obj.id = prop_dbList.id.id "
+                + "and prop_dbList.id.name = :prop_dbList_id_name "
                 + "and size(prop_dbList.list) = 0 ");
         Map<String, Object> values = Map.of(
             "className", "Space.MyClass",
@@ -899,7 +899,7 @@ class LiveTableResultsTest extends PageTest
                 + "where obj.name=doc.fullName "
                 + "and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                + "and obj.id = prop_dbList.id and prop_dbList.name = :prop_dbList_id_name "
+                + "and obj.id = prop_dbList.id.id and prop_dbList.id.name = :prop_dbList_id_name "
                 + "and ("
                 + ":prop_dbList_list_1 in elements(prop_dbList.list) "
                 + "OR size(prop_dbList.list) = 0"
@@ -946,8 +946,8 @@ class LiveTableResultsTest extends PageTest
                 + "where obj.name=doc.fullName "
                 + "and obj.className = :className "
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
-                + "and obj.id = prop_dbList.id "
-                + "and prop_dbList.name = :prop_dbList_id_name "
+                + "and obj.id = prop_dbList.id.id "
+                + "and prop_dbList.id.name = :prop_dbList_id_name "
                 + "and (upper(prop_dbList_item) like upper(:prop_dbList_item_1)"
                 + ") "
         );

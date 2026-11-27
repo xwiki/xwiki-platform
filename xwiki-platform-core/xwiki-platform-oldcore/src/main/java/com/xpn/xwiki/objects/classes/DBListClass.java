@@ -313,7 +313,7 @@ public class DBListClass extends ListClass
                 } else {
                     select.append("idprop.value");
                     fromStatements.add("StringProperty as idprop");
-                    whereStatements.add("obj.id=idprop.id and idprop.name='" + idField + "'");
+                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                 }
 
                 // If specified, add the second column to the query.
@@ -325,7 +325,7 @@ public class DBListClass extends ListClass
                     } else {
                         select.append(", valueprop.value");
                         fromStatements.add("StringProperty as valueprop");
-                        whereStatements.add("obj.id=valueprop.id and valueprop.name='" + valueField + "'");
+                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                     }
                 }
                 // Let's create the complete query

@@ -145,4 +145,12 @@ class HibernateStoreTest
         assertEquals("legacy",
             this.store.getConfiguration().getProperty("hibernate.id.db_structure_naming_strategy"));
     }
+
+    @Test
+    void initializeUsesTheLegacyWrapperArrayHandlingByDefault()
+    {
+        // Byte[] and Character[] properties (wrapper-binary and wrapper-characters types) are stored like byte[] and
+        // char[]
+        assertEquals("LEGACY", this.store.getConfiguration().getProperty("hibernate.type.wrapper_array_handling"));
+    }
 }

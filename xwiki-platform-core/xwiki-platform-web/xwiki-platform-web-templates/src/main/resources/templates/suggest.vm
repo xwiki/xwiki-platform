@@ -90,12 +90,12 @@ $response.setContentType("text/xml")
 #else ## hibquery == ""
   ######################### DBListProperty query
   #if($p.isRelationalStorage() && $p.isMultiSelect())
-    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> :templatename and obj.className = :classname and prop.id = obj.id and prop.name = :fieldname and lower(list) like :input ESCAPE '!'")
+    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(list) like :input ESCAPE '!'")
     #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
     #set($results = $queryResult.toArray())
     #set($documentQuery = 'select obj.name from BaseObject as obj, DBStringListProperty as prop join prop.list list
-    where obj.name <> :templateName and obj.className = :className and prop.id = obj.id
-    and prop.name = :fieldname and list = :propertyValue')
+    where obj.name <> :templateName and obj.className = :className and prop.id.id = obj.id
+    and prop.id.name = :fieldname and list = :propertyValue')
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="3">
     #foreach($res in $results)
@@ -108,11 +108,11 @@ $response.setContentType("text/xml")
     </results>
   ######################### StringListProperty query
   #elseif($p.isMultiSelect())
-    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :input ESCAPE '!'")
+    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :input ESCAPE '!'")
     #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
     #set($results = $queryResult.toArray())
     #set($documentQuery = 'select obj.name from BaseObject as obj, StringListProperty as prop where obj.name <>
-    :templateName and obj.className = :className and prop.id = obj.id and prop.name = :fieldname and
+    :templateName and obj.className = :className and prop.id.id = obj.id and prop.name = :fieldname and
     prop.textValue = :propertyValue')
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="5">
@@ -130,11 +130,11 @@ $response.setContentType("text/xml")
     </results>
   ######################### StringProperty query
   #elseif($p && !$field.isSensitive())
-    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = :classname and obj.name <> :templatename and prop.id = obj.id and prop.name = :fieldname and lower(prop.value) like :input ESCAPE '!'")
+    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = :classname and obj.name <> :templatename and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :input ESCAPE '!'")
     #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
     #set($results = $queryResult.toArray())
     #set($documentQuery = 'select obj.name from BaseObject as obj, StringProperty as prop where
-    obj.className = :className and obj.name <> :templateName and prop.id = obj.id and prop.name = :fieldname and
+    obj.className = :className and obj.name <> :templateName and prop.id.id = obj.id and prop.id.name = :fieldname and
     prop.value = :propertyValue')
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="8">

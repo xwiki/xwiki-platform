@@ -91,9 +91,9 @@
   ## Search in page content
   #databaseAddResults("where $matchLocation upper(doc.content) like upper(:text) escape '!'" $params $results)
   ## Search in text fields (simple String properties)
-  #databaseAddResults(", BaseObject as obj, StringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
+  #databaseAddResults(", BaseObject as obj, StringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
   ## Search in big text fields (textarea properties)
-  #databaseAddResults(", BaseObject as obj, LargeStringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
+  #databaseAddResults(", BaseObject as obj, LargeStringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
   #set ($discard = $list.addAll($collectiontool.sort($results, ['date'])))
 #end
 {{/velocity}}

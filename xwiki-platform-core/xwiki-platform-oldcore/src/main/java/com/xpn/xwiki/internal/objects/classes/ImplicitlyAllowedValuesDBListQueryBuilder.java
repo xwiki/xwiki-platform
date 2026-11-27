@@ -205,7 +205,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
                 }
                 column = fieldAlias + ".value";
                 fromClause.add("StringProperty as " + fieldAlias);
-                whereClause.add(String.format("obj.id = %1$s.id and %1$s.name = :%1$s", fieldAlias));
+                whereClause.add(String.format("obj.id = %1$s.id.id and %1$s.id.name = :%1$s", fieldAlias));
                 parameters.put(fieldAlias, fieldName);
             } catch (XWikiException e) {
                 throw new QueryException("Failed to get the XClass definition", null, e);

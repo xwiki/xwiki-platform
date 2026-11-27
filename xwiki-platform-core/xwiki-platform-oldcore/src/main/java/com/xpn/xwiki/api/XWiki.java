@@ -741,8 +741,8 @@ public class XWiki extends Api
      *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>. Result: All the documents with at least
      * one comment ordered by the last modification date from the most recent</li>
      * <li>Query: <code>,BaseObject as obj, StringProperty as prop where
-     *       doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id
-     *       and prop.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date
+     *       doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id.id
+     *       and prop.id.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date
      *       desc</code>. Result: All the documents with at least one comment from LudovicDubost ordered by the last
      * modification date from the most recent</li>
      * </ul>

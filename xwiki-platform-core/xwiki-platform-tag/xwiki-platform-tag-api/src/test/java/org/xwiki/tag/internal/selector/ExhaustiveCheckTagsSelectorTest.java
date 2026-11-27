@@ -209,8 +209,8 @@ class ExhaustiveCheckTagsSelectorTest
             + "from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop join prop.list item "
             + "where obj.name=doc.fullName "
             + "and obj.className='XWiki.TagClass' "
-            + "and obj.id=prop.id "
-            + "and prop.name='tags' "
+            + "and obj.id=prop.id.id "
+            + "and prop.id.name='tags' "
             + "order by item", Query.HQL);
     }
 

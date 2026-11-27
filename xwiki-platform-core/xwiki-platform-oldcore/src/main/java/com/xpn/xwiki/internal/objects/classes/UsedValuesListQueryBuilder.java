@@ -147,12 +147,12 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
                     + "from BaseObject as obj, %2$s "
                     + "where obj.className = :className "
                     + "  and obj.name <> :templateName "
-                    + "  and prop.id = obj.id "
-                    + "  and prop.name = :propertyName "
+                    + "  and prop.id.id = obj.id "
+                    + "  and prop.id.name = :propertyName "
                     + "  and not exists ("
                     + "    select 1 from %3$s "
-                    + "    where prop2.name = :propertyName "
-                    + "      and prop2.id < prop.id "
+                    + "    where prop2.id.name = :propertyName "
+                    + "      and prop2.id.id < prop.id.id "
                     + "      and FUNCTION('DBMS_LOB.COMPARE', %4$s, %1$s) = 0"
                     + "  ) "
                     + "order by obj.id",
@@ -166,7 +166,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
             statement = String.format("select %1$s as stringValue, count(*) as unfilterable0 "
                 + "from BaseObject as obj, %2$s "
                 + "where obj.className = :className and obj.name <> :templateName"
-                + " and prop.id = obj.id and prop.name = :propertyName "
+                + " and prop.id.id = obj.id and prop.id.name = :propertyName "
                 + "group by %1$s "
                 + "order by unfilterable0 desc", selectAndFrom.selectColumn(), selectAndFrom.fromTable());
         }
@@ -237,7 +237,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
         String statement = String.format(
             "select obj.name from BaseObject as obj, %s "
                 + "where obj.className = :className and obj.name <> :templateName "
-                + "and prop.id = obj.id and prop.name = :propertyName and %s",
+                + "and prop.id.id = obj.id and prop.id.name = :propertyName and %s",
             selectAndFrom.fromTable(), comparison);
         try {
             Query query = this.queryManager.createQuery(statement, Query.HQL);

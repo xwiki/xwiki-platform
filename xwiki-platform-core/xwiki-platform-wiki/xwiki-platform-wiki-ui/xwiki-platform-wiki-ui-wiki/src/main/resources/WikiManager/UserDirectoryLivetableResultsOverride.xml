@@ -140,7 +140,7 @@
         ## This is grouped with the users clause from above.
         #set ($extraWhereClause = "${extraWhereClause} OR ")
       #end
-      #set ($extraWhereClause = "${extraWhereClause}doc.fullName IN (SELECT prop.value FROM BaseObject as obj, StringProperty as prop WHERE obj.className='XWiki.XWikiGroups' AND prop.id=obj.id AND prop.name='member' AND obj.name IN (")
+      #set ($extraWhereClause = "${extraWhereClause}doc.fullName IN (SELECT prop.value FROM BaseObject as obj, StringProperty as prop WHERE obj.className='XWiki.XWikiGroups' AND prop.id.id=obj.id AND prop.name='member' AND obj.name IN (")
       #foreach ($workspaceMemberGroup in $workspaceMemberGroups)
         #if ($foreach.count &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")

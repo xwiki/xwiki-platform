@@ -214,7 +214,7 @@ class DBTreeListClassTest
             "select distinct idprop.value, idprop.value, doc.parent"
                 + " from XWikiDocument as doc, BaseObject as obj, StringProperty as idprop"
                 + " where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=idprop.id and idprop.name='property'",
+                + " and obj.id=idprop.id.id and idprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
     }
 
@@ -239,7 +239,7 @@ class DBTreeListClassTest
             "select distinct idprop.value, idprop.value, doc.name"
                 + " from XWikiDocument as doc, BaseObject as obj, StringProperty as idprop"
                 + " where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=idprop.id and idprop.name='property'",
+                + " and obj.id=idprop.id.id and idprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
 
         dbtlc.setParentField("obj.className");
@@ -257,7 +257,7 @@ class DBTreeListClassTest
         assertEquals(
             "select distinct idprop.value, idprop.value, obj.className"
                 + " from BaseObject as obj, StringProperty as idprop" + " where obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=idprop.id and idprop.name='property'",
+                + " and obj.id=idprop.id.id and idprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
 
         dbtlc.setParentField("property");
@@ -266,26 +266,26 @@ class DBTreeListClassTest
             "select distinct doc.name, doc.name, parentprop.value"
                 + " from XWikiDocument as doc, BaseObject as obj, StringProperty as parentprop"
                 + " where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=parentprop.id and parentprop.name='property'",
+                + " and obj.id=parentprop.id.id and parentprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setIdField("obj.className");
         assertEquals(
             "select distinct obj.className, obj.className, parentprop.value"
                 + " from BaseObject as obj, StringProperty as parentprop" + " where obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=parentprop.id and parentprop.name='property'",
+                + " and obj.id=parentprop.id.id and parentprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setIdField("property");
         assertEquals(
             "select distinct idprop.value, idprop.value, idprop.value"
                 + " from BaseObject as obj, StringProperty as idprop" + " where obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=idprop.id and idprop.name='property'",
+                + " and obj.id=idprop.id.id and idprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setIdField("property2");
         assertEquals(
             "select distinct idprop.value, idprop.value, parentprop.value"
                 + " from BaseObject as obj, StringProperty as idprop, StringProperty as parentprop"
-                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id and idprop.name='property2'"
-                + " and obj.id=parentprop.id and parentprop.name='property'",
+                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id.id and idprop.id.name='property2'"
+                + " and obj.id=parentprop.id.id and parentprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
     }
 
@@ -389,14 +389,14 @@ class DBTreeListClassTest
             "select distinct doc.name, valueprop.value, doc.parent"
                 + " from XWikiDocument as doc, BaseObject as obj, StringProperty as valueprop"
                 + " where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=valueprop.id and valueprop.name='property'",
+                + " and obj.id=valueprop.id.id and valueprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setIdField("property");
         assertEquals(
             "select distinct idprop.value, idprop.value, doc.parent"
                 + " from XWikiDocument as doc, BaseObject as obj, StringProperty as idprop"
                 + " where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=idprop.id and idprop.name='property'",
+                + " and obj.id=idprop.id.id and idprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setIdField("property2");
         assertEquals(
@@ -404,8 +404,8 @@ class DBTreeListClassTest
                 + " from XWikiDocument as doc, BaseObject as obj,"
                 + " StringProperty as idprop, StringProperty as valueprop"
                 + " where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=idprop.id and idprop.name='property2'"
-                + " and obj.id=valueprop.id and valueprop.name='property'",
+                + " and obj.id=idprop.id.id and idprop.id.name='property2'"
+                + " and obj.id=valueprop.id.id and valueprop.id.name='property'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
     }
 
@@ -427,30 +427,30 @@ class DBTreeListClassTest
         assertEquals(
             "select distinct idprop.value, idprop.value, idprop.value"
                 + " from BaseObject as obj, StringProperty as idprop" + " where obj.className='XWiki.XWikiUsers'"
-                + " and obj.id=idprop.id and idprop.name='prop1'",
+                + " and obj.id=idprop.id.id and idprop.id.name='prop1'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setValueField("prop2");
         assertEquals(
             "select distinct idprop.value, valueprop.value, idprop.value"
                 + " from BaseObject as obj, StringProperty as idprop, StringProperty as valueprop"
-                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id and idprop.name='prop1'"
-                + " and obj.id=valueprop.id and valueprop.name='prop2'",
+                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id.id and idprop.id.name='prop1'"
+                + " and obj.id=valueprop.id.id and valueprop.id.name='prop2'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setParentField("prop2");
         assertEquals(
             "select distinct idprop.value, valueprop.value, valueprop.value"
                 + " from BaseObject as obj, StringProperty as idprop, StringProperty as valueprop"
-                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id and idprop.name='prop1'"
-                + " and obj.id=valueprop.id and valueprop.name='prop2'",
+                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id.id and idprop.id.name='prop1'"
+                + " and obj.id=valueprop.id.id and valueprop.id.name='prop2'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
         dbtlc.setParentField("prop3");
         assertEquals(
             "select distinct idprop.value, valueprop.value, parentprop.value"
                 + " from BaseObject as obj, StringProperty as idprop,"
                 + " StringProperty as valueprop, StringProperty as parentprop"
-                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id and idprop.name='prop1'"
-                + " and obj.id=valueprop.id and valueprop.name='prop2'"
-                + " and obj.id=parentprop.id and parentprop.name='prop3'",
+                + " where obj.className='XWiki.XWikiUsers'" + " and obj.id=idprop.id.id and idprop.id.name='prop1'"
+                + " and obj.id=valueprop.id.id and valueprop.id.name='prop2'"
+                + " and obj.id=parentprop.id.id and parentprop.id.name='prop3'",
             dbtlc.getQuery(this.oldcore.getXWikiContext()));
     }
 

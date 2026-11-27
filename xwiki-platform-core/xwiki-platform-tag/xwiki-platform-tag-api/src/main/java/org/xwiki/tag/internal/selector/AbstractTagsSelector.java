@@ -76,7 +76,7 @@ public abstract class AbstractTagsSelector implements TagsSelector
         throws TagException
     {
         String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item"
-            + " where obj.className=:className and obj.name=doc.fullName and obj.id=prop.id and prop.name='tags'";
+            + " where obj.className=:className and obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags'";
         if (caseSensitive) {
             hql += " and item = :item";
         } else {

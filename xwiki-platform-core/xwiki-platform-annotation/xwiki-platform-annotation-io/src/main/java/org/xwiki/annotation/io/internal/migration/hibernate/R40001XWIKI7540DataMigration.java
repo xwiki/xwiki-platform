@@ -216,7 +216,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                 Query<Object[]> getExistingAnnotationsAndCommentsQuery =
                     session.createQuery("SELECT obj, prop FROM BaseObject obj, BaseProperty prop WHERE "
                         + "(obj.className='AnnotationCode.AnnotationClass' OR obj.className='XWiki.XWikiComments') "
-                        + "AND prop.id=obj.id AND obj.name in "
+                        + "AND prop.id.id=obj.id AND obj.name in "
                         + "(SELECT doc.fullName FROM XWikiDocument doc, BaseObject ann WHERE "
                         + "ann.name=doc.fullName AND ann.className='AnnotationCode.AnnotationClass')", Object[].class);
                 List<Object[]> queryResults = getExistingAnnotationsAndCommentsQuery.list();

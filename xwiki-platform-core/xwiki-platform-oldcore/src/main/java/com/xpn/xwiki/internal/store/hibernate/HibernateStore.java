@@ -80,6 +80,7 @@ import org.hibernate.mapping.Property;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.tool.schema.extract.spi.ExtractionContext;
 import org.hibernate.tool.schema.extract.spi.SequenceInformation;
+import org.hibernate.type.WrapperArrayHandling;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
@@ -146,6 +147,14 @@ public class HibernateStore implements Disposable, Initializable
      * 50), which would be created empty on an existing database and generate identifiers already in use.
      */
     private static final String DEFAULT_ID_NAMING_STRATEGY = LegacyNamingStrategy.STRATEGY_NAME;
+
+    /**
+     * The handling of the {@code Byte[]} and {@code Character[]} properties when the Hibernate configuration doesn't
+     * set one. With the {@code legacy} handling, they are stored like {@code byte[]} and {@code char[]} (and mappings
+     * can keep using the {@code wrapper-binary} and {@code wrapper-characters} types), while by default Hibernate
+     * rejects these mappings.
+     */
+    private static final String DEFAULT_WRAPPER_ARRAY_HANDLING = WrapperArrayHandling.LEGACY.name();
 
     @Inject
     private Logger logger;
@@ -259,7 +268,7 @@ public class HibernateStore implements Disposable, Initializable
         this.configuration = new HibernateStoreConfiguration(this.configurationURL);
         replaceVariables(this.configuration.getProperties());
         setDefaultIsolation(this.configuration);
-        setDefaultIdentifierNamingStrategy(this.configuration.getProperties());
+        setDefaultSettings(this.configuration.getProperties());
     }
 
     private void disposeSessionFactory()
@@ -291,8 +300,8 @@ public class HibernateStore implements Disposable, Initializable
         replaceVariables(baseConfiguration.getConfigurationValues());
         // Make sure a transaction isolation level is set, whatever the database defaults to
         setDefaultIsolation(baseConfiguration);
-        // Keep using the sequence that existing databases contain
-        setDefaultIdentifierNamingStrategy(baseConfiguration.getConfigurationValues());
+        // Keep the behaviors that existing databases and mappings rely on
+        setDefaultSettings(baseConfiguration.getConfigurationValues());
 
         StandardServiceRegistryBuilder standardRegistryBuilder =
             new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
@@ -386,15 +395,22 @@ public class HibernateStore implements Disposable, Initializable
 
     /**
      * Set the strategy used to name the sequences of the identifier generators to {@link #DEFAULT_ID_NAMING_STRATEGY}
-     * unless the configuration already contains one.
+     * and the handling of the wrapper arrays to {@link #DEFAULT_WRAPPER_ARRAY_HANDLING}, unless the configuration
+     * already sets them.
      *
      * @param settings the Hibernate settings to complete
      */
-    private void setDefaultIdentifierNamingStrategy(Map<? super String, Object> settings)
+    private void setDefaultSettings(Map<? super String, Object> settings)
     {
-        Object strategy = settings.get(MappingSettings.ID_DB_STRUCTURE_NAMING_STRATEGY);
-        if (strategy == null || StringUtils.isBlank(strategy.toString())) {
-            settings.put(MappingSettings.ID_DB_STRUCTURE_NAMING_STRATEGY, DEFAULT_ID_NAMING_STRATEGY);
+        setDefaultSetting(settings, MappingSettings.ID_DB_STRUCTURE_NAMING_STRATEGY, DEFAULT_ID_NAMING_STRATEGY);
+        setDefaultSetting(settings, MappingSettings.WRAPPER_ARRAY_HANDLING, DEFAULT_WRAPPER_ARRAY_HANDLING);
+    }
+
+    private void setDefaultSetting(Map<? super String, Object> settings, String name, String defaultValue)
+    {
+        Object value = settings.get(name);
+        if (value == null || StringUtils.isBlank(value.toString())) {
+            settings.put(name, defaultValue);
         }
     }
 

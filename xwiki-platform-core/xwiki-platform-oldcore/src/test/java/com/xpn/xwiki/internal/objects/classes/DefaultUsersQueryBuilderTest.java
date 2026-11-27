@@ -94,10 +94,10 @@ class DefaultUsersQueryBuilderTest
             + "from XWikiDocument doc, BaseObject obj, StringProperty firstName, StringProperty lastName"
             + ", IntegerProperty active"
             + " where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'"
-            + " and obj.id = firstName.id and firstName.name = 'first_name'"
-            + " and obj.id = lastName.id and lastName.name = 'last_name'"
+            + " and obj.id = firstName.id.id and firstName.id.name = 'first_name'"
+            + " and obj.id = lastName.id.id and lastName.id.name = 'last_name'"
             + " and doc.space = 'XWiki' "
-            + "and obj.id = active.id and active.name = 'active' and active.value = 1 "
+            + "and obj.id = active.id.id and active.id.name = 'active' and active.value = 1 "
             + "order by lower(firstName.value), firstName.value, lower(lastName.value), lastName.value");
     }
 
@@ -110,8 +110,8 @@ class DefaultUsersQueryBuilderTest
             + " firstName.value||' '||lastName.value as userName "
             + "from XWikiDocument doc, BaseObject obj, StringProperty firstName, StringProperty lastName "
             + "where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'"
-            + " and obj.id = firstName.id and firstName.name = 'first_name'"
-            + " and obj.id = lastName.id and lastName.name = 'last_name'"
+            + " and obj.id = firstName.id.id and firstName.id.name = 'first_name'"
+            + " and obj.id = lastName.id.id and lastName.id.name = 'last_name'"
             + " and doc.space = 'XWiki' "
             + "order by lower(firstName.value), firstName.value, lower(lastName.value), lastName.value");
     }

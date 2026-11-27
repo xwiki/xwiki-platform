@@ -79,8 +79,8 @@ public class R180600000XWIKI20699DataMigration extends AbstractDocumentsMigratio
                 .createQuery("SELECT distinct doc.fullName "
                     + "FROM XWikiDocument doc, BaseObject as obj, StringProperty as prop "
                     + "where doc.fullName = obj.name and obj.className = 'XWiki.XWikiComments' "
-                    + "and obj.id = prop.id "
-                    + "and prop.name = 'target' "
+                    + "and obj.id = prop.id.id "
+                    + "and prop.id.name = 'target' "
                     // length() is used to skip empty targets because on Oracle an empty string is stored as null,
                     // and comparing with an empty string never matches.
                     + "and length(prop.value) > 0", Query.HQL)

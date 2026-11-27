@@ -557,7 +557,7 @@
         <separators/>
         <size>1</size>
         <sort/>
-        <sql>select docPlan.fullName, concat(docSupporter.title, ' &gt; ', docPlan.title) FROM XWikiDocument docPlan, XWikiDocument docSupporter, BaseObject as plan, BaseObject as supporter, StringProperty as planSupporter WHERE docPlan.fullName = plan.name and plan.className = 'ExtensionCode.ExtensionSupportPlanClass' and docPlan.fullName &lt;&gt; 'ExtensionCode.ExtensionSupportPlanTemplate' and docSupporter.fullName = supporter.name and supporter.className = 'ExtensionCode.ExtensionSupporterClass' and docSupporter.fullName &lt;&gt; 'ExtensionCode.ExtensionSupporterTemplate' and plan.id=planSupporter.id and planSupporter.name='supporter' and planSupporter.value=docSupporter.fullName</sql>
+        <sql>select docPlan.fullName, concat(docSupporter.title, ' &gt; ', docPlan.title) FROM XWikiDocument docPlan, XWikiDocument docSupporter, BaseObject as plan, BaseObject as supporter, StringProperty as planSupporter WHERE docPlan.fullName = plan.name and plan.className = 'ExtensionCode.ExtensionSupportPlanClass' and docPlan.fullName &lt;&gt; 'ExtensionCode.ExtensionSupportPlanTemplate' and docSupporter.fullName = supporter.name and supporter.className = 'ExtensionCode.ExtensionSupporterClass' and docSupporter.fullName &lt;&gt; 'ExtensionCode.ExtensionSupporterTemplate' and plan.id=planSupporter.id.id and planSupporter.id.name='supporter' and planSupporter.value=docSupporter.fullName</sql>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>

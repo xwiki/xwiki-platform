@@ -173,7 +173,7 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         query = assertQuery("select distinct doc.fullName as unfilterable0, idProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
-            + " and obj.id = idProp.id and idProp.name = :idProp"
+            + " and obj.id = idProp.id.id and idProp.id.name = :idProp"
             + " order by idProp.value, doc.fullName");
         verify(query).bindValue("idProp", "property");
     }
@@ -267,7 +267,7 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         assertQuery("select distinct doc.fullName as unfilterable0, doc.name, valueProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as valueProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = valueProp.id and valueProp.name = :valueProp"
+            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp"
             + " order by valueProp.value, doc.name, doc.fullName");
 
         this.dbListClass.setIdField("obj.className");
@@ -293,7 +293,7 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className, valueProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as valueProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = valueProp.id and valueProp.name = :valueProp"
+            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp"
             + " order by valueProp.value, obj.className, doc.fullName");
 
         this.dbListClass.setIdField("property");
@@ -301,29 +301,29 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, doc.name "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = idProp.id and idProp.name = :idProp"
+            + "and obj.id = idProp.id.id and idProp.id.name = :idProp"
             + " order by doc.name, idProp.value, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, obj.className "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = idProp.id and idProp.name = :idProp"
+            + "and obj.id = idProp.id.id and idProp.id.name = :idProp"
             + " order by obj.className, idProp.value, doc.fullName");
 
         this.dbListClass.setValueField("property");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = idProp.id and idProp.name = :idProp"
+            + "and obj.id = idProp.id.id and idProp.id.name = :idProp"
             + " order by idProp.value, doc.fullName");
 
         this.dbListClass.setValueField("otherProperty");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, valueProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp, StringProperty as valueProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = idProp.id and idProp.name = :idProp "
-            + "and obj.id = valueProp.id and valueProp.name = :valueProp"
+            + "and obj.id = idProp.id.id and idProp.id.name = :idProp "
+            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp"
             + " order by valueProp.value, idProp.value, doc.fullName");
     }
 
@@ -358,9 +358,9 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, valueProp.value, parentProp.value"
             + " from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp, StringProperty as valueProp,"
             + " StringProperty as parentProp where doc.fullName = obj.name and obj.className = :className and"
-            + " doc.fullName <> :templateName and obj.id = idProp.id and idProp.name = :idProp and"
-            + " obj.id = valueProp.id and valueProp.name = :valueProp and obj.id = parentProp.id and"
-            + " parentProp.name = :parentProp"
+            + " doc.fullName <> :templateName and obj.id = idProp.id.id and idProp.id.name = :idProp and"
+            + " obj.id = valueProp.id.id and valueProp.id.name = :valueProp and obj.id = parentProp.id.id and"
+            + " parentProp.id.name = :parentProp"
             + " order by valueProp.value, idProp.value, parentProp.value, doc.fullName");
     }
 
@@ -423,8 +423,8 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
                 assertQuery(
                     "select distinct doc.fullName as unfilterable0, idProp.value from XWikiDocument as doc, "
                         + "BaseObject as obj, StringProperty as idProp where doc.fullName = obj.name and "
-                        + "obj.className = :className and doc.fullName <> :templateName and obj.id = idProp.id "
-                        + "and idProp.name = :idProp order by idProp.value, doc.fullName");
+                        + "obj.className = :className and doc.fullName <> :templateName and obj.id = idProp.id.id "
+                        + "and idProp.id.name = :idProp order by idProp.value, doc.fullName");
             verify(query).bindValue("className", "Space.XClass");
             verify(query).bindValue("templateName", "Space.XTemplate");
             verify(query).bindValue("idProp", fieldName);

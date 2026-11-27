@@ -134,11 +134,15 @@
     }).appendTo('head');
   }
 
+  #set ($sheetQueryString = $escapetool.url({
+    'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui',
+      "wiki:$xcontext.database").version.value
+  }))
   const css = [
     // Styles for the editor UI (tool bar, dialogs, etc.).
-    new XWiki.Document('EditSheet', 'CKEditor').getURL('ssx'),
+    new XWiki.Document('EditSheet', 'CKEditor').getURL('ssx', $jsontool.serialize($sheetQueryString)),
     // Custom styles for the edited content.
-    new XWiki.Document('ContentSheet', 'CKEditor').getURL('ssx'),
+    new XWiki.Document('ContentSheet', 'CKEditor').getURL('ssx', $jsontool.serialize($sheetQueryString)),
     $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-wysiwyg-webjar',
       'webjar.bundle.min.css')),
     $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',

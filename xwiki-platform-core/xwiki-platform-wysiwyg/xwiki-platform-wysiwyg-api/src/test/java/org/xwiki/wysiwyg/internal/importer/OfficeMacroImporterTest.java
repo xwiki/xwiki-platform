@@ -35,6 +35,7 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -119,7 +120,8 @@ class OfficeMacroImporterTest
 
         XDOM xdom = new XDOM(List.of());
 
-        assertEquals("[]", this.officeMacroImporter.render(xdom, "blocknote/1.0"));
+        assertEquals("[]", this.officeMacroImporter.render(xdom,
+            new Syntax(new SyntaxType("blocknote", "BlockNote"), "1.0")));
 
         // The office macro must run before the renderer sees the XDOM, otherwise its output is missing.
         verify(this.renderingContext).transformInContext(eq(this.macroTransformation),

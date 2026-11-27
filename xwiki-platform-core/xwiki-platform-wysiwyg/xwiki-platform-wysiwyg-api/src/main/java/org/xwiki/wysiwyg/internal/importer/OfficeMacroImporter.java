@@ -42,6 +42,7 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -137,19 +138,19 @@ public class OfficeMacroImporter
      * Renders the given XDOM to the specified syntax.
      * 
      * @param xdom the XDOM to be rendered
-     * @param outputSyntax the identifier of the syntax to render the given XDOM to
+     * @param outputSyntax the syntax to render the given XDOM to
      * @return the result of rendering the given XDOM to the specified syntax
      * @throws Exception if rendering fails, in particular if no renderer exists for the specified syntax
      * @since 19.0.0RC1
      */
-    public String render(XDOM xdom, String outputSyntax) throws Exception
+    public String render(XDOM xdom, Syntax outputSyntax) throws Exception
     {
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
         ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
 
         BlockRenderer renderer =
-            this.contextComponentManagerProvider.get().getInstance(BlockRenderer.class, outputSyntax);
+            this.contextComponentManagerProvider.get().getInstance(BlockRenderer.class, outputSyntax.toIdString());
         WikiPrinter printer = new DefaultWikiPrinter();
         renderer.render(xdom, printer);
 

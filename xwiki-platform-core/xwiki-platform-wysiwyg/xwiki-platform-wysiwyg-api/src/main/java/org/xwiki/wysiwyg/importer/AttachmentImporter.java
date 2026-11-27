@@ -23,10 +23,12 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to import existing attachments into the content of a WYSIWYG editor.
- * 
+ *
  * @version $Id$
  * @since 9.8
  */
@@ -34,12 +36,70 @@ import org.xwiki.model.reference.AttachmentReference;
 public interface AttachmentImporter
 {
     /**
+     * The import parameter holding the {@link Syntax} the attachment content is converted to.
+     *
+     * @since 19.0.0RC1
+     */
+    @Unstable
+    String OUTPUT_SYNTAX = "outputSyntax";
+
+    /**
      * Generates the HTML needed to import the specified attachment.
-     * 
+     *
      * @param attachmentReference specifies the attachment to import
      * @param parameters import parameters
      * @return the HTML to insert into the content of the WYSIWIYG editor
      * @throws Exception if importing the specified attachment fails
+     * @deprecated use {@link #importAttachment(AttachmentReference, Map)} instead
      */
+    @Deprecated(since = "19.0.0RC1")
     String toHTML(AttachmentReference attachmentReference, Map<String, Object> parameters) throws Exception;
+
+    /**
+     * Generates the content needed to import the specified attachment, in the syntax asked for by the
+     * {@link #OUTPUT_SYNTAX} parameter.
+     *
+     * @param attachmentReference specifies the attachment to import
+     * @param parameters import parameters; {@link #OUTPUT_SYNTAX} holds the {@link Syntax} to convert the attachment
+     *     content to, {@link Syntax#ANNOTATED_XHTML_1_0} by default
+     * @return the content to insert into the content of the WYSIWYG editor
+     * @throws Exception if importing the specified attachment fails
+     * @throws IllegalArgumentException if the {@link #OUTPUT_SYNTAX} parameter is not a {@link Syntax}
+     * @throws UnsupportedOperationException if this importer cannot produce the requested syntax
+     * @since 19.0.0RC1
+     */
+    @Unstable
+    default String importAttachment(AttachmentReference attachmentReference, Map<String, Object> parameters)
+        throws Exception
+    {
+        Syntax outputSyntax = getOutputSyntax(parameters);
+        if (Syntax.ANNOTATED_XHTML_1_0.equals(outputSyntax)) {
+            return toHTML(attachmentReference, parameters);
+        }
+        // The id, not Syntax#toString, which gives the display name rather than what a caller passes.
+        throw new UnsupportedOperationException(
+            String.format("This importer doesn't support the [%s] output syntax.", outputSyntax.toIdString()));
+    }
+
+    /**
+     * Reads the {@link #OUTPUT_SYNTAX} import parameter. Script callers can put anything in the parameters map, so an
+     * unusable value has to fail with a message that names the parameter rather than a {@link ClassCastException}.
+     *
+     * @param parameters the import parameters
+     * @return the syntax to convert the attachment content to, {@link Syntax#ANNOTATED_XHTML_1_0} when unset
+     * @throws IllegalArgumentException if the parameter is set to something that is not a {@link Syntax}
+     * @since 19.0.0RC1
+     */
+    @Unstable
+    static Syntax getOutputSyntax(Map<String, Object> parameters)
+    {
+        Object outputSyntax = parameters.get(OUTPUT_SYNTAX);
+        if (outputSyntax == null) {
+            return Syntax.ANNOTATED_XHTML_1_0;
+        } else if (outputSyntax instanceof Syntax syntax) {
+            return syntax;
+        }
+        throw new IllegalArgumentException(String.format("The [%s] import parameter must be a [%s] but was [%s].",
+            OUTPUT_SYNTAX, Syntax.class.getName(), outputSyntax.getClass().getName()));
+    }
 }

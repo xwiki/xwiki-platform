@@ -28,6 +28,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.bridge.event.WikiDeletingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.event.ComponentDescriptorEvent;
@@ -35,6 +36,7 @@ import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.authorization.event.RightUpdatedEvent;
 
@@ -66,8 +68,13 @@ public class AsyncRendererCacheListener extends AbstractEventListener
      */
     public static final String NAME = "org.xwiki.rendering.async.internal.AsyncRendererCacheListener";
 
+    private static final WikiDeletingEvent WIKI_DELETING = new WikiDeletingEvent();
+
     @Inject
     private AsyncRendererCache cache;
+
+    @Inject
+    private ObservationContext observationContext;
 
     /**
      * Default constructor.
@@ -85,7 +92,11 @@ public class AsyncRendererCacheListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof RightUpdatedEvent) {
-            this.cache.cleanCacheForRight();
+            // The rights of the users and entities of a wiki being deleted cannot be evaluated anymore (e.g. once its
+            // descriptor is deleted): the cache entries associated with that wiki are cleaned when it's deleted.
+            if (!this.observationContext.isIn(WIKI_DELETING)) {
+                this.cache.cleanCacheForRight();
+            }
         } else if (event instanceof ComponentDescriptorEvent componentEvent) {
             this.cache.cleanCache(componentEvent.getRoleType(), componentEvent.getRoleHint());
         } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {

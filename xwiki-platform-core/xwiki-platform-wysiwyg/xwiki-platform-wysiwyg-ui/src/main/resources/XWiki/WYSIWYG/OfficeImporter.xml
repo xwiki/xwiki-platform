@@ -48,7 +48,10 @@
   ## Core reads these two parameters with $xwiki.getAvailableRendererSyntax, so we read them the same way. The
   ## version is optional and the newest one wins, and a syntax with no renderer fails here instead of later.
   #set ($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
-  #if ("$!request.outputSyntax" != '' &amp;&amp; !$outputSyntax)
+  #if ("$!request.outputSyntax" == '' &amp;&amp; "$!request.outputSyntaxVersion" != '')
+    ## A version on its own resolves to nothing, so answer the caller rather than fall back to annotated XHTML.
+    $response.sendError(400, "The outputSyntaxVersion request parameter requires outputSyntax.")
+  #elseif ("$!request.outputSyntax" != '' &amp;&amp; !$outputSyntax)
     #set ($outputSyntaxId = "$request.outputSyntax")
     #if ("$!request.outputSyntaxVersion" != '')
       #set ($outputSyntaxId = "${outputSyntaxId}/${request.outputSyntaxVersion}")

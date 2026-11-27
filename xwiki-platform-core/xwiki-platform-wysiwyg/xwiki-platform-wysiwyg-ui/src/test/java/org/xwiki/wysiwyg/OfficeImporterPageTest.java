@@ -170,4 +170,20 @@ class OfficeImporterPageTest extends PageTest
         verify(this.wysiwygEditorScriptService, never())
             .importOfficeAttachment(any(AttachmentReference.class), any(Map.class));
     }
+
+    @Test
+    void importWithOutputSyntaxVersionOnlyFailsWithBadRequest() throws Exception
+    {
+        XWikiServletResponseStub response = spy(new XWikiServletResponseStub());
+        this.context.setResponse(response);
+        this.request.put("fileName", "my.doc");
+        this.request.put("outputSyntaxVersion", "1.0");
+
+        renderPage(OFFICE_IMPORTER);
+
+        // A version with no type resolves to nothing, which would silently import as annotated XHTML.
+        verify(response).sendError(eq(400), startsWith("The outputSyntaxVersion request parameter requires"));
+        verify(this.wysiwygEditorScriptService, never())
+            .importOfficeAttachment(any(AttachmentReference.class), any(Map.class));
+    }
 }

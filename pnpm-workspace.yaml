@@ -125,7 +125,7 @@ catalog:
   "@vitejs/plugin-react": 6.3.0
   "@vitejs/plugin-vue": 6.0.11
   "@vitest/eslint-plugin": 1.6.28
-  "@vue/compiler-dom": 3.5.45
+  "@vue/compiler-dom": 3.5.46
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.9.0
   "@vue/test-utils": 2.6.0
@@ -195,7 +195,7 @@ catalog:
   vite-plugin-dts: 4.5.4
   vitest: 5.1.0
   vitest-mock-extended: 6.0.1
-  vue: 3.5.45
+  vue: 3.5.46
   vue-eslint-parser: 10.4.2
   vue-i18n: 11.4.23
   vue-router: 5.3.1

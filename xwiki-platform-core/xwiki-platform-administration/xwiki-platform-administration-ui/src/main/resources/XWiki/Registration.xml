@@ -87,6 +87,9 @@
    * Each field may have:
    *   label - this String will be written above the field.
    *
+   *   skipLabelFor - If true, the label is not bound to an element with the field name as id. Use it when the field
+   *                  html has no such element.
+   *
    *   tag - the HTML tag which will be created, default is &lt;input&gt;, may also be a non form tag such as &lt;img&gt;
    *
    *   params - a Map, each key value pair will be in the html tag. eg: {"size" : "30"} becomes &lt;input size=30...
@@ -94,7 +97,8 @@
    *   validate a Map describing how to validate the field, validation is done in javascript then redone in velocity
    *   |        for security and because not everyone has javascript.
    *   |
-   *   +-mandatory (Optional) - Will fail if the field is not filled in.
+   *   +-mandatory (Optional) - Will fail if the field is not filled in. For an html field, it only marks the field as
+   *   |                        required: the field needs its own programmaticValidation to reject an empty value.
    *   | +-failureMessage (Required) - The message to display if the field is not filled in.
    *   | +-noscript (Optional) - will not be checked by javascript
    *   |
@@ -286,6 +290,8 @@
     ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
     ## mandatory test is misleading.
     ## Also, not filled back in if there is an error ('noReturn').
+    ## The mandatory validation only marks the field as required, the empty answer is rejected by the programmatic
+    ## validation.
     #set($field =
       {'name' : 'captcha_placeholder',
         'label' : $services.localization.render('core.captcha.label'),
@@ -294,6 +300,10 @@
         'html'  : "&lt;span class='xHint'&gt;$escapetool.xml($services.localization.render('core.captcha.instruction'))
           &lt;/span&gt; $!{services.captcha.default.display()}",
         'validate' : {
+          'mandatory' : {
+            'failureMessage' : $services.localization.render('core.validation.required.message'),
+            'noscript' : true
+          },
           'programmaticValidation' : {
             'code' : '#if (!$services.captcha.default.isValid())failed#end',
             'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong')

@@ -205,8 +205,8 @@ catalogs:
       specifier: 2.1.0
       version: 2.1.0
     npm-package-json-lint:
-      specifier: 11.0.1
-      version: 11.0.1
+      specifier: 11.1.0
+      version: 11.1.0
     npm-run-all:
       specifier: 4.1.5
       version: 4.1.5
@@ -889,7 +889,7 @@ importers:
         version: 17.14.0
       npm-package-json-lint:
         specifier: 'catalog:'
-        version: 11.0.1(supports-color@8.1.1)
+        version: 11.1.0(supports-color@8.1.1)
       publint:
         specifier: 'catalog:'
         version: 0.3.25
@@ -6982,6 +6982,10 @@ packages:
     resolution: {integrity: sha512-wCBiZ77u1tuWde6G/nfOtLaCTYcFDU5yCzARzK10y+rLhzYoL7a7yEemcopcc2Mzow7gZOIjnV2ym1NYmdiJOQ==}
     engines: {node: '>= 4'}
 
+  ignore@7.0.16:
+    resolution: {integrity: sha512-52N+Y4HRMOJmbLmr+DqO4iSRyyB7N52gm7PWCT6h0p978+oKbqHCB7gIJIwZvBUsjlSdWbrBFqUSmIFNZMpn0A==}
+    engines: {node: '>= 4'}
+
   import-lazy@4.0.0:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
     engines: {node: '>=8'}
@@ -7516,12 +7520,12 @@ packages:
     resolution: {integrity: sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==}
     engines: {node: 18 || 20 || >=22}
 
-  minimatch@11.0.2:
-    resolution: {integrity: sha512-pWTgz5CN3tjqyZNSK2tePlSmu9IwM41q8yn8Usdqqwe9TIHh+9dEpLLjF4uApsfPEAZY71qtSiA2B2APEr+1Yw==}
-    engines: {node: 18 || 20 || >=22}
-
   minimatch@11.0.8:
     resolution: {integrity: sha512-nFQuYSTVrGvysVBps5Ih+0BdnYFN/Cj3C816r6+p7yK+FHrVLGE4O4N9AFwykrlNlvM2HYt+Rad1Uiro6h88Ig==}
+    engines: {node: 20 || >=22}
+
+  minimatch@11.0.9:
+    resolution: {integrity: sha512-KCFkfyjqerNlSstjlhIGNXIKZGA/6O4V4RlhZ+Dsr621SPPw0mzlypE9D9ZOoPiVefHID+j7/XuMMlqfD/F60Q==}
     engines: {node: 20 || >=22}
 
   minimatch@3.1.5:
@@ -7594,8 +7598,8 @@ packages:
     resolution: {integrity: sha512-tdt4aFn9QamlhdN3HV2D2ccpBwO5/fyjjbXUxYA6uBjyekMZcZvDq0aSj9t5Jo+tih6AYFnt/cuIRn9013e0Uw==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  npm-package-json-lint@11.0.1:
-    resolution: {integrity: sha512-kC/I/qD8YzGdEhvM3DZoVCTOXvsrhsRZQLvjgtXss6OFtkMtGly1QGmtPpFnb1vByFAAU6qfyW0momdeg2wCtA==}
+  npm-package-json-lint@11.1.0:
+    resolution: {integrity: sha512-c8hGQJs+KhjkumuDhf/2NghjXCpClaL0fGIWLcCaaINCxHa8vxpVtVOxii1PwoN8FpiTBo1qC73UbxTRxEJvKQ==}
     engines: {node: '>=22.0.0', npm: '>=10.0.0'}
     hasBin: true
 
@@ -8475,6 +8479,10 @@ packages:
   type-fest@5.10.0:
     resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
     engines: {node: '>=20'}
+
+  type-fest@6.0.3:
+    resolution: {integrity: sha512-MOJXegkac3h+sWdVb6VY/ACclsa71z3BprNpedGV8ljIzYCo+LRWgyIkWhidKNoiNJOb6kUds1pNCyzQ2p6hJQ==}
+    engines: {node: '>=22'}
 
   typed-array-buffer@1.0.3:
     resolution: {integrity: sha512-nAYYwfY3qnzX30IkA6AQZjVbtK6duGontcQm1WSG1MD94YLqK0515GNApXkoxKOWMusVssAHWLh9SeaoefYFGw==}
@@ -11378,6 +11386,8 @@ snapshots:
 
   ignore@7.0.14: {}
 
+  ignore@7.0.16: {}
+
   import-lazy@4.0.0: {}
 
   imurmurhash@0.1.4: {}
@@ -12014,12 +12024,12 @@ snapshots:
     dependencies:
       brace-expansion: 5.0.12
 
-  minimatch@11.0.2:
+  minimatch@11.0.8:
     dependencies:
       '@isaacs/nonrecursive-glob-match': 1.1.0
       brace-expansion: 5.0.12
 
-  minimatch@11.0.8:
+  minimatch@11.0.9:
     dependencies:
       '@isaacs/nonrecursive-glob-match': 1.1.0
       brace-expansion: 5.0.12
@@ -12087,19 +12097,19 @@ snapshots:
 
   npm-normalize-package-bin@6.0.0: {}
 
-  npm-package-json-lint@11.0.1(supports-color@8.1.1):
+  npm-package-json-lint@11.1.0(supports-color@8.1.1):
     dependencies:
       chalk: 4.1.2
       cosmiconfig: 10.0.1
       debug: 4.4.3(supports-color@8.1.1)
       globby: 11.1.0
-      ignore: 7.0.14
+      ignore: 7.0.16
       jsonc-parser: 3.3.1
       meow: 9.0.0
-      minimatch: 11.0.2
-      semver: 7.8.5
+      minimatch: 11.0.9
+      semver: 7.8.6
       strip-json-comments: 3.1.1
-      type-fest: 5.10.0
+      type-fest: 6.0.3
       validate-npm-package-name: 8.0.0
     transitivePeerDependencies:
       - supports-color
@@ -13081,6 +13091,10 @@ snapshots:
   type-fest@0.8.1: {}
 
   type-fest@5.10.0:
+    dependencies:
+      tagged-tag: 1.0.0
+
+  type-fest@6.0.3:
     dependencies:
       tagged-tag: 1.0.0
 
